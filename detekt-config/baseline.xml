@@ -9,8 +9,8 @@
     <ID>EmptyClassBlock:RepoModule.kt$RepoModule</ID>
     <ID>FunctionOnlyReturningConstant:ApiModule.kt$ApiModule$@Provides @Singleton @ServerUrl fun serverUrl()</ID>
     <ID>FunctionOnlyReturningConstant:StatusBarConfigProvider.kt$StatusBarConfigProvider$fun drawUnderStatusBar(): Boolean</ID>
-    <ID>MaxLineLength:GeneralPmFactory.kt$com.nullgr.android.presentation.core.pm.factory.GeneralPmFactory>
-    <ID>MaxLineLength:PmProviderNotFoundException.kt$com.nullgr.android.presentation.core.pm.factory.PmProviderNotFoundException>
+    <ID>MaxLineLength:GeneralPmFactory.kt$com.nullgr.android.presentation.core.pm.factory.GeneralPmFactory></ID>
+    <ID>MaxLineLength:PmProviderNotFoundException.kt$com.nullgr.android.presentation.core.pm.factory.PmProviderNotFoundException></ID>
     <ID>TooManyFunctions:BaseMapFragment.kt$BaseMapFragment&lt;T&gt; : FragmentMapPmViewBackHandlerUiErrorHandlerStatusBarConfigProvider</ID>
     <ID>UnnecessaryAbstractClass:ActivityBuilder.kt$ActivityBuilder</ID>
     <ID>UnnecessaryAbstractClass:DataMappersModule.kt$DataMappersModule</ID>
