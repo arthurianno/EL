@@ -1,0 +1,102 @@
+{
+  "name": "RxPmFeature",
+  "description": "BASE_NAME - package of feature",
+  "directory": {
+    "listBaseElement": [
+      {
+        "listBaseElement": [
+          {
+            "templateName": "TemplatePm",
+            "extension": "kt",
+            "mapProperties": {},
+            "name": "${NAME}Pm",
+            "isEnabled": true,
+            "script": "",
+            "writeRules": "FROM_PARENT",
+            "CLASS_META_KEY": "File"
+          }
+        ],
+        "name": "pm",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      },
+      {
+        "listBaseElement": [
+          {
+            "templateName": "TemplatePmFragment",
+            "extension": "kt",
+            "mapProperties": {},
+            "name": "${NAME}Fragment",
+            "isEnabled": true,
+            "script": "",
+            "writeRules": "FROM_PARENT",
+            "CLASS_META_KEY": "File"
+          }
+        ],
+        "name": "ui",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      },
+      {
+        "listBaseElement": [
+          {
+            "templateName": "TemplatePmModule",
+            "extension": "kt",
+            "mapProperties": {},
+            "name": "${NAME}Module",
+            "isEnabled": true,
+            "script": "",
+            "writeRules": "FROM_PARENT",
+            "CLASS_META_KEY": "File"
+          }
+        ],
+        "name": "di",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      }
+    ],
+    "name": "${BASE_NAME}",
+    "isEnabled": true,
+    "script": "",
+    "writeRules": "OVERWRITE"
+  },
+  "mapGlobalVars": {},
+  "listGlobalVariable": [
+    {
+      "name": "BASE_NAME",
+      "isEnabled": true,
+      "script": "",
+      "value": "example"
+    },
+    {
+      "name": "NAME",
+      "isEnabled": true,
+      "script": "",
+      "value": "Example"
+    },
+    {
+      "name": "PM",
+      "isEnabled": true,
+      "script": "",
+      "value": "${NAME}Pm"
+    },
+    {
+      "name": "LayoutResId",
+      "isEnabled": true,
+      "script": "",
+      "value": "fragment_${LayoutResId}"
+    }
+  ],
+  "listTextInjection": [],
+  "skipRootDirectory": false,
+  "skipDefiningNames": false,
+  "shouldRegisterAction": true,
+  "shouldShowReport": true,
+  "fileTemplateSource": "DEFAULT_ONLY"
+}

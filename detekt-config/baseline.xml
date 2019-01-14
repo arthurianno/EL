@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <Blacklist timestamp="1528804241283"></Blacklist>
+  <Whitelist timestamp="1528804241283">
+    <ID>EmptyClassBlock:ActivityBuilder.kt$ActivityBuilder</ID>
+    <ID>EmptyClassBlock:Clicks.kt$Clicks</ID>
+    <ID>EmptyClassBlock:DataMappersModule.kt$DataMappersModule</ID>
+    <ID>EmptyClassBlock:Events.kt$Events</ID>
+    <ID>EmptyClassBlock:RepoModule.kt$RepoModule</ID>
+    <ID>FunctionOnlyReturningConstant:ApiModule.kt$ApiModule$@Provides @Singleton @ServerUrl fun serverUrl()</ID>
+    <ID>FunctionOnlyReturningConstant:StatusBarConfigProvider.kt$StatusBarConfigProvider$fun drawUnderStatusBar(): Boolean</ID>
+    <ID>MaxLineLength:GeneralPmFactory.kt$com.nullgr.android.presentation.core.pm.factory.GeneralPmFactory>
+    <ID>MaxLineLength:PmProviderNotFoundException.kt$com.nullgr.android.presentation.core.pm.factory.PmProviderNotFoundException>
+    <ID>TooManyFunctions:BaseMapFragment.kt$BaseMapFragment&lt;T&gt; : FragmentMapPmViewBackHandlerUiErrorHandlerStatusBarConfigProvider</ID>
+    <ID>UnnecessaryAbstractClass:ActivityBuilder.kt$ActivityBuilder</ID>
+    <ID>UnnecessaryAbstractClass:DataMappersModule.kt$DataMappersModule</ID>
+    <ID>UnnecessaryAbstractClass:DataSourceModule.kt$DataSourceModule</ID>
+    <ID>UnnecessaryAbstractClass:RepoModule.kt$RepoModule</ID>
+    <ID>UnnecessaryAbstractClass:PmModule.kt$ViewModelModule</ID>
+    <ID>UtilityClassWithPublicConstructor:ActivityBuilder.kt$ActivityBuilder</ID>
+    <ID>UtilityClassWithPublicConstructor:Clicks.kt$Clicks</ID>
+    <ID>UtilityClassWithPublicConstructor:DataMappersModule.kt$DataMappersModule</ID>
+    <ID>UtilityClassWithPublicConstructor:Events.kt$Events</ID>
+    <ID>UtilityClassWithPublicConstructor:RepoModule.kt$RepoModule</ID>
+  </Whitelist>
+</SmellBaseline>

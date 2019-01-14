@@ -1,0 +1,80 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+
+    def androidConfigurationVersion = rootProject.ext.androidVersions
+
+    compileSdkVersion androidConfigurationVersion.androidCompileSdkVersion
+    buildToolsVersion androidConfigurationVersion.androidBuildToolsVersion
+
+    defaultConfig {
+        minSdkVersion androidConfigurationVersion.androidMinSdkVersion
+        targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    dexOptions {
+        preDexLibraries = false
+        dexInProcess = false
+        javaMaxHeapSize "4g"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+        disable 'InvalidPackage'
+        disable 'OldTargetApi'
+    }
+    testOptions {
+        unitTests.all {
+            jvmArgs '-noverify'
+        }
+    }
+}
+
+configurations {
+    all {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        }
+    }
+    ktlint
+}
+
+dependencies {
+    def commonDependencies = rootProject.ext.commonDependencies
+    def commonTestDependencies = rootProject.ext.commonTestDependencies
+
+    ktlint commonDependencies.ktlint
+
+    implementation project(':common')
+
+    implementation commonDependencies.appCoreInteractor
+    implementation commonDependencies.supportCompatV7
+
+    implementation commonDependencies.rxKotlin
+
+    implementation commonDependencies.javaxAnnotation
+    implementation commonDependencies.javaxInject
+
+    // Dagger2
+    kapt commonDependencies.daggerCompiler
+    kapt commonDependencies.daggerAndroidProcessor
+    implementation commonDependencies.dagger
+    implementation commonDependencies.daggerAndroid
+    implementation commonDependencies.daggerAndroidSupport
+
+    implementation commonDependencies.timber
+
+    testImplementation commonTestDependencies.junit
+    testImplementation commonTestDependencies.mockito
+}

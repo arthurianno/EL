@@ -1,0 +1,250 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+// TODO: add it for real project
+//apply plugin: 'io.fabric'
+
+def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
+def CREDENTIALS_RELEASE = '../keystore/credentials-release.properties'
+
+def STORE_FILE = 'keystore.file'
+def STORE_PASSWORD = 'keystore.password'
+def KEY_ALIAS = 'key.alias'
+def KEY_PASSWORD = 'key.password'
+
+def GLOBAL_CONFIGURATION_PROPERTIES = "../configuration.properties"
+def GLOBAL_CONFIGURATION_APPLICATION_ID = "application.id"
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+android {
+
+    def globalConfigProperties = new Properties()
+    file(GLOBAL_CONFIGURATION_PROPERTIES).withInputStream {
+        globalConfigProperties.load(it)
+    }
+
+    def androidConfigurationVersion = rootProject.ext.androidVersions
+
+    compileSdkVersion androidConfigurationVersion.androidCompileSdkVersion
+    buildToolsVersion androidConfigurationVersion.androidBuildToolsVersion
+
+    defaultConfig {
+        applicationId globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
+        minSdkVersion androidConfigurationVersion.androidMinSdkVersion
+        targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
+
+        versionCode rootProject.ext.applicationVersionCode
+        versionName rootProject.ext.applicationVersionName
+
+        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+
+        def credentialsDebug = new Properties()
+        file(CREDENTIALS_DEBUG).withInputStream {
+            credentialsDebug.load(it)
+        }
+
+        debug {
+            storeFile file(credentialsDebug[STORE_FILE])
+            storePassword credentialsDebug[STORE_PASSWORD]
+            keyAlias credentialsDebug[KEY_ALIAS]
+            keyPassword credentialsDebug[KEY_PASSWORD]
+        }
+
+        release {
+            def credentialsRelease = new Properties()
+            def credentialsReleaseFile = file(CREDENTIALS_RELEASE)
+            if (credentialsReleaseFile.exists()) {
+                credentialsReleaseFile.withInputStream { credentialsRelease.load(it) }
+                println("credentials-release.properties is exist")
+            } else {
+                println("credentials-release.properties isn't exist - credentials-debug.properties will be used")
+                credentialsRelease = credentialsDebug
+            }
+
+            storeFile file(credentialsRelease[STORE_FILE])
+            storePassword credentialsRelease[STORE_PASSWORD]
+            keyAlias credentialsRelease[KEY_ALIAS]
+            keyPassword credentialsRelease[KEY_PASSWORD]
+        }
+    }
+
+    buildTypes {
+
+        // TODO: add it for real project
+        //all {
+        //    ext.betaDistributionReleaseNotesFilePath =
+        //            file('../CHANGELOG.md').absolutePath
+        //}
+
+        debug {
+            signingConfig signingConfigs.debug
+            buildConfigField "boolean", "IS_LOG_ENABLED", "true"
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles fileTree('proguard').asList().toArray()
+            buildConfigField "boolean", "IS_LOG_ENABLED", "false"
+        }
+    }
+
+    dexOptions {
+        preDexLibraries = false
+        dexInProcess = false
+        javaMaxHeapSize "4g"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+        disable 'InvalidPackage'
+        disable 'OldTargetApi'
+    }
+    testOptions {
+        unitTests.all {
+            jvmArgs '-noverify'
+        }
+    }
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+configurations {
+    all {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        }
+    }
+    ktlint
+}
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    def commonDependencies = rootProject.ext.commonDependencies
+    def commonTestDependencies = rootProject.ext.commonTestDependencies
+
+    ktlint commonDependencies.ktlint
+
+    implementation project(':common')
+    api project(':presentation')
+    api project(':data')
+
+    implementation commonDependencies.libs
+    implementation commonDependencies.appCore
+
+    implementation commonDependencies.supportAnnotations
+    implementation commonDependencies.supportV4
+    implementation commonDependencies.supportV13
+    implementation commonDependencies.supportCompatV7
+    implementation commonDependencies.supportRecyclerView
+    implementation commonDependencies.supportCardView
+    implementation commonDependencies.supportDesign
+    implementation commonDependencies.supportvectorDrawable
+    implementation commonDependencies.supportConstraint
+    implementation commonDependencies.supportCustomTabs
+    implementation commonDependencies.multiDex
+    implementation commonDependencies.materialDialogs
+
+    implementation commonDependencies.rxKotlin
+    implementation commonDependencies.rxAndroid
+    implementation commonDependencies.rxPm
+    implementation commonDependencies.rxBinding
+    implementation commonDependencies.rxNetwork
+    implementation commonDependencies.rxPermissions
+
+    implementation commonDependencies.javaxAnnotation
+    implementation commonDependencies.javaxInject
+
+    implementation commonDependencies.cicerone
+    implementation commonDependencies.pinView
+
+    implementation commonDependencies.expandableLayout
+    implementation commonDependencies.tooltipLibrary
+    implementation commonDependencies.barcodeScanner
+
+    // Dagger2
+    kapt commonDependencies.daggerCompiler
+    kapt commonDependencies.daggerAndroidProcessor
+    implementation commonDependencies.dagger
+    implementation commonDependencies.daggerAndroid
+    implementation commonDependencies.daggerAndroidSupport
+
+    implementation commonDependencies.timber
+    implementation commonDependencies.maps
+    implementation commonDependencies.inputMask
+    implementation (commonDependencies.glide) {
+        exclude group: "com.android.support"
+    }
+    kapt commonDependencies.glideProcessor
+
+    implementation commonDependencies.retrofit
+    implementation commonDependencies.retrofitConverter
+    implementation commonDependencies.retrofitAdapter
+    implementation commonDependencies.okHttp
+    implementation commonDependencies.okHttpLogger
+    implementation commonDependencies.gson
+    implementation(commonDependencies.crashlytics) {
+        transitive = true
+    }
+
+    implementation commonDependencies.firebaseCore
+    implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.exoPlayer
+    implementation commonDependencies.datePicker
+
+    testImplementation commonTestDependencies.junit
+    testImplementation commonTestDependencies.mockito
+}
+
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    main = "com.github.shyiko.ktlint.Main"
+    classpath = configurations.ktlint
+    args "src/**/*.kt"
+}
+check.dependsOn ktlint
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    main = "com.github.shyiko.ktlint.Main"
+    classpath = configurations.ktlint
+    args "-F", "src/**/*.kt"
+}
+
+detekt {
+    profile("main") {
+        input = "$project.projectDir/../app/src/main/java"
+        config = "$project.projectDir/../detekt-config/config.yml"
+        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+        baseline = "$project.projectDir/../detekt-config/baseline.xml"
+        parallel = true
+    }
+}
+// TODO: add it for real project
+//apply plugin: 'com.google.gms.google-services'
