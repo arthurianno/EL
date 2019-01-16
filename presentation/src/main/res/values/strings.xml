@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ELTA</string>
+    <string name="input_font_name">roboto_regular.ttf</string>
 </resources>

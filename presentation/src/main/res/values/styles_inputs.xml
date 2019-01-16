@@ -1,4 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--TODO in progress -->
+    <style name="InputStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textSize">@dimen/font_size_input_text</item>
+        <item name="met_baseColor">@color/color_input_not_active</item>
+        <item name="met_underlineColor">@color/color_input_not_active</item>
+        <item name="met_floatingLabel">none</item>
+        <item name="met_primaryColor">@color/color_input_base</item>
+        <item name="met_textColorHint">@color/color_input_hint_color</item>
+        <item name="met_errorColor">@color/color_input_error</item>
+        <item name="met_textColor">@color/color_input_text_color</item>
+        <item name="met_bottomTextSize">@dimen/font_size_input_error_text</item>
+        <item name="met_accentTypeface">@string/input_font_name</item>
+        <item name="met_typeface">@string/input_font_name</item>
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+    </style>
+
+    <style name="InputStyle.Text" parent="InputStyle">
+        <item name="android:inputType">text</item>
+    </style>
+
+    <style name="InputStyle.Digits" parent="InputStyle">
+        <item name="android:inputType">numberDecimal</item>
+    </style>
+
+    <style name="InputStyle.Password" parent="InputStyle">
+        <item name="android:inputType">textPassword</item>
+    </style>
+
+    <style name="InputStyle.Email" parent="InputStyle">
+        <item name="android:inputType">textEmailAddress</item>
+    </style>
 </resources>

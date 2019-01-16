@@ -68,4 +68,10 @@
     <color name="color_social_button_pressed">#d8d8d8</color>
 
     <!-- INPUT COLORS -->
+
+    <color name="color_input_base">@color/shade_black0</color>
+    <color name="color_input_text_color">@color/black_blue</color>
+    <color name="color_input_hint_color">@color/shade_black2</color>
+    <color name="color_input_error">@color/shade_red1</color>
+    <color name="color_input_not_active">@color/shade_black3</color>
 </resources>
