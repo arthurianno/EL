@@ -3,11 +3,12 @@ package com.nullgr.android.presentation.features.app.pm
 import com.nullgr.android.presentation.Screens
 import com.nullgr.android.presentation.core.pm.BasePm
 import com.nullgr.android.presentation.core.pm.ServiceFacade
+import com.nullgr.android.presentation.core.pm.listeners.ConnectionListener
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
     services: ServiceFacade
-) : BasePm(services) {
+) : BasePm(services), ConnectionListener {
 
     val coldStartAction = Action<Unit>()
 
