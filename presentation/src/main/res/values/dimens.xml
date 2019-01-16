@@ -31,4 +31,5 @@
     <dimen name="social_button_content_padding">9dp</dimen>
 
     <dimen name="padding_connection_status_text">4dp</dimen>
+    <dimen name="padding_toolbar_layout">16dp</dimen>
 </resources>
