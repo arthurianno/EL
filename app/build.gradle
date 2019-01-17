@@ -2,8 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-// TODO: add it for real project
-//apply plugin: 'io.fabric'
+apply plugin: 'io.fabric'
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
 def CREDENTIALS_RELEASE = '../keystore/credentials-release.properties'
@@ -246,5 +245,4 @@ detekt {
         parallel = true
     }
 }
-// TODO: add it for real project
-//apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.gms.google-services'
