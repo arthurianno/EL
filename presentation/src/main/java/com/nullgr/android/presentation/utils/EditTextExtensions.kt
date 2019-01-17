@@ -5,7 +5,6 @@ import android.widget.EditText
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.reactivex.functions.Consumer
 
-
 fun EditText.toggleSecure(): Boolean {
     transformationMethod = when (transformationMethod == null) {
         true -> PasswordTransformationMethod.getInstance()

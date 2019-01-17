@@ -276,3 +276,16 @@ task commitCodeStyle {
     }
     group 'version'
 }
+
+task commitReviewFixes {
+    doLast {
+        def addCommand = 'git add .'
+        def addProc = addCommand.execute([], rootDir)
+        addProc.waitFor()
+
+        def commitCommand = ["git", "commit", "-m", "[Review] Fix review comments"]
+        def commitProc = commitCommand.execute([], rootDir)
+        commitProc.waitFor()
+    }
+    group 'version'
+}

@@ -6,5 +6,5 @@
     <item name="itemsView" type="id" />
     <item name="containerView" type="id" />
     <item name="fadeAnimationTag" type="id" />
-    <item name="homeButton" type="id" />
+    <item name="homeButtonView" type="id" />
 </resources>

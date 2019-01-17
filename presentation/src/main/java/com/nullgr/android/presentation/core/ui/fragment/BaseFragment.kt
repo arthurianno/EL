@@ -39,7 +39,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
     private var errorStateView: StateView? = null
     private var emptyStateView: StateView? = null
     private var progressView: View? = null
-    private var homeButton: View? = null
+    private var homeButtonView: View? = null
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -54,7 +54,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView = view.findViewById<View>(R.id.errorStateView) as? StateView
         emptyStateView = view.findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = view.findViewById(R.id.progressView)
-        homeButton = view.findViewById(R.id.homeButton)
+        homeButtonView = view.findViewById(R.id.homeButtonView)
     }
 
     override fun onStart() {
@@ -69,7 +69,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButton?.clicks()?.bindTo(pm.backAction)
+        homeButtonView?.clicks()?.bindTo(pm.backAction)
     }
 
     override fun providePresentationModel(): T {

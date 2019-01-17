@@ -56,7 +56,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
     private var errorStateView: StateView? = null
     private var emptyStateView: StateView? = null
     private var progressView: View? = null
-    private var homeButton: View? = null
+    private var homeButtonView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -66,7 +66,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         errorStateView = findViewById<View>(R.id.errorStateView) as? StateView
         emptyStateView = findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = findViewById(R.id.progressView)
-        homeButton = findViewById(R.id.homeButton)
+        homeButtonView = findViewById(R.id.homeButtonView)
     }
 
     override fun onResumeFragments() {
@@ -89,7 +89,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButton?.clicks()?.bindTo(pm.backAction)
+        homeButtonView?.clicks()?.bindTo(pm.backAction)
     }
 
     override fun providePresentationModel(): T {
