@@ -46,7 +46,6 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
 }
 
 dependencies {
