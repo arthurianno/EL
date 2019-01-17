@@ -1,0 +1,46 @@
+image: ovitaliy/android_b28
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+  - .gradle/
+
+before_script:
+- export GRADLE_USER_HOME=$(pwd)/.gradle
+- chmod +x ./gradlew
+
+stages:
+- check
+- beta
+- rc
+
+complexCheck:
+  stage: check
+  script:
+  - ./gradlew detektCheck ktlint testDebugUnitTest
+  
+# For tag v0.0.0-beta
+beta:
+  stage: beta
+  only:
+    - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
+  when: on_success
+  script:
+    - ./gradlew clean build crashlyticsUploadDistributionDebug
+  artifacts:
+    expire_in: 1 week
+    paths:
+    - app/build/outputs/
+
+# For tag v0.0.0-rc
+rc:
+  stage: rc
+  only:
+  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
+  when: on_success
+  script:
+  - ./gradlew clean build crashlyticsUploadDistributionRelease
+  artifacts:
+    expire_in: 1 week
+    paths:
+    - app/build/outputs/
