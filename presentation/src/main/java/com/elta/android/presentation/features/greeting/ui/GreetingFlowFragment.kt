@@ -31,11 +31,6 @@ class GreetingFlowFragment : BaseFlowFragment<GreetingPm>() {
     }
 
     companion object {
-        fun newInstance(): GreetingFlowFragment {
-            return GreetingFlowFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
-        }
+        fun newInstance(): GreetingFlowFragment = GreetingFlowFragment()
     }
 }
