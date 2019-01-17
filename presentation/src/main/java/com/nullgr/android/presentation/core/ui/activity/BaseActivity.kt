@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.android.presentation.R
 import com.nullgr.android.presentation.core.navigation.BackHandler
@@ -55,6 +56,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
     private var errorStateView: StateView? = null
     private var emptyStateView: StateView? = null
     private var progressView: View? = null
+    private var homeButtonView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -64,6 +66,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         errorStateView = findViewById<View>(R.id.errorStateView) as? StateView
         emptyStateView = findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = findViewById(R.id.progressView)
+        homeButtonView = findViewById(R.id.homeButtonView)
     }
 
     override fun onResumeFragments() {
@@ -86,7 +89,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        // TODO: add shackbar binding
+        homeButtonView?.clicks()?.bindTo(pm.backAction)
     }
 
     override fun providePresentationModel(): T {

@@ -6,6 +6,7 @@ import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.android.presentation.R
 import com.nullgr.android.presentation.core.navigation.BackHandler
@@ -38,6 +39,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
     private var errorStateView: StateView? = null
     private var emptyStateView: StateView? = null
     private var progressView: View? = null
+    private var homeButtonView: View? = null
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -52,6 +54,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView = view.findViewById<View>(R.id.errorStateView) as? StateView
         emptyStateView = view.findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = view.findViewById(R.id.progressView)
+        homeButtonView = view.findViewById(R.id.homeButtonView)
     }
 
     override fun onStart() {
@@ -66,7 +69,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        // TODO: add shackbar binding
+        homeButtonView?.clicks()?.bindTo(pm.backAction)
     }
 
     override fun providePresentationModel(): T {

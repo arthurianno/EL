@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/connectionStatusExpandableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_duration="500"
+            app:el_expanded="true">
+
+            <FrameLayout
+                android:id="@+id/connectionStatusBackgroundView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                tools:background="@color/black">
+
+                <TextView
+                    android:id="@+id/connectionStatusTextView"
+                    style="@style/Typography.Base.Roboto.Regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@color/color_text_white"
+                    android:textSize="12sp"
+                    tools:text="Нет подключения" />
+            </FrameLayout>
+
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
+    </FrameLayout>
+</merge>

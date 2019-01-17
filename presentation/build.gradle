@@ -15,6 +15,7 @@ android {
         targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     dexOptions {
@@ -101,6 +102,7 @@ dependencies {
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
     implementation commonDependencies.barcodeScanner
+    implementation commonDependencies.materialEditText
 
     // Dagger2
     kapt commonDependencies.daggerCompiler

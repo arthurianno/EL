@@ -35,6 +35,7 @@ abstract class BasePm(
 
     val retryAction = Action<Unit>()
     val networkStateAction = Action<Boolean>()
+    val networkStateCommand = Command<Boolean>(bufferSize = 1)
 
     val errorControl = stateControl()
     val emptyControl = stateControl()
@@ -61,6 +62,11 @@ abstract class BasePm(
         }
 
         if (this is ConnectionListener) {
+            networkStateAction.observable
+                .doOnNext { networkStateCommand.consumer.accept(it) }
+                .subscribe()
+                .untilDestroy()
+
             networkControl.observable
                 .subscribe()
                 .untilDestroy()
