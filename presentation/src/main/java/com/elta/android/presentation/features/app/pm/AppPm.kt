@@ -16,7 +16,7 @@ class AppPm @Inject constructor(
         super.onCreate()
 
         coldStartAction.observable
-            .doOnNext { router.newRootScreen(Screens.OnBoardingFlow) }
+            .doOnNext { router.newRootScreen(Screens.RegistrationFlow) }
             .retry()
             .subscribe()
             .untilDestroy()
