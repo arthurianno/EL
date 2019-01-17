@@ -11,7 +11,7 @@ class NetworkControl(
     pm: BasePm
 ) {
     val observable: Observable<Boolean> = network.observeNetworkConnectivity()
-        .map { it.state() == NetworkInfo.State.CONNECTED}
+        .map { it.state() == NetworkInfo.State.CONNECTED }
         .publish { u ->
             Observable.merge(u.take(1).filter { !it }, u.skip(1))
         }

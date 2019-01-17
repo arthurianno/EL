@@ -15,12 +15,12 @@ object Screens {
         override fun getFragment(): Fragment = GreetingFlowFragment.newInstance()
     }
 
-    object RegistrationFlow: SupportAppScreen() {
+    object RegistrationFlow : SupportAppScreen() {
         // TODO: create real registration fragment here
         override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
     }
 
-    object AuthFlow: SupportAppScreen() {
+    object AuthFlow : SupportAppScreen() {
         // TODO: create real auth fragment here
         override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
     }

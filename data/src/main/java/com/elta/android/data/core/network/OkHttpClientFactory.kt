@@ -37,7 +37,6 @@ object OkHttpClientFactory {
                 connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
                 writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
-
             }
             .build()
 }
