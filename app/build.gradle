@@ -80,11 +80,10 @@ android {
 
     buildTypes {
 
-        // TODO: add it for real project
-        //all {
-        //    ext.betaDistributionReleaseNotesFilePath =
-        //            file('../CHANGELOG.md').absolutePath
-        //}
+        all {
+            ext.betaDistributionReleaseNotesFilePath =
+                    file('../CHANGELOG.md').absolutePath
+        }
 
         debug {
             signingConfig signingConfigs.debug
@@ -137,7 +136,6 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
 }
 androidExtensions {
     experimental = true
@@ -220,29 +218,4 @@ dependencies {
     testImplementation commonTestDependencies.mockito
 }
 
-
-task ktlint(type: JavaExec, group: "verification") {
-    description = "Check Kotlin code style."
-    main = "com.github.shyiko.ktlint.Main"
-    classpath = configurations.ktlint
-    args "src/**/*.kt"
-}
-check.dependsOn ktlint
-
-task ktlintFormat(type: JavaExec, group: "formatting") {
-    description = "Fix Kotlin code style deviations."
-    main = "com.github.shyiko.ktlint.Main"
-    classpath = configurations.ktlint
-    args "-F", "src/**/*.kt"
-}
-
-detekt {
-    profile("main") {
-        input = "$project.projectDir/../app/src/main/java"
-        config = "$project.projectDir/../detekt-config/config.yml"
-        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
-        baseline = "$project.projectDir/../detekt-config/baseline.xml"
-        parallel = true
-    }
-}
 apply plugin: 'com.google.gms.google-services'

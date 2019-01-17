@@ -4,6 +4,7 @@ import com.elta.android.presentation.core.pm.PmKey
 import com.elta.android.presentation.core.pm.factory.GeneralPmFactory
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.features.app.pm.AppPm
+import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import dagger.Binds
 import dagger.Module
@@ -25,4 +26,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(OnBoardingPm::class)
     abstract fun bindOnBoardingPm(pm: OnBoardingPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(GreetingPm::class)
+    abstract fun bindGreetingPm(pm: GreetingPm): PresentationModel
 }

@@ -3,4 +3,9 @@
     <string name="input_font_name">roboto_regular.ttf</string>
     <string name="title_connection_lost">Нет подключения</string>
     <string name="title_connection_found">Соединение восстановлено</string>
+
+    <string name="greeting_registration">Зарегистрироваться</string>
+    <string name="greeting_title">Добро пожаловать</string>
+    <string name="greeting_message">Управляйте диабетом вместе Сателлит\nOnline</string>
+    <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
 </resources>

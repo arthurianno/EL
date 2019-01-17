@@ -11,8 +11,11 @@ import com.elta.android.presentation.R
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.view_connection_status.view.*
 
-class ConnectionStatusView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-    : LinearLayout(context, attrs, defStyleAttr) {
+class ConnectionStatusView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val hideViewCallback = Runnable {
         connectionStatusExpandableLayout.collapse(true)
@@ -62,7 +65,7 @@ class ConnectionStatusView @JvmOverloads constructor(context: Context, attrs: At
     }
 
     companion object {
-        private const val HIDE_VIEW_DELAY = 3000L //millis
-        private const val COLOR_ANIMATION_DURATION = 700L //millis
+        private const val HIDE_VIEW_DELAY = 3000L // millis
+        private const val COLOR_ANIMATION_DURATION = 700L // millis
     }
 }
