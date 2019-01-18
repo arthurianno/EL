@@ -18,7 +18,7 @@ private const val ANIMATION_DURATION_MILLIS = 600L
 
 private const val FADING_OUT = 1
 private const val FADING_IN = 2
-private val FADING_TAG = R.id.fadeAnimationTag
+private val fadingTag = R.id.fadeAnimationTag
 
 fun ProgressBar.setProgressWithAnimation(to: Int, animate: Boolean) {
     when (animate) {
@@ -58,18 +58,18 @@ fun TextView.animateValue(value: Int, valueUnit: String? = null, animate: Boolea
 
 fun View.fadeVisibility(visibilityWhenFalse: Int = View.GONE): Consumer<in Boolean> = Consumer {
     if (it) {
-        if (visibility != View.VISIBLE && getTag(FADING_TAG) != FADING_OUT) {
+        if (visibility != View.VISIBLE && getTag(fadingTag) != FADING_OUT) {
             animate().cancel()
             visibility = View.VISIBLE
-            setTag(FADING_TAG, FADING_OUT)
+            setTag(fadingTag, FADING_OUT)
             animate()
                 .alpha(1f)
                 .start()
         }
     } else {
-        if (visibility == View.VISIBLE && getTag(FADING_TAG) != FADING_IN) {
+        if (visibility == View.VISIBLE && getTag(fadingTag) != FADING_IN) {
             animate().cancel()
-            setTag(FADING_TAG, FADING_IN)
+            setTag(fadingTag, FADING_IN)
             animate()
                 .alpha(0f)
                 .withEndAction {
