@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/layout_auth_toolbar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            tools:ignore="UselessParent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/padding_base">
+
+                <android.support.v7.widget.AppCompatTextView
+                    style="@style/Headline1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/registration_main_title_new_user" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    style="@style/Subtitle1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:text="@string/registration_main_subtitle" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp">
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/emailInputView"
+                        style="@style/InputStyle.Email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/registration_main_email_hint" />
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/emailErrorIconView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_warning" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp">
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/passwordInputView"
+                        style="@style/InputStyle.Password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/registration_main_password_hint" />
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/passwordVisibilityButtonView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginBottom="4dp"
+                        app:srcCompat="@drawable/ic_show_password" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <CheckBox
+                        android:id="@+id/policyConfirmationCheckBoxView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/policyDescriptionTextView"
+                        style="@style/Body1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:linksClickable="true"
+                        android:text="@string/registration_main_description_privacy_policy" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="32dp"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/facebookButtonView"
+                        style="@style/Button.Social"
+                        app:srcCompat="@drawable/ic_facebook" />
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/vkButtonView"
+                        style="@style/Button.Social"
+                        android:layout_marginStart="16dp"
+                        app:srcCompat="@drawable/ic_vk" />
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/okButtonView"
+                        style="@style/Button.Social"
+                        android:layout_marginStart="16dp"
+                        app:srcCompat="@drawable/ic_ok" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/continueButtonView"
+        style="@style/Button.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/registration_main_button_continue"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</LinearLayout>

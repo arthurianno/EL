@@ -16,6 +16,9 @@ open class FlowNavigator(
         nextFragment: Fragment?,
         fragmentTransaction: FragmentTransaction
     ) {
-        fragmentTransaction.setReorderingAllowed(true)
+        fragmentTransaction.apply {
+            setReorderingAllowed(true)
+            setCustomAnimations(R.animator.fade_in_animator, 0, 0, 0)
+        }
     }
 }

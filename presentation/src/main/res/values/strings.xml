@@ -8,4 +8,14 @@
     <string name="greeting_title">Добро пожаловать</string>
     <string name="greeting_message">Управляйте диабетом вместе Сателлит\nOnline</string>
     <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
+
+    <!--REGISTRATION FLOW -->
+    <string name="registration_main_toolbar_button_text">У вас уже есть аккаунт?</string>
+    <string name="registration_main_title_new_user">Новый пользователь</string>
+    <string name="registration_main_subtitle">Пожалуйста, введите email и пароль для вашего будущего аккаунта</string>
+    <string name="registration_main_email_hint">Ваш email</string>
+    <string name="registration_main_password_hint">Пароль</string>
+    <string name="registration_main_description_privacy_policy">Я согласен с условиями Политики конфиденциальности</string>
+    <string name="registration_main_privacy_policy_clickable_mask">Политики конфиденциальности</string>
+    <string name="registration_main_button_continue">Продолжить</string>
 </resources>
