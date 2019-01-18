@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.onboaring.pm;
+package com.elta.android.presentation.features.onboaring.pm
 
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade

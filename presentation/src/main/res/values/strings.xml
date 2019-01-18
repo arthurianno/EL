@@ -4,6 +4,11 @@
     <string name="title_connection_lost">Нет подключения</string>
     <string name="title_connection_found">Соединение восстановлено</string>
 
+    <string name="greeting_registration">Зарегистрироваться</string>
+    <string name="greeting_title">Добро пожаловать</string>
+    <string name="greeting_message">Управляйте диабетом вместе Сателлит\nOnline</string>
+    <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
+
     <!--REGISTRATION FLOW -->
     <string name="registration_main_toolbar_button_text">У вас уже есть аккаунт?</string>
     <string name="registration_main_title_new_user">Новый пользователь</string>

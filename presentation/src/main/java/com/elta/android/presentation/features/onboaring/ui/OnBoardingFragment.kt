@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.onboaring.ui;
+package com.elta.android.presentation.features.onboaring.ui
 
 import android.os.Bundle
 import com.elta.android.presentation.R
