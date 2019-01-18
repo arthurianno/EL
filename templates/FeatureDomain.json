@@ -1,0 +1,68 @@
+{
+  "name": "FeatureDomain",
+  "description": "Manual:\n1. Do foo\n2. Do bar",
+  "directory": {
+    "listBaseElement": [
+      {
+        "listBaseElement": [],
+        "name": "interactor",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      },
+      {
+        "listBaseElement": [],
+        "name": "model",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      },
+      {
+        "listBaseElement": [
+          {
+            "templateName": "TemplateDomainRepository",
+            "extension": "kt",
+            "mapProperties": {},
+            "name": "${NAME}Repository",
+            "isEnabled": true,
+            "script": "",
+            "writeRules": "FROM_PARENT",
+            "CLASS_META_KEY": "File"
+          }
+        ],
+        "name": "repository",
+        "isEnabled": true,
+        "script": "",
+        "writeRules": "FROM_PARENT",
+        "CLASS_META_KEY": "Directory"
+      }
+    ],
+    "name": "${BASE_NAME}",
+    "isEnabled": true,
+    "script": "",
+    "writeRules": "OVERWRITE"
+  },
+  "mapGlobalVars": {},
+  "listGlobalVariable": [
+    {
+      "name": "BASE_NAME",
+      "isEnabled": true,
+      "script": "",
+      "value": "example"
+    },
+    {
+      "name": "NAME",
+      "isEnabled": true,
+      "script": "",
+      "value": "Example"
+    }
+  ],
+  "listTextInjection": [],
+  "skipRootDirectory": false,
+  "skipDefiningNames": false,
+  "shouldRegisterAction": true,
+  "shouldShowReport": false,
+  "fileTemplateSource": "DEFAULT_ONLY"
+}
