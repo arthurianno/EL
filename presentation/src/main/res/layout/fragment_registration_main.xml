@@ -121,19 +121,19 @@
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/facebookButtonView"
                         style="@style/Button.Social"
-                        app:srcCompat="@drawable/ic_bg" />
+                        app:srcCompat="@drawable/ic_facebook" />
 
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/vkButtonView"
                         style="@style/Button.Social"
                         android:layout_marginStart="16dp"
-                        app:srcCompat="@drawable/ic_bg" />
+                        app:srcCompat="@drawable/ic_vk" />
 
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/okButtonView"
                         style="@style/Button.Social"
                         android:layout_marginStart="16dp"
-                        app:srcCompat="@drawable/ic_bg" />
+                        app:srcCompat="@drawable/ic_ok" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
