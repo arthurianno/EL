@@ -7,6 +7,7 @@ import com.elta.android.presentation.features.registration.flow.ui.RegistrationF
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
+@Suppress("ForbiddenComment")
 object Screens {
 
     object OnBoardingFlow : SupportAppScreen() {

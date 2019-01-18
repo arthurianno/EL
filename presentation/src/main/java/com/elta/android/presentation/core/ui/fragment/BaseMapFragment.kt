@@ -27,7 +27,7 @@ import me.dmdev.rxpm.map.MapPmView
 import me.dmdev.rxpm.map.delegate.MapPmSupportFragmentDelegate
 import javax.inject.Inject
 
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "ForbiddenComment")
 abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
     where T : BaseMapPm, T : MapPmExtension {
 
