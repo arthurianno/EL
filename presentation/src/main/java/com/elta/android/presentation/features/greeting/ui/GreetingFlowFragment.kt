@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.greeting.ui
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider

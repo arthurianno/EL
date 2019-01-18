@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.registration.main.ui;
+package com.elta.android.presentation.features.registration.main.ui
 
 import android.os.Bundle
 import android.view.View
