@@ -38,7 +38,7 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
 
     private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
         setImageResource(when (isSecure) {
-            true -> R.drawable.ic_show_password/.
+            true -> R.drawable.ic_show_password
             else -> R.drawable.ic_password_hide
         })
     }
