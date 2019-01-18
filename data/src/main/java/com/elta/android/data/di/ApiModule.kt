@@ -6,6 +6,5 @@ import dagger.Module
 @Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
 class ApiModule {
 
-    object ApiConfig {
-    }
+    object ApiConfig
 }
