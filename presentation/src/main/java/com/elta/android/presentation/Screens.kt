@@ -9,14 +9,6 @@ import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
 
-    object RegistrationFlow : SupportAppScreen() {
-        override fun getFragment() = RegistrationFlowFragment()
-    }
-
-    object RegistrationMain : SupportAppScreen() {
-        override fun getFragment() = RegistrationMainFragment.newInstance()
-    }
-
     object OnBoardingFlow : SupportAppScreen() {
         override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
     }
@@ -26,8 +18,11 @@ object Screens {
     }
 
     object RegistrationFlow : SupportAppScreen() {
-        // TODO: create real registration fragment here
-        override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
+        override fun getFragment() = RegistrationFlowFragment.newInstance()
+    }
+
+    object RegistrationMain : SupportAppScreen() {
+        override fun getFragment() = RegistrationMainFragment.newInstance()
     }
 
     object AuthFlow : SupportAppScreen() {

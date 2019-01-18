@@ -7,18 +7,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.elta.android.presentation.R
+import com.elta.android.presentation.core.navigation.BackHandler
+import com.elta.android.presentation.core.navigation.RouterProvider
+import com.elta.android.presentation.core.pm.BaseMapPm
+import com.elta.android.presentation.core.pm.factory.PmFactory
+import com.elta.android.presentation.core.pm.widgets.bind
+import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.jakewharton.rxbinding2.view.visibility
-import com.elta.android.presentation.R
-import com.elta.android.presentation.core.navigation.BackHandler
-import com.elta.android.presentation.core.navigation.RouterProvider
-import com.elta.android.presentation.core.ui.state_view.StateView
-import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.core.pm.BaseMapPm
-import com.elta.android.presentation.core.pm.factory.PmFactory
-import com.elta.android.presentation.core.pm.widgets.bind
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -136,8 +136,7 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
         return pm
     }
 
-    override fun handleBack(): Boolean {
-        passTo(presentationModel.backAction.consumer)
-        return true
+    override fun handleBack() {
+        router.exit()
     }
 }

@@ -51,10 +51,8 @@ abstract class BasePm(
     protected val flowRouter: FlowRouter? by lazy { router as? FlowRouter }
 
     private val networkControl by lazy { networkControl(network) }
-    private val backActionDefault = Action<Unit>()
 
     open val isEmptyScreen: Boolean = false
-    open val backAction: Action<Unit> = backActionDefault
 
     override fun onCreate() {
         super.onCreate()
@@ -73,13 +71,6 @@ abstract class BasePm(
                 .subscribe()
                 .untilDestroy()
         }
-
-        backActionDefault.observable
-            .subscribe {
-                hideKeyBoardCommand.consumer.accept(Unit)
-                router.exit()
-            }
-            .untilDestroy()
     }
 
     internal fun showSnackBar(data: SnackBarData) {

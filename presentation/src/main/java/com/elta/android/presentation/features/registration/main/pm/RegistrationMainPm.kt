@@ -8,19 +8,7 @@ class RegistrationMainPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    override val backAction = Action<Unit>()
-
     override fun onCreate() {
         super.onCreate()
-
-        // TODO discuss
-        backAction.observable
-            .doOnNext { ::handleBack }
-            .subscribe()
-            .untilDestroy()
-    }
-
-    private fun handleBack() {
-        flowRouter?.finishFlow()
     }
 }
