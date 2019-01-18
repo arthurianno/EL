@@ -4,7 +4,6 @@ import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
-import com.elta.android.presentation.features.registration.main.di.RegistrationMainModule
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -26,6 +25,6 @@ abstract class FragmentBuilder {
     abstract fun bindRegistrationFlowFragment(): RegistrationFlowFragment
 
     @FragmentScope
-    @ContributesAndroidInjector(modules = [RegistrationMainModule::class])
+    @ContributesAndroidInjector
     abstract fun bindRegistrationMainFragment(): RegistrationMainFragment
 }

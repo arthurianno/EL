@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.registration.main.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -20,10 +21,6 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
     override val classToken: Class<RegistrationMainPm> = RegistrationMainPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    companion object {
-        fun newInstance() = RegistrationMainFragment()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         menuButtonView.setText(R.string.registration_main_toolbar_button_text)
@@ -35,10 +32,18 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
             getString(R.string.registration_main_privacy_policy_clickable_mask)
         ).bindTo { router.navigateTo(Screens.OnBoardingFlow) } // TODO bind to Pm command
         passwordVisibilityButtonView.clicks().bindTo {
-            when (passwordInputView.toggleSecure()) {
-                true -> passwordVisibilityButtonView.setImageResource(R.drawable.ic_show_password)
-                else -> passwordVisibilityButtonView.setImageResource(R.drawable.ic_password_hide)
-            }
+            passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
         }
+    }
+
+    private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
+        setImageResource(when (isSecure) {
+            true -> R.drawable.ic_show_password/.
+            else -> R.drawable.ic_password_hide
+        })
+    }
+
+    companion object {
+        fun newInstance() = RegistrationMainFragment()
     }
 }
