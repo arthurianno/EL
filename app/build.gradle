@@ -153,6 +153,7 @@ dependencies {
 
     implementation commonDependencies.libs
     implementation commonDependencies.appCore
+    implementation commonDependencies.appCoreSecurity
 
     implementation commonDependencies.supportAnnotations
     implementation commonDependencies.supportV4
