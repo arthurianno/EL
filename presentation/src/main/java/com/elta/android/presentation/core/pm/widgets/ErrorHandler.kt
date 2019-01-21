@@ -2,6 +2,7 @@ package com.elta.android.presentation.core.pm.widgets
 
 import com.elta.android.presentation.core.pm.BasePm
 
+@Suppress("EmptyWhenBlock")
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {

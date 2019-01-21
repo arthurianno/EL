@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.greeting.pm
 
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import javax.inject.Inject
@@ -17,11 +16,11 @@ class GreetingPm @Inject constructor(
         super.onCreate()
 
         menuAction.observable
-            .subscribe { (router as? FlowRouter)?.startFlow(Screens.AuthFlow) }
+            .subscribe { router.navigateTo(Screens.AuthFlow) }
             .untilDestroy()
 
         registrationAction.observable
-            .subscribe { (router as? FlowRouter)?.startFlow(Screens.RegistrationFlow) }
+            .subscribe { router.navigateTo(Screens.RegistrationFlow) }
             .untilDestroy()
     }
 }

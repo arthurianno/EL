@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.view.visibility
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FixedNavigator
@@ -15,6 +13,8 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.state_view.StateView
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -80,8 +80,10 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
     }
 
     override fun onBackPressed() {
-        if (currentFragment?.handleBack() == false) {
-            passTo(presentationModel.backAction)
+        if (currentFragment != null && supportFragmentManager.backStackEntryCount > 0) {
+            currentFragment?.handleBack()
+        } else {
+            handleBack()
         }
     }
 
@@ -89,7 +91,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.bindTo(pm.backAction)
+        homeButtonView?.clicks()?.bindTo { onBackPressed() }
     }
 
     override fun providePresentationModel(): T {
@@ -100,8 +102,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentInjector
 
-    override fun handleBack(): Boolean {
-        passTo(presentationModel.backAction.consumer)
-        return true
+    override fun handleBack() {
+        router.exit()
     }
 }
