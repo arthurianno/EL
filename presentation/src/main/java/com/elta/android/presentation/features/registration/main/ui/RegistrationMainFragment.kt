@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
+import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.utils.clickableSpan
 import com.elta.android.presentation.utils.toggleSecure
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.fragment_registration_main.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
 
@@ -30,7 +31,7 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
         super.onBindPresentationModel(pm)
         policyDescriptionTextView.clickableSpan(
             getString(R.string.registration_main_privacy_policy_clickable_mask)
-        ).bindTo { router.navigateTo(Screens.OnBoardingFlow) } // TODO bind to Pm command
+        ).bindTo { childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance()) }
         passwordVisibilityButtonView.clicks().bindTo {
             passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
         }

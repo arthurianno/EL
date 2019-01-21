@@ -3,12 +3,16 @@ package com.elta.android.presentation.core.ui.fragment
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.BottomSheetDialog
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+
 
 abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() {
 
@@ -30,7 +34,15 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         bottomSheetAnimationStyleRes?.let {
-            dialog.window.attributes.windowAnimations = it
+            dialog.window?.attributes?.windowAnimations = it
+        }
+        dialog.setOnShowListener { innerDialog ->
+            val bottomSheet = (innerDialog as? BottomSheetDialog)?.findViewById(
+                android.support.design.R.id.design_bottom_sheet
+            ) as? FrameLayout?
+            bottomSheet?.let {
+                BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
         return dialog
     }

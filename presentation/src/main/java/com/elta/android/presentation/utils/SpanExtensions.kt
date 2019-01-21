@@ -1,5 +1,6 @@
 package com.elta.android.presentation.utils
 
+import android.text.Html
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
@@ -24,3 +25,9 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
         }
     }
 }
+
+var TextView.htmlText: CharSequence?
+    get() = text
+    set(value) {
+        text = Html.fromHtml(value.toString())
+    }
