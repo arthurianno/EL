@@ -8,6 +8,7 @@ import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
+import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -43,4 +44,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(GreetingPm::class)
     abstract fun bindGreetingPm(pm: GreetingPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(RegistrationPrivacyPolicyPm::class)
+    abstract fun bindRegistrationPrivacyPolicyPm(pm: RegistrationPrivacyPolicyPm): PresentationModel
 }
