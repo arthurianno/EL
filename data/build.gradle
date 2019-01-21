@@ -60,6 +60,7 @@ dependencies {
 
     implementation commonDependencies.appCoreRx
     implementation commonDependencies.appCoreSecurity
+    implementation commonDependencies.appCoreHardware
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxNetwork
