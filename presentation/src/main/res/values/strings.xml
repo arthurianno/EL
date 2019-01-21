@@ -18,4 +18,7 @@
     <string name="registration_main_description_privacy_policy">Я согласен с условиями Политики конфиденциальности</string>
     <string name="registration_main_privacy_policy_clickable_mask">Политики конфиденциальности</string>
     <string name="registration_main_button_continue">Продолжить</string>
+    <string name="registration_activate_title">Активируйте ваш профиль</string>
+    <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
+    <string name="registration_send_again">Отправить письмо повторно</string>
 </resources>

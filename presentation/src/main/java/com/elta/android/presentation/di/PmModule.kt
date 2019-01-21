@@ -6,6 +6,7 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
 import dagger.Binds
@@ -43,4 +44,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(GreetingPm::class)
     abstract fun bindGreetingPm(pm: GreetingPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ActivationPm::class)
+    abstract fun bindActivationPm(pm: ActivationPm): PresentationModel
 }
