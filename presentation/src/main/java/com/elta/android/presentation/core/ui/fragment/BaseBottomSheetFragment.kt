@@ -13,7 +13,6 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-
 abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() {
 
     @Inject
