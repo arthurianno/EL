@@ -64,6 +64,6 @@ class AppModule(private val enableLog: Boolean) {
 
     @Provides
     @Singleton
-    fun provideCryptoPreferences(context: Context) : CryptoPreferences =
+    fun provideCryptoPreferences(context: Context): CryptoPreferences =
         CryptoPreferences(context, context.getString(R.string.crypto_key_alias))
 }
