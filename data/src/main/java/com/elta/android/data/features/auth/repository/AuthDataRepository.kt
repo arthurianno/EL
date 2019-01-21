@@ -36,5 +36,4 @@ class AuthDataRepository @Inject constructor(
         source.isEmailConfirmed()
             .andThen(Single.just(true))
             .onErrorReturn { false }
-
 }
