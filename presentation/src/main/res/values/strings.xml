@@ -62,4 +62,5 @@
         ]]>
     </string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
+    <string name="registration_error_input_email">Некорректный email</string>
 </resources>

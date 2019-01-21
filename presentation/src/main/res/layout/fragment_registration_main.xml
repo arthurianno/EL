@@ -59,8 +59,8 @@
                         android:id="@+id/emailErrorIconView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_marginBottom="4dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="4dp"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_warning" />
                 </FrameLayout>

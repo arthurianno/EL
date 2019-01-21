@@ -12,6 +12,7 @@
         <item name="met_bottomTextSize">@dimen/font_size_input_error_text</item>
         <item name="met_accentTypeface">@string/input_font_name</item>
         <item name="met_typeface">@string/input_font_name</item>
+        <item name="met_autoValidate">true</item>
         <item name="android:textCursorDrawable">@drawable/cursor</item>
     </style>
 

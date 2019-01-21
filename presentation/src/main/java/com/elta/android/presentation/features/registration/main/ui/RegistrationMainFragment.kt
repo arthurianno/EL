@@ -10,6 +10,8 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.utils.clickableSpan
+import com.elta.android.presentation.utils.error
+import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.fragments.showDialog
@@ -29,12 +31,19 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
 
     override fun onBindPresentationModel(pm: RegistrationMainPm) {
         super.onBindPresentationModel(pm)
-        policyDescriptionTextView.clickableSpan(
-            getString(R.string.registration_main_privacy_policy_clickable_mask)
-        ).bindTo { childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance()) }
+        policyDescriptionTextView
+            .clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
+            .bindTo(pm.privacyPolicyClickAction)
+        pm.openPrivacyPolicyCommand.bindTo {
+            childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
+        }
         passwordVisibilityButtonView.clicks().bindTo {
             passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
         }
+
+        pm.emailInput.bindTo(emailInputView)
+        pm.emailInput.error.observable.bindTo(emailInputView.error())
+        pm.emailInput.error.observable.map(String::isNotEmpty).distinctUntilChanged().bindTo(emailErrorIconView.fadeVisibility())
     }
 
     private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
