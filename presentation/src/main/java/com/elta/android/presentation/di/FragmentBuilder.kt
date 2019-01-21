@@ -3,6 +3,7 @@ package com.elta.android.presentation.di
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
@@ -32,4 +33,8 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRegistrationPrivacyPolicyFragment(): RegistrationPrivacyPolicyFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindActivationFragment(): ActivationFragment
 }

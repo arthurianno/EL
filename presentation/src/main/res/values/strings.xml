@@ -62,4 +62,7 @@
         ]]>
     </string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
+    <string name="registration_activate_title">Активируйте ваш профиль</string>
+    <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
+    <string name="registration_send_again">Отправить письмо повторно</string>
 </resources>

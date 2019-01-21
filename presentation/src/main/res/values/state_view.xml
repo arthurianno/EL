@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="layout_state" type="layout" />
-    <item name="stateIconView" type="id" />
-    <item name="stateTitleView" type="id" />
-    <item name="stateDescriptionView" type="id" />
-    <item name="stateButtonView" type="id" />
-
     <declare-styleable name="StateWidget">
         <attr name="state_icon" format="reference" />
         <attr name="state_title" format="reference|string" />
@@ -13,5 +7,4 @@
         <attr name="state_button" format="reference|string" />
         <attr name="android:background" format="reference|color" />
     </declare-styleable>
-
 </resources>
