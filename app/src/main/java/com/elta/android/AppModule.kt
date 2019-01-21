@@ -16,6 +16,7 @@ import com.nullgr.core.rx.SingletonRxBusProvider
 import com.nullgr.core.rx.schedulers.ComputationSchedulersFacade
 import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
+import com.nullgr.core.security.prefs.CryptoPreferences
 import dagger.Module
 import dagger.Provides
 import timber.log.Timber
@@ -60,4 +61,9 @@ class AppModule(private val enableLog: Boolean) {
     @Provides
     @Singleton
     fun provideLogTree(): Timber.Tree = if (enableLog) Timber.DebugTree() else ReleaseTree()
+
+    @Provides
+    @Singleton
+    fun provideCryptoPreferences(context: Context): CryptoPreferences =
+        CryptoPreferences(context, context.getString(R.string.crypto_key_alias))
 }

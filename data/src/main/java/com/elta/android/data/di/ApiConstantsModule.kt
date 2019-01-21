@@ -16,7 +16,7 @@ class ApiConstantsModule(private val isDebugMode: Boolean) {
     }
 
     private companion object {
-        const val SERVER_URL_PROD = "https://www.google.com/"
-        const val SERVER_URL_TEST = "https://www.google.com/"
+        const val SERVER_URL_PROD = "https://elta-test.nullgr.com"
+        const val SERVER_URL_TEST = "https://elta-test.nullgr.com"
     }
 }
