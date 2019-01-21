@@ -12,15 +12,15 @@ import retrofit2.http.POST
 
 interface AuthApi {
 
-    @POST("api/v1/auth/accounts")
+    @POST("api/v1/accounts")
     fun register(@Body request: AuthRequest): Single<TokensDto>
 
-    @POST("api/v1/auth/accounts/login")
+    @POST("api/v1/accounts/login")
     fun login(@Body request: AuthRequest): Single<LoginDto>
 
-    @POST("api/v1/auth/accounts/refresh")
+    @POST("api/v1/accounts/refresh")
     fun refresh(@Body request: RefreshRequest): Single<TokensDto>
 
-    @GET("api/v1/auth/accounts/emailcomfirmed")
+    @GET("api/v1/accounts/email/confirmed")
     fun checkEmail(): Completable
 }
