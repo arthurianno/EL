@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.elta.android.presentation.R
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
-import com.elta.android.presentation.R
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 
@@ -19,10 +21,10 @@ class StateWidget @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), StateView {
 
-    private val iconView: ImageView
-    private val titleView: TextView
-    private val descriptionView: TextView
-    private val buttonView: TextView
+    private val iconView: ImageView?
+    private val titleView: TextView?
+    private val descriptionView: TextView?
+    private val buttonView: TextView?
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_state, this, true)
@@ -42,9 +44,15 @@ class StateWidget @JvmOverloads constructor(
 
             icon?.let { iconView.setImageDrawable(it) }
 
-            titleView.text = title
-            descriptionView.text = description
-            buttonView.text = button
+            titleView?.text = title
+            descriptionView?.text = description
+
+            if (!button.isNullOrEmpty()) {
+                buttonView?.show()
+                buttonView?.text = button
+            } else {
+                buttonView?.hide()
+            }
 
             bg?.let { background = it }
 
@@ -54,17 +62,17 @@ class StateWidget @JvmOverloads constructor(
 
     override fun state(): Consumer<in StateData> = Consumer { data ->
         with(data) {
-            icon?.let { iconView.setImageResource(it) }
-            titleView.text = title
-            descriptionView.text = description
-            buttonView.text = button
+            icon?.let { iconView?.setImageResource(it) }
+            titleView?.text = title
+            descriptionView?.text = description
+            buttonView?.text = button
         }
     }
 
-    override fun clicks(): Observable<Unit> = buttonView.clicks()
+    override fun clicks(): Observable<Unit> = buttonView?.clicks() ?: Observable.empty()
 
     override fun enable(): Consumer<in Boolean> = Consumer { enable ->
-        buttonView.isEnabled = enable
+        buttonView?.isEnabled = enable
     }
 
     override fun visibility(): Consumer<in Boolean> = this.visibility(View.GONE)
