@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.snakbars
+package com.elta.android.presentation.utils
 
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
@@ -23,7 +23,7 @@ fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {
 
 fun Snackbar.applySnackbarHeight(): Snackbar {
     with(view) {
-       layoutParams?.height = view.resources.getDimensionPixelSize(R.dimen.large_button_height)
+        layoutParams?.height = view.resources.getDimensionPixelSize(R.dimen.large_button_height)
     }
     return this
 }

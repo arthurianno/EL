@@ -14,12 +14,16 @@ class ErrorHandler(private val pm: BasePm) {
         // TODO logic of error processing should be improved
         when (error) {
             is EmailAlreadyRegisteredError -> {
-                pm.passToErrorContainer(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                pm.passToErrorContainer(
+                    States.SimpleError(icon = R.drawable.ic_warning, description = error.message)
+                )
                 pm.passToErrorViewVisibility(true)
             }
             is NetworkConnectionError -> {
             } // TODO logic of Network exception should be improved
-            else -> pm.showSnackBar(SnackbarMessageData.SimpleTextMessage(pm.resources.getString(R.string.error_test_error)))
+            else -> pm.showSnackBar(
+                SnackbarMessageData.SimpleTextMessage(pm.resources.getString(R.string.error_test_error))
+            )
 //            is UnauthorizedException -> pm.router.newRootScreen(Screens.SCREEN_AUTH_LOGOUT, false)
 //            else -> {
 //                val errorData = when (error) {

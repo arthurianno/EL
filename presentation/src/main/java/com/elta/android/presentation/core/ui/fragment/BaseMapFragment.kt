@@ -16,7 +16,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.widgets.snakbars.makeSnackBar
+import com.elta.android.presentation.utils.makeSnackBar
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer

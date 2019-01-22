@@ -14,7 +14,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
-import com.elta.android.presentation.widgets.snakbars.makeSnackBar
+import com.elta.android.presentation.utils.makeSnackBar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import dagger.android.AndroidInjection
