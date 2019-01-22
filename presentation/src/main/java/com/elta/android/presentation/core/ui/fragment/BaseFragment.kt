@@ -14,6 +14,7 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
@@ -32,6 +33,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider
 
+    open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
         ((parentFragment ?: activity) as RouterProvider).router
     }

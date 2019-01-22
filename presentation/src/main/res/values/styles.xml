@@ -18,4 +18,11 @@
 
     <style name="TooltipStyle"></style>
 
+    <style name="AppProgressBar" parent="Base.Widget.AppCompat.ProgressBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:indeterminateTint">@color/colorPrimary</item>
+        <item name="android:indeterminate">true</item>
+    </style>
 </resources>
