@@ -17,7 +17,10 @@ fun EditText.toggleSecure(): Boolean {
 fun EditText.isSecure(): Boolean = transformationMethod != null
 
 fun MaterialEditText.error(): Consumer<String> = Consumer {
-    error = it
+    error = when (it.isEmpty()) {
+        true -> null
+        else -> it
+    }
 }
 
 fun MaterialEditText.clearError() {

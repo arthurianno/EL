@@ -47,7 +47,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp">
-
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/emailInputView"
                         style="@style/InputStyle.Email"
@@ -59,8 +58,8 @@
                         android:id="@+id/emailErrorIconView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_marginBottom="4dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="4dp"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_warning" />
                 </FrameLayout>
@@ -68,23 +67,30 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dp">
+                    android:layout_marginBottom="8dp">
 
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/passwordInputView"
                         style="@style/InputStyle.Password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/registration_main_password_hint" />
+                        android:hint="@string/registration_main_password_hint"
+                        app:met_helperText="@string/registration_password_pattern" />
 
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/passwordVisibilityButtonView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_marginBottom="4dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="4dp"
                         app:srcCompat="@drawable/ic_show_password" />
                 </FrameLayout>
+
+                <com.elta.android.presentation.widgets.SimpleErrorView
+                    android:id="@+id/errorStateView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -143,6 +149,7 @@
         style="@style/Button.Large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:text="@string/registration_main_button_continue"
         app:layout_constraintBottom_toBottomOf="parent" />
 </LinearLayout>
