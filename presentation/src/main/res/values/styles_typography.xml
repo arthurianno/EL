@@ -124,4 +124,8 @@
     <style name="Typography.Button.Small.Text.Light" parent="Typography.Button.Small.Text">
         <item name="android:textColor">@color/button_small_light_text_color</item>
     </style>
+
+    <style name="Typography.Body1.BackendError" parent="Typography.Body1">
+        <item name="android:textColor">@color/color_backend_error</item>
+    </style>
 </resources>

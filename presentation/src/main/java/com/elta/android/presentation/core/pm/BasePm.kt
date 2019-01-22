@@ -96,6 +96,12 @@ abstract class BasePm(
     protected inline fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
+    protected inline fun <T> Single<T>.hideErrorContainer(): Single<T> =
+        this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
+
+    protected inline fun Completable.hideErrorContainer(): Completable =
+        this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
+
     protected inline fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
         this.skipWhileInProgress(progressState.observable)
 

@@ -18,6 +18,8 @@
 
     <style name="ToolbarTextButton" parent="Typography.Toolbar.Button.Primary" />
 
+    <style name="BackendError" parent="Typography.Body1.BackendError"/>
+
     <style name="ConnectionStateText" parent="Typography.Base.Roboto.Regular">
         <item name="android:textColor">@color/color_connection_status_text</item>
         <item name="android:textSize">@dimen/font_size_connection_status</item>

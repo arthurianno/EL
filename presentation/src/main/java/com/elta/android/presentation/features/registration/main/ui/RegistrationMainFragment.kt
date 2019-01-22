@@ -14,6 +14,7 @@ import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.fragment_registration_main.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
@@ -42,8 +43,17 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
         }
 
         pm.emailInput.bindTo(emailInputView)
-        pm.emailInput.error.observable.bindTo(emailInputView.error())
+        pm.emailInput.error.observable.distinctUntilChanged().bindTo(emailInputView.error())
         pm.emailInput.error.observable.map(String::isNotEmpty).distinctUntilChanged().bindTo(emailErrorIconView.fadeVisibility())
+
+        pm.passwordInput.bindTo(passwordInputView)
+        pm.passwordInput.error.observable.distinctUntilChanged().bindTo(passwordInputView.error())
+
+        policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
+
+        pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
+        continueButtonView.clicks().bindTo(pm.continueAction)
+        menuButtonView.clicks().bindTo(pm.userHasAccountAction)
     }
 
     private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
