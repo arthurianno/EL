@@ -44,8 +44,13 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
         }
 
         pm.emailInput.bindTo(emailInputView)
-        pm.emailInput.error.observable.distinctUntilChanged().bindTo(emailInputView.error())
-        pm.emailInput.error.observable.map(String::isNotEmpty).distinctUntilChanged().bindTo(emailErrorIconView.fadeVisibility())
+        pm.emailInput.error.observable
+            .distinctUntilChanged()
+            .bindTo(emailInputView.error())
+        pm.emailInput.error.observable
+            .map(String::isNotEmpty)
+            .distinctUntilChanged()
+            .bindTo(emailErrorIconView.fadeVisibility())
 
         pm.passwordInput.bindTo(passwordInputView)
         pm.passwordInput.error.observable.distinctUntilChanged().bindTo(passwordInputView.error())
