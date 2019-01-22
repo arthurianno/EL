@@ -79,4 +79,8 @@
     <!-- CONNECTION STATUS VIEW COLORS -->
     <color name="color_background_disconnected">@color/black</color>
     <color name="color_background_connected">@color/shade_g_green_a</color>
+
+    <!-- ERROR VIEW COLORS -->
+    <color name="color_backend_error">@color/shade_red1</color>
+    <color name="color_backend_error_bg">#FBE7E7</color>
 </resources>

@@ -3,6 +3,7 @@
     <string name="input_font_name">roboto_regular.ttf</string>
     <string name="title_connection_lost">Нет подключения</string>
     <string name="title_connection_found">Соединение восстановлено</string>
+    <string name="space"> </string>
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
@@ -65,4 +66,7 @@
     <string name="registration_activate_title">Активируйте ваш профиль</string>
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
     <string name="registration_send_again">Отправить письмо повторно</string>
+    <string name="registration_error_input_email">Некорректный email</string>
+    <string name="registration_error_input_password">Некорректный пароль</string>
+    <string name="registration_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
 </resources>

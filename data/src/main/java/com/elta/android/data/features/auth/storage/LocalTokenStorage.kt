@@ -1,13 +1,8 @@
 package com.elta.android.data.features.auth.storage
 
 import com.nullgr.core.security.prefs.CryptoPreferences
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LocalTokenStorage @Inject constructor(
-    private val pref: CryptoPreferences
-) : TokenStorage {
+class LocalTokenStorage(private val pref: CryptoPreferences) : TokenStorage {
 
     override var accessToken: String?
         get() = pref.getString(ACCESS_TOKEN, null)

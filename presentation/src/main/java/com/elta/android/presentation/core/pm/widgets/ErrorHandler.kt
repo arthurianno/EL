@@ -1,6 +1,8 @@
 package com.elta.android.presentation.core.pm.widgets
 
+import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.presentation.R
+import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.messages.SnackbarMessageData
 
@@ -10,6 +12,10 @@ class ErrorHandler(private val pm: BasePm) {
     fun handleError(error: Throwable) {
         pm.showSnackBar(SnackbarMessageData.SimpleTextMessage(pm.resources.getString(R.string.error_test_error)))
         when (error) {
+            is EmailAlreadyRegisteredError -> {
+                pm.passToErrorContainer(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                pm.passToErrorViewVisibility(true)
+            }
 //            is UnauthorizedException -> pm.router.newRootScreen(Screens.SCREEN_AUTH_LOGOUT, false)
 //            else -> {
 //                val errorData = when (error) {

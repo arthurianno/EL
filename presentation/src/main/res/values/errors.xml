@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="error_test_error">Internal error</string>
-    <string name="error_verify_your_email">Верифицируйте email</string>
-</resources>
