@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="server_error_email_exists">Внимание! Указанный email уже\nсуществует</string>
+    <string name="error_603">Внимание! Указанный email уже\nсуществует</string>
 </resources>

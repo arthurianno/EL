@@ -4,10 +4,9 @@ import com.elta.android.domain.features.auth.interactor.RegisterUseCase
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
 import com.elta.android.presentation.R
-import com.elta.android.presentation.States
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.core.ui.state_view.StateData
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
@@ -18,10 +17,6 @@ class RegistrationMainPm @Inject constructor(
 ) : BasePm(services) {
 
     private val privacyPolicyAcceptedState = State<Boolean>()
-    private val emailError: StateData by lazy {
-        States.SimpleError(icon = R.drawable.ic_warning, description = resources.getString(R.string.server_error_email_exists))
-    }
-    private var v: Boolean = false
 
     val emailInput = inputControl(hideErrorOnUserInput = false)
     val passwordInput = inputControl(hideErrorOnUserInput = false)
@@ -65,11 +60,9 @@ class RegistrationMainPm @Inject constructor(
             .subscribe(continueEnabledState.consumer)
             .untilDestroy()
 
-        errorControl.dataState.consumer.accept(emailError)
         userHasAccountAction.observable
             .subscribe {
-                v = !v
-                errorControl.visibilityState.consumer.accept(v)
+                flowRouter?.startFlow(Screens.AuthFlow)
             }
             .untilDestroy()
 
@@ -116,6 +109,6 @@ class RegistrationMainPm @Inject constructor(
         RegisterUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
     private fun handleSuccess() {
-
+        router.navigateTo(Screens.ActivateProfile)
     }
 }

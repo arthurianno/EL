@@ -13,6 +13,7 @@ import com.elta.android.presentation.utils.clickableSpan
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
+import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.fragments.showDialog
@@ -54,6 +55,7 @@ class RegistrationMainFragment : BaseFragment<RegistrationMainPm>() {
         pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)
         menuButtonView.clicks().bindTo(pm.userHasAccountAction)
+        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
     }
 
     private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
