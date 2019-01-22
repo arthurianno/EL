@@ -24,6 +24,7 @@ import dagger.Provides
 import timber.log.Timber
 import javax.inject.Singleton
 
+@Suppress("TooManyFunctions")
 @Module
 class AppModule(private val enableLog: Boolean) {
 

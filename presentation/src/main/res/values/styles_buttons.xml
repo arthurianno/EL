@@ -4,9 +4,8 @@
     <style name="Button.Large" parent="Typography.Button.Large.Text.Primary">
         <item name="android:background">@drawable/selector_button_large</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingBottom">@dimen/large_button_padding_bottom</item>
-        <item name="android:paddingTop">@dimen/large_button_padding_top</item>
+        <item name="android:layout_height">@dimen/large_button_height</item>
+        <item name="android:gravity">center</item>
     </style>
 
     <style name="Button.Small.Dark" parent="Typography.Button.Small.Text.Dark">
