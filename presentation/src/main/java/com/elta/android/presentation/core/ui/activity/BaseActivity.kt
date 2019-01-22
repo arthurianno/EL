@@ -12,7 +12,9 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.widgets.snakbars.makeSnackBar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import dagger.android.AndroidInjection
@@ -92,6 +94,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
         homeButtonView?.clicks()?.bindTo { onBackPressed() }
+        pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 
     override fun providePresentationModel(): T {
@@ -104,5 +107,11 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
 
     override fun handleBack() {
         router.exit()
+    }
+
+    private fun showSnackbar(data: SnackBarData) {
+        findViewById<View>(android.R.id.content)?.let { content ->
+            makeSnackBar(content, data).show()
+        }
     }
 }

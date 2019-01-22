@@ -12,9 +12,11 @@ import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
+import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
+import com.elta.android.presentation.widgets.snakbars.makeSnackBar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
@@ -72,6 +74,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
         homeButtonView?.clicks()?.bindTo { activity?.onBackPressed() }
+        pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 
     override fun providePresentationModel(): T {
@@ -82,5 +85,11 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     override fun handleBack() {
         router.exit()
+    }
+
+    private fun showSnackbar(data: SnackBarData) {
+        view?.let { content ->
+            makeSnackBar(content, data).show()
+        }
     }
 }

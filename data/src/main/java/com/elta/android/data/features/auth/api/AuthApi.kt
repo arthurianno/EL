@@ -23,4 +23,7 @@ interface AuthApi {
 
     @GET("api/v1/accounts/email/confirmed")
     fun checkEmail(): Completable
+
+    @GET("api/v1/accounts/email/confirm")
+    fun sendConfirmationLink(): Completable
 }

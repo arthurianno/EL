@@ -10,4 +10,6 @@ interface AuthRepository {
     fun login(email: String, password: String): Single<Boolean>
 
     fun checkEmail(): Single<Boolean>
+
+    fun sendConfirmationLink(): Completable
 }

@@ -1,11 +1,14 @@
 package com.elta.android.presentation.core.pm.widgets
 
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.messages.SnackbarMessageData
 
 @Suppress("EmptyWhenBlock")
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
+        pm.showSnackBar(SnackbarMessageData.SimpleTextMessage(pm.resources.getString(R.string.error_test_error)))
         when (error) {
 //            is UnauthorizedException -> pm.router.newRootScreen(Screens.SCREEN_AUTH_LOGOUT, false)
 //            else -> {
