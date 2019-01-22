@@ -1,7 +1,7 @@
 package com.elta.android.data.di
 
-import com.elta.android.data.features.feature1.repository.TestDataRepository
-import com.elta.android.domain.features.feature1.repository.TestRepository
+import com.elta.android.data.features.auth.repository.AuthDataRepository
+import com.elta.android.domain.features.auth.repository.AuthRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -12,5 +12,5 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindTestRepository(repo: TestDataRepository): TestRepository
+    abstract fun bindAuthRepository(repo: AuthDataRepository): AuthRepository
 }

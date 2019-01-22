@@ -7,7 +7,7 @@ allprojects {
 
 ext.androidVersions = [
         androidBuildToolsVersion: '28.0.3',
-        androidMinSdkVersion    : 19,
+        androidMinSdkVersion    : 22,
         androidTargetSdkVersion : 28,
         androidCompileSdkVersion: 28
 ]
@@ -123,6 +123,8 @@ ext.commonDependencies = [
         appCoreInteractor     : "com.nullgr.core:core-interactor:${libraryVersions.appCoreVersion}",
         appCoreRx             : "com.nullgr.core:core-rx:${libraryVersions.appCoreVersion}",
         appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
+        appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
+        appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
         kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libraryVersions.kotlin_version}",
         gson                  : "com.google.code.gson:gson:${libraryVersions.gsonVersion}",
         glide                 : "com.github.bumptech.glide:glide:${libraryVersions.glideVersion}",

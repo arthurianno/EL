@@ -1,5 +1,7 @@
 package com.elta.android.data.di
 
+import com.elta.android.data.common.ErrorInterceptor
+import com.elta.android.data.common.TokenInterceptor
 import com.elta.android.data.core.network.TimberInterceptorLogger
 import com.elta.android.data.core.qualifires.Interceptors
 import com.elta.android.data.core.qualifires.NetworkInterceptors
@@ -28,14 +30,21 @@ class InterceptorModule(
     @Singleton
     @Interceptors
     fun interceptors(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor
     ): List<@JvmWildcard Interceptor> =
         arrayListOf<Interceptor>().apply {
+            add(tokenInterceptor)
             add(httpLoggingInterceptor)
         }
 
     @Provides
     @Singleton
     @NetworkInterceptors
-    fun networkInterceptors(): List<@JvmWildcard Interceptor> = emptyList()
+    fun networkInterceptors(
+        errorInterceptor: ErrorInterceptor
+    ): List<@JvmWildcard Interceptor> =
+        arrayListOf<Interceptor>().apply {
+            add(errorInterceptor)
+        }
 }

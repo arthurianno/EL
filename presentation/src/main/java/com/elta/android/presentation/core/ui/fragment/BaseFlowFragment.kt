@@ -1,9 +1,12 @@
 package com.elta.android.presentation.core.ui.fragment
 
 import android.content.Context
+import android.os.Bundle
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.FlowNavigator
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
+import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.BasePm
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.Navigator
@@ -20,11 +23,23 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     private val navigatorHolder: NavigatorHolder by lazy { cicerone.navigatorHolder }
     private lateinit var navigator: Navigator
 
+    private val currentFragment: BaseFragment<*>?
+        get() = childFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
+
     override val router: FlowRouter by lazy { cicerone.router }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         navigator = FlowNavigator(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (childFragmentManager.fragments.isEmpty()) {
+            (presentationModel as? BaseFlowPm)?.launchScreenAction?.let {
+                passTo(it)
+            }
+        }
     }
 
     override fun onResume() {
@@ -35,5 +50,13 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     override fun onPause() {
         navigatorHolder.removeNavigator()
         super.onPause()
+    }
+
+    override fun handleBack() {
+        if (currentFragment != null && childFragmentManager.backStackEntryCount > 0) {
+            currentFragment?.handleBack()
+        } else {
+            router.finishFlow()
+        }
     }
 }

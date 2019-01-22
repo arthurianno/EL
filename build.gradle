@@ -42,3 +42,32 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+detekt {
+    profile("main") {
+        config = "$project.projectDir/detekt-config/config.yml"
+        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+        baseline = "$project.projectDir/detekt-config/baseline.xml"
+        parallel = true
+    }
+}
+
+subprojects {
+
+    configurations {
+        ktlint
+    }
+
+    task ktlint(type: JavaExec, group: "verification") {
+        description = "Check Kotlin code style."
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "src/**/*.kt"
+    }
+
+    task ktlintFormat(type: JavaExec, group: "formatting") {
+        description = "Fix Kotlin code style deviations."
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "-F", "src/**/*.kt"
+    }
+}

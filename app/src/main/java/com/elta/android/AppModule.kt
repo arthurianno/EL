@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.elta.android.common.di.qualifires.ComputationFacade
 import com.elta.android.common.logger.ReleaseTree
+import com.elta.android.data.features.auth.storage.LocalTokenStorage
+import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.presentation.core.pm.ExceptionParser
 import com.elta.android.presentation.core.pm.SimpleExceptionParser
 import com.nullgr.core.adapter.DiffCalculator
@@ -16,6 +18,7 @@ import com.nullgr.core.rx.SingletonRxBusProvider
 import com.nullgr.core.rx.schedulers.ComputationSchedulersFacade
 import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
+import com.nullgr.core.security.prefs.CryptoPreferences
 import dagger.Module
 import dagger.Provides
 import timber.log.Timber
@@ -60,4 +63,13 @@ class AppModule(private val enableLog: Boolean) {
     @Provides
     @Singleton
     fun provideLogTree(): Timber.Tree = if (enableLog) Timber.DebugTree() else ReleaseTree()
+
+    @Provides
+    @Singleton
+    fun provideCryptoPreferences(context: Context): CryptoPreferences =
+        CryptoPreferences(context, context.getString(R.string.crypto_key_alias))
+
+    @Provides
+    @Singleton
+    fun provideTokenStorage(pref: CryptoPreferences): TokenStorage = LocalTokenStorage(pref)
 }

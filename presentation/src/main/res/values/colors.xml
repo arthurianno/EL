@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">@color/white</color>
     <color name="colorPrimaryDark">#f3f2f2</color>
-    <color name="colorAccent">@color/shade_g_green2_a</color>
+    <color name="colorAccent">@color/shade_g_green_a</color>
     <color name="color_window_background">@color/white</color>
     <!--TODO maybe its no need to keep this color -->
     <color name="color_status_bar_dark">#f3f2f2</color>
@@ -46,6 +46,7 @@
     <color name="color_text_button_small_light_enabled">@color/shade_black0</color>
     <color name="color_text_button_small_light_disabled">@color/shade_black1</color>
     <color name="color_connection_status_text">@color/white</color>
+    <color name="color_text_link">@color/g_green_b</color>
 
     <!-- BUTTONS COLORS -->
     <color name="color_button_large_active_gradient_start">@color/g_green_a</color>
@@ -78,4 +79,8 @@
     <!-- CONNECTION STATUS VIEW COLORS -->
     <color name="color_background_disconnected">@color/black</color>
     <color name="color_background_connected">@color/shade_g_green_a</color>
+
+    <!-- ERROR VIEW COLORS -->
+    <color name="color_backend_error">@color/shade_red1</color>
+    <color name="color_backend_error_bg">#FBE7E7</color>
 </resources>

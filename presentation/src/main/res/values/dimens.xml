@@ -16,8 +16,8 @@
     <dimen name="font_size_input_text">15sp</dimen>
     <dimen name="font_size_input_error_text">12sp</dimen>
 
-    <dimen name="line_spacing_body_1">6sp</dimen>
-    <dimen name="line_spacing_subtitle_1">6sp</dimen>
+    <dimen name="line_spacing_body_1">0sp</dimen>
+    <dimen name="line_spacing_subtitle_1">0sp</dimen>
     <dimen name="line_spacing_subtitle_2">6sp</dimen>
     <dimen name="line_spacing_caption_1">4sp</dimen>
 
@@ -32,4 +32,5 @@
 
     <dimen name="padding_connection_status_text">4dp</dimen>
     <dimen name="padding_toolbar_layout">16dp</dimen>
+    <dimen name="padding_base">16dp</dimen>
 </resources>

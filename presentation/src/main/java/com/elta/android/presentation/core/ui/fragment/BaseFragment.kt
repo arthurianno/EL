@@ -6,8 +6,6 @@ import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.view.visibility
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.RouterProvider
@@ -16,6 +14,9 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.widgets.dialogs.ProgressDialog
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
 import me.dmdev.rxpm.base.PmSupportFragment
@@ -32,6 +33,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider
 
+    open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
         ((parentFragment ?: activity) as RouterProvider).router
     }
@@ -69,7 +71,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.bindTo(pm.backAction)
+        homeButtonView?.clicks()?.bindTo { activity?.onBackPressed() }
     }
 
     override fun providePresentationModel(): T {
@@ -78,8 +80,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         return pm
     }
 
-    override fun handleBack(): Boolean {
-        passTo(presentationModel.backAction)
-        return true
+    override fun handleBack() {
+        router.exit()
     }
 }

@@ -2,6 +2,7 @@
 
 package com.elta.android.presentation.core.pm
 
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.core.pm.listeners.Trackable
 import com.elta.android.presentation.core.pm.widgets.ErrorHandler
@@ -47,12 +48,11 @@ abstract class BasePm(
     internal val errorParser = services.errorParser
 
     protected val errorHandler: ErrorHandler = errorHandler()
+    protected val flowRouter: FlowRouter? by lazy { router as? FlowRouter }
 
     private val networkControl by lazy { networkControl(network) }
-    private val backActionDefault = Action<Unit>()
 
     open val isEmptyScreen: Boolean = false
-    open val backAction: Action<Unit> = backActionDefault
 
     override fun onCreate() {
         super.onCreate()
@@ -71,13 +71,6 @@ abstract class BasePm(
                 .subscribe()
                 .untilDestroy()
         }
-
-        backActionDefault.observable
-            .subscribe {
-                hideKeyBoardCommand.consumer.accept(Unit)
-                router.exit()
-            }
-            .untilDestroy()
     }
 
     internal fun showSnackBar(data: SnackBarData) {
@@ -101,6 +94,12 @@ abstract class BasePm(
         this.throttleFirst(ACTION_DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
 
     protected inline fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
+        this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
+
+    protected inline fun <T> Single<T>.hideErrorContainer(): Single<T> =
+        this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
+
+    protected inline fun Completable.hideErrorContainer(): Completable =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
     protected inline fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
