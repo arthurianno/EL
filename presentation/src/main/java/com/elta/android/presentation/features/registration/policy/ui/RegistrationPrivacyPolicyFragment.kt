@@ -19,7 +19,7 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
         super.onViewCreated(view, savedInstanceState)
         privacyPolicyTextView.htmlText = getString(R.string.registration_privacy_policy_text)
         toolbarTitleView.text = getString(R.string.registration_privacy_policy_toolbar_title)
-        homeButtonView.clicks().bindTo { dismissAllowingStateLoss() }
+        homeButtonView.clicks().bindTo { dialog.dismiss() }
         privacyContentScrollView.viewTreeObserver.addOnScrollChangedListener {
             toolbarView.z = when (privacyContentScrollView.scrollY) {
                 0 -> ZERO_Z_INDEX
