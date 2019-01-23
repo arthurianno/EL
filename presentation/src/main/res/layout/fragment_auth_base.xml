@@ -4,13 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/layout_auth_toolbar"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include layout="@layout/layout_auth_toolbar" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -29,24 +25,42 @@
                 android:orientation="vertical"
                 android:padding="@dimen/padding_base">
 
-                <android.support.v7.widget.AppCompatTextView
-                    style="@style/Headline1"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/registration_main_title_new_user" />
+                    android:layout_marginBottom="8dp">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/authTitleView"
+                        style="@style/Headline1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        tools:text="@string/registration_main_title_new_user" />
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/authTitleIconView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="12dp"
+                        tools:src="@drawable/ic_warning" />
+
+                </LinearLayout>
 
                 <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/authSubtitleView"
                     style="@style/Subtitle1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    android:text="@string/registration_main_subtitle" />
+                    tools:text="@string/registration_main_subtitle" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp">
+
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/emailInputView"
                         style="@style/InputStyle.Email"
@@ -93,9 +107,9 @@
                     android:layout_marginBottom="8dp" />
 
                 <LinearLayout
+                    android:id="@+id/privacyPolicyView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingTop="4dp"
@@ -120,6 +134,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="32dp"
                     android:orientation="horizontal">
 
@@ -150,6 +165,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="false"
-        android:text="@string/registration_main_button_continue"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="@string/registration_main_button_continue" />
 </LinearLayout>

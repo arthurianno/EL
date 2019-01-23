@@ -4,6 +4,8 @@ import com.elta.android.presentation.core.pm.PmKey
 import com.elta.android.presentation.core.pm.factory.GeneralPmFactory
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.features.app.pm.AppPm
+import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
+import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
@@ -31,6 +33,7 @@ abstract class PmModule {
     @PmKey(OnBoardingPm::class)
     abstract fun bindOnBoardingPm(pm: OnBoardingPm): PresentationModel
 
+    // REGISTRATION FLOW
     @Binds
     @IntoMap
     @PmKey(RegistrationFlowPm::class)
@@ -55,4 +58,15 @@ abstract class PmModule {
     @IntoMap
     @PmKey(ActivationPm::class)
     abstract fun bindActivationPm(pm: ActivationPm): PresentationModel
+
+    // AUTH FLOW
+    @Binds
+    @IntoMap
+    @PmKey(AuthFlowPm::class)
+    abstract fun bindAuthFlowPm(pm: AuthFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(LoginPm::class)
+    abstract fun bindLoginPm(pm: LoginPm): PresentationModel
 }

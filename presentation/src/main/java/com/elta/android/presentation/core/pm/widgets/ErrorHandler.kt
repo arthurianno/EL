@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.pm.widgets
 
-import com.elta.android.common.errors.EmailAlreadyRegisteredError
+import com.elta.android.common.errors.RemoteAuthError
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
@@ -10,7 +10,7 @@ class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
         when (error) {
-            is EmailAlreadyRegisteredError -> {
+            is RemoteAuthError -> {
                 pm.passToErrorContainer(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
                 pm.passToErrorViewVisibility(true)
             }

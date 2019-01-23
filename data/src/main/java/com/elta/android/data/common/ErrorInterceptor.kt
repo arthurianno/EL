@@ -1,7 +1,7 @@
 package com.elta.android.data.common
 
 import android.content.Context
-import com.elta.android.common.errors.EmailAlreadyRegisteredError
+import com.elta.android.common.errors.RemoteAuthError
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -18,19 +18,16 @@ class ErrorInterceptor @Inject constructor(
 
         val responseCode = response.code()
         when {
-            responseCode > ERROR_CODE_600 -> {
+            responseCode >= ERROR_CODE_600 -> {
                 val res = getStringByCode(context, responseCode)
                 val message = context.getString(res)
-                when (responseCode) {
-                    603 -> throw EmailAlreadyRegisteredError(message)
-                }
+                throw RemoteAuthError(message)
             }
         }
         return response
     }
 
     companion object {
-        const val ERROR_CODE_400 = 400
         const val ERROR_CODE_600 = 600
 
         fun getStringByCode(context: Context, code: Int): Int =

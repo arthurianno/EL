@@ -1,6 +1,8 @@
 package com.elta.android.presentation
 
 import android.support.v4.app.Fragment
+import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
+import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
@@ -32,8 +34,16 @@ object Screens {
         override fun getFragment(): Fragment = ActivationFragment.newInstance()
     }
 
+    // AUTH FLOW
     object AuthFlow : SupportAppScreen() {
-        // TODO: create real auth fragment here
+        override fun getFragment(): Fragment = AuthFlowFragment.newInstance()
+    }
+
+    object Login : SupportAppScreen() {
+        override fun getFragment(): Fragment = LoginFragment.newInstance()
+    }
+
+    object RestorePassword : SupportAppScreen() {
         override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
     }
 }
