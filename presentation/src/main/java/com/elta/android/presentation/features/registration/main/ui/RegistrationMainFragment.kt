@@ -10,6 +10,7 @@ import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 
 class RegistrationMainFragment : BaseAuthFragment<RegistrationMainPm>() {
@@ -20,17 +21,19 @@ class RegistrationMainFragment : BaseAuthFragment<RegistrationMainPm>() {
     override val authSubtitleText: Int = R.string.registration_main_subtitle
     override val classToken: Class<RegistrationMainPm> = RegistrationMainPm::class.java
 
+    private lateinit var spanClicks: Observable<Unit>
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         privacyPolicyView.show()
         authTitleIconView.hide()
+        spanClicks = policyDescriptionTextView
+            .clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
     }
 
     override fun onBindPresentationModel(pm: RegistrationMainPm) {
         super.onBindPresentationModel(pm)
-        policyDescriptionTextView
-            .clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
-            .bindTo(pm.privacyPolicyClickAction)
+        spanClicks.bindTo(pm.privacyPolicyClickAction)
         pm.openPrivacyPolicyCommand.bindTo {
             childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
         }
