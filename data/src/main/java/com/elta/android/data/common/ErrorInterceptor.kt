@@ -7,6 +7,7 @@ import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@Suppress("MagicNumber")
 @Singleton
 class ErrorInterceptor @Inject constructor(
     private val context: Context

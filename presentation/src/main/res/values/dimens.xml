@@ -25,6 +25,7 @@
     <dimen name="small_button_border_width">1dp</dimen>
     <dimen name="large_button_padding_top">18dp</dimen>
     <dimen name="large_button_padding_bottom">17dp</dimen>
+    <dimen name="large_button_height">52dp</dimen>
     <dimen name="small_button_padding">14dp</dimen>
     <dimen name="small_button_width">160dp</dimen>
     <dimen name="social_button_size">40dp</dimen>

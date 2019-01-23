@@ -162,8 +162,6 @@
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/continueButtonView"
         style="@style/Button.Large"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="@string/registration_main_button_continue" />

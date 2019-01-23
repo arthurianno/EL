@@ -13,5 +13,7 @@ interface AuthDataSource {
 
     fun refresh(accessToken: String, refreshToken: String): Single<TokensDto>
 
+    fun sendConfirmationLink(): Completable
+
     fun isEmailConfirmed(): Completable
 }

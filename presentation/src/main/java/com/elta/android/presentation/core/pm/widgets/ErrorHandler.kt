@@ -1,19 +1,27 @@
 package com.elta.android.presentation.core.pm.widgets
 
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.RemoteAuthError
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.messages.SnackbarMessageData
 
 @Suppress("EmptyWhenBlock")
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
+        // TODO logic of error processing should be improved
         when (error) {
             is RemoteAuthError -> {
                 pm.passToErrorContainer(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
                 pm.passToErrorViewVisibility(true)
             }
+            is NetworkConnectionError -> {
+            } // TODO logic of Network exception should be improved
+            else -> pm.showSnackBar(
+                SnackbarMessageData.SimpleTextMessage(pm.resources.getString(R.string.error_test_error))
+            )
 //            is UnauthorizedException -> pm.router.newRootScreen(Screens.SCREEN_AUTH_LOGOUT, false)
 //            else -> {
 //                val errorData = when (error) {

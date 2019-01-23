@@ -27,4 +27,7 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun isEmailConfirmed(): Completable =
         api.checkEmail().checkNetwork(checker)
+
+    override fun sendConfirmationLink(): Completable =
+        api.sendConfirmationLink().checkNetwork(checker)
 }
