@@ -13,8 +13,10 @@ import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BaseMapPm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
+import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.utils.makeSnackBar
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
@@ -127,7 +129,7 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        // TODO: add shackbar binding
+        pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 
     override fun providePresentationModel(): T {
@@ -138,5 +140,11 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
 
     override fun handleBack() {
         router.exit()
+    }
+
+    private fun showSnackbar(data: SnackBarData) {
+        view?.let { content ->
+            makeSnackBar(content, data).show()
+        }
     }
 }

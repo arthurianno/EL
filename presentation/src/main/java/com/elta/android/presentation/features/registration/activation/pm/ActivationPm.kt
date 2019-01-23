@@ -1,13 +1,63 @@
 package com.elta.android.presentation.features.registration.activation.pm
 
+import com.elta.android.domain.features.auth.interactor.CheckEmailUseCase
+import com.elta.android.domain.features.auth.interactor.SendConfirmationLinkUseCase
+import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.messages.SnackbarMessageData
+import timber.log.Timber
 import javax.inject.Inject
 
 class ActivationPm @Inject constructor(
-    services: ServiceFacade
+    services: ServiceFacade,
+    private val sendConfirmationLinkUseCase: SendConfirmationLinkUseCase,
+    private val checkEmailUseCase: CheckEmailUseCase
 ) : BasePm(services) {
 
     val sendAgainAction = Action<Unit>()
     val continueAction = Action<Unit>()
+
+    override fun onCreate() {
+        super.onCreate()
+        sendAgainAction.observable
+            .skipWhileInProgress()
+            .flatMapCompletable {
+                sendConfirmationLinkUseCase.execute()
+                    .bindProgress()
+                    .doOnComplete(::handleResendSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        continueAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle {
+                checkEmailUseCase.execute()
+                    .bindProgress()
+                    .doOnSuccess(::handleEmailActivated)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleResendSuccess() {
+        Timber.d("Resend success") // TODO show some message
+    }
+
+    private fun handleEmailActivated(isActivated: Boolean) {
+        when (isActivated) {
+            true -> flowRouter?.newRootFlow(Screens.OnBoardingFlow)
+            else -> showSnackBar(
+                SnackbarMessageData.SimpleTextMessage(
+                    resources.getString(R.string.error_verify_your_email)
+                )
+            )
+        }
+    }
 }

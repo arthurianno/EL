@@ -36,4 +36,7 @@ class AuthDataRepository @Inject constructor(
         source.isEmailConfirmed()
             .andThen(Single.just(true))
             .onErrorReturn { false }
+
+    override fun sendConfirmationLink(): Completable =
+        source.sendConfirmationLink()
 }

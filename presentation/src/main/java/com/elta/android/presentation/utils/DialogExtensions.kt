@@ -7,7 +7,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import io.reactivex.functions.Consumer
 
-const val progressTag = "PROGRESS_TAG"
+const val PROGRESS_TAG = "PROGRESS_TAG"
 
 inline fun MaterialDialog.visibility(): Consumer<in Boolean> = Consumer {
     when (it) {
@@ -17,12 +17,12 @@ inline fun MaterialDialog.visibility(): Consumer<in Boolean> = Consumer {
 }
 
 inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer<in Boolean> = Consumer {
-    val fragment = fragmentManager.findFragmentByTag(progressTag)
+    val fragment = fragmentManager.findFragmentByTag(PROGRESS_TAG)
     if (fragment != null && !it) {
         (fragment as ProgressDialog).dismissAllowingStateLoss()
         fragmentManager.executePendingTransactions()
     } else if (fragment == null && it) {
-        show(fragmentManager, progressTag)
+        show(fragmentManager, PROGRESS_TAG)
         fragmentManager.executePendingTransactions()
     }
 }
