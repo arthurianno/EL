@@ -2,6 +2,8 @@ package com.elta.android.data.features.auth.api
 
 import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import io.reactivex.Completable
@@ -26,4 +28,10 @@ interface AuthApi {
 
     @GET("api/auth/v1/accounts/email/confirm")
     fun sendConfirmationLink(): Completable
+
+    @GET("api/auth/v1/accounts/password/reset")
+    fun sendPasswordResetLink(@Body request: ResetPasswordLinkRequest): Completable
+
+    @GET("api/auth/v1/accounts/password/reset")
+    fun resetPassword(@Body request: ResetPasswordRequest): Completable
 }

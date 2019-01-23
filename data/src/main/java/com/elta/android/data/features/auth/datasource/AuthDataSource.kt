@@ -16,4 +16,8 @@ interface AuthDataSource {
     fun sendConfirmationLink(): Completable
 
     fun isEmailConfirmed(): Completable
+
+    fun sendResetPasswordLink(email: String): Completable
+
+    fun resetPassword(token: String, newPassword: String): Completable
 }
