@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.registration.main.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
@@ -11,6 +10,7 @@ import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
+import com.elta.android.presentation.utils.toggleSecureIcon
 import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
@@ -58,12 +58,5 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
         continueButtonView.clicks().bindTo(pm.continueAction)
         menuButtonView.clicks().bindTo(pm.menuAction)
         pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
-    }
-
-    private fun ImageView.toggleSecureIcon(isSecure: Boolean) {
-        setImageResource(when (isSecure) {
-            true -> R.drawable.ic_show_password
-            else -> R.drawable.ic_password_hide
-        })
     }
 }

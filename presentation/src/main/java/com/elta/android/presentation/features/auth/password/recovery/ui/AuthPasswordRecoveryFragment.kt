@@ -36,8 +36,8 @@ class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
             .map(String::isNotEmpty)
             .distinctUntilChanged()
             .bindTo(emailErrorIconView.fadeVisibility())
-        pm.sendButtonEnabledState.bindTo { sendLinkButtonView.isEnabled = it }
-        sendLinkButtonView.clicks().bindTo(pm.sendAction)
+        pm.continueEnabledState.bindTo { sendLinkButtonView.isEnabled = it }
+        sendLinkButtonView.clicks().bindTo(pm.continueAction)
     }
 
     companion object {
