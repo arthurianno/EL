@@ -19,6 +19,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import me.dmdev.rxpm.PresentationModel
 
+@Suppress("TooManyFunctions")
 @Module
 abstract class PmModule {
 
