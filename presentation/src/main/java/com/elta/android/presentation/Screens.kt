@@ -3,6 +3,8 @@ package com.elta.android.presentation
 import android.support.v4.app.Fragment
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
+import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
+import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
@@ -42,7 +44,11 @@ object Screens {
         override fun getFragment(): Fragment = LoginFragment.newInstance()
     }
 
-    object RestorePassword : SupportAppScreen() {
-        override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
+    object PasswordRecovery : SupportAppScreen() {
+        override fun getFragment(): Fragment = AuthPasswordRecoveryFragment.newInstance()
+    }
+
+    object PasswordCreate : SupportAppScreen() {
+        override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance()
     }
 }

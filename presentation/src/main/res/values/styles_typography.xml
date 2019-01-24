@@ -67,7 +67,6 @@
     <!-- CAPTION 1 -->
     <style name="Typography.Caption1" parent="Typography.Base.Roboto.Regular">
         <item name="android:textSize">@dimen/font_size_caption_1</item>
-        <item name="android:lineSpacingExtra">@dimen/line_spacing_caption_1</item>
     </style>
 
     <style name="Typography.Caption1.Primary" parent="Typography.Caption1">

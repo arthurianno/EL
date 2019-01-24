@@ -4,6 +4,8 @@ import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.nullgr.core.hardware.NetworkChecker
@@ -30,4 +32,10 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun sendConfirmationLink(): Completable =
         api.sendConfirmationLink().checkNetwork(checker)
+
+    override fun sendResetPasswordLink(email: String): Completable =
+        api.sendPasswordResetLink(ResetPasswordLinkRequest(email))
+
+    override fun resetPassword(token: String, newPassword: String): Completable =
+        api.resetPassword(ResetPasswordRequest(token, newPassword))
 }

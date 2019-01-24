@@ -24,7 +24,7 @@ class LoginPm @Inject constructor(
             .untilDestroy()
 
         menuAction.observable
-            .subscribe { router.navigateTo(Screens.RestorePassword) }
+            .subscribe { router.navigateTo(Screens.PasswordRecovery) }
             .untilDestroy()
 
         continueAction.observable

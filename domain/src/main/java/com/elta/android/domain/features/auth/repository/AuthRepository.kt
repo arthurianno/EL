@@ -12,4 +12,8 @@ interface AuthRepository {
     fun checkEmail(): Single<Boolean>
 
     fun sendConfirmationLink(): Completable
+
+    fun sendResetPasswordLink(email: String): Completable
+
+    fun resetPassword(token: String, newPassword: String): Completable
 }

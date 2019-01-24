@@ -3,6 +3,8 @@ package com.elta.android.presentation.di
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
+import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
+import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
@@ -49,4 +51,12 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindLoginFragment(): LoginFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindAuthPasswordRecoveryFragment(): AuthPasswordRecoveryFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindAuthPasswordCreateFragment(): AuthPasswordCreateFragment
 }

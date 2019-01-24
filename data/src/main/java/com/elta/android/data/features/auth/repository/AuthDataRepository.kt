@@ -39,4 +39,10 @@ class AuthDataRepository @Inject constructor(
 
     override fun sendConfirmationLink(): Completable =
         source.sendConfirmationLink()
+
+    override fun sendResetPasswordLink(email: String): Completable =
+        source.sendResetPasswordLink(email)
+
+    override fun resetPassword(token: String, newPassword: String): Completable =
+        source.resetPassword(token, newPassword)
 }
