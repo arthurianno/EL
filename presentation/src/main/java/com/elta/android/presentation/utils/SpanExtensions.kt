@@ -27,7 +27,7 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
         }
 
         text = spannable.withSpan {
-            setSpan(span, startIndex, startIndex+spanText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(span, startIndex, startIndex + spanText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         it.setDisposable(Disposables.fromAction {

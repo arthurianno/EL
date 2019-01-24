@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.auth.login.ui;
+package com.elta.android.presentation.features.auth.login.ui
 
 import android.os.Bundle
 import android.view.View

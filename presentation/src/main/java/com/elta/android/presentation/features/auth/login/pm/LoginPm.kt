@@ -1,8 +1,6 @@
 package com.elta.android.presentation.features.auth.login.pm
 
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
-import com.elta.android.domain.features.auth.interactor.isEmailValid
-import com.elta.android.domain.features.auth.interactor.isPasswordValid
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
@@ -18,8 +16,8 @@ class LoginPm @Inject constructor(
         super.onCreate()
 
         Observables.combineLatest(
-            emailInput.text.observable.map(::isEmailValid),
-            passwordInput.text.observable.map(::isPasswordValid)
+            isEmailValidState.observable,
+            isPasswordValidState.observable
         )
             .map { it.first && it.second }
             .subscribe(continueEnabledState.consumer)
@@ -48,6 +46,9 @@ class LoginPm @Inject constructor(
         LoginUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
     private fun handleSuccess(isEmailActivated: Boolean) {
-        router.navigateTo(Screens.ActivateProfile)
+        when(isEmailActivated) {
+            true -> flowRouter?.newRootFlow(Screens.OnBoardingFlow)
+            else -> router.navigateTo(Screens.ActivateProfile)
+        }
     }
 }

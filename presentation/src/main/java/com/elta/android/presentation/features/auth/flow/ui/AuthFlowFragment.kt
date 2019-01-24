@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.auth.flow.ui;
+package com.elta.android.presentation.features.auth.flow.ui
 
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
