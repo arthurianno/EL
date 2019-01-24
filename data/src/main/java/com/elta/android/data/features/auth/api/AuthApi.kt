@@ -11,6 +11,7 @@ import io.reactivex.Single
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface AuthApi {
 
@@ -29,9 +30,9 @@ interface AuthApi {
     @GET("api/auth/v1/accounts/email/confirm")
     fun sendConfirmationLink(): Completable
 
-    @GET("api/auth/v1/accounts/password/reset")
+    @PUT("api/auth/v1/accounts/password/reset")
     fun sendPasswordResetLink(@Body request: ResetPasswordLinkRequest): Completable
 
-    @GET("api/auth/v1/accounts/password/reset")
+    @POST("api/auth/v1/accounts/password/reset")
     fun resetPassword(@Body request: ResetPasswordRequest): Completable
 }

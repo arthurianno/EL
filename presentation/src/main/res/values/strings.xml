@@ -82,6 +82,7 @@
     <string name="auth_password_recovery_email_description">После отправки запроса на вашу почту будет выслана инструкция для восстановления пароля</string>
     <string name="auth_password_recovery_button_text">Отправить запрос на email</string>
     <string name="auth_password_recover_error_input_email">Некорректный email</string>
+    <string name="auth_password_recover_success_message">Ссылка отправлена на указанный email</string>
 
     <string name="auth_password_create_title">Новый пароль</string>
     <string name="auth_password_create_subtitle">Придумайте новый пароль для входа в приложение</string>
