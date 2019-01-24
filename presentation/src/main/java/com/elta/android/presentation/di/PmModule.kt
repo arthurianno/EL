@@ -71,12 +71,12 @@ abstract class PmModule {
     @IntoMap
     @PmKey(LoginPm::class)
     abstract fun bindLoginPm(pm: LoginPm): PresentationModel
-    
+
     @Binds
     @IntoMap
     @PmKey(AuthPasswordRecoveryPm::class)
     abstract fun bindAuthPasswordRecoveryPm(pm: AuthPasswordRecoveryPm): PresentationModel
-    
+
     @Binds
     @IntoMap
     @PmKey(AuthPasswordCreatePm::class)
