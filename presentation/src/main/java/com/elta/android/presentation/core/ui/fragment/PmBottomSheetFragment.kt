@@ -1,13 +1,15 @@
 package com.elta.android.presentation.core.ui.fragment
 
+import android.app.Dialog
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
+import android.support.v7.app.AppCompatDialogFragment
+import com.elta.android.presentation.core.ui.bottom_sheet.BottomSheetDialog
 import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.AndroidPmView
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.delegate.PmSupportFragmentDelegate
 
-abstract class PmBottomSheetFragment<PM : PresentationModel> : BottomSheetDialogFragment(), AndroidPmView<PM> {
+abstract class PmBottomSheetFragment<PM : PresentationModel> : AppCompatDialogFragment(), AndroidPmView<PM> {
 
     private val delegate by lazy(LazyThreadSafetyMode.NONE) { PmSupportFragmentDelegate(this) }
 
@@ -19,6 +21,9 @@ abstract class PmBottomSheetFragment<PM : PresentationModel> : BottomSheetDialog
         super.onCreate(savedInstanceState)
         delegate.onCreate(savedInstanceState)
     }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        BottomSheetDialog(checkNotNull(context), theme)
 
     override fun onStart() {
         super.onStart()

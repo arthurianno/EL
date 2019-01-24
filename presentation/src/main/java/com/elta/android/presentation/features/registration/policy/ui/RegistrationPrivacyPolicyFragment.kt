@@ -19,7 +19,6 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
         super.onViewCreated(view, savedInstanceState)
         privacyPolicyTextView.htmlText = getString(R.string.registration_privacy_policy_text)
         toolbarTitleView.text = getString(R.string.registration_privacy_policy_toolbar_title)
-        homeButtonView.clicks().bindTo { dismissAllowingStateLoss() }
         privacyContentScrollView.viewTreeObserver.addOnScrollChangedListener {
             toolbarView.z = when (privacyContentScrollView.scrollY) {
                 0 -> ZERO_Z_INDEX
@@ -28,7 +27,9 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
         }
     }
 
-    override fun onBindPresentationModel(pm: RegistrationPrivacyPolicyPm) {}
+    override fun onBindPresentationModel(pm: RegistrationPrivacyPolicyPm) {
+        homeButtonView.clicks().bindTo { dialog.dismiss() }
+    }
 
     companion object {
         fun newInstance() = RegistrationPrivacyPolicyFragment()

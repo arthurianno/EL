@@ -12,6 +12,9 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     val emailInput = inputControl(hideErrorOnUserInput = false)
     val passwordInput = inputControl(hideErrorOnUserInput = false)
 
+    val isEmailValidState = State(false)
+    val isPasswordValidState = State(false)
+
     val continueEnabledState = State(false)
     val continueAction = Action<Unit>()
     val menuAction = Action<Unit>()
@@ -35,7 +38,9 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     private fun validateEmail(email: String): Boolean =
         when (email.isEmpty()) {
             true -> true
-            else -> isEmailValid(email)
+            else -> isEmailValid(email).also {
+                isEmailValidState.consumer.accept(it)
+            }
         }
 
     private fun getEmailError(isEmailValid: Boolean): String =
@@ -47,13 +52,14 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     private fun validatePassword(password: String): Boolean =
         when (password.isEmpty()) {
             true -> true
-            else -> isPasswordValid(password)
+            else -> isPasswordValid(password).also {
+                isPasswordValidState.consumer.accept(it)
+            }
         }
 
     private fun getPasswordError(isEmailValid: Boolean): String =
         when (isEmailValid) {
             true -> ""
-            else -> resources.getString(R.string.registration_error_input_password)
+            else -> resources.getString(R.string.registration_password_pattern)
         }
-
 }

@@ -1,8 +1,6 @@
 package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.domain.features.auth.interactor.RegisterUseCase
-import com.elta.android.domain.features.auth.interactor.isEmailValid
-import com.elta.android.domain.features.auth.interactor.isPasswordValid
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
 import io.reactivex.rxkotlin.Observables
@@ -31,8 +29,8 @@ class RegistrationMainPm @Inject constructor(
             .untilDestroy()
 
         Observables.combineLatest(
-            emailInput.text.observable.map(::isEmailValid),
-            passwordInput.text.observable.map(::isPasswordValid),
+            isEmailValidState.observable,
+            isPasswordValidState.observable,
             privacyPolicyAcceptedState.observable
         )
             .map { it.first && it.second && it.third }

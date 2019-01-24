@@ -16,7 +16,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
 
-abstract class BaseAuthFragment<PM: BaseAuthPm> : BaseFragment<PM>() {
+abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
 
     protected abstract val menuButtonText: Int
     protected abstract val continueButtonText: Int
