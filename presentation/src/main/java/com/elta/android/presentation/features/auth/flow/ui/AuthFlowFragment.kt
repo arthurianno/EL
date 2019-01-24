@@ -1,17 +1,18 @@
-package com.elta.android.presentation.features.registration.flow.ui
+package com.elta.android.presentation.features.auth.flow.ui
 
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
+import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 
-class RegistrationFlowFragment : BaseFlowFragment<RegistrationFlowPm>() {
+class AuthFlowFragment : BaseFlowFragment<AuthFlowPm>() {
+
     override val screenLayout: Int = R.layout.layout_container
-    override val classToken: Class<RegistrationFlowPm> = RegistrationFlowPm::class.java
+    override val classToken: Class<AuthFlowPm> = AuthFlowPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     companion object {
-        fun newInstance(): RegistrationFlowFragment = RegistrationFlowFragment()
+        fun newInstance(): AuthFlowFragment = AuthFlowFragment()
     }
 }

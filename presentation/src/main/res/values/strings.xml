@@ -69,4 +69,10 @@
     <string name="registration_error_input_email">Некорректный email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+
+    <!-- AUTH FLOW -->
+    <string name="auth_toolbar_button_text">Забыли пароль?</string>
+    <string name="auth_title">С возвращением!</string>
+    <string name="auth_subtitle">Чтобы продолжить, введите ваш email\nи пароль от аккаунта</string>
+    <string name="auth_button_continue">Войти</string>
 </resources>
