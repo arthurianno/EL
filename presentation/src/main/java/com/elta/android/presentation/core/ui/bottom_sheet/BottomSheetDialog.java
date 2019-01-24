@@ -98,13 +98,13 @@ public class BottomSheetDialog extends AppCompatDialog {
         }
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if (behavior != null && behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
-//            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (behavior != null && behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
 
     @Override
     public void setCanceledOnTouchOutside(boolean cancel) {
