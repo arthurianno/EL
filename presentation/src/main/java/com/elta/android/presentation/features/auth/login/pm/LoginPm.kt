@@ -46,7 +46,7 @@ class LoginPm @Inject constructor(
         LoginUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
     private fun handleSuccess(isEmailActivated: Boolean) {
-        when(isEmailActivated) {
+        when (isEmailActivated) {
             true -> flowRouter?.newRootFlow(Screens.OnBoardingFlow)
             else -> router.navigateTo(Screens.ActivateProfile)
         }
