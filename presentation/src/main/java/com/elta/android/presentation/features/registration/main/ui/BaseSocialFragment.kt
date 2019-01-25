@@ -4,7 +4,7 @@ import com.elta.android.presentation.features.registration.main.pm.BaseSocialPm
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 
-abstract class BaseSocialFragment<PM : BaseSocialPm> : BaseAuthFragment<PM>() {
+abstract class BaseSocialFragment<PM : BaseSocialPm> : BaseRegistrationFragment<PM>() {
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)

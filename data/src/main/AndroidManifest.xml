@@ -4,7 +4,7 @@
     <application>
         <!-- SOCIAL NETWORKS -->
 
-        <activity android:name=".features.auth.datasource.RxSocialActivity"
+        <activity android:name=".features.auth.datasource.social.RxSocialActivity"
             android:screenOrientation="portrait"/>
 
         <activity

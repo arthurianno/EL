@@ -7,13 +7,13 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
 import javax.inject.Inject
 
-class LoginSocialNetworkUseCase @Inject constructor(
+class LoginToSocialNetworkUseCase @Inject constructor(
     private val repository: AuthRepository,
     schedulers: SchedulersFacade
-) : CompletableUseCase<LoginSocialNetworkUseCase.Params>(schedulers) {
+) : CompletableUseCase<LoginToSocialNetworkUseCase.Params>(schedulers) {
 
-    override fun buildUseCaseObservable(params: LoginSocialNetworkUseCase.Params?): Completable =
-        repository.loginSocialNetwork(checkNotNull(params).network)
+    override fun buildUseCaseObservable(params: LoginToSocialNetworkUseCase.Params?): Completable =
+        repository.loginToSocialNetwork(checkNotNull(params).network)
 
     data class Params(val network: SocialNetwork)
 }
