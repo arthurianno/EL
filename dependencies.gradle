@@ -76,7 +76,11 @@ def libraryVersions = [
 
         ciceroneVersion            : '4.0.2',
 
-        ktlintVersion              : "0.24.0"
+        ktlintVersion              : "0.24.0",
+
+        fbVersion                  : '4.29.0',
+        vkVersion                  : '1.6.9',
+        okVersion                  : '2.0.3'
 ]
 
 ext.commonDependencies = [
@@ -152,7 +156,11 @@ ext.commonDependencies = [
 
         cicerone              : "ru.terrakok.cicerone:cicerone:${libraryVersions.ciceroneVersion}",
         exoPlayer             : "com.google.android.exoplayer:exoplayer:${libraryVersions.exoPlayer}",
-        datePicker            : "com.github.prolificinteractive:material-calendarview:${libraryVersions.datePickerVersion}"
+        datePicker            : "com.github.prolificinteractive:material-calendarview:${libraryVersions.datePickerVersion}",
+
+        fb                    : "com.facebook.android:facebook-login:${libraryVersions.fbVersion}",
+        vk                    : "com.vk:androidsdk:${libraryVersions.vkVersion}",
+        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}"
 ]
 
 ext.commonTestDependencies = [

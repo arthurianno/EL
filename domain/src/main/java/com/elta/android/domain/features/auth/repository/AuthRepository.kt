@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.auth.repository
 
+import com.elta.android.domain.features.auth.model.SocialNetwork
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -16,4 +17,10 @@ interface AuthRepository {
     fun sendResetPasswordLink(email: String): Completable
 
     fun resetPassword(token: String, newPassword: String): Completable
+
+    fun linkSocialNetwork(network: SocialNetwork): Completable
+
+    fun unLinkSocialNetwork(network: SocialNetwork): Completable
+
+    fun loginSocialNetwork(network: SocialNetwork): Completable
 }
