@@ -103,6 +103,10 @@ dependencies {
     implementation commonDependencies.barcodeScanner
     implementation commonDependencies.materialEditText
 
+    implementation commonDependencies.fb
+    implementation commonDependencies.vk
+    implementation commonDependencies.ok
+
     // Dagger2
     kapt commonDependencies.daggerCompiler
     kapt commonDependencies.daggerAndroidProcessor

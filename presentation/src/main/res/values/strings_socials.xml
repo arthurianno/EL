@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">1985879115014479</string>
+    <string name="fb_login_protocol_scheme">fb1985879115014479</string>
+    <string name="OK_APP_ID">1269730560</string>
+    <string name="OK_APP_KEY">E418C633163130BCC75AAD87</string>
+    <integer name="com_vk_sdk_AppId">6643458</integer>
+    <string name="uri_redirect">https://onetouch.nullgr.com/public/login/</string>
+</resources>
