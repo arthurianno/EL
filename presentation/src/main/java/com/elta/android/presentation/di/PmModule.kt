@@ -8,6 +8,7 @@ import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
+import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
@@ -81,4 +82,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(AuthPasswordCreatePm::class)
     abstract fun bindAuthPasswordCreatePm(pm: AuthPasswordCreatePm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(EmailConfirmationPm::class)
+    abstract fun bindEmailConfirmationPm(pm: EmailConfirmationPm): PresentationModel
 }

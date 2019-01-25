@@ -18,6 +18,7 @@ def libraryVersions = [
         playServicesVersion        : '11.8.0',
         firebaseVersion            : '16.0.6',
         firebaseMessagingVersion   : '17.3.4',
+        firebaseDynamicLinkVersion : '16.1.5',
         constraintVersion          : '1.1.3',
         customTabsVersion          : '27.1.0',
         androidAnnotationsVersion  : '21.0.3',
@@ -147,6 +148,7 @@ ext.commonDependencies = [
 
         firebaseCore          : "com.google.firebase:firebase-core:${libraryVersions.firebaseVersion}",
         firebaseMessaging     : "com.google.firebase:firebase-messaging:${libraryVersions.firebaseMessagingVersion}",
+        firebaseDynamicLinks  : "com.google.firebase:firebase-dynamic-links:${libraryVersions.firebaseDynamicLinkVersion}",
 
         ktlint                : "com.github.shyiko:ktlint:${libraryVersions.ktlintVersion}",
 
