@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.registration.main.ui
+package com.elta.android.data.features.auth.datasource
 
 import android.content.Context
 import android.content.Intent
@@ -121,8 +121,8 @@ class RxSocialActivity : AppCompatActivity() {
             }
 
             override fun onError(error: String?) {
-                Odnoklassniki.getInstance().requestAuthorization(this@RxSocialActivity, getString(R.string.uri_redirect),
-                    OkAuthType.ANY, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN)
+                Odnoklassniki.getInstance().requestAuthorization(this@RxSocialActivity, null,
+                    OkAuthType.ANY, OkScope.LONG_ACCESS_TOKEN)
             }
         })
     }

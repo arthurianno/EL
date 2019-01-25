@@ -126,6 +126,7 @@ ext.commonDependencies = [
         appCore               : "com.nullgr.core:core-all:${libraryVersions.appCoreVersion}",
         appCoreInteractor     : "com.nullgr.core:core-interactor:${libraryVersions.appCoreVersion}",
         appCoreRx             : "com.nullgr.core:core-rx:${libraryVersions.appCoreVersion}",
+        appCoreIntents        : "com.nullgr.core:core-intents:${libraryVersions.appCoreVersion}",
         appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
         appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
         appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
