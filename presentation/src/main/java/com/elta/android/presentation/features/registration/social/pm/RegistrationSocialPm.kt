@@ -53,12 +53,9 @@ class RegistrationSocialPm @Inject constructor(
             .untilDestroy()
 
         getSocialUserAction.observable
-            .skipWhileInProgress()
             .map(::createSocialUserParams)
             .flatMapSingle { params ->
                 getSocialUserUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
                     .doOnSuccess(::handleSocialUserSuccess)
                     .doOnError(::handleError)
             }

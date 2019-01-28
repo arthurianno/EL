@@ -38,6 +38,7 @@ class SocialDataRepository @Inject constructor(
         socialFactory.getDataSource(network).getToken().take(1)
             .switchMapSingle { token ->
                 source.loginSocialNetwork(network.name, token)
+                    .applyScheduler(schedulersFacade)
                     .doOnSuccess { response -> saveTokens(response.tokens) }
             }
             .map(LoginDto::isEmailConfirmed)
