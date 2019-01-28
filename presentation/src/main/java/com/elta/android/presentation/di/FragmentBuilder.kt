@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.registration.activation.ui.Activat
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
+import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -34,6 +35,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRegistrationMainFragment(): RegistrationMainFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindRegistrationSocialFragment(): RegistrationSocialFragment
 
     @FragmentScope
     @ContributesAndroidInjector

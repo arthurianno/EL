@@ -4,7 +4,6 @@ import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
-import com.elta.android.data.features.auth.api.request.SocialNetworkRequest
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import io.reactivex.Completable
@@ -13,7 +12,6 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 
 @Suppress("TooManyFunctions", "ComplexInterface")
 interface AuthApi {
@@ -38,13 +36,4 @@ interface AuthApi {
 
     @POST("api/auth/v1/accounts/password/reset")
     fun resetPassword(@Body request: ResetPasswordRequest): Completable
-
-    @POST("api/auth/v1/socialnetworks/{name}/link")
-    fun linkSocialNetwork(@Path("name") name: String, @Body request: SocialNetworkRequest): Completable
-
-    @POST("api/auth/v1/socialnetworks/{name}/unlink")
-    fun unLinkSocialNetwork(@Path("name") name: String): Completable
-
-    @POST("api/auth/v1/socialnetworks/{name}/login")
-    fun loginSocialNetwork(@Path("name") name: String, @Body request: SocialNetworkRequest): Completable
 }

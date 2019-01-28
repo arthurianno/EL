@@ -1,0 +1,52 @@
+package com.elta.android.data.features.auth.datasource.social.datasource
+
+import android.content.Context
+import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
+import com.elta.android.data.features.auth.datasource.social.authAndGetToken
+import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.domain.features.auth.model.SocialNetwork
+import io.reactivex.Observable
+import io.reactivex.Single
+import org.json.JSONObject
+import ru.ok.android.sdk.Odnoklassniki
+import ru.ok.android.sdk.OkListener
+import ru.ok.android.sdk.OkRequestMode
+
+class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
+
+    private val ok: Odnoklassniki = Odnoklassniki.getInstance()
+
+    override fun getToken(): Observable<String> =
+        Observable.create<String> { emitter ->
+            ok.checkValidTokens(object : OkListener {
+                override fun onSuccess(json: JSONObject) {
+                    if (!emitter.isDisposed) {
+                        emitter.onNext(json.toString())
+                    }
+                }
+
+                override fun onError(error: String?) {
+                    if (!emitter.isDisposed) {
+                        emitter.onError(RuntimeException())
+                    }
+                }
+            })
+        }.onErrorResumeNext(SocialNetwork.OK.authAndGetToken(context))
+
+    override fun getSocialUser(): Single<SocialUserDto> = Single.create { emitter ->
+        ok.requestAsync("users.getCurrentUser", null, OkRequestMode.DEFAULT, object : OkListener {
+            override fun onSuccess(json: JSONObject) {
+                if (!emitter.isDisposed) {
+                    val name = json["first_name"] as String
+                    emitter.onSuccess(SocialUserDto(name))
+                }
+            }
+
+            override fun onError(error: String) {
+                if (!emitter.isDisposed) {
+                    emitter.onError(RuntimeException(error))
+                }
+            }
+        })
+    }
+}

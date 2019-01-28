@@ -5,7 +5,6 @@ import com.elta.android.data.features.auth.dto.TokensDto
 import io.reactivex.Completable
 import io.reactivex.Single
 
-@Suppress("TooManyFunctions", "ComplexInterface")
 interface AuthDataSource {
 
     fun register(email: String, password: String): Single<TokensDto>
@@ -21,10 +20,4 @@ interface AuthDataSource {
     fun sendResetPasswordLink(email: String): Completable
 
     fun resetPassword(token: String, newPassword: String): Completable
-
-    fun linkSocialNetwork(name: String, token: String): Completable
-
-    fun unLinkSocialNetwork(name: String): Completable
-
-    fun loginSocialNetwork(name: String, token: String): Completable
 }
