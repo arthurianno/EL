@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
-import com.elta.android.presentation.features.registration.main.ui.BaseAuthFragment
+import com.elta.android.presentation.features.registration.main.ui.BaseSocialFragment
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 
-class LoginFragment : BaseAuthFragment<LoginPm>() {
+class LoginFragment : BaseSocialFragment<LoginPm>() {
 
     override val menuButtonText: Int = R.string.auth_toolbar_button_text
     override val continueButtonText: Int = R.string.auth_button_continue

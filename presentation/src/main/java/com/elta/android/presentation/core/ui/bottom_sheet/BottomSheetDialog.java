@@ -1,8 +1,14 @@
 package com.elta.android.presentation.core.ui.bottom_sheet;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +30,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import timber.log.Timber;
-
 /**
  * Base class for {@link android.app.Dialog}s styled as a bottom sheet.
  */
@@ -33,12 +37,21 @@ public class BottomSheetDialog extends AppCompatDialog {
 
     private BottomSheetBehavior<FrameLayout> behavior;
     private Handler handler = new Handler();
-    private Long startDelay = 180L;
+    private Long startDelay = 0L;
 
     boolean cancelable = true;
     private boolean canceledOnTouchOutside = true;
     private boolean canceledOnTouchOutsideSet;
     private int initialState = BottomSheetBehavior.STATE_EXPANDED;
+    private int color1 = Color.TRANSPARENT;
+    private int color2 = Color.parseColor("#B3000000");
+    private ObjectAnimator inAnimator;
+    private ObjectAnimator outAnimator;
+    private TypeEvaluator colorEvaluator = new ArgbEvaluator();
+    private long inColorAnimationDuration = 400;
+    private long outColorAnimationDuration = 300;
+    private boolean isAnimationFinished;
+    private boolean isDismissing;
 
     public BottomSheetDialog(@NonNull Context context) {
         this(context, 0);
@@ -74,6 +87,30 @@ public class BottomSheetDialog extends AppCompatDialog {
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             }
             window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            View view = window.getDecorView();
+
+            inAnimator = ObjectAnimator.ofInt(view, "backgroundColor", color1, color2);
+            inAnimator.setEvaluator(colorEvaluator);
+            inAnimator.setDuration(inColorAnimationDuration);
+
+            outAnimator = ObjectAnimator.ofInt(view, "backgroundColor", color2, color1);
+            outAnimator.setEvaluator(colorEvaluator);
+            outAnimator.setDuration(outColorAnimationDuration);
+            outAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    isAnimationFinished = true;
+                    checkAndDismiss();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    isAnimationFinished = true;
+                    checkAndDismiss();
+                }
+            });
+
+            animateIn();
         }
     }
 
@@ -131,6 +168,7 @@ public class BottomSheetDialog extends AppCompatDialog {
     }
 
     public void closeSmooth() {
+        animateOut();
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
@@ -229,22 +267,44 @@ public class BottomSheetDialog extends AppCompatDialog {
         setOnShowListener(new OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        behavior.setState(initialState);
-                    }
-                }, startDelay);
+                if (behavior.getState() != initialState) {
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            behavior.setState(initialState);
+                        }
+                    }, startDelay);
+                }
             }
         });
+    }
+
+    private void animateIn() {
+        inAnimator.start();
+    }
+
+    private void animateOut() {
+        if (!isDismissing) {
+            outAnimator.start();
+        }
+    }
+
+    private void checkAndDismiss() {
+        int newState = behavior.getState();
+        if ((newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED)
+                && isAnimationFinished
+                && !isDismissing) {
+            isDismissing = true;
+            BottomSheetDialog.super.dismiss();
+        }
     }
 
     private BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, @BottomSheetBehavior.State int newState) {
-            Timber.d("onStateChanged " + newState);
             if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                BottomSheetDialog.super.dismiss();
+                checkAndDismiss();
+                animateOut();
             }
         }
 

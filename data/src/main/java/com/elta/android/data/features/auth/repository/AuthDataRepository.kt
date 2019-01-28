@@ -3,6 +3,7 @@ package com.elta.android.data.features.auth.repository
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.dto.LoginDto
+import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import io.reactivex.Completable
@@ -16,21 +17,14 @@ class AuthDataRepository @Inject constructor(
 
     override fun register(email: String, password: String): Completable =
         source.register(email, password)
-            .doOnSuccess { tokens ->
-                tokenStorage.accessToken = tokens.accessToken
-                tokenStorage.refreshToken = tokens.refreshToken
-            }
+            .doOnSuccess(::saveTokens)
             .flatMapCompletable {
                 Completable.complete()
             }
 
     override fun login(email: String, password: String): Single<Boolean> =
         source.login(email, password)
-            .doOnSuccess { response ->
-                val tokens = response.tokens
-                tokenStorage.accessToken = tokens.accessToken
-                tokenStorage.refreshToken = tokens.refreshToken
-            }
+            .doOnSuccess { response -> saveTokens(response.tokens) }
             .map(LoginDto::isEmailConfirmed)
 
     override fun checkEmail(): Single<Boolean> =
@@ -58,4 +52,9 @@ class AuthDataRepository @Inject constructor(
 
     override fun confirmEmail(token: String): Completable =
         source.confirmEmail(token)
+
+    private fun saveTokens(tokens: TokensDto) {
+        tokenStorage.accessToken = tokens.accessToken
+        tokenStorage.refreshToken = tokens.refreshToken
+    }
 }

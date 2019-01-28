@@ -8,6 +8,7 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
+import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -32,6 +33,7 @@ class App : Application(), HasActivityInjector {
         initializeInjector()
         initializeLogger()
         initializeJodaTime()
+        initializeSocialNetworks()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -65,5 +67,9 @@ class App : Application(), HasActivityInjector {
         val crashlyticsKit = Crashlytics.Builder()
             .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build()
         Fabric.with(this, crashlyticsKit)
+    }
+
+    private fun initializeSocialNetworks() {
+        SocialNetworks.initialize(this)
     }
 }

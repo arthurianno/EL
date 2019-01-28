@@ -37,10 +37,10 @@ class AuthRemoteDataSource @Inject constructor(
         api.sendConfirmationLink().checkNetwork(checker)
 
     override fun sendResetPasswordLink(email: String): Completable =
-        api.sendPasswordResetLink(ResetPasswordLinkRequest(email))
+        api.sendPasswordResetLink(ResetPasswordLinkRequest(email)).checkNetwork(checker)
 
     override fun resetPassword(token: String, newPassword: String): Completable =
-        api.resetPassword(ResetPasswordRequest(token, newPassword))
+        api.resetPassword(ResetPasswordRequest(token, newPassword)).checkNetwork(checker)
 
     override fun checkTokenOwner(token: String): Single<TokenOwnerDto> =
         api.checkTokenOwner(TokenRequest(token)).checkNetwork(checker)

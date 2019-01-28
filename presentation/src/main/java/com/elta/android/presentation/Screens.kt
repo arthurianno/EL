@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import android.support.v4.app.Fragment
+import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
@@ -11,6 +12,7 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
+import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -30,6 +32,10 @@ object Screens {
 
     object RegistrationMain : SupportAppScreen() {
         override fun getFragment(): Fragment = RegistrationMainFragment.newInstance()
+    }
+
+    data class RegistrationSocial(val network: SocialNetwork) : SupportAppScreen() {
+        override fun getFragment(): Fragment = RegistrationSocialFragment.newInstance(network)
     }
 
     object ActivateProfile : SupportAppScreen() {

@@ -77,7 +77,11 @@ def libraryVersions = [
 
         ciceroneVersion            : '4.0.2',
 
-        ktlintVersion              : "0.24.0"
+        ktlintVersion              : "0.24.0",
+
+        fbVersion                  : '4.29.0',
+        vkVersion                  : '1.6.9',
+        okVersion                  : '2.1.6'
 ]
 
 ext.commonDependencies = [
@@ -123,6 +127,7 @@ ext.commonDependencies = [
         appCore               : "com.nullgr.core:core-all:${libraryVersions.appCoreVersion}",
         appCoreInteractor     : "com.nullgr.core:core-interactor:${libraryVersions.appCoreVersion}",
         appCoreRx             : "com.nullgr.core:core-rx:${libraryVersions.appCoreVersion}",
+        appCoreIntents        : "com.nullgr.core:core-intents:${libraryVersions.appCoreVersion}",
         appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
         appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
         appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
@@ -154,7 +159,11 @@ ext.commonDependencies = [
 
         cicerone              : "ru.terrakok.cicerone:cicerone:${libraryVersions.ciceroneVersion}",
         exoPlayer             : "com.google.android.exoplayer:exoplayer:${libraryVersions.exoPlayer}",
-        datePicker            : "com.github.prolificinteractive:material-calendarview:${libraryVersions.datePickerVersion}"
+        datePicker            : "com.github.prolificinteractive:material-calendarview:${libraryVersions.datePickerVersion}",
+
+        fb                    : "com.facebook.android:facebook-login:${libraryVersions.fbVersion}",
+        vk                    : "com.vk:androidsdk:${libraryVersions.vkVersion}",
+        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}"
 ]
 
 ext.commonTestDependencies = [
