@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.registration.confirmation.ui;
+package com.elta.android.presentation.features.registration.confirmation.ui
 
 import android.os.Bundle
 import android.view.View

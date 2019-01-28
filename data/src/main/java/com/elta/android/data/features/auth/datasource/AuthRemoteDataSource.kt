@@ -13,7 +13,6 @@ import com.elta.android.data.features.auth.dto.TokensDto
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AuthRemoteDataSource @Inject constructor(
