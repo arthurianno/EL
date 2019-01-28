@@ -14,11 +14,13 @@ import com.elta.android.presentation.features.registration.activation.pm.Activat
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
+import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import me.dmdev.rxpm.PresentationModel
 
+@Suppress("TooManyFunctions")
 @Module
 abstract class PmModule {
 
@@ -45,6 +47,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(RegistrationMainPm::class)
     abstract fun bindRegistrationMainPm(pm: RegistrationMainPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(RegistrationSocialPm::class)
+    abstract fun bindRegistrationSocialPm(pm: RegistrationSocialPm): PresentationModel
 
     @Binds
     @IntoMap

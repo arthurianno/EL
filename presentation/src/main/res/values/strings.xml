@@ -90,4 +90,8 @@
     <string name="auth_password_create_login_button_title">Сохранить и войти</string>
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+
+    <string name="registration_social_title">Приветствуем, %s</string>
+    <string name="registration_social_title_no_name">Приветствуем</string>
+    <string name="registration_social_subtitle">Осталось ввести email и пароль для вашего\nбудущего аккаунта</string>
 </resources>
