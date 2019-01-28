@@ -90,4 +90,5 @@
     <string name="auth_password_create_login_button_title">Сохранить и войти</string>
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+    <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
 </resources>
