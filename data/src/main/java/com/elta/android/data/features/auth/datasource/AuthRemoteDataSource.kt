@@ -6,11 +6,14 @@ import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
+import com.elta.android.data.features.auth.api.request.TokenRequest
 import com.elta.android.data.features.auth.dto.LoginDto
+import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AuthRemoteDataSource @Inject constructor(
@@ -38,4 +41,11 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun resetPassword(token: String, newPassword: String): Completable =
         api.resetPassword(ResetPasswordRequest(token, newPassword))
+
+    override fun checkTokenOwner(token: String): Single<TokenOwnerDto> =
+        api.checkTokenOwner(TokenRequest(token)).checkNetwork(checker)
+
+    override fun confirmEmail(token: String): Completable {
+        return api.confirmEmail(TokenRequest(token)).checkNetwork(checker)
+    }
 }
