@@ -20,5 +20,4 @@ abstract class SocialDelegate(activity: Activity) : ActivityDelegate(activity) {
         activity.finish()
         activity.overridePendingTransition(0, 0)
     }
-
 }

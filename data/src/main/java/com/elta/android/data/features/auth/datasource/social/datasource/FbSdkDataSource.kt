@@ -9,13 +9,10 @@ import com.facebook.AccessToken
 import com.facebook.Profile
 import io.reactivex.Observable
 import io.reactivex.Single
-import javax.inject.Inject
 
-class FbSdkDataSource @Inject constructor(
-    private val context: Context
-) : SocialNetworkDataSource {
+class FbSdkDataSource(private val context: Context) : SocialNetworkDataSource {
 
-    override fun getToken(network: SocialNetwork): Observable<String> =
+    override fun getToken(): Observable<String> =
         Observable.create<String> { emitter ->
             val token = AccessToken.getCurrentAccessToken()
             if (token != null && !token.isExpired) {
@@ -27,9 +24,9 @@ class FbSdkDataSource @Inject constructor(
                     emitter.onError(RuntimeException())
                 }
             }
-        }.onErrorResumeNext(network.authAndGetToken(context))
+        }.onErrorResumeNext(SocialNetwork.FB.authAndGetToken(context))
 
-    override fun getSocialUser(network: SocialNetwork): Single<SocialUserDto> =
+    override fun getSocialUser(): Single<SocialUserDto> =
         Single.fromCallable {
             SocialUserDto(Profile.getCurrentProfile().firstName)
         }

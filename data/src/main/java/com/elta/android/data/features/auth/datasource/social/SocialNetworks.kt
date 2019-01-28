@@ -9,6 +9,10 @@ object SocialNetworks {
 
     fun initialize(context: Context) {
         VKSdk.initialize(context)
-        Odnoklassniki.createInstance(context, context.getString(R.string.OK_APP_ID), context.getString(R.string.OK_APP_KEY))
+        Odnoklassniki.createInstance(
+            context,
+            context.getString(R.string.OK_APP_ID),
+            context.getString(R.string.OK_APP_KEY)
+        )
     }
 }

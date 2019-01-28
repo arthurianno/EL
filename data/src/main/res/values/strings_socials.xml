@@ -3,6 +3,7 @@
     <string name="facebook_app_id">658847084530835</string>
     <string name="fb_login_protocol_scheme">fb658847084530835</string>
     <string name="OK_APP_ID">1275033600</string>
-    <string name="OK_APP_KEY">5E42FBE41017F22478A28CDC</string>
+    <string name="OK_APP_KEY">CBAJHQPMEBABABABA</string>
+    <string name="OK_REDIRECT_URL">okauth://ok1269730560</string>
     <integer name="com_vk_sdk_AppId">6819846</integer>
 </resources>

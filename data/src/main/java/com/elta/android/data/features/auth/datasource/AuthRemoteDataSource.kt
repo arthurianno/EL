@@ -6,7 +6,6 @@ import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
-import com.elta.android.data.features.auth.api.request.SocialNetworkRequest
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.nullgr.core.hardware.NetworkChecker
@@ -14,7 +13,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
 
-@Suppress("TooManyFunctions")
 class AuthRemoteDataSource @Inject constructor(
     private val checker: NetworkChecker,
     private val api: AuthApi
@@ -40,13 +38,4 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun resetPassword(token: String, newPassword: String): Completable =
         api.resetPassword(ResetPasswordRequest(token, newPassword)).checkNetwork(checker)
-
-    override fun linkSocialNetwork(name: String, token: String): Completable =
-        api.linkSocialNetwork(name, SocialNetworkRequest(token)).checkNetwork(checker)
-
-    override fun unLinkSocialNetwork(name: String): Completable =
-        api.unLinkSocialNetwork(name).checkNetwork(checker)
-
-    override fun loginSocialNetwork(name: String, token: String): Completable =
-        api.loginSocialNetwork(name, SocialNetworkRequest(token)).checkNetwork(checker)
 }

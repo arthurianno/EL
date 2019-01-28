@@ -8,57 +8,7 @@ import com.elta.android.data.features.auth.datasource.social.delegates.FbSocialD
 import com.elta.android.data.features.auth.datasource.social.delegates.OkSocialDelegate
 import com.elta.android.data.features.auth.datasource.social.delegates.VkSocialDelegate
 import com.elta.android.domain.features.auth.model.SocialNetwork
-import com.facebook.AccessToken
-import com.vk.sdk.VKAccessToken
 import io.reactivex.Observable
-import org.json.JSONObject
-import ru.ok.android.sdk.Odnoklassniki
-import ru.ok.android.sdk.OkListener
-
-fun SocialNetwork.getToken(): Observable<String> = Observable.create { emitter ->
-    when (this) {
-        SocialNetwork.FB -> {
-            val token = AccessToken.getCurrentAccessToken()
-            if (token != null && !token.isExpired) {
-                if (!emitter.isDisposed) {
-                    emitter.onNext(token.token)
-                }
-            } else {
-                if (!emitter.isDisposed) {
-                    emitter.onError(RuntimeException())
-                }
-            }
-        }
-        SocialNetwork.VK -> {
-            val token = VKAccessToken.currentToken()
-            if (token != null && !token.isExpired) {
-                if (!emitter.isDisposed) {
-                    emitter.onNext(token.accessToken)
-                }
-            } else {
-                if (!emitter.isDisposed) {
-                    emitter.onError(RuntimeException())
-                }
-            }
-        }
-
-        SocialNetwork.OK -> {
-            Odnoklassniki.getInstance().checkValidTokens(object : OkListener {
-                override fun onSuccess(json: JSONObject?) {
-                    if (!emitter.isDisposed) {
-                        emitter.onNext(json.toString())
-                    }
-                }
-
-                override fun onError(error: String?) {
-                    if (!emitter.isDisposed) {
-                        emitter.onError(RuntimeException())
-                    }
-                }
-            })
-        }
-    }
-}
 
 fun SocialNetwork.authAndGetToken(context: Context): Observable<String> =
     RxSocialActivity.launchForResult(context, this)
@@ -71,7 +21,7 @@ fun SocialNetwork.authAndGetToken(context: Context): Observable<String> =
         }
 
 fun SocialNetwork.getDelegate(activity: Activity): ActivityDelegate =
-    when(this) {
+    when (this) {
         SocialNetwork.FB -> FbSocialDelegate(activity)
         SocialNetwork.VK -> VkSocialDelegate(activity)
         SocialNetwork.OK -> OkSocialDelegate(activity)

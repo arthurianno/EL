@@ -4,11 +4,13 @@
     <application>
         <!-- SOCIAL NETWORKS -->
 
-        <activity android:name=".features.auth.datasource.social.RxSocialActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".features.auth.datasource.social.RxSocialActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="ru.ok.android.sdk.OkAuthActivity"
+            android:theme="@style/OkTheme"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -43,5 +45,11 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.vk.sdk.VKServiceActivity"
+            android:label="ServiceActivity"
+            android:theme="@style/VK.Transparent" />
+
     </application>
 </manifest>

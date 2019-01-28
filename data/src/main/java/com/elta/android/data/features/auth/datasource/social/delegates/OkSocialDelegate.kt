@@ -3,6 +3,7 @@ package com.elta.android.data.features.auth.datasource.social.delegates
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.elta.android.data.R
 import com.elta.android.data.features.auth.datasource.social.SocialResult
 import com.elta.android.domain.features.auth.model.SocialNetwork
 import org.json.JSONException
@@ -37,8 +38,8 @@ class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
             }
 
             override fun onError(error: String?) {
-                Odnoklassniki.getInstance().requestAuthorization(activity, null,
-                    OkAuthType.ANY, OkScope.LONG_ACCESS_TOKEN)
+                Odnoklassniki.getInstance().requestAuthorization(activity, activity.getString(R.string.OK_REDIRECT_URL),
+                    OkAuthType.ANY, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN)
             }
         })
     }

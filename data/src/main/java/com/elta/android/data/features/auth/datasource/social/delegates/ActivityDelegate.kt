@@ -8,11 +8,8 @@ abstract class ActivityDelegate(val activity: Activity) {
 
     abstract fun onCreate(state: Bundle?)
 
-    open fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return false
-    }
+    open fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean = false
 
     open fun onBackPressed() {
-
     }
 }

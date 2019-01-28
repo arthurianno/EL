@@ -13,8 +13,8 @@ import kotlinx.android.synthetic.main.fragment_auth_base.*
 class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm>() {
 
     override val continueButtonText: Int = R.string.registration_main_button_continue
-    override val authTitleText: Int = R.string.registration_main_title_new_user
-    override val authSubtitleText: Int = R.string.registration_main_subtitle
+    override val authTitleText: Int = R.string.registration_social_title_no_name
+    override val authSubtitleText: Int = R.string.registration_social_subtitle
     override val classToken: Class<RegistrationSocialPm> = RegistrationSocialPm::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {

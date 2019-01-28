@@ -17,8 +17,9 @@ class RegistrationSocialPm @Inject constructor(
     services: ServiceFacade
 ) : BaseRegistrationPm(services) {
 
-    val authTitleState = State(resources.getString(R.string.registration_main_title_new_user))
+    val authTitleState = State(resources.getString(R.string.registration_social_title_no_name))
 
+    private val getSocialUserAction = Action<SocialNetwork>()
     private val socialNetworkState = State<SocialNetwork>()
 
     override fun onCreate() {
@@ -51,8 +52,7 @@ class RegistrationSocialPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        socialNetworkState.observable
-            .take(1)
+        getSocialUserAction.observable
             .skipWhileInProgress()
             .map(::createSocialUserParams)
             .flatMapSingle { params ->
@@ -62,7 +62,13 @@ class RegistrationSocialPm @Inject constructor(
                     .doOnSuccess(::handleSocialUserSuccess)
                     .doOnError(::handleError)
             }
+            .retry()
             .subscribe()
+            .untilDestroy()
+
+        socialNetworkState.observable
+            .take(1)
+            .subscribe(getSocialUserAction.consumer)
             .untilDestroy()
     }
 
@@ -71,7 +77,11 @@ class RegistrationSocialPm @Inject constructor(
     }
 
     private fun createRegisterParams(i: Unit): RegisterWithSocialNetworkUseCase.Params =
-        RegisterWithSocialNetworkUseCase.Params(emailInput.text.value, passwordInput.text.value, socialNetworkState.value)
+        RegisterWithSocialNetworkUseCase.Params(
+            emailInput.text.value,
+            passwordInput.text.value,
+            socialNetworkState.value
+        )
 
     private fun createSocialUserParams(network: SocialNetwork): GetSocialUserUseCase.Params =
         GetSocialUserUseCase.Params(network)

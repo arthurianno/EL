@@ -44,5 +44,4 @@ class FbSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data)
-
 }

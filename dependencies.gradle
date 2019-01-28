@@ -80,7 +80,7 @@ def libraryVersions = [
 
         fbVersion                  : '4.29.0',
         vkVersion                  : '1.6.9',
-        okVersion                  : '2.0.3'
+        okVersion                  : '2.1.6'
 ]
 
 ext.commonDependencies = [

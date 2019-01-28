@@ -2,8 +2,8 @@ package com.elta.android.data.di
 
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
-import com.elta.android.data.features.auth.datasource.social.SocialNetworkSdkDataSource
-import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
+import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
+import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -18,5 +18,5 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindSocialNetworkTokenDataSource(source: SocialNetworkSdkDataSource): SocialNetworkDataSource
+    abstract fun bindAuthSocialDataSource(source: AuthSocialRemoteDataSource): AuthSocialDataSource
 }
