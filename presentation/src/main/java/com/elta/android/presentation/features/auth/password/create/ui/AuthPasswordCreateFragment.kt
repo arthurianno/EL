@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
+import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
@@ -21,9 +22,11 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
     override val classToken: Class<AuthPasswordCreatePm> = AuthPasswordCreatePm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        presentationModel.passToken("Sometoken") // TODO here will be token from deep link
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.get(EXTRA_TOKEN)?.let {
+            presentationModel.passToken(it as String)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,6 +49,11 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
     }
 
     companion object {
-        fun newInstance(): AuthPasswordCreateFragment = AuthPasswordCreateFragment()
+        fun newInstance(token: String): AuthPasswordCreateFragment =
+            AuthPasswordCreateFragment().apply {
+                arguments = bundle(EXTRA_TOKEN to token)
+            }
+
+        private const val EXTRA_TOKEN = "extra_token"
     }
 }

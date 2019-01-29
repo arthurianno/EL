@@ -1,5 +1,6 @@
 package com.elta.android.data.features.auth.repository
 
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokensDto
@@ -29,7 +30,12 @@ class AuthDataRepository @Inject constructor(
     override fun checkEmail(): Single<Boolean> =
         source.isEmailConfirmed()
             .andThen(Single.just(true))
-            .onErrorReturn { false }
+            .onErrorResumeNext {
+                // TODO this condition should be improved
+                // Need to add specific error for not verified email and bind it as simple error
+                if (it !is NetworkConnectionError) Single.just(false)
+                else Single.error<Boolean>(it)
+            }
 
     override fun sendConfirmationLink(): Completable =
         source.sendConfirmationLink()
@@ -39,6 +45,13 @@ class AuthDataRepository @Inject constructor(
 
     override fun resetPassword(token: String, newPassword: String): Completable =
         source.resetPassword(token, newPassword)
+
+    override fun checkTokenOwner(token: String): Single<Boolean> =
+        source.checkTokenOwner(token)
+            .map { it.isOwner }
+
+    override fun confirmEmail(token: String): Completable =
+        source.confirmEmail(token)
 
     private fun saveTokens(tokens: TokensDto) {
         tokenStorage.accessToken = tokens.accessToken

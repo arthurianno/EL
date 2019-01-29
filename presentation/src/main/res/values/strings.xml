@@ -5,6 +5,11 @@
     <string name="title_connection_found">Соединение восстановлено</string>
     <string name="space"> </string>
 
+    <!-- ERROR VIEW ERRORS -->
+    <string name="error_server_not_responding_title">Сервер не доступен</string>
+    <string name="error_server_not_responding_subtitle">Приносим свои извиненияза принесенные неудобства</string>
+    <string name="error_server_not_responding_retry_button">Повторить</string>
+
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
     <string name="greeting_message">Управляйте диабетом вместе Сателлит\nOnline</string>
@@ -69,6 +74,14 @@
     <string name="registration_error_input_email">Некорректный email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+    <string name="registration_email_confirmation_title">Аккаунт верифицирован</string>
+    <string name="registration_email_confirmation_subtitle">Ваш аккаунт успешно верифицирован. Чтобы использовать этот аккаунт, необходимо войти в систему используя ваш email и пароль.</string>
+    <string name="registration_email_confirmation_continue_button">Продолжить работу</string>
+    <string name="registration_email_confirmation_login_button">Войти</string>
+
+    <string name="registration_social_title">Приветствуем, %s</string>
+    <string name="registration_social_title_no_name">Приветствуем</string>
+    <string name="registration_social_subtitle">Осталось ввести email и пароль для вашего\nбудущего аккаунта</string>
 
     <!-- AUTH FLOW -->
     <string name="auth_toolbar_button_text">Забыли пароль?</string>
@@ -90,8 +103,5 @@
     <string name="auth_password_create_login_button_title">Сохранить и войти</string>
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
-
-    <string name="registration_social_title">Приветствуем, %s</string>
-    <string name="registration_social_title_no_name">Приветствуем</string>
-    <string name="registration_social_subtitle">Осталось ввести email и пароль для вашего\nбудущего аккаунта</string>
+    <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
 </resources>

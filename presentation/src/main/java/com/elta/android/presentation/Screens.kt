@@ -9,6 +9,7 @@ import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPass
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
+import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
@@ -41,6 +42,10 @@ object Screens {
         override fun getFragment(): Fragment = ActivationFragment.newInstance()
     }
 
+    data class EmailConfirmation(val token: String) : SupportAppScreen() {
+        override fun getFragment(): Fragment = EmailConfirmationFragment.newInstance(token)
+    }
+
     // AUTH FLOW
     object AuthFlow : SupportAppScreen() {
         override fun getFragment(): Fragment = AuthFlowFragment.newInstance()
@@ -54,7 +59,7 @@ object Screens {
         override fun getFragment(): Fragment = AuthPasswordRecoveryFragment.newInstance()
     }
 
-    object PasswordCreate : SupportAppScreen() {
-        override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance()
+    data class PasswordCreate(val token: String) : SupportAppScreen() {
+        override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance(token)
     }
 }

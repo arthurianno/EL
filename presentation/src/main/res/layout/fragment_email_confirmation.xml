@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/confirmationNextActionView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <include
+            layout="@layout/layout_auth_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.elta.android.presentation.core.ui.state_view.StateWidget
+            android:id="@+id/confirmationSuccessStateView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:state_button="@string/registration_main_button_continue"
+            app:state_description="@string/registration_activate_description"
+            app:state_icon="@drawable/ic_activation"
+            app:state_title="@string/registration_activate_title" />
+
+    </LinearLayout>
+
+    <com.elta.android.presentation.core.ui.state_view.StateWidget
+        android:id="@+id/errorStateView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:state_button="@string/error_server_not_responding_retry_button"
+        app:state_description="@string/error_server_not_responding_subtitle"
+        app:state_icon="@drawable/ic_server_error"
+        app:state_title="@string/error_server_not_responding_title" />
+
+</FrameLayout>
