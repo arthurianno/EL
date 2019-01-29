@@ -22,8 +22,8 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
     override val classToken: Class<AuthPasswordCreatePm> = AuthPasswordCreatePm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         arguments?.get(EXTRA_TOKEN)?.let {
             presentationModel.passToken(it as String)
         }
