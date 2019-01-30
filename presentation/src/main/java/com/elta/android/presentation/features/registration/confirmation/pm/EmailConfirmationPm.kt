@@ -14,6 +14,8 @@ class EmailConfirmationPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
+    override val isEmptyScreen: Boolean = true
+
     val loginWithAnotherAccountAction = Action<Unit>()
     val continueAction = Action<Unit>()
     val contentVisibilityCommand = Command<Boolean>(bufferSize = 1)
@@ -58,12 +60,7 @@ class EmailConfirmationPm @Inject constructor(
             .untilDestroy()
     }
 
-    override fun handleError(error: Throwable) {
-        // TODO its not a real logic, should be implemented in errorHandler
-        passToErrorViewVisibility(true)
-    }
-
-    fun passToken(token: String) {
+    fun setToken(token: String) {
         this.token.consumer.accept(token)
     }
 

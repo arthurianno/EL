@@ -2,6 +2,7 @@ package com.elta.android.data.core.network
 
 import com.elta.android.data.core.qualifires.Interceptors
 import com.elta.android.data.core.qualifires.NetworkInterceptors
+import okhttp3.Authenticator
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -18,13 +19,16 @@ object OkHttpClientFactory {
     private const val CACHE_SIZE: Long = 1024 * 1024 * 10 // 10Mb
 
     fun create(
-        cacheFolder: File,
+        cacheFolder: File? = null,
         @Interceptors interceptors: List<Interceptor>,
-        @NetworkInterceptors networkInterceptors: List<Interceptor>
+        @NetworkInterceptors networkInterceptors: List<Interceptor>,
+        authenticator: Authenticator? = null
     ): OkHttpClient =
         OkHttpClient().newBuilder()
             .apply {
-                cache(Cache(cacheFolder, CACHE_SIZE))
+                if (cacheFolder != null) {
+                    cache(Cache(cacheFolder, CACHE_SIZE))
+                }
 
                 for (interceptor in interceptors) {
                     addInterceptor(interceptor)
@@ -37,6 +41,12 @@ object OkHttpClientFactory {
                 connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
                 writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+
+                if (authenticator != null) {
+                    authenticator(authenticator)
+                }
             }
             .build()
+
+    fun create(): OkHttpClient = OkHttpClient().newBuilder().build()
 }

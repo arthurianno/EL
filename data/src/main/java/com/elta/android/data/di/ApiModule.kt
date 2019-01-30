@@ -1,6 +1,8 @@
 package com.elta.android.data.di
 
+import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.features.auth.api.AuthApi
+import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.auth.api.SocialApi
 import dagger.Module
 import dagger.Provides
@@ -13,11 +15,21 @@ class ApiModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create<AuthApi>(AuthApi::class.java)
+    fun provideAuthApi(
+        retrofit: Retrofit
+    ): AuthApi = retrofit.create<AuthApi>(AuthApi::class.java)
 
     @Provides
     @Singleton
-    fun provideAuthSocialApi(retrofit: Retrofit): SocialApi = retrofit.create<SocialApi>(SocialApi::class.java)
+    fun provideAuthRefreshApi(
+        @Token retrofit: Retrofit
+    ): TokenRefreshApi = retrofit.create<TokenRefreshApi>(TokenRefreshApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAuthSocialApi(
+        retrofit: Retrofit
+    ): SocialApi = retrofit.create<SocialApi>(SocialApi::class.java)
 
     object ApiConfig
 }

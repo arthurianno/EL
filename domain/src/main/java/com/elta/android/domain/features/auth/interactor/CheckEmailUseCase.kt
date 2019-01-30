@@ -11,5 +11,5 @@ class CheckEmailUseCase @Inject constructor(
     schedulers: SchedulersFacade
 ) : SingleUseCase<Boolean, Unit>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Unit?): Single<Boolean> = repository.checkEmail()
+    override fun buildUseCaseObservable(params: Unit?): Single<Boolean> = repository.isEmailConfirmed()
 }

@@ -4,4 +4,6 @@ interface TokenStorage {
     var accessToken: String?
 
     var refreshToken: String?
+
+    fun refresh()
 }

@@ -8,6 +8,7 @@ import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.MappersModule
 import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
+import com.elta.android.data.di.TokenModule
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.di.FragmentBuilder
@@ -28,6 +29,7 @@ import javax.inject.Singleton
     ApiModule::class,
     ApiConstantsModule::class,
     NetworkModule::class,
+    TokenModule::class,
     DataSourceModule::class,
     MappersModule::class,
     // domain

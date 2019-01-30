@@ -1,8 +1,14 @@
 package com.elta.android.data.features.auth.storage
 
+import android.annotation.SuppressLint
+import com.elta.android.data.features.auth.api.TokenRefreshApi
+import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.nullgr.core.security.prefs.CryptoPreferences
 
-class LocalTokenStorage(private val pref: CryptoPreferences) : TokenStorage {
+class LocalTokenStorage(
+    private val pref: CryptoPreferences,
+    private val api: TokenRefreshApi
+) : TokenStorage {
 
     override var accessToken: String?
         get() = pref.getString(ACCESS_TOKEN, null)
@@ -15,6 +21,16 @@ class LocalTokenStorage(private val pref: CryptoPreferences) : TokenStorage {
         set(value) {
             pref.setString(REFRESH_TOKEN, value)
         }
+
+    @SuppressLint("CheckResult")
+    override fun refresh() {
+        api.refresh(RefreshRequest(accessToken, refreshToken))
+            .doOnSuccess { tokens ->
+                accessToken = tokens.accessToken
+                refreshToken = tokens.refreshToken
+            }
+            .blockingGet()
+    }
 
     private companion object {
         const val ACCESS_TOKEN = "access_token"

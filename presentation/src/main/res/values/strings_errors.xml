@@ -4,8 +4,20 @@
     <string name="error_600">Incorrect login or password</string>
     <string name="error_602">Account is locked</string>
     <string name="error_603">Внимание! Указанный email уже\nсуществует</string>
+    <string name="error_604">Not found user by access token</string>
+    <string name="error_605">Invalid refresh token</string>
+    <string name="error_606">Email is already confirmed</string>
+    <string name="error_607">Invalid token</string>
+    <string name="error_608">Invalid token</string>
+    <string name="error_609">User already linked to social network</string>
+    <string name="error_610">Social network account is already linked</string>
+    <string name="error_611">User had not been linked to this social network</string>
+    <string name="error_612">Not found. New account</string>
 
     <!-- DEFAULT ERRORS -->
     <string name="error_test_error">Internal error</string>
     <string name="error_verify_your_email">Верифицируйте email</string>
+
+    <string name="error_general_title">Ошибка</string>
+    <string name="error_general_button">Повторить</string>
 </resources>

@@ -1,15 +1,16 @@
 package com.elta.android.data.di
 
 import android.content.Context
-import com.google.gson.Gson
 import com.elta.android.data.core.network.GsonFactory
 import com.elta.android.data.core.network.OkHttpClientFactory
 import com.elta.android.data.core.network.RetrofitFactory
 import com.elta.android.data.core.qualifires.Interceptors
 import com.elta.android.data.core.qualifires.NetworkInterceptors
 import com.elta.android.data.core.qualifires.ServerUrl
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import okhttp3.Authenticator
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.CallAdapter
@@ -42,8 +43,14 @@ class NetworkModule {
     fun okHttpClient(
         cacheFolder: File,
         @Interceptors interceptors: List<Interceptor>,
-        @NetworkInterceptors networkInterceptors: List<Interceptor>
-    ): OkHttpClient = OkHttpClientFactory.create(cacheFolder, interceptors, networkInterceptors)
+        @NetworkInterceptors networkInterceptors: List<Interceptor>,
+        authenticator: Authenticator
+    ): OkHttpClient = OkHttpClientFactory.create(
+        cacheFolder,
+        interceptors,
+        networkInterceptors,
+        authenticator
+    )
 
     @Provides
     @Singleton
