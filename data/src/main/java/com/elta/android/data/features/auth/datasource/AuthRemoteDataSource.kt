@@ -1,5 +1,6 @@
 package com.elta.android.data.features.auth.datasource
 
+import com.elta.android.common.errors.EmailAlreadyConfirmedError
 import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.request.AuthRequest
@@ -7,6 +8,7 @@ import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.api.request.TokenRequest
+import com.elta.android.data.features.auth.dto.EmailStatusDto
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
@@ -29,8 +31,8 @@ class AuthRemoteDataSource @Inject constructor(
     override fun refresh(accessToken: String, refreshToken: String): Single<TokensDto> =
         api.refresh(RefreshRequest(accessToken, refreshToken)).checkNetwork(checker)
 
-    override fun isEmailConfirmed(): Completable =
-        api.checkEmail().checkNetwork(checker)
+    override fun isEmailConfirmed(): Single<EmailStatusDto> =
+        api.isEmailConfirmed().checkNetwork(checker)
 
     override fun sendConfirmationLink(): Completable =
         api.sendConfirmationLink().checkNetwork(checker)
@@ -44,7 +46,7 @@ class AuthRemoteDataSource @Inject constructor(
     override fun checkTokenOwner(token: String): Single<TokenOwnerDto> =
         api.checkTokenOwner(TokenRequest(token)).checkNetwork(checker)
 
-    override fun confirmEmail(token: String): Completable {
-        return api.confirmEmail(TokenRequest(token)).checkNetwork(checker)
-    }
+    override fun confirmEmail(token: String): Completable =
+        api.confirmEmail(TokenRequest(token)).checkNetwork(checker)
+            .onErrorComplete { error -> error is EmailAlreadyConfirmedError }
 }

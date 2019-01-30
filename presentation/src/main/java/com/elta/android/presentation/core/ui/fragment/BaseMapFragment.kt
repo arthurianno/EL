@@ -129,7 +129,7 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        pm.showSnackBarCommand.bindTo { showSnackbar(it) }
+        pm.showSnackBarCommand.bindTo { showSnackBar(it) }
     }
 
     override fun providePresentationModel(): T {
@@ -142,7 +142,7 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
         router.exit()
     }
 
-    private fun showSnackbar(data: SnackBarData) {
+    private fun showSnackBar(data: SnackBarData) {
         view?.let { content ->
             makeSnackBar(content, data).show()
         }

@@ -4,7 +4,7 @@ import com.elta.android.domain.features.auth.interactor.ResetPasswordUseCase
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
-import com.elta.android.presentation.messages.SnackbarMessageData
+import com.elta.android.presentation.messages.SnackBarMessageData
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ class AuthPasswordCreatePm @Inject constructor(
 
     private fun showSuccessMessage(i: Unit) {
         showSnackBarCommand.consumer.accept(
-            SnackbarMessageData.SimpleTextMessage(
+            SnackBarMessageData.SimpleTextMessage(
                 resources.getString(R.string.auth_password_create_message_changed_success)
             )
         )

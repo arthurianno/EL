@@ -48,7 +48,7 @@ abstract class BasePm(
     internal val errorParser = services.errorParser
 
     protected val errorHandler: ErrorHandler = errorHandler()
-    protected val flowRouter: FlowRouter? by lazy { router as? FlowRouter }
+    internal val flowRouter: FlowRouter? by lazy { router as? FlowRouter }
 
     private val networkControl by lazy { networkControl(network) }
 
@@ -77,11 +77,11 @@ abstract class BasePm(
         showSnackBarCommand.consumer.accept(data)
     }
 
-    internal fun passToErrorContainer(data: StateData) {
+    internal fun setErrorStateData(data: StateData) {
         errorControl.dataState.consumer.accept(data)
     }
 
-    internal fun passToErrorViewVisibility(visible: Boolean) {
+    internal fun setErrorViewVisibility(visible: Boolean) {
         errorControl.visibilityState.consumer.accept(visible)
     }
 
