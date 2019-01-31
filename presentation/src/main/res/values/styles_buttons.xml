@@ -24,6 +24,10 @@
         <item name="android:paddingTop">@dimen/small_button_padding</item>
     </style>
 
+    <style name="Button.Small.Blue" parent="Button.Small.Light">
+        <item name="android:background">@drawable/selector_button_small_blue</item>
+    </style>
+
     <style name="Button.Social" parent="Base.Widget.AppCompat.ImageButton">
         <item name="android:background">@drawable/selector_button_social</item>
         <item name="android:layout_width">@dimen/social_button_size</item>
