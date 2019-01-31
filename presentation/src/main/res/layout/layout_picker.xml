@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <com.shawnlin.numberpicker.NumberPicker
-        android:id="@+id/number_picker"
+        android:id="@+id/p1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="60dp"
-        app:np_dividerColor="#3ec9a8"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:np_dividerDistance="60dp"
-        app:np_dividerThickness="1dp"
         app:np_height="264dp"
         app:np_max="200"
         app:np_min="0"
@@ -28,4 +30,67 @@
         app:np_wheelItemCount="3"
         app:np_width="108dp" />
 
-</LinearLayout>
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="60dp"
+        android:text=","
+        android:textColor="#3ec9a8"
+        android:textSize="62sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/p2"
+        app:layout_constraintStart_toEndOf="@+id/p1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.shawnlin.numberpicker.NumberPicker
+        android:id="@+id/p2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:np_dividerDistance="60dp"
+        app:np_height="264dp"
+        app:np_max="9"
+        app:np_min="0"
+        app:np_order="descending"
+        app:np_selectedTextAlign="selectedTextAlignCenter"
+        app:np_selectedTextColor="#3ec9a8"
+        app:np_selectedTextSize="62sp"
+        app:np_textAlign="textAlignCenter"
+        app:np_textColor="#bbbfca"
+        app:np_textSize="42sp"
+        app:np_value="8"
+        app:np_wheelItemCount="3"
+        app:np_width="108dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="#183ec9a8"
+        app:layout_constraintBottom_toBottomOf="@+id/p1"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/p1">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="top"
+            android:background="#3ec9a8" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#3ec9a8" />
+
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>
