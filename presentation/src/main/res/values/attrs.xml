@@ -8,5 +8,9 @@
         <attr name="paddingBetweenIndicators" format="dimension" />
         <attr name="numberOfIndicators" format="integer" />
         <attr name="selectedIndicator" format="integer" />
+        <attr name="indicatorMode">
+            <enum name="single" value="0" />
+            <enum name="fill" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

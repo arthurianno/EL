@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.elta.android.presentation.R
 import com.nullgr.core.ui.animation.doOnCancel
+import com.nullgr.core.ui.animation.doOnEnd
 import io.reactivex.functions.Consumer
 
 private val progressEvaluator by lazy(LazyThreadSafetyMode.NONE) {
@@ -15,6 +16,7 @@ private val progressEvaluator by lazy(LazyThreadSafetyMode.NONE) {
 }
 private val progressInterpolator by lazy(LazyThreadSafetyMode.NONE) { AccelerateDecelerateInterpolator() }
 private const val ANIMATION_DURATION_MILLIS = 600L
+private const val TEXT_ANIMATION_DURATION_MILLIS = 300L
 
 private const val FADING_OUT = 1
 private const val FADING_IN = 2
@@ -56,26 +58,48 @@ fun TextView.animateValue(value: Int, valueUnit: String? = null, animate: Boolea
     }
 }
 
-fun View.fadeVisibility(visibilityWhenFalse: Int = View.GONE): Consumer<in Boolean> = Consumer {
-    if (it) {
-        if (visibility != View.VISIBLE && getTag(fadingTag) != FADING_OUT) {
-            animate().cancel()
-            visibility = View.VISIBLE
-            setTag(fadingTag, FADING_OUT)
-            animate()
+fun TextView.animateText(value: String) {
+    this.animate()
+        .alpha(0f)
+        .setDuration(TEXT_ANIMATION_DURATION_MILLIS)
+        .doOnEnd {
+            this.text = value
+            this.animate()
                 .alpha(1f)
-                .start()
+                .duration = TEXT_ANIMATION_DURATION_MILLIS
         }
-    } else {
-        if (visibility == View.VISIBLE && getTag(fadingTag) != FADING_IN) {
-            animate().cancel()
-            setTag(fadingTag, FADING_IN)
-            animate()
-                .alpha(0f)
-                .withEndAction {
-                    visibility = visibilityWhenFalse
-                }
-                .start()
-        }
+}
+
+fun View.fadeVisibility(visibilityWhenFalse: Int = View.GONE): Consumer<in Boolean> = Consumer {
+    if (it) showViewWithFadeAnimation()
+    else hideViewWithFadeAnimation(visibilityWhenFalse)
+}
+
+fun View.fadeVisibility(state: Boolean, visibilityWhenFalse: Int = View.GONE) {
+    if (state) showViewWithFadeAnimation()
+    else hideViewWithFadeAnimation(visibilityWhenFalse)
+}
+
+private fun View.showViewWithFadeAnimation() {
+    if (visibility != View.VISIBLE && getTag(fadingTag) != FADING_OUT) {
+        animate().cancel()
+        visibility = View.VISIBLE
+        setTag(fadingTag, FADING_OUT)
+        animate()
+            .alpha(1f)
+            .start()
+    }
+}
+
+private fun View.hideViewWithFadeAnimation(visibilityWhenFalse: Int = View.GONE) {
+    if (visibility == View.VISIBLE && getTag(fadingTag) != FADING_IN) {
+        animate().cancel()
+        setTag(fadingTag, FADING_IN)
+        animate()
+            .alpha(0f)
+            .withEndAction {
+                visibility = visibilityWhenFalse
+            }
+            .start()
     }
 }

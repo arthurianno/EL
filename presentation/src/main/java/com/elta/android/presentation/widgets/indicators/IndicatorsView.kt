@@ -8,11 +8,11 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.support.annotation.NonNull
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.utils.firstVisiblePosition
 import com.elta.android.presentation.widgets.indicators.listeners.SimpleAdapterDataObserver
 import com.nullgr.core.ui.extensions.dpToPx
 
@@ -26,7 +26,6 @@ class IndicatorsView : View {
     private lateinit var selectedBitmap: Bitmap
 
     private lateinit var rect: Rect
-    private val tempRect: Rect by lazy { Rect() }
 
     private var indicatorWidth = DEFAULT_INDICATOR_SIZE
     private var indicatorHeight = DEFAULT_INDICATOR_SIZE
@@ -40,13 +39,10 @@ class IndicatorsView : View {
     private var topBound: Int = 0
     private var totalWidthWeNeed: Int = 0
 
-    private var smoothTransitionEnabled: Boolean = false
-    private var currentPositionOffset: Float = 0.toFloat()
-    private var currentPosition: Int = 0
-
     private var recyclerView: RecyclerView? = null
     private var onScrollListener: RecyclerView.OnScrollListener? = null
     private var dataObserver: RecyclerView.AdapterDataObserver? = null
+    private var mode = Mode.SINGLE
 
     constructor (context: Context) : super(context) {
         if (!isInEditMode) {
@@ -111,24 +107,12 @@ class IndicatorsView : View {
 
         rect.offsetTo(leftBound, topBound)
         for (i in 0 until numOfIndicators) {
-
-            if (i != selectedIndicator || smoothTransitionEnabled) {
-                canvas.drawBitmap(unSelectedBitmap, null, rect, null)
-            } else {
+            if (isIndexOfSelectedIndicator(i)) {
                 canvas.drawBitmap(selectedBitmap, null, rect, null)
+            } else {
+                canvas.drawBitmap(unSelectedBitmap, null, rect, null)
             }
-
-            if (i == currentPosition && smoothTransitionEnabled) {
-                tempRect.set(rect)
-            }
-
             rect.offset(indicatorWidth + this.paddingBetweenIndicators, 0)
-        }
-
-        if (smoothTransitionEnabled) {
-            val offset = Math.round((indicatorWidth + this.paddingBetweenIndicators) * currentPositionOffset)
-            tempRect.offset(offset, 0)
-            canvas.drawBitmap(selectedBitmap, null, tempRect, null)
         }
     }
 
@@ -180,17 +164,11 @@ class IndicatorsView : View {
 
         onScrollListener = object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(@NonNull recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (smoothTransitionEnabled) {
-                    currentPositionOffset = dx.toFloat()
-                    currentPosition = findVisiblePosition()
-                    invalidate()
-                }
-            }
+            override fun onScrolled(@NonNull recyclerView: RecyclerView, dx: Int, dy: Int) {}
 
             override fun onScrollStateChanged(@NonNull recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val position = findVisiblePosition()
+                    val position = recyclerView.firstVisiblePosition()
                     setSelected(position)
                 }
             }
@@ -227,8 +205,12 @@ class IndicatorsView : View {
             }
 
             // Get indicator size
-            indicatorWidth = a.getDimension(R.styleable.IndicatorsView_indicatorWidth, indicatorWidth.toFloat()).toInt()
-            indicatorHeight = a.getDimension(R.styleable.IndicatorsView_indicatorHeight, indicatorHeight.toFloat()).toInt()
+            indicatorWidth = a.getDimension(
+                R.styleable.IndicatorsView_indicatorWidth, indicatorWidth.toFloat()
+            ).toInt()
+            indicatorHeight = a.getDimension(
+                R.styleable.IndicatorsView_indicatorHeight, indicatorHeight.toFloat()
+            ).toInt()
 
             // Get padding between indicators
             paddingBetweenIndicators = a.getDimension(
@@ -237,10 +219,14 @@ class IndicatorsView : View {
             ).toInt()
 
             // Get number of indicators
-            numOfIndicators = a.getInteger(R.styleable.IndicatorsView_numberOfIndicators, numOfIndicators)
+            numOfIndicators = a.getInteger(
+                R.styleable.IndicatorsView_numberOfIndicators, numOfIndicators)
 
             // Get selected indicator
             selectedIndicator = a.getInteger(R.styleable.IndicatorsView_selectedIndicator, selectedIndicator)
+
+            // Indicator mode
+            mode = Mode.values()[a.getInteger(R.styleable.IndicatorsView_indicatorMode, DEFAULT_MODE_INDEX)]
 
             a.recycle()
         }
@@ -274,14 +260,16 @@ class IndicatorsView : View {
         }
     }
 
-    private fun findVisiblePosition(): Int {
-        val layoutManager = recyclerView?.layoutManager as LinearLayoutManager
-        return layoutManager.findFirstCompletelyVisibleItemPosition()
-    }
-
     private fun notifyIndicatorsCountChanged() {
         numOfIndicators = recyclerView?.adapter?.itemCount ?: numOfIndicators
         requestLayout()
+    }
+
+    private fun isIndexOfSelectedIndicator(index: Int): Boolean {
+        return when (mode) {
+            Mode.SINGLE -> index == selectedIndicator
+            else -> index <= selectedIndicator
+        }
     }
 
     private fun Drawable?.toBitmap(width: Int, height: Int): Bitmap {
@@ -298,5 +286,10 @@ class IndicatorsView : View {
     companion object {
         private const val DEFAULT_INDICATOR_SIZE = 13
         private const val DEFAULT_PADDING_BETWEEN_INDICATORS = 7
+        private const val DEFAULT_MODE_INDEX = 0
+    }
+
+    enum class Mode {
+        SINGLE, FILL;
     }
 }
