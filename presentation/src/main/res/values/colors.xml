@@ -87,4 +87,8 @@
     <!-- ERROR VIEW COLORS -->
     <color name="color_backend_error">@color/shade_red1</color>
     <color name="color_backend_error_bg">#FBE7E7</color>
+
+    <!-- INDICATOR VIEW COLORS -->
+    <color name="color_indicator_selected">@color/black_blue</color>
+    <color name="color_indicator_unselected">#f1f0f0</color>
 </resources>
