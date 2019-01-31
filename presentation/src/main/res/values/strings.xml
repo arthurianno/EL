@@ -116,4 +116,11 @@
     <string name="on_boarding_next_button_title">Далее</string>
     <string name="on_boarding_gender_male">Мужской</string>
     <string name="on_boarding_gender_female">Женский</string>
+
+    <string name="diabetes_type_first">Первый тип</string>
+    <string name="diabetes_type_second">Второй тип</string>
+    <string name="diabetes_type_lada">Гестационный</string>
+    <string name="diabetes_type_gestational">LADA</string>
+    <string name="diabetes_type_prediabetes">Предиабет</string>
+    <string name="diabetes_type_other">Другой</string>
 </resources>
