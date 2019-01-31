@@ -105,7 +105,15 @@
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
     <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
 
-    <!-- ON BOARDING -->
+
+    <!-- ON BOARDING FLOW -->
+    <string name="on_boarding_toolbar_menu_button">Пропустить этот шаг</string>
+    <string name="on_boarding_subtitle">Давайте знакомиться</string>
+    <string name="on_boarding_header_user_sex">Укажите ваш пол</string>
+    <string name="on_boarding_header_user_weight">Какой у вас вес?</string>
+    <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
+    <string name="on_boarding_prev_button_title">Назад</string>
+    <string name="on_boarding_next_button_title">Далее</string>
     <string name="on_boarding_gender_male">Мужской</string>
     <string name="on_boarding_gender_female">Женский</string>
 

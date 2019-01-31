@@ -114,7 +114,7 @@ dependencies {
     implementation commonDependencies.timber
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
-    implementation (commonDependencies.glide) {
+    implementation(commonDependencies.glide) {
         exclude group: "com.android.support"
     }
     kapt commonDependencies.glideProcessor
