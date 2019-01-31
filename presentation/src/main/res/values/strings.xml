@@ -114,4 +114,6 @@
     <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
     <string name="on_boarding_prev_button_title">Назад</string>
     <string name="on_boarding_next_button_title">Далее</string>
+    <string name="on_boarding_gender_male">Мужской</string>
+    <string name="on_boarding_gender_female">Женский</string>
 </resources>

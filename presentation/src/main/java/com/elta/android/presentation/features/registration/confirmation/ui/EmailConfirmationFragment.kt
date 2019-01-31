@@ -23,7 +23,7 @@ class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.get(EXTRA_TOKEN)?.let {
-            presentationModel.passToken(it as String)
+            presentationModel.setToken(it as String)
         }
     }
 

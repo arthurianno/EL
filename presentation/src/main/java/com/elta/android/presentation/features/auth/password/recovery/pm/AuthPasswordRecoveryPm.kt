@@ -4,7 +4,7 @@ import com.elta.android.domain.features.auth.interactor.SendPasswordResetLinkUse
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
-import com.elta.android.presentation.messages.SnackbarMessageData
+import com.elta.android.presentation.messages.SnackBarMessageData
 import javax.inject.Inject
 
 class AuthPasswordRecoveryPm @Inject constructor(
@@ -38,7 +38,7 @@ class AuthPasswordRecoveryPm @Inject constructor(
 
     private fun handleSuccess() {
         showSnackBar(
-            SnackbarMessageData.SimpleTextMessage(
+            SnackBarMessageData.SimpleTextMessage(
                 resources.getString(R.string.auth_password_recover_success_message)
             )
         )

@@ -1,3 +1,6 @@
+### Android_v0.0.4 ###
+- [ELTA-1209] - Added token refreshing. Improve error handling. Improve deeplinks handling.
+
 ### Android_v0.0.1 ###
 - [ELTA-111] - Added auth
 - [ELTA-112] - Added registration

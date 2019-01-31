@@ -11,16 +11,19 @@ class TokenInterceptor @Inject constructor(
     private val storage: TokenStorage
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val original = chain.request()
-        val builder = original.newBuilder()
+        val builder = chain.request().newBuilder()
 
-        storage.accessToken?.let { token -> builder.addHeader(AUTH_HEADER, token) }
+        if (chain.request().header(AUTH_HEADER) == null) {
+            storage.accessToken?.let { token ->
+                builder.addHeader(AUTH_HEADER, "$PREFIX $token")
+            }
+        }
 
-        val request = builder.method(original.method(), original.body()).build()
-        return chain.proceed(request)
+        return chain.proceed(builder.build())
     }
 
     companion object {
+        private const val PREFIX = "Bearer"
         private const val AUTH_HEADER = "Authorization"
     }
 }

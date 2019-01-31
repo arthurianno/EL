@@ -6,7 +6,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.messages.SnackbarMessageData
+import com.elta.android.presentation.messages.SnackBarMessageData
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class ActivationPm @Inject constructor(
             .flatMapSingle {
                 checkEmailUseCase.execute()
                     .bindProgress()
-                    .doOnSuccess(::handleEmailActivated)
+                    .doOnSuccess(::handleEmailConfirmed)
                     .doOnError(::handleError)
             }
             .retry()
@@ -50,11 +50,11 @@ class ActivationPm @Inject constructor(
         Timber.d("Resend success") // TODO show some message
     }
 
-    private fun handleEmailActivated(isActivated: Boolean) {
-        when (isActivated) {
+    private fun handleEmailConfirmed(isConfirmed: Boolean) {
+        when (isConfirmed) {
             true -> flowRouter?.newRootFlow(Screens.OnBoardingFlow)
             else -> showSnackBar(
-                SnackbarMessageData.SimpleTextMessage(
+                SnackBarMessageData.SimpleTextMessage(
                     resources.getString(R.string.error_verify_your_email)
                 )
             )

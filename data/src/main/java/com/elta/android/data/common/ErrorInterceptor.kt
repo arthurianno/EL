@@ -1,7 +1,12 @@
 package com.elta.android.data.common
 
 import android.content.Context
-import com.elta.android.common.errors.RemoteAuthError
+import com.elta.android.common.errors.EmailAlreadyConfirmedError
+import com.elta.android.common.errors.EmailAlreadyRegisteredError
+import com.elta.android.common.errors.IncorrectLoginOrPasswordError
+import com.elta.android.common.errors.InvalidRefreshTokenError
+import com.elta.android.common.errors.ServerError
+import com.elta.android.common.errors.ServiceUnavailableError
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -19,19 +24,32 @@ class ErrorInterceptor @Inject constructor(
 
         val responseCode = response.code()
         when {
+            responseCode == ERROR_CODE_400 || responseCode == ERROR_CODE_500 -> throw ServiceUnavailableError()
             responseCode >= ERROR_CODE_600 -> {
-                val res = getStringByCode(context, responseCode)
-                val message = context.getString(res)
-                throw RemoteAuthError(message)
+                val message = getStringByCode(context, responseCode)
+                when (responseCode) {
+                    ERROR_CODE_600 -> throw IncorrectLoginOrPasswordError(message)
+                    ERROR_CODE_603 -> throw EmailAlreadyRegisteredError(message)
+                    ERROR_CODE_605 -> throw InvalidRefreshTokenError(message)
+                    ERROR_CODE_606 -> throw EmailAlreadyConfirmedError(message)
+                    else -> throw ServerError(message)
+                }
             }
         }
         return response
     }
 
     companion object {
+        const val ERROR_CODE_400 = 400
+        const val ERROR_CODE_500 = 500
         const val ERROR_CODE_600 = 600
+        const val ERROR_CODE_603 = 603
+        const val ERROR_CODE_605 = 605
+        const val ERROR_CODE_606 = 606
 
-        fun getStringByCode(context: Context, code: Int): Int =
-            context.resources.getIdentifier("error_$code", "string", context.packageName)
+        fun getStringByCode(context: Context, code: Int): String {
+            val res = context.resources.getIdentifier("error_$code", "string", context.packageName)
+            return if (res != 0) context.getString(res) else "$code"
+        }
     }
 }
