@@ -123,4 +123,5 @@
     <string name="diabetes_type_gestational">LADA</string>
     <string name="diabetes_type_prediabetes">Предиабет</string>
     <string name="diabetes_type_other">Другой</string>
+    <string name="coma">,</string>
 </resources>

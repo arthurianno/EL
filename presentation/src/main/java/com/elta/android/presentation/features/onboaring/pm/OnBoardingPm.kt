@@ -1,8 +1,12 @@
 package com.elta.android.presentation.features.onboaring.pm
 
+import com.elta.android.domain.features.user.model.Diabetes
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.onboaring.ui.adapter.items.TestItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
@@ -18,11 +22,13 @@ class OnBoardingPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        items.consumer.accept(listOf(
-            TestItem("ITEM 1"),
-            TestItem("ITEM 2"),
-            TestItem("ITEM 2")
-        ))
+        items.consumer.accept(
+            listOf(
+                OnBoardingGenderItem(resources.getString(R.string.on_boarding_header_user_sex)),
+                OnBoardingWeightItem(resources.getString(R.string.on_boarding_header_user_weight)),
+                OnBoardingDiabetesItem(resources.getString(R.string.on_boarding_header_user_diabetes_type), Diabetes.values().toList())
+            )
+        )
 
         pageChangedAction.observable
             .filter { it != currentPageState.value }

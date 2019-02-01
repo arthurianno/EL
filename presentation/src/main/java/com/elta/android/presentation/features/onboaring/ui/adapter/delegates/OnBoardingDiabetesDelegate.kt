@@ -31,10 +31,12 @@ class OnBoardingDiabetesDelegate(
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
                 val listener = View.OnClickListener { view ->
-                    val newType = view.getTag(TYPE_TAG) as Diabetes
+                    val newType = view.tag as Diabetes
                     withAdapterPosition<OnBoardingDiabetesItem> { _, item, _ ->
                         switchDiabetesType(item, newType)
-                        view.isSelected = newType == item.type
+                        typesView.children().forEach { child ->
+                            child.isSelected = child.tag as Diabetes == item.type
+                        }
                         bus.click(Clicks.DiabetesTypeSelected(item.type))
                     }
                 }
@@ -53,7 +55,7 @@ class OnBoardingDiabetesDelegate(
             item.types.forEachIndexed { index, type ->
                 val child = (typesView.getChildAt(index) as TextView)
                 child.text = type.toString(resources)
-                child.setTag(TYPE_TAG, type)
+                child.tag = type
                 child.isSelected = type == item.type
             }
         }
@@ -65,9 +67,5 @@ class OnBoardingDiabetesDelegate(
         } else {
             item.type = newType
         }
-    }
-
-    private companion object {
-        const val TYPE_TAG = 100
     }
 }

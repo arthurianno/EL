@@ -36,4 +36,7 @@
     <dimen name="padding_base">16dp</dimen>
 
     <dimen name="indicator_shape_radius">3dp</dimen>
+
+    <dimen name="weight_picker_unselected_text">42sp</dimen>
+    <dimen name="weight_picker_selected_text">62sp</dimen>
 </resources>

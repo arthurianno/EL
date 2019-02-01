@@ -60,7 +60,6 @@ def libraryVersions = [
         barcodeScannerVersion      : '1.9.8',
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
-        numberPickerVersion        : '2.4.7',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -147,7 +146,6 @@ ext.commonDependencies = [
         pinView               : "com.chaos.view:pinview:${libraryVersions.pinViewVersion}",
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
-        numberPicker          : "com.shawnlin:number-picker:${libraryVersions.numberPickerVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",

@@ -2,10 +2,10 @@ package com.elta.android.presentation.features.onboaring.ui.adapter
 
 import com.elta.android.presentation.features.onboaring.ui.adapter.delegates.OnBoardingDiabetesDelegate
 import com.elta.android.presentation.features.onboaring.ui.adapter.delegates.OnBoardingGenderDelegate
-import com.elta.android.presentation.features.onboaring.ui.adapter.delegates.TestDelegate
+import com.elta.android.presentation.features.onboaring.ui.adapter.delegates.OnBoardingWeightDelegate
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
-import com.elta.android.presentation.features.onboaring.ui.adapter.items.TestItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
@@ -20,8 +20,8 @@ class OnBoardingDelegatesFactory @Inject constructor(
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
-            TestItem::class.java -> TestDelegate()
             OnBoardingGenderItem::class.java -> OnBoardingGenderDelegate(bus)
+            OnBoardingWeightItem::class.java -> OnBoardingWeightDelegate(bus)
             OnBoardingDiabetesItem::class.java -> OnBoardingDiabetesDelegate(bus, resources)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }

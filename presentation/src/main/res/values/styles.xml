@@ -23,4 +23,44 @@
         <item name="android:indeterminateTint">@color/colorPrimary</item>
         <item name="android:indeterminate">true</item>
     </style>
+
+    <style name="NumberPicker">
+        <item name="android:layout_height">300dp</item>
+        <item name="np_dividerThickness">0dp</item>
+        <item name="np_fadingEdgeEnabled">true</item>
+        <item name="np_fadingEdgeStrength">0.3</item>
+        <item name="np_order">descending</item>
+        <item name="np_typeface">roboto_bold.ttf</item>
+        <item name="np_wheelItemCount">3</item>
+        <item name="np_max_fling_velocity_coefficient">6</item>
+
+        <item name="np_selectedTextAlign">selectedTextAlignCenter</item>
+        <item name="np_selectedTextColor">@color/color_picker_weight_selected_text</item>
+        <item name="np_selectedTextSize">@dimen/weight_picker_selected_text</item>
+
+        <item name="np_textAlign">textAlignCenter</item>
+        <item name="np_textColor">@color/color_picker_weight_unselected_text</item>
+        <item name="np_textSize">@dimen/weight_picker_unselected_text</item>
+    </style>
+
+    <style name="NumberPicker.WeightLeft">
+        <item name="android:layout_width">120dp</item>
+        <item name="np_value">70</item>
+        <item name="np_max">200</item>
+        <item name="np_min">1</item>
+    </style>
+
+    <style name="NumberPicker.Сoma">
+        <item name="android:textColor">@color/color_picker_weight_selected_text</item>
+        <item name="android:textSize">@dimen/weight_picker_selected_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="NumberPicker.WeightRight">
+        <item name="android:layout_width">40dp</item>
+        <item name="np_value">0</item>
+        <item name="np_max">9</item>
+        <item name="np_min">0</item>
+    </style>
 </resources>
