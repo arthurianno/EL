@@ -104,4 +104,11 @@
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
     <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
     <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
+
+
+    <!-- SHOPS FLOW -->
+    <string name="shops_start_title">У вас нет глюкометра?</string>
+    <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
+    <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
+    <string name="shops_start_find_action_button">Найти магазин на карте</string>
 </resources>
