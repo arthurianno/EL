@@ -24,9 +24,16 @@ class OnBoardingPm @Inject constructor(
         super.onCreate()
         items.consumer.accept(
             listOf(
-                OnBoardingGenderItem(resources.getString(R.string.on_boarding_header_user_sex)),
-                OnBoardingWeightItem(resources.getString(R.string.on_boarding_header_user_weight)),
-                OnBoardingDiabetesItem(resources.getString(R.string.on_boarding_header_user_diabetes_type), Diabetes.values().toList())
+                OnBoardingGenderItem(
+                    resources.getString(R.string.on_boarding_header_user_sex)
+                ),
+                OnBoardingWeightItem(
+                    resources.getString(R.string.on_boarding_header_user_weight)
+                ),
+                OnBoardingDiabetesItem(
+                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
+                    Diabetes.values().toList()
+                )
             )
         )
 

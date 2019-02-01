@@ -13,7 +13,9 @@ fun ImageView.toggleSecureIcon(isSecure: Boolean) {
     })
 }
 
-inline fun <reified T : ListItem> RecyclerView.ViewHolder.withAdapterPosition(block: (items: List<ListItem>, item: T, position: Int) -> Unit) {
+inline fun <reified T : ListItem> RecyclerView.ViewHolder.withAdapterPosition(
+    block: (items: List<ListItem>, item: T, position: Int) -> Unit
+) {
     with(adapterPosition) {
         if (this != RecyclerView.NO_POSITION) {
             val items = items()
