@@ -91,4 +91,10 @@
     <!-- INDICATOR VIEW COLORS -->
     <color name="color_indicator_selected">@color/black_blue</color>
     <color name="color_indicator_unselected">#f1f0f0</color>
+
+    <!-- PICKER VIEW COLORS -->
+    <color name="color_picker_weight_unselected_text">@color/shade_black2</color>
+    <color name="color_picker_weight_selected_text">@color/shade_g_green_a</color>
+    <color name="color_picker_weight_divider">@color/shade_g_green_a</color>
+    <color name="color_picker_weight_mask">#183ec9a8</color>
 </resources>
