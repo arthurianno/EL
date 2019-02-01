@@ -5,14 +5,16 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
-import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
+import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
+import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
+import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -69,4 +71,13 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindAuthPasswordCreateFragment(): AuthPasswordCreateFragment
+
+    // SHOPS FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindShopsFlowFragment(): ShopsFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindShopsStartFragment(): ShopsStartFragment
 }

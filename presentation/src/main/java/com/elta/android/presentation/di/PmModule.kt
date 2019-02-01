@@ -8,14 +8,16 @@ import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
-import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
+import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
+import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
+import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -94,4 +96,15 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EmailConfirmationPm::class)
     abstract fun bindEmailConfirmationPm(pm: EmailConfirmationPm): PresentationModel
+
+    // SHOPS FLOW
+    @Binds
+    @IntoMap
+    @PmKey(ShopsFlowPm::class)
+    abstract fun bindShopsFlowPm(pm: ShopsFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ShopsStartPm::class)
+    abstract fun bindShopsStartPm(pm: ShopsStartPm): PresentationModel
 }

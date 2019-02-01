@@ -13,6 +13,8 @@ import com.elta.android.presentation.features.registration.confirmation.ui.Email
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
+import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
+import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -61,5 +63,14 @@ object Screens {
 
     data class PasswordCreate(val token: String) : SupportAppScreen() {
         override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance(token)
+    }
+
+    // SHOPS FLOW
+    object ShopsFlow : SupportAppScreen() {
+        override fun getFragment() = ShopsFlowFragment.newInstance()
+    }
+
+    object ShopsStart : SupportAppScreen() {
+        override fun getFragment() = ShopsStartFragment.newInstance()
     }
 }
