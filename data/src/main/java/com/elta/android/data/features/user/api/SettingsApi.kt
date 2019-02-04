@@ -7,6 +7,6 @@ import retrofit2.http.PATCH
 
 interface SettingsApi {
 
-    @PATCH("v1/settings")
+    @PATCH("api/profile/v1/settings")
     fun updateUserSettings(@Body request: ShortUserSettingsRequest): Completable
 }

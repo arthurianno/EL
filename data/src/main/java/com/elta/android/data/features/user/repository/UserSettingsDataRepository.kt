@@ -13,8 +13,8 @@ class UserSettingsDataRepository @Inject constructor(
 
     override fun updateUserProfile(gender: Gender?, weight: Double?, diabetes: Diabetes?): Completable =
         settingsDataSource.updateUserProfile(
-            gender = gender?.toString(),
+            gender = gender?.name,
             weight = weight,
-            diabetes = diabetes?.toString()
+            diabetes = diabetes?.name
         )
 }
