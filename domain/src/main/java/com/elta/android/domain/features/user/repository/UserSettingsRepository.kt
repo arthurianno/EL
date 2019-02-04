@@ -6,5 +6,5 @@ import io.reactivex.Completable
 
 interface UserSettingsRepository {
 
-    fun updateUserProfile(gender: Gender, weight: Float, diabetes: Diabetes): Completable
+    fun updateUserProfile(gender: Gender?, weight: Double?, diabetes: Diabetes?): Completable
 }
