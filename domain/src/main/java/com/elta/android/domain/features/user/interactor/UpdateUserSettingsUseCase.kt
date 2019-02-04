@@ -19,8 +19,8 @@ class UpdateUserSettingsUseCase @Inject constructor(
     }
 
     data class Params(
-        val gender: Gender,
-        val weight: Float,
-        val diabetes: Diabetes
+        val gender: Gender?,
+        val weight: Double?,
+        val diabetes: Diabetes?
     )
 }
