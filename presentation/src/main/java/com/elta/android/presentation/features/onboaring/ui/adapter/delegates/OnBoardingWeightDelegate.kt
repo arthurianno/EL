@@ -25,8 +25,8 @@ class OnBoardingWeightDelegate(
             with(this as ViewHolder) {
                 weightView.valueChanges().subscribe { newValue ->
                     withAdapterPosition<OnBoardingWeightItem> { _, item, _ ->
-                        item.value = newValue
-                        bus.event(Events.WeightSelected(item.value))
+                        item.weight = newValue
+                        bus.event(Events.OnBoardingPageSelected(item))
                     }
                 }
             }
@@ -37,7 +37,7 @@ class OnBoardingWeightDelegate(
         val item = items[position] as OnBoardingWeightItem
 
         with(holder as ViewHolder) {
-            if (item.initialValue != null && item.value == null) {
+            if (item.initialValue != null && item.weight == null) {
                 weightView.setValue(item.initialValue)
             }
         }

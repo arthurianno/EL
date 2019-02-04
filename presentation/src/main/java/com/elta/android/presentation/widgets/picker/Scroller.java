@@ -165,10 +165,10 @@ public class Scroller  {
     }
 
     /**
-     * The amount of friction applied to flings. The default value
+     * The amount of friction applied to flings. The default weight
      * is {@link ViewConfiguration#getScrollFriction}.
      *
-     * @param friction A scalar dimension-less value representing the coefficient of
+     * @param friction A scalar dimension-less weight representing the coefficient of
      *         friction.
      */
     public final void setFriction(float friction) {
@@ -194,9 +194,9 @@ public class Scroller  {
     }
 
     /**
-     * Force the finished field to a particular value.
+     * Force the finished field to a particular weight.
      *
-     * @param finished The new finished value.
+     * @param finished The new finished weight.
      */
     public final void forceFinished(boolean finished) {
         mFinished = finished;
@@ -337,7 +337,7 @@ public class Scroller  {
 
     /**
      * Start scrolling by providing a starting point and the distance to travel.
-     * The scroll will use the default value of 250 milliseconds for the
+     * The scroll will use the default weight of 250 milliseconds for the
      * duration.
      *
      * @param startX Starting horizontal scroll offset in pixels. Positive
@@ -391,13 +391,13 @@ public class Scroller  {
      *        second.
      * @param velocityY Initial velocity of the fling (Y) measured in pixels per
      *        second
-     * @param minX Minimum X value. The scroller will not scroll past this
+     * @param minX Minimum X weight. The scroller will not scroll past this
      *        point.
-     * @param maxX Maximum X value. The scroller will not scroll past this
+     * @param maxX Maximum X weight. The scroller will not scroll past this
      *        point.
-     * @param minY Minimum Y value. The scroller will not scroll past this
+     * @param minY Minimum Y weight. The scroller will not scroll past this
      *        point.
-     * @param maxY Maximum Y value. The scroller will not scroll past this
+     * @param maxY Maximum Y weight. The scroller will not scroll past this
      *        point.
      */
     public void fling(int startX, int startY, int velocityX, int velocityY,

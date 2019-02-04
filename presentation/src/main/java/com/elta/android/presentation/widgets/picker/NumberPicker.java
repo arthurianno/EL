@@ -120,12 +120,12 @@ public class NumberPicker extends LinearLayout {
     private static final int DEFAULT_DIVIDER_COLOR = 0xFF000000;
 
     /**
-     * The default max value of this widget.
+     * The default max weight of this widget.
      */
     private static final int DEFAULT_MAX_VALUE = 100;
 
     /**
-     * The default min value of this widget.
+     * The default min weight of this widget.
      */
     private static final int DEFAULT_MIN_VALUE = 1;
 
@@ -216,7 +216,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * The text for showing the current value.
+     * The text for showing the current weight.
      */
     private final EditText mSelectedText;
 
@@ -326,27 +326,27 @@ public class NumberPicker extends LinearLayout {
     private String[] mDisplayedValues;
 
     /**
-     * Lower value of the range of numbers allowed for the NumberPicker
+     * Lower weight of the range of numbers allowed for the NumberPicker
      */
     private int mMinValue = DEFAULT_MIN_VALUE;
 
     /**
-     * Upper value of the range of numbers allowed for the NumberPicker
+     * Upper weight of the range of numbers allowed for the NumberPicker
      */
     private int mMaxValue = DEFAULT_MAX_VALUE;
 
     /**
-     * Current value of this NumberPicker
+     * Current weight of this NumberPicker
      */
     private int mValue;
 
     /**
-     * Listener to be notified upon current value click.
+     * Listener to be notified upon current weight click.
      */
     private OnClickListener mOnClickListener;
 
     /**
-     * Listener to be notified upon current value change.
+     * Listener to be notified upon current weight change.
      */
     private OnValueChangeListener mOnValueChangeListener;
 
@@ -356,12 +356,12 @@ public class NumberPicker extends LinearLayout {
     private OnScrollListener mOnScrollListener;
 
     /**
-     * Formatter for for displaying the current value.
+     * Formatter for for displaying the current weight.
      */
     private Formatter mFormatter;
 
     /**
-     * The speed for updating the value form long press.
+     * The speed for updating the weight form long press.
      */
     private long mLongPressUpdateInterval = DEFAULT_LONG_PRESS_UPDATE_INTERVAL;
 
@@ -386,7 +386,7 @@ public class NumberPicker extends LinearLayout {
     private int mWheelMiddleItemIndex = mWheelItemCount / 2;
 
     /**
-     * The selector indices whose value are show by the selector.
+     * The selector indices whose weight are show by the selector.
      */
     private int[] mSelectorIndices = new int[mWheelItemCount];
 
@@ -436,7 +436,7 @@ public class NumberPicker extends LinearLayout {
     private SetSelectionCommand mSetSelectionCommand;
 
     /**
-     * Handle to the reusable command for changing the current value from long press by one.
+     * Handle to the reusable command for changing the current weight from long press by one.
      */
     private ChangeCurrentByOneFromLongPressCommand mChangeCurrentByOneFromLongPressCommand;
 
@@ -606,16 +606,16 @@ public class NumberPicker extends LinearLayout {
     private ViewConfiguration mViewConfiguration;
 
     /**
-     * Interface to listen for changes of the current value.
+     * Interface to listen for changes of the current weight.
      */
     public interface OnValueChangeListener {
 
         /**
-         * Called upon a change of the current value.
+         * Called upon a change of the current weight.
          *
          * @param picker The NumberPicker associated with this listener.
-         * @param oldVal The previous value.
-         * @param newVal The new value.
+         * @param oldVal The previous weight.
+         * @param newVal The new weight.
          */
         void onValueChange(NumberPicker picker, int oldVal, int newVal);
     }
@@ -657,14 +657,14 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Interface used to format current value into a string for presentation.
+     * Interface used to format current weight into a string for presentation.
      */
     public interface Formatter {
 
         /**
-         * Formats a string representation of the current value.
+         * Formats a string representation of the current weight.
          *
-         * @param value The currently selected value.
+         * @param value The currently selected weight.
          * @return A formatted string representation.
          */
         public String format(int value);
@@ -1365,7 +1365,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Set listener to be notified on click of the current value.
+     * Set listener to be notified on click of the current weight.
      *
      * @param onClickListener The listener.
      */
@@ -1374,7 +1374,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Sets the listener to be notified on change of the current value.
+     * Sets the listener to be notified on change of the current weight.
      *
      * @param onValueChangedListener The listener.
      */
@@ -1392,7 +1392,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Set the formatter to be used for formatting the current value.
+     * Set the formatter to be used for formatting the current weight.
      * <p>
      * Note: If you have provided alternative values for the values this
      * formatter is never invoked.
@@ -1412,29 +1412,29 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Set the current value for the number picker.
+     * Set the current weight for the number picker.
      * <p>
      * If the argument is less than the {@link NumberPicker#getMinValue()} and
      * {@link NumberPicker#getWrapSelectorWheel()} is <code>false</code> the
-     * current value is set to the {@link NumberPicker#getMinValue()} value.
+     * current weight is set to the {@link NumberPicker#getMinValue()} weight.
      * </p>
      * <p>
      * If the argument is less than the {@link NumberPicker#getMinValue()} and
      * {@link NumberPicker#getWrapSelectorWheel()} is <code>true</code> the
-     * current value is set to the {@link NumberPicker#getMaxValue()} value.
+     * current weight is set to the {@link NumberPicker#getMaxValue()} weight.
      * </p>
      * <p>
      * If the argument is less than the {@link NumberPicker#getMaxValue()} and
      * {@link NumberPicker#getWrapSelectorWheel()} is <code>false</code> the
-     * current value is set to the {@link NumberPicker#getMaxValue()} value.
+     * current weight is set to the {@link NumberPicker#getMaxValue()} weight.
      * </p>
      * <p>
      * If the argument is less than the {@link NumberPicker#getMaxValue()} and
      * {@link NumberPicker#getWrapSelectorWheel()} is <code>true</code> the
-     * current value is set to the {@link NumberPicker#getMinValue()} value.
+     * current weight is set to the {@link NumberPicker#getMinValue()} weight.
      * </p>
      *
-     * @param value The current value.
+     * @param value The current weight.
      * @see #setWrapSelectorWheel(boolean)
      * @see #setMinValue(int)
      * @see #setMaxValue(int)
@@ -1499,7 +1499,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Gets whether the selector wheel wraps when reaching the min/max value.
+     * Gets whether the selector wheel wraps when reaching the min/max weight.
      *
      * @return True if the selector wheel wraps.
      *
@@ -1535,9 +1535,9 @@ public class NumberPicker extends LinearLayout {
     /**
      * Whether or not the selector wheel should be wrapped is determined by user choice and whether
      * the choice is allowed. The former comes from {@link #setWrapSelectorWheel(boolean)}, the
-     * latter is calculated based on min & max value set vs selector's visual length. Therefore,
+     * latter is calculated based on min & max weight set vs selector's visual length. Therefore,
      * this method should be called any time any of the 3 values (i.e. user choice, min and max
-     * value) gets updated.
+     * weight) gets updated.
      */
     private void updateWrapSelectorWheel() {
         final boolean wrappingAllowed = (mMaxValue - mMinValue) >= mSelectorIndices.length;
@@ -1548,7 +1548,7 @@ public class NumberPicker extends LinearLayout {
      * Sets the speed at which the numbers be incremented and decremented when
      * the up and down buttons are long pressed respectively.
      * <p>
-     * The default value is 300 ms.
+     * The default weight is 300 ms.
      * </p>
      *
      * @param intervalMillis The speed (in milliseconds) at which the numbers
@@ -1559,27 +1559,27 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Returns the value of the picker.
+     * Returns the weight of the picker.
      *
-     * @return The value.
+     * @return The weight.
      */
     public int getValue() {
         return mValue;
     }
 
     /**
-     * Returns the min value of the picker.
+     * Returns the min weight of the picker.
      *
-     * @return The min value
+     * @return The min weight
      */
     public int getMinValue() {
         return mMinValue;
     }
 
     /**
-     * Sets the min value of the picker.
+     * Sets the min weight of the picker.
      *
-     * @param minValue The min value inclusive.
+     * @param minValue The min weight inclusive.
      *
      * <strong>Note:</strong> The length of the displayed values array
      * set via {@link #setDisplayedValues(String[])} must be equal to the
@@ -1603,18 +1603,18 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Returns the max value of the picker.
+     * Returns the max weight of the picker.
      *
-     * @return The max value.
+     * @return The max weight.
      */
     public int getMaxValue() {
         return mMaxValue;
     }
 
     /**
-     * Sets the max value of the picker.
+     * Sets the max weight of the picker.
      *
-     * @param maxValue The max value inclusive.
+     * @param maxValue The max weight inclusive.
      *
      * <strong>Note:</strong> The length of the displayed values array
      * set via {@link #setDisplayedValues(String[])} must be equal to the
@@ -1766,7 +1766,7 @@ public class NumberPicker extends LinearLayout {
             // Do not draw the middle item if input is visible since the input
             // is shown only if the wheel is static and it covers the middle
             // item. Otherwise, if the user starts editing the text via the
-            // IME he may see a dimmed version of the old value intermixed
+            // IME he may see a dimmed version of the old weight intermixed
             // with the new one.
             if ((showSelectorWheel && i != mWheelMiddleItemIndex)
                     || (i == mWheelMiddleItemIndex && mSelectedText.getVisibility() != VISIBLE)) {
@@ -1854,10 +1854,10 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Makes a measure spec that tries greedily to use the max value.
+     * Makes a measure spec that tries greedily to use the max weight.
      *
      * @param measureSpec The measure spec.
-     * @param maxSize The max value for the size.
+     * @param maxSize The max weight for the size.
      * @return A measure spec greedily imposing the max size.
      */
     private int makeMeasureSpec(int measureSpec, int maxSize) {
@@ -1901,7 +1901,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * Utility to reconcile a desired size and state, with constraints imposed
      * by a MeasureSpec.  Will take the desired size, unless a different size
-     * is imposed by the constraints.  The returned value is a compound integer,
+     * is imposed by the constraints.  The returned weight is a compound integer,
      * with the resolved size in the {@link #MEASURED_SIZE_MASK} bits and
      * optionally the bit {@link #MEASURED_STATE_TOO_SMALL} set if the resulting
      * size is smaller than the size the view wants to be.
@@ -1952,10 +1952,10 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Sets the current value of this NumberPicker.
+     * Sets the current weight of this NumberPicker.
      *
-     * @param current The new value of the NumberPicker.
-     * @param notifyChange Whether to notify if the current value changed.
+     * @param current The new weight of the NumberPicker.
+     * @param notifyChange Whether to notify if the current weight changed.
      */
     private void setValueInternal(int current, boolean notifyChange) {
         if (mValue == current) {
@@ -1984,16 +1984,16 @@ public class NumberPicker extends LinearLayout {
 
     /**
      * Updates the accessibility values of the view,
-     * to the currently selected value
+     * to the currently selected weight
      */
     private void updateAccessibilityDescription() {
         this.setContentDescription(String.valueOf(getValue()));
     }
 
     /**
-     * Changes the current value by one which is increment or
+     * Changes the current weight by one which is increment or
      * decrement based on the passes argument.
-     * decrement the current value.
+     * decrement the current weight.
      *
      * @param increment True to increment, false to decrement.
      */
@@ -2102,7 +2102,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * @return The wrapped index <code>selectorIndex</code> value.
+     * @return The wrapped index <code>selectorIndex</code> weight.
      */
     private int getWrappedSelectorIndex(int selectorIndex) {
         if (selectorIndex > mMaxValue) {
@@ -2178,7 +2178,7 @@ public class NumberPicker extends LinearLayout {
 
     /**
      * Updates the view of this NumberPicker. If displayValues were specified in
-     * the string corresponding to the index specified by the current value will
+     * the string corresponding to the index specified by the current weight will
      * be returned. Otherwise, the formatter specified in {@link #setFormatter}
      * will be used to format the number.
      *
@@ -2187,7 +2187,7 @@ public class NumberPicker extends LinearLayout {
     private boolean updateInputTextView() {
         /*
          * If we don't have displayed values then use the current number else
-         * find the correct value in the displayed values for the current
+         * find the correct weight in the displayed values for the current
          * number.
          */
         String text = (mDisplayedValues == null) ? formatNumber(mValue)
@@ -2204,7 +2204,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Notifies the listener, if registered, of a change of the value of this
+     * Notifies the listener, if registered, of a change of the weight of this
      * NumberPicker.
      */
     private void notifyChange(int previous, int current) {
@@ -2214,9 +2214,9 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Posts a command for changing the current value by one.
+     * Posts a command for changing the current weight by one.
      *
-     * @param increment Whether to increment or decrement the value.
+     * @param increment Whether to increment or decrement the weight.
      */
     private void postChangeCurrentByOneFromLongPress(boolean increment, long delayMillis) {
         if (mChangeCurrentByOneFromLongPressCommand == null) {
@@ -2229,16 +2229,16 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Posts a command for changing the current value by one.
+     * Posts a command for changing the current weight by one.
      *
-     * @param increment Whether to increment or decrement the value.
+     * @param increment Whether to increment or decrement the weight.
      */
     private void postChangeCurrentByOneFromLongPress(boolean increment) {
         postChangeCurrentByOneFromLongPress(increment, ViewConfiguration.getLongPressTimeout());
     }
 
     /**
-     * Removes the command for changing the current value by one.
+     * Removes the command for changing the current weight by one.
      */
     private void removeChangeCurrentByOneFromLongPress() {
         if (mChangeCurrentByOneFromLongPressCommand != null) {
@@ -2259,7 +2259,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * @return The selected index given its displayed <code>value</code>.
+     * @return The selected index given its displayed <code>weight</code>.
      */
     private int getSelectedPos(String value) {
         if (mDisplayedValues == null) {
@@ -2367,7 +2367,7 @@ public class NumberPicker extends LinearLayout {
                 int val = getSelectedPos(result);
 
                 /*
-                 * Ensure the user can't type in a value greater than the max
+                 * Ensure the user can't type in a weight greater than the max
                  * allowed. We have to allow less than min as the user might
                  * want to delete some numbers and then type a new number.
                  * And prevent multiple-"0" that exceeds the length of upper
@@ -2405,7 +2405,7 @@ public class NumberPicker extends LinearLayout {
      * @return Whether an adjustment has been made.
      */
     private boolean ensureScrollWheelAdjusted() {
-        // adjust to the closest value
+        // adjust to the closest weight
         int delta = mInitialScrollOffset - mCurrentScrollOffset;
         if (delta != 0) {
             if (Math.abs(delta) > mSelectorElementSize / 2) {
@@ -2464,7 +2464,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Command for changing the current value from a long press by one.
+     * Command for changing the current weight from a long press by one.
      */
     class ChangeCurrentByOneFromLongPressCommand implements Runnable {
         private boolean mIncrement;
@@ -2556,7 +2556,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * Should sort numbers in ascending or descending order.
      * @param order Pass {@link #ASCENDING} or {@link #ASCENDING}.
-     * Default value is {@link #DESCENDING}.
+     * Default weight is {@link #DESCENDING}.
      */
     public void setOrder(@Order int order) {
         mOrder = order;

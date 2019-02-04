@@ -73,14 +73,14 @@ class IndicatorsView : View {
 
         // Measure Width
         if (widthMode == View.MeasureSpec.EXACTLY) {
-            width = widthSize // Must be this size (match_parent or exactly value)
+            width = widthSize // Must be this size (match_parent or exactly weight)
         } else if (widthMode == View.MeasureSpec.AT_MOST) {
             width = Math.min(desiredWidth, widthSize) // (wrap_content)
         }
 
         // Measure Height
         if (heightMode == View.MeasureSpec.EXACTLY) {
-            height = heightSize // Must be this size (match_parent or exactly value)
+            height = heightSize // Must be this size (match_parent or exactly weight)
         } else if (heightMode == View.MeasureSpec.AT_MOST) {
             height = Math.min(desiredHeight, heightSize) // (wrap_content)
         }

@@ -4,9 +4,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.elta.android.domain.features.user.model.Gender
-import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.click
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.utils.withAdapterPosition
 import com.nullgr.core.adapter.items.ListItem
@@ -34,7 +34,7 @@ class OnBoardingGenderDelegate(
                     withAdapterPosition<OnBoardingGenderItem> { _, item, _ ->
                         switchGenders(item, newGender)
                         setGendersState(genderMaleView, genderFemaleView, item.gender)
-                        bus.click(Clicks.GenderSelected(item.gender))
+                        bus.event(Events.OnBoardingPageSelected(item))
                     }
                 }
 

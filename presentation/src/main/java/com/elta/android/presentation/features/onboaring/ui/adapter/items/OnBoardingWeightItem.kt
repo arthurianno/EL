@@ -1,11 +1,12 @@
 package com.elta.android.presentation.features.onboaring.ui.adapter.items
 
-import com.nullgr.core.adapter.items.ListItem
-
 data class OnBoardingWeightItem(
     override val title: String,
     val initialValue: Double? = null
-) : ListItem, OnBoardingItem {
+) : OnBoardingItem {
 
-    var value: Double? = null
+    override val data: Any?
+        get() = weight
+
+    var weight: Double? = null
 }
