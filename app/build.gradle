@@ -167,6 +167,7 @@ dependencies {
     implementation commonDependencies.supportCustomTabs
     implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
+    implementation commonDependencies.yandexMapKit
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid

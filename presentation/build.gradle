@@ -102,6 +102,7 @@ dependencies {
     implementation commonDependencies.tooltipLibrary
     implementation commonDependencies.barcodeScanner
     implementation commonDependencies.materialEditText
+    implementation commonDependencies.yandexMapKit
 
     // Dagger2
     kapt commonDependencies.daggerCompiler

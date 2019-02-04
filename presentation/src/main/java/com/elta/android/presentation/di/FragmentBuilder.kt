@@ -14,6 +14,8 @@ import com.elta.android.presentation.features.registration.main.ui.RegistrationM
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
+import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
+import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -80,4 +82,8 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindShopsStartFragment(): ShopsStartFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ShopsMapModule::class])
+    abstract fun bindShopsMapFragment(): ShopsMapFragment
 }
