@@ -1,12 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_auth_toolbar" />
 
     <android.support.v7.widget.AppCompatTextView
-        android:layout_width="wrap_content"
+        style="@style/Caption1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="OnBoarding" />
+        android:layout_marginStart="@dimen/padding_base"
+        android:layout_marginTop="@dimen/padding_base"
+        android:layout_marginEnd="@dimen/padding_base"
+        android:text="@string/on_boarding_subtitle" />
 
-</FrameLayout>
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/onBoardingHeaderTextView"
+        style="@style/Headline1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_base"
+        android:layout_marginEnd="@dimen/padding_base"
+        android:layout_marginBottom="@dimen/padding_base"
+        android:text="@string/on_boarding_header_user_sex" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/itemsView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:padding="@dimen/padding_base">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/previewPageButtonView"
+            style="@style/Button.Small.Light"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/on_boarding_prev_button_title"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.elta.android.presentation.widgets.indicators.IndicatorsView
+            android:id="@+id/indicatorsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:indicatorHeight="4dp"
+            app:indicatorMode="fill"
+            app:indicatorWidth="20dp"
+            app:numberOfIndicators="3"
+            app:paddingBetweenIndicators="6dp" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/nextPageButtonView"
+            style="@style/Button.Small.Dark"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:text="@string/on_boarding_next_button_title"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+</LinearLayout>
