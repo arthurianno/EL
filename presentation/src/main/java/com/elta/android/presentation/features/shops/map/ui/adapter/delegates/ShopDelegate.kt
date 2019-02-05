@@ -1,0 +1,61 @@
+package com.elta.android.presentation.features.shops.map.ui.adapter.delegates
+
+import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.view.ViewGroup
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.click
+import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
+import com.elta.android.presentation.utils.withAdapterPosition
+import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.adapter.ktx.AdapterDelegate
+import com.nullgr.core.adapter.ktx.ViewHolder
+import com.nullgr.core.rx.RxBus
+import kotlinx.android.synthetic.main.item_shop.*
+
+class ShopDelegate(
+    private val bus: RxBus
+) : AdapterDelegate() {
+
+    override val layoutResource: Int = R.layout.item_shop
+    override val itemType: Any = ShopItem::class
+
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        return super.onCreateViewHolder(parent).apply {
+            with(this as ViewHolder) {
+                val listener = View.OnClickListener { view ->
+                    withAdapterPosition<ShopItem> { _, item, _ ->
+                        val click = when (view.id) {
+                            R.id.shopRouteView -> Clicks.ShopMakeRoute(item)
+                            R.id.shopCallView -> Clicks.ShopMakeCall(item)
+                            else -> throw IllegalArgumentException()
+                        }
+                        bus.click(click)
+                    }
+                }
+                shopRouteView.setOnClickListener(listener)
+                shopCallView.setOnClickListener(listener)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+        val item = items[position] as ShopItem
+
+        with(holder as ViewHolder) {
+            shopNameView.text = item.name
+            shopAddressView.text = item.address
+            shopDistanceView.text = item.distance
+        }
+    }
+
+    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+        val item = items[position] as ShopItem
+        with(holder as ViewHolder) {
+            when (payload) {
+                ShopItem.Payload.DISTANCE_CHANGED -> shopDistanceView.text = item.distance
+            }
+        }
+    }
+}

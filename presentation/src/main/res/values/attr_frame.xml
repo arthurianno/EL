@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WidthAdjustedFrameLayout">
+        <attr name="leftOffset" format="dimension" />
+        <attr name="rightOffset" format="dimension" />
+    </declare-styleable>
+</resources>
