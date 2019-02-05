@@ -106,6 +106,26 @@
     <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
 
 
+    <!-- ON BOARDING FLOW -->
+    <string name="on_boarding_toolbar_menu_button">Пропустить этот шаг</string>
+    <string name="on_boarding_subtitle">Давайте знакомиться</string>
+    <string name="on_boarding_header_user_sex">Укажите ваш пол</string>
+    <string name="on_boarding_header_user_weight">Какой у вас вес?</string>
+    <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
+    <string name="on_boarding_prev_button_title">Назад</string>
+    <string name="on_boarding_next_button_title">Далее</string>
+    <string name="on_boarding_gender_male">Мужской</string>
+    <string name="on_boarding_gender_female">Женский</string>
+
+    <string name="diabetes_type_first">Первый тип</string>
+    <string name="diabetes_type_second">Второй тип</string>
+    <string name="diabetes_type_lada">Гестационный</string>
+    <string name="diabetes_type_gestational">LADA</string>
+    <string name="diabetes_type_prediabetes">Предиабет</string>
+    <string name="diabetes_type_other">Другой</string>
+    <string name="coma">,</string>
+
+
     <!-- SHOPS FLOW -->
     <string name="shops_start_title">У вас нет глюкометра?</string>
     <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
