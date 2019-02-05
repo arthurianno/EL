@@ -115,7 +115,7 @@ abstract class BasePm(
         this.bindProgress(progressState.consumer)
 
     companion object {
-        const val ACTION_DEBOUNCE_MILLIS = 1000L
+        const val ACTION_DEBOUNCE_MILLIS = 500L
         const val RELOAD_DELAY_MILLIS = 3000L
     }
 }

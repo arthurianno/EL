@@ -12,6 +12,7 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
 import kotlinx.android.synthetic.main.item_onboarding_weight.*
+import java.util.concurrent.TimeUnit
 
 class OnBoardingWeightDelegate(
     private val bus: RxBus
@@ -23,12 +24,13 @@ class OnBoardingWeightDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                weightView.valueChanges().subscribe { newValue ->
-                    withAdapterPosition<OnBoardingWeightItem> { _, item, _ ->
-                        item.weight = newValue
-                        bus.event(Events.OnBoardingPageSelected(item))
+                weightView.valueChanges().throttleLast(INTERVAL, TimeUnit.MILLISECONDS)
+                    .subscribe { newValue ->
+                        withAdapterPosition<OnBoardingWeightItem> { _, item, _ ->
+                            item.weight = newValue
+                            bus.event(Events.OnBoardingPageSelected(item))
+                        }
                     }
-                }
             }
         }
     }
@@ -41,5 +43,9 @@ class OnBoardingWeightDelegate(
                 weightView.setValue(item.initialValue)
             }
         }
+    }
+
+    private companion object {
+        const val INTERVAL = 300L
     }
 }

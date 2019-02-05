@@ -15,6 +15,7 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.pageScrolled
+import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
@@ -37,6 +38,7 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         itemsView?.let {
             snapHelper.attachToRecyclerView(it)
             indicatorsView.attachToRecyclerView(it)
+            it.setOnTouchListener { _, _ -> true }
         }
     }
 
@@ -48,8 +50,9 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         pm.currentPageState.bindTo { page -> itemsView?.smoothScrollToPosition(page) }
         pm.titleState.observable.skip(1).bindTo { onBoardingHeaderTextView.animateText(it) }
         pm.titleState.observable.take(1).bindTo(onBoardingHeaderTextView.text())
-        pm.previousPageAvailableCommand.bindTo(previewPageButtonView.available())
-        pm.nextPageAvailableCommand.bindTo(nextPageButtonView.available())
+        pm.previousPageVisibilityState.bindTo(previewPageButtonView.fadeVisibility())
+        pm.nextPageVisibilityState.bindTo(nextPageButtonView.fadeVisibility())
+        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
 
         previewPageButtonView.clicks().bindTo(pm.previousPageAction)

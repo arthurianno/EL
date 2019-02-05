@@ -62,9 +62,4 @@ object Screens {
     data class PasswordCreate(val token: String) : SupportAppScreen() {
         override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance(token)
     }
-
-    // MAPS
-    object Maps : SupportAppScreen() {
-        override fun getFragment(): Fragment = OnBoardingFragment.newInstance()
-    }
 }

@@ -5,7 +5,6 @@ import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -25,8 +24,8 @@ class OnBoardingPm @Inject constructor(
     val skipPageAction = Action<Unit>()
     val nextPageAction = Action<Unit>()
     val previousPageAction = Action<Unit>()
-    val nextPageAvailableCommand = Command<Boolean>(bufferSize = 1)
-    val previousPageAvailableCommand = Command<Boolean>(bufferSize = 1)
+    val nextPageVisibilityState = State(false)
+    val previousPageVisibilityState = State(false)
     val titleState = State(resources.getString(R.string.on_boarding_header_user_sex))
 
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
@@ -52,29 +51,38 @@ class OnBoardingPm @Inject constructor(
         )
 
         pageChangedAction.observable
-            .filter { it != currentPageState.value }
+            .filter { it.isPageInRange() && it != currentPageState.value }
             .subscribe(currentPageState.consumer)
             .untilDestroy()
 
         currentPageState.observable
             .map { it > 0 }
-            .doOnNext(previousPageAvailableCommand.consumer)
+            .doOnNext(previousPageVisibilityState.consumer)
             .subscribe()
+            .untilDestroy()
+
+        currentPageState.observable
+            .filter { it.isPageInRange() }
+            .subscribe {
+                val currentItem = items.value[it] as OnBoardingItem
+                titleState.consumer.accept(currentItem.title)
+                updateNextButtonState(currentItem)
+            }
             .untilDestroy()
 
         skipPageAction.observable
-            .doOnNext(::skipPage)
-            .subscribe()
+            .debounceAction()
+            .subscribe(::skipPage)
             .untilDestroy()
 
         nextPageAction.observable
-            .doOnNext(::nextPage)
-            .subscribe()
+            .debounceAction()
+            .subscribe(::nextPage)
             .untilDestroy()
 
         previousPageAction.observable
-            .doOnNext(::prevPage)
-            .subscribe()
+            .debounceAction()
+            .subscribe(::prevPage)
             .untilDestroy()
 
         bus.events<Events.OnBoardingPageSelected>()
@@ -97,37 +105,48 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun nextPage(i: Unit) {
-        var currentPage = currentPageState.value
-        if (currentPage < items.value.size - 1) {
-            currentPageState.consumer.accept(++currentPage)
-            val currentItem = items.value[currentPageState.value] as OnBoardingItem
-            titleState.consumer.accept(currentItem.title)
-        } else {
+        val currentPage = currentPageState.value
+        if (currentPage == items.value.size - 1) {
             updateProfileSettingsAction.consumer.accept(Unit)
+        } else {
+            val nextPage = currentPage + 1
+            if (nextPage.isPageInRange()) {
+                currentPageState.consumer.accept(nextPage)
+            }
         }
     }
 
     private fun skipPage(i: Unit) {
-        nextPage(i)
-        val currentItem = items.value[currentPageState.value] as OnBoardingItem
+        val currentPage = currentPageState.value
+        val currentItem = items.value[currentPage] as OnBoardingItem
         params[currentItem::class.java] = null
+        nextPage(i)
     }
 
     private fun prevPage(i: Unit) {
-        currentPageState.consumer.accept(currentPageState.value - 1)
+        val currentPage = currentPageState.value
+        val prevPage = currentPage - 1
+        if (prevPage.isPageInRange()) {
+            currentPageState.consumer.accept(prevPage)
+        }
     }
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
         val item = event.item
         val data = item.data
-        val isNextPageAvailable = when (item) {
+        params[item::class.java] = data
+        updateNextButtonState(item)
+    }
+
+    private fun updateNextButtonState(currentItem: OnBoardingItem) {
+        val data = currentItem.data
+        val isNextPageAvailable = when (currentItem) {
             is OnBoardingGenderItem -> data != null
             is OnBoardingDiabetesItem -> data != null
             is OnBoardingWeightItem -> data != null && data != INITIAL_WEIGHT
             else -> false
         }
-        params[item::class.java] = data
-        nextPageAvailableCommand.consumer.accept(isNextPageAvailable)
+        nextPageVisibilityState.consumer.accept(isNextPageAvailable)
     }
 
     private fun createUseCaseParams(i: Unit): UpdateUserSettingsUseCase.Params {
@@ -138,8 +157,10 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        router.navigateTo(Screens.Maps)
+        // TODO: navigate to Maps Screen
     }
+
+    private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size
 
     private companion object {
         const val INITIAL_WEIGHT = 70.0
