@@ -1,11 +1,13 @@
 package com.elta.android.presentation.features.onboaring.ui.adapter.items
 
 import com.elta.android.domain.features.user.model.Gender
-import com.nullgr.core.adapter.items.ListItem
 
 data class OnBoardingGenderItem(
     override val title: String
-) : ListItem, OnBoardingItem {
+) : OnBoardingItem {
+
+    override val data: Any?
+        get() = gender
 
     var gender: Gender? = null
 }

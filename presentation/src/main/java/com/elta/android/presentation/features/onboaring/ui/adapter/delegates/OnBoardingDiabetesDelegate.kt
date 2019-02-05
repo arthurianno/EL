@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.elta.android.domain.features.user.model.Diabetes
-import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.click
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.utils.withAdapterPosition
@@ -37,7 +37,7 @@ class OnBoardingDiabetesDelegate(
                         typesView.children().forEach { child ->
                             child.isSelected = child.tag as Diabetes == item.type
                         }
-                        bus.click(Clicks.DiabetesTypeSelected(item.type))
+                        bus.event(Events.OnBoardingPageSelected(item))
                     }
                 }
 

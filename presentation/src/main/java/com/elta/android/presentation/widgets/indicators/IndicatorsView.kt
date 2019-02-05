@@ -169,7 +169,9 @@ class IndicatorsView : View {
             override fun onScrollStateChanged(@NonNull recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     val position = recyclerView.firstVisiblePosition()
-                    setSelected(position)
+                    if (position in 0 until numOfIndicators) {
+                        setSelected(position)
+                    }
                 }
             }
         }

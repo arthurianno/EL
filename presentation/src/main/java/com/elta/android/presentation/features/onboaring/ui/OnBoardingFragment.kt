@@ -15,7 +15,9 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.pageScrolled
+import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
@@ -36,6 +38,7 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         itemsView?.let {
             snapHelper.attachToRecyclerView(it)
             indicatorsView.attachToRecyclerView(it)
+            it.setOnTouchListener { _, _ -> true }
         }
     }
 
@@ -44,28 +47,17 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
 
     override fun onBindPresentationModel(pm: OnBoardingPm) {
         super.onBindPresentationModel(pm)
-        pm.currentPageState.bindTo(::bindUiForPage)
-        pm.previousPageAvailableCommand.bindTo(previewPageButtonView.available())
-        pm.nextPageAvailableCommand.bindTo(nextPageButtonView.available())
+        pm.currentPageState.bindTo { page -> itemsView?.smoothScrollToPosition(page) }
+        pm.titleState.observable.skip(1).bindTo { onBoardingHeaderTextView.animateText(it) }
+        pm.titleState.observable.take(1).bindTo(onBoardingHeaderTextView.text())
+        pm.previousPageVisibilityState.bindTo(previewPageButtonView.fadeVisibility())
+        pm.nextPageVisibilityState.bindTo(nextPageButtonView.fadeVisibility())
+        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
 
         previewPageButtonView.clicks().bindTo(pm.previousPageAction)
         nextPageButtonView.clicks().bindTo(pm.nextPageAction)
-        menuButtonView.clicks().bindTo(pm.nextPageAction)
-    }
-
-    private fun bindUiForPage(pageIndex: Int) {
-        getPageHeader(pageIndex)?.let { onBoardingHeaderTextView.animateText(it) }
-        itemsView?.smoothScrollToPosition(pageIndex)
-    }
-
-    private fun getPageHeader(pageIndex: Int): String? {
-        return when (pageIndex) {
-            FIRST_PAGE -> getString(R.string.on_boarding_header_user_sex)
-            SECOND_PAGE -> getString(R.string.on_boarding_header_user_weight)
-            THIRD_PAGE -> getString(R.string.on_boarding_header_user_diabetes_type)
-            else -> null
-        }
+        menuButtonView.clicks().bindTo(pm.skipPageAction)
     }
 
     private fun TextView.available(): Consumer<Boolean> {
@@ -79,10 +71,7 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
     }
 
     companion object {
-        fun newInstance() = OnBoardingFragment()
-        private const val FIRST_PAGE = 0
-        private const val SECOND_PAGE = 1
-        private const val THIRD_PAGE = 2
+        fun newInstance(): OnBoardingFragment = OnBoardingFragment()
         private const val DISABLE_DELAY = 300L
     }
 }

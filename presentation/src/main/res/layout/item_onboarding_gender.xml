@@ -46,7 +46,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="2dp"
             android:duplicateParentState="true"
-            android:text="@string/on_boarding_gender_male" />
+            android:text="@string/on_boarding_gender_male"
+            android:textColor="@color/button_small_light_text_color" />
 
     </LinearLayout>
 
@@ -76,7 +77,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="2dp"
             android:duplicateParentState="true"
-            android:text="@string/on_boarding_gender_female" />
+            android:text="@string/on_boarding_gender_female"
+            android:textColor="@color/button_small_light_text_color" />
     </LinearLayout>
 
 

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <include layout="@layout/layout_auth_toolbar" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         style="@style/Caption1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +17,7 @@
         android:layout_marginEnd="@dimen/padding_base"
         android:text="@string/on_boarding_subtitle" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/onBoardingHeaderTextView"
         style="@style/Headline1"
         android:layout_width="match_parent"
@@ -32,37 +33,40 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="90dp"
         android:padding="@dimen/padding_base">
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/previewPageButtonView"
             style="@style/Button.Small.Light"
             android:layout_width="84dp"
             android:layout_height="wrap_content"
-            android:text="@string/on_boarding_prev_button_title" />
+            android:layout_gravity="start|center_vertical"
+            android:text="@string/on_boarding_prev_button_title"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <com.elta.android.presentation.widgets.indicators.IndicatorsView
             android:id="@+id/indicatorsView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="1"
             app:indicatorHeight="4dp"
             app:indicatorMode="fill"
             app:indicatorWidth="20dp"
             app:numberOfIndicators="3"
             app:paddingBetweenIndicators="6dp" />
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/nextPageButtonView"
             style="@style/Button.Small.Dark"
             android:layout_width="84dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="@string/on_boarding_next_button_title" />
-    </LinearLayout>
+            android:layout_gravity="end|center_vertical"
+            android:text="@string/on_boarding_next_button_title"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
 </LinearLayout>
