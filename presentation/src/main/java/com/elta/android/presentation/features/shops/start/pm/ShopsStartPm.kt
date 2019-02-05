@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.shops.start.pm
 
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import timber.log.Timber
@@ -27,7 +28,7 @@ class ShopsStartPm @Inject constructor(
     }
 
     private fun navigateToMapScreen(i: Unit) {
-        Timber.d("navigateToMapScreen")
+        router.navigateTo(Screens.ShopsMap)
     }
 
     private fun navigateToMainScreen(i: Unit) {

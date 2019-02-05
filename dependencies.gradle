@@ -15,7 +15,7 @@ ext.androidVersions = [
 def libraryVersions = [
         //Support libraries
         supportLibraryVersion      : '28.0.0',
-        playServicesVersion        : '11.8.0',
+        playServicesVersion        : '16.0.0',
         firebaseVersion            : '16.0.6',
         firebaseMessagingVersion   : '17.3.4',
         firebaseDynamicLinkVersion : '16.1.5',

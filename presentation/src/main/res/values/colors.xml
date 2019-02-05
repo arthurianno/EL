@@ -7,6 +7,7 @@
     <!--TODO maybe its no need to keep this color -->
     <color name="color_status_bar_dark">#f3f2f2</color>
     <color name="color_status_bar_light">#f3f2f2</color>
+    <color name="color_status_bar_transparent">#0c373737</color>
 
     <!-- PROJECT PALETTE, DO NOT USE THIS COLORS DIRECTLY -->
     <color name="blue">#245aa7</color>

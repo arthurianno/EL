@@ -15,8 +15,9 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.widgets.dialogs.ProgressDialog
+import com.elta.android.presentation.utils.applyInsetsToContentView
 import com.elta.android.presentation.utils.makeSnackBar
+import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
@@ -64,7 +65,8 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
     override fun onStart() {
         super.onStart()
         with(statusBarConfigProvider) {
-            activity?.window?.setStatusBarColor(statusBarColor, lightStatusBar)
+            view?.applyInsetsToContentView(!this.drawUnderStatusBar)
+            activity?.window?.setStatusBarColor(this.statusBarColor, this.lightStatusBar)
         }
     }
 

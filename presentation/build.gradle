@@ -122,6 +122,7 @@ dependencies {
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
     implementation commonDependencies.firebaseDynamicLinks
+    implementation commonDependencies.location
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
