@@ -71,11 +71,11 @@
     <color name="color_social_button_active">@color/shade_black4</color>
     <color name="color_social_button_pressed">#d8d8d8</color>
 
-    <color name="color_button_small_blue_gradient_start">@color/shade_g_purpur_a</color>
+    <color name="color_button_small_blue_gradient_start">@color/g_purpur_a</color>
     <color name="color_button_small_blue_gradient_end">@color/g_purpur_b</color>
 
-    <color name="color_button_small_blue_pressed_gradient_start">@color/shade_g_green2_a</color>
-    <color name="color_button_small_blue_pressed_gradient_end">@color/shade_g_green2_b</color>
+    <color name="color_button_small_blue_pressed_gradient_start">@color/shade_g_purpur_a</color>
+    <color name="color_button_small_blue_pressed_gradient_end">@color/g_purpur_b</color>
 
     <color name="color_text_button_small_blue_2_active">@color/blue</color>
     <color name="color_text_button_small_blue_2_pressed">@color/blue</color>

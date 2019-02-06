@@ -40,4 +40,7 @@
 
     <dimen name="weight_picker_unselected_text">42sp</dimen>
     <dimen name="weight_picker_selected_text">62sp</dimen>
+
+    <dimen name="shop_margin">16dp</dimen>
+    <dimen name="shop_between">8dp</dimen>
 </resources>

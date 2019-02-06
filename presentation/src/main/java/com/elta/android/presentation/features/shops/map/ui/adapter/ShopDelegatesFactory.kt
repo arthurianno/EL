@@ -6,8 +6,9 @@ import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.RxBus
+import javax.inject.Inject
 
-class ShopDelegatesFactory(
+class ShopDelegatesFactory @Inject constructor(
     private val bus: RxBus
 ) : AdapterDelegatesFactory {
 
