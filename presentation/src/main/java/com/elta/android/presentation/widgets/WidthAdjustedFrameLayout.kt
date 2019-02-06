@@ -34,6 +34,8 @@ class WidthAdjustedFrameLayout @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(View.MeasureSpec.makeMeasureSpec(screenWidth - leftOffset - rightOffset, View.MeasureSpec.EXACTLY), heightMeasureSpec)
+        val size = screenWidth - leftOffset - rightOffset
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+        super.onMeasure(widthSpec, heightMeasureSpec)
     }
 }

@@ -9,6 +9,7 @@ import android.view.animation.LinearInterpolator
 object ContentResizer {
 
     private var heightAnimator: ValueAnimator = ObjectAnimator()
+    private const val resizeDuration = 250L
 
     fun listen(activity: Activity) {
         val viewHolder = ActivityViewHolder.createFrom(activity)
@@ -34,7 +35,7 @@ object ContentResizer {
         // for some reason it skips the first animation and I cannot figure out why.
         heightAnimator = ObjectAnimator.ofInt(event.contentHeightBeforeResize, event.contentHeight).apply {
             interpolator = LinearInterpolator()
-            duration = 250
+            duration = resizeDuration
         }
         heightAnimator.addUpdateListener { contentView.setHeight(it.animatedValue as Int) }
         heightAnimator.start()

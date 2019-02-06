@@ -10,10 +10,8 @@ data class ShopItem(
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {
-        if (other is ShopItem) {
-            if (distance != other.distance) {
-                return Payload.DISTANCE_CHANGED
-            }
+        if (other is ShopItem && distance != other.distance) {
+            return Payload.DISTANCE_CHANGED
         }
         return super.getChangePayload(other)
     }

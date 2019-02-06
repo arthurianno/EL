@@ -5,6 +5,6 @@ import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopIte
 
 sealed class Clicks : Click {
 
-    data class ShopMakeRoute(val item: ShopItem): Clicks()
-    data class ShopMakeCall(val item: ShopItem): Clicks()
+    data class ShopMakeRoute(val item: ShopItem) : Clicks()
+    data class ShopMakeCall(val item: ShopItem) : Clicks()
 }

@@ -35,7 +35,14 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         itemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         itemsView.adapter = adapter
-        itemsView.addItemDecoration(MarginItemDecoration(checkNotNull(context), R.dimen.shop_margin, R.dimen.shop_margin, R.dimen.shop_between))
+        itemsView.addItemDecoration(
+            MarginItemDecoration(
+                checkNotNull(context),
+                R.dimen.shop_margin,
+                R.dimen.shop_margin,
+                R.dimen.shop_between
+            )
+        )
         snapHelper.attachToRecyclerView(itemsView)
     }
 

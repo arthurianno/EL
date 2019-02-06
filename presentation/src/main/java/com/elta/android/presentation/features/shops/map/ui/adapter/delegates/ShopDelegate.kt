@@ -29,7 +29,7 @@ class ShopDelegate(
                         val click = when (view.id) {
                             R.id.shopRouteView -> Clicks.ShopMakeRoute(item)
                             R.id.shopCallView -> Clicks.ShopMakeCall(item)
-                            else -> throw IllegalArgumentException()
+                            else -> throw IllegalArgumentException("Unknown view id")
                         }
                         bus.click(click)
                     }

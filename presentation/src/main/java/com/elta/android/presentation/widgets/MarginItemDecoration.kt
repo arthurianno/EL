@@ -47,7 +47,6 @@ class MarginItemDecoration(
         }
     }
 
-    private fun getPixelSize(resources: Resources, @DimenRes margin: Int): Int {
-        return if (margin == 0) 0 else resources.getDimensionPixelSize(margin)
-    }
+    private fun getPixelSize(resources: Resources, @DimenRes margin: Int): Int =
+        if (margin == 0) 0 else resources.getDimensionPixelSize(margin)
 }
