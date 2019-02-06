@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -27,6 +28,8 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
         get() = childFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
 
     override val router: FlowRouter by lazy { cicerone.router }
+
+    override val statusBarConfigProvider: StatusBarConfigProvider? = null
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

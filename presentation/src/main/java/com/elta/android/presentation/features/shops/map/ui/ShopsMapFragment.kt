@@ -9,7 +9,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
-import com.elta.android.presentation.utils.applySystemWindowPadding
+import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.nullgr.core.adapter.DynamicAdapter
 import kotlinx.android.synthetic.main.fragment_shops_map.*
@@ -31,7 +31,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         super.onViewCreated(view, savedInstanceState)
         homeButtonView.setImageResource(R.drawable.ic_dialog_close)
         toolbarTitleView.text = getString(R.string.shops_map_toolbar_title)
-        toolbarView.applySystemWindowPadding()
+        toolbarView.applyWindowInsetsForChildrenView()
 
         itemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         itemsView.adapter = adapter

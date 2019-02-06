@@ -34,7 +34,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     protected abstract val classToken: Class<T>
 
-    protected abstract val statusBarConfigProvider: StatusBarConfigProvider
+    protected abstract val statusBarConfigProvider: StatusBarConfigProvider?
 
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
@@ -64,9 +64,9 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     override fun onStart() {
         super.onStart()
-        with(statusBarConfigProvider) {
-            view?.applyInsetsToContentView(!this.drawUnderStatusBar)
-            activity?.window?.setStatusBarColor(this.statusBarColor, this.lightStatusBar)
+        statusBarConfigProvider?.let {
+            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
+            activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
         }
     }
 
