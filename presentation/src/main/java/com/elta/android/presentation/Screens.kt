@@ -14,6 +14,7 @@ import com.elta.android.presentation.features.registration.flow.ui.RegistrationF
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
+import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
@@ -72,5 +73,9 @@ object Screens {
 
     object ShopsStart : SupportAppScreen() {
         override fun getFragment() = ShopsStartFragment.newInstance()
+    }
+
+    object ShopsMap : SupportAppScreen() {
+        override fun getFragment() = ShopsMapFragment.newInstance()
     }
 }
