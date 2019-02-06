@@ -12,6 +12,7 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
+import com.elta.android.presentation.messages.SnackBarMessageData
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
@@ -143,7 +144,7 @@ class OnBoardingPm @Inject constructor(
         val isNextPageAvailable = when (currentItem) {
             is OnBoardingGenderItem -> data != null
             is OnBoardingDiabetesItem -> data != null
-            is OnBoardingWeightItem -> data != null && data != INITIAL_WEIGHT
+            is OnBoardingWeightItem -> true
             else -> false
         }
         nextPageVisibilityState.consumer.accept(isNextPageAvailable)
@@ -158,6 +159,7 @@ class OnBoardingPm @Inject constructor(
 
     private fun handleSuccess() {
         // TODO: navigate to Maps Screen
+        showSnackBar(SnackBarMessageData.SimpleTextMessage("Success"))
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size

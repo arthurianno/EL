@@ -1,3 +1,6 @@
+### Android_v0.1.1 ###
+- [ELTA-288] - Fixed weight screen. Fixed request params. Fixed diabetes order.
+
 ### Android_v0.1.0 ###
 - [ELTA-230] - Added OnBoarding
 
