@@ -13,9 +13,9 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>() where T : BasePm {
     protected var mapView: MapView? = null
     protected var map: Map? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
         MapKitFactory.initialize(activity)
+        super.onActivityCreated(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,11 +26,13 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>() where T : BasePm {
 
     override fun onStart() {
         super.onStart()
+        mapView?.onStart()
         MapKitFactory.getInstance().onStart()
     }
 
     override fun onStop() {
         super.onStop()
+        mapView?.onStop()
         MapKitFactory.getInstance().onStop()
     }
 }

@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.shops.map.ui;
+package com.elta.android.presentation.features.shops.map.ui
 
 import android.os.Bundle
 import android.view.View
