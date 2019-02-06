@@ -15,7 +15,7 @@ ext.androidVersions = [
 def libraryVersions = [
         //Support libraries
         supportLibraryVersion      : '28.0.0',
-        playServicesVersion        : '11.8.0',
+        playServicesVersion        : '16.0.0',
         firebaseVersion            : '16.0.6',
         firebaseMessagingVersion   : '17.3.4',
         firebaseDynamicLinkVersion : '16.1.5',
@@ -60,6 +60,7 @@ def libraryVersions = [
         barcodeScannerVersion      : '1.9.8',
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
+        mapKitVersion              : '3.2.0',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -146,6 +147,7 @@ ext.commonDependencies = [
         pinView               : "com.chaos.view:pinview:${libraryVersions.pinViewVersion}",
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
+        yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",

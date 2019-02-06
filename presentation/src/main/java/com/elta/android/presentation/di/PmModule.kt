@@ -17,6 +17,7 @@ import com.elta.android.presentation.features.registration.main.pm.RegistrationM
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
+import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import dagger.Binds
 import dagger.Module
@@ -107,4 +108,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(ShopsStartPm::class)
     abstract fun bindShopsStartPm(pm: ShopsStartPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ShopsMapPm::class)
+    abstract fun bindShopsMapPm(pm: ShopsMapPm): PresentationModel
 }

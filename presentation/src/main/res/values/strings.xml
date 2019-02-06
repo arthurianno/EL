@@ -131,4 +131,5 @@
     <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
     <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
     <string name="shops_start_find_action_button">Найти магазин на карте</string>
+    <string name="shops_map_toolbar_title">Приобрести глюкометр</string>
 </resources>
