@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Title1" parent="Typography.Title1.Primary" />
+
+    <style name="Title2" parent="Typography.Title2.Primary" />
 
     <style name="Body1" parent="Typography.Body1.Primary" />
 
@@ -12,16 +15,20 @@
 
     <style name="Caption1" parent="Typography.Caption1.Primary" />
 
+    <style name="Caption2" parent="Typography.Caption2.Primary" />
+
     <style name="SnackbarText" parent="Typography.Snackbar.Text.Primary" />
 
     <style name="SnackbarButton" parent="Typography.Snackbar.Button" />
 
     <style name="ToolbarTextButton" parent="Typography.Toolbar.Button.Primary" />
 
-    <style name="BackendError" parent="Typography.Body1.BackendError"/>
+    <style name="BackendError" parent="Typography.Body1.BackendError" />
 
     <style name="ConnectionStateText" parent="Typography.Base.Roboto.Regular">
         <item name="android:textColor">@color/color_connection_status_text</item>
         <item name="android:textSize">@dimen/font_size_connection_status</item>
     </style>
+
+    <style name="TextStyle2" parent="Typography.TextStyle2" />
 </resources>
