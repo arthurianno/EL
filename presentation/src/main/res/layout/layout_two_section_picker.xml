@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
+
+    <com.elta.android.presentation.widgets.picker.NumberPicker
+        android:id="@+id/leftPickerView"
+        style="@style/NumberPicker.WeightLeft"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/comaView"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/comaView"
+        style="@style/NumberPicker.Сoma"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="50dp"
+        android:text="@string/coma"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/rightPickerView"
+        app:layout_constraintStart_toEndOf="@+id/leftPickerView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.elta.android.presentation.widgets.picker.NumberPicker
+        android:id="@+id/rightPickerView"
+        style="@style/NumberPicker.WeightRight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/comaView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/topDividerView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_picker_weight_divider"
+        app:layout_constraintBottom_toTopOf="@+id/maskView"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <View
+        android:id="@+id/maskView"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@color/color_picker_weight_mask"
+        app:layout_constraintBottom_toTopOf="@+id/bottomDividerView"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topDividerView" />
+
+    <View
+        android:id="@+id/bottomDividerView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_picker_weight_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/maskView" />
+
+</merge>
