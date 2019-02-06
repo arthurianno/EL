@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class ShortUserSettingsRequest(
     @SerializedName("diabet") val diabetes: String?,
-    @SerializedName("weight") val weight: Double? = 0.0,
+    @SerializedName("weight") val weight: Double?,
     @SerializedName("gender") val gender: String?
 )

@@ -13,6 +13,6 @@ class SettingsRemoteDataSource @Inject constructor(
 ) : SettingsDataSource {
 
     override fun updateUserProfile(gender: String?, weight: Double?, diabetes: String?): Completable =
-        api.updateUserSettings(ShortUserSettingsRequest(gender, weight, diabetes))
+        api.updateUserSettings(ShortUserSettingsRequest(diabetes, weight, gender))
             .checkNetwork(checker)
 }
