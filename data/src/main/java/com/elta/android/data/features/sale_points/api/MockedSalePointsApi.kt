@@ -22,7 +22,7 @@ class MockedSalePointsApi(context: Context) : SalePointsApi {
         list = Gson().fromJson<List<SalePointDto>>(reader, type)
     }
 
-    override fun getSalePoints(lastSync: Long, page: Int, pageSize: Int): Observable<SalePointsDto> =
+    override fun getSalePoints(lastSync: Long?, page: Int, pageSize: Int): Observable<SalePointsDto> =
         Observable.fromCallable {
             val pageOfPoints = list.getPage(page, PAGE_SIZE)
             SalePointsDto(pageOfPoints, MetaDto(list.size, page, PAGE_SIZE))
