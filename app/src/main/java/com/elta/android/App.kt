@@ -7,6 +7,7 @@ import android.support.multidex.MultiDex
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.elta.android.data.di.ApiConstantsModule
+import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
@@ -50,6 +51,7 @@ class App : Application(), HasActivityInjector {
             .builder()
             .context(this)
             .appModule(AppModule(BuildConfig.IS_LOG_ENABLED))
+            .cacheModule(CacheModule(this))
             .apiConstantsModule(ApiConstantsModule(BuildConfig.DEBUG))
             .interceptorModule(InterceptorModule(App::class.java.simpleName, HttpLoggingInterceptor.Level.BODY))
             .analyticsModule(AnalyticsModule(this))
