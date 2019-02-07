@@ -25,5 +25,4 @@ class CacheModule(context: Context) {
     @Provides
     @Singleton
     fun provideBoxStore(): BoxStore = boxStore
-
 }
