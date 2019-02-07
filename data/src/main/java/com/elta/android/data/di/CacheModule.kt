@@ -11,9 +11,7 @@ import io.objectbox.BoxStore
 import javax.inject.Singleton
 
 @Module(includes = [CacheModule.Declarations::class])
-class CacheModule(context: Context) {
-
-    private val boxStore = MyObjectBox.builder().androidContext(context).build()
+class CacheModule {
 
     @Module
     interface Declarations {
@@ -24,5 +22,5 @@ class CacheModule(context: Context) {
 
     @Provides
     @Singleton
-    fun provideBoxStore(): BoxStore = boxStore
+    fun provideBoxStore(context: Context): BoxStore = MyObjectBox.builder().androidContext(context).build()
 }

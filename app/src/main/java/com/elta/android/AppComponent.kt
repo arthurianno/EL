@@ -54,8 +54,6 @@ interface AppComponent {
 
         fun appModule(module: AppModule): Builder
 
-        fun cacheModule(module: CacheModule): Builder
-
         fun apiConstantsModule(module: ApiConstantsModule): Builder
 
         fun interceptorModule(module: InterceptorModule): Builder
