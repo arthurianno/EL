@@ -10,7 +10,7 @@ interface SalePointsApi {
     // TODO: change url
     @GET("api/salepoints/v1")
     fun getSalePoints(
-        @Query("lastTimestampSync") lastSync: Long,
+        @Query("lastTimestampSync") lastSync: Long?,
         @Query("pageIndex") page: Int,
         @Query("pageSize") pageSize: Int
     ): Observable<SalePointsDto>
