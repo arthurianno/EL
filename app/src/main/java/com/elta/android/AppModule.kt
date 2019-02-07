@@ -13,6 +13,7 @@ import com.nullgr.core.preferences.defaultPrefs
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
+import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.schedulers.ComputationSchedulersFacade
 import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -67,4 +68,9 @@ class AppModule(private val enableLog: Boolean) {
     @Singleton
     fun provideCryptoPreferences(context: Context): CryptoPreferences =
         CryptoPreferences(context, context.getString(R.string.crypto_key_alias))
+
+    @Provides
+    @Singleton
+    fun provideRxLocationManager(context: Context): RxLocationManager =
+        RxLocationManager(context)
 }

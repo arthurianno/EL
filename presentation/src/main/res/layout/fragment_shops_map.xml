@@ -15,9 +15,18 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="top" />
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/myLocationButtonView"
+            style="@style/Button.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gps"
+            app:layout_constraintBottom_toTopOf="@id/itemsView"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/itemsView"
