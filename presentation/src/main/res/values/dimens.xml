@@ -2,6 +2,7 @@
 <resources>
     <dimen name="font_size_title_1">15sp</dimen>
     <dimen name="font_size_title_2">15sp</dimen>
+    <dimen name="font_size_title_3">14sp</dimen>
     <dimen name="font_size_body_1">14sp</dimen>
     <dimen name="font_size_subtitle_1">15sp</dimen>
     <dimen name="font_size_subtitle_2">14sp</dimen>

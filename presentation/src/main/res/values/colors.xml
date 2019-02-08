@@ -32,6 +32,7 @@
     <color name="white">#ffffff</color>
     <color name="shade_g_green2_a">#3ea48d</color>
     <color name="shade_g_green2_b">#3b919a</color>
+    <color name="pale_gray">#f7f7f8</color>
 
     <!-- TEXT COLORS -->
     <color name="color_text_primary">@color/black_blue</color>
