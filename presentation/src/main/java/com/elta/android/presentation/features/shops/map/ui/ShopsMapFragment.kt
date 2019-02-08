@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
@@ -14,14 +15,17 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
+import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.DynamicAdapter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import timber.log.Timber
 import javax.inject.Inject
 
+@Suppress("MagicNumber")
 class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
     @Inject
@@ -30,6 +34,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
+    override val selectedPinRes = R.drawable.ic_active_pin
+    override val normalPinRes = R.drawable.ic_normal_pin
+    override val userLocationPinRes = R.drawable.ic_my_loc
 
     private val snapHelper = PagerSnapHelper()
     private val rxPermissions by lazy { RxPermissions(this) }
@@ -63,10 +70,21 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
             .bindTo(pm.permissionStatusUpdatedAction.consumer)
         pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
+
+        pinClicks().subscribe {
+            Timber.d("onBindPresentationModel $it")
+        }.untilUnbind()
+
+        addPins(arrayListOf(
+            GeoPoint(47.117953, 37.521493),
+            GeoPoint(47.118359, 37.519666),
+            GeoPoint(47.115393, 37.520877),
+            GeoPoint(47.117465, 37.522465)
+        ))
     }
 
     private fun showUserLocation(location: Location) {
-        moveTo(location)
+        moveTo(location.toPoint())
         addMyLocationPin(location)
     }
 

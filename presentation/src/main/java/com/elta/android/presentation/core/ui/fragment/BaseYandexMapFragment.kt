@@ -4,24 +4,45 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.geo.GeoPoint
+import com.elta.android.presentation.core.geo.UserLocationGeoPoint
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.utils.toPoint
+import com.jakewharton.rxrelay2.BehaviorRelay
+import com.nullgr.core.rx.asConsumer
+import com.nullgr.core.rx.asObservable
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObject
+import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
-abstract class BaseYandexMapFragment<T> : BaseFragment<T>() where T : BasePm {
+abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListener where T : BasePm {
 
     protected var mapView: MapView? = null
     protected var map: Map? = null
-    private val myLocationImageProvider by lazy {
-        ImageProvider.fromResource(activity, R.drawable.ic_my_loc)
-    }
 
+    protected abstract val selectedPinRes: Int
+    protected abstract val normalPinRes: Int
+    protected abstract val userLocationPinRes: Int
+
+    private val myLocationImageProvider by lazy {
+        ImageProvider.fromResource(activity, userLocationPinRes)
+    }
+    private val simplePinImageProvider by lazy {
+        ImageProvider.fromResource(activity, normalPinRes)
+    }
+    private val selectedPinImageProvider by lazy {
+        ImageProvider.fromResource(activity, selectedPinRes)
+    }
     private val mapObjects by lazy { map?.mapObjects?.addCollection() }
+    private var userLocationMapObject: MapObject? = null
+    private var pinObjects = hashMapOf<GeoPoint, MapObject?>()
+    private val selectedObjectRelay = BehaviorRelay.create<GeoPoint>()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         MapKitFactory.initialize(activity)
@@ -32,6 +53,8 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>() where T : BasePm {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.yandexMapView)
         map = mapView?.map
+        map?.isRotateGesturesEnabled = false
+        mapObjects?.addTapListener(this)
     }
 
     override fun onStart() {
@@ -46,18 +69,75 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>() where T : BasePm {
         MapKitFactory.getInstance().onStop()
     }
 
-    fun moveTo(location: Location, zoom: Float? = null) {
+    fun moveTo(location: Point, zoom: Float? = null) {
         map?.move(
-            CameraPosition(location.toPoint(), zoom ?: DEFAULT_ZOOM, AZIMUT, TILT),
+            CameraPosition(location, zoom ?: DEFAULT_ZOOM, AZIMUT, TILT),
             Animation(Animation.Type.SMOOTH, ANIMATION_DURATION),
             null
         )
     }
 
     fun addMyLocationPin(location: Location) {
-        // TODO LOOKS LIKE SHIT. SHOULD BE IMPROVED
-        mapObjects?.clear()
-        mapObjects?.addPlacemark(location.toPoint(), myLocationImageProvider)
+        userLocationMapObject?.let { mapObjects?.remove(it) }
+        userLocationMapObject = mapObjects?.addPlacemark(location.toPoint(), myLocationImageProvider)
+        userLocationMapObject?.userData = UserLocationGeoPoint(location)
+    }
+
+    fun replacePins(points: List<GeoPoint>) {
+        clearAllPins()
+        addPins(points)
+    }
+
+    fun addPins(points: List<GeoPoint>) {
+        points.forEach { drawPinObject(it) }
+    }
+
+    fun pinClicks() = selectedObjectRelay.asObservable()
+
+    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
+        val selectedPoint = mapObject.userData as? GeoPoint
+        val previousSelectedPoint = selectedObjectRelay.value
+        previousSelectedPoint?.let {
+            it.selected = false
+            drawPinObject(it)
+        }
+        selectedPoint?.let {
+            if (it !is UserLocationGeoPoint) {
+                it.selected = true
+                setSelectedPin(it)
+            }
+        }
+        selectedObjectRelay.asConsumer().accept(selectedPoint)
+        return true
+    }
+
+    private fun drawPinObject(geoPoint: GeoPoint) {
+        if (geoPoint in pinObjects.keys) {
+            pinObjects[geoPoint]?.let {
+                mapObjects?.remove(it)
+                pinObjects.remove(geoPoint)
+            }
+        }
+        val mapObject = mapObjects?.addPlacemark(
+            geoPoint.toPoint(),
+            when (geoPoint.selected) {
+                true -> selectedPinImageProvider
+                else -> simplePinImageProvider
+            })
+        mapObject?.userData = geoPoint
+        pinObjects[geoPoint] = mapObject
+    }
+
+    private fun clearAllPins() {
+        pinObjects.forEach { entry ->
+            entry.value?.let { mapObjects?.remove(it) }
+        }
+        pinObjects.clear()
+    }
+
+    private fun setSelectedPin(geoPoint: GeoPoint) {
+        drawPinObject(geoPoint)
+        moveTo(geoPoint.toPoint())
     }
 
     companion object {
