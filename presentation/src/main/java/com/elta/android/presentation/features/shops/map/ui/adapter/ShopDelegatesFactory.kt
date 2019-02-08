@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.shops.map.ui.adapter
 
+import com.elta.android.presentation.features.shops.map.ui.adapter.delegates.SearchHeaderDelegate
 import com.elta.android.presentation.features.shops.map.ui.adapter.delegates.ShopDelegate
+import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
@@ -15,6 +17,7 @@ class ShopDelegatesFactory @Inject constructor(
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
             ShopItem::class.java -> ShopDelegate(bus)
+            SearchHeaderItem::class.java -> SearchHeaderDelegate()
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }

@@ -43,4 +43,7 @@
 
     <dimen name="shop_margin">16dp</dimen>
     <dimen name="shop_between">8dp</dimen>
+
+    <dimen name="card_corner">8dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
 </resources>

@@ -5,6 +5,7 @@ import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.widget.inputControl
@@ -36,6 +37,28 @@ class ShopsMapPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+
+        searchItems.consumer.accept(
+            arrayListOf<ListItem>().apply {
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+                add(SearchHeaderItem())
+            }
+        )
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .doOnNext {
