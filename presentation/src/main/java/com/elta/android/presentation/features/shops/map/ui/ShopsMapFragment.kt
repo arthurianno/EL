@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.widgets.MarginItemDecoration
+import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
 import kotlinx.android.synthetic.main.fragment_shops_map.*
@@ -59,6 +60,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
         pm.searchInput.bindTo(searchInputView)
         searchInputView.textChanges().map { it.isNotEmpty() }.bindTo { searchIconView.isSelected = it }
+        searchInputView.textChanges().map { it.isNotEmpty() }.bindTo(searchItemsView.visibility())
     }
 
     companion object {
