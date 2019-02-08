@@ -1,5 +1,7 @@
 package com.elta.android.presentation.features.shops.map.pm
 
+import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
+import com.elta.android.domain.features.sale_points.model.SalePoint
 import android.annotation.SuppressLint
 import android.location.Location
 import com.elta.android.presentation.R
@@ -15,6 +17,7 @@ import javax.inject.Inject
 
 class ShopsMapPm @Inject constructor(
     private val rxLocationManager: RxLocationManager,
+    private val getSalePointsUseCase: GetSalePointsUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -29,11 +32,46 @@ class ShopsMapPm @Inject constructor(
     private val permissionStatusState = State<PermissionStatus>()
     private val loadScreenAction = Action<Unit>()
 
+    private val loadSalePoints = Action<Unit>()
+
     override fun onCreate() {
         super.onCreate()
         bindPermissionsBehaviour()
         bindLocationBehaviour()
         bindShopsItems()
+
+        loadSalePoints.observable
+            .skipWhileInProgress()
+            .flatMap { params ->
+                getSalePointsUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnNext(::handleSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .doOnNext {
+                loadSalePoints.consumer.accept(Unit)
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleSuccess(points: List<SalePoint>) {
+        items.consumer.accept(points.map { it.toItem() })
+    }
+
+    private fun SalePoint.toItem(): ListItem =
+        ShopItem(
+            id = id,
+            name = name,
+            address = fullAddress,
+            distance = resources.getString(R.string.shops_map_distance_km_pattern, 10)
+        )
     }
 
     private fun bindLocationBehaviour() {

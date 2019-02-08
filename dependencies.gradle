@@ -82,7 +82,9 @@ def libraryVersions = [
 
         fbVersion                  : '4.29.0',
         vkVersion                  : '1.6.9',
-        okVersion                  : '2.1.6'
+        okVersion                  : '2.1.6',
+
+        objectboxVersion           : ext.objectboxVersion
 ]
 
 ext.commonDependencies = [
@@ -165,7 +167,9 @@ ext.commonDependencies = [
 
         fb                    : "com.facebook.android:facebook-login:${libraryVersions.fbVersion}",
         vk                    : "com.vk:androidsdk:${libraryVersions.vkVersion}",
-        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}"
+        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}",
+
+        objectbox             : "io.objectbox:objectbox-kotlin:${libraryVersions.objectboxVersion}"
 ]
 
 ext.commonTestDependencies = [
