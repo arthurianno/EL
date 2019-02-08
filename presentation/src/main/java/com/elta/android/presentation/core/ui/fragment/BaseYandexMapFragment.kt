@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.geo.GeoPoint
-import com.elta.android.presentation.core.geo.UserLocationGeoPoint
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.utils.toPoint
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -80,7 +79,7 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
     fun addMyLocationPin(location: Location) {
         userLocationMapObject?.let { mapObjects?.remove(it) }
         userLocationMapObject = mapObjects?.addPlacemark(location.toPoint(), myLocationImageProvider)
-        userLocationMapObject?.userData = UserLocationGeoPoint(location)
+        userLocationMapObject?.userData = GeoPoint(location.latitude, location.longitude, isUserPoint = true)
     }
 
     fun replacePins(points: List<GeoPoint>) {
@@ -102,7 +101,7 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
             drawPinObject(it)
         }
         selectedPoint?.let {
-            if (it !is UserLocationGeoPoint) {
+            if (!it.isUserPoint) {
                 it.selected = true
                 setSelectedPin(it)
             }
