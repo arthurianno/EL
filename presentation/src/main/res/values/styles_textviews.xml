@@ -31,4 +31,6 @@
     </style>
 
     <style name="TextStyle2" parent="Typography.TextStyle2" />
+
+    <style name="Search" parent="Typography.Search" />
 </resources>

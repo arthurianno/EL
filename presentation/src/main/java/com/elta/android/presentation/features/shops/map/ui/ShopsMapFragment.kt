@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.widgets.MarginItemDecoration
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -20,6 +21,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
     @Inject
     lateinit var adapter: DynamicAdapter
+
+    @Inject
+    lateinit var searchAdapter: DynamicAdapter
 
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
@@ -44,11 +48,17 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
             )
         )
         snapHelper.attachToRecyclerView(itemsView)
+
+        searchItemsView.layoutManager = LinearLayoutManager(context)
+        searchItemsView.adapter = searchAdapter
     }
 
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         pm.items.bindTo { items -> adapter.updateData(items) }
+        pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
+        pm.searchInput.bindTo(searchInputView)
+        searchInputView.textChanges().map { it.isNotEmpty() }.bindTo { searchIconView.isSelected = it }
     }
 
     companion object {
