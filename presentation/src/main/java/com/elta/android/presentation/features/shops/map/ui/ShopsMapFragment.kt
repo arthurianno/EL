@@ -34,7 +34,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
     override val selectedPinRes = R.drawable.ic_active_pin
-    override val normalPinRes = R.drawable.ic_normal_pin
+    override val normalPinRes = R.drawable.ic_pin_b_normal
     override val userLocationPinRes = R.drawable.ic_my_loc
 
     private val snapHelper = PagerSnapHelper()
