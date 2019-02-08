@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.view.View
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
@@ -70,17 +69,11 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
             .bindTo(pm.permissionStatusUpdatedAction.consumer)
         pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
+        pm.geoPoints.bindTo(::addPins)
 
         pinClicks().subscribe {
             Timber.d("onBindPresentationModel $it")
         }.untilUnbind()
-
-        addPins(arrayListOf(
-            GeoPoint(47.117953, 37.521493),
-            GeoPoint(47.118359, 37.519666),
-            GeoPoint(47.115393, 37.520877),
-            GeoPoint(47.117465, 37.522465)
-        ))
     }
 
     private fun showUserLocation(location: Location) {

@@ -1,10 +1,11 @@
 package com.elta.android.presentation.features.shops.map.pm
 
-import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
-import com.elta.android.domain.features.sale_points.model.SalePoint
 import android.annotation.SuppressLint
 import android.location.Location
+import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
+import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -22,6 +23,7 @@ class ShopsMapPm @Inject constructor(
 ) : BasePm(services) {
 
     val items = State<List<ListItem>>()
+    val geoPoints = State<List<GeoPoint>>()
 
     val permissionStatusUpdatedAction = Action<PermissionStatus>()
     val permissionRequiredCommand = Command<Unit>()
@@ -32,46 +34,17 @@ class ShopsMapPm @Inject constructor(
     private val permissionStatusState = State<PermissionStatus>()
     private val loadScreenAction = Action<Unit>()
 
-    private val loadSalePoints = Action<Unit>()
-
     override fun onCreate() {
         super.onCreate()
         bindPermissionsBehaviour()
         bindLocationBehaviour()
-        bindShopsItems()
+        bindSalePoints()
 
-        loadSalePoints.observable
-            .skipWhileInProgress()
-            .flatMap { params ->
-                getSalePointsUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .doOnNext(::handleSuccess)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .subscribe(loadScreenAction.consumer)
             .untilDestroy()
-
-        lifecycleObservable.filter { it == Lifecycle.CREATED }
-            .doOnNext {
-                loadSalePoints.consumer.accept(Unit)
-            }
-            .subscribe()
-            .untilDestroy()
-    }
-
-    private fun handleSuccess(points: List<SalePoint>) {
-        items.consumer.accept(points.map { it.toItem() })
-    }
-
-    private fun SalePoint.toItem(): ListItem =
-        ShopItem(
-            id = id,
-            name = name,
-            address = fullAddress,
-            distance = resources.getString(R.string.shops_map_distance_km_pattern, 10)
-        )
     }
 
     private fun bindLocationBehaviour() {
@@ -105,30 +78,42 @@ class ShopsMapPm @Inject constructor(
             }
             .subscribe()
             .untilDestroy()
+    }
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
-            .subscribe(loadScreenAction.consumer)
+    private fun bindSalePoints() {
+        loadScreenAction.observable
+            .skipWhileInProgress()
+            .flatMap { params ->
+                getSalePointsUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnNext(::handleSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
             .untilDestroy()
     }
 
-    private fun bindShopsItems() {
-        items.consumer.accept(
-            mutableListOf<ListItem>().apply {
-                repeat((0..10).count()) {
-                    add(
-                        ShopItem(
-                            id = it,
-                            name = "Test Name #$it",
-                            address = "Test Address #$it",
-                            distance = resources.getString(R.string.shops_map_distance_km_pattern, it)
-                        )
-                    )
-                }
-            }
-        )
+    private fun handleSuccess(points: List<SalePoint>) {
+        items.consumer.accept(points.map { it.toItem() })
+        geoPoints.consumer.accept(points.map { it.toGeoPoint() })
     }
+
+    private fun SalePoint.toItem(): ListItem =
+        ShopItem(
+            id = id,
+            name = name,
+            address = fullAddress,
+            distance = resources.getString(R.string.shops_map_distance_km_pattern, 10)
+        )
+
+    private fun SalePoint.toGeoPoint(): GeoPoint =
+        GeoPoint(
+            latitude = coordinates.latitude,
+            longitude = coordinates.longitude,
+            id = id
+        )
 
     @SuppressLint("MissingPermission")
     private fun fetchMyLocation(i: Unit) {

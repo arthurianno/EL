@@ -6,13 +6,12 @@ import com.yandex.mapkit.geometry.Point
 open class GeoPoint(
     val latitude: Double,
     val longitude: Double,
-    val id: Int? = null,
+    val id: String? = null,
     var selected: Boolean? = false,
     var meta: Any? = null
 ) {
 
     fun toPoint() = Point(latitude, longitude)
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -29,7 +28,7 @@ open class GeoPoint(
     override fun hashCode(): Int {
         var result = latitude.hashCode()
         result = 31 * result + longitude.hashCode()
-        result = 31 * result + (id ?: 0)
+        result = 31 * result + (id?.hashCode() ?: 0)
         return result
     }
 }
