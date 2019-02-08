@@ -13,5 +13,22 @@ class SalePointsCachedDataSource @Inject constructor(
 ) : SalePointsDataSource {
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
-        Observable.fromCallable { cache.getAll() }.map(fromCacheMapper::mapFromObjects)
+        Observable.fromCallable {
+            cache.getAll()
+        }.map(fromCacheMapper::mapFromObjects)
+
+    override fun getSalePoints(
+        southWestLatitude: Double,
+        southWestLongitude: Double,
+        northEastLatitude: Double,
+        northEastLongitude: Double
+    ): Observable<List<SalePointDto>> =
+        Observable.fromCallable {
+            cache.getAllInBounds(
+                southWestLatitude = southWestLatitude,
+                southWestLongitude = southWestLongitude,
+                northEastLatitude = northEastLatitude,
+                northEastLongitude = northEastLongitude
+            )
+        }.map(fromCacheMapper::mapFromObjects)
 }
