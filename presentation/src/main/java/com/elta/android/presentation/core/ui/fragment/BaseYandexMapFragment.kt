@@ -89,6 +89,7 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
 
     fun addPins(points: List<GeoPoint>) {
         points.forEach { drawPinObject(it) }
+        points.find { it.selected }?.let { setSelectedPin(it) }
     }
 
     fun pinClicks() = selectedObjectRelay.asObservable()
@@ -106,7 +107,6 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
                 setSelectedPin(it)
             }
         }
-        selectedObjectRelay.asConsumer().accept(selectedPoint)
         return true
     }
 
@@ -135,12 +135,13 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
     }
 
     private fun setSelectedPin(geoPoint: GeoPoint) {
+        selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
         moveTo(geoPoint.toPoint())
     }
 
     companion object {
-        private const val DEFAULT_ZOOM = 18f
+        private const val DEFAULT_ZOOM = 15f
         private const val AZIMUT = 0f
         private const val TILT = 0f
         private const val ANIMATION_DURATION = 5f

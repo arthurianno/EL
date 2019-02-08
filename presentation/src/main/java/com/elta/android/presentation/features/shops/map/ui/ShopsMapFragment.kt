@@ -69,9 +69,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
             .bindTo(pm.permissionStatusUpdatedAction.consumer)
         pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
-        pm.geoPoints.bindTo(::addPins)
+        pm.geoPoints.bindTo(::replacePins)
 
-        pinClicks().subscribe {
+        pinClicks().skip(1).subscribe {
             Timber.d("onBindPresentationModel $it")
         }.untilUnbind()
     }
