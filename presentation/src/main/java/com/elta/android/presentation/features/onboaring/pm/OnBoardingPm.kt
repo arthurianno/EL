@@ -5,6 +5,7 @@ import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -12,7 +13,6 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
-import com.elta.android.presentation.messages.SnackBarMessageData
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
@@ -158,8 +158,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        // TODO: navigate to Maps Screen
-        showSnackBar(SnackBarMessageData.SimpleTextMessage("Success"))
+        router.navigateTo(Screens.ShopsMap)
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size

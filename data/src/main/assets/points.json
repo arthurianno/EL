@@ -1,0 +1,1618 @@
+[
+  {
+    "address": "Авиамоторная ул., 0",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "997B0B6C-22E1-4C3E-BE70-22BAD175AED5",
+    "phone": "+380111111110",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.566438488451816,
+      "latitude": 55.669425970123406
+    },
+    "name": "Аптека Витафарм0",
+    "fullAddress": "г. Москва, Авиамоторная ул., 0"
+  },
+  {
+    "address": "Авиамоторная ул., 1",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "41A22680-B8BD-4438-8B80-A4FFCAB721ED",
+    "phone": "+380111111111",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.514571406675678,
+      "latitude": 55.685005399254436
+    },
+    "name": "Аптека Витафарм1",
+    "fullAddress": "г. Москва, Авиамоторная ул., 1"
+  },
+  {
+    "address": "Авиамоторная ул., 2",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "A1CA1243-B1A5-4F01-9FD3-A0317E1DC808",
+    "phone": "+380111111112",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.710568967077243,
+      "latitude": 55.661196469730434
+    },
+    "name": "Аптека Витафарм2",
+    "fullAddress": "г. Москва, Авиамоторная ул., 2"
+  },
+  {
+    "address": "Авиамоторная ул., 3",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "F2C68244-A215-4D4E-A03D-88FD7A5674A3",
+    "phone": "+380111111113",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.614994742719944,
+      "latitude": 55.787448483759185
+    },
+    "name": "Аптека Витафарм3",
+    "fullAddress": "г. Москва, Авиамоторная ул., 3"
+  },
+  {
+    "address": "Авиамоторная ул., 4",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "552C1484-0FF2-477E-9C69-1B174D0EFA98",
+    "phone": "+380111111114",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.466035573916074,
+      "latitude": 55.653207425347674
+    },
+    "name": "Аптека Витафарм4",
+    "fullAddress": "г. Москва, Авиамоторная ул., 4"
+  },
+  {
+    "address": "Авиамоторная ул., 5",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "934CB7C1-C6D4-48CA-8A48-1EACC5B1634F",
+    "phone": "+380111111115",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.617836902068639,
+      "latitude": 55.638803338245211
+    },
+    "name": "Аптека Витафарм5",
+    "fullAddress": "г. Москва, Авиамоторная ул., 5"
+  },
+  {
+    "address": "Авиамоторная ул., 6",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "D8E23058-2CCE-475E-B147-04EE33B6BD0D",
+    "phone": "+380111111116",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.732247399147411,
+      "latitude": 55.700773735255332
+    },
+    "name": "Аптека Витафарм6",
+    "fullAddress": "г. Москва, Авиамоторная ул., 6"
+  },
+  {
+    "address": "Авиамоторная ул., 7",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "501FC154-DBE9-4E54-BF25-53B14B67E538",
+    "phone": "+380111111117",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.748629778387787,
+      "latitude": 55.695786898698657
+    },
+    "name": "Аптека Витафарм7",
+    "fullAddress": "г. Москва, Авиамоторная ул., 7"
+  },
+  {
+    "address": "Авиамоторная ул., 8",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3D0B79AA-C4A8-487D-B1A2-B267C8429F65",
+    "phone": "+380111111118",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.462361884540769,
+      "latitude": 55.667748938649893
+    },
+    "name": "Аптека Витафарм8",
+    "fullAddress": "г. Москва, Авиамоторная ул., 8"
+  },
+  {
+    "address": "Авиамоторная ул., 9",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "84EA8AB4-99C8-4A01-9C6F-4D6C2ED1C1D5",
+    "phone": "+380111111119",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.500090295965471,
+      "latitude": 55.799615813780584
+    },
+    "name": "Аптека Витафарм9",
+    "fullAddress": "г. Москва, Авиамоторная ул., 9"
+  },
+  {
+    "address": "Авиамоторная ул., 10",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "58AFB1F2-B1A8-49F0-9C54-3E51E67983C9",
+    "phone": "+3801111111110",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.468139563532873,
+      "latitude": 55.822622631078481
+    },
+    "name": "Аптека Витафарм10",
+    "fullAddress": "г. Москва, Авиамоторная ул., 10"
+  },
+  {
+    "address": "Авиамоторная ул., 11",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "739CEC8B-C92B-45D6-BE79-7B84CC1E6AD8",
+    "phone": "+3801111111111",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.531370819882063,
+      "latitude": 55.770964158587283
+    },
+    "name": "Аптека Витафарм11",
+    "fullAddress": "г. Москва, Авиамоторная ул., 11"
+  },
+  {
+    "address": "Авиамоторная ул., 12",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "4EF9E308-6AF0-4918-96EF-5BBB796B2039",
+    "phone": "+3801111111112",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.602608829677116,
+      "latitude": 55.811065450048631
+    },
+    "name": "Аптека Витафарм12",
+    "fullAddress": "г. Москва, Авиамоторная ул., 12"
+  },
+  {
+    "address": "Авиамоторная ул., 13",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "65D84D0D-8BEC-4A4B-8FF9-9D20EB2B184C",
+    "phone": "+3801111111113",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.755617069276191,
+      "latitude": 55.672637313565595
+    },
+    "name": "Аптека Витафарм13",
+    "fullAddress": "г. Москва, Авиамоторная ул., 13"
+  },
+  {
+    "address": "Авиамоторная ул., 14",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "872077BD-B3CF-4850-8D56-414CEB152930",
+    "phone": "+3801111111114",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.624991874561388,
+      "latitude": 55.81425506130298
+    },
+    "name": "Аптека Витафарм14",
+    "fullAddress": "г. Москва, Авиамоторная ул., 14"
+  },
+  {
+    "address": "Авиамоторная ул., 15",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "15B3C0D2-DDAC-4FCA-A619-AD45E1390CEF",
+    "phone": "+3801111111115",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.641362302948743,
+      "latitude": 55.812109100162616
+    },
+    "name": "Аптека Витафарм15",
+    "fullAddress": "г. Москва, Авиамоторная ул., 15"
+  },
+  {
+    "address": "Авиамоторная ул., 16",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "A9D586D9-5150-4386-AFBA-7932DD6471C3",
+    "phone": "+3801111111116",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.566354670017461,
+      "latitude": 55.695249244717012
+    },
+    "name": "Аптека Витафарм16",
+    "fullAddress": "г. Москва, Авиамоторная ул., 16"
+  },
+  {
+    "address": "Авиамоторная ул., 17",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "8159C149-D99C-44D2-A31C-0D23465580E4",
+    "phone": "+3801111111117",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.771975499181934,
+      "latitude": 55.758281047522992
+    },
+    "name": "Аптека Витафарм17",
+    "fullAddress": "г. Москва, Авиамоторная ул., 17"
+  },
+  {
+    "address": "Авиамоторная ул., 18",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "AA503B1E-64B5-49DE-8CE0-A3FA52A66A4F",
+    "phone": "+3801111111118",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.652138356995366,
+      "latitude": 55.755896223584749
+    },
+    "name": "Аптека Витафарм18",
+    "fullAddress": "г. Москва, Авиамоторная ул., 18"
+  },
+  {
+    "address": "Авиамоторная ул., 19",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "48764836-D3A3-41DA-B684-0621DF71638B",
+    "phone": "+3801111111119",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.700353451460892,
+      "latitude": 55.822122096124083
+    },
+    "name": "Аптека Витафарм19",
+    "fullAddress": "г. Москва, Авиамоторная ул., 19"
+  },
+  {
+    "address": "Авиамоторная ул., 20",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "EF35632C-3A9D-4C1E-8087-DD138829D87A",
+    "phone": "+3801111111120",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.703471335183899,
+      "latitude": 55.746212385987661
+    },
+    "name": "Аптека Витафарм20",
+    "fullAddress": "г. Москва, Авиамоторная ул., 20"
+  },
+  {
+    "address": "Авиамоторная ул., 21",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "071931B3-57EB-4C0C-A23A-25FF27C615A0",
+    "phone": "+3801111111121",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.631867871405731,
+      "latitude": 55.664427655306085
+    },
+    "name": "Аптека Витафарм21",
+    "fullAddress": "г. Москва, Авиамоторная ул., 21"
+  },
+  {
+    "address": "Авиамоторная ул., 22",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "EEE0B040-1BDA-45DD-9BE4-DC03E2D5D6AD",
+    "phone": "+3801111111122",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.520238826668319,
+      "latitude": 55.688184383266211
+    },
+    "name": "Аптека Витафарм22",
+    "fullAddress": "г. Москва, Авиамоторная ул., 22"
+  },
+  {
+    "address": "Авиамоторная ул., 23",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "E4908AB9-C65B-462D-B0FC-15B7848BCC54",
+    "phone": "+3801111111123",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.592369488888856,
+      "latitude": 55.766586488566318
+    },
+    "name": "Аптека Витафарм23",
+    "fullAddress": "г. Москва, Авиамоторная ул., 23"
+  },
+  {
+    "address": "Авиамоторная ул., 24",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0C27051C-990B-45CF-A17E-3CE6EB45D0FA",
+    "phone": "+3801111111124",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.727077121189055,
+      "latitude": 55.735728036611484
+    },
+    "name": "Аптека Витафарм24",
+    "fullAddress": "г. Москва, Авиамоторная ул., 24"
+  },
+  {
+    "address": "Авиамоторная ул., 25",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "1767A00F-3D9F-410C-9D38-BE90F70708B3",
+    "phone": "+3801111111125",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.599408106408859,
+      "latitude": 55.70086754566816
+    },
+    "name": "Аптека Витафарм25",
+    "fullAddress": "г. Москва, Авиамоторная ул., 25"
+  },
+  {
+    "address": "Авиамоторная ул., 26",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "DBF3C40C-725F-42F0-B611-ADD163276F82",
+    "phone": "+3801111111126",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.710202075360698,
+      "latitude": 55.806212753867939
+    },
+    "name": "Аптека Витафарм26",
+    "fullAddress": "г. Москва, Авиамоторная ул., 26"
+  },
+  {
+    "address": "Авиамоторная ул., 27",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "D1AD509A-89E0-45C3-A7A5-D726F677752E",
+    "phone": "+3801111111127",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.658290395095044,
+      "latitude": 55.749336033486536
+    },
+    "name": "Аптека Витафарм27",
+    "fullAddress": "г. Москва, Авиамоторная ул., 27"
+  },
+  {
+    "address": "Авиамоторная ул., 28",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "80F5E6E9-73A2-41B8-8135-221AD6097D61",
+    "phone": "+3801111111128",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.551438091740877,
+      "latitude": 55.727007507526132
+    },
+    "name": "Аптека Витафарм28",
+    "fullAddress": "г. Москва, Авиамоторная ул., 28"
+  },
+  {
+    "address": "Авиамоторная ул., 29",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "C068FF47-514D-4BCE-9C8E-8C4C5E3DECC8",
+    "phone": "+3801111111129",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.692647281918291,
+      "latitude": 55.731458264626241
+    },
+    "name": "Аптека Витафарм29",
+    "fullAddress": "г. Москва, Авиамоторная ул., 29"
+  },
+  {
+    "address": "Авиамоторная ул., 30",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "AD37A4AB-36FD-4469-A115-E652002BC3B3",
+    "phone": "+3801111111130",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.755126103809175,
+      "latitude": 55.651780160509674
+    },
+    "name": "Аптека Витафарм30",
+    "fullAddress": "г. Москва, Авиамоторная ул., 30"
+  },
+  {
+    "address": "Авиамоторная ул., 31",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "677704FB-57EA-4B7F-8146-0706ABE045BD",
+    "phone": "+3801111111131",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.541220831828845,
+      "latitude": 55.748671288456094
+    },
+    "name": "Аптека Витафарм31",
+    "fullAddress": "г. Москва, Авиамоторная ул., 31"
+  },
+  {
+    "address": "Авиамоторная ул., 32",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0E62D553-91A7-4099-B9E3-63D8EE670E5A",
+    "phone": "+3801111111132",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.501911804698494,
+      "latitude": 55.707864167879272
+    },
+    "name": "Аптека Витафарм32",
+    "fullAddress": "г. Москва, Авиамоторная ул., 32"
+  },
+  {
+    "address": "Авиамоторная ул., 33",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "799E6C25-CC3F-492A-A664-CD389E4F8176",
+    "phone": "+3801111111133",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.643025187014807,
+      "latitude": 55.643805233617755
+    },
+    "name": "Аптека Витафарм33",
+    "fullAddress": "г. Москва, Авиамоторная ул., 33"
+  },
+  {
+    "address": "Авиамоторная ул., 34",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "B8A481CA-961F-4865-9518-2CFDEB222BFD",
+    "phone": "+3801111111134",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.550719567472406,
+      "latitude": 55.820876220679928
+    },
+    "name": "Аптека Витафарм34",
+    "fullAddress": "г. Москва, Авиамоторная ул., 34"
+  },
+  {
+    "address": "Авиамоторная ул., 35",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "999ADA89-4134-49E5-9B98-4C4D4B15411B",
+    "phone": "+3801111111135",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.468642668557465,
+      "latitude": 55.750785846295109
+    },
+    "name": "Аптека Витафарм35",
+    "fullAddress": "г. Москва, Авиамоторная ул., 35"
+  },
+  {
+    "address": "Авиамоторная ул., 36",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "21D14815-010F-4DB4-BB58-C5A9E2788025",
+    "phone": "+3801111111136",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.694408961034682,
+      "latitude": 55.763327026125836
+    },
+    "name": "Аптека Витафарм36",
+    "fullAddress": "г. Москва, Авиамоторная ул., 36"
+  },
+  {
+    "address": "Авиамоторная ул., 37",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "77FF4054-C257-499A-9BA7-8D0F905AB982",
+    "phone": "+3801111111137",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.500919083507817,
+      "latitude": 55.802415199018796
+    },
+    "name": "Аптека Витафарм37",
+    "fullAddress": "г. Москва, Авиамоторная ул., 37"
+  },
+  {
+    "address": "Авиамоторная ул., 38",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "968C10F4-E083-49B1-A149-7991CD665546",
+    "phone": "+3801111111138",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.58283904888188,
+      "latitude": 55.748918573960538
+    },
+    "name": "Аптека Витафарм38",
+    "fullAddress": "г. Москва, Авиамоторная ул., 38"
+  },
+  {
+    "address": "Авиамоторная ул., 39",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "F47BE955-5710-4B88-A5F4-5E4783A97CAC",
+    "phone": "+3801111111139",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.760563658155142,
+      "latitude": 55.661327545411673
+    },
+    "name": "Аптека Витафарм39",
+    "fullAddress": "г. Москва, Авиамоторная ул., 39"
+  },
+  {
+    "address": "Авиамоторная ул., 40",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "276D6D29-0768-486B-8628-70B5AB0D671C",
+    "phone": "+3801111111140",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.709640432757524,
+      "latitude": 55.665394358116224
+    },
+    "name": "Аптека Витафарм40",
+    "fullAddress": "г. Москва, Авиамоторная ул., 40"
+  },
+  {
+    "address": "Авиамоторная ул., 41",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "F1961050-8FBD-4C1C-B0AD-DA0CE703AB88",
+    "phone": "+3801111111141",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.633191679267327,
+      "latitude": 55.679558509198948
+    },
+    "name": "Аптека Витафарм41",
+    "fullAddress": "г. Москва, Авиамоторная ул., 41"
+  },
+  {
+    "address": "Авиамоторная ул., 42",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "C755E6EA-C87B-4CBB-8888-61BFF6AAAE87",
+    "phone": "+3801111111142",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.524020480958967,
+      "latitude": 55.814205130291832
+    },
+    "name": "Аптека Витафарм42",
+    "fullAddress": "г. Москва, Авиамоторная ул., 42"
+  },
+  {
+    "address": "Авиамоторная ул., 43",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "6CDD139F-1CD8-40F2-BA6E-1036E4ECF7CF",
+    "phone": "+3801111111143",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.657211471550262,
+      "latitude": 55.645041022684552
+    },
+    "name": "Аптека Витафарм43",
+    "fullAddress": "г. Москва, Авиамоторная ул., 43"
+  },
+  {
+    "address": "Авиамоторная ул., 44",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "33E56F2C-C87A-4360-8734-8FFA1DA8EBAC",
+    "phone": "+3801111111144",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.535533498375813,
+      "latitude": 55.700307452270451
+    },
+    "name": "Аптека Витафарм44",
+    "fullAddress": "г. Москва, Авиамоторная ул., 44"
+  },
+  {
+    "address": "Авиамоторная ул., 45",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "2DB279BD-FED4-4384-AC3A-257A30E8A8B2",
+    "phone": "+3801111111145",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.531592424513398,
+      "latitude": 55.754794907758971
+    },
+    "name": "Аптека Витафарм45",
+    "fullAddress": "г. Москва, Авиамоторная ул., 45"
+  },
+  {
+    "address": "Авиамоторная ул., 46",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "64BDBA0F-73A6-424C-B12A-E7C2194BCC8A",
+    "phone": "+3801111111146",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.637043759221804,
+      "latitude": 55.814041872332218
+    },
+    "name": "Аптека Витафарм46",
+    "fullAddress": "г. Москва, Авиамоторная ул., 46"
+  },
+  {
+    "address": "Авиамоторная ул., 47",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "2D8F69C2-E32C-4D8F-A501-0C9601245C72",
+    "phone": "+3801111111147",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.634272085177379,
+      "latitude": 55.72158718344506
+    },
+    "name": "Аптека Витафарм47",
+    "fullAddress": "г. Москва, Авиамоторная ул., 47"
+  },
+  {
+    "address": "Авиамоторная ул., 48",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "1780BCA9-5E7A-475A-B776-83892B6B67A4",
+    "phone": "+3801111111148",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.577659930590464,
+      "latitude": 55.670737125704662
+    },
+    "name": "Аптека Витафарм48",
+    "fullAddress": "г. Москва, Авиамоторная ул., 48"
+  },
+  {
+    "address": "Авиамоторная ул., 49",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "D5D04D98-EE1D-43B8-82AB-6A01298FC219",
+    "phone": "+3801111111149",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.54847480137721,
+      "latitude": 55.767723077735184
+    },
+    "name": "Аптека Витафарм49",
+    "fullAddress": "г. Москва, Авиамоторная ул., 49"
+  },
+  {
+    "address": "Авиамоторная ул., 50",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0E9E2273-29B0-4931-9098-8F5A2994B4F6",
+    "phone": "+3801111111150",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.537493856204087,
+      "latitude": 55.748530615149939
+    },
+    "name": "Аптека Витафарм50",
+    "fullAddress": "г. Москва, Авиамоторная ул., 50"
+  },
+  {
+    "address": "Авиамоторная ул., 51",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "103466E3-98DF-465E-8563-3F49EE035ED4",
+    "phone": "+3801111111151",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.566989086232098,
+      "latitude": 55.6845252646388
+    },
+    "name": "Аптека Витафарм51",
+    "fullAddress": "г. Москва, Авиамоторная ул., 51"
+  },
+  {
+    "address": "Авиамоторная ул., 52",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "A6C09532-90E6-4D6A-A51E-94DE3A0F4076",
+    "phone": "+3801111111152",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.5118348838635,
+      "latitude": 55.772081935373954
+    },
+    "name": "Аптека Витафарм52",
+    "fullAddress": "г. Москва, Авиамоторная ул., 52"
+  },
+  {
+    "address": "Авиамоторная ул., 53",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "E0341309-7E09-4CB9-AFA2-72B217BDFD57",
+    "phone": "+3801111111153",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.737052570307753,
+      "latitude": 55.718465692156897
+    },
+    "name": "Аптека Витафарм53",
+    "fullAddress": "г. Москва, Авиамоторная ул., 53"
+  },
+  {
+    "address": "Авиамоторная ул., 54",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "8F670728-CAE6-487D-A456-6B7D53B439AF",
+    "phone": "+3801111111154",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.712065094905292,
+      "latitude": 55.723970402688408
+    },
+    "name": "Аптека Витафарм54",
+    "fullAddress": "г. Москва, Авиамоторная ул., 54"
+  },
+  {
+    "address": "Авиамоторная ул., 55",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "1C8401BD-4FE8-47A1-A709-A814D2AF4257",
+    "phone": "+3801111111155",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.514753443986223,
+      "latitude": 55.718949305086355
+    },
+    "name": "Аптека Витафарм55",
+    "fullAddress": "г. Москва, Авиамоторная ул., 55"
+  },
+  {
+    "address": "Авиамоторная ул., 56",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "E65C1703-68BC-4CF5-931E-E753A24078CD",
+    "phone": "+3801111111156",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.48862119297636,
+      "latitude": 55.817064754298613
+    },
+    "name": "Аптека Витафарм56",
+    "fullAddress": "г. Москва, Авиамоторная ул., 56"
+  },
+  {
+    "address": "Авиамоторная ул., 57",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0774970C-6DB1-4767-85F2-2D8974295D46",
+    "phone": "+3801111111157",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.693672237035507,
+      "latitude": 55.733609138632218
+    },
+    "name": "Аптека Витафарм57",
+    "fullAddress": "г. Москва, Авиамоторная ул., 57"
+  },
+  {
+    "address": "Авиамоторная ул., 58",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "525BF265-57BF-48E2-8CBF-A7AA5ECC9C56",
+    "phone": "+3801111111158",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.494134836687913,
+      "latitude": 55.716343509190182
+    },
+    "name": "Аптека Витафарм58",
+    "fullAddress": "г. Москва, Авиамоторная ул., 58"
+  },
+  {
+    "address": "Авиамоторная ул., 59",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "427AE74F-3C64-4AC0-A6F2-ED68074324C4",
+    "phone": "+3801111111159",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.641663507305537,
+      "latitude": 55.724153382181214
+    },
+    "name": "Аптека Витафарм59",
+    "fullAddress": "г. Москва, Авиамоторная ул., 59"
+  },
+  {
+    "address": "Авиамоторная ул., 60",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3305ADBF-EC1B-4E69-9A02-D03E808A6A08",
+    "phone": "+3801111111160",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.578386027909609,
+      "latitude": 55.643792037637965
+    },
+    "name": "Аптека Витафарм60",
+    "fullAddress": "г. Москва, Авиамоторная ул., 60"
+  },
+  {
+    "address": "Авиамоторная ул., 61",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "7F5753B7-4ABB-4DFA-90DE-A607477F4E40",
+    "phone": "+3801111111161",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.699011492242583,
+      "latitude": 55.671506022607801
+    },
+    "name": "Аптека Витафарм61",
+    "fullAddress": "г. Москва, Авиамоторная ул., 61"
+  },
+  {
+    "address": "Авиамоторная ул., 62",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "BD02A571-6074-424C-AA60-CF938C9118BD",
+    "phone": "+3801111111162",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.607439473592535,
+      "latitude": 55.759216250907087
+    },
+    "name": "Аптека Витафарм62",
+    "fullAddress": "г. Москва, Авиамоторная ул., 62"
+  },
+  {
+    "address": "Авиамоторная ул., 63",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3196192E-611B-4C8F-A108-9A78A9B2D5AC",
+    "phone": "+3801111111163",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.476036071295567,
+      "latitude": 55.654033907370618
+    },
+    "name": "Аптека Витафарм63",
+    "fullAddress": "г. Москва, Авиамоторная ул., 63"
+  },
+  {
+    "address": "Авиамоторная ул., 64",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0EFE2A4C-88CF-4E70-910C-5AE071DDD8E1",
+    "phone": "+3801111111164",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.501848514532661,
+      "latitude": 55.704921724563683
+    },
+    "name": "Аптека Витафарм64",
+    "fullAddress": "г. Москва, Авиамоторная ул., 64"
+  },
+  {
+    "address": "Авиамоторная ул., 65",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "1E26957F-062C-4BE4-A47A-9D7E58481101",
+    "phone": "+3801111111165",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.567044749624884,
+      "latitude": 55.648206172962787
+    },
+    "name": "Аптека Витафарм65",
+    "fullAddress": "г. Москва, Авиамоторная ул., 65"
+  },
+  {
+    "address": "Авиамоторная ул., 66",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "29DD6D23-1C43-4223-8CA3-68E39E8C59A6",
+    "phone": "+3801111111166",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.690769123458423,
+      "latitude": 55.746350444555723
+    },
+    "name": "Аптека Витафарм66",
+    "fullAddress": "г. Москва, Авиамоторная ул., 66"
+  },
+  {
+    "address": "Авиамоторная ул., 67",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "0786BAEE-7F9B-4B99-9751-765B53E0DF46",
+    "phone": "+3801111111167",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.484714438422017,
+      "latitude": 55.774416972671041
+    },
+    "name": "Аптека Витафарм67",
+    "fullAddress": "г. Москва, Авиамоторная ул., 67"
+  },
+  {
+    "address": "Авиамоторная ул., 68",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "36057059-2F1B-4161-8FA0-CACEB06B0E93",
+    "phone": "+3801111111168",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.785490779241194,
+      "latitude": 55.701805561765426
+    },
+    "name": "Аптека Витафарм68",
+    "fullAddress": "г. Москва, Авиамоторная ул., 68"
+  },
+  {
+    "address": "Авиамоторная ул., 69",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3F83D598-C8C4-4654-8DE5-C6448D02C710",
+    "phone": "+3801111111169",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.626220364717042,
+      "latitude": 55.795552574378675
+    },
+    "name": "Аптека Витафарм69",
+    "fullAddress": "г. Москва, Авиамоторная ул., 69"
+  },
+  {
+    "address": "Авиамоторная ул., 70",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "75006AA5-3612-40A8-910F-05854804B407",
+    "phone": "+3801111111170",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.580422217988342,
+      "latitude": 55.813334393794008
+    },
+    "name": "Аптека Витафарм70",
+    "fullAddress": "г. Москва, Авиамоторная ул., 70"
+  },
+  {
+    "address": "Авиамоторная ул., 71",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "E9C85052-3527-4570-B3F4-911A61C1831E",
+    "phone": "+3801111111171",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.721224938023319,
+      "latitude": 55.674288643847568
+    },
+    "name": "Аптека Витафарм71",
+    "fullAddress": "г. Москва, Авиамоторная ул., 71"
+  },
+  {
+    "address": "Авиамоторная ул., 72",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "4AFE5940-57D6-403C-AD4B-697D3B54686C",
+    "phone": "+3801111111172",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.756088047129481,
+      "latitude": 55.694976136284801
+    },
+    "name": "Аптека Витафарм72",
+    "fullAddress": "г. Москва, Авиамоторная ул., 72"
+  },
+  {
+    "address": "Авиамоторная ул., 73",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "977E75AC-EE1C-4EEA-9A7E-B00AB5358332",
+    "phone": "+3801111111173",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.684157950621028,
+      "latitude": 55.651945972785811
+    },
+    "name": "Аптека Витафарм73",
+    "fullAddress": "г. Москва, Авиамоторная ул., 73"
+  },
+  {
+    "address": "Авиамоторная ул., 74",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "96037D5F-750E-4DEC-A027-75574CDCB15E",
+    "phone": "+3801111111174",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.553488879851031,
+      "latitude": 55.662764537864227
+    },
+    "name": "Аптека Витафарм74",
+    "fullAddress": "г. Москва, Авиамоторная ул., 74"
+  },
+  {
+    "address": "Авиамоторная ул., 75",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "19EC1406-87B4-47DF-9C93-9C1CECB3089E",
+    "phone": "+3801111111175",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.499355962183223,
+      "latitude": 55.739320064895381
+    },
+    "name": "Аптека Витафарм75",
+    "fullAddress": "г. Москва, Авиамоторная ул., 75"
+  },
+  {
+    "address": "Авиамоторная ул., 76",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3D5B4BCA-943B-48CA-8C7E-82FB5F7CF54F",
+    "phone": "+3801111111176",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.46578173347536,
+      "latitude": 55.781484401405891
+    },
+    "name": "Аптека Витафарм76",
+    "fullAddress": "г. Москва, Авиамоторная ул., 76"
+  },
+  {
+    "address": "Авиамоторная ул., 77",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "8391664C-FB4F-46DC-AA18-A3D96F822A37",
+    "phone": "+3801111111177",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.767150058673757,
+      "latitude": 55.791015171772884
+    },
+    "name": "Аптека Витафарм77",
+    "fullAddress": "г. Москва, Авиамоторная ул., 77"
+  },
+  {
+    "address": "Авиамоторная ул., 78",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "D1CFC265-079F-496C-B448-B020039C707E",
+    "phone": "+3801111111178",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.491488499707543,
+      "latitude": 55.766099225162925
+    },
+    "name": "Аптека Витафарм78",
+    "fullAddress": "г. Москва, Авиамоторная ул., 78"
+  },
+  {
+    "address": "Авиамоторная ул., 79",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "BB5EE604-48E8-4714-8C84-774FA7E5BC16",
+    "phone": "+3801111111179",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.64658562560858,
+      "latitude": 55.716013009939623
+    },
+    "name": "Аптека Витафарм79",
+    "fullAddress": "г. Москва, Авиамоторная ул., 79"
+  },
+  {
+    "address": "Авиамоторная ул., 80",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "151E4560-4FB4-46DF-A5E9-467B0344D647",
+    "phone": "+3801111111180",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.489055090821772,
+      "latitude": 55.638070825058485
+    },
+    "name": "Аптека Витафарм80",
+    "fullAddress": "г. Москва, Авиамоторная ул., 80"
+  },
+  {
+    "address": "Авиамоторная ул., 81",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "CFAB2268-09AB-4963-AB08-A02466659946",
+    "phone": "+3801111111181",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.518088380546324,
+      "latitude": 55.730628129887734
+    },
+    "name": "Аптека Витафарм81",
+    "fullAddress": "г. Москва, Авиамоторная ул., 81"
+  },
+  {
+    "address": "Авиамоторная ул., 82",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "815B1E20-308F-4EB4-8796-E49D76ED551A",
+    "phone": "+3801111111182",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.557004796180301,
+      "latitude": 55.710371120040143
+    },
+    "name": "Аптека Витафарм82",
+    "fullAddress": "г. Москва, Авиамоторная ул., 82"
+  },
+  {
+    "address": "Авиамоторная ул., 83",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "2370218D-AA32-46A7-B636-E83D2AA0ADBD",
+    "phone": "+3801111111183",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.497193368082272,
+      "latitude": 55.708651778640473
+    },
+    "name": "Аптека Витафарм83",
+    "fullAddress": "г. Москва, Авиамоторная ул., 83"
+  },
+  {
+    "address": "Авиамоторная ул., 84",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "C24C01CE-F6D4-44A3-B705-D62B94BF9663",
+    "phone": "+3801111111184",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.631999011354822,
+      "latitude": 55.771411877726955
+    },
+    "name": "Аптека Витафарм84",
+    "fullAddress": "г. Москва, Авиамоторная ул., 84"
+  },
+  {
+    "address": "Авиамоторная ул., 85",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "6A4C8423-773E-4E73-AD56-81D344C04738",
+    "phone": "+3801111111185",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.734258525002645,
+      "latitude": 55.807671415679216
+    },
+    "name": "Аптека Витафарм85",
+    "fullAddress": "г. Москва, Авиамоторная ул., 85"
+  },
+  {
+    "address": "Авиамоторная ул., 86",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "DD8C034D-5BC7-4471-A3BE-54E8B91FD9BE",
+    "phone": "+3801111111186",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.58606540815488,
+      "latitude": 55.67294782106211
+    },
+    "name": "Аптека Витафарм86",
+    "fullAddress": "г. Москва, Авиамоторная ул., 86"
+  },
+  {
+    "address": "Авиамоторная ул., 87",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "642FEF91-24D0-4A93-B0AE-C1BB200CF28B",
+    "phone": "+3801111111187",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.539431117726828,
+      "latitude": 55.732943666760583
+    },
+    "name": "Аптека Витафарм87",
+    "fullAddress": "г. Москва, Авиамоторная ул., 87"
+  },
+  {
+    "address": "Авиамоторная ул., 88",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "45CBF63C-0834-4A7D-BD1B-EB618E02C071",
+    "phone": "+3801111111188",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.740727580612067,
+      "latitude": 55.676333760762198
+    },
+    "name": "Аптека Витафарм88",
+    "fullAddress": "г. Москва, Авиамоторная ул., 88"
+  },
+  {
+    "address": "Авиамоторная ул., 89",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "7E13AECE-5583-4476-AE83-EEA0B442A176",
+    "phone": "+3801111111189",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.522641203243808,
+      "latitude": 55.701594278272182
+    },
+    "name": "Аптека Витафарм89",
+    "fullAddress": "г. Москва, Авиамоторная ул., 89"
+  },
+  {
+    "address": "Авиамоторная ул., 90",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "FFC51937-7FB9-41CC-997B-3F0E40AB0324",
+    "phone": "+3801111111190",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.732472964469324,
+      "latitude": 55.721457734964538
+    },
+    "name": "Аптека Витафарм90",
+    "fullAddress": "г. Москва, Авиамоторная ул., 90"
+  },
+  {
+    "address": "Авиамоторная ул., 91",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "F9D13BDB-0E92-4EFA-9CB8-687F08E9D976",
+    "phone": "+3801111111191",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.572111557810047,
+      "latitude": 55.669979399955196
+    },
+    "name": "Аптека Витафарм91",
+    "fullAddress": "г. Москва, Авиамоторная ул., 91"
+  },
+  {
+    "address": "Авиамоторная ул., 92",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "7B1466A9-7065-4F49-A188-2F37D406E85B",
+    "phone": "+3801111111192",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.674767450545055,
+      "latitude": 55.676415459601543
+    },
+    "name": "Аптека Витафарм92",
+    "fullAddress": "г. Москва, Авиамоторная ул., 92"
+  },
+  {
+    "address": "Авиамоторная ул., 93",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "6165F6CF-23DA-4A9E-B697-085667F9D98F",
+    "phone": "+3801111111193",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.694052238433187,
+      "latitude": 55.742658177179514
+    },
+    "name": "Аптека Витафарм93",
+    "fullAddress": "г. Москва, Авиамоторная ул., 93"
+  },
+  {
+    "address": "Авиамоторная ул., 94",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "3A0611D9-7BEC-4C65-B5A5-43EBC9C7B7ED",
+    "phone": "+3801111111194",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.585271121787606,
+      "latitude": 55.703058066475961
+    },
+    "name": "Аптека Витафарм94",
+    "fullAddress": "г. Москва, Авиамоторная ул., 94"
+  },
+  {
+    "address": "Авиамоторная ул., 95",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "9B84F549-6D7B-4C09-9B4B-E3264204E8DE",
+    "phone": "+3801111111195",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.536929748847328,
+      "latitude": 55.678991140743847
+    },
+    "name": "Аптека Витафарм95",
+    "fullAddress": "г. Москва, Авиамоторная ул., 95"
+  },
+  {
+    "address": "Авиамоторная ул., 96",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "F3B72C69-00AB-4C6A-AF7F-AC0D58E571F7",
+    "phone": "+3801111111196",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.772600009776689,
+      "latitude": 55.656458329347849
+    },
+    "name": "Аптека Витафарм96",
+    "fullAddress": "г. Москва, Авиамоторная ул., 96"
+  },
+  {
+    "address": "Авиамоторная ул., 97",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "DDDA58D7-35A2-4D30-AFA5-FE038AFAC627",
+    "phone": "+3801111111197",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.567211504815248,
+      "latitude": 55.763740434434688
+    },
+    "name": "Аптека Витафарм97",
+    "fullAddress": "г. Москва, Авиамоторная ул., 97"
+  },
+  {
+    "address": "Авиамоторная ул., 98",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "45057BA6-774B-4250-8417-34E95A25CD83",
+    "phone": "+3801111111198",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.680799277180078,
+      "latitude": 55.808212761795573
+    },
+    "name": "Аптека Витафарм98",
+    "fullAddress": "г. Москва, Авиамоторная ул., 98"
+  },
+  {
+    "address": "Авиамоторная ул., 99",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "38C5A660-4F50-4D65-9BE4-52BD40908957",
+    "phone": "+3801111111199",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.520511970517731,
+      "latitude": 55.705818976998998
+    },
+    "name": "Аптека Витафарм99",
+    "fullAddress": "г. Москва, Авиамоторная ул., 99"
+  },
+  {
+    "address": "Авиамоторная ул., 100",
+    "region": "Москва",
+    "city": "Москва",
+    "id": "10B2E0F7-D7CF-4248-8BA4-3D29C61A6322",
+    "phone": "+38011111111100",
+    "modifiedState": "CREATED",
+    "timeStamp": 0,
+    "type": "SALE",
+    "coordinates": {
+      "longitude": 37.728201398007421,
+      "latitude": 55.658088999772744
+    },
+    "name": "Аптека Витафарм100",
+    "fullAddress": "г. Москва, Авиамоторная ул., 100"
+  }
+]

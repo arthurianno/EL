@@ -3,6 +3,7 @@ package com.elta.android
 import android.content.Context
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.ApiModule
+import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.DataSourceModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.MappersModule
@@ -32,6 +33,7 @@ import javax.inject.Singleton
     TokenModule::class,
     DataSourceModule::class,
     MappersModule::class,
+    CacheModule::class,
     // domain
     RepoModule::class,
     // presentation
