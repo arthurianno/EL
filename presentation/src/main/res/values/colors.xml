@@ -83,6 +83,9 @@
     <color name="color_button_small_blue_2_active">@color/shade_black4</color>
     <color name="color_button_small_blue_2_pressed">#d8d8d8</color>
 
+    <color name="color_floating_action_button">@color/white</color>
+    <color name="color_floating_action_button_pressed">@color/shade_black3</color>
+
     <!-- INPUT COLORS -->
 
     <color name="color_input_base">@color/shade_black0</color>
