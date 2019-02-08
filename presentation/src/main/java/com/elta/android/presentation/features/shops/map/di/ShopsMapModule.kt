@@ -20,7 +20,6 @@ class ShopsMapModule {
     }
 
     @Provides
-    @FragmentScope
     fun dynamicAdapter(
         factory: AdapterDelegatesFactory,
         calculator: DiffCalculator

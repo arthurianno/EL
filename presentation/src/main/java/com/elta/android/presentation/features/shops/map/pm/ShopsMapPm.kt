@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 import com.nullgr.core.adapter.items.ListItem
+import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
 class ShopsMapPm @Inject constructor(
@@ -15,6 +16,8 @@ class ShopsMapPm @Inject constructor(
 ) : BasePm(services) {
 
     val items = State<List<ListItem>>()
+    val searchItems = State<List<ListItem>>()
+    val searchInput = inputControl()
 
     private val loadSalePoints = Action<Unit>()
 
