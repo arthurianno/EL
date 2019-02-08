@@ -9,6 +9,7 @@ import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.MappersModule
 import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
+import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticsModule
@@ -34,6 +35,7 @@ import javax.inject.Singleton
     DataSourceModule::class,
     MappersModule::class,
     CacheModule::class,
+    StorageModule::class,
     // domain
     RepoModule::class,
     // presentation

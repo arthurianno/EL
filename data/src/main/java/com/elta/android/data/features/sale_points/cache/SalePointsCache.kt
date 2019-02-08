@@ -11,4 +11,11 @@ interface SalePointsCache {
     fun delete(points: List<SalePointCacheDto>)
 
     fun getAll(): List<SalePointCacheDto>
+
+    fun getAllInBounds(
+        southWestLatitude: Double,
+        southWestLongitude: Double,
+        northEastLatitude: Double,
+        northEastLongitude: Double
+    ): List<SalePointCacheDto>
 }

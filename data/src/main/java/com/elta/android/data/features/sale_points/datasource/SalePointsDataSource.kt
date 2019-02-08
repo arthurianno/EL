@@ -6,4 +6,11 @@ import io.reactivex.Observable
 interface SalePointsDataSource {
 
     fun getSalePoints(): Observable<List<SalePointDto>>
+
+    fun getSalePoints(
+        southWestLatitude: Double,
+        southWestLongitude: Double,
+        northEastLatitude: Double,
+        northEastLongitude: Double
+    ): Observable<List<SalePointDto>>
 }
