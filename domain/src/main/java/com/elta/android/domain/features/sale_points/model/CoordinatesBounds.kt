@@ -6,9 +6,9 @@ data class CoordinatesBounds(
 ) {
 
     fun contains(coordinates: Coordinates): Boolean {
-        return southWest.latitude <= coordinates.latitude
-            && coordinates.latitude <= northEast.latitude
-            && magic(coordinates.longitude)
+        return southWest.latitude <= coordinates.latitude &&
+            coordinates.latitude <= northEast.latitude &&
+            magic(coordinates.longitude)
     }
 
     private fun magic(longitude: Double): Boolean {
