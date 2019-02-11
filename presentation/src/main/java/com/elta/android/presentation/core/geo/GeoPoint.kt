@@ -29,3 +29,9 @@ class GeoPoint(
         return result
     }
 }
+
+private const val STUB_ID = "stub_geo_point_id"
+
+val EMPTY_GEO_POINT = GeoPoint(0.0, 0.0, STUB_ID)
+
+fun GeoPoint.isEmpty(): Boolean = this == EMPTY_GEO_POINT

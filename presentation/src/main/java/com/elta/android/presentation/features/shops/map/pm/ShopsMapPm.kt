@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.location.Location
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.presentation.core.geo.EMPTY_GEO_POINT
 import com.elta.android.presentation.core.geo.GeoPoint
+import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -32,8 +34,14 @@ class ShopsMapPm @Inject constructor(
     val permissionRequiredCommand = Command<Unit>()
     val showMyLocationCommand = Command<Location>()
     val showDefaultLocationCommand = Command<Location>()
-    val fetchMyLocationAction = Action<Unit>()
+    val moveToMyLocationAction = Action<Unit>()
 
+    val shopListItemSelectedAction = Action<Int>()
+    val shopItemGeoPointSelectedAction = Action<GeoPoint>()
+    val selectGeoPointCommand = Command<GeoPoint>()
+    val selectShopItemCommand = Command<Int>()
+
+    private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
     private val defaultLocationState = State<Location>()
     private val permissionStatusState = State<PermissionStatus>()
@@ -46,6 +54,7 @@ class ShopsMapPm @Inject constructor(
         bindPermissionsBehaviour()
         bindLocationBehaviour()
         bindSalePoints()
+        bindShopSelectionBehaviour()
 
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
@@ -59,6 +68,13 @@ class ShopsMapPm @Inject constructor(
             .filter { permissionStatusState.valueOrNull == PermissionStatus.GRANTED }
             .map { Unit }
             .doOnNext(::fetchMyLocation)
+            .subscribe()
+            .untilDestroy()
+
+        moveToMyLocationAction.observable
+            .map { myLocationState.valueOrNull ?: EMPTY_LOCATION }
+            .filter { !it.isEmpty() }
+            .doOnNext(showMyLocationCommand.consumer)
             .subscribe()
             .untilDestroy()
 
@@ -108,8 +124,6 @@ class ShopsMapPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        // TODO have an issue when user taps on my location and it scrolls to selected shop
-        // TODO Need to be improved
         Observables.combineLatest(salePointsState.observable, foundedLocation.observable)
             .map {
                 it.first.forEach { point ->
@@ -133,6 +147,25 @@ class ShopsMapPm @Inject constructor(
         })
     }
 
+    private fun bindShopSelectionBehaviour() {
+        shopListItemSelectedAction.observable
+            .filter { it.isInRange() }
+            .map { items.valueOrNull?.get(it) }
+            .map(::findGeoPointBySelectedShop)
+            .filter { !it.isEmpty() }
+            .doOnNext(selectGeoPointCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        shopItemGeoPointSelectedAction.observable
+            .map { it.id as String }
+            .map(::findShopItemBySelectedGeoPoint)
+            .filter { it != INVALID_INDEX }
+            .doOnNext(selectShopItemCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+    }
+
     private fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,
@@ -148,6 +181,19 @@ class ShopsMapPm @Inject constructor(
             id = id
         )
 
+    private fun findGeoPointBySelectedShop(item: ListItem?): GeoPoint {
+        (item as? ShopItem)?.let { shopItem ->
+            return geoPoints.valueOrNull?.find { it.id == shopItem.id }?.also { it.selected = true }
+                ?: EMPTY_GEO_POINT
+        }
+        return EMPTY_GEO_POINT
+    }
+
+    private fun findShopItemBySelectedGeoPoint(geoPointId: String): Int {
+        return items.valueOrNull?.indexOfFirst { it is ShopItem && it.id == geoPointId }
+            ?: INVALID_INDEX
+    }
+
     private fun handleLocationResult(location: Location) {
         if (location.isEmpty()) defaultLocationState.consumer.accept(moskowLocation)
         else myLocationState.consumer.accept(location)
@@ -159,5 +205,11 @@ class ShopsMapPm @Inject constructor(
             .doOnNext(::handleLocationResult)
             .subscribe()
             .untilDestroy()
+    }
+
+    private fun Int.isInRange(): Boolean = this in 0 until items.value.size
+
+    companion object {
+        private const val INVALID_INDEX = -1
     }
 }

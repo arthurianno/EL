@@ -92,21 +92,15 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         points.find { it.selected }?.let { setSelectedPin(it) }
     }
 
+    fun selectPin(geoPoint: GeoPoint) {
+        processPinSelection(geoPoint)
+    }
+
     fun pinClicks() = selectedObjectRelay.asObservable()
 
     override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
         val selectedPoint = mapObject.userData as? GeoPoint
-        val previousSelectedPoint = selectedObjectRelay.value
-        previousSelectedPoint?.let {
-            it.selected = false
-            drawPinObject(it)
-        }
-        selectedPoint?.let {
-            if (!it.isUserPoint) {
-                it.selected = true
-                setSelectedPin(it)
-            }
-        }
+        processPinSelection(selectedPoint)
         return true
     }
 
@@ -132,6 +126,20 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
             entry.value?.let { mapObjects?.remove(it) }
         }
         pinObjects.clear()
+    }
+
+    private fun processPinSelection(selectedPoint: GeoPoint?) {
+        val previousSelectedPoint = selectedObjectRelay.value
+        previousSelectedPoint?.let {
+            it.selected = false
+            drawPinObject(it)
+        }
+        selectedPoint?.let {
+            if (!it.isUserPoint) {
+                it.selected = true
+                setSelectedPin(it)
+            }
+        }
     }
 
     private fun setSelectedPin(geoPoint: GeoPoint) {
