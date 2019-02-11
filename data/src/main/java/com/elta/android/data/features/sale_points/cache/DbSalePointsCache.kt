@@ -4,7 +4,6 @@ import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.query
-import io.objectbox.query.QueryBuilder
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,22 +26,10 @@ class DbSalePointsCache @Inject constructor(
         box.remove(points)
     }
 
-    override fun get(condition: Condition): List<SalePointCacheDto> {
-        return when (condition) {
-            is SalePointsConditions.All -> box.all
-            is SalePointsConditions.Bounds -> getAllInBounds(
-                southWestLatitude = condition.southWestLatitude,
-                southWestLongitude = condition.southWestLongitude,
-                northEastLatitude = condition.northEastLatitude,
-                northEastLongitude = condition.northEastLongitude
-            )
-            is SalePointsConditions.Query -> getAllByQuery(condition.query)
-            else -> throw IllegalArgumentException("Passed condition $condition not supported.")
-        }
-    }
+    override fun getAll(): List<SalePointCacheDto> = box.all
 
     @Suppress("LongMethod")
-    private fun getAllInBounds(
+    override fun getAllInBounds(
         southWestLatitude: Double,
         southWestLongitude: Double,
         northEastLatitude: Double,
@@ -62,25 +49,6 @@ class DbSalePointsCache @Inject constructor(
         }
         return query.find()
     }
-
-    private fun getAllByQuery(query: String): List<SalePointCacheDto> {
-        val regex = Regex("[ ]{2,}")
-        val tokens = query.trim().replace(regex, " ")
-        return box.query {
-            tokens.asSequence().map { it.toString() }.forEach { token ->
-                contains(SalePointCacheDto_.address, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
-                or()
-                contains(SalePointCacheDto_.city, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
-                or()
-                contains(SalePointCacheDto_.fullAddress, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
-                or()
-                contains(SalePointCacheDto_.name, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
-                or()
-                contains(SalePointCacheDto_.region, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
-            }
-        }.find()
-    }
-
 
     private companion object {
         const val TOLERANCE = 1E-5 // represents meter accuracy

@@ -2,7 +2,6 @@ package com.elta.android.data.features.sale_points.datasource
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
-import com.elta.android.data.features.sale_points.cache.SalePointsConditions
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import io.reactivex.Observable
@@ -15,7 +14,7 @@ class SalePointsCachedDataSource @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
         Observable.fromCallable {
-            cache.get(SalePointsConditions.All)
+            cache.getAll()
         }.map(fromCacheMapper::mapFromObjects)
 
     override fun getSalePoints(
@@ -25,18 +24,11 @@ class SalePointsCachedDataSource @Inject constructor(
         northEastLongitude: Double
     ): Observable<List<SalePointDto>> =
         Observable.fromCallable {
-            cache.get(
-                SalePointsConditions.Bounds(
-                    southWestLatitude = southWestLatitude,
-                    southWestLongitude = southWestLongitude,
-                    northEastLatitude = northEastLatitude,
-                    northEastLongitude = northEastLongitude
-                )
+            cache.getAllInBounds(
+                southWestLatitude = southWestLatitude,
+                southWestLongitude = southWestLongitude,
+                northEastLatitude = northEastLatitude,
+                northEastLongitude = northEastLongitude
             )
-        }.map(fromCacheMapper::mapFromObjects)
-
-    override fun searchSalePoints(query: String): Observable<List<SalePointDto>> =
-        Observable.fromCallable {
-            cache.get(SalePointsConditions.Query(query))
         }.map(fromCacheMapper::mapFromObjects)
 }

@@ -35,8 +35,6 @@ class SalePointsRemoteDataSource @Inject constructor(
         northEastLongitude: Double
     ): Observable<List<SalePointDto>> = getSalePoints()
 
-    override fun searchSalePoints(query: String): Observable<List<SalePointDto>> = getSalePoints()
-
     private fun getSalePointsByPage(page: Int, size: Int): Observable<SalePointsDto> =
         api.getSalePoints(syncStorage.lastSync, page, size)
             .switchMap { points ->

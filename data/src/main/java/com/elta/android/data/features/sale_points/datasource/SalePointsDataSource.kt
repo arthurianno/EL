@@ -13,6 +13,4 @@ interface SalePointsDataSource {
         northEastLatitude: Double,
         northEastLongitude: Double
     ): Observable<List<SalePointDto>>
-
-    fun searchSalePoints(query: String): Observable<List<SalePointDto>>
 }
