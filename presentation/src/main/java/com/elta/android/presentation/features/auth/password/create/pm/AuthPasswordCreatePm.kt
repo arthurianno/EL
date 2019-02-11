@@ -16,6 +16,7 @@ class AuthPasswordCreatePm @Inject constructor(
     private val token = State<String>()
     private val passwordChangedSuccessAction = Action<Unit>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 

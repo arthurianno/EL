@@ -18,6 +18,7 @@ object OkHttpClientFactory {
 
     private const val CACHE_SIZE: Long = 1024 * 1024 * 10 // 10Mb
 
+    @Suppress("LongMethod")
     fun create(
         cacheFolder: File? = null,
         @Interceptors interceptors: List<Interceptor>,

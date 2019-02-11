@@ -6,6 +6,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
+import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.widget.inputControl
@@ -22,6 +23,7 @@ class ShopsMapPm @Inject constructor(
 
     private val loadSalePoints = Action<Unit>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 
@@ -38,25 +40,19 @@ class ShopsMapPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        @Suppress("MagicNumber")
         searchItems.consumer.accept(
             arrayListOf<ListItem>().apply {
                 add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
-                add(SearchHeaderItem())
+                repeat((0..30).count()) {
+                    add(
+                        SearchResultItem(
+                            id = it,
+                            name = "Test name #$it",
+                            address = "Test address #$it"
+                        )
+                    )
+                }
             }
         )
 
@@ -72,6 +68,7 @@ class ShopsMapPm @Inject constructor(
         items.consumer.accept(points.map { it.toItem() })
     }
 
+    @Suppress("MagicNumber")
     private fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,

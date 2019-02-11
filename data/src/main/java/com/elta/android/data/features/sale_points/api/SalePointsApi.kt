@@ -9,6 +9,7 @@ interface SalePointsApi {
 
     // TODO: change url
     @GET("api/salepoints/v1")
+    @Suppress("ForbiddenComment")
     fun getSalePoints(
         @Query("lastTimestampSync") lastSync: Long?,
         @Query("pageIndex") page: Int,

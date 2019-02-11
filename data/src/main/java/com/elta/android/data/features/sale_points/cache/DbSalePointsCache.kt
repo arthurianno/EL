@@ -28,6 +28,7 @@ class DbSalePointsCache @Inject constructor(
 
     override fun getAll(): List<SalePointCacheDto> = box.all
 
+    @Suppress("LongMethod")
     override fun getAllInBounds(
         southWestLatitude: Double,
         southWestLongitude: Double,

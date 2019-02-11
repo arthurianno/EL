@@ -16,6 +16,7 @@ class DynamicLinkProcessor private constructor(
     private val coldStartByDeepLinkAction: PresentationModel.Action<Uri>?
 ) {
 
+    @Suppress("LongMethod")
     fun process() {
         if (initialIntent != null) {
             FirebaseDynamicLinks.getInstance().getDynamicLink(initialIntent)

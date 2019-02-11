@@ -7,6 +7,8 @@ buildscript {
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.0'

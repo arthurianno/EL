@@ -34,4 +34,17 @@
     <style name="InputStyle.Email" parent="InputStyle">
         <item name="android:inputType">textEmailAddress</item>
     </style>
+
+    <style name="Search" parent="Widget.AppCompat.EditText">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textColorHint">@color/color_input_hint_color_2</item>
+        <item name="android:textColor">@color/color_input_text_color</item>
+        <item name="android:textSize">@dimen/font_size_input_text</item>
+        <item name="android:background">@null</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_search</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:inputType">text</item>
+        <item name="android:lines">1</item>
+        <item name="android:imeOptions">actionDone</item>
+    </style>
 </resources>
