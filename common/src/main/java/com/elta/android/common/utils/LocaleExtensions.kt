@@ -6,7 +6,8 @@ import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
 
-@SuppressLint("ObsoleteSdkInt", "LongMethod")
+@Suppress("LongMethod")
+@SuppressLint("ObsoleteSdkInt")
 fun updateResources(context: Context, lang: String): Context {
     val locale = Locale(lang)
 
