@@ -14,11 +14,14 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
+import com.elta.android.presentation.utils.navigationIntent
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.intents.callIntent
+import com.nullgr.core.intents.launch
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -74,6 +77,11 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         pm.selectGeoPointCommand.bindTo(::selectPin)
         pm.selectShopItemCommand.bindTo { itemsView.smoothScrollToPosition(it) }
+
+        pm.makeCallCommand.bindTo { callIntent(it).launch(activity) }
+        pm.buildRouteCommand.bindTo {
+            navigationIntent(it.latitude, it.longitude, it.meta as String).launch(activity)
+        }
 
         pinClicks().skip(1).bindTo(pm.shopItemGeoPointSelectedAction)
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)

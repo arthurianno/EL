@@ -2,8 +2,11 @@ package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
 import android.location.Location
+import com.elta.android.common.utils.log
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.geo.EMPTY_GEO_POINT
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
@@ -41,6 +44,9 @@ class ShopsMapPm @Inject constructor(
     val selectGeoPointCommand = Command<GeoPoint>()
     val selectShopItemCommand = Command<Int>()
 
+    val makeCallCommand = Command<String>()
+    val buildRouteCommand = Command<GeoPoint>()
+
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
     private val defaultLocationState = State<Location>()
@@ -55,6 +61,7 @@ class ShopsMapPm @Inject constructor(
         bindLocationBehaviour()
         bindSalePoints()
         bindShopSelectionBehaviour()
+        bindClicks()
 
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
@@ -151,7 +158,7 @@ class ShopsMapPm @Inject constructor(
         shopListItemSelectedAction.observable
             .filter { it.isInRange() }
             .map { items.valueOrNull?.get(it) }
-            .map(::findGeoPointBySelectedShop)
+            .map(::findGeoPointByShopItem)
             .filter { !it.isEmpty() }
             .doOnNext(selectGeoPointCommand.consumer)
             .subscribe()
@@ -159,11 +166,27 @@ class ShopsMapPm @Inject constructor(
 
         shopItemGeoPointSelectedAction.observable
             .map { it.id as String }
-            .map(::findShopItemBySelectedGeoPoint)
+            .map(::findShopItemByGeoPoint)
             .filter { it != INVALID_INDEX }
             .doOnNext(selectShopItemCommand.consumer)
             .subscribe()
             .untilDestroy()
+    }
+
+    private fun bindClicks() {
+        bus.clicks<Clicks>()
+            .doOnNext(::processClick)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun processClick(clicks: Clicks) {
+        when (clicks) {
+            is Clicks.ShopMakeCall -> clicks.item.phone?.let { makeCallCommand.consumer.accept(it) }
+            is Clicks.ShopMakeRoute -> buildRouteCommand.consumer.accept(
+                findGeoPointByShopItem(clicks.item)
+            )
+        }
     }
 
     private fun SalePoint.toItem(): ListItem =
@@ -171,17 +194,19 @@ class ShopsMapPm @Inject constructor(
             id = id,
             name = name,
             address = fullAddress,
-            distance = distance.formatDistance(resources)
+            distance = distance.formatDistance(resources),
+            phone = phone
         )
 
     private fun SalePoint.toGeoPoint(): GeoPoint =
         GeoPoint(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
-            id = id
+            id = id,
+            meta = fullAddress
         )
 
-    private fun findGeoPointBySelectedShop(item: ListItem?): GeoPoint {
+    private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
             return geoPoints.valueOrNull?.find { it.id == shopItem.id }?.also { it.selected = true }
                 ?: EMPTY_GEO_POINT
@@ -189,7 +214,7 @@ class ShopsMapPm @Inject constructor(
         return EMPTY_GEO_POINT
     }
 
-    private fun findShopItemBySelectedGeoPoint(geoPointId: String): Int {
+    private fun findShopItemByGeoPoint(geoPointId: String): Int {
         return items.valueOrNull?.indexOfFirst { it is ShopItem && it.id == geoPointId }
             ?: INVALID_INDEX
     }

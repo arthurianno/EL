@@ -28,6 +28,17 @@ class GeoPoint(
         result = 31 * result + (id?.hashCode() ?: 0)
         return result
     }
+
+    override fun toString(): String {
+        return "GeoPoint(" +
+            "latitude=$latitude, " +
+            "longitude=$longitude, " +
+            "id=$id, " +
+            "selected=$selected, " +
+            "isUserPoint=$isUserPoint, " +
+            "meta=$meta" +
+            ")"
+    }
 }
 
 private const val STUB_ID = "stub_geo_point_id"
