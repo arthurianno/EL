@@ -64,10 +64,10 @@ class DbSalePointsCache @Inject constructor(
     }
 
     private fun getAllByQuery(query: String): List<SalePointCacheDto> {
-        val regex = Regex("[ ]{2,}")
-        val tokens = query.trim().replace(regex, " ")
+        val regex = Regex(TWO_AND_MORE_SPACES)
+        val tokens = query.trim().replace(regex, SPACE).split(SPACE)
         return box.query {
-            tokens.asSequence().map { it.toString() }.forEach { token ->
+            tokens.forEach { token ->
                 contains(SalePointCacheDto_.address, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
                 or()
                 contains(SalePointCacheDto_.city, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
@@ -81,8 +81,9 @@ class DbSalePointsCache @Inject constructor(
         }.find()
     }
 
-
     private companion object {
         const val TOLERANCE = 1E-5 // represents meter accuracy
+        const val SPACE = " "
+        const val TWO_AND_MORE_SPACES = "[ ]{2,}"
     }
 }
