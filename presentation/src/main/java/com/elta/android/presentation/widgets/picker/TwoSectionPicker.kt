@@ -12,6 +12,7 @@ import io.reactivex.android.MainThreadDisposable
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.layout_two_section_picker.view.*
 
+@Suppress("UnnecessaryParentheses")
 class TwoSectionPicker @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

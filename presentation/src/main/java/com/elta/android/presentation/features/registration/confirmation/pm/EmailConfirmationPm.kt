@@ -23,6 +23,7 @@ class EmailConfirmationPm @Inject constructor(
 
     private val token = State<String>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 
