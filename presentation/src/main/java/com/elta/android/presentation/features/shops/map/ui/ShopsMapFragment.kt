@@ -55,13 +55,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         searchItemsView.layoutManager = LinearLayoutManager(context)
         searchItemsView.adapter = searchAdapter
-//        searchItemsView.addItemDecoration(
-//            DividerItemDecoration(
-//                checkNotNull(context),
-//                R.drawable.divider_search,
-//                false
-//            )
-//        )
     }
 
     override fun onBindPresentationModel(pm: ShopsMapPm) {
