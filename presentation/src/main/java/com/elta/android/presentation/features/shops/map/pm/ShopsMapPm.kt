@@ -2,12 +2,11 @@ package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
 import android.location.Location
-import com.elta.android.common.utils.log
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.clicks
-import com.elta.android.presentation.core.geo.EMPTY_GEO_POINT
+import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
@@ -209,9 +208,9 @@ class ShopsMapPm @Inject constructor(
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
             return geoPoints.valueOrNull?.find { it.id == shopItem.id }?.also { it.selected = true }
-                ?: EMPTY_GEO_POINT
+                ?: emptyGeoPoint
         }
-        return EMPTY_GEO_POINT
+        return emptyGeoPoint
     }
 
     private fun findShopItemByGeoPoint(geoPointId: String): Int {

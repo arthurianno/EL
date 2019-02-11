@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.geo
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "UseDataClass")
 class GeoPoint(
     val latitude: Double,
     val longitude: Double,
@@ -43,6 +43,6 @@ class GeoPoint(
 
 private const val STUB_ID = "stub_geo_point_id"
 
-val EMPTY_GEO_POINT = GeoPoint(0.0, 0.0, STUB_ID)
+val emptyGeoPoint = GeoPoint(0.0, 0.0, STUB_ID)
 
-fun GeoPoint.isEmpty(): Boolean = this == EMPTY_GEO_POINT
+fun GeoPoint.isEmpty(): Boolean = this == emptyGeoPoint

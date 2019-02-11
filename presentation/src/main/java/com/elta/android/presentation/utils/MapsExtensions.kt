@@ -24,6 +24,7 @@ fun Location.distanceTo(coordinates: Coordinates): Float {
     return distanceResultHolder[0]
 }
 
+@Suppress("MagicNumber")
 val moskowLocation = Location("").apply {
     latitude = 55.753638
     longitude = 37.621913
