@@ -61,6 +61,7 @@ def libraryVersions = [
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
         mapKitVersion              : '3.2.0',
+        cardViewVersion            : '1.0.0',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -150,6 +151,7 @@ ext.commonDependencies = [
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
         yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
+        cardView              : "com.github.captain-miao:optroundcardview:${libraryVersions.cardViewVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",

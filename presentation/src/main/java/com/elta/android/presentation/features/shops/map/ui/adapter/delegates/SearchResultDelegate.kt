@@ -6,7 +6,6 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.bindBackground
-import com.elta.android.presentation.core.ui.adapter.bindElevation
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.utils.withAdapterPosition
 import com.nullgr.core.adapter.items.ListItem
@@ -24,7 +23,6 @@ class SearchResultDelegate(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
-            bindElevation(this)
             with(this as ViewHolder) {
                 itemView.setOnClickListener {
                     withAdapterPosition<SearchResultItem> { _, item, _ ->

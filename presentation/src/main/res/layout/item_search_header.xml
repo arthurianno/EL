@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Caption1"
+<com.github.captain_miao.optroundcardview.OptRoundCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:text="@string/shops_search_header" />
+    app:optRoundCardBackgroundColor="@color/white"
+    app:optRoundCardCornerRadius="@dimen/card_corner"
+    app:optRoundCardElevation="@dimen/card_elevation">
+
+    <android.support.v7.widget.AppCompatTextView
+        style="@style/Caption1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/shops_search_header" />
+
+</com.github.captain_miao.optroundcardview.OptRoundCardView>

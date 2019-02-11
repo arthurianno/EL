@@ -16,7 +16,6 @@ import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
-import com.nullgr.core.ui.decor.DividerItemDecoration
 import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -56,13 +55,13 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         searchItemsView.layoutManager = LinearLayoutManager(context)
         searchItemsView.adapter = searchAdapter
-        searchItemsView.addItemDecoration(
-            DividerItemDecoration(
-                checkNotNull(context),
-                R.drawable.divider_search,
-                false
-            )
-        )
+//        searchItemsView.addItemDecoration(
+//            DividerItemDecoration(
+//                checkNotNull(context),
+//                R.drawable.divider_search,
+//                false
+//            )
+//        )
     }
 
     override fun onBindPresentationModel(pm: ShopsMapPm) {
