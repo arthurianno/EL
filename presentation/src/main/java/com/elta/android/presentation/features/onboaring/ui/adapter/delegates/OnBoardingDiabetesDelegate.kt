@@ -54,7 +54,7 @@ class OnBoardingDiabetesDelegate(
 
         with(holder as ViewHolder) {
             item.types.forEachIndexed { index, type ->
-                val child = (typesView.getChildAt(index) as TextView)
+                val child = typesView.getChildAt(index) as TextView
                 child.text = type.toString(resources)
                 child.tag = type
                 child.isSelected = type == item.type

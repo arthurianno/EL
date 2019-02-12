@@ -6,7 +6,8 @@ data class ShopItem(
     val id: Any,
     val name: String,
     val address: String,
-    val distance: String?
+    val distance: String?,
+    val phone: String?
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = id
