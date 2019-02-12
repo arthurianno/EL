@@ -13,7 +13,7 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.widgets.MarginItemDecoration
-import com.jakewharton.rxbinding2.view.visibility
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.hideKeyboard
@@ -62,8 +62,12 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.items.bindTo { items -> adapter.updateData(items) }
         pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
         pm.searchInput.bindTo(searchInputView)
+        pm.searchCloseCommand.bindTo {
+            searchInputView.hideKeyboard()
+            activity?.window?.decorView?.clearFocus()
+        }
+        searchClearView.clicks().bindTo(pm.searchClearAction)
         searchInputView.textChanges().map { it.isNotEmpty() }.bindTo { searchIconView.isSelected = it }
-        searchInputView.textChanges().map { it.isNotEmpty() }.bindTo(searchItemsView.visibility())
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
             .bindTo { searchInputView.hideKeyboard() }

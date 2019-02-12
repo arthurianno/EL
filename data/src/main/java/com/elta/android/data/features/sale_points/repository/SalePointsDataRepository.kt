@@ -41,9 +41,6 @@ class SalePointsDataRepository @Inject constructor(
             }
 
     override fun searchSalePoints(query: String): Observable<List<SalePoint>> =
-        remoteSource.searchSalePoints(query)
-            .switchMap {
-                cacheSource.searchSalePoints(query)
-                    .map { toDomainMapper.mapFromObjects(it) }
-            }
+        cacheSource.searchSalePoints(query)
+            .map { toDomainMapper.mapFromObjects(it) }
 }

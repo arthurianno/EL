@@ -9,8 +9,7 @@ data class SalePointDto(
     @SerializedName("region") val region: String,
     @SerializedName("city") val city: String,
     @SerializedName("address") val address: String,
-    @SerializedName("fullAddress") val fullAddress: String,
-    @SerializedName("phone") val phone: String,
+    @SerializedName("phone") val phone: String?,
     @SerializedName("coordinates") val coordinates: CoordinatesDto,
     @SerializedName("timeStamp") val timeStamp: Int,
     @SerializedName("modifiedState") val modifiedState: StateDto

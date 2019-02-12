@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView
 import com.github.captain_miao.optroundcardview.OptRoundCardView
 import com.nullgr.core.adapter.items.ListItem
 
-fun bindBackground(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+fun bindCardCorners(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
     with(holder.itemView) {
         if (this is OptRoundCardView) {
             when {
@@ -16,3 +16,11 @@ fun bindBackground(items: List<ListItem>, position: Int, holder: RecyclerView.Vi
         }
     }
 }
+
+fun getCardType(size: Int, position: Int): CardType =
+    when {
+        size == 1 -> CardType.SINGLE
+        position == 0 -> CardType.TOP
+        position == size - 1 -> CardType.BOTTOM
+        else -> CardType.MIDDLE
+    }

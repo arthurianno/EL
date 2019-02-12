@@ -2,6 +2,8 @@ package com.elta.android.data.features.sale_points.cache.dto
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.annotation.Index
+import io.objectbox.annotation.IndexType
 
 @Entity
 data class SalePointCacheDto(
@@ -12,10 +14,11 @@ data class SalePointCacheDto(
     val region: String,
     val city: String,
     val address: String,
-    val fullAddress: String,
-    val phone: String,
+    val phone: String?,
     val latitude: Double,
     val longitude: Double,
     val timeStamp: Int,
-    val modifiedState: String
+    val modifiedState: String,
+    @Index(type = IndexType.DEFAULT)
+    val fullAddress: String
 )

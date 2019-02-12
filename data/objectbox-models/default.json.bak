@@ -38,7 +38,6 @@
         },
         {
           "id": "8:1438092714743827296",
-          "indexId": "1:2188257097820880010",
           "name": "fullAddress"
         },
         {
@@ -66,7 +65,7 @@
     }
   ],
   "lastEntityId": "1:4013678417496712339",
-  "lastIndexId": "1:2188257097820880010",
+  "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 4,

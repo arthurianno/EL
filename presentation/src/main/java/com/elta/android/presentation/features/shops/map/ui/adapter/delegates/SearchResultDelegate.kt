@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
-import com.elta.android.presentation.core.ui.adapter.bindBackground
+import com.elta.android.presentation.core.ui.adapter.bindCardCorners
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.utils.withAdapterPosition
 import com.nullgr.core.adapter.items.ListItem
@@ -34,12 +34,18 @@ class SearchResultDelegate(
     }
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
-        bindBackground(items, position, holder)
+        bindCardCorners(items, position, holder)
         val item = items[position] as SearchResultItem
 
         with(holder as ViewHolder) {
             nameView.text = item.name
             addressView.text = item.address
+        }
+    }
+
+    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+        when(payload) {
+            SearchResultItem.Payload.CARD_TYPE_CHANGED -> bindCardCorners(items, position, holder)
         }
     }
 }
