@@ -46,7 +46,7 @@ def libraryVersions = [
         javaxInjectVersion         : '1',
         glassfishAnnotationVersion : '10.0-b28',
 
-        appCoreVersion             : '2.0.0-beta.1',
+        appCoreVersion             : '2.0.1-beta.2',
         jodaTimeVersion            : '2.10.1',
         glideVersion               : '4.8.0',
         materialDialogsVersion     : '0.9.4.4',

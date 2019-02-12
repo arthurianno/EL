@@ -9,5 +9,6 @@ data class SalePoint(
     val address: String,
     val phone: String?,
     val coordinates: Coordinates,
-    val timeStamp: Int
+    val timeStamp: Int,
+    var distance: Float? = null
 )

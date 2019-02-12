@@ -35,22 +35,7 @@ class OnBoardingPm @Inject constructor(
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
-
-        items.consumer.accept(
-            listOf(
-                OnBoardingGenderItem(
-                    resources.getString(R.string.on_boarding_header_user_sex)
-                ),
-                OnBoardingWeightItem(
-                    resources.getString(R.string.on_boarding_header_user_weight),
-                    INITIAL_WEIGHT
-                ),
-                OnBoardingDiabetesItem(
-                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
-                    Diabetes.values().toList()
-                )
-            )
-        )
+        addItems()
 
         pageChangedAction.observable
             .filter { it.isPageInRange() && it != currentPageState.value }
@@ -87,10 +72,29 @@ class OnBoardingPm @Inject constructor(
             .subscribe(::prevPage)
             .untilDestroy()
 
-        bus.events<Events.OnBoardingPageSelected>()
-            .subscribe(::onBoardingPageSelected)
-            .untilDestroy()
+        bindBusEvents()
+        bindUpdateProfileBehaviour()
+    }
 
+    private fun addItems() {
+        items.consumer.accept(
+            listOf(
+                OnBoardingGenderItem(
+                    resources.getString(R.string.on_boarding_header_user_sex)
+                ),
+                OnBoardingWeightItem(
+                    resources.getString(R.string.on_boarding_header_user_weight),
+                    INITIAL_WEIGHT
+                ),
+                OnBoardingDiabetesItem(
+                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
+                    Diabetes.values().toList()
+                )
+            )
+        )
+    }
+
+    private fun bindUpdateProfileBehaviour() {
         updateProfileSettingsAction.observable
             .skipWhileInProgress()
             .map(::createUseCaseParams)
@@ -103,6 +107,12 @@ class OnBoardingPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindBusEvents() {
+        bus.events<Events.OnBoardingPageSelected>()
+            .subscribe(::onBoardingPageSelected)
             .untilDestroy()
     }
 

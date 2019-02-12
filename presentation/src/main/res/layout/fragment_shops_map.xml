@@ -84,6 +84,15 @@
             android:overScrollMode="never"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/myLocationButtonView"
+            style="@style/Button.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gps"
+            app:layout_constraintBottom_toTopOf="@id/itemsView"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

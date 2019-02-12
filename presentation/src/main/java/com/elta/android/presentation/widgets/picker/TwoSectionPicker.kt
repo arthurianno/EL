@@ -34,7 +34,7 @@ class TwoSectionPicker @JvmOverloads constructor(
         Observables.combineLatest(
             ValueChangeObservable(leftPickerView),
             ValueChangeObservable(rightPickerView)
-        ) { left: Int, right: Int -> (left + right.toDouble() / TEN) }
+        ) { left: Int, right: Int -> left + right.toDouble() / TEN }
 
     companion object {
         private const val TEN = 10
