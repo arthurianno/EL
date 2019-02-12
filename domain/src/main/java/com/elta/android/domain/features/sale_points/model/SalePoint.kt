@@ -7,8 +7,7 @@ data class SalePoint(
     val region: String,
     val city: String,
     val address: String,
-    val fullAddress: String,
-    val phone: String,
+    val phone: String?,
     val coordinates: Coordinates,
     val timeStamp: Int,
     var distance: Float? = null

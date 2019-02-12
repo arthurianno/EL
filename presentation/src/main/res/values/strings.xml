@@ -136,4 +136,6 @@
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
     <string name="shops_map_distance_m_pattern">%d м</string>
+    <string name="shops_search_hint">Найти магазин</string>
+    <string name="shops_search_header">Результат поиска</string>
 </resources>

@@ -10,8 +10,10 @@ import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
 import com.elta.android.data.features.sale_points.dto.StateDto
 import com.elta.android.data.features.sale_points.storage.SyncStorage
+import com.nullgr.core.date.toTimestamp
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Observable
+import java.util.Date
 import javax.inject.Inject
 
 class SalePointsRemoteDataSource @Inject constructor(
@@ -24,7 +26,7 @@ class SalePointsRemoteDataSource @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
         getSalePointsByPage(PAGE, PAGE_SIZE).checkNetwork(checker)
-            .doOnNext { syncStorage.lastSync = System.currentTimeMillis() }
+            .doOnNext { syncStorage.lastSync = Date().toTimestamp() }
             .map(SalePointsDto::points)
             .doOnNext(::updateCache)
 
@@ -34,6 +36,8 @@ class SalePointsRemoteDataSource @Inject constructor(
         northEastLatitude: Double,
         northEastLongitude: Double
     ): Observable<List<SalePointDto>> = getSalePoints()
+
+    override fun searchSalePoints(query: String): Observable<List<SalePointDto>> = getSalePoints()
 
     private fun getSalePointsByPage(page: Int, size: Int): Observable<SalePointsDto> =
         api.getSalePoints(syncStorage.lastSync, page, size)
@@ -77,6 +81,6 @@ class SalePointsRemoteDataSource @Inject constructor(
 
     private companion object {
         const val PAGE = 1
-        const val PAGE_SIZE = 100
+        const val PAGE_SIZE = 500
     }
 }

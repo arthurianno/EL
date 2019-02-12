@@ -7,8 +7,7 @@ import retrofit2.http.Query
 
 interface SalePointsApi {
 
-    // TODO: change url
-    @GET("api/salepoints/v1")
+    @GET("api/salepoints/v1/points")
     fun getSalePoints(
         @Query("lastTimestampSync") lastSync: Long?,
         @Query("pageIndex") page: Int,

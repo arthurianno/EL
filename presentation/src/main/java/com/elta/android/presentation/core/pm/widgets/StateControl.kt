@@ -17,6 +17,7 @@ class StateControl(pm: PresentationModel) {
 
 fun PresentationModel.stateControl(): StateControl = StateControl(this)
 
+@Suppress("LongMethod")
 inline fun StateControl.bind(view: StateView, compositeDisposable: CompositeDisposable) {
     compositeDisposable.add(
         dataState.observable

@@ -19,6 +19,7 @@ import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.children
 import kotlinx.android.synthetic.main.item_onboarding_diabetes_types.*
 
+@Suppress("UnnecessaryParentheses")
 class OnBoardingDiabetesDelegate(
     private val bus: RxBus,
     private val resources: ResourceProvider

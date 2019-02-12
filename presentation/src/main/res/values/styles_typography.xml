@@ -34,6 +34,14 @@
         <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
+    <style name="Typography.Title3" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_title_3</item>
+    </style>
+
+    <style name="Typography.Title3.Primary" parent="Typography.Title3">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
     <!-- BODY 1-->
     <style name="Typography.Body1" parent="Typography.Base.Roboto.Regular">
         <item name="android:textSize">@dimen/font_size_body_1</item>

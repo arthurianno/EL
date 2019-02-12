@@ -25,18 +25,14 @@ class SalePointsDataRepository @Inject constructor(
             }
 
     override fun getSalePoints(bounds: CoordinatesBounds): Observable<List<SalePoint>> =
-        remoteSource.getSalePoints(
+        cacheSource.getSalePoints(
             southWestLatitude = bounds.southWest.latitude,
             southWestLongitude = bounds.southWest.longitude,
             northEastLatitude = bounds.northEast.latitude,
             northEastLongitude = bounds.northEast.longitude
-        )
-            .switchMap {
-                cacheSource.getSalePoints(
-                    southWestLatitude = bounds.southWest.latitude,
-                    southWestLongitude = bounds.southWest.longitude,
-                    northEastLatitude = bounds.northEast.latitude,
-                    northEastLongitude = bounds.northEast.longitude
-                ).map { toDomainMapper.mapFromObjects(it) }
-            }
+        ).map { toDomainMapper.mapFromObjects(it) }
+
+    override fun searchSalePoints(query: String): Observable<List<SalePoint>> =
+        cacheSource.searchSalePoints(query)
+            .map { toDomainMapper.mapFromObjects(it) }
 }

@@ -11,7 +11,7 @@ import com.elta.android.presentation.messages.SnackBarMessageData
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
-@Suppress("EmptyWhenBlock")
+@Suppress("EmptyWhenBlock", "LongMethod")
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {

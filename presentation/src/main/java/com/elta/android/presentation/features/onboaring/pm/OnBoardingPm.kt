@@ -32,6 +32,7 @@ class OnBoardingPm @Inject constructor(
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
     private val updateProfileSettingsAction = Action<Unit>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
         addItems()

@@ -34,6 +34,7 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
         authSubtitleView.setText(authSubtitleText)
     }
 
+    @Suppress("LongMethod")
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
         passwordVisibilityButtonView.clicks().bindTo {

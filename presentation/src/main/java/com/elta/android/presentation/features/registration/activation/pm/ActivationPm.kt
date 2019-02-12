@@ -19,6 +19,7 @@ class ActivationPm @Inject constructor(
     val sendAgainAction = Action<Unit>()
     val continueAction = Action<Unit>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
         sendAgainAction.observable

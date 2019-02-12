@@ -8,6 +8,7 @@ import java.util.concurrent.Executor
 
 object RetrofitFactory {
 
+    @Suppress("LongParameterList", "LongMethod")
     fun create(
         okHttpClient: OkHttpClient,
         callAdapterFactory: CallAdapter.Factory,

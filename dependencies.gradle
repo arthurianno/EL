@@ -61,6 +61,7 @@ def libraryVersions = [
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
         mapKitVersion              : '3.2.0',
+        cardViewVersion            : '1.0.0',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -134,6 +135,7 @@ ext.commonDependencies = [
         appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
         appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
         appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
+        appCoreDate           : "com.nullgr.core:core-date:${libraryVersions.appCoreVersion}",
         kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libraryVersions.kotlin_version}",
         gson                  : "com.google.code.gson:gson:${libraryVersions.gsonVersion}",
         glide                 : "com.github.bumptech.glide:glide:${libraryVersions.glideVersion}",
@@ -150,6 +152,7 @@ ext.commonDependencies = [
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
         yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
+        cardView              : "com.github.captain-miao:optroundcardview:${libraryVersions.cardViewVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",

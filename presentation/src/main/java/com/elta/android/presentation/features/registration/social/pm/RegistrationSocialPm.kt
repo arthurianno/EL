@@ -22,6 +22,7 @@ class RegistrationSocialPm @Inject constructor(
     private val getSocialUserAction = Action<SocialNetwork>()
     private val socialNetworkState = State<SocialNetwork>()
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 

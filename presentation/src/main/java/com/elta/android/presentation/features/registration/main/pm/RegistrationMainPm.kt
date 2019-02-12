@@ -14,6 +14,7 @@ class RegistrationMainPm @Inject constructor(
     services: ServiceFacade
 ) : BaseSocialPm(services) {
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 

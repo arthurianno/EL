@@ -152,6 +152,6 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         private const val DEFAULT_ZOOM = 15f
         private const val AZIMUT = 0f
         private const val TILT = 0f
-        private const val ANIMATION_DURATION = 5f
+        private const val ANIMATION_DURATION = 3f
     }
 }
