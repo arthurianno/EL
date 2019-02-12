@@ -9,4 +9,6 @@ interface SalePointsRepository {
     fun getSalePoints(): Observable<List<SalePoint>>
 
     fun getSalePoints(bounds: CoordinatesBounds): Observable<List<SalePoint>>
+
+    fun searchSalePoints(query: String): Observable<List<SalePoint>>
 }

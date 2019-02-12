@@ -39,4 +39,11 @@ class SalePointsDataRepository @Inject constructor(
                     northEastLongitude = bounds.northEast.longitude
                 ).map { toDomainMapper.mapFromObjects(it) }
             }
+
+    override fun searchSalePoints(query: String): Observable<List<SalePoint>> =
+        remoteSource.searchSalePoints(query)
+            .switchMap {
+                cacheSource.searchSalePoints(query)
+                    .map { toDomainMapper.mapFromObjects(it) }
+            }
 }
