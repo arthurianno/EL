@@ -5,9 +5,10 @@ import android.location.Location
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
-import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.GeoPoint
+import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
@@ -42,9 +43,6 @@ class ShopsMapPm @Inject constructor(
     val shopItemGeoPointSelectedAction = Action<GeoPoint>()
     val selectGeoPointCommand = Command<GeoPoint>()
     val selectShopItemCommand = Command<Int>()
-
-    val makeCallCommand = Command<String>()
-    val buildRouteCommand = Command<GeoPoint>()
 
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
@@ -181,10 +179,19 @@ class ShopsMapPm @Inject constructor(
 
     private fun processClick(clicks: Clicks) {
         when (clicks) {
-            is Clicks.ShopMakeCall -> clicks.item.phone?.let { makeCallCommand.consumer.accept(it) }
-            is Clicks.ShopMakeRoute -> buildRouteCommand.consumer.accept(
-                findGeoPointByShopItem(clicks.item)
-            )
+            is Clicks.ShopMakeCall ->
+                clicks.item.phone?.let { router.navigateTo(Screens.CallScreen(it)) }
+            is Clicks.ShopMakeRoute ->
+                findGeoPointByShopItem(clicks.item).let {
+                    if (!it.isEmpty())
+                        router.navigateTo(
+                            Screens.NavigationScreen(
+                                it.latitude,
+                                it.longitude,
+                                it.meta as String
+                            )
+                        )
+                }
         }
     }
 

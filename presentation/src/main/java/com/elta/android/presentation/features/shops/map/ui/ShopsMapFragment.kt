@@ -78,11 +78,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.selectGeoPointCommand.bindTo(::selectPin)
         pm.selectShopItemCommand.bindTo { itemsView.smoothScrollToPosition(it) }
 
-        pm.makeCallCommand.bindTo { callIntent(it).launch(activity) }
-        pm.buildRouteCommand.bindTo {
-            navigationIntent(it.latitude, it.longitude, it.meta as String).launch(activity)
-        }
-
         pinClicks().skip(1).bindTo(pm.shopItemGeoPointSelectedAction)
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
     }
