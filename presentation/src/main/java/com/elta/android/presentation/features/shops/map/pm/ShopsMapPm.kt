@@ -13,9 +13,6 @@ import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
-import com.elta.android.presentation.Clicks
-import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.adapter.CardType
@@ -27,11 +24,11 @@ import com.elta.android.presentation.utils.distanceTo
 import com.elta.android.presentation.utils.formatDistance
 import com.elta.android.presentation.utils.moskowLocation
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
 import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.location.isEmpty
 import io.reactivex.rxkotlin.Observables
-import com.nullgr.core.rx.bindProgress
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
@@ -58,13 +55,13 @@ class ShopsMapPm @Inject constructor(
     val selectGeoPointCommand = Command<GeoPoint>()
     val selectShopItemCommand = Command<Int>()
 
-    //search
     val searchItems = State<List<ListItem>>()
     val searchInput = inputControl()
-    val searchAction = Action<String>()
-    val searchProgressState = State(false)
     val searchClearAction = Action<Unit>()
     val searchCloseCommand = Command<Unit>()
+
+    private val searchAction = Action<String>()
+    private val searchResultSelectedAction = Action<SearchResultItem>()
 
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
@@ -74,64 +71,14 @@ class ShopsMapPm @Inject constructor(
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
 
-
     override fun onCreate() {
         super.onCreate()
         bindPermissionsBehaviour()
         bindLocationBehaviour()
         bindSalePoints()
         bindShopSelectionBehaviour()
+        bindSearchBehaviour()
         bindClicks()
-
-        //search
-        searchInput.text.observable
-            .debounce(INPUT_DELAY, TimeUnit.MILLISECONDS)
-            .doOnNext { query ->
-                if (!isSearchInputValid(query)) {
-                    searchItems.consumer.accept(emptyList())
-                } else {
-                    searchAction.consumer.accept(query)
-                }
-            }
-            .subscribe()
-            .untilDestroy()
-
-        searchAction.observable
-            .skipWhileInProgress(progressState.observable)
-            .map(::createSearchParams)
-            .flatMap { params ->
-                searchSalePointsUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress(progressState.consumer)
-                    .doOnNext(::handleSearchSuccess)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        searchClearAction.observable
-            .subscribe {
-                when (searchInput.text.value.isEmpty()) {
-                    true -> {
-                        searchItems.consumer.accept(emptyList())
-                        searchCloseCommand.consumer.accept(Unit)
-                    }
-                    else -> searchInput.textChanges.consumer.accept("")
-                }
-            }
-            .untilDestroy()
-
-        bus.clicks<Clicks.SearchResult>()
-            .subscribe {
-                searchInput.textChanges.consumer.accept("")
-                searchCloseCommand.consumer.accept(Unit)
-                searchItems.consumer.accept(emptyList())
-
-                // TODO: navigate to sale point on map and in the list
-            }
-            .untilDestroy()
-
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
             .map { Unit }
@@ -240,6 +187,54 @@ class ShopsMapPm @Inject constructor(
             .doOnNext(selectShopItemCommand.consumer)
             .subscribe()
             .untilDestroy()
+
+        searchResultSelectedAction.observable
+            .map { it.id as String }
+            .map(::findShopItemByGeoPoint)
+            .filter { it != INVALID_INDEX }
+            .doOnNext(selectShopItemCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindSearchBehaviour() {
+        searchInput.text.observable
+            .debounce(INPUT_DELAY, TimeUnit.MILLISECONDS)
+            .doOnNext { query ->
+                if (!isSearchInputValid(query)) {
+                    searchItems.consumer.accept(emptyList())
+                } else {
+                    searchAction.consumer.accept(query)
+                }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        searchAction.observable
+            .skipWhileInProgress(progressState.observable)
+            .map(::createSearchParams)
+            .flatMap { params ->
+                searchSalePointsUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress(progressState.consumer)
+                    .doOnNext(::handleSearchSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        searchClearAction.observable
+            .subscribe {
+                when (searchInput.text.value.isEmpty()) {
+                    true -> {
+                        searchItems.consumer.accept(emptyList())
+                        searchCloseCommand.consumer.accept(Unit)
+                    }
+                    else -> searchInput.textChanges.consumer.accept("")
+                }
+            }
+            .untilDestroy()
     }
 
     private fun bindClicks() {
@@ -264,6 +259,12 @@ class ShopsMapPm @Inject constructor(
                             )
                         )
                 }
+            is Clicks.SearchResult -> {
+                searchInput.textChanges.consumer.accept("")
+                searchCloseCommand.consumer.accept(Unit)
+                searchItems.consumer.accept(emptyList())
+                searchResultSelectedAction.consumer.accept(clicks.item)
+            }
         }
     }
 

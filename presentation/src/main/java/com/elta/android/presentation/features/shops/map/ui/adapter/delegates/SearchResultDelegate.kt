@@ -44,7 +44,7 @@ class SearchResultDelegate(
     }
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
-        when(payload) {
+        when (payload) {
             SearchResultItem.Payload.CARD_TYPE_CHANGED -> bindCardCorners(items, position, holder)
         }
     }

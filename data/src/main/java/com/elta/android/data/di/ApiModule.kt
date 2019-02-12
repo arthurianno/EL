@@ -54,6 +54,6 @@ class ApiModule {
         }
 
     object ApiConfig {
-        const val USE_MOCKED_SALE_POINTS_API = true
+        const val USE_MOCKED_SALE_POINTS_API = false
     }
 }

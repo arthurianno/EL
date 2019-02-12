@@ -135,6 +135,7 @@ ext.commonDependencies = [
         appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
         appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
         appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
+        appCoreDate           : "com.nullgr.core:core-date:${libraryVersions.appCoreVersion}",
         kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libraryVersions.kotlin_version}",
         gson                  : "com.google.code.gson:gson:${libraryVersions.gsonVersion}",
         glide                 : "com.github.bumptech.glide:glide:${libraryVersions.glideVersion}",
