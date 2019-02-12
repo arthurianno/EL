@@ -20,7 +20,6 @@ class SalePointToDomainMapper @Inject constructor(
                 region = region,
                 city = city,
                 address = address,
-                fullAddress = fullAddress,
                 phone = phone,
                 coordinates = coordinatesMapper.mapFromObject(coordinates),
                 timeStamp = timeStamp

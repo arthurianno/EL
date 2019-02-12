@@ -56,5 +56,6 @@
         <item name="backgroundTint">@color/color_floating_action_button</item>
         <item name="rippleColor">@color/color_floating_action_button_pressed</item>
         <item name="android:layout_margin">@dimen/padding_base</item>
+        <item name="elevation">@dimen/card_elevation</item>
     </style>
 </resources>

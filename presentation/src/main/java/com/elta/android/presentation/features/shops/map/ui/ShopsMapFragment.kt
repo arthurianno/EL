@@ -5,6 +5,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
@@ -15,10 +16,13 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
+import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.ui.extensions.hideKeyboard
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -86,8 +90,12 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         // search
         pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
         pm.searchInput.bindTo(searchInputView)
+        pm.searchCloseCommand.bindTo {
+            searchInputView.hideKeyboard()
+            activity?.window?.decorView?.clearFocus()
+        }
+        searchClearView.clicks().bindTo(pm.searchClearAction)
         searchInputView.textChanges().map { it.isNotEmpty() }.bindTo { searchIconView.isSelected = it }
-        searchInputView.textChanges().map { it.isNotEmpty() }.bindTo(searchItemsView.visibility())
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
             .bindTo { searchInputView.hideKeyboard() }

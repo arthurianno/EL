@@ -9,26 +9,28 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
+import timber.log.Timber
 import java.io.InputStreamReader
 
-class MockedSalePointsApi(context: Context) : SalePointsApi {
+class MockedSalePointsApi(private val context: Context) : SalePointsApi {
 
-    private val list: List<SalePointDto>
-
-    init {
-        val file = context.assets.open("points.json")
-        val type = object : TypeToken<List<SalePointDto>>() {}.type
-        val reader = JsonReader(InputStreamReader(file))
-        list = Gson().fromJson<List<SalePointDto>>(reader, type)
-    }
+    private val list: MutableList<SalePointDto> = mutableListOf()
 
     override fun getSalePoints(lastSync: Long?, page: Int, pageSize: Int): Observable<SalePointsDto> =
         Observable.fromCallable {
+            if (list.isEmpty()) {
+                val file = context.assets.open("points.json")
+                val type = object : TypeToken<List<SalePointDto>>() {}.type
+                val reader = JsonReader(InputStreamReader(file))
+                list.addAll(Gson().fromJson<List<SalePointDto>>(reader, type))
+            }
+
+            Timber.d(Thread.currentThread().name)
             val pageOfPoints = list.getPage(page, PAGE_SIZE)
             SalePointsDto(pageOfPoints, MetaDto(list.size, page, PAGE_SIZE))
         }.log("Points", "meta") { it.meta.toString() }
 
     private companion object {
-        const val PAGE_SIZE = 20
+        const val PAGE_SIZE = 500
     }
 }

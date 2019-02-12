@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.shops.map.pm
 import android.annotation.SuppressLint
 import android.location.Location
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
+import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
+import com.elta.android.domain.features.sale_points.interactor.isSearchInputValid
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Screens
@@ -13,6 +15,8 @@ import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.ui.adapter.CardType
+import com.elta.android.presentation.core.ui.adapter.getCardType
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
@@ -20,14 +24,19 @@ import com.elta.android.presentation.utils.distanceTo
 import com.elta.android.presentation.utils.formatDistance
 import com.elta.android.presentation.utils.moskowLocation
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
 import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.location.isEmpty
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.widget.inputControl
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ShopsMapPm @Inject constructor(
     private val rxLocationManager: RxLocationManager,
+    private val searchSalePointsUseCase: SearchSalePointsUseCase,
     private val getSalePointsUseCase: GetSalePointsUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
@@ -46,9 +55,13 @@ class ShopsMapPm @Inject constructor(
     val selectGeoPointCommand = Command<GeoPoint>()
     val selectShopItemCommand = Command<Int>()
 
-    //search
     val searchItems = State<List<ListItem>>()
     val searchInput = inputControl()
+    val searchClearAction = Action<Unit>()
+    val searchCloseCommand = Command<Unit>()
+
+    private val searchAction = Action<String>()
+    private val searchResultSelectedAction = Action<SearchResultItem>()
 
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
@@ -58,15 +71,14 @@ class ShopsMapPm @Inject constructor(
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
 
-
     override fun onCreate() {
         super.onCreate()
         bindPermissionsBehaviour()
         bindLocationBehaviour()
         bindSalePoints()
         bindShopSelectionBehaviour()
+        bindSearchBehaviour()
         bindClicks()
-
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
             .map { Unit }
@@ -175,6 +187,54 @@ class ShopsMapPm @Inject constructor(
             .doOnNext(selectShopItemCommand.consumer)
             .subscribe()
             .untilDestroy()
+
+        searchResultSelectedAction.observable
+            .map { it.id as String }
+            .map(::findShopItemByGeoPoint)
+            .filter { it != INVALID_INDEX }
+            .doOnNext(selectShopItemCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindSearchBehaviour() {
+        searchInput.text.observable
+            .debounce(INPUT_DELAY, TimeUnit.MILLISECONDS)
+            .doOnNext { query ->
+                if (!isSearchInputValid(query)) {
+                    searchItems.consumer.accept(emptyList())
+                } else {
+                    searchAction.consumer.accept(query)
+                }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        searchAction.observable
+            .skipWhileInProgress(progressState.observable)
+            .map(::createSearchParams)
+            .flatMap { params ->
+                searchSalePointsUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress(progressState.consumer)
+                    .doOnNext(::handleSearchSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        searchClearAction.observable
+            .subscribe {
+                when (searchInput.text.value.isEmpty()) {
+                    true -> {
+                        searchItems.consumer.accept(emptyList())
+                        searchCloseCommand.consumer.accept(Unit)
+                    }
+                    else -> searchInput.textChanges.consumer.accept("")
+                }
+            }
+            .untilDestroy()
     }
 
     private fun bindClicks() {
@@ -199,6 +259,12 @@ class ShopsMapPm @Inject constructor(
                             )
                         )
                 }
+            is Clicks.SearchResult -> {
+                searchInput.textChanges.consumer.accept("")
+                searchCloseCommand.consumer.accept(Unit)
+                searchItems.consumer.accept(emptyList())
+                searchResultSelectedAction.consumer.accept(clicks.item)
+            }
         }
     }
 
@@ -206,7 +272,7 @@ class ShopsMapPm @Inject constructor(
         ShopItem(
             id = id,
             name = name,
-            address = fullAddress,
+            address = "$city, $address",
             distance = distance.formatDistance(resources),
             phone = phone
         )
@@ -216,7 +282,7 @@ class ShopsMapPm @Inject constructor(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
             id = id,
-            meta = fullAddress
+            meta = "$city, $address"
         )
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
@@ -247,7 +313,32 @@ class ShopsMapPm @Inject constructor(
 
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
 
-    companion object {
-        private const val INVALID_INDEX = -1
+    private fun createSearchParams(query: String): SearchSalePointsUseCase.Params =
+        SearchSalePointsUseCase.Params(query)
+
+    private fun handleSearchSuccess(points: List<SalePoint>) {
+        if (points.isEmpty()) {
+            searchItems.consumer.accept(emptyList())
+        } else {
+            val result = mutableListOf<ListItem>()
+            result.add(SearchHeaderItem())
+            points.forEach { point ->
+                result.add(point.toSearchItem(getCardType(points.size + 1, result.size)))
+            }
+            searchItems.consumer.accept(result)
+        }
+    }
+
+    private fun SalePoint.toSearchItem(cardType: CardType): ListItem =
+        SearchResultItem(
+            id = id,
+            name = name,
+            address = "$city, $address",
+            cardType = cardType
+        )
+
+    private companion object {
+        const val INVALID_INDEX = -1
+        const val INPUT_DELAY = 300L
     }
 }
