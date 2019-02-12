@@ -1,3 +1,6 @@
+### Android_v0.3.0 ###
+- [ELTA-239] - Added search at sale points screens.
+
 ### Android_v0.2.0 ###
 - [ELTA-240] - Added sale points screens.
 
