@@ -14,6 +14,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
+import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
@@ -21,7 +22,6 @@ import com.nullgr.core.adapter.DynamicAdapter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @Suppress("MagicNumber")
@@ -61,19 +61,22 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
-        myLocationButtonView.clicks().bindTo(pm.fetchMyLocationAction)
+        myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
 
         pm.items.bindTo { items -> adapter.updateData(items) }
         pm.showMyLocationCommand.bindTo(::showUserLocation)
+        pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
         pm.permissionRequiredCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
             .bindTo(pm.permissionStatusUpdatedAction.consumer)
         pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
         pm.geoPoints.bindTo(::addPins)
 
-        pinClicks().subscribe {
-            Timber.d("onBindPresentationModel $it")
-        }.untilUnbind()
+        pm.selectGeoPointCommand.bindTo(::selectPin)
+        pm.selectShopItemCommand.bindTo { itemsView.smoothScrollToPosition(it) }
+
+        pinClicks().skip(1).bindTo(pm.shopItemGeoPointSelectedAction)
+        itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
     }
 
     private fun showUserLocation(location: Location) {

@@ -89,24 +89,18 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
 
     fun addPins(points: List<GeoPoint>) {
         points.forEach { drawPinObject(it) }
+        points.find { it.selected }?.let { setSelectedPin(it) }
+    }
+
+    fun selectPin(geoPoint: GeoPoint) {
+        processPinSelection(geoPoint)
     }
 
     fun pinClicks() = selectedObjectRelay.asObservable()
 
     override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
         val selectedPoint = mapObject.userData as? GeoPoint
-        val previousSelectedPoint = selectedObjectRelay.value
-        previousSelectedPoint?.let {
-            it.selected = false
-            drawPinObject(it)
-        }
-        selectedPoint?.let {
-            if (!it.isUserPoint) {
-                it.selected = true
-                setSelectedPin(it)
-            }
-        }
-        selectedObjectRelay.asConsumer().accept(selectedPoint)
+        processPinSelection(selectedPoint)
         return true
     }
 
@@ -134,13 +128,28 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         pinObjects.clear()
     }
 
+    private fun processPinSelection(selectedPoint: GeoPoint?) {
+        val previousSelectedPoint = selectedObjectRelay.value
+        previousSelectedPoint?.let {
+            it.selected = false
+            drawPinObject(it)
+        }
+        selectedPoint?.let {
+            if (!it.isUserPoint) {
+                it.selected = true
+                setSelectedPin(it)
+            }
+        }
+    }
+
     private fun setSelectedPin(geoPoint: GeoPoint) {
+        selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
         moveTo(geoPoint.toPoint())
     }
 
     companion object {
-        private const val DEFAULT_ZOOM = 18f
+        private const val DEFAULT_ZOOM = 15f
         private const val AZIMUT = 0f
         private const val TILT = 0f
         private const val ANIMATION_DURATION = 5f

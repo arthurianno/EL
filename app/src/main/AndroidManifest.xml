@@ -37,6 +37,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.nullgr.core.intents.rxresult.RxResolveResultActivity"
+            android:theme="@style/AppTheme.Transparent" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="920aba3e4b6a09e14708096e535391e22085e85f" />

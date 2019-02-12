@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
@@ -16,6 +17,8 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.utils.navigationIntent
+import com.nullgr.core.intents.callIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -77,5 +80,19 @@ object Screens {
 
     object ShopsMap : SupportAppScreen() {
         override fun getFragment() = ShopsMapFragment.newInstance()
+    }
+
+    class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            callIntent(phoneNumber)
+    }
+
+    class NavigationScreen(
+        private val lat: Double,
+        private val lng: Double,
+        private val address: String
+    ) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            navigationIntent(lat, lng, address)
     }
 }

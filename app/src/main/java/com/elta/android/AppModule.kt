@@ -72,5 +72,5 @@ class AppModule(private val enableLog: Boolean) {
     @Provides
     @Singleton
     fun provideRxLocationManager(context: Context): RxLocationManager =
-        RxLocationManager(context, updateCount = 1)
+        RxLocationManager(context, updatesInterval = 1100, updateCount = 1)
 }
