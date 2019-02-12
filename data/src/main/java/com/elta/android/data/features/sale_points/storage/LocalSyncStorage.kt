@@ -9,7 +9,13 @@ class LocalSyncStorage @Inject constructor(
     private val pref: SharedPreferences
 ) : SyncStorage {
     override var lastSync: Long?
-        get() = pref[LAST_SYNC]
+        get() {
+            val value: Long? = pref[LAST_SYNC]
+            if (value == null || value == -1L) {
+                return null
+            }
+            return value
+        }
         set(value) {
             pref[LAST_SYNC] = value
         }
