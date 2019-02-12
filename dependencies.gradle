@@ -15,7 +15,7 @@ ext.androidVersions = [
 def libraryVersions = [
         //Support libraries
         supportLibraryVersion      : '28.0.0',
-        playServicesVersion        : '11.8.0',
+        playServicesVersion        : '16.0.0',
         firebaseVersion            : '16.0.6',
         firebaseMessagingVersion   : '17.3.4',
         firebaseDynamicLinkVersion : '16.1.5',
@@ -46,7 +46,7 @@ def libraryVersions = [
         javaxInjectVersion         : '1',
         glassfishAnnotationVersion : '10.0-b28',
 
-        appCoreVersion             : '2.0.0-beta.1',
+        appCoreVersion             : '2.0.1-beta.2',
         jodaTimeVersion            : '2.10.1',
         glideVersion               : '4.8.0',
         materialDialogsVersion     : '0.9.4.4',
@@ -60,6 +60,7 @@ def libraryVersions = [
         barcodeScannerVersion      : '1.9.8',
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
+        mapKitVersion              : '3.2.0',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -81,7 +82,9 @@ def libraryVersions = [
 
         fbVersion                  : '4.29.0',
         vkVersion                  : '1.6.9',
-        okVersion                  : '2.1.6'
+        okVersion                  : '2.1.6',
+
+        objectboxVersion           : ext.objectboxVersion
 ]
 
 ext.commonDependencies = [
@@ -146,6 +149,7 @@ ext.commonDependencies = [
         pinView               : "com.chaos.view:pinview:${libraryVersions.pinViewVersion}",
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
+        yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",
@@ -163,7 +167,9 @@ ext.commonDependencies = [
 
         fb                    : "com.facebook.android:facebook-login:${libraryVersions.fbVersion}",
         vk                    : "com.vk:androidsdk:${libraryVersions.vkVersion}",
-        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}"
+        ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}",
+
+        objectbox             : "io.objectbox:objectbox-kotlin:${libraryVersions.objectboxVersion}"
 ]
 
 ext.commonTestDependencies = [

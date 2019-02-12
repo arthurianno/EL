@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
@@ -13,6 +14,11 @@ import com.elta.android.presentation.features.registration.confirmation.ui.Email
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
+import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
+import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
+import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.utils.navigationIntent
+import com.nullgr.core.intents.callIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -61,5 +67,32 @@ object Screens {
 
     data class PasswordCreate(val token: String) : SupportAppScreen() {
         override fun getFragment(): Fragment = AuthPasswordCreateFragment.newInstance(token)
+    }
+
+    // SHOPS FLOW
+    object ShopsFlow : SupportAppScreen() {
+        override fun getFragment() = ShopsFlowFragment.newInstance()
+    }
+
+    object ShopsStart : SupportAppScreen() {
+        override fun getFragment() = ShopsStartFragment.newInstance()
+    }
+
+    object ShopsMap : SupportAppScreen() {
+        override fun getFragment() = ShopsMapFragment.newInstance()
+    }
+
+    class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            callIntent(phoneNumber)
+    }
+
+    class NavigationScreen(
+        private val lat: Double,
+        private val lng: Double,
+        private val address: String
+    ) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            navigationIntent(lat, lng, address)
     }
 }

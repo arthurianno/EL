@@ -5,6 +5,7 @@ import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -12,7 +13,6 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
-import com.elta.android.presentation.messages.SnackBarMessageData
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
@@ -34,22 +34,7 @@ class OnBoardingPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-
-        items.consumer.accept(
-            listOf(
-                OnBoardingGenderItem(
-                    resources.getString(R.string.on_boarding_header_user_sex)
-                ),
-                OnBoardingWeightItem(
-                    resources.getString(R.string.on_boarding_header_user_weight),
-                    INITIAL_WEIGHT
-                ),
-                OnBoardingDiabetesItem(
-                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
-                    Diabetes.values().toList()
-                )
-            )
-        )
+        addItems()
 
         pageChangedAction.observable
             .filter { it.isPageInRange() && it != currentPageState.value }
@@ -86,10 +71,29 @@ class OnBoardingPm @Inject constructor(
             .subscribe(::prevPage)
             .untilDestroy()
 
-        bus.events<Events.OnBoardingPageSelected>()
-            .subscribe(::onBoardingPageSelected)
-            .untilDestroy()
+        bindBusEvents()
+        bindUpdateProfileBehaviour()
+    }
 
+    private fun addItems() {
+        items.consumer.accept(
+            listOf(
+                OnBoardingGenderItem(
+                    resources.getString(R.string.on_boarding_header_user_sex)
+                ),
+                OnBoardingWeightItem(
+                    resources.getString(R.string.on_boarding_header_user_weight),
+                    INITIAL_WEIGHT
+                ),
+                OnBoardingDiabetesItem(
+                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
+                    Diabetes.values().toList()
+                )
+            )
+        )
+    }
+
+    private fun bindUpdateProfileBehaviour() {
         updateProfileSettingsAction.observable
             .skipWhileInProgress()
             .map(::createUseCaseParams)
@@ -102,6 +106,12 @@ class OnBoardingPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindBusEvents() {
+        bus.events<Events.OnBoardingPageSelected>()
+            .subscribe(::onBoardingPageSelected)
             .untilDestroy()
     }
 
@@ -158,8 +168,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        // TODO: navigate to Maps Screen
-        showSnackBar(SnackBarMessageData.SimpleTextMessage("Success"))
+        router.navigateTo(Screens.ShopsMap)
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size

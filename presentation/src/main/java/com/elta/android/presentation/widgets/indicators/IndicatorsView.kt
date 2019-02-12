@@ -16,7 +16,7 @@ import com.elta.android.presentation.utils.firstVisiblePosition
 import com.elta.android.presentation.widgets.indicators.listeners.SimpleAdapterDataObserver
 import com.nullgr.core.ui.extensions.dpToPx
 
-@Suppress("TooManyFunctions", "LargeClass")
+@Suppress("TooManyFunctions", "LargeClass", "LongMethod")
 class IndicatorsView : View {
 
     private var selectedDrawable: Drawable? = null

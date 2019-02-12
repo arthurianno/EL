@@ -18,11 +18,19 @@
     </style>
 
     <!-- TITLE 1 -->
-    <style name="Typography.Title1" parent="Typography.Base.Roboto.Medium">
+    <style name="Typography.Title1" parent="Typography.Base.Roboto.Bold">
         <item name="android:textSize">@dimen/font_size_title_1</item>
     </style>
 
     <style name="Typography.Title1.Primary" parent="Typography.Title1">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <style name="Typography.Title2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_title_1</item>
+    </style>
+
+    <style name="Typography.Title2.Primary" parent="Typography.Title2">
         <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
@@ -70,6 +78,15 @@
     </style>
 
     <style name="Typography.Caption1.Primary" parent="Typography.Caption1">
+        <item name="android:textColor">@color/color_text_caption</item>
+    </style>
+
+    <!-- CAPTION 2 -->
+    <style name="Typography.Caption2" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_caption_1</item>
+    </style>
+
+    <style name="Typography.Caption2.Primary" parent="Typography.Caption1">
         <item name="android:textColor">@color/color_text_caption</item>
     </style>
 
@@ -127,4 +144,11 @@
     <style name="Typography.Body1.BackendError" parent="Typography.Body1">
         <item name="android:textColor">@color/color_backend_error</item>
     </style>
+
+    <!-- TEXT STYLE 2 -->
+    <style name="Typography.TextStyle2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_text_style_2</item>
+        <item name="android:textColor">@color/color_text_style_2</item>
+    </style>
+
 </resources>

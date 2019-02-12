@@ -168,6 +168,7 @@ dependencies {
     implementation commonDependencies.supportCustomTabs
     implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
+    implementation commonDependencies.yandexMapKit
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
@@ -215,6 +216,7 @@ dependencies {
     implementation commonDependencies.firebaseMessaging
     implementation commonDependencies.exoPlayer
     implementation commonDependencies.datePicker
+    implementation commonDependencies.location
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

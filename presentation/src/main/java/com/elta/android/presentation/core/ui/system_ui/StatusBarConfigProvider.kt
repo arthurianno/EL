@@ -4,4 +4,5 @@ interface StatusBarConfigProvider {
 
     val statusBarColor: Int
     val lightStatusBar: Boolean
+    var drawUnderStatusBar: Boolean
 }

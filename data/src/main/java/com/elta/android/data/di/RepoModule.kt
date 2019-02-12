@@ -2,9 +2,11 @@ package com.elta.android.data.di
 
 import com.elta.android.data.features.auth.repository.AuthDataRepository
 import com.elta.android.data.features.auth.repository.SocialDataRepository
+import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.UserSettingsDataRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
+import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.UserSettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -25,4 +27,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindUserSettingsRepository(repo: UserSettingsDataRepository): UserSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSalePointsRepository(repo: SalePointsDataRepository): SalePointsRepository
 }

@@ -10,6 +10,7 @@ import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
+import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -34,6 +35,7 @@ class App : Application(), HasActivityInjector {
         initializeLogger()
         initializeJodaTime()
         initializeSocialNetworks()
+        initalizeYandexMapKit()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -61,6 +63,10 @@ class App : Application(), HasActivityInjector {
 
     private fun initializeJodaTime() {
         JodaTimeAndroid.init(this)
+    }
+
+    private fun initalizeYandexMapKit() {
+        MapKitFactory.setApiKey(resources.getString(R.string.yandex_map_api_key))
     }
 
     private fun initializeCrashlytics() {
