@@ -1,3 +1,6 @@
+### Android_v0.2.0 ###
+- [ELTA-240] - Added sale points screens.
+
 ### Android_v0.1.1 ###
 - [ELTA-288] - Fixed weight screen. Fixed request params. Fixed diabetes order.
 
