@@ -1,7 +1,6 @@
 package com.elta.android.presentation
 
 import android.content.Context
-import android.content.Intent
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
@@ -84,9 +83,8 @@ object Screens {
     }
 
     class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?): Intent {
-            return callIntent(phoneNumber)
-        }
+        override fun getActivityIntent(context: Context?) =
+            callIntent(phoneNumber)
     }
 
     class NavigationScreen(
@@ -94,8 +92,7 @@ object Screens {
         private val lng: Double,
         private val address: String
     ) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?): Intent {
-            return navigationIntent(lat, lng, address)
-        }
+        override fun getActivityIntent(context: Context?) =
+            navigationIntent(lat, lng, address)
     }
 }

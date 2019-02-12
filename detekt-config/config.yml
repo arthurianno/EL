@@ -86,13 +86,13 @@ complexity:
     active: true
   LargeClass:
     active: true
-    threshold: 150
+    threshold: 500
   LongMethod:
     active: true
-    threshold: 20
+    threshold: 50
   LongParameterList:
     active: true
-    threshold: 5
+    threshold: 8
     ignoreDefaultParameters: false
   MethodOverloading:
     active: true
@@ -108,10 +108,10 @@ complexity:
     ignoreStringsRegex: '$^'
   TooManyFunctions:
     active: true
-    thresholdInFiles: 10
-    thresholdInClasses: 10
+    thresholdInFiles: 30
+    thresholdInClasses: 20
     thresholdInInterfaces: 10
-    thresholdInObjects: 10
+    thresholdInObjects: 30
     thresholdInEnums: 10
 
 empty-blocks:
@@ -293,7 +293,7 @@ style:
     active: true
   ForbiddenComment:
     active: true
-    values: 'TODO:,FIXME:,STOPSHIP:'
+    values: 'FIXME:,STOPSHIP:'
   ForbiddenImport:
     active: false
     imports: ''
