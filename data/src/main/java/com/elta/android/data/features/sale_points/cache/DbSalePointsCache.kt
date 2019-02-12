@@ -78,11 +78,7 @@ class DbSalePointsCache @Inject constructor(
                     builder.and()
                 }
             }
-            val start = System.currentTimeMillis()
-            val result = builder.build().find()
-            val end = System.currentTimeMillis()
-            Timber.d("getAllByQuery $query; time ${end - start}")
-            return result
+            return builder.build().find()
         }
     }
 

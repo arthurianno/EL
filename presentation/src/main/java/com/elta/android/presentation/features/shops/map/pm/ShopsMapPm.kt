@@ -313,7 +313,6 @@ class ShopsMapPm @Inject constructor(
 
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
 
-    // search
     private fun createSearchParams(query: String): SearchSalePointsUseCase.Params =
         SearchSalePointsUseCase.Params(query)
 
