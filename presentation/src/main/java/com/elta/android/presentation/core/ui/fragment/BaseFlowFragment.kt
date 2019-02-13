@@ -56,7 +56,7 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     }
 
     override fun handleBack() {
-        if (currentFragment != null) {
+        if (currentFragment != null && childFragmentManager.backStackEntryCount > 0) {
             currentFragment?.handleBack()
         } else {
             router.finishFlow()
