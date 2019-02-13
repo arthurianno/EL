@@ -10,7 +10,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 object OkHttpClientFactory {
-    private const val DEFAULT_TIME_OUT = 30L
+    private const val DEFAULT_TIME_OUT = 40L
 
     private const val CONNECTION_TIMEOUT: Long = DEFAULT_TIME_OUT
     private const val READ_TIMEOUT: Long = DEFAULT_TIME_OUT
@@ -49,5 +49,14 @@ object OkHttpClientFactory {
             }
             .build()
 
-    fun create(): OkHttpClient = OkHttpClient().newBuilder().build()
+    fun create(
+        @Interceptors interceptors: List<Interceptor>,
+        @NetworkInterceptors networkInterceptors: List<Interceptor>
+    ): OkHttpClient =
+        OkHttpClientFactory.create(
+            cacheFolder = null,
+            interceptors = interceptors,
+            networkInterceptors = networkInterceptors,
+            authenticator = null
+        )
 }
