@@ -13,7 +13,7 @@ class TokenAuthenticator(
     override fun authenticate(route: Route?, response: Response): Request? {
         synchronized(TokenAuthenticator::class.java) {
             val storedToken = storage.accessToken
-            val requestToken = response.request().header(AUTH_HEADER)
+            val requestToken = response.request().header(AUTH_HEADER)?.removePrefix(PREFIX)?.trim()
 
             if (storedToken == requestToken) {
                 storage.refresh()

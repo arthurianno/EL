@@ -4,6 +4,7 @@ import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.common.TokenAuthenticator
 import com.elta.android.data.core.network.OkHttpClientFactory
 import com.elta.android.data.core.network.RetrofitFactory
+import com.elta.android.data.core.qualifires.NetworkInterceptors
 import com.elta.android.data.core.qualifires.ServerUrl
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.auth.storage.LocalTokenStorage
@@ -12,7 +13,9 @@ import com.nullgr.core.security.prefs.CryptoPreferences
 import dagger.Module
 import dagger.Provides
 import okhttp3.Authenticator
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.CallAdapter
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -33,7 +36,10 @@ class TokenModule {
     @Token
     @Provides
     @Singleton
-    fun tokenOkHttpClient(): OkHttpClient = OkHttpClientFactory.create()
+    fun tokenOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        @NetworkInterceptors networkInterceptors: List<Interceptor>
+    ): OkHttpClient = OkHttpClientFactory.create(listOf(loggingInterceptor), networkInterceptors)
 
     @Token
     @Provides
