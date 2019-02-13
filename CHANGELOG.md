@@ -1,5 +1,6 @@
 ### Android_v0.3.1 ###
 - [ELTA-XXX] - Fixed default value for sale point last sync time
+- [ELTA-XXX] - Fix navigation problems
 
 ### Android_v0.3.0 ###
 - [ELTA-239] - Added search at sale points screens.

@@ -82,7 +82,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
     }
 
     override fun onBackPressed() {
-        if (currentFragment != null && supportFragmentManager.backStackEntryCount > 0) {
+        if (currentFragment != null) {
             currentFragment?.handleBack()
         } else {
             handleBack()
