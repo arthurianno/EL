@@ -169,7 +169,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        router.navigateTo(Screens.ShopsMap)
+        router.newRootScreen(Screens.ShopsFlow)
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size
