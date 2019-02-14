@@ -28,7 +28,7 @@ class RegistrationMainPm @Inject constructor(
             .untilDestroy()
 
         menuAction.observable
-            .subscribe { flowRouter?.startFlow(Screens.AuthFlow) }
+            .subscribe { router.startFlow(Screens.AuthFlow) }
             .untilDestroy()
 
         continueAction.observable

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
@@ -38,7 +39,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
-        ((parentFragment ?: activity) as RouterProvider).router
+        ((parentFragment ?: activity) as RouterProvider).router as FlowRouter
     }
 
     private var errorStateView: StateView? = null

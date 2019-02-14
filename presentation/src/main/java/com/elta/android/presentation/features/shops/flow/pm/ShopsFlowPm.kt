@@ -10,6 +10,6 @@ class ShopsFlowPm @Inject constructor(
 ) : BaseFlowPm(services) {
 
     override fun navigateToLaunchScreen() {
-        flowRouter?.newRootScreen(Screens.ShopsStart)
+        router.newRootScreen(Screens.ShopsStart)
     }
 }

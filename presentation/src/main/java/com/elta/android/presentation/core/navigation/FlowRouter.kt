@@ -3,21 +3,29 @@ package com.elta.android.presentation.core.navigation
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
-class FlowRouter(private val appRouter: Router) : UiThreadRouter() {
+class FlowRouter(private val parentRouter: Router?) : UiThreadRouter() {
 
     fun startFlow(screen: SupportAppScreen) {
-        appRouter.navigateTo(screen)
+        runCommand { navigateTo(screen) }
     }
 
     fun newRootFlow(screen: SupportAppScreen) {
-        appRouter.newRootScreen(screen)
+        runCommand { newRootScreen(screen) }
     }
 
     fun finishFlow() {
-        appRouter.exit()
+        runCommand { exit() }
     }
 
     fun replaceFlow(screen: SupportAppScreen) {
-        appRouter.replaceScreen(screen)
+        // TODO impelement attach/detach command
+        runCommand { replaceScreen(screen) }
+    }
+
+    private fun runCommand(command: Router.() -> Unit) {
+        if (parentRouter != null)
+            parentRouter.command()
+        else
+            this.command()
     }
 }

@@ -3,8 +3,8 @@ package com.elta.android.presentation.core.ui.fragment
 import android.content.Context
 import android.os.Bundle
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.navigation.FlowNavigator
 import com.elta.android.presentation.core.navigation.FlowRouter
+import com.elta.android.presentation.core.navigation.FragmentNavigator
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.BasePm
@@ -12,13 +12,12 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
 abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider {
 
     @Inject
-    lateinit var globalRouter: Router
+    lateinit var globalRouter: FlowRouter
 
     private val cicerone by lazy { Cicerone.create(FlowRouter(globalRouter)) }
     private val navigatorHolder: NavigatorHolder by lazy { cicerone.navigatorHolder }
@@ -33,7 +32,7 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        navigator = FlowNavigator(this)
+        navigator = FragmentNavigator(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
