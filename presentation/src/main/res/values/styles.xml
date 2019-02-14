@@ -72,4 +72,9 @@
         <item name="np_max">9</item>
         <item name="np_min">0</item>
     </style>
+
+    <style name="BottomNavigationMenuItem">
+        <item name="bnm_selected_color">@color/color_bottom_menu_selected_state</item>
+        <item name="bnm_normal_color">@color/color_bottom_menu_normal_state</item>
+    </style>
 </resources>

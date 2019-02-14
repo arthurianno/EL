@@ -113,4 +113,8 @@
     <color name="color_picker_weight_selected_text">@color/shade_g_green_a</color>
     <color name="color_picker_weight_divider">@color/shade_g_green_a</color>
     <color name="color_picker_weight_mask">#183ec9a8</color>
+
+    <!-- BOTTOM NAVIGATION -->
+    <color name="color_bottom_menu_selected_state">@color/black_blue</color>
+    <color name="color_bottom_menu_normal_state">@color/shade_black2</color>
 </resources>

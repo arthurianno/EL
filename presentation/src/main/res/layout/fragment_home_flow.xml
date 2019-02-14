@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/containerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
+        android:background="@color/color_background_connected" />
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:translationZ="3dp">
+
+        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
+            android:id="@+id/mainMenuItemView"
+            style="@style/BottomNavigationMenuItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:bnm_icon="@drawable/ic_menu_home"
+            app:bnm_title="@string/bottom_navigation_menu_main_title" />
+
+        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
+            android:id="@+id/notesMenuItemView"
+            style="@style/BottomNavigationMenuItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:bnm_icon="@drawable/ic_menu_note"
+            app:bnm_title="@string/bottom_navigation_menu_notes_title" />
+
+        <Space
+            android:layout_width="80dp"
+            android:layout_height="match_parent" />
+
+        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
+            android:id="@+id/statsMenuItemView"
+            style="@style/BottomNavigationMenuItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:bnm_icon="@drawable/ic_menu_stats"
+            app:bnm_title="@string/bottom_navigation_menu_stats_title" />
+
+        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
+            android:id="@+id/profileMenuItemView"
+            style="@style/BottomNavigationMenuItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:bnm_icon="@drawable/ic_menu_profile"
+            app:bnm_title="@string/bottom_navigation_menu_profile_title" />
+    </LinearLayout>
+</FrameLayout>

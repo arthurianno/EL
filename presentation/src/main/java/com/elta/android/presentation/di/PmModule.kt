@@ -9,6 +9,7 @@ import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
+import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
@@ -113,4 +114,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(ShopsMapPm::class)
     abstract fun bindShopsMapPm(pm: ShopsMapPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(HomeFlowPm::class)
+    abstract fun bindHomeFlowPm(pm: HomeFlowPm): PresentationModel
 }

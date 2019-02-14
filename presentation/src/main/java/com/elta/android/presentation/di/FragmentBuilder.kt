@@ -6,6 +6,7 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
+import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
@@ -87,4 +88,9 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [ShopsMapModule::class])
     abstract fun bindShopsMapFragment(): ShopsMapFragment
+
+    // HOME FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindHomeFlowFragment(): HomeFlowFragment
 }
