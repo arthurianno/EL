@@ -70,6 +70,7 @@ class ShopsMapPm @Inject constructor(
     private val loadScreenAction = Action<Unit>()
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
+    private val selectedPointId = State<Any>()
 
     override fun onCreate() {
         super.onCreate()
@@ -117,6 +118,7 @@ class ShopsMapPm @Inject constructor(
 
     private fun bindPermissionsBehaviour() {
         loadScreenAction.observable
+            // TODO: this code emits GRANTED state for each onBindPresentationModel this end up new location request and updating ui
             .flatMap { permissionStatusUpdatedAction.observable }
             .subscribe(permissionStatusState.consumer)
             .untilDestroy()
@@ -162,12 +164,17 @@ class ShopsMapPm @Inject constructor(
 
     private fun displayPoints(points: List<SalePoint>) {
         items.consumer.accept(points.map { it.toItem() })
-        geoPoints.consumer.accept(points.mapIndexed { index, point ->
-            val geoPoint = point.toGeoPoint()
-            // TODO this behaviour should be changed
-            geoPoint.selected = index == 0
-            geoPoint
-        })
+        geoPoints.consumer.accept(
+            points.mapIndexed { index, point ->
+                point.toGeoPoint().apply {
+                    selected = if (!selectedPointId.hasValue()) {
+                        index == 0
+                    } else {
+                        point.id == selectedPointId.value
+                    }
+                }
+            }
+        )
     }
 
     private fun bindShopSelectionBehaviour() {
@@ -176,12 +183,14 @@ class ShopsMapPm @Inject constructor(
             .map { items.valueOrNull?.get(it) }
             .map(::findGeoPointByShopItem)
             .filter { !it.isEmpty() }
+            .doOnNext { selectedPointId.consumer.accept(it.id) }
             .doOnNext(selectGeoPointCommand.consumer)
             .subscribe()
             .untilDestroy()
 
         shopItemGeoPointSelectedAction.observable
             .map { it.id as String }
+            .doOnNext { selectedPointId.consumer.accept(it) }
             .map(::findShopItemByGeoPoint)
             .filter { it != INVALID_INDEX }
             .doOnNext(selectShopItemCommand.consumer)
@@ -190,6 +199,7 @@ class ShopsMapPm @Inject constructor(
 
         searchResultSelectedAction.observable
             .map { it.id as String }
+            .doOnNext { selectedPointId.consumer.accept(it) }
             .map(::findShopItemByGeoPoint)
             .filter { it != INVALID_INDEX }
             .doOnNext(selectShopItemCommand.consumer)
