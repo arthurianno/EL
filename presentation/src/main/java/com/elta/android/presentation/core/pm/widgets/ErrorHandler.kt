@@ -2,6 +2,7 @@ package com.elta.android.presentation.core.pm.widgets
 
 import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.ServiceUnavailableError
+import com.elta.android.common.errors.SocialAuthError
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
@@ -24,6 +25,7 @@ class ErrorHandler(private val pm: BasePm) {
                     r.newRootScreen(Screens.AuthFlow)
                 }
             }
+            is SocialAuthError -> handleSocialAuthError(error)
             else ->
                 if (pm.isEmptyScreen) {
                     if (error.isServerUnavailableError()) {
@@ -48,6 +50,10 @@ class ErrorHandler(private val pm: BasePm) {
 
     private fun Throwable.isServerUnavailableError(): Boolean =
         this is ConnectException || this is SocketTimeoutException || this is ServiceUnavailableError
+
+    private fun handleSocialAuthError(error: SocialAuthError) {
+        // temporary ignored
+    }
 }
 
 fun BasePm.errorHandler() = ErrorHandler(this)
