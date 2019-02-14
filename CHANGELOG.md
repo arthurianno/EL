@@ -1,3 +1,6 @@
+### Android_v0.4.0 ###
+- [ELTA-285] - Added new credentials for Facebook
+
 ### Android_v0.3.2 ###
 - [ELTA-315] - Fixed crash. Improve stability
 
