@@ -1,3 +1,6 @@
+### Android_v0.3.2 ###
+- [ELTA-315] - Fixed crash. Improve stability
+
 ### Android_v0.3.1 ###
 - [ELTA-XXX] - Fixed default value for sale point last sync time
 - [ELTA-XXX] - Fixed navigation problems
