@@ -21,10 +21,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            app:state_button="@string/registration_main_button_continue"
-            app:state_description="@string/registration_activate_description"
-            app:state_icon="@drawable/ic_activation"
-            app:state_title="@string/registration_activate_title" />
+            app:state_button="@string/registration_email_confirmation_continue_button"
+            app:state_description="@string/registration_email_confirmation_subtitle"
+            app:state_icon="@drawable/ic_email_confirmation"
+            app:state_title="@string/registration_email_confirmation_title" />
 
     </LinearLayout>
 
