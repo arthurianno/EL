@@ -6,7 +6,4 @@ import javax.inject.Inject
 
 class HomeFlowPm @Inject constructor(
     services: ServiceFacade
-) : BasePm(services) {
-
-
-}
+) : BasePm(services)

@@ -11,54 +11,36 @@
         android:layout_marginBottom="56dp"
         android:background="@color/color_background_connected" />
 
-    <LinearLayout
-        android:id="@+id/bottomNavigationView"
+    <pl.bclogic.pulsator4droid.library.PulsatorLayout
+        android:id="@+id/homePulseView"
+        style="@style/PulseStyle"
+        android:layout_width="142dp"
+        android:layout_height="142dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="-31dp" />
+
+    <com.elta.android.presentation.widgets.BottomNavigationView
+        android:id="@+id/homeBottomNavigationView"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom"
-        android:background="@color/white"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:translationZ="3dp">
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
 
-        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
-            android:id="@+id/mainMenuItemView"
-            style="@style/BottomNavigationMenuItem"
-            android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/homeActionView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/selector_home_button"
+        android:elevation="6dp"
+        android:stateListAnimator="@drawable/selector_home_button_animator">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_home"
-            app:bnm_title="@string/bottom_navigation_menu_main_title" />
+            android:layout_gravity="center"
+            android:stateListAnimator="@drawable/selector_home_button_icon_animator"
+            app:srcCompat="@drawable/ic_home_plus" />
 
-        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
-            android:id="@+id/notesMenuItemView"
-            style="@style/BottomNavigationMenuItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_note"
-            app:bnm_title="@string/bottom_navigation_menu_notes_title" />
-
-        <Space
-            android:layout_width="80dp"
-            android:layout_height="match_parent" />
-
-        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
-            android:id="@+id/statsMenuItemView"
-            style="@style/BottomNavigationMenuItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_stats"
-            app:bnm_title="@string/bottom_navigation_menu_stats_title" />
-
-        <com.elta.android.presentation.widgets.BottomNavigationMenuItem
-            android:id="@+id/profileMenuItemView"
-            style="@style/BottomNavigationMenuItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:bnm_icon="@drawable/ic_menu_profile"
-            app:bnm_title="@string/bottom_navigation_menu_profile_title" />
-    </LinearLayout>
+    </FrameLayout>
 </FrameLayout>
