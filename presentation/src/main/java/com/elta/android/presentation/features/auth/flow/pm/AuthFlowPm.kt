@@ -10,6 +10,6 @@ class AuthFlowPm @Inject constructor(
 ) : BaseFlowPm(services) {
 
     override fun navigateToLaunchScreen() {
-        flowRouter?.newRootScreen(Screens.Login)
+        router.newRootScreen(Screens.Login)
     }
 }

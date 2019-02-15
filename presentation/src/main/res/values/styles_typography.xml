@@ -159,4 +159,10 @@
         <item name="android:textColor">@color/color_text_style_2</item>
     </style>
 
+    <!-- BOTTOM MENU TEXT -->
+
+    <style name="Typography.BottomMenu" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_bottom_menu_title</item>
+    </style>
+
 </resources>

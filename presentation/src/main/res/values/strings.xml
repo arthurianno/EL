@@ -138,4 +138,10 @@
     <string name="shops_map_distance_m_pattern">%d м</string>
     <string name="shops_search_hint">Найти магазин</string>
     <string name="shops_search_header">Результат поиска</string>
+
+    <!-- HOME FLOW -->
+    <string name="bottom_navigation_menu_main_title">Главная</string>
+    <string name="bottom_navigation_menu_notes_title">Дневник</string>
+    <string name="bottom_navigation_menu_stats_title">Статистика</string>
+    <string name="bottom_navigation_menu_profile_title">Профиль</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.elta.android.presentation.di
 
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.LocalCiceroneHolder
-import com.elta.android.presentation.core.navigation.UiThreadRouter
 import dagger.Module
 import dagger.Provides
 import ru.terrakok.cicerone.Cicerone
@@ -12,11 +12,11 @@ import javax.inject.Singleton
 @Module
 class NavigationModule {
 
-    private var cicerone: Cicerone<Router> = Cicerone.create(UiThreadRouter())
+    private var cicerone: Cicerone<Router> = Cicerone.create(FlowRouter(null))
 
     @Provides
     @Singleton
-    fun provideRouter(): Router = cicerone.router
+    fun provideRouter(): FlowRouter = cicerone.router as FlowRouter
 
     @Provides
     @Singleton

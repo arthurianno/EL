@@ -6,7 +6,7 @@ import com.elta.android.presentation.R
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.commands.Command
 
-open class FlowNavigator(
+open class FragmentNavigator(
     fragment: Fragment
 ) : SupportAppNavigator(fragment.activity, fragment.childFragmentManager, R.id.containerView) {
 

@@ -34,4 +34,6 @@
 
     <style name="TextStyle2" parent="Typography.TextStyle2" />
 
+    <style name="BottomMenuTitle" parent="Typography.BottomMenu" />
+
 </resources>

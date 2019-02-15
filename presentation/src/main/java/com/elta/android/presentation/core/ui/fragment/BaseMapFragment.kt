@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BaseMapPm
 import com.elta.android.presentation.core.pm.factory.PmFactory
@@ -52,7 +53,7 @@ abstract class BaseMapFragment<T> : Fragment(), MapPmView<T>, BackHandler
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider
 
     private val router by lazy(LazyThreadSafetyMode.NONE) {
-        ((parentFragment ?: activity) as RouterProvider).router
+        ((parentFragment ?: activity) as RouterProvider).router as FlowRouter
     }
 
     private var errorStateView: StateView? = null

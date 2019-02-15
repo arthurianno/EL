@@ -13,4 +13,11 @@
             <enum name="fill" value="1" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="BottomNavigationMenuItem">
+        <attr name="bnm_icon" format="reference" />
+        <attr name="bnm_title" format="reference" />
+        <attr name="bnm_selected_color" format="reference" />
+        <attr name="bnm_normal_color" format="reference" />
+    </declare-styleable>
 </resources>

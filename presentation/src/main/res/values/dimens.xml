@@ -17,6 +17,7 @@
     <dimen name="font_size_input_text">15sp</dimen>
     <dimen name="font_size_input_error_text">12sp</dimen>
     <dimen name="font_size_text_style_2">12sp</dimen>
+    <dimen name="font_size_bottom_menu_title">12sp</dimen>
 
     <dimen name="line_spacing_body_1">0sp</dimen>
     <dimen name="line_spacing_subtitle_1">0sp</dimen>
