@@ -97,7 +97,6 @@ object Screens {
             navigationIntent(lat, lng, address)
     }
 
-
     // MAIN FLOW
     object HomeFlow : SupportAppScreen() {
         override fun getFragment() = HomeFlowFragment.newInstance()
