@@ -104,6 +104,7 @@ dependencies {
     implementation commonDependencies.materialEditText
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.cardView
+    implementation commonDependencies.pulseView
 
     // Dagger2
     kapt commonDependencies.daggerCompiler

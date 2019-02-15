@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import kotlinx.android.synthetic.main.view_bottom_navigation_menu_item.view.*
@@ -20,7 +21,8 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
     private var normalColor: Int? = null
 
     init {
-        inflate(context, R.layout.view_bottom_navigation_menu_item, this)
+        LayoutInflater.from(context).inflate(R.layout.view_bottom_navigation_menu_item, this, true)
+        orientation = LinearLayout.VERTICAL
         readAttrs(attrs)
         bindItem()
     }

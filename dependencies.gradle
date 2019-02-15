@@ -62,6 +62,7 @@ def libraryVersions = [
         materialEditTextVersion    : '2.1.4',
         mapKitVersion              : '3.2.0',
         cardViewVersion            : '1.0.0',
+        pulseViewVersion           : '1.0.3',
 
         //Testing
         robolectricVersion         : '3.4.2',
@@ -153,6 +154,7 @@ ext.commonDependencies = [
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
         yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
         cardView              : "com.github.captain-miao:optroundcardview:${libraryVersions.cardViewVersion}",
+        pulseView             : "pl.bclogic:pulsator4droid:${libraryVersions.pulseViewVersion}",
 
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",
