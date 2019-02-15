@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.home.ui;
+package com.elta.android.presentation.features.home.ui
 
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment

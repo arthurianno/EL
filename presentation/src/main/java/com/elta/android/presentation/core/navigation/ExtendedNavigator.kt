@@ -89,7 +89,7 @@ open class ExtendedNavigator(
     }
 
     private fun throwInvalidConditionException(command: Command) {
-        throw  IllegalStateException(
+        throw IllegalStateException(
             "${command.javaClass.simpleName} command supports only fragments"
         )
     }
