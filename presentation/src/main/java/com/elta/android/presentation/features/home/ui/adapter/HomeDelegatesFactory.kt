@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.home.ui.adapter
 
-import com.elta.android.presentation.features.home.ui.adapter.delegates.EventDelegate
-import com.elta.android.presentation.features.home.ui.adapter.items.EventItem
+import com.elta.android.presentation.features.home.ui.adapter.delegates.UserEventDelegate
+import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
@@ -14,7 +14,7 @@ class HomeDelegatesFactory @Inject constructor(
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate {
         return when (clazz) {
-            EventItem::class.java -> EventDelegate(bus)
+            UserEventItem::class.java -> UserEventDelegate(bus)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
     }

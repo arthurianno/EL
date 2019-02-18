@@ -39,6 +39,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
+        pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
     }
 
     override fun handleBack() {
