@@ -9,6 +9,8 @@
 
     <style name="Body1" parent="Typography.Body1.Primary" />
 
+    <style name="Body2" parent="Typography.Body2.Primary" />
+
     <style name="Subtitle1" parent="Typography.Subtitle1.Primary" />
 
     <style name="Headline1" parent="Typography.Headline1.Primary" />

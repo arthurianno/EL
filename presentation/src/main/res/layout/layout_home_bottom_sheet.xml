@@ -15,12 +15,12 @@
         android:paddingBottom="19dp"
         android:text="@string/home_bottom_sheet_title" />
 
-    <!-- TODO: remove background and height-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/bottomSheetItemsView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
-        android:overScrollMode="never" />
+        android:overScrollMode="never"
+        android:paddingBottom="75dp" />
 
 </LinearLayout>

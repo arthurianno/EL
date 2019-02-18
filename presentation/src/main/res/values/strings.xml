@@ -145,4 +145,11 @@
     <string name="bottom_navigation_menu_stats_title">Статистика</string>
     <string name="bottom_navigation_menu_profile_title">Профиль</string>
     <string name="home_bottom_sheet_title">Что бы вы хотели записать?</string>
+
+    <!-- EVENT TYPES -->
+    <string name="event_type_xe">Хлебные единицы</string>
+    <string name="event_type_insulin">Инсулин</string>
+    <string name="event_type_medicines">Медикаменты</string>
+    <string name="event_type_weight">Вес</string>
+    <string name="event_type_activity">Активность</string>
 </resources>
