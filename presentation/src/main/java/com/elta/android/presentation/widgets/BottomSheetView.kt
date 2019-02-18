@@ -41,9 +41,9 @@ class BottomSheetView @JvmOverloads constructor(
     private val inAnimator: ObjectAnimator
     private var outAnimator: ObjectAnimator
     private val colorEvaluator = ArgbEvaluator()
-    private val inColorAnimationDuration: Long = 400
-    private val outColorAnimationDuration: Long = 500
-    private val debounce: Long = 400
+    private val inColorAnimationDuration: Long = IN_ANIMATION_DURATION
+    private val outColorAnimationDuration: Long = OUT_ANIMATION_DURATION
+    private val debounce: Long = DEBOUNCE_MILLIS
 
     private var bottomSheetLayout: Int = 0
     private val behavior: BottomSheetBehavior<FrameLayout>
@@ -291,5 +291,11 @@ class BottomSheetView @JvmOverloads constructor(
                 animator.removeListener(animationListener)
             }
         }
+    }
+
+    companion object {
+        private const val IN_ANIMATION_DURATION = 400L
+        private const val OUT_ANIMATION_DURATION = 500L
+        private const val DEBOUNCE_MILLIS = 400L
     }
 }
