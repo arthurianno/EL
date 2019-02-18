@@ -6,6 +6,7 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
+import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
@@ -91,6 +92,6 @@ abstract class FragmentBuilder {
 
     // HOME FLOW
     @FragmentScope
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [HomeFlowModule::class])
     abstract fun bindHomeFlowFragment(): HomeFlowFragment
 }
