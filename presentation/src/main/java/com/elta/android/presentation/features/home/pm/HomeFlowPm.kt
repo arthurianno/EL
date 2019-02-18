@@ -1,10 +1,15 @@
 package com.elta.android.presentation.features.home.pm
 
-import com.elta.android.presentation.R
+import com.elta.android.domain.features.events.model.UserEvent
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.home.ui.adapter.items.EventItem
+import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
+import com.elta.android.presentation.utils.toIcon
+import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
+import timber.log.Timber
 import javax.inject.Inject
 
 class HomeFlowPm @Inject constructor(
@@ -12,10 +17,12 @@ class HomeFlowPm @Inject constructor(
 ) : BaseFlowPm(services) {
 
     val bottomSheetItems = State<List<ListItem>>()
+    val closeBottomSheetCommand = Command<Unit>()
 
     override fun onCreate() {
         super.onCreate()
         addEventItems()
+        observeClicks()
     }
 
     override fun navigateToLaunchScreen() {
@@ -24,13 +31,29 @@ class HomeFlowPm @Inject constructor(
 
     private fun addEventItems() {
         bottomSheetItems.consumer.accept(
-            listOf(
-                EventItem(R.drawable.ic_xe, R.string.event_type_xe),
-                EventItem(R.drawable.ic_ins, R.string.event_type_insulin),
-                EventItem(R.drawable.ic_medicine, R.string.event_type_medicines),
-                EventItem(R.drawable.ic_weight, R.string.event_type_weight),
-                EventItem(R.drawable.ic_active, R.string.event_type_activity)
-            )
+            UserEvent.values().map { it.toListItem() }
         )
     }
+
+    private fun observeClicks() {
+        bus.clicks<Clicks.AddUserEvent>()
+            .map { it.userEvent }
+            .doOnNext(::handleAddEventClick)
+            .map { Unit }
+            .doOnNext(closeBottomSheetCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleAddEventClick(event: UserEvent) {
+        Timber.d("handleAddEventClick $event")
+        // TODO navigateTo -> Add event screen
+    }
+
+    private fun UserEvent.toListItem() =
+        UserEventItem(
+            titleRes = this.toName(),
+            iconRes = this.toIcon(),
+            userEvent = this
+        )
 }
