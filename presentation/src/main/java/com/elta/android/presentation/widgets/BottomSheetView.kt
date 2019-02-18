@@ -43,6 +43,7 @@ class BottomSheetView @JvmOverloads constructor(
     private val colorEvaluator = ArgbEvaluator()
     private val inColorAnimationDuration: Long = 400
     private val outColorAnimationDuration: Long = 500
+    private val debounce: Long = 400
 
     private var bottomSheetLayout: Int = 0
     private val behavior: BottomSheetBehavior<FrameLayout>
@@ -92,12 +93,12 @@ class BottomSheetView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         showAction
-            .throttleFirst(400, TimeUnit.MILLISECONDS)
+            .throttleFirst(debounce, TimeUnit.MILLISECONDS)
             .subscribe(::showInternal)
             .addTo(compositeDisposable)
 
         hideAction
-            .throttleFirst(400, TimeUnit.MILLISECONDS)
+            .throttleFirst(debounce, TimeUnit.MILLISECONDS)
             .subscribe(::hideInternal)
             .addTo(compositeDisposable)
 
