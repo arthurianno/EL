@@ -76,14 +76,12 @@ open class ExtendedNavigator(
 
     private fun checkCondition(command: Command): Command {
         when (command) {
-            is AttachTab -> {
+            is AttachTab ->
                 if (command.screen.fragment == null) throwInvalidConditionException(command)
-            }
-            is AddTabs -> {
+            is AddTabs ->
                 command.screens.forEach {
                     if (it.fragment == null) throwInvalidConditionException(command)
                 }
-            }
         }
         return command
     }
