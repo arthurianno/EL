@@ -16,20 +16,20 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         super.onViewCreated(view, savedInstanceState)
         homeBottomNavigationView.select(R.id.mainMenuItemView)
         homePulseView.start()
-        bottomTest.visibilityChanges().subscribe { visible ->
+        homeBottomSheetView.visibilityChanges().subscribe { visible ->
             homeActionView.isSelected = visible
         }
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
-                bottomTest.show()
+                homeBottomSheetView.show()
             } else {
-                bottomTest.hide()
+                homeBottomSheetView.hide()
             }
         }
     }
 
     override fun handleBack() {
-        if (!bottomTest.handleBack()) {
+        if (!homeBottomSheetView.handleBack()) {
             super.handleBack()
         }
     }
