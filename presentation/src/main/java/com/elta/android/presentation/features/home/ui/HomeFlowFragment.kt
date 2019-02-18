@@ -16,8 +16,21 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         super.onViewCreated(view, savedInstanceState)
         homeBottomNavigationView.select(R.id.mainMenuItemView)
         homePulseView.start()
+        bottomTest.visibilityChanges().subscribe { visible ->
+            homeActionView.isSelected = visible
+        }
         homeActionView.setOnClickListener {
-            it.isSelected = !it.isSelected
+            if (!it.isSelected) {
+                bottomTest.show()
+            } else {
+                bottomTest.hide()
+            }
+        }
+    }
+
+    override fun handleBack() {
+        if (!bottomTest.handleBack()) {
+            super.handleBack()
         }
     }
 

@@ -43,4 +43,11 @@
             app:srcCompat="@drawable/ic_home_plus" />
 
     </FrameLayout>
+
+    <com.elta.android.presentation.widgets.BottomSheetView
+        android:id="@+id/bottomTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:bottom_sheet_layout="@layout/layout_home_bottom_sheet" />
 </FrameLayout>
