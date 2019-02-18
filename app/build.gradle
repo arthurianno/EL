@@ -169,6 +169,8 @@ dependencies {
     implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
     implementation commonDependencies.yandexMapKit
+    implementation commonDependencies.cardView
+    implementation commonDependencies.pulseView
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
