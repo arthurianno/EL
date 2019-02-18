@@ -112,7 +112,8 @@ class BottomSheetView @JvmOverloads constructor(
                 val animationEvent = it.second
 
                 if (bottomSheetEvent is BottomSheetEvent.State && animationEvent is AnimationEvent.End) {
-                    if (bottomSheetEvent.state == BottomSheetBehavior.STATE_HIDDEN || bottomSheetEvent.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    val state = bottomSheetEvent.state
+                    if (state == BottomSheetBehavior.STATE_HIDDEN || state == BottomSheetBehavior.STATE_COLLAPSED) {
                         visibility = View.INVISIBLE
                         visibilityChanges.accept(false)
                     }
