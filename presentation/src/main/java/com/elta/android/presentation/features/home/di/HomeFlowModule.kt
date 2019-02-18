@@ -6,9 +6,5 @@ import dagger.Module
 class HomeFlowModule {
 
     @Module
-    interface Declarations {
-        // Place @Binds here
-    }
-
-    // Place @Provides here
+    interface Declarations
 }
