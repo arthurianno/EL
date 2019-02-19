@@ -8,8 +8,7 @@
         android:id="@+id/containerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"
-        android:background="@color/color_background_connected" />
+        android:layout_marginBottom="56dp"/>
 
     <pl.bclogic.pulsator4droid.library.PulsatorLayout
         android:id="@+id/homePulseView"
