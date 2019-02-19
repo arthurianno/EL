@@ -6,7 +6,8 @@ import android.support.v4.app.Fragment
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
-import com.elta.android.presentation.core.navigation.FixedNavigator
+import com.elta.android.presentation.core.navigation.AppNavigator
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
@@ -24,7 +25,6 @@ import dagger.android.support.HasSupportFragmentInjector
 import me.dmdev.rxpm.base.PmSupportActivity
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
@@ -44,13 +44,13 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
     lateinit var navigatorHolder: NavigatorHolder
 
     @Inject
-    override lateinit var router: Router
+    override lateinit var router: FlowRouter
 
     protected abstract val screenLayout: Int
 
     protected abstract val classToken: Class<T>
 
-    protected open val navigator: Navigator = FixedNavigator(this)
+    protected open val navigator: Navigator = AppNavigator(this)
 
     private val currentFragment: BaseFragment<*>?
         get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>

@@ -17,7 +17,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.skipWhileInProgress
-import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -25,7 +24,7 @@ abstract class BasePm(
     protected val services: ServiceFacade
 ) : PresentationModel() {
 
-    lateinit var router: Router
+    lateinit var router: FlowRouter
 
     val progressState = State(false)
     val progressDialogState = State(false)
@@ -48,7 +47,6 @@ abstract class BasePm(
     internal val errorParser = services.errorParser
 
     protected val errorHandler: ErrorHandler = errorHandler()
-    internal val flowRouter: FlowRouter? by lazy { router as? FlowRouter }
 
     private val networkControl by lazy { networkControl(network) }
 

@@ -10,6 +10,6 @@ class RegistrationFlowPm @Inject constructor(
 ) : BaseFlowPm(services) {
 
     override fun navigateToLaunchScreen() {
-        flowRouter?.newRootScreen(Screens.RegistrationMain)
+        router.newRootScreen(Screens.RegistrationMain)
     }
 }

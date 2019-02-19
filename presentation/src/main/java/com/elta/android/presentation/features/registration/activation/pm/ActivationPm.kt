@@ -53,7 +53,7 @@ class ActivationPm @Inject constructor(
 
     private fun handleEmailConfirmed(isConfirmed: Boolean) {
         when (isConfirmed) {
-            true -> flowRouter?.newRootFlow(Screens.OnBoardingFlow)
+            true -> router.newRootFlow(Screens.OnBoardingFlow)
             else -> showSnackBar(
                 SnackBarMessageData.SimpleTextMessage(
                     resources.getString(R.string.error_verify_your_email)
