@@ -44,7 +44,7 @@
 
     </FrameLayout>
 
-    <com.elta.android.presentation.widgets.BottomSheetView
+    <com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView
         android:id="@+id/homeBottomSheetView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -24,9 +24,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         initBottomSheetItemsView()
         homeBottomNavigationView.select(R.id.mainMenuItemView)
         homePulseView.start()
-        homeBottomSheetView.visibilityChanges().bindTo { visible ->
-            homeActionView.isSelected = visible
-        }
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
                 homeBottomSheetView.show()
@@ -39,7 +36,12 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
-        pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
+        pm.closeBottomSheetCommand.bindTo {
+            bottomSheetItemsView.postDelayed({ homeBottomSheetView.hide() }, HIDE_DELAY)
+        }
+        homeBottomSheetView.visibilityChanges().bindTo { visible ->
+            homeActionView.isSelected = visible
+        }
     }
 
     override fun handleBack() {
@@ -54,6 +56,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     }
 
     companion object {
+        private const val HIDE_DELAY = 200L
         fun newInstance() = HomeFlowFragment()
     }
 }
