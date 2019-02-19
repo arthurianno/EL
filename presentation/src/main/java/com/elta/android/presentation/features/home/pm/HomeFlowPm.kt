@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.home.pm
 
 import com.elta.android.domain.features.events.model.UserEvent
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -26,7 +27,8 @@ class HomeFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        // TODO here should be called router.newTabs
+        router.newTabs(arrayOf(Screens.MainTab))
+        router.navigateToTab(Screens.MainTab)
     }
 
     private fun addEventItems() {
