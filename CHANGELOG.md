@@ -1,3 +1,6 @@
+### Android_v0.5.0 ###
+- [ELTA-363] - Added empty home screen
+
 ### Android_v0.4.0 ###
 - [ELTA-285] - Added new credentials for Facebook
 
