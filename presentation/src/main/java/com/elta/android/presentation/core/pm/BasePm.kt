@@ -84,7 +84,7 @@ abstract class BasePm(
     }
 
     protected open fun handleError(error: Throwable) {
-        Timber.e(error)
+        Timber.tag(this::class.java.simpleName).e(error)
         errorHandler.handleError(error)
     }
 

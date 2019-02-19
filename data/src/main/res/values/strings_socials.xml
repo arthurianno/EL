@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="facebook_app_id">658847084530835</string>
-    <string name="fb_login_protocol_scheme">fb658847084530835</string>
+    <string name="facebook_app_id">388218928620956</string>
+    <string name="fb_login_protocol_scheme">fb388218928620956</string>
     <string name="OK_APP_ID">1275033600</string>
     <string name="OK_APP_KEY">CBAJHQPMEBABABABA</string>
     <string name="OK_REDIRECT_URL">okauth://ok1269730560</string>
