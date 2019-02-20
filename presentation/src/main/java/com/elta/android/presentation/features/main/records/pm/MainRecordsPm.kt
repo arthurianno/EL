@@ -5,13 +5,14 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
+import com.elta.android.presentation.utils.getGreetingText
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
-import com.elta.android.presentation.core.pm.widgets.stateControl
-import com.elta.android.presentation.utils.getGreetingText
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -26,6 +27,15 @@ class MainRecordsPm @Inject constructor(
         super.onCreate()
 
         items.consumer.accept(arrayListOf<ListItem>().apply {
+            add(
+                RecordsHeaderItem(
+                    2.5,
+                    1.2,
+                    RecordsHeaderItem.IndexDirection.UP,
+                    4.5,
+                    6.2
+                )
+            )
             (0..5).forEach { group ->
                 add(
                     RecordsGroupItem(

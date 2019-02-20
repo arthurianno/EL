@@ -33,7 +33,6 @@ class MarginItemDecoration2(
         val last = state.itemCount.minus(1)
         when (position) {
             0 -> {
-                outRect.top = marginStart
                 outRect.bottom = marginBetween
             }
             last -> {
