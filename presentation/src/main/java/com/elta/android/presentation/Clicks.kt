@@ -2,7 +2,7 @@ package com.elta.android.presentation
 
 import com.elta.android.domain.features.events.model.UserEvent
 import com.elta.android.presentation.core.bus.Click
-import com.elta.android.presentation.features.main.adapter.items.RecordItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 

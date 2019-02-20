@@ -29,6 +29,14 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_medicine" />
 
+        <View
+            android:id="@+id/recordLabelView"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/ic_record_label"
+            app:layout_constraintBottom_toBottomOf="@+id/recordIconView"
+            app:layout_constraintEnd_toEndOf="@+id/recordIconView" />
+
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/recordTitleView"
             style="@style/New.Body2.BlackBlue"

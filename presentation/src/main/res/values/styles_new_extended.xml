@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- HEADLINE-->
+    <style name="New.Headline5.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
 
     <!-- TITLE -->
 
