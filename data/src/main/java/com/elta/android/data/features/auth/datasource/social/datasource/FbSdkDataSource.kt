@@ -12,6 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.json.JSONException
 
+@Suppress("SwallowedException", "TooGenericExceptionCaught")
 class FbSdkDataSource(private val context: Context) : SocialNetworkDataSource {
 
     override fun getToken(): Observable<String> =

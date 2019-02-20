@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- HEADLINE-->
+    <style name="New.Headline5.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
+    <!-- TITLE -->
+
+    <!-- CAPTION -->
+    <style name="New.Caption1.ShadeBlack2">
+        <item name="android:textColor">@color/shade_black2</item>
+    </style>
+
+    <!-- BUTTON -->
+
+    <!-- OVERLINE -->
+
+    <!-- BODY -->
+    <style name="New.Body2.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
+    <style name="New.Body2.ShadeGreen">
+        <item name="android:textColor">@color/shade_g_green2_a</item>
+    </style>
+</resources>

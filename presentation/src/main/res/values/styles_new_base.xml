@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="New" />
+
+    <!-- HEADLINE-->
+    <style name="New.Headline1" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">62sp</item>
+    </style>
+
+    <style name="New.Headline2" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">42sp</item>
+    </style>
+
+    <style name="New.Headline3" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="New.Headline4" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="New.Headline5" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- TITLE -->
+    <style name="New.Title1" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="New.Title2" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- CAPTION -->
+    <style name="New.Caption1" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="New.Caption2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- BUTTON -->
+    <style name="New.Button2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+
+    <style name="New.Button3" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- OVERLINE -->
+    <style name="New.Overline" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <!-- BODY -->
+    <style name="New.Body2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>
