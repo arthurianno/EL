@@ -12,6 +12,4 @@ sealed class SalePointsConditions : Condition {
         val northEastLatitude: Double,
         val northEastLongitude: Double
     ) : SalePointsConditions()
-
-    object All : SalePointsConditions()
 }

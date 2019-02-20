@@ -6,7 +6,7 @@ interface Cache<T> {
 
     fun update(objects: List<T>)
 
-    fun delete(objects: List<T>)
+    fun delete(condition: Condition)
 
     fun get(condition: Condition): List<T>
 }

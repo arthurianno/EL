@@ -1,8 +1,9 @@
 package com.elta.android.data.features.diary.cache
 
 import com.elta.android.data.features.common.cache.Condition
+import java.util.Date
 
 sealed class EventsConditions : Condition {
 
-    object All : EventsConditions()
+    data class ByPeriod(val start: Date, val end: Date) : EventsConditions()
 }

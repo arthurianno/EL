@@ -1,6 +1,9 @@
 package com.elta.android.data.features.sale_points.cache
 
+import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.cache.Condition
+import com.elta.android.data.features.common.cache.IllegalDeleteConditionError
+import com.elta.android.data.features.common.cache.IllegalGetConditionError
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.BoxStore
@@ -24,13 +27,17 @@ class DbSalePointsCache @Inject constructor(
         box.put(objects)
     }
 
-    override fun delete(objects: List<SalePointCacheDto>) {
-        box.remove(objects)
+    override fun delete(condition: Condition) {
+        when (condition) {
+            is CommonConditions.All -> box.removeAll()
+            is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
+            else -> throw IllegalDeleteConditionError(condition)
+        }
     }
 
-    override fun get(condition: Condition): List<SalePointCacheDto> {
-        return when (condition) {
-            is SalePointsConditions.All -> box.all
+    override fun get(condition: Condition): List<SalePointCacheDto> =
+        when (condition) {
+            is CommonConditions.All -> box.all
             is SalePointsConditions.Bounds -> getAllInBounds(
                 southWestLatitude = condition.southWestLatitude,
                 southWestLongitude = condition.southWestLongitude,
@@ -38,9 +45,8 @@ class DbSalePointsCache @Inject constructor(
                 northEastLongitude = condition.northEastLongitude
             )
             is SalePointsConditions.Query -> getAllByQuery(condition.query)
-            else -> throw IllegalArgumentException("Passed condition $condition not supported.")
+            else -> throw IllegalGetConditionError(condition)
         }
-    }
 
     @Suppress("LongMethod")
     private fun getAllInBounds(

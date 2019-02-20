@@ -1,9 +1,11 @@
 package com.elta.android.data.di
 
 import android.content.Context
+import com.elta.android.data.features.MyObjectBox
+import com.elta.android.data.features.diary.cache.DbEventsCache
+import com.elta.android.data.features.diary.cache.EventsCache
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
-import com.elta.android.data.features.sale_points.cache.dto.MyObjectBox
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -18,6 +20,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindSalePointsCache(cache: DbSalePointsCache): SalePointsCache
+
+        @Binds
+        @Singleton
+        fun bindEventsCache(cache: DbEventsCache): EventsCache
     }
 
     @Provides

@@ -6,6 +6,9 @@ import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
+import com.elta.android.data.features.diary.datasource.DiaryCachedDataSource
+import com.elta.android.data.features.diary.datasource.DiaryDataSource
+import com.elta.android.data.features.diary.datasource.DiaryRemoteDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
@@ -40,4 +43,14 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindSalePointsCacheDataSource(source: SalePointsCachedDataSource): SalePointsDataSource
+
+    @Remote
+    @Binds
+    @Singleton
+    abstract fun bindDiaryRemoteDataSource(source: DiaryRemoteDataSource): DiaryDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindDiaryCachedDataSource(source: DiaryCachedDataSource): DiaryDataSource
 }

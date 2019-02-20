@@ -1,15 +1,13 @@
 package com.elta.android.data.di
 
 import android.content.Context
+import com.elta.android.data.core.network.GsonFactory
 import com.elta.android.data.core.network.OkHttpClientFactory
 import com.elta.android.data.core.network.RetrofitFactory
 import com.elta.android.data.core.qualifires.Interceptors
 import com.elta.android.data.core.qualifires.NetworkInterceptors
 import com.elta.android.data.core.qualifires.ServerUrl
-import com.elta.android.data.features.diary.api.deserializer.EventDtoDeserializer
-import com.elta.android.data.features.diary.dto.event.EventDto
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import okhttp3.Authenticator
@@ -35,10 +33,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun gson(): Gson = GsonBuilder()
-        .setLenient()
-        .registerTypeAdapter(EventDto::class.java, EventDtoDeserializer())
-        .create()
+    fun gson(): Gson = GsonFactory.create()
 
     @Provides
     @Singleton

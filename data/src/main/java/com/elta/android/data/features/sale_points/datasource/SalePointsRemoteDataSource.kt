@@ -4,12 +4,12 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
+import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
-import com.elta.android.data.features.sale_points.storage.SyncStorage
 import com.nullgr.core.date.toTimestamp
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Observable
@@ -25,8 +25,8 @@ class SalePointsRemoteDataSource @Inject constructor(
 ) : SalePointsDataSource {
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
-        getSalePointsByPage(PAGE, PAGE_SIZE).checkNetwork(checker)
-            .doOnNext { syncStorage.lastSync = Date().toTimestamp() }
+        getDataByPage(PAGE, PAGE_SIZE).checkNetwork(checker)
+            .doOnNext { syncStorage.lastSalePointsSync = Date().toTimestamp() }
             .map(SalePointsDto::points)
             .doOnNext { points -> updateCache(points, salePointsCache, toCacheMapper) }
 
@@ -39,21 +39,21 @@ class SalePointsRemoteDataSource @Inject constructor(
 
     override fun searchSalePoints(query: String): Observable<List<SalePointDto>> = getSalePoints()
 
-    private fun getSalePointsByPage(page: Int, size: Int): Observable<SalePointsDto> =
-        api.getSalePoints(syncStorage.lastSync, page, size)
-            .switchMap { points ->
-                val meta = points.meta
+    private fun getDataByPage(page: Int, size: Int): Observable<SalePointsDto> =
+        api.getSalePoints(syncStorage.lastSalePointsSync, page, size)
+            .switchMap { data ->
+                val meta = data.meta
                 val nextPage = meta.currentPage + 1
                 when (meta.isTheLastPage()) {
-                    true -> Observable.just(points)
-                    else -> Observable.just(points).concatWith(getSalePointsByPage(nextPage, meta.pageSize))
+                    true -> Observable.just(data)
+                    else -> Observable.just(data).concatWith(getDataByPage(nextPage, meta.pageSize))
                 }
             }
-            .collectInto(mutableListOf<SalePointsDto>()) { list, points -> list.add(points) }
+            .collectInto(mutableListOf<SalePointsDto>()) { list, data -> list.add(data) }
             .map { list ->
-                val allPoints = list.map { it.points }.flatten()
+                val allData = list.map { it.points }.flatten()
                 val lastMeta = list.last().meta
-                SalePointsDto(allPoints, lastMeta)
+                SalePointsDto(allData, lastMeta)
             }
             .toObservable()
 

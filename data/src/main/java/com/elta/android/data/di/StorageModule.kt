@@ -1,7 +1,7 @@
 package com.elta.android.data.di
 
-import com.elta.android.data.features.sale_points.storage.LocalSyncStorage
-import com.elta.android.data.features.sale_points.storage.SyncStorage
+import com.elta.android.data.features.common.storage.LocalSyncStorage
+import com.elta.android.data.features.common.storage.SyncStorage
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
