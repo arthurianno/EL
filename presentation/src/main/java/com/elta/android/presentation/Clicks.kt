@@ -12,5 +12,5 @@ sealed class Clicks : Click {
     data class ShopMakeCall(val item: ShopItem) : Clicks()
     data class SearchResult(val item: SearchResultItem) : Clicks()
     data class AddUserEvent(val userEvent: UserEvent) : Clicks()
-    data class RecordClicked(val item: RecordItem): Clicks()
+    data class RecordClicked(val item: RecordItem) : Clicks()
 }
