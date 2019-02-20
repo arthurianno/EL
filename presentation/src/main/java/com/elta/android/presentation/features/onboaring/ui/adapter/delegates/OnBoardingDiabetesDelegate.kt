@@ -8,9 +8,9 @@ import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.utils.toString
-import com.elta.android.presentation.utils.withAdapterPosition
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder

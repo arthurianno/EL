@@ -16,9 +16,19 @@ fun UserEvent.toName(): Int =
 @DrawableRes
 fun UserEvent.toIcon(): Int =
     when (this) {
-        UserEvent.XE -> R.drawable.ic_xe
-        UserEvent.INSULIN -> R.drawable.ic_ins
-        UserEvent.MEDICINE -> R.drawable.ic_medicine
-        UserEvent.WEIGHT -> R.drawable.ic_weight
-        UserEvent.ACTIVITY -> R.drawable.ic_active
+        UserEvent.XE -> R.drawable.ic_event_xe
+        UserEvent.INSULIN -> R.drawable.ic_event_ins
+        UserEvent.MEDICINE -> R.drawable.ic_event_medicine
+        UserEvent.WEIGHT -> R.drawable.ic_event_weight
+        UserEvent.ACTIVITY -> R.drawable.ic_event_active
+    }
+
+@DrawableRes
+fun UserEvent.toIconWithBg(): Int =
+    when (this) {
+        UserEvent.XE -> R.drawable.ic_event_xe_with_bg
+        UserEvent.INSULIN -> R.drawable.ic_event_ins_with_bg
+        UserEvent.MEDICINE -> R.drawable.ic_event_medicine_with_bg
+        UserEvent.WEIGHT -> R.drawable.ic_event_weight_with_bg
+        UserEvent.ACTIVITY -> R.drawable.ic_event_active_with_bg
     }

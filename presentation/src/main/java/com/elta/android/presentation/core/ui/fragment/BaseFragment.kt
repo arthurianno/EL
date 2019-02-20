@@ -37,6 +37,8 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider?
 
+    protected open val backgroundColor: Int? = R.color.color_window_background
+
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
         ((parentFragment ?: activity) as RouterProvider).router as FlowRouter
@@ -61,6 +63,11 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         emptyStateView = view.findViewById<View>(R.id.emptyStateView) as? StateView
         progressView = view.findViewById(R.id.progressView)
         homeButtonView = view.findViewById(R.id.homeButtonView)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        backgroundColor?.let { activity?.window?.setBackgroundDrawableResource(it) }
     }
 
     override fun onStart() {

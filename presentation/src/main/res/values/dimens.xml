@@ -48,4 +48,6 @@
 
     <dimen name="card_corner">8dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
+
+    <dimen name="home_between_margin">10dp</dimen>
 </resources>
