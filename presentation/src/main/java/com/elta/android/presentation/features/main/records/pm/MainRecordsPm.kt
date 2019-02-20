@@ -7,7 +7,7 @@ import com.elta.android.presentation.features.main.records.ui.adapter.items.Reco
 import com.nullgr.core.adapter.items.ListItem
 import javax.inject.Inject
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "ForEachOnRange")
 class MainRecordsPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
