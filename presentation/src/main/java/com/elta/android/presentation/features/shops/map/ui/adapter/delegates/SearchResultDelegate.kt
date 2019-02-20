@@ -6,8 +6,8 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.bindCardCorners
+import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
-import com.elta.android.presentation.utils.withAdapterPosition
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
