@@ -8,4 +8,10 @@
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.elta.android.presentation.widgets.MainScreenStateView
+        android:id="@+id/mainScreenStateView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_gradient_green" />
 </FrameLayout>
