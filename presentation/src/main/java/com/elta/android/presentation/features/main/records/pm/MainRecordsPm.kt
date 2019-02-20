@@ -36,11 +36,13 @@ class MainRecordsPm @Inject constructor(
                 )
             }
         })
-    }
 
+        bindMainScreenState()
+    }
 
     private fun bindMainScreenState() {
         mainScreenState.dataState.consumer.accept(makeNewDayLaunchState())
+        mainScreenState.visibilityState.consumer.accept(false)
     }
 
     private fun makeFirsLaunchState() =
