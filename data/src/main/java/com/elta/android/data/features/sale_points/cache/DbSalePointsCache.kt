@@ -1,11 +1,11 @@
 package com.elta.android.data.features.sale_points.cache
 
+import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.query
 import io.objectbox.query.QueryBuilder
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,17 +16,16 @@ class DbSalePointsCache @Inject constructor(
 
     private val box = boxStore.boxFor(SalePointCacheDto::class.java)
 
-    override fun add(points: List<SalePointCacheDto>) {
-        Timber.d("add ${Thread.currentThread().name}")
-        box.put(points)
+    override fun add(objects: List<SalePointCacheDto>) {
+        box.put(objects)
     }
 
-    override fun update(points: List<SalePointCacheDto>) {
-        box.put(points)
+    override fun update(objects: List<SalePointCacheDto>) {
+        box.put(objects)
     }
 
-    override fun delete(points: List<SalePointCacheDto>) {
-        box.remove(points)
+    override fun delete(objects: List<SalePointCacheDto>) {
+        box.remove(objects)
     }
 
     override fun get(condition: Condition): List<SalePointCacheDto> {

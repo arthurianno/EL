@@ -1,5 +1,7 @@
 package com.elta.android.data.features.sale_points.dto
 
+import com.elta.android.data.features.common.dto.DataWithStateDto
+import com.elta.android.data.features.common.dto.StateDto
 import com.google.gson.annotations.SerializedName
 
 data class SalePointDto(
@@ -12,5 +14,5 @@ data class SalePointDto(
     @SerializedName("phone") val phone: String?,
     @SerializedName("coordinates") val coordinates: CoordinatesDto,
     @SerializedName("timeStamp") val timeStamp: Int,
-    @SerializedName("modifiedState") val modifiedState: StateDto
-)
+    @SerializedName("state") override val state: StateDto
+) : DataWithStateDto

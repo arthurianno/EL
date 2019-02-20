@@ -1,9 +1,9 @@
-package com.elta.android.data.features.sale_points.dto
+package com.elta.android.data.features.diary.dto.event
 
 import com.elta.android.data.features.common.dto.MetaDto
 import com.google.gson.annotations.SerializedName
 
-data class SalePointsDto(
-    @SerializedName("data") val points: List<SalePointDto>,
+data class EventsDto(
+    @SerializedName("events.json") val events: List<EventDto>,
     @SerializedName("meta") val meta: MetaDto
 )

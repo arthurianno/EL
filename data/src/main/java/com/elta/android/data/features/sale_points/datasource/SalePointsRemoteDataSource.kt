@@ -2,13 +2,13 @@ package com.elta.android.data.features.sale_points.datasource
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.common.checkNetwork
+import com.elta.android.data.features.common.cache.updateCache
+import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
-import com.elta.android.data.features.sale_points.dto.MetaDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
-import com.elta.android.data.features.sale_points.dto.StateDto
 import com.elta.android.data.features.sale_points.storage.SyncStorage
 import com.nullgr.core.date.toTimestamp
 import com.nullgr.core.hardware.NetworkChecker
@@ -28,7 +28,7 @@ class SalePointsRemoteDataSource @Inject constructor(
         getSalePointsByPage(PAGE, PAGE_SIZE).checkNetwork(checker)
             .doOnNext { syncStorage.lastSync = Date().toTimestamp() }
             .map(SalePointsDto::points)
-            .doOnNext(::updateCache)
+            .doOnNext { points -> updateCache(points, salePointsCache, toCacheMapper) }
 
     override fun getSalePoints(
         southWestLatitude: Double,
@@ -56,28 +56,6 @@ class SalePointsRemoteDataSource @Inject constructor(
                 SalePointsDto(allPoints, lastMeta)
             }
             .toObservable()
-
-    private fun MetaDto.isTheLastPage(): Boolean = currentPage * pageSize >= totalItems
-
-    private fun updateCache(points: List<SalePointDto>) {
-        val states = mutableMapOf<StateDto, MutableList<SalePointDto>>()
-        points.forEach { point ->
-            var state = states[point.modifiedState]
-            if (state == null) {
-                state = mutableListOf()
-                states[point.modifiedState] = state
-            }
-            state.add(point)
-        }
-        states.forEach { entry ->
-            val pointsForCache = toCacheMapper.mapFromObjects(entry.value)
-            when (entry.key) {
-                StateDto.CREATED -> salePointsCache.add(pointsForCache)
-                StateDto.DELETED -> salePointsCache.delete(pointsForCache)
-                StateDto.UPDATED -> salePointsCache.update(pointsForCache)
-            }
-        }
-    }
 
     private companion object {
         const val PAGE = 1

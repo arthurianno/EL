@@ -21,7 +21,7 @@ class SalePointToCacheMapper @Inject constructor() : Mapper<SalePointDto, SalePo
                 latitude = coordinates.latitude,
                 longitude = coordinates.longitude,
                 timeStamp = timeStamp,
-                modifiedState = modifiedState.name
+                modifiedState = state.name
             )
         }
 }

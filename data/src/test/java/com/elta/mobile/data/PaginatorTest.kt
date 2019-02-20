@@ -1,6 +1,6 @@
 package com.elta.mobile.data
 
-import com.elta.android.data.features.sale_points.api.getPage
+import com.elta.android.data.features.common.getPage
 import org.junit.Test
 
 class PaginatorTest {

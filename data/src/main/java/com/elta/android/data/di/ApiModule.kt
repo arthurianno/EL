@@ -2,10 +2,13 @@ package com.elta.android.data.di
 
 import android.content.Context
 import com.elta.android.common.di.qualifires.Token
+import com.elta.android.data.di.ApiModule.ApiConfig.USE_MOCKED_DIARY_API
 import com.elta.android.data.di.ApiModule.ApiConfig.USE_MOCKED_SALE_POINTS_API
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
+import com.elta.android.data.features.diary.api.DiaryApi
+import com.elta.android.data.features.diary.api.MockedDiaryApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.user.api.SettingsApi
@@ -53,7 +56,19 @@ class ApiModule {
             else -> retrofit.create<SalePointsApi>(SalePointsApi::class.java)
         }
 
+    @Provides
+    @Singleton
+    fun provideDiaryApi(
+        context: Context,
+        retrofit: Retrofit
+    ): DiaryApi =
+        when (USE_MOCKED_DIARY_API) {
+            true -> MockedDiaryApi(context)
+            else -> retrofit.create<DiaryApi>(DiaryApi::class.java)
+        }
+
     object ApiConfig {
         const val USE_MOCKED_SALE_POINTS_API = false
+        const val USE_MOCKED_DIARY_API = true
     }
 }
