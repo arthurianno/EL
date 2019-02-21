@@ -29,7 +29,7 @@ class MainRecordsPm @Inject constructor(
         items.consumer.accept(arrayListOf<ListItem>().apply {
             add(
                 RecordsHeaderItem(
-                    2.5,
+                    null,
                     1.2,
                     RecordsHeaderItem.IndexDirection.UP,
                     4.5,

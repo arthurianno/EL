@@ -22,9 +22,9 @@ data class RecordsHeaderItem(
     }
 
     private fun isGlucoseChanged(other: RecordsHeaderItem): Boolean =
-        glucoseLevel != other.glucoseLevel
-            || glucoseLevelIndex != other.glucoseLevelIndex
-            || glucoseLevelIndexDirection != other.glucoseLevelIndexDirection
+        glucoseLevel != other.glucoseLevel ||
+            glucoseLevelIndex != other.glucoseLevelIndex ||
+            glucoseLevelIndexDirection != other.glucoseLevelIndexDirection
 
     enum class Payload {
         GLUCOSE_LEVEL_CHANGED,
@@ -37,7 +37,7 @@ data class RecordsHeaderItem(
     }
 }
 
-val EMPTY_RECORDS_HEADER_ITEM = RecordsHeaderItem(
+val emptyRecordsHeaderItem = RecordsHeaderItem(
     glucoseLevel = null,
     glucoseLevelIndex = null,
     glucoseLevelIndexDirection = null,

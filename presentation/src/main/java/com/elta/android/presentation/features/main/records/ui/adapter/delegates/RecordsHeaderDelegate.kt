@@ -2,18 +2,19 @@ package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
 import android.support.v7.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.features.main.records.models.GlucoseRange
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.ui.extensions.toggleView
-import kotlinx.android.synthetic.main.item_main_records_header.*
+import kotlinx.android.synthetic.main.item_records_header.*
 import java.text.DecimalFormat
 
 class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : AdapterDelegate() {
 
-    override val layoutResource: Int = R.layout.item_main_records_header
+    override val layoutResource: Int = R.layout.item_records_header
     override val itemType: Any = RecordsHeaderItem::class
 
     private val numberFormat by lazy { DecimalFormat("#.#") }
@@ -44,6 +45,8 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
             item.glucoseLevelIndexDirection?.let {
                 glucoseLevelChangeIndexIconView.setImageResource(it.toIcon())
             }
+
+            itemView.setBackgroundResource(item.glucoseLevel.glucoseToBackground())
         }
     }
 
@@ -65,6 +68,13 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
         when {
             this != null -> resourceProvider.getString(R.string.main_records_mask_value, this.format())
             else -> resourceProvider.getString(R.string.main_records_empty_value)
+        }
+
+    private fun Double?.glucoseToBackground(): Int =
+        when {
+            this == null || this in GlucoseRange.MEDIUM -> R.drawable.bg_gradient_green
+            this in GlucoseRange.HIGH -> R.drawable.bg_gradient_red
+            else -> R.drawable.bg_gradient_blue
         }
 
     private fun RecordsHeaderItem.IndexDirection.toIcon(): Int =
