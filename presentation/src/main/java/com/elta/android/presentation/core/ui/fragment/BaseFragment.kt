@@ -72,10 +72,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     override fun onStart() {
         super.onStart()
-        statusBarConfigProvider?.let {
-            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
-            activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
-        }
+        initStatusBarConfig()
     }
 
     @CallSuper
@@ -95,6 +92,17 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     override fun handleBack() {
         router.exit()
+    }
+
+    open fun initStatusBarConfig() {
+        statusBarConfigProvider.applyStatusBarConfig()
+    }
+
+    protected fun StatusBarConfigProvider?.applyStatusBarConfig() {
+        this?.let {
+            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
+            activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
+        }
     }
 
     private fun showSnackbar(data: SnackBarData) {

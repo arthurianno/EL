@@ -162,4 +162,10 @@
     <string name="main_records_new_day_title_evening">Добрый вечер</string>
     <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте синхронизироваться с глюкометроми внести первую запись в свой дневник</string>
 
+    <string name="main_records_header_title_bread">Хлебных ед</string>
+    <string name="main_records_header_title_glucose">Уровень глюкозы</string>
+    <string name="main_records_header_title_insulin">Инсулина</string>
+
+    <string name="main_records_mask_value">%s ед</string>
+    <string name="main_records_empty_value">—</string>
 </resources>
