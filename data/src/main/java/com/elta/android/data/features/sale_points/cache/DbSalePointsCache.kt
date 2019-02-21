@@ -7,6 +7,7 @@ import com.elta.android.data.features.common.cache.IllegalGetConditionError
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.BoxStore
+import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.query
 import io.objectbox.query.QueryBuilder
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class DbSalePointsCache @Inject constructor(
     boxStore: BoxStore
 ) : SalePointsCache {
 
-    private val box = boxStore.boxFor(SalePointCacheDto::class.java)
+    private val box = boxStore.boxFor<SalePointCacheDto>()
 
     override fun add(objects: List<SalePointCacheDto>) {
         box.put(objects)

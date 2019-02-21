@@ -39,7 +39,10 @@ class SocialDataRepository @Inject constructor(
             .switchMapSingle { token ->
                 source.loginSocialNetwork(network.name, token)
                     .applyScheduler(schedulersFacade)
-                    .doOnSuccess { response -> saveTokens(response.tokens) }
+                    .doOnSuccess { response ->
+                        saveTokens(response.tokens)
+
+                    }
             }
             .map(LoginDto::isEmailConfirmed)
             .single(false)

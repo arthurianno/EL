@@ -5,3 +5,5 @@ data class IllegalGetConditionError(val condition: Condition)
 
 data class IllegalDeleteConditionError(val condition: Condition)
     : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} not supported for delete operation.")
+
+object AccessDeniedError : RuntimeException("Current user == null")
