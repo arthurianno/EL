@@ -1,6 +1,6 @@
-package com.elta.android.data.features.diary.dto
+package com.elta.android.data.features.diary.dto.tag
 
-enum class TagTypeDto {
+enum class TagImageDto {
     BREAKFAST,
     LUNCH,
     SNACK,

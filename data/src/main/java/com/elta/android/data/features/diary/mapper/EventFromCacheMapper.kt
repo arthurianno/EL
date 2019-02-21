@@ -3,12 +3,12 @@ package com.elta.android.data.features.diary.mapper
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.cache.dto.EventCachedDto
-import com.elta.android.data.features.diary.dto.ActivityTypeDto
-import com.elta.android.data.features.diary.dto.EventTypeDto
-import com.elta.android.data.features.diary.dto.InsulinTypeDto
-import com.elta.android.data.features.diary.dto.MealTagDto
+import com.elta.android.data.features.diary.dto.event.ActivityTypeDto
 import com.elta.android.data.features.diary.dto.event.EventDataDto
 import com.elta.android.data.features.diary.dto.event.EventDto
+import com.elta.android.data.features.diary.dto.event.EventTypeDto
+import com.elta.android.data.features.diary.dto.event.InsulinTypeDto
+import com.elta.android.data.features.diary.dto.event.MealTagDto
 import com.nullgr.core.date.CommonFormats.FORMAT_STANDARD_DATE_FULL_MILLIS_UTC
 import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.date.toTimestamp

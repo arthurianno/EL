@@ -4,9 +4,13 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
 import com.elta.android.data.features.diary.cache.dto.EventCachedDto
+import com.elta.android.data.features.diary.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.dto.event.EventDto
+import com.elta.android.data.features.diary.dto.tag.TagDto
 import com.elta.android.data.features.diary.mapper.EventFromCacheMapper
 import com.elta.android.data.features.diary.mapper.EventToCacheMapper
+import com.elta.android.data.features.diary.mapper.TagFromCacheMapper
+import com.elta.android.data.features.diary.mapper.TagToCacheMapper
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.CoordinatesDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
@@ -58,4 +62,14 @@ abstract class MappersModule {
     abstract fun bindEventFromCacheMapper(
         mapper: EventFromCacheMapper
     ): Mapper<EventCachedDto, EventDto>
+
+    @Binds
+    abstract fun bindTagToCacheMapper(
+        mapper: TagToCacheMapper
+    ): Mapper<TagDto, TagCachedDto>
+
+    @Binds
+    abstract fun bindTagFromCacheMapper(
+        mapper: TagFromCacheMapper
+    ): Mapper<TagCachedDto, TagDto>
 }

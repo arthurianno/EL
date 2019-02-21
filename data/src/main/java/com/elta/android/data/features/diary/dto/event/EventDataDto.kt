@@ -1,9 +1,5 @@
 package com.elta.android.data.features.diary.dto.event
 
-import com.elta.android.data.features.diary.dto.ActivityTypeDto
-import com.elta.android.data.features.diary.dto.EventTypeDto
-import com.elta.android.data.features.diary.dto.InsulinTypeDto
-import com.elta.android.data.features.diary.dto.MealTagDto
 import com.google.gson.annotations.SerializedName
 
 data class EventDataDto(

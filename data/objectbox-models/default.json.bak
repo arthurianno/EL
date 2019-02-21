@@ -66,7 +66,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "15:8865794857143658417",
+      "lastPropertyId": "16:4534211085864672993",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -128,12 +128,52 @@
         {
           "id": "15:8865794857143658417",
           "name": "state"
+        },
+        {
+          "id": "16:4534211085864672993",
+          "name": "userId"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:7269490173938270184",
+      "lastPropertyId": "7:5946479875638262848",
+      "name": "TagCachedDto",
+      "properties": [
+        {
+          "id": "1:5348712621338611844",
+          "name": "id"
+        },
+        {
+          "id": "2:2158825089604613816",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:8469353903357674267",
+          "name": "userId"
+        },
+        {
+          "id": "4:8150391136256062536",
+          "name": "image"
+        },
+        {
+          "id": "5:2917272193991273202",
+          "name": "isReadOnly"
+        },
+        {
+          "id": "6:119621998202467244",
+          "name": "modificationTime"
+        },
+        {
+          "id": "7:5946479875638262848",
+          "name": "state"
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "2:5982963766031290345",
+  "lastEntityId": "3:7269490173938270184",
   "lastIndexId": "1:5049058603170790455",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

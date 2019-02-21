@@ -14,5 +14,5 @@ data class SalePointDto(
     @SerializedName("coordinates") val coordinates: CoordinatesDto,
     @SerializedName("timeStamp") val timeStamp: Int,
     @SerializedName("id") override val id: String,
-    @SerializedName("state") override val state: StateDto
+    @SerializedName("modifiedState") override val state: StateDto
 ) : DataWithStateDto

@@ -10,6 +10,7 @@ import com.elta.android.data.features.diary.cache.EventsCache
 import com.elta.android.data.features.diary.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.dto.event.EventDto
 import com.elta.android.data.features.diary.dto.event.EventsDto
+import com.elta.android.data.features.diary.dto.tag.TagDto
 import com.nullgr.core.date.toTimestamp
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Observable
@@ -32,6 +33,8 @@ class DiaryRemoteDataSource @Inject constructor(
 
     override fun getEvents(start: Date, end: Date): Observable<List<EventDto>> =
         getEvents()
+
+    override fun getTags(): Observable<List<TagDto>> = Observable.empty()
 
     private fun getDataByPage(page: Int, size: Int): Observable<EventsDto> =
         api.getEvents(syncStorage.lastEventsSync, page, size)

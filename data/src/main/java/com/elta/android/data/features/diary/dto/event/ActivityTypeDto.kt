@@ -1,4 +1,4 @@
-package com.elta.android.data.features.diary.dto
+package com.elta.android.data.features.diary.dto.event
 
 enum class ActivityTypeDto {
     RUNNING,

@@ -3,7 +3,9 @@ package com.elta.android.data.di
 import android.content.Context
 import com.elta.android.data.features.MyObjectBox
 import com.elta.android.data.features.diary.cache.DbEventsCache
+import com.elta.android.data.features.diary.cache.DbTagsCache
 import com.elta.android.data.features.diary.cache.EventsCache
+import com.elta.android.data.features.diary.cache.TagsCache
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import dagger.Binds
@@ -24,6 +26,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindEventsCache(cache: DbEventsCache): EventsCache
+
+        @Binds
+        @Singleton
+        fun bindTagsCache(cache: DbTagsCache): TagsCache
     }
 
     @Provides
