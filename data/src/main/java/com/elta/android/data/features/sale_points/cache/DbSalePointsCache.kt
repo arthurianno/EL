@@ -1,11 +1,15 @@
 package com.elta.android.data.features.sale_points.cache
 
+import com.elta.android.data.features.common.cache.CommonConditions
+import com.elta.android.data.features.common.cache.Condition
+import com.elta.android.data.features.common.cache.IllegalDeleteConditionError
+import com.elta.android.data.features.common.cache.IllegalGetConditionError
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.BoxStore
+import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.query
 import io.objectbox.query.QueryBuilder
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,24 +18,27 @@ class DbSalePointsCache @Inject constructor(
     boxStore: BoxStore
 ) : SalePointsCache {
 
-    private val box = boxStore.boxFor(SalePointCacheDto::class.java)
+    private val box = boxStore.boxFor<SalePointCacheDto>()
 
-    override fun add(points: List<SalePointCacheDto>) {
-        Timber.d("add ${Thread.currentThread().name}")
-        box.put(points)
+    override fun add(objects: List<SalePointCacheDto>) {
+        box.put(objects)
     }
 
-    override fun update(points: List<SalePointCacheDto>) {
-        box.put(points)
+    override fun update(objects: List<SalePointCacheDto>) {
+        box.put(objects)
     }
 
-    override fun delete(points: List<SalePointCacheDto>) {
-        box.remove(points)
+    override fun delete(condition: Condition) {
+        when (condition) {
+            is CommonConditions.All -> box.removeAll()
+            is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
+            else -> throw IllegalDeleteConditionError(condition)
+        }
     }
 
-    override fun get(condition: Condition): List<SalePointCacheDto> {
-        return when (condition) {
-            is SalePointsConditions.All -> box.all
+    override fun get(condition: Condition): List<SalePointCacheDto> =
+        when (condition) {
+            is CommonConditions.All -> box.all
             is SalePointsConditions.Bounds -> getAllInBounds(
                 southWestLatitude = condition.southWestLatitude,
                 southWestLongitude = condition.southWestLongitude,
@@ -39,9 +46,8 @@ class DbSalePointsCache @Inject constructor(
                 northEastLongitude = condition.northEastLongitude
             )
             is SalePointsConditions.Query -> getAllByQuery(condition.query)
-            else -> throw IllegalArgumentException("Passed condition $condition not supported.")
+            else -> throw IllegalGetConditionError(condition)
         }
-    }
 
     @Suppress("LongMethod")
     private fun getAllInBounds(

@@ -1,5 +1,6 @@
 package com.elta.android.data.features.sale_points.dto
 
+import com.elta.android.data.features.common.dto.MetaDto
 import com.google.gson.annotations.SerializedName
 
 data class SalePointsDto(

@@ -1,4 +1,4 @@
-package com.elta.android.data.features.sale_points.dto
+package com.elta.android.data.features.common.dto
 
 import com.google.gson.annotations.SerializedName
 

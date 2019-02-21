@@ -6,12 +6,14 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
+import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
 
 class AuthDataRepository @Inject constructor(
+    private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
     private val source: AuthDataSource
 ) : AuthRepository {
@@ -25,7 +27,10 @@ class AuthDataRepository @Inject constructor(
 
     override fun login(email: String, password: String): Single<Boolean> =
         source.login(email, password)
-            .doOnSuccess { response -> saveTokens(response.tokens) }
+            .doOnSuccess { response ->
+                saveTokens(response.tokens)
+                userHolder.currentUser = email.hashCode().toLong()
+            }
             .map(LoginDto::isEmailConfirmed)
 
     override fun isEmailConfirmed(): Single<Boolean> =
