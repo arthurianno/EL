@@ -1,11 +1,11 @@
 package com.elta.android.data.di
 
 import android.content.Context
-import com.elta.android.data.features.MyObjectBox
-import com.elta.android.data.features.diary.cache.DbEventsCache
-import com.elta.android.data.features.diary.cache.DbTagsCache
-import com.elta.android.data.features.diary.cache.EventsCache
-import com.elta.android.data.features.diary.cache.TagsCache
+import com.elta.android.data.features.diary.MyObjectBox
+import com.elta.android.data.features.diary.events.cache.DbEventsCache
+import com.elta.android.data.features.diary.events.cache.EventsCache
+import com.elta.android.data.features.diary.tags.cache.DbTagsCache
+import com.elta.android.data.features.diary.tags.cache.TagsCache
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import dagger.Binds

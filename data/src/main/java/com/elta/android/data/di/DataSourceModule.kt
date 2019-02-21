@@ -6,9 +6,12 @@ import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
-import com.elta.android.data.features.diary.datasource.DiaryCachedDataSource
-import com.elta.android.data.features.diary.datasource.DiaryDataSource
-import com.elta.android.data.features.diary.datasource.DiaryRemoteDataSource
+import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
+import com.elta.android.data.features.diary.events.datasource.EventsDataSource
+import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSource
+import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
+import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
+import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
@@ -47,10 +50,20 @@ abstract class DataSourceModule {
     @Remote
     @Binds
     @Singleton
-    abstract fun bindDiaryRemoteDataSource(source: DiaryRemoteDataSource): DiaryDataSource
+    abstract fun bindEventsRemoteDataSource(source: EventsRemoteDataSource): EventsDataSource
 
     @Cache
     @Binds
     @Singleton
-    abstract fun bindDiaryCachedDataSource(source: DiaryCachedDataSource): DiaryDataSource
+    abstract fun bindEventsCachedDataSource(source: EventsCachedDataSource): EventsDataSource
+
+    @Remote
+    @Binds
+    @Singleton
+    abstract fun bindTagsRemoteDataSource(source: TagsRemoteDataSource): TagsDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindTagsCachedDataSource(source: TagsCachedDataSource): TagsDataSource
 }
