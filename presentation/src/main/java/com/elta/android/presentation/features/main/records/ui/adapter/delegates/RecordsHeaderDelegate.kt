@@ -21,43 +21,43 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
         val item = items[position] as RecordsHeaderItem
+        holder as ViewHolder
         bindGlucose(holder, item)
-        bindXe(holder, item)
+        bindBread(holder, item)
         bindInsulin(holder, item)
     }
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
         val item = items[position] as RecordsHeaderItem
+        holder as ViewHolder
         when (payload) {
             RecordsHeaderItem.Payload.GLUCOSE_LEVEL_CHANGED -> bindGlucose(holder, item)
-            RecordsHeaderItem.Payload.XE_LEVEL_CHANGED -> bindXe(holder, item)
+            RecordsHeaderItem.Payload.BREAD_LEVEL_CHANGED -> bindBread(holder, item)
             RecordsHeaderItem.Payload.INSULIN_CHANGED -> bindInsulin(holder, item)
         }
     }
 
-    private fun bindGlucose(holder: RecyclerView.ViewHolder, item: RecordsHeaderItem) {
-        with(holder as ViewHolder) {
+    private fun bindGlucose(holder: ViewHolder, item: RecordsHeaderItem) {
+        with(holder) {
             glucoseEmptyValueView.toggleView(item.glucoseLevel == null)
             glucoseValueContainerView.toggleView(item.glucoseLevel != null)
 
             item.glucoseLevel?.let { glucoseLevelValueView.text = it.format() }
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
-            item.glucoseLevelIndexDirection?.let {
-                glucoseLevelChangeIndexIconView.setImageResource(it.toIcon())
-            }
+            item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
 
             itemView.setBackgroundResource(item.glucoseLevel.glucoseToBackground())
         }
     }
 
-    private fun bindXe(holder: RecyclerView.ViewHolder, item: RecordsHeaderItem) {
-        with(holder as ViewHolder) {
-            xeValueView.text = item.xeLevel.formatAsValueOrEmpty()
+    private fun bindBread(holder: ViewHolder, item: RecordsHeaderItem) {
+        with(holder) {
+            breadValueView.text = item.breadLevel.formatAsValueOrEmpty()
         }
     }
 
-    private fun bindInsulin(holder: RecyclerView.ViewHolder, item: RecordsHeaderItem) {
-        with(holder as ViewHolder) {
+    private fun bindInsulin(holder: ViewHolder, item: RecordsHeaderItem) {
+        with(holder) {
             insulinValueView.text = item.insulinLevel.formatAsValueOrEmpty()
         }
     }
@@ -75,11 +75,5 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
             this == null || this in GlucoseRange.MEDIUM -> R.drawable.bg_gradient_green
             this in GlucoseRange.HIGH -> R.drawable.bg_gradient_red
             else -> R.drawable.bg_gradient_blue
-        }
-
-    private fun RecordsHeaderItem.IndexDirection.toIcon(): Int =
-        when (this) {
-            RecordsHeaderItem.IndexDirection.UP -> R.drawable.ic_change_index_up
-            else -> R.drawable.ic_change_index_down
         }
 }

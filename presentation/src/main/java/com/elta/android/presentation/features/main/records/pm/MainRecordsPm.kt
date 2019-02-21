@@ -31,7 +31,7 @@ class MainRecordsPm @Inject constructor(
                 RecordsHeaderItem(
                     null,
                     1.2,
-                    RecordsHeaderItem.IndexDirection.UP,
+                    R.drawable.ic_change_index_down,
                     4.5,
                     6.2
                 )

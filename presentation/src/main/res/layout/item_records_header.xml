@@ -81,18 +81,18 @@
         app:layout_constraintTop_toTopOf="@+id/glucoseLevelContainerView">
 
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/xeValueView"
+            android:id="@+id/breadValueView"
             style="@style/New.Headline5.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="6,5 XE" />
 
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/xeTitleView"
+            android:id="@+id/breadTitleView"
             style="@style/New.Caption2.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/main_records_header_title_xe" />
+            android:text="@string/main_records_header_title_bread" />
     </LinearLayout>
 
     <LinearLayout

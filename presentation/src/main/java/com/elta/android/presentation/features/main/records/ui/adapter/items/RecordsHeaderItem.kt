@@ -5,8 +5,8 @@ import com.nullgr.core.adapter.items.ListItem
 data class RecordsHeaderItem(
     val glucoseLevel: Double?,
     val glucoseLevelIndex: Double?,
-    val glucoseLevelIndexDirection: IndexDirection?,
-    val xeLevel: Double?,
+    val glucoseLevelIndexIcon: Int?,
+    val breadLevel: Double?,
     val insulinLevel: Double?
 ) : ListItem {
 
@@ -14,7 +14,7 @@ data class RecordsHeaderItem(
         if (other is RecordsHeaderItem) {
             return mutableSetOf<Payload>().apply {
                 if (isGlucoseChanged(other)) add(Payload.GLUCOSE_LEVEL_CHANGED)
-                if (xeLevel != other.xeLevel) add(Payload.XE_LEVEL_CHANGED)
+                if (breadLevel != other.breadLevel) add(Payload.BREAD_LEVEL_CHANGED)
                 if (insulinLevel != other.insulinLevel) add(Payload.INSULIN_CHANGED)
             }
         }
@@ -24,23 +24,19 @@ data class RecordsHeaderItem(
     private fun isGlucoseChanged(other: RecordsHeaderItem): Boolean =
         glucoseLevel != other.glucoseLevel ||
             glucoseLevelIndex != other.glucoseLevelIndex ||
-            glucoseLevelIndexDirection != other.glucoseLevelIndexDirection
+            glucoseLevelIndexIcon != other.glucoseLevelIndexIcon
 
     enum class Payload {
         GLUCOSE_LEVEL_CHANGED,
-        XE_LEVEL_CHANGED,
+        BREAD_LEVEL_CHANGED,
         INSULIN_CHANGED
-    }
-
-    enum class IndexDirection {
-        UP, DOWN
     }
 }
 
 val emptyRecordsHeaderItem = RecordsHeaderItem(
     glucoseLevel = null,
     glucoseLevelIndex = null,
-    glucoseLevelIndexDirection = null,
-    xeLevel = null,
+    glucoseLevelIndexIcon = null,
+    breadLevel = null,
     insulinLevel = null
 )
