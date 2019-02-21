@@ -41,7 +41,7 @@ class SocialDataRepository @Inject constructor(
                     .applyScheduler(schedulersFacade)
                     .doOnSuccess { response ->
                         saveTokens(response.tokens)
-
+                        // TODO: set current user
                     }
             }
             .map(LoginDto::isEmailConfirmed)

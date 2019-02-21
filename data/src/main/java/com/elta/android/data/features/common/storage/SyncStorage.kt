@@ -5,4 +5,6 @@ interface SyncStorage {
     var lastSalePointsSync: Long?
 
     var lastEventsSync: Long?
+
+    var lastTagsSync: Long?
 }

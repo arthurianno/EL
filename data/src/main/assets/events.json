@@ -7,7 +7,7 @@
       "kind": "Омлет"
     },
     "additionalTime": "2019-02-20T13:43:55.0947399+00:00",
-    "tag": "13576272-44c9-42a1-9751-d4c9d699e3a1",
+    "tag": "7322502e-22c6-412f-9438-da5247e165e8",
     "note": "Заметка",
     "timeStamp": 1549372140,
     "modifiedState": "CREATED"
@@ -40,7 +40,7 @@
       "duration": "03:05",
       "activityType": "FOOTBALL"
     },
-    "tag": "56a2ef84-273c-4843-927d-e0b6048b8dea",
+    "tag": "7322502e-22c6-412f-9438-da5247e165e8",
     "note": "Заметка об активности",
     "additionalTime": "2019-02-20T13:43:55.0948484+00:00",
     "timeStamp": 1549372140,
@@ -52,6 +52,7 @@
       "eventType": "WEIGHT",
       "value": 79
     },
+    "tag": "f7e26bb8-0666-486a-ac4f-de56f6be4616",
     "additionalTime": "2019-02-20T13:43:55.0948535+00:00",
     "timeStamp": 1549372140,
     "modifiedState": "UPDATED"
@@ -63,6 +64,7 @@
       "value": 3,
       "mealTagging": "BEFOREMEAL"
     },
+    "tag": "26e52187-946e-4b94-bca6-10773810d207",
     "additionalTime": "2019-02-20T13:43:55.0948597+00:00",
     "timeStamp": 1549372140,
     "modifiedState": "CREATED"

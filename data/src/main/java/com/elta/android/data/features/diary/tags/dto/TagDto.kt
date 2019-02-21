@@ -11,4 +11,4 @@ data class TagDto(
     @SerializedName("timeStamp") val modificationTime: Long?,
     @SerializedName("id") override val id: String,
     @SerializedName("modifiedState") override val state: StateDto
-): DataWithStateDto
+) : DataWithStateDto

@@ -41,7 +41,7 @@ class SalePointsRemoteDataSource @Inject constructor(
 
     private fun getDataByPage(page: Int, size: Int): Observable<SalePointsDto> =
         api.getSalePoints(syncStorage.lastSalePointsSync, page, size)
-            .switchMap { data ->
+            .concatMap { data ->
                 val meta = data.meta
                 val nextPage = meta.currentPage + 1
                 when (meta.isTheLastPage()) {

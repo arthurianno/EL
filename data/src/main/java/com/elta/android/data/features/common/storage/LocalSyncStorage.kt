@@ -21,6 +21,12 @@ class LocalSyncStorage @Inject constructor(
             pref[LAST_EVENTS_SYNC] = value
         }
 
+    override var lastTagsSync: Long?
+        get() = pref.getLongOrNull(LAST_TAGS_SYNC)
+        set(value) {
+            pref[LAST_TAGS_SYNC] = value
+        }
+
     private fun SharedPreferences.getLongOrNull(key: String): Long? {
         val value: Long? = this[key]
         if (value == null || value == -1L) {
@@ -29,9 +35,9 @@ class LocalSyncStorage @Inject constructor(
         return value
     }
 
-
     private companion object {
         const val LAST_SALE_POINTS_SYNC = "last_sale_points_sync"
         const val LAST_EVENTS_SYNC = "last_events_sync"
+        const val LAST_TAGS_SYNC = "last_tags_sync"
     }
 }
