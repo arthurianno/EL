@@ -25,7 +25,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                tools:src="@drawable/ic_event_medicine" />
+                tools:src="@drawable/ic_event_medicaments" />
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/groupNameView"

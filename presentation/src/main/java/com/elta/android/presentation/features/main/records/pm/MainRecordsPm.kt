@@ -46,7 +46,7 @@ class MainRecordsPm @Inject constructor(
                 add(
                     RecordsGroupItem(
                         id = group,
-                        icon = R.drawable.ic_event_medicine,
+                        icon = R.drawable.ic_event_medicaments,
                         name = "Name #$group",
                         items = arrayListOf<ListItem>().apply {
                             EventType.values().forEachIndexed { index, event ->

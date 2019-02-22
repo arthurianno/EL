@@ -6,9 +6,9 @@ import com.elta.android.presentation.R
 
 fun EventType.toName(): Int =
     when (this) {
-        EventType.BREAD -> R.string.event_type_xe
+        EventType.BREAD -> R.string.event_type_bread
         EventType.INSULIN -> R.string.event_type_insulin
-        EventType.MEDICAMENTS -> R.string.event_type_medicines
+        EventType.MEDICAMENTS -> R.string.event_type_medicaments
         EventType.WEIGHT -> R.string.event_type_weight
         EventType.ACTIVITY -> R.string.event_type_activity
         EventType.GLUCOSE -> R.string.event_type_glucose
@@ -17,21 +17,21 @@ fun EventType.toName(): Int =
 @DrawableRes
 fun EventType.toIcon(): Int =
     when (this) {
-        EventType.BREAD -> R.drawable.ic_event_xe
-        EventType.INSULIN -> R.drawable.ic_event_ins
-        EventType.MEDICAMENTS -> R.drawable.ic_event_medicine
+        EventType.BREAD -> R.drawable.ic_event_bread
+        EventType.INSULIN -> R.drawable.ic_event_insulin
+        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments
         EventType.WEIGHT -> R.drawable.ic_event_weight
-        EventType.ACTIVITY -> R.drawable.ic_event_active
-        EventType.GLUCOSE -> R.drawable.ic_event_ins
+        EventType.ACTIVITY -> R.drawable.ic_event_activity
+        EventType.GLUCOSE -> R.drawable.ic_event_glucose
     }
 
 @DrawableRes
 fun EventType.toIconWithBg(): Int =
     when (this) {
-        EventType.BREAD -> R.drawable.ic_event_xe_with_bg
-        EventType.INSULIN -> R.drawable.ic_event_ins_with_bg
-        EventType.MEDICAMENTS -> R.drawable.ic_event_medicine_with_bg
+        EventType.BREAD -> R.drawable.ic_event_bread_with_bg
+        EventType.INSULIN -> R.drawable.ic_event_insulin_with_bg
+        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments_with_bg
         EventType.WEIGHT -> R.drawable.ic_event_weight_with_bg
-        EventType.ACTIVITY -> R.drawable.ic_event_active_with_bg
-        EventType.GLUCOSE -> R.drawable.ic_event_ins_with_bg
+        EventType.ACTIVITY -> R.drawable.ic_event_activity_with_bg
+        EventType.GLUCOSE -> R.drawable.ic_event_insulin_with_bg
     }
