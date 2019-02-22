@@ -21,6 +21,7 @@ object EventTestFactory {
         Event(
             id = UUID.randomUUID().toString(),
             additionTime = Date(),
+            additionTimeString = "",
             tagId = tagId,
             note = "Test note",
             modificationTime = Date(),

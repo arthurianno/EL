@@ -25,10 +25,10 @@ class GlucoseLevelDirectionTest {
     }
 
     @Test
-    fun glucoseLevelDirection_Last_5_PreLast_Null_Stable() {
+    fun glucoseLevelDirection_Last_5_PreLast_Null_Up() {
         val last = EventTestFactory.create(type = EventType.GLUCOSE, value = 5.0)
         val direction = last.glucoseLevelDirection(null)
-        assert(direction == GlucoseLevelDirection.STABLE)
+        assert(direction == GlucoseLevelDirection.UP)
     }
 
     @Test

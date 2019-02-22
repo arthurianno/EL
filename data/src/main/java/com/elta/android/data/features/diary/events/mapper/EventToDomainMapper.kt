@@ -19,6 +19,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 id = id,
                 type = EventType.valueOf(data.type.name),
                 additionTime = additionTime.getDate(),
+                additionTimeString = additionTime,
                 tagId = tagId,
                 note = note,
                 modificationTime = modificationTime?.dateFromTimestamp(),

@@ -30,26 +30,26 @@ class DayPeriodTest {
         assert(period == DayPeriod.MORNING)
     }
 
-    // day
+    // afternoon
     @Test
-    fun getDayPeriod_12_00_00_Day() {
+    fun getDayPeriod_12_00_00_Afternoon() {
         val now = Date().atTimeOfDay(12, 0).time
         val period = getDayPeriod(now)
-        assert(period == DayPeriod.DAY)
+        assert(period == DayPeriod.AFTERNOON)
     }
 
     @Test
-    fun getDayPeriod_12_30_00_Day() {
+    fun getDayPeriod_12_30_00_Afternoon() {
         val now = Date().atTimeOfDay(12, 30).time
         val period = getDayPeriod(now)
-        assert(period == DayPeriod.DAY)
+        assert(period == DayPeriod.AFTERNOON)
     }
 
     @Test
-    fun getDayPeriod_17_59_59_Day() {
+    fun getDayPeriod_17_59_59_Afternoon() {
         val now = Date().atTimeOfDay(17, 59, 59).time
         val period = getDayPeriod(now)
-        assert(period == DayPeriod.DAY)
+        assert(period == DayPeriod.AFTERNOON)
     }
 
     // evening

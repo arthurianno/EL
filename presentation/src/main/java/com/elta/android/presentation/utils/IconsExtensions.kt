@@ -1,0 +1,126 @@
+package com.elta.android.presentation.utils
+
+import android.support.annotation.DrawableRes
+import com.elta.android.domain.features.diary.events.model.ActivityType
+import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.diary.tags.model.TagImage
+import com.elta.android.presentation.R
+import com.nullgr.core.resources.ResourceProvider
+
+fun EventType.toName(): Int =
+    when (this) {
+        EventType.BREAD -> R.string.event_type_bread
+        EventType.INSULIN -> R.string.event_type_insulin
+        EventType.MEDICAMENTS -> R.string.event_type_medicaments
+        EventType.WEIGHT -> R.string.event_type_weight
+        EventType.ACTIVITY -> R.string.event_type_activity
+        EventType.GLUCOSE -> R.string.event_type_glucose
+    }
+
+@DrawableRes
+fun EventType.toIcon(): Int =
+    when (this) {
+        EventType.BREAD -> R.drawable.ic_event_bread
+        EventType.INSULIN -> R.drawable.ic_event_insulin
+        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments
+        EventType.WEIGHT -> R.drawable.ic_event_weight
+        EventType.ACTIVITY -> R.drawable.ic_event_activity
+        EventType.GLUCOSE -> R.drawable.ic_event_glucose
+    }
+
+@DrawableRes
+fun EventType.toIconWithBg(): Int =
+    when (this) {
+        EventType.BREAD -> R.drawable.ic_event_bread_with_bg
+        EventType.INSULIN -> R.drawable.ic_event_insulin_with_bg
+        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments_with_bg
+        EventType.WEIGHT -> R.drawable.ic_event_weight_with_bg
+        EventType.ACTIVITY -> R.drawable.ic_event_activity_with_bg
+        EventType.GLUCOSE -> R.drawable.ic_event_glucose_with_bg
+    }
+
+@DrawableRes
+fun Tag?.toIcon(): Int =
+    when (this) {
+        null -> R.drawable.ic_tag_notag
+        else -> image.toIcon()
+    }
+
+fun Tag?.toName(resources: ResourceProvider): String =
+    when (this) {
+        null -> resources.getString(R.string.tag_name_no_tag)
+        else -> name
+    }
+
+@DrawableRes
+fun TagImage.toIcon(): Int =
+    when (this) {
+        TagImage.BREAKFAST -> R.drawable.ic_tag_breakfast
+        TagImage.LUNCH -> R.drawable.ic_tag_lunch
+        TagImage.SNACK -> R.drawable.ic_tag_snack
+        TagImage.DINNER -> R.drawable.ic_tag_dinner
+        TagImage.WORK -> R.drawable.ic_tag_work
+        TagImage.LEISURE -> R.drawable.ic_tag_leisure
+        TagImage.TRAINING -> R.drawable.ic_tag_training
+        TagImage.NIGHT -> R.drawable.ic_tag_night
+        TagImage.SPECIALEVENT -> R.drawable.ic_tag_specialevent
+    }
+
+fun InsulinType.toName(): Int =
+    when (this) {
+        InsulinType.ULTRASHORT -> R.string.insulin_type_ultrashort
+        InsulinType.SHORT -> R.string.insulin_type_short
+        InsulinType.INTERMIDIATE -> R.string.insulin_type_intermidiate
+        InsulinType.LONG -> R.string.insulin_type_long
+        InsulinType.ULTRALONG -> R.string.insulin_type_ultralong
+        InsulinType.MIXED -> R.string.insulin_type_mixed
+    }
+
+fun ActivityType.toName(): Int =
+    when (this) {
+        ActivityType.RUNNING -> R.string.activity_type_running
+        ActivityType.WALKING -> R.string.activity_type_walking
+        ActivityType.SWIMMING -> R.string.activity_type_swimming
+        ActivityType.FITNESS -> R.string.activity_type_fitness
+        ActivityType.CYCLING -> R.string.activity_type_cycling
+        ActivityType.BADMINTON -> R.string.activity_type_badminton
+        ActivityType.BASKETBALL -> R.string.activity_type_basketball
+        ActivityType.CROSSCOUNTRYSKIING -> R.string.activity_type_crosscountryskiing
+        ActivityType.SPORTCOMBATS -> R.string.activity_type_sportcombats
+        ActivityType.BOX -> R.string.activity_type_box
+        ActivityType.WRESTLING -> R.string.activity_type_wrestling
+        ActivityType.WATERPOLO -> R.string.activity_type_waterpolo
+        ActivityType.VOLLEYBALL -> R.string.activity_type_volleyball
+        ActivityType.HANDBALL -> R.string.activity_type_handball
+        ActivityType.GYMNASTICS -> R.string.activity_type_gymnastics
+        ActivityType.GOLF -> R.string.activity_type_golf
+        ActivityType.SKIING -> R.string.activity_type_skiing
+        ActivityType.SKATING -> R.string.activity_type_skating
+        ActivityType.ROLLERSKATING -> R.string.activity_type_rollerskating
+        ActivityType.PINGPONG -> R.string.activity_type_pingpong
+        ActivityType.BEACHVOLLEYBALL -> R.string.activity_type_beachvolleyball
+        ActivityType.TRAMPOLINING -> R.string.activity_type_trampolining
+        ActivityType.SNOWBOARDING -> R.string.activity_type_snowboarding
+        ActivityType.PEDESTRIANISM -> R.string.activity_type_pedestrianism
+        ActivityType.TENNIS -> R.string.activity_type_tennis
+        ActivityType.TRIATHLON -> R.string.activity_type_triathlon
+        ActivityType.WEIGHTLIFTING -> R.string.activity_type_weightlifting
+        ActivityType.FENCING -> R.string.activity_type_Fencing
+        ActivityType.FOOTBALL -> R.string.activity_type_football
+        ActivityType.YOGA -> R.string.activity_type_yoga
+        ActivityType.HOCKEY -> R.string.activity_type_hockey
+        ActivityType.WHEELCHAIRRIDING -> R.string.activity_type_wheelchairriding
+        ActivityType.HIKING -> R.string.activity_type_hiking
+        ActivityType.NORDICWALKING -> R.string.activity_type_nordicwalking
+        ActivityType.ROWING -> R.string.activity_type_rowing
+        ActivityType.HOUSEKEEPING -> R.string.activity_type_housekeeping
+        ActivityType.DANCING -> R.string.activity_type_dancing
+        ActivityType.HORSEBACKRIDING -> R.string.activity_type_horsebackriding
+        ActivityType.SHOOTING -> R.string.activity_type_shooting
+        ActivityType.SKATEBOARDING -> R.string.activity_type_skateboarding
+        ActivityType.SURFING -> R.string.activity_type_surfing
+        ActivityType.MARTIALARTS -> R.string.activity_type_martialarts
+        ActivityType.ANOTHER -> R.string.activity_type_another
+    }

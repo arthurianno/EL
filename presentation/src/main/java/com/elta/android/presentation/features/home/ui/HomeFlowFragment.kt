@@ -7,6 +7,8 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
 import javax.inject.Inject
@@ -23,7 +25,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         super.onViewCreated(view, savedInstanceState)
         initBottomSheetItemsView()
         homeBottomNavigationView.select(R.id.mainMenuItemView)
-        homePulseView.start()
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
                 homeBottomSheetView.show()
@@ -36,8 +37,15 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
-        pm.closeBottomSheetCommand.bindTo {
-            bottomSheetItemsView.postDelayed({ homeBottomSheetView.hide() }, HIDE_DELAY)
+        pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
+        pm.pulseCommand.bindTo {
+            if (it) {
+                homePulseView.show()
+                homePulseView.start()
+            } else {
+                homePulseView.stop()
+                homePulseView.hide()
+            }
         }
         homeBottomSheetView.visibilityChanges().bindTo { visible ->
             homeActionView.isSelected = visible
@@ -56,7 +64,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     }
 
     companion object {
-        private const val HIDE_DELAY = 200L
         fun newInstance() = HomeFlowFragment()
     }
 }

@@ -3,8 +3,10 @@ package com.elta.android.presentation.features.home.pm
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
@@ -21,6 +23,7 @@ class HomeFlowPm @Inject constructor(
 
     val bottomSheetItems = State<List<ListItem>>()
     val closeBottomSheetCommand = Command<Unit>()
+    val pulseCommand = Command<Boolean>()
 
     private val loadEvents = Action<Unit>()
 
@@ -44,6 +47,11 @@ class HomeFlowPm @Inject constructor(
             .filter { it == Lifecycle.CREATED }
             .map { Unit }
             .subscribe(loadEvents.consumer)
+            .untilDestroy()
+
+        bus.events<Events.HomeModelChanged>()
+            .map { it.model.isFirstEntrance || !it.model.hasEvents }
+            .subscribe(pulseCommand.consumer)
             .untilDestroy()
 
         observeClicks()

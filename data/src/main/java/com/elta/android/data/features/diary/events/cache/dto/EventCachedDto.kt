@@ -11,6 +11,7 @@ data class EventCachedDto(
     val userId: Long?,
     val type: String,
     val additionTime: Date,
+    val additionTimeString: String,
     val tagId: String?,
     val note: String?,
     val modificationTime: Date?,

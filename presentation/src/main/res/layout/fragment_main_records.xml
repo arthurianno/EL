@@ -6,11 +6,14 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:overScrollMode="never" />
 
     <com.elta.android.presentation.widgets.MainScreenStateView
         android:id="@+id/mainScreenStateView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_gradient_green" />
+        android:background="@drawable/bg_gradient_green"
+        android:visibility="gone" />
+
 </FrameLayout>

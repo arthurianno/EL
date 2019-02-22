@@ -65,6 +65,8 @@ class DbTagsCache @Inject constructor(
     private fun getAll(): List<TagCachedDto> =
         userHolder.doInUserExists {
             box.query {
+                equal(TagCachedDto_.isReadOnly, true)
+                or()
                 equal(TagCachedDto_.userId, it)
             }.find()
         }

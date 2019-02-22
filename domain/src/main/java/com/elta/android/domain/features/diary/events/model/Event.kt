@@ -5,6 +5,7 @@ import java.util.Date
 data class Event(
     val id: String,
     val additionTime: Date,
+    val additionTimeString: String,
     val tagId: String?,
     val note: String?,
     val modificationTime: Date?,
