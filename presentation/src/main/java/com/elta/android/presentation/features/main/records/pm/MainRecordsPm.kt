@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.elta.android.presentation.utils.getGreetingText
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
