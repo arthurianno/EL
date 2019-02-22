@@ -15,8 +15,8 @@ class EventsOptionsChooserPm @Inject constructor(
 ) : BaseListPm(services) {
 
     private val configurationState = State<ChooserConfiguration>()
-    val toolbarTitleCommand = Command<String>()
-    val appBarBackgroundCommand = Command<Int>()
+    val toolbarTitleCommand = State<String>()
+    val appBarBackgroundCommand = State<Int>()
 
     override fun onCreate() {
         super.onCreate()
