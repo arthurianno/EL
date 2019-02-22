@@ -8,8 +8,9 @@
         android:id="@+id/appBarLayoutView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/shade_blue"
-        android:paddingTop="24dp">
+        android:background="@drawable/bg_gradient_green"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp">
 
         <include layout="@layout/layout_toolbar" />
     </FrameLayout>
@@ -19,5 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:overScrollMode="never" />
+        android:overScrollMode="never"
+        android:layout_marginTop="-8dp" />
 </LinearLayout>
