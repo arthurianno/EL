@@ -52,6 +52,10 @@
         <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
+    <style name="Typography.Body1.ShadeBlack2" parent="Typography.Body1">
+        <item name="android:textColor">@color/shade_black2</item>
+    </style>
+
     <style name="Typography.Body2.Primary" parent="Typography.Body1.Primary">
         <item name="android:textSize">@dimen/font_size_title_2</item>
     </style>

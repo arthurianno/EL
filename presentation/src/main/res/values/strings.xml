@@ -168,4 +168,12 @@
 
     <string name="main_records_mask_value">%s ед</string>
     <string name="main_records_empty_value">—</string>
+
+    <!-- EVENTS -->
+    <string name="events_options_chooser_title_tags">Тег для группировки</string>
+    <string name="events_options_chooser_title_activities">Вид активности</string>
+    <string name="events_options_chooser_title_insulin">Тип исулина</string>
+
+    <string name="events_options_chooser_header_tags">Доступные теги</string>
+    <string name="events_options_chooser_header_variants">Доступные варианты</string>
 </resources>
