@@ -32,6 +32,15 @@ class MainRecordsPm @Inject constructor(
         super.onCreate()
 
         items.consumer.accept(arrayListOf<ListItem>().apply {
+            add(
+                RecordsHeaderItem(
+                    null,
+                    1.2,
+                    R.drawable.ic_change_index_down,
+                    4.5,
+                    6.2
+                )
+            )
             (0..5).forEach { group ->
                 add(
                     RecordsGroupItem(
