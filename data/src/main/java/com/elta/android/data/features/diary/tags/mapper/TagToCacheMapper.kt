@@ -16,7 +16,7 @@ class TagToCacheMapper @Inject constructor(
             TagCachedDto(
                 id = id.hashCode().toLong(),
                 secondaryId = id,
-                userId = userHolder.currentUser,
+                userId = if (!isReadOnly) userHolder.currentUser else null,
                 name = name,
                 image = image.name,
                 isReadOnly = isReadOnly,
