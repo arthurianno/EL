@@ -19,7 +19,14 @@
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
         android:layout_weight="1"
-        android:overScrollMode="never"
-        android:layout_marginTop="-8dp" />
+        android:overScrollMode="never" />
+
+    <TextView
+        android:id="@+id/confirmButtonView"
+        style="@style/Button.Large"
+        android:visibility="gone"
+        android:layout_marginBottom="-8dp"
+        android:text="@string/events_options_chooser_button_confirm" />
 </LinearLayout>

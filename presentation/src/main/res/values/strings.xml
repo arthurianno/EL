@@ -176,4 +176,5 @@
 
     <string name="events_options_chooser_header_tags">Доступные теги</string>
     <string name="events_options_chooser_header_variants">Доступные варианты</string>
+    <string name="events_options_chooser_button_confirm">Подтвердить</string>
 </resources>

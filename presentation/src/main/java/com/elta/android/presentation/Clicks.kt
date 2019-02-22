@@ -13,4 +13,5 @@ sealed class Clicks : Click {
     data class SearchResult(val item: SearchResultItem) : Clicks()
     data class AddUserEvent(val userEvent: UserEvent) : Clicks()
     data class RecordClicked(val item: RecordItem) : Clicks()
+    data class ChooserOptionClicked(val id: String) : Clicks()
 }
