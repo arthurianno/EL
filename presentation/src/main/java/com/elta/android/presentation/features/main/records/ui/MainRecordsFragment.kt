@@ -30,7 +30,7 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
                 checkNotNull(context),
                 R.dimen.home_between_margin,
                 R.dimen.home_between_margin,
-                R.dimen.home_between_margin,
+                R.dimen.home_margin_end,
                 R.dimen.overlap_first_item_margin
             )
         )

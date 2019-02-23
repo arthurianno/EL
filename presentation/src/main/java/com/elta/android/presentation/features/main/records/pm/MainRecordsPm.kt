@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.main.records.pm
 
+import android.graphics.drawable.Drawable
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.EventsBlock
+import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.presentation.Events
@@ -126,6 +128,7 @@ class MainRecordsPm @Inject constructor(
 
     private fun HomeModel.header(): ListItem =
         RecordsHeaderItem(
+            background = glucoseLevel?.toBackground(),
             glucoseLevel = this.lastGlucoseEvent?.value,
             glucoseLevelIndex = this.glucoseLevelDifference,
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
@@ -152,5 +155,12 @@ class MainRecordsPm @Inject constructor(
             GlucoseLevelDirection.UP -> R.drawable.ic_change_index_up
             GlucoseLevelDirection.DOWN -> R.drawable.ic_change_index_down
             else -> null
+        }
+
+    private fun GlucoseLevel.toBackground(): Drawable? =
+        when (this) {
+            GlucoseLevel.HIGH -> resources.getDrawable(R.drawable.bg_gradient_red)
+            GlucoseLevel.NORMAL -> resources.getDrawable(R.drawable.bg_gradient_green)
+            GlucoseLevel.LOW -> resources.getDrawable(R.drawable.bg_gradient_blue)
         }
 }

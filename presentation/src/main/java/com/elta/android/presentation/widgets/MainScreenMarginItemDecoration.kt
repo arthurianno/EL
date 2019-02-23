@@ -36,19 +36,7 @@ class MainScreenMarginItemDecoration(
         val position = parent.getChildAdapterPosition(view)
         val last = state.itemCount.minus(1)
         when (position) {
-            0 -> outRect.bottom = marginBetween
-            1 -> {
-                outRect.top = -overlapItem
-                outRect.bottom = marginBetween
-            }
-            last -> {
-                outRect.top = marginBetween
-                outRect.bottom = marginEnd
-            }
-            else -> {
-                outRect.top = marginBetween
-                outRect.bottom = marginBetween
-            }
+            1 -> outRect.top = -overlapItem
         }
     }
 

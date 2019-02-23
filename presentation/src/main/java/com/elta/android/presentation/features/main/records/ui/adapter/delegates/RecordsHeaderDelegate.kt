@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
 import android.support.v7.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.main.records.models.GlucoseRange
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
@@ -12,7 +11,9 @@ import com.nullgr.core.ui.extensions.toggleView
 import kotlinx.android.synthetic.main.item_records_header.*
 import java.text.DecimalFormat
 
-class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : AdapterDelegate() {
+class RecordsHeaderDelegate(
+    private val resources: ResourceProvider
+) : AdapterDelegate() {
 
     override val layoutResource: Int = R.layout.item_records_header
     override val itemType: Any = RecordsHeaderItem::class
@@ -46,7 +47,7 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
             item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
 
-            itemView.setBackgroundResource(item.glucoseLevel.glucoseToBackground())
+            itemView.background = item.background
         }
     }
 
@@ -66,14 +67,7 @@ class RecordsHeaderDelegate(private val resourceProvider: ResourceProvider) : Ad
 
     private fun Double?.formatAsValueOrEmpty(): String =
         when {
-            this != null -> resourceProvider.getString(R.string.main_records_mask_value, this.format())
-            else -> resourceProvider.getString(R.string.main_records_empty_value)
-        }
-
-    private fun Double?.glucoseToBackground(): Int =
-        when {
-            this == null || this in GlucoseRange.MEDIUM -> R.drawable.bg_gradient_green
-            this in GlucoseRange.HIGH -> R.drawable.bg_gradient_red
-            else -> R.drawable.bg_gradient_blue
+            this != null -> resources.getString(R.string.main_records_mask_value, this.format())
+            else -> resources.getString(R.string.main_records_empty_value)
         }
 }
