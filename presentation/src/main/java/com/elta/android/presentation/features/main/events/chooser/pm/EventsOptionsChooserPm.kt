@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
-import com.elta.android.domain.features.events.model.UserEvent
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.clicks
@@ -96,10 +96,10 @@ class EventsOptionsChooserPm @Inject constructor(
             resources.getString(
                 when {
                     configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == UserEvent.INSULIN ->
+                        configuration.eventType == EventType.INSULIN ->
                         R.string.events_options_chooser_title_insulin
                     configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == UserEvent.ACTIVITY ->
+                        configuration.eventType == EventType.ACTIVITY ->
                         R.string.events_options_chooser_title_activities
                     else ->
                         R.string.events_options_chooser_title_tags
@@ -112,11 +112,12 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun setUpAppBarBackground(configuration: ChooserConfiguration) {
         appBarBackgroundCommand.consumer.accept(
             when (configuration.eventType) {
-                UserEvent.XE -> R.drawable.bg_gradient_bread
-                UserEvent.ACTIVITY -> R.drawable.bg_gradient_activity
-                UserEvent.WEIGHT -> R.drawable.bg_gradient_weight
-                UserEvent.MEDICINE -> R.drawable.bg_gradient_medicine
-                UserEvent.INSULIN -> R.drawable.bg_gradient_insulin
+                EventType.BREAD -> R.drawable.bg_gradient_bread
+                EventType.ACTIVITY -> R.drawable.bg_gradient_activity
+                EventType.WEIGHT -> R.drawable.bg_gradient_weight
+                EventType.MEDICAMENTS -> R.drawable.bg_gradient_medicine
+                EventType.INSULIN -> R.drawable.bg_gradient_insulin
+                else -> R.drawable.bg_gradient_insulin
             }
         )
     }
@@ -124,7 +125,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun ChooserConfiguration.toHeaderTitle(): String =
         resources.getString(
             when {
-                chooserType == ChooserType.VARIANTS && eventType == UserEvent.INSULIN ->
+                chooserType == ChooserType.VARIANTS && eventType == EventType.INSULIN ->
                     R.string.events_options_chooser_header_variants
                 else -> R.string.events_options_chooser_header_tags
             }
