@@ -1,22 +1,29 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
 import com.elta.android.domain.features.events.model.UserEvent
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserType
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.nullgr.core.adapter.items.ListItem
 import javax.inject.Inject
 
+@Suppress("MagicNumber", "ForEachOnRange")
 class EventsOptionsChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    private val configurationState = State<ChooserConfiguration>()
     val toolbarTitleCommand = State<String>()
     val appBarBackgroundCommand = State<Int>()
+    val confirmButtonVisibilityCommand = Command<Boolean>(bufferSize = 1)
+
+    private val selectedItemIdState = State(NONE_ID)
+    private val configurationState = State<ChooserConfiguration>()
 
     override fun onCreate() {
         super.onCreate()
@@ -27,17 +34,62 @@ class EventsOptionsChooserPm @Inject constructor(
             .doOnNext { items.consumer.accept(addMockItems()) } // TODO test case
             .subscribe()
             .untilDestroy()
+
+        bindSelectionBehaviour()
     }
 
     fun setConfiguration(configuration: ChooserConfiguration) {
         configurationState.consumer.accept(configuration)
     }
 
+    private fun bindSelectionBehaviour() {
+        selectedItemIdState.observable
+            .skip(1)
+            .doOnNext(::performSelection)
+            .map { it != NONE_ID }
+            .doOnNext(confirmButtonVisibilityCommand.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ChooserOptionClicked>()
+            .map {
+                if (it.id == selectedItemIdState.value) NONE_ID
+                else it.id
+            }
+            .doOnNext(selectedItemIdState.consumer)
+            .subscribe()
+            .untilDestroy()
+    }
+
     // TODO replace
     private fun addMockItems(): List<ListItem> =
-        arrayListOf(
-            ChooserHeaderItem(configurationState.value.toHeaderTitle())
+        arrayListOf<ListItem>().apply {
+            add(ChooserHeaderItem(configurationState.value.toHeaderTitle()))
+            (0..20).forEach {
+                add(
+                    ChooserItem(
+                        id = it.toString(),
+                        title = "Option $it",
+                        iconId = R.drawable.ic_event_medicine_with_bg
+                    )
+                )
+            }
+        }
+
+    private fun performSelection(id: String) {
+        items.consumer.accept(
+            items.value.map {
+                if (it is ChooserItem) {
+                    return@map when {
+                        it.isSelected -> it.copy(isSelected = false)
+                        it.id == id -> it.copy(isSelected = true)
+                        else -> it
+                    }
+                }
+                return@map it
+            }
         )
+    }
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         toolbarTitleCommand.consumer.accept(
@@ -77,4 +129,8 @@ class EventsOptionsChooserPm @Inject constructor(
                 else -> R.string.events_options_chooser_header_tags
             }
         )
+
+    companion object {
+        private const val NONE_ID = "none_id"
+    }
 }

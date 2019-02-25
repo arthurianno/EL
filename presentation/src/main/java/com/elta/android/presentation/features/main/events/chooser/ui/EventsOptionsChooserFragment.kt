@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBar
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.utils.bundle
+import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_events_options_chooser.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -38,6 +39,7 @@ class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() 
         super.onBindPresentationModel(pm)
         pm.toolbarTitleCommand.bindTo(toolbarTitleView.text())
         pm.appBarBackgroundCommand.bindTo { appBarLayoutView.setBackgroundResource(it) }
+        pm.confirmButtonVisibilityCommand.bindTo(confirmButtonView.visibility())
     }
 
     companion object {
