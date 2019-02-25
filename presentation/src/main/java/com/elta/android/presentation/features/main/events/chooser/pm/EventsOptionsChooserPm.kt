@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
+import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
@@ -7,13 +8,12 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
-import com.elta.android.presentation.features.main.events.chooser.models.ChooserType
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.nullgr.core.adapter.items.ListItem
 import javax.inject.Inject
 
-@Suppress("MagicNumber", "ForEachOnRange")
+@Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
 class EventsOptionsChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {

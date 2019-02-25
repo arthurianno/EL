@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.chooser.models
+package com.elta.android.domain.features.diary.chooser.model
 
 /**
  * This class provides logic dividing for choosing screen.

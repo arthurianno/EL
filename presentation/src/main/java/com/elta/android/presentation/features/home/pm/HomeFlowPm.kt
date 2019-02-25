@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.pm
 
+import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Screens
@@ -8,7 +9,6 @@ import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
-import com.elta.android.presentation.features.main.events.chooser.models.ChooserType
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
