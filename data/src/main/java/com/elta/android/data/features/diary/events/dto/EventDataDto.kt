@@ -3,7 +3,7 @@ package com.elta.android.data.features.diary.events.dto
 import com.google.gson.annotations.SerializedName
 
 data class EventDataDto(
-    @SerializedName("duration") val duration: String?,
+    @SerializedName("duration") val duration: Long?,
     @SerializedName("value") val value: Double?,
     @SerializedName("kind") val kind: String?,
     @SerializedName("name") val name: String?,

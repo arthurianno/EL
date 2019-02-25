@@ -42,7 +42,7 @@ object EventMockedFactory {
                 value = value,
                 name = "Test name",
                 kind = "Test kind",
-                duration = "00:00",
+                duration = 2 * 60 * 60 + 30 * 60, // 2h 30m
                 activityType = activityType,
                 mealTag = mealTag,
                 insulinType = insulinType,

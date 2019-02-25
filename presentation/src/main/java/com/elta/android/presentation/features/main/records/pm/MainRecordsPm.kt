@@ -24,10 +24,9 @@ import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.date.CommonFormats
-import com.nullgr.core.date.toDate
-import com.nullgr.core.date.toStringWithFormat
+import com.nullgr.core.resources.ResourceProvider
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -109,9 +108,12 @@ class MainRecordsPm @Inject constructor(
             EventType.BREAD -> resources.getString(R.string.event_type_bread_pattern, checkNotNull(value))
             EventType.WEIGHT -> resources.getString(R.string.event_type_weight_pattern, checkNotNull(value))
             EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_pattern, checkNotNull(value))
-            EventType.ACTIVITY -> checkNotNull(duration).toDate(CommonFormats.FORMAT_TIME_2)?.toStringWithFormat("HH ч mm мин ss сек")
+            EventType.ACTIVITY -> this.formatDuration(resources)
             else -> null
         }
+
+    private fun Event.formatDuration(resources: ResourceProvider): String =
+        checkNotNull(duration).asTimeString(resources)
 
     private fun Event.formatDate(): String = additionTime.time.toString()
 
@@ -163,4 +165,43 @@ class MainRecordsPm @Inject constructor(
             GlucoseLevel.LOW -> resources.getDrawable(R.drawable.bg_gradient_blue)
             else -> resources.getDrawable(R.drawable.bg_gradient_green)
         }
+
+    val HOURS_IN_DAY = 24
+    val MINUTES_IN_HOUR = 60
+    val SECONDS_IN_MINUTE = 60
+    val ZERO = 0
+
+    fun Long.asTimeString(resources: ResourceProvider): String {
+
+        val days = TimeUnit.SECONDS.toDays(this)
+        val hours = TimeUnit.SECONDS.toHours(this) - days * HOURS_IN_DAY
+        val minutes = TimeUnit.SECONDS.toMinutes(this) - TimeUnit.SECONDS.toHours(this) * MINUTES_IN_HOUR
+        val seconds = TimeUnit.SECONDS.toSeconds(this) - TimeUnit.SECONDS.toMinutes(this) * SECONDS_IN_MINUTE
+
+        val time = StringBuilder().apply {
+            if (days > ZERO) {
+                val daysText = resources.getString(R.string.activity_duration_day, days.toInt())
+                append(daysText)
+            }
+            if (hours > ZERO) {
+                val hoursText = resources.getString(R.string.activity_duration_hour, hours.toInt())
+                append(" ")
+                append(hoursText)
+
+            }
+            if (minutes > ZERO) {
+                val minutesText = resources.getString(R.string.activity_duration_min, minutes.toInt())
+                append(" ")
+                append(minutesText)
+
+            }
+            if (seconds > ZERO && isEmpty()) {
+                val secondsText = resources.getString(R.string.activity_duration_sec, seconds.toInt())
+                append(" ")
+                append(secondsText)
+            }
+        }
+
+        return time.toString()
+    }
 }

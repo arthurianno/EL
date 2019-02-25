@@ -220,6 +220,11 @@
     <string name="activity_type_martialarts">Боевые искусства</string>
     <string name="activity_type_another">Другое</string>
 
+    <string name="activity_duration_day">%d д</string>
+    <string name="activity_duration_hour">%d ч</string>
+    <string name="activity_duration_min">%d мин</string>
+    <string name="activity_duration_sec">%d сек</string>
+
     <!-- MAIN RECORDS -->
     <string name="main_records_firs_launch_title">Добро пожаловать</string>
     <string name="main_records_firs_launch_subtitle">Чтобы добавить новую запись в дневник, воспользуйтесь кнопкой "плюс" и выберите нужный показатель\n\nДля добавления записи об уровне глюкозы проведите измерение с помощью глюкометра</string>

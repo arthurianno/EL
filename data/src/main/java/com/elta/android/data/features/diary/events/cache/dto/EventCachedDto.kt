@@ -20,7 +20,7 @@ data class EventCachedDto(
     val value: Double?,
     val name: String?,
     val kind: String?,
-    val duration: String?,
+    val duration: Long?,
     val activityType: String?,
     val mealTag: String?,
     val insulinType: String?,

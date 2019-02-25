@@ -12,7 +12,7 @@ data class Event(
     val value: Double?,
     val name: String?,
     val kind: String?,
-    val duration: String?,
+    val duration: Long?,
     val activityType: ActivityType?,
     val mealTag: MealTag?,
     val insulinType: InsulinType?,
