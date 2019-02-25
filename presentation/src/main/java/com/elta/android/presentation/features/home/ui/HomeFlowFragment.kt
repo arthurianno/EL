@@ -3,10 +3,13 @@ package com.elta.android.presentation.features.home.ui
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_home_flow.*
@@ -20,6 +23,9 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     @Inject
     lateinit var adapter: DynamicAdapter
+
+    @Inject
+    lateinit var bus: RxBus
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,6 +55,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         }
         homeBottomSheetView.visibilityChanges().bindTo { visible ->
             homeActionView.isSelected = visible
+            bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
     }
 

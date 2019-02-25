@@ -7,5 +7,7 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 sealed class Events : Event {
 
     data class OnBoardingPageSelected(val item: OnBoardingItem) : Events()
-    data class HomeModelChanged(val model: HomeModel): Events()
+    data class HomeModelChanged(val model: HomeModel) : Events()
+    data class HomeBottomSheetStateChanged(val opened: Boolean) : Events()
+    data class RecordsAttachedStateChanged(val attached: Boolean) : Events()
 }

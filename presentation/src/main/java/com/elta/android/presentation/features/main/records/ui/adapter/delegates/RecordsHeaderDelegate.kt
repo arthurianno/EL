@@ -1,17 +1,21 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
 import android.support.v7.widget.RecyclerView
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.resources.ResourceProvider
+import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView
 import kotlinx.android.synthetic.main.item_records_header.*
 import java.text.DecimalFormat
 
 class RecordsHeaderDelegate(
+    private val bus: RxBus,
     private val resources: ResourceProvider
 ) : AdapterDelegate() {
 
@@ -36,6 +40,16 @@ class RecordsHeaderDelegate(
             RecordsHeaderItem.Payload.BREAD_LEVEL_CHANGED -> bindBread(holder, item)
             RecordsHeaderItem.Payload.INSULIN_CHANGED -> bindInsulin(holder, item)
         }
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        bus.event(Events.RecordsAttachedStateChanged(true))
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        bus.event(Events.RecordsAttachedStateChanged(false))
     }
 
     private fun bindGlucose(holder: ViewHolder, item: RecordsHeaderItem) {

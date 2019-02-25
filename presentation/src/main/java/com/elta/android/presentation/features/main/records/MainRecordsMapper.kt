@@ -102,10 +102,11 @@ class MainRecordsMapper @Inject constructor(
             else -> null
         }
 
-    private fun GlucoseLevel.toBackground(): Drawable? =
-        when (this) {
-            GlucoseLevel.HIGH -> resources.getDrawable(R.drawable.bg_gradient_red)
-            GlucoseLevel.LOW -> resources.getDrawable(R.drawable.bg_gradient_blue)
+    private fun GlucoseLevel?.toBackground(): Drawable? =
+        when {
+            this == null -> resources.getDrawable(R.drawable.bg_gradient_green)
+            this == GlucoseLevel.HIGH -> resources.getDrawable(R.drawable.bg_gradient_red)
+            this == GlucoseLevel.LOW -> resources.getDrawable(R.drawable.bg_gradient_blue)
             else -> resources.getDrawable(R.drawable.bg_gradient_green)
         }
 

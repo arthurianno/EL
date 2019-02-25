@@ -1,18 +1,25 @@
 package com.elta.android.presentation.features.main.records.ui
 
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenTransparentStatusBarConfigProvider
 import com.elta.android.presentation.widgets.MainScreenMarginItemDecoration
+import com.nullgr.core.rx.RxBus
+import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_main_records.*
+import javax.inject.Inject
 
 class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
+
+    @Inject
+    lateinit var bus: RxBus
 
     override val screenLayout: Int = R.layout.fragment_main_records
     override val classToken: Class<MainRecordsPm> = MainRecordsPm::class.java
@@ -20,41 +27,34 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
     override val backgroundColor: Int = R.color.pale_gray
 
     private val secondaryProvider = MainScreenLightStatusBarConfigProvider
-    private var itemsViewScrollOffset = 0
-    private val headerOffset by lazy { resources.getDimensionPixelSize(R.dimen.main_records_offset) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         itemsView?.addItemDecoration(
             MainScreenMarginItemDecoration(
                 checkNotNull(context),
-                R.dimen.home_between_margin,
-                R.dimen.home_between_margin,
-                R.dimen.home_margin_end,
                 R.dimen.overlap_first_item_margin
             )
         )
-
-        itemsView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                itemsViewScrollOffset += dy
-                setUpStatusBarConfigForOffset()
-            }
-        })
     }
 
     override fun onBindPresentationModel(pm: MainRecordsPm) {
         super.onBindPresentationModel(pm)
         pm.mainScreenState.bind(mainScreenStateView, compositeUnbind)
-    }
-
-    override fun initStatusBarConfig() {
-        setUpStatusBarConfigForOffset()
-    }
-
-    private fun setUpStatusBarConfigForOffset() {
-        if (itemsViewScrollOffset >= headerOffset) secondaryProvider.applyStatusBarConfig()
-        else statusBarConfigProvider.applyStatusBarConfig()
+        Observables.combineLatest(
+            bus.events<Events.HomeBottomSheetStateChanged>().map { it.opened }.startWith(false),
+            bus.events<Events.RecordsAttachedStateChanged>().map { it.attached }
+        ).bindTo {
+            val bottomSheetVisible = it.first
+            val headerVisible = it.second
+            if (bottomSheetVisible) {
+                statusBarConfigProvider.applyStatusBarConfig()
+            } else if (!headerVisible) {
+                secondaryProvider.applyStatusBarConfig()
+            } else {
+                statusBarConfigProvider.applyStatusBarConfig()
+            }
+        }
     }
 
     companion object {
