@@ -65,6 +65,7 @@ class MainRecordsMapper @Inject constructor(
     private fun Event.formatDuration(resources: ResourceProvider): String =
         checkNotNull(duration).asTimeString(resources)
 
+    // TODO: rework this solution using Android310
     private fun Event.formatDate(): String {
         val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault()).parse(additionTimeString)
         val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")

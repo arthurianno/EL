@@ -40,9 +40,13 @@
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/recordTitleView"
             style="@style/New.Body2.BlackBlue"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lines="1"
+            app:layout_constraintEnd_toStartOf="@+id/barrierView"
             app:layout_constraintStart_toEndOf="@+id/recordIconView"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Короткий" />
@@ -50,13 +54,24 @@
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/recordTypeView"
             style="@style/New.Caption1.ShadeBlack2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lines="1"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/barrierView"
             app:layout_constraintStart_toEndOf="@+id/recordIconView"
             app:layout_constraintTop_toBottomOf="@+id/recordTitleView"
             tools:text="Инсулин" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrierView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="recordCountView,recordDateView" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/recordCountView"
