@@ -26,6 +26,8 @@ import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -115,13 +117,19 @@ class MainRecordsPm @Inject constructor(
     private fun Event.formatDuration(resources: ResourceProvider): String =
         checkNotNull(duration).asTimeString(resources)
 
-    private fun Event.formatDate(): String = additionTime.time.toString()
+    private fun Event.formatDate(): String {
+        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault()).parse(additionTimeString)
+        val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
+        return "в ${tokens[0]} (UTC ${tokens[1]})"
+    }
 
     private fun Event.toTitle(): String =
         when (type) {
             EventType.INSULIN -> resources.getString(checkNotNull(insulinType).toName())
-            EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) } ?: resources.getString(R.string.event_type_activity_no_name)
-            EventType.BREAD -> kind?.let { it } ?: resources.getString(R.string.event_type_bread_no_name)
+            EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) }
+                ?: resources.getString(R.string.event_type_activity_no_name)
+            EventType.BREAD -> kind?.let { it }
+                ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.MEDICAMENTS -> checkNotNull(name)
             EventType.WEIGHT -> resources.getString(R.string.weight_name)
             EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_no_name)
