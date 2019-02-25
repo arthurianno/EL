@@ -8,6 +8,7 @@ import com.nullgr.core.rx.RxBus
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
 
+@Suppress("GroupControl")
 class GroupControl(pm: BasePm, items: PresentationModel.State<List<ListItem>>) {
 
     val groupItems: Observable<List<ListItem>> = pm.bus.observable(GroupControl::class.java)

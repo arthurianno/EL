@@ -14,6 +14,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+@Suppress("LongMethod", "MagicNumber")
 class MorphView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -56,7 +57,6 @@ class MorphView @JvmOverloads constructor(
         smallOvalSize.yMin = cy * 0.85f
         smallOvalSize.yMax = cy * 0.9f
 
-
         largeOvalSize.xMin = cx * 0.60f
         largeOvalSize.xMax = cx * 0.70f
         largeOvalSize.yMin = cy * 0.95f
@@ -70,7 +70,6 @@ class MorphView @JvmOverloads constructor(
 
         oval3.radius.x = largeOvalSize.xMin
         oval3.radius.y = largeOvalSize.yMin
-
 
         createOvalPath(oval1, oval2, oval3)
 
@@ -89,7 +88,6 @@ class MorphView @JvmOverloads constructor(
             addUpdateListener {
                 oval1.angle = it.animatedValue as Float
                 oval2.angle = it.animatedValue as Float
-
             }
         }
 
@@ -191,10 +189,6 @@ class MorphView @JvmOverloads constructor(
         }
         ovals.map { it.path.close() }
     }
-
-    fun start() {
-
-    }
 }
 
 class Oval(
@@ -211,6 +205,7 @@ class Oval(
     }
 }
 
+@Suppress("UseDataClass")
 class OvalSize(
     var xMin: Float = 0f,
     var xMax: Float = 0f,

@@ -19,9 +19,9 @@
 
         <com.elta.android.presentation.widgets.MorphView
             android:id="@+id/morphView"
-            android:layout_gravity="center"
             android:layout_width="156dp"
-            android:layout_height="156dp" />
+            android:layout_height="156dp"
+            android:layout_gravity="center" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/glucoseEmptyValueView"
@@ -102,8 +102,8 @@
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/glucoseLevelContainerView"
-        app:layout_constraintStart_toEndOf="@id/glucoseLevelContainerView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/glucoseLevelContainerView"
         app:layout_constraintTop_toTopOf="@+id/glucoseLevelContainerView">
 
         <android.support.v7.widget.AppCompatTextView

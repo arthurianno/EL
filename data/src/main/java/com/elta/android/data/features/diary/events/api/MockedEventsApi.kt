@@ -14,6 +14,7 @@ import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.tags.api.TagMockedFactory
 import io.reactivex.Observable
 
+@Suppress("MagicNumber", "ForEachOnRange", "MaxLineLength")
 class MockedEventsApi(private val context: Context) : EventsApi {
 
     private val list: MutableList<EventDto> = mutableListOf()
@@ -28,10 +29,22 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                             EventMockedFactory.create(
                                 type = type,
                                 value = inner * index.toDouble(),
-                                activityType = if (type == EventTypeDto.ACTIVITY) ActivityTypeDto.values().random() else null,
-                                mealTag = if (index % 2 == 0) MealTagDto.AFTERMEAL else MealTagDto.BEFOREMEAL,
-                                insulinType = if (type == EventTypeDto.INSULIN) InsulinTypeDto.values().random() else null,
-                                tagId = if (inner == 0) TagMockedFactory.nextId else null,
+                                activityType = if (type == EventTypeDto.ACTIVITY)
+                                    ActivityTypeDto.values().random()
+                                else
+                                    null,
+                                mealTag = if (index % 2 == 0)
+                                    MealTagDto.AFTERMEAL
+                                else
+                                    MealTagDto.BEFOREMEAL,
+                                insulinType = if (type == EventTypeDto.INSULIN)
+                                    InsulinTypeDto.values().random()
+                                else
+                                    null,
+                                tagId = if (inner == 0)
+                                    TagMockedFactory.nextId
+                                else
+                                    null,
                                 state = StateDto.values().random()
                             )
                         )

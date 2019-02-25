@@ -32,7 +32,6 @@ class MainRecordsMapper @Inject constructor(
             addAll(source.eventsBlocks.map { it.group() })
         }
 
-
     private fun EventsBlock.group(): ListItem =
         RecordsGroupItem(
             id = tag?.id ?: "tag",
@@ -87,7 +86,7 @@ class MainRecordsMapper @Inject constructor(
 
     private fun HomeModel.header(): ListItem =
         RecordsHeaderItem(
-            background = glucoseLevel?.toBackground(),
+            background = glucoseLevel.toBackground(),
             glucoseLevel = this.lastGlucoseEvent?.value,
             glucoseLevelIndex = this.glucoseLevelDifference,
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
@@ -120,18 +119,17 @@ class MainRecordsMapper @Inject constructor(
         val time = StringBuilder().apply {
             if (days > ZERO) {
                 append(resources.getString(R.string.activity_duration_day, days.toInt()))
+                append(" ")
             }
             if (hours > ZERO) {
                 append(resources.getString(R.string.activity_duration_hour, hours.toInt()))
-
+                append(" ")
             }
             if (minutes > ZERO) {
-                append(" ")
                 append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
-
+                append(" ")
             }
             if (seconds > ZERO && isEmpty()) {
-                append(" ")
                 append(resources.getString(R.string.activity_duration_sec, seconds.toInt()))
             }
         }
