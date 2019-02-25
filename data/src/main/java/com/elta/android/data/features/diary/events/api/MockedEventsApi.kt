@@ -18,25 +18,12 @@ class MockedEventsApi(private val context: Context) : EventsApi {
 
     private val list: MutableList<EventDto> = mutableListOf()
 
-//    override fun getEvents(lastSync: Long?, page: Int, pageSize: Int): Observable<EventsDto> =
-//        Observable.fromCallable {
-//            if (list.isEmpty()) {
-//                val file = context.assets.open("events.json")
-//                val type = object : TypeToken<List<EventDto>>() {}.type
-//                val reader = JsonReader(InputStreamReader(file))
-//                list.addAll(Gson().fromJson<List<EventDto>>(reader, type))
-//            }
-//
-//            val pageOfData = list.getPage(page, PAGE_SIZE)
-//            EventsDto(pageOfData, MetaDto(list.size, page, PAGE_SIZE))
-//        }.log("Events", "meta") { it.meta.toString() }
-
     override fun getEvents(lastSync: Long?, page: Int, pageSize: Int): Observable<EventsDto> =
         Observable.fromCallable {
 
             if (list.isEmpty()) {
                 EventTypeDto.values().forEachIndexed { index, type ->
-                    (0..2).forEach { inner ->
+                    (0..3).forEach { inner ->
                         list.add(
                             EventMockedFactory.create(
                                 type = type,
@@ -48,6 +35,7 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                                 state = StateDto.values().random()
                             )
                         )
+                        Thread.sleep(50)
                     }
                 }
             }
@@ -55,8 +43,4 @@ class MockedEventsApi(private val context: Context) : EventsApi {
             val pageOfData = list.getPage(page, pageSize)
             EventsDto(pageOfData, MetaDto(list.size, page, pageSize))
         }.log("Events", "meta") { it.meta.toString() }
-
-    private companion object {
-        const val PAGE_SIZE = 2
-    }
 }

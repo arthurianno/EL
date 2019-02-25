@@ -44,6 +44,8 @@ class RecordsHeaderDelegate(
             glucoseValueContainerView.toggleView(item.glucoseLevel != null)
 
             item.glucoseLevel?.let { glucoseLevelValueView.text = it.format() }
+
+            glucoseLevelDirectionView.toggleView(item.glucoseLevelIndex != 0.0)
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
             item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
 

@@ -14,19 +14,6 @@ class MockedTagsApi(private val context: Context) : TagsApi {
     private val list: MutableList<TagDto> = mutableListOf()
     private val userTags = arrayListOf("User tag 1", "User tag 2", "User tag 3", "User tag 4")
 
-//    override fun getTags(lastSync: Long?, page: Int, pageSize: Int): Observable<TagsDto> =
-//        Observable.fromCallable {
-//            if (list.isEmpty()) {
-//                val file = context.assets.open("tags.json")
-//                val type = object : TypeToken<List<TagDto>>() {}.type
-//                val reader = JsonReader(InputStreamReader(file))
-//                list.addAll(Gson().fromJson<List<TagDto>>(reader, type))
-//            }
-//
-//            val pageOfData = list.getPage(page, PAGE_SIZE)
-//            TagsDto(pageOfData, MetaDto(list.size, page, PAGE_SIZE))
-//        }.log("Tags", "meta") { it.meta.toString() }
-
     override fun getTags(lastSync: Long?, page: Int, pageSize: Int): Observable<TagsDto> =
         Observable.fromCallable {
             if (list.isEmpty()) {
@@ -40,8 +27,4 @@ class MockedTagsApi(private val context: Context) : TagsApi {
             val pageOfData = list.getPage(page, pageSize)
             TagsDto(pageOfData, MetaDto(pageOfData.size, page, pageSize))
         }.log("Tags", "meta") { it.meta.toString() }
-
-    private companion object {
-        const val PAGE_SIZE = 2
-    }
 }

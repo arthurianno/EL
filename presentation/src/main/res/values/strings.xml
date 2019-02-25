@@ -161,6 +161,9 @@
     <string name="event_type_activity_pattern_short">%1$s мин</string>
     <string name="event_type_glucose_pattern">%.1f ммоль/л</string>
 
+    <string name="event_type_bread_no_name">Приём пищи</string>
+    <string name="event_type_activity_no_name">Физическая активность</string>
+    <string name="event_type_glucose_no_name">Измерение глюкозы</string>
     <string name="tag_name_no_tag">Без тега</string>
     <string name="weight_name">Внесение замеров</string>
 

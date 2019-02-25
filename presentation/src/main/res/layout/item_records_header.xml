@@ -17,8 +17,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3">
 
+        <com.elta.android.presentation.widgets.MorphView
+            android:id="@+id/morphView"
+            android:layout_gravity="center"
+            android:layout_width="156dp"
+            android:layout_height="156dp" />
+
         <android.support.v7.widget.AppCompatImageView
             android:layout_width="wrap_content"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:srcCompat="@drawable/ic_bulb_static" />
@@ -48,6 +55,7 @@
                 tools:text="8,2" />
 
             <LinearLayout
+                android:id="@+id/glucoseLevelDirectionView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"

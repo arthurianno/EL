@@ -798,7 +798,7 @@ public class NumberPicker extends LinearLayout {
         mSelectedText.setFocusable(false);
         mSelectedText.setImeOptions(EditorInfo.IME_ACTION_NONE);
 
-        // create the selector wheel paint
+        // create the selector wheel smallOvalpaint
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);

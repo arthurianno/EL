@@ -9,9 +9,18 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import java.util.Date
-import java.util.UUID
 
 object EventMockedFactory {
+
+    private val ids = arrayListOf<String>().apply {
+        (0..40).forEach {
+            add("ID_TEST_$it")
+        }
+    }
+
+    private var index = 0
+    private val id: String
+        get() = ids[index++ % ids.size]
 
     fun create(
         type: EventTypeDto,
@@ -23,7 +32,7 @@ object EventMockedFactory {
         state: StateDto = StateDto.CREATED
     ): EventDto =
         EventDto(
-            id = UUID.randomUUID().toString(),
+            id = id,
             additionTime = Date().toStringIso(),
             tagId = tagId,
             note = "Test note",

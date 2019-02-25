@@ -96,7 +96,7 @@ class MainRecordsPm @Inject constructor(
         RecordItem(
             id = id,
             icon = type.toIconWithBg(),
-            title = name(),
+            title = this.toTitle(),
             type = resources.getString(type.toName()),
             count = formatValue(),
             date = formatDate(),
@@ -113,16 +113,16 @@ class MainRecordsPm @Inject constructor(
             else -> null
         }
 
-    private fun Event.formatDate(): String = additionTimeString
+    private fun Event.formatDate(): String = additionTime.time.toString()
 
-    private fun Event.name(): String =
+    private fun Event.toTitle(): String =
         when (type) {
             EventType.INSULIN -> resources.getString(checkNotNull(insulinType).toName())
-            EventType.ACTIVITY -> resources.getString(checkNotNull(activityType).toName())
-            EventType.BREAD -> checkNotNull(kind)
+            EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) } ?: resources.getString(R.string.event_type_activity_no_name)
+            EventType.BREAD -> kind?.let { it } ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.MEDICAMENTS -> checkNotNull(name)
             EventType.WEIGHT -> resources.getString(R.string.weight_name)
-            // TODO: what about glucose?
+            EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_no_name)
             else -> ""
         }
 
@@ -160,7 +160,7 @@ class MainRecordsPm @Inject constructor(
     private fun GlucoseLevel.toBackground(): Drawable? =
         when (this) {
             GlucoseLevel.HIGH -> resources.getDrawable(R.drawable.bg_gradient_red)
-            GlucoseLevel.NORMAL -> resources.getDrawable(R.drawable.bg_gradient_green)
             GlucoseLevel.LOW -> resources.getDrawable(R.drawable.bg_gradient_blue)
+            else -> resources.getDrawable(R.drawable.bg_gradient_green)
         }
 }
