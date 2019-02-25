@@ -74,14 +74,22 @@ class MorphView @JvmOverloads constructor(
 
         createOvalPath(oval1, oval2, oval3)
 
+        val timer = ValueAnimator.ofInt(0, 60).apply {
+            duration = 1000
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener {
+                createOvalPath(oval1, oval2, oval3)
+                invalidate()
+            }
+        }
+
         val smallAngleAnimator = ValueAnimator.ofFloat(0.0f, 2.0f).apply {
             duration = 8000
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
                 oval1.angle = it.animatedValue as Float
                 oval2.angle = it.animatedValue as Float
-                createOvalPath(oval1, oval2)
-                invalidate()
+
             }
         }
 
@@ -90,7 +98,6 @@ class MorphView @JvmOverloads constructor(
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
                 oval3.angle = it.animatedValue as Float
-                createOvalPath(oval3)
             }
         }
 
@@ -135,6 +142,8 @@ class MorphView @JvmOverloads constructor(
         largeAngleAnimator.start()
         xRlargeAnimator.start()
         yRlargeAnimator.start()
+
+        timer.start()
     }
 
     override fun onDraw(canvas: Canvas) {
