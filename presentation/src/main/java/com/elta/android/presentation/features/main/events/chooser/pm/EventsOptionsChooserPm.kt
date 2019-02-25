@@ -18,7 +18,6 @@ class EventsOptionsChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-
     val toolbarTitleCommand = State<String>()
     val appBarBackgroundCommand = State<Int>()
     val confirmButtonVisibilityCommand = Command<Boolean>(bufferSize = 1)
@@ -54,9 +53,8 @@ class EventsOptionsChooserPm @Inject constructor(
 
         bus.clicks<Clicks.ChooserOptionClicked>()
             .map {
-                val id = it.id
-                if (id == selectedItemIdState.value) NONE_ID
-                else id
+                if (it.id == selectedItemIdState.value) NONE_ID
+                else it.id
             }
             .doOnNext(selectedItemIdState.consumer)
             .subscribe()
@@ -67,7 +65,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun addMockItems(): List<ListItem> =
         arrayListOf<ListItem>().apply {
             add(ChooserHeaderItem(configurationState.value.toHeaderTitle()))
-            (0..10).forEach {
+            (0..20).forEach {
                 add(
                     ChooserItem(
                         id = it.toString(),
@@ -78,16 +76,19 @@ class EventsOptionsChooserPm @Inject constructor(
             }
         }
 
-    // TODO IMPROVE????
     private fun performSelection(id: String) {
-        val copy = addMockItems()
-        copy.map {
-            if (it is ChooserItem) {
-                it.isSelected = it.id.equals(id, true)
+        items.consumer.accept(
+            items.value.map {
+                if (it is ChooserItem) {
+                    return@map when {
+                        it.isSelected -> it.copy(isSelected = false)
+                        it.id == id -> it.copy(isSelected = true)
+                        else -> it
+                    }
+                }
+                return@map it
             }
-            it
-        }
-        items.consumer.accept(copy)
+        )
     }
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
