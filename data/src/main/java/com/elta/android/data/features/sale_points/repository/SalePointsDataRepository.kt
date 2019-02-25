@@ -19,7 +19,7 @@ class SalePointsDataRepository @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePoint>> =
         remoteSource.getSalePoints()
-            .switchMap {
+            .flatMap {
                 cacheSource.getSalePoints()
                     .map { toDomainMapper.mapFromObjects(it) }
             }

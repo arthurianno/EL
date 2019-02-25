@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.home.pm
 
-import com.elta.android.domain.features.events.model.UserEvent
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
@@ -34,22 +34,23 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun addEventItems() {
+        // TODO: add use case and filter EventType.GLUCOSE
         bottomSheetItems.consumer.accept(
-            UserEvent.values().map { it.toListItem() }
+            EventType.values().map { it.toListItem() }
         )
     }
 
     private fun observeClicks() {
         bus.clicks<Clicks.AddUserEvent>()
+            .map { it.event }
             .doOnNext { closeBottomSheetCommand.consumer.accept(Unit) }
-            .map { it.userEvent }
             .delay(OPEN_EVENT_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(::handleAddEventClick)
             .subscribe()
             .untilDestroy()
     }
 
-    private fun handleAddEventClick(event: UserEvent) {
+    private fun handleAddEventClick(event: EventType) {
         // TODO TEST CASE ONLY
         router.startFlow(
             Screens.EventsChooserScreen(
@@ -58,11 +59,11 @@ class HomeFlowPm @Inject constructor(
         )
     }
 
-    private fun UserEvent.toListItem() =
+    private fun EventType.toListItem() =
         UserEventItem(
             titleRes = this.toName(),
             iconRes = this.toIcon(),
-            userEvent = this
+            event = this
         )
 
     companion object {

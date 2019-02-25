@@ -152,6 +152,7 @@
     <string name="event_type_medicines">Медикаменты</string>
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
+    <string name="event_type_glucose">Измерение глюкозы</string>
 
     <!-- MAIN RECORDS -->
     <string name="main_records_firs_launch_title">Добро пожаловать</string>
