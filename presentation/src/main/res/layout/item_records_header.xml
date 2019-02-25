@@ -23,13 +23,6 @@
             android:layout_width="156dp"
             android:layout_height="156dp" />
 
-        <android.support.v7.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_bulb_static" />
-
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/glucoseEmptyValueView"
             style="@style/New.Headline2.ShadeBlack2"
