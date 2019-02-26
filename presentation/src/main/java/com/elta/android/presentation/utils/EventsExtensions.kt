@@ -1,6 +1,7 @@
 package com.elta.android.presentation.utils
 
 import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
@@ -9,6 +10,7 @@ import com.elta.android.domain.features.diary.tags.model.TagImage
 import com.elta.android.presentation.R
 import com.nullgr.core.resources.ResourceProvider
 
+@StringRes
 fun EventType.toName(): Int =
     when (this) {
         EventType.BREAD -> R.string.event_type_bread
@@ -68,6 +70,7 @@ fun TagImage.toIcon(): Int =
         TagImage.SPECIALEVENT -> R.drawable.ic_tag_specialevent
     }
 
+@StringRes
 fun InsulinType.toName(): Int =
     when (this) {
         InsulinType.ULTRASHORT -> R.string.insulin_type_ultrashort
@@ -78,6 +81,7 @@ fun InsulinType.toName(): Int =
         InsulinType.MIXED -> R.string.insulin_type_mixed
     }
 
+@StringRes
 fun ActivityType.toName(): Int =
     when (this) {
         ActivityType.RUNNING -> R.string.activity_type_running
@@ -123,4 +127,52 @@ fun ActivityType.toName(): Int =
         ActivityType.SURFING -> R.string.activity_type_surfing
         ActivityType.MARTIALARTS -> R.string.activity_type_martialarts
         ActivityType.ANOTHER -> R.string.activity_type_another
+    }
+
+@DrawableRes
+fun ActivityType.toIcon(): Int =
+    when (this) {
+        ActivityType.RUNNING -> R.drawable.ic_running
+        ActivityType.WALKING -> R.drawable.ic_walking
+        ActivityType.SWIMMING -> R.drawable.ic_swimming
+        ActivityType.FITNESS -> R.drawable.ic_fitness
+        ActivityType.CYCLING -> R.drawable.ic_cycling
+        ActivityType.BADMINTON -> R.drawable.ic_badminton
+        ActivityType.BASKETBALL -> R.drawable.ic_basketball
+        ActivityType.CROSSCOUNTRYSKIING -> R.drawable.ic_cross_country_skiing
+        ActivityType.SPORTCOMBATS -> R.drawable.ic_sport_combats
+        ActivityType.BOX -> R.drawable.ic_box
+        ActivityType.WRESTLING -> R.drawable.ic_wrestling
+        ActivityType.WATERPOLO -> R.drawable.ic_water_polo
+        ActivityType.VOLLEYBALL -> R.drawable.ic_volleyball
+        ActivityType.HANDBALL -> R.drawable.ic_handball
+        ActivityType.GYMNASTICS -> R.drawable.ic_gymnastics
+        ActivityType.GOLF -> R.drawable.ic_golf
+        ActivityType.SKIING -> R.drawable.ic_skiing
+        ActivityType.SKATING -> R.drawable.ic_skating
+        ActivityType.ROLLERSKATING -> R.drawable.ic_roller_skating
+        ActivityType.PINGPONG -> R.drawable.ic_ping_pong
+        ActivityType.BEACHVOLLEYBALL -> R.drawable.ic_beach_volleyball
+        ActivityType.TRAMPOLINING -> R.drawable.ic_trampolining
+        ActivityType.SNOWBOARDING -> R.drawable.ic_snowboarding
+        ActivityType.PEDESTRIANISM -> R.drawable.ic_pedestrianism
+        ActivityType.TENNIS -> R.drawable.ic_tennis
+        ActivityType.TRIATHLON -> R.drawable.ic_triathlon
+        ActivityType.WEIGHTLIFTING -> R.drawable.ic_weightlifting
+        ActivityType.FENCING -> R.drawable.ic_fencing
+        ActivityType.FOOTBALL -> R.drawable.ic_football
+        ActivityType.YOGA -> R.drawable.ic_yoga
+        ActivityType.HOCKEY -> R.drawable.ic_hockey
+        ActivityType.WHEELCHAIRRIDING -> R.drawable.ic_wheelchair_riding
+        ActivityType.HIKING -> R.drawable.ic_hiking
+        ActivityType.NORDICWALKING -> R.drawable.ic_nordic_walking
+        ActivityType.ROWING -> R.drawable.ic_rowing
+        ActivityType.HOUSEKEEPING -> R.drawable.ic_house_keeping
+        ActivityType.DANCING -> R.drawable.ic_dancing
+        ActivityType.HORSEBACKRIDING -> R.drawable.ic_horseback_riding
+        ActivityType.SHOOTING -> R.drawable.ic_shooting
+        ActivityType.SKATEBOARDING -> R.drawable.ic_surfing // TODO cahnge
+        ActivityType.SURFING -> R.drawable.ic_surfing
+        ActivityType.MARTIALARTS -> R.drawable.ic_martial_arts
+        ActivityType.ANOTHER -> R.drawable.ic_another
     }
