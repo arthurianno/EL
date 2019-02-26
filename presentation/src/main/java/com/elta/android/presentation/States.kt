@@ -30,8 +30,9 @@ sealed class States : StateData {
 
     data class MainRecordsScreenNewDayState(
         val resources: ResourceProvider,
+        val titleRes: Int,
         override val icon: Int? = null,
-        override val title: String,
+        override val title: String = resources.getString(titleRes),
         override val description: String = resources.getString(R.string.main_records_new_day_subtitle),
         override val button: String? = null
     ) : States()

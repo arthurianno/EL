@@ -20,6 +20,7 @@ class EventToCacheMapper @Inject constructor(
                 userId = userHolder.currentUser,
                 type = data.type.name,
                 additionTime = additionTime.getDate(),
+                additionTimeString = additionTime,
                 tagId = tagId,
                 note = note,
                 modificationTime = modificationTime?.dateFromTimestamp(),

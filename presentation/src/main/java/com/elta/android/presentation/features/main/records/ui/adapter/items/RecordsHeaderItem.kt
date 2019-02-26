@@ -1,8 +1,10 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
+import android.graphics.drawable.Drawable
 import com.nullgr.core.adapter.items.ListItem
 
 data class RecordsHeaderItem(
+    val background: Drawable?,
     val glucoseLevel: Double?,
     val glucoseLevelIndex: Double?,
     val glucoseLevelIndexIcon: Int?,
@@ -32,11 +34,3 @@ data class RecordsHeaderItem(
         INSULIN_CHANGED
     }
 }
-
-val emptyRecordsHeaderItem = RecordsHeaderItem(
-    glucoseLevel = null,
-    glucoseLevelIndex = null,
-    glucoseLevelIndexIcon = null,
-    breadLevel = null,
-    insulinLevel = null
-)

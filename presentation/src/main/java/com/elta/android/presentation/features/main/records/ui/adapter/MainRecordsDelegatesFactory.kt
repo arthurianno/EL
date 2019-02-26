@@ -26,7 +26,7 @@ class MainRecordsDelegatesFactory @Inject constructor(
         when (clazz) {
             RecordItem::class.java -> RecordDelegate(bus)
             RecordsGroupItem::class.java -> RecordsGroupDelegate(this, calculator, viewPool)
-            RecordsHeaderItem::class.java -> RecordsHeaderDelegate(resources)
+            RecordsHeaderItem::class.java -> RecordsHeaderDelegate(bus, resources)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }
