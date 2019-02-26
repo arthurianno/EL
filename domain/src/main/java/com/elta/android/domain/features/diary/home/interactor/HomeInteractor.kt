@@ -14,8 +14,6 @@ import com.elta.android.domain.features.diary.tags.model.Tag
 import java.util.Date
 import kotlin.math.abs
 
-private var entranceCount = 0
-
 fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelSettings): HomeModel {
 
     val sortedEvents = events.sortedByDescending { it.additionTime }
@@ -38,7 +36,6 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
     }
 
     return HomeModel(
-        // TODO: this is only for demo remove it
         isFirstEntrance = false,
         dayPeriod = getDayPeriod(Date().time),
         lastBreadEvent = lastBreadEvent,
