@@ -131,6 +131,7 @@ android {
             enable true
             reset()
             include "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+            universalApk true
         }
     }
 }
@@ -148,6 +149,23 @@ configurations {
 }
 androidExtensions {
     experimental = true
+}
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        // Filter is null for universal APKs.
+        def filter = output.getFilter(com.android.build.OutputFile.ABI)
+
+        if (filter == null) {
+            tasks.findAll {
+                it.name.startsWith("crashlyticsUploadDistribution${variant.name.capitalize()}")
+            }.each {
+                it.doFirst {
+                    ext.betaDistributionApkFilePath = output.outputFile.absolutePath
+                }
+            }
+        }
+    }
 }
 
 dependencies {
