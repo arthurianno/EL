@@ -1,3 +1,6 @@
+### Android_v0.6.0 ###
+- [ELTA-364] - Added home screen with list of events
+
 ### Android_v0.5.0 ###
 - [ELTA-363] - Added empty home screen
 
