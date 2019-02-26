@@ -147,9 +147,97 @@
     <string name="home_bottom_sheet_title">Что бы вы хотели записать?</string>
 
     <!-- EVENT TYPES -->
-    <string name="event_type_xe">Хлебные единицы</string>
+    <string name="event_type_bread">Хлебные единицы</string>
     <string name="event_type_insulin">Инсулин</string>
-    <string name="event_type_medicines">Медикаменты</string>
+    <string name="event_type_medicaments">Медикаменты</string>
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
+    <string name="event_type_glucose">Измерение глюкозы</string>
+
+    <string name="event_type_bread_pattern">%.1f ХЕ</string>
+    <string name="event_type_insulin_pattern">%.1f ед</string>
+    <string name="event_type_weight_pattern">%.1f кг</string>
+    <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
+    <string name="event_type_activity_pattern_short">%1$s мин</string>
+    <string name="event_type_glucose_pattern">%.1f ммоль/л</string>
+
+    <string name="event_type_bread_no_name">Приём пищи</string>
+    <string name="event_type_activity_no_name">Физическая активность</string>
+    <string name="event_type_glucose_no_name">Измерение глюкозы</string>
+    <string name="tag_name_no_tag">Без тега</string>
+    <string name="weight_name">Внесение замеров</string>
+
+    <!-- INSULIN TYPES -->
+    <string name="insulin_type_ultrashort">Ультракороткий</string>
+    <string name="insulin_type_short">Короткий</string>
+    <string name="insulin_type_intermidiate">Средний</string>
+    <string name="insulin_type_long">Длинный</string>
+    <string name="insulin_type_ultralong">Ультрадлинный</string>
+    <string name="insulin_type_mixed">Смешанный</string>
+
+    <!-- ACTIVITY TYPES -->
+    <string name="activity_type_running">Бег</string>
+    <string name="activity_type_walking">Ходьба</string>
+    <string name="activity_type_swimming">Плавание</string>
+    <string name="activity_type_fitness">Фитнес</string>
+    <string name="activity_type_cycling">Велоспорт</string>
+    <string name="activity_type_badminton">Бадминтон</string>
+    <string name="activity_type_basketball">Баскетбол</string>
+    <string name="activity_type_crosscountryskiing">Беговые лыжи</string>
+    <string name="activity_type_sportcombats">Спортивные единоборства</string>
+    <string name="activity_type_box">Бокс</string>
+    <string name="activity_type_wrestling">Борьба</string>
+    <string name="activity_type_waterpolo">Водное поло</string>
+    <string name="activity_type_volleyball">Волейбол</string>
+    <string name="activity_type_handball">Гандбол</string>
+    <string name="activity_type_gymnastics">Гимнастика</string>
+    <string name="activity_type_golf">Гольф</string>
+    <string name="activity_type_skiing">Горные лыжи</string>
+    <string name="activity_type_skating">Катание на коньках</string>
+    <string name="activity_type_rollerskating">Катание на роликовых коньках</string>
+    <string name="activity_type_pingpong">Настольный теннис</string>
+    <string name="activity_type_beachvolleyball">Пляжный волейбол</string>
+    <string name="activity_type_trampolining">Прыжки на батуте</string>
+    <string name="activity_type_snowboarding">Сноубординг</string>
+    <string name="activity_type_pedestrianism">Спортивная ходьба</string>
+    <string name="activity_type_tennis">Теннис</string>
+    <string name="activity_type_triathlon">Триатлон</string>
+    <string name="activity_type_weightlifting">Тяжелая атлетика</string>
+    <string name="activity_type_Fencing">Фехтование</string>
+    <string name="activity_type_football">Футбол</string>
+    <string name="activity_type_yoga">Йога</string>
+    <string name="activity_type_hockey">Хоккей</string>
+    <string name="activity_type_wheelchairriding">Езда на коляске</string>
+    <string name="activity_type_hiking">Хайкинг</string>
+    <string name="activity_type_nordicwalking">Скандинавская ходьба</string>
+    <string name="activity_type_rowing">Гребля</string>
+    <string name="activity_type_housekeeping">Работа по дому/в саду</string>
+    <string name="activity_type_dancing">Танцы</string>
+    <string name="activity_type_horsebackriding">Конный спорт</string>
+    <string name="activity_type_shooting">Стрельба</string>
+    <string name="activity_type_skateboarding">Скейтбординг</string>
+    <string name="activity_type_surfing">Серфинг</string>
+    <string name="activity_type_martialarts">Боевые искусства</string>
+    <string name="activity_type_another">Другое</string>
+
+    <string name="activity_duration_day">%d д</string>
+    <string name="activity_duration_hour">%d ч</string>
+    <string name="activity_duration_min">%d мин</string>
+    <string name="activity_duration_sec">%d сек</string>
+
+    <!-- MAIN RECORDS -->
+    <string name="main_records_firs_launch_title">Добро пожаловать</string>
+    <string name="main_records_firs_launch_subtitle">Чтобы добавить новую запись в дневник,\nвоспользуйтесь кнопкой "плюс" и выберите\nнужный показатель\n\nДля добавления записи об уровне глюкозы\nпроведите измерение с помощью\nглюкометра</string>
+
+    <string name="main_records_new_day_title_morning">Доброе утро</string>
+    <string name="main_records_new_day_title_afternoon">Добрый день</string>
+    <string name="main_records_new_day_title_evening">Добрый вечер</string>
+    <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте\nсинхронизироваться с глюкометром\nи внести первую запись в свой дневник</string>
+
+    <string name="main_records_header_title_bread">Хлебных ед</string>
+    <string name="main_records_header_title_glucose">Уровень глюкозы</string>
+    <string name="main_records_header_title_insulin">Инсулина</string>
+
+    <string name="main_records_mask_value">%s ед</string>
+    <string name="main_records_empty_value">—</string>
 </resources>

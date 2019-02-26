@@ -30,6 +30,8 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
 
     override val statusBarConfigProvider: StatusBarConfigProvider? = null
 
+    override val backgroundColor: Int? = null
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         navigator = FragmentNavigator(this)

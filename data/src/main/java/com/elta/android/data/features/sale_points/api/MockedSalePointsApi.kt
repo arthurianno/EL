@@ -2,14 +2,14 @@ package com.elta.android.data.features.sale_points.api
 
 import android.content.Context
 import com.elta.android.common.utils.log
-import com.elta.android.data.features.sale_points.dto.MetaDto
+import com.elta.android.data.features.common.dto.MetaDto
+import com.elta.android.data.features.common.getPage
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
-import timber.log.Timber
 import java.io.InputStreamReader
 
 class MockedSalePointsApi(private val context: Context) : SalePointsApi {
@@ -25,9 +25,8 @@ class MockedSalePointsApi(private val context: Context) : SalePointsApi {
                 list.addAll(Gson().fromJson<List<SalePointDto>>(reader, type))
             }
 
-            Timber.d(Thread.currentThread().name)
-            val pageOfPoints = list.getPage(page, PAGE_SIZE)
-            SalePointsDto(pageOfPoints, MetaDto(list.size, page, PAGE_SIZE))
+            val pageOfData = list.getPage(page, PAGE_SIZE)
+            SalePointsDto(pageOfData, MetaDto(list.size, page, PAGE_SIZE))
         }.log("Points", "meta") { it.meta.toString() }
 
     private companion object {

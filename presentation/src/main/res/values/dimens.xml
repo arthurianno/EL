@@ -48,4 +48,12 @@
 
     <dimen name="card_corner">8dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
+
+    <dimen name="home_between_margin">10dp</dimen>
+    <dimen name="home_margin_end">16dp</dimen>
+    <dimen name="overlap_first_item_margin">18dp</dimen>
+
+    <dimen name="main_records_height">290dp</dimen>
+    <dimen name="main_records_padding">24dp</dimen>
+    <dimen name="main_records_offset">242dp</dimen>
 </resources>

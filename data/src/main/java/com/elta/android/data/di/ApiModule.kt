@@ -2,10 +2,13 @@ package com.elta.android.data.di
 
 import android.content.Context
 import com.elta.android.common.di.qualifires.Token
-import com.elta.android.data.di.ApiModule.ApiConfig.USE_MOCKED_SALE_POINTS_API
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
+import com.elta.android.data.features.diary.events.api.EventsApi
+import com.elta.android.data.features.diary.events.api.MockedEventsApi
+import com.elta.android.data.features.diary.tags.api.MockedTagsApi
+import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.user.api.SettingsApi
@@ -48,12 +51,36 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): SalePointsApi =
-        when (USE_MOCKED_SALE_POINTS_API) {
+        when (ApiConfig.USE_MOCKED_SALE_POINTS_API) {
             true -> MockedSalePointsApi(context)
             else -> retrofit.create<SalePointsApi>(SalePointsApi::class.java)
         }
 
+    @Provides
+    @Singleton
+    fun provideEventsApi(
+        context: Context,
+        retrofit: Retrofit
+    ): EventsApi =
+        when (ApiConfig.USE_MOCKED_EVENTS_API) {
+            true -> MockedEventsApi(context)
+            else -> retrofit.create<EventsApi>(EventsApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideTagsApi(
+        context: Context,
+        retrofit: Retrofit
+    ): TagsApi =
+        when (ApiConfig.USE_MOCKED_TAGS_API) {
+            true -> MockedTagsApi(context)
+            else -> retrofit.create<TagsApi>(TagsApi::class.java)
+        }
+
     object ApiConfig {
         const val USE_MOCKED_SALE_POINTS_API = false
+        const val USE_MOCKED_EVENTS_API = false
+        const val USE_MOCKED_TAGS_API = false
     }
 }

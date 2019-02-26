@@ -9,6 +9,8 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
+import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
+import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
@@ -97,8 +99,18 @@ object Screens {
             navigationIntent(lat, lng, address)
     }
 
-    // MAIN FLOW
+    // HOME FLOW
     object HomeFlow : SupportAppScreen() {
         override fun getFragment() = HomeFlowFragment.newInstance()
+    }
+
+    // TABS
+    object MainTab : SupportAppScreen() {
+        override fun getFragment() = MainFlowFragment.newInstance()
+    }
+
+    // MAIN FLOW
+    object MainRecordsScreen : SupportAppScreen() {
+        override fun getFragment() = MainRecordsFragment.newInstance()
     }
 }

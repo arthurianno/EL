@@ -37,6 +37,8 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     protected abstract val statusBarConfigProvider: StatusBarConfigProvider?
 
+    protected open val backgroundColor: Int? = R.color.color_window_background
+
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
     open val router by lazy(LazyThreadSafetyMode.NONE) {
         ((parentFragment ?: activity) as RouterProvider).router as FlowRouter
@@ -63,12 +65,14 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         homeButtonView = view.findViewById(R.id.homeButtonView)
     }
 
+    override fun onResume() {
+        super.onResume()
+        backgroundColor?.let { activity?.window?.setBackgroundDrawableResource(it) }
+    }
+
     override fun onStart() {
         super.onStart()
-        statusBarConfigProvider?.let {
-            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
-            activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
-        }
+        initStatusBarConfig()
     }
 
     @CallSuper
@@ -88,6 +92,17 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
 
     override fun handleBack() {
         router.exit()
+    }
+
+    open fun initStatusBarConfig() {
+        statusBarConfigProvider.applyStatusBarConfig()
+    }
+
+    protected fun StatusBarConfigProvider?.applyStatusBarConfig() {
+        this?.let {
+            view?.applyInsetsToContentView(!it.drawUnderStatusBar)
+            activity?.window?.setStatusBarColor(it.statusBarColor, it.lightStatusBar)
+        }
     }
 
     private fun showSnackbar(data: SnackBarData) {

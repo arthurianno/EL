@@ -1,6 +1,7 @@
 package com.elta.android.data.features.sale_points.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import com.elta.android.data.features.sale_points.cache.SalePointsConditions
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
@@ -15,7 +16,7 @@ class SalePointsCachedDataSource @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
         Observable.fromCallable {
-            cache.get(SalePointsConditions.All)
+            cache.get(CommonConditions.All)
         }.map(fromCacheMapper::mapFromObjects)
 
     override fun getSalePoints(

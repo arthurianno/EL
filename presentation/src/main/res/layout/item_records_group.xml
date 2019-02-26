@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    app:cardCornerRadius="@dimen/card_corner"
+    app:cardElevation="0dp"
+    app:cardMaxElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_record_group"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/groupIconView"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                tools:src="@drawable/ic_event_medicaments" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/groupNameView"
+                style="@style/New.Headline5.BlackBlue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:lines="1"
+                tools:text="@tools:sample/lorem" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/groupStateView"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="12dp"
+                android:stateListAnimator="@drawable/selector_group_icon_animator"
+                app:srcCompat="@drawable/ic_arrow_down" />
+
+        </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/itemsContainerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_expanded="false">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/itemsView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never" />
+
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

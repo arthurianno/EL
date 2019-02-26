@@ -1,0 +1,191 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:6697420626765801241",
+      "lastPropertyId": "13:5607327283194514943",
+      "name": "SalePointCacheDto",
+      "properties": [
+        {
+          "id": "1:392071321748032581",
+          "name": "id"
+        },
+        {
+          "id": "2:2740189061387891066",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:6903008663868988168",
+          "name": "name"
+        },
+        {
+          "id": "4:4228641277243866155",
+          "name": "type"
+        },
+        {
+          "id": "5:4636704346031725540",
+          "name": "region"
+        },
+        {
+          "id": "6:735437868986304645",
+          "name": "city"
+        },
+        {
+          "id": "7:9058751639033436457",
+          "name": "address"
+        },
+        {
+          "id": "8:551080887049802226",
+          "name": "phone"
+        },
+        {
+          "id": "9:3053822631022506412",
+          "name": "latitude"
+        },
+        {
+          "id": "10:3975185315051658766",
+          "name": "longitude"
+        },
+        {
+          "id": "11:5877632020839739909",
+          "name": "timeStamp"
+        },
+        {
+          "id": "12:5732498039669845223",
+          "name": "modifiedState"
+        },
+        {
+          "id": "13:5607327283194514943",
+          "indexId": "1:5049058603170790455",
+          "name": "fullAddress"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:5982963766031290345",
+      "lastPropertyId": "16:4534211085864672993",
+      "name": "EventCachedDto",
+      "properties": [
+        {
+          "id": "1:7105984032723577790",
+          "name": "id"
+        },
+        {
+          "id": "2:1803987764994271304",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:4547071645338469172",
+          "name": "type"
+        },
+        {
+          "id": "4:7098375176323475402",
+          "name": "additionTime"
+        },
+        {
+          "id": "5:5561471174870734704",
+          "name": "tagId"
+        },
+        {
+          "id": "6:2220357999565801382",
+          "name": "note"
+        },
+        {
+          "id": "7:6241854495862624254",
+          "name": "modificationTime"
+        },
+        {
+          "id": "8:9157379137866537319",
+          "name": "value"
+        },
+        {
+          "id": "9:6583229833092561246",
+          "name": "name"
+        },
+        {
+          "id": "10:5886246000041659660",
+          "name": "kind"
+        },
+        {
+          "id": "11:8405758619725871361",
+          "name": "duration"
+        },
+        {
+          "id": "12:6400976524049145017",
+          "name": "activityType"
+        },
+        {
+          "id": "13:4436020323931534475",
+          "name": "mealTag"
+        },
+        {
+          "id": "14:4716768788257142137",
+          "name": "insulinType"
+        },
+        {
+          "id": "15:8865794857143658417",
+          "name": "state"
+        },
+        {
+          "id": "16:4534211085864672993",
+          "name": "userId"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:7269490173938270184",
+      "lastPropertyId": "8:5970261778621166859",
+      "name": "TagCachedDto",
+      "properties": [
+        {
+          "id": "1:5348712621338611844",
+          "name": "id"
+        },
+        {
+          "id": "2:2158825089604613816",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:8469353903357674267",
+          "name": "userId"
+        },
+        {
+          "id": "4:8150391136256062536",
+          "name": "image"
+        },
+        {
+          "id": "5:2917272193991273202",
+          "name": "isReadOnly"
+        },
+        {
+          "id": "6:119621998202467244",
+          "name": "modificationTime"
+        },
+        {
+          "id": "7:5946479875638262848",
+          "name": "state"
+        },
+        {
+          "id": "8:5970261778621166859",
+          "name": "name"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "3:7269490173938270184",
+  "lastIndexId": "1:5049058603170790455",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 4,
+  "modelVersionParserMinimum": 4,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
