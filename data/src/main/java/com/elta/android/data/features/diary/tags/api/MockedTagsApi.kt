@@ -5,31 +5,26 @@ import com.elta.android.common.utils.log
 import com.elta.android.data.features.common.dto.MetaDto
 import com.elta.android.data.features.common.getPage
 import com.elta.android.data.features.diary.tags.dto.TagDto
+import com.elta.android.data.features.diary.tags.dto.TagImageDto
 import com.elta.android.data.features.diary.tags.dto.TagsDto
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.google.gson.stream.JsonReader
 import io.reactivex.Observable
-import java.io.InputStreamReader
 
 class MockedTagsApi(private val context: Context) : TagsApi {
 
     private val list: MutableList<TagDto> = mutableListOf()
+    private val userTags = arrayListOf("User tag 1", "User tag 2", "User tag 3", "User tag 4")
 
     override fun getTags(lastSync: Long?, page: Int, pageSize: Int): Observable<TagsDto> =
         Observable.fromCallable {
             if (list.isEmpty()) {
-                val file = context.assets.open("tags.json")
-                val type = object : TypeToken<List<TagDto>>() {}.type
-                val reader = JsonReader(InputStreamReader(file))
-                list.addAll(Gson().fromJson<List<TagDto>>(reader, type))
+                userTags.map { name ->
+                    list.add(TagMockedFactory.create(TagMockedFactory.nextImage, name))
+                }
+                TagImageDto.values().map { image ->
+                    list.add(TagMockedFactory.create(image))
+                }
             }
-
-            val pageOfData = list.getPage(page, PAGE_SIZE)
-            TagsDto(pageOfData, MetaDto(list.size, page, PAGE_SIZE))
+            val pageOfData = list.getPage(page, pageSize)
+            TagsDto(pageOfData, MetaDto(pageOfData.size, page, pageSize))
         }.log("Tags", "meta") { it.meta.toString() }
-
-    private companion object {
-        const val PAGE_SIZE = 2
-    }
 }

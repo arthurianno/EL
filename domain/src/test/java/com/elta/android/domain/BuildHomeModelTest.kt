@@ -23,7 +23,7 @@ class BuildHomeModelTest {
     }
 
     @Test
-    fun buildHomeModel_OneGlucoseEvent_DirectionStable() {
+    fun buildHomeModel_OneGlucoseEvent_DirectionUp() {
         val event = EventTestFactory.create(type = EventType.GLUCOSE)
         val model = buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings())
 
@@ -31,7 +31,7 @@ class BuildHomeModelTest {
         assert(model.lastBreadEvent == null)
         assert(model.lastGlucoseEvent != null)
         assert(model.lastGlucoseEvent == event)
-        assert(model.glucoseLevelDirection == GlucoseLevelDirection.STABLE)
+        assert(model.glucoseLevelDirection == GlucoseLevelDirection.UP)
         assert(model.lastInsulinEvent == null)
     }
 

@@ -12,6 +12,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.model.Tag
 import java.util.Date
+import kotlin.math.abs
 
 fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelSettings): HomeModel {
 
@@ -42,6 +43,7 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
         lastGlucoseEvent = lastGlucoseEvent,
         glucoseLevel = lastGlucoseEvent?.glucoseLevel(settings),
         glucoseLevelDirection = lastGlucoseEvent?.glucoseLevelDirection(preLastGlucoseEvent),
+        glucoseLevelDifference = lastGlucoseEvent?.glucoseLevelDifference(preLastGlucoseEvent),
         eventsBlocks = getEventsBlocks(sortedEvents, tags)
     )
 }
@@ -49,7 +51,7 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
 fun getDayPeriod(now: Long): DayPeriod =
     when (now) {
         in morning -> DayPeriod.MORNING
-        in day -> DayPeriod.DAY
+        in day -> DayPeriod.AFTERNOON
         else -> DayPeriod.EVENING
     }
 
@@ -62,11 +64,14 @@ fun Event.glucoseLevel(settings: GlucoseLevelSettings): GlucoseLevel =
 
 fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection =
     when {
-        preLastEvent == null -> GlucoseLevelDirection.STABLE
+        preLastEvent == null -> GlucoseLevelDirection.UP
         this.value ?: 0.0 > preLastEvent.value ?: 0.0 -> GlucoseLevelDirection.UP
         this.value ?: 0.0 < preLastEvent.value ?: 0.0 -> GlucoseLevelDirection.DOWN
         else -> GlucoseLevelDirection.STABLE
     }
+
+fun Event.glucoseLevelDifference(preLastEvent: Event?): Double =
+    abs(this.value?.minus(preLastEvent?.value ?: 0.0) ?: 0.0)
 
 fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
     if (events.isEmpty()) {
@@ -82,7 +87,9 @@ fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
             block = mutableListOf()
             blocksMap[tagId] = block
         }
-        block.add(event)
+        if (event.tagId ?: nullTagId == tagId) {
+            block.add(event)
+        }
     }
 
     val blocks = mutableListOf<EventsBlock>()

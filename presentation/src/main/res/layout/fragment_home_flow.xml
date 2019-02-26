@@ -8,7 +8,25 @@
         android:id="@+id/containerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"/>
+        android:layout_marginBottom="56dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/bg_home_bottom_bar_shadow" />
+
+        <com.elta.android.presentation.widgets.BottomNavigationView
+            android:id="@+id/homeBottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <pl.bclogic.pulsator4droid.library.PulsatorLayout
         android:id="@+id/homePulseView"
@@ -17,12 +35,6 @@
         android:layout_height="142dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="-31dp" />
-
-    <com.elta.android.presentation.widgets.BottomNavigationView
-        android:id="@+id/homeBottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom" />
 
     <FrameLayout
         android:id="@+id/homeActionView"

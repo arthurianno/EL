@@ -1,7 +1,6 @@
 package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.toStringIso
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
@@ -29,7 +28,7 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it) },
                     type = EventTypeDto.valueOf(type)
                 ),
-                additionTime = additionTime.toStringIso(),
+                additionTime = additionTimeString,
                 tagId = tagId,
                 note = note,
                 modificationTime = modificationTime?.toTimestamp(),

@@ -6,22 +6,20 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.UserHolder
 
 fun <T : DataWithStateDto, R> updateCache(datas: List<T>, cache: Cache<R>, mapper: Mapper<in T, R>) {
-    val states = mutableMapOf<StateDto, MutableList<DataWithStateDto>>()
+    val created = mutableListOf<T>()
+    val updated = mutableListOf<T>()
+    val deleted = mutableListOf<T>()
     datas.forEach { data ->
-        var list = states[data.state]
-        if (list == null) {
-            list = mutableListOf()
-            states[data.state] = list
-        }
-        list.add(data)
-    }
-    states.forEach { entry ->
-        when (entry.key) {
-            StateDto.CREATED -> cache.add(mapper.mapFromObjects(entry.value as Collection<T>))
-            StateDto.DELETED -> cache.delete(CommonConditions.ByIds(entry.value.map { it.id.hashCode().toLong() }))
-            StateDto.UPDATED -> cache.update(mapper.mapFromObjects(entry.value as Collection<T>))
+        when (data.state) {
+            StateDto.CREATED -> created.add(data)
+            StateDto.UPDATED -> updated.add(data)
+            StateDto.DELETED -> deleted.add(data)
         }
     }
+
+    cache.add(mapper.mapFromObjects(created))
+    cache.update(mapper.mapFromObjects(updated))
+    cache.delete(CommonConditions.ByIds(deleted.map { it.id.hashCode().toLong() }))
 }
 
 fun <T> UserHolder.doInUserExists(action: (user: Long) -> T): T {

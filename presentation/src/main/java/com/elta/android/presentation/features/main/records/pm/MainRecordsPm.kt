@@ -1,27 +1,22 @@
 package com.elta.android.presentation.features.main.records.pm
 
-import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
+import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
-import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
-import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
-import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
-import com.elta.android.presentation.utils.getGreetingText
-import com.elta.android.presentation.utils.toIconWithBg
-import com.elta.android.presentation.utils.toName
-import com.nullgr.core.adapter.items.ListItem
-import timber.log.Timber
-import java.util.Calendar
+import com.elta.android.presentation.core.ui.state_view.StateData
+import com.elta.android.presentation.features.main.records.MainRecordsMapper
 import javax.inject.Inject
 
-@Suppress("MagicNumber", "ForEachOnRange")
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -31,42 +26,6 @@ class MainRecordsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-
-        items.consumer.accept(arrayListOf<ListItem>().apply {
-            add(
-                RecordsHeaderItem(
-                    null,
-                    1.2,
-                    R.drawable.ic_change_index_down,
-                    4.5,
-                    6.2
-                )
-            )
-            (0..5).forEach { group ->
-                add(
-                    RecordsGroupItem(
-                        id = group,
-                        icon = R.drawable.ic_event_medicine,
-                        name = "Name #$group",
-                        items = arrayListOf<ListItem>().apply {
-                            EventType.values().forEachIndexed { index, event ->
-                                add(
-                                    RecordItem(
-                                        id = index,
-                                        icon = event.toIconWithBg(),
-                                        title = "Title #$event",
-                                        type = resources.getString(event.toName()),
-                                        count = "$index ед",
-                                        date = "12:00",
-                                        showLabel = index % 2 == 0
-                                    )
-                                )
-                            }
-                        }
-                    )
-                )
-            }
-        })
 
         loadScreenAction.observable
             .skipWhileInProgress()
@@ -85,25 +44,35 @@ class MainRecordsPm @Inject constructor(
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
-
-        bindMainScreenState()
     }
-
-    private fun bindMainScreenState() {
-        mainScreenState.dataState.consumer.accept(makeNewDayLaunchState())
-        mainScreenState.visibilityState.consumer.accept(false)
-    }
-
-    private fun makeFirsLaunchState() =
-        States.MainRecordsScreenFirstLaunchState(resources)
-
-    private fun makeNewDayLaunchState() =
-        States.MainRecordsScreenNewDayState(
-            resources,
-            title = Calendar.getInstance().getGreetingText(resources)
-        )
 
     private fun handleSuccess(model: HomeModel) {
-        Timber.d(model.toString())
+        bus.event(Events.HomeModelChanged(model))
+
+        if (model.isFirstEntrance) {
+            mainScreenState.dataState.consumer.accept(model.launchState())
+            mainScreenState.visibilityState.consumer.accept(true)
+        } else if (!model.hasEvents) {
+            mainScreenState.dataState.consumer.accept(model.launchState())
+            mainScreenState.visibilityState.consumer.accept(true)
+        } else {
+            mainScreenState.visibilityState.consumer.accept(false)
+        }
+
+        items.consumer.accept(recordsMapper.mapFromObject(model))
     }
+
+    private fun HomeModel.launchState(): StateData? =
+        when {
+            this.isFirstEntrance -> States.MainRecordsScreenFirstLaunchState(resources)
+            !this.hasEvents -> States.MainRecordsScreenNewDayState(resources, dayPeriod.greetingTitle())
+            else -> null
+        }
+
+    private fun DayPeriod.greetingTitle(): Int =
+        when (this) {
+            DayPeriod.MORNING -> R.string.main_records_new_day_title_morning
+            DayPeriod.AFTERNOON -> R.string.main_records_new_day_title_afternoon
+            DayPeriod.EVENING -> R.string.main_records_new_day_title_evening
+        }
 }

@@ -10,6 +10,7 @@ data class HomeModel(
     val lastGlucoseEvent: Event?,
     val glucoseLevel: GlucoseLevel?,
     val glucoseLevelDirection: GlucoseLevelDirection?,
+    val glucoseLevelDifference: Double?,
     val eventsBlocks: List<EventsBlock>
 ) {
     val hasEvents: Boolean

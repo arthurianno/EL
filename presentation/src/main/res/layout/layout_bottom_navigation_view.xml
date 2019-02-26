@@ -12,7 +12,6 @@
         android:layout_height="56dp"
         android:layout_gravity="bottom"
         android:background="@color/white"
-        android:elevation="3dp"
         android:gravity="center"
         android:orientation="horizontal">
 

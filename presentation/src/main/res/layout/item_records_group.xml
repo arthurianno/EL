@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
     app:cardCornerRadius="@dimen/card_corner"
-    app:cardElevation="1dp"
-    app:cardMaxElevation="1dp">
+    app:cardElevation="0dp"
+    app:cardMaxElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_record_group"
         android:orientation="vertical">
 
         <LinearLayout
@@ -25,7 +27,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                tools:src="@drawable/ic_event_medicine" />
+                tools:src="@drawable/ic_event_medicaments" />
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/groupNameView"
@@ -34,7 +36,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:layout_weight="1"
+                android:ellipsize="end"
+                android:lines="1"
                 tools:text="@tools:sample/lorem" />
 
             <android.support.v7.widget.AppCompatImageView
