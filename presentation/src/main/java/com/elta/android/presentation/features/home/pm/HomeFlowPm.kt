@@ -82,7 +82,11 @@ class HomeFlowPm @Inject constructor(
         // TODO TEST CASE ONLY
         router.startFlow(
             Screens.EventsChooserScreen(
-                ChooserConfiguration(ChooserType.GROUP_TAGS, event)
+                when (event) {
+                    EventType.INSULIN, EventType.ACTIVITY ->
+                        ChooserConfiguration(ChooserType.VARIANTS, event)
+                    else -> ChooserConfiguration(ChooserType.GROUP_TAGS, event)
+                }
             )
         )
     }
