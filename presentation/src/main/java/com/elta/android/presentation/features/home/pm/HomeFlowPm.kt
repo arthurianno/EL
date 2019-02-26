@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.pm
 
+import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.presentation.Clicks
@@ -10,10 +11,11 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
+import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
-import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class HomeFlowPm @Inject constructor(
@@ -69,16 +71,24 @@ class HomeFlowPm @Inject constructor(
     private fun observeClicks() {
         bus.clicks<Clicks.AddUserEvent>()
             .map { it.event }
+            .doOnNext { closeBottomSheetCommand.consumer.accept(Unit) }
+            .delay(OPEN_EVENT_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(::handleAddEventClick)
-            .map { Unit }
-            .doOnNext(closeBottomSheetCommand.consumer)
             .subscribe()
             .untilDestroy()
     }
 
     private fun handleAddEventClick(event: EventType) {
-        Timber.d("handleAddEventClick $event")
-        // TODO navigateTo -> Add event screen
+        // TODO TEST CASE ONLY
+        router.startFlow(
+            Screens.EventsChooserScreen(
+                when (event) {
+                    EventType.INSULIN, EventType.ACTIVITY ->
+                        ChooserConfiguration(ChooserType.VARIANTS, event)
+                    else -> ChooserConfiguration(ChooserType.GROUP_TAGS, event)
+                }
+            )
+        )
     }
 
     private fun EventType.toListItem() =
@@ -87,4 +97,8 @@ class HomeFlowPm @Inject constructor(
             iconRes = this.toIcon(),
             event = this
         )
+
+    companion object {
+        private const val OPEN_EVENT_SCREEN_DELAY = 300L
+    }
 }

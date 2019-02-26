@@ -56,4 +56,5 @@
     <dimen name="main_records_height">290dp</dimen>
     <dimen name="main_records_padding">24dp</dimen>
     <dimen name="main_records_offset">242dp</dimen>
+    <dimen name="overlap_margin_8dp">-8dp</dimen>
 </resources>

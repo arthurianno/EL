@@ -9,6 +9,8 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
+import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
+import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
@@ -112,5 +114,9 @@ object Screens {
     // MAIN FLOW
     object MainRecordsScreen : SupportAppScreen() {
         override fun getFragment() = MainRecordsFragment.newInstance()
+    }
+
+    data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
+        override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
     }
 }

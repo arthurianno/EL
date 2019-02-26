@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/appBarLayoutView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_gradient_green"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp">
+
+        <include layout="@layout/layout_toolbar" />
+    </FrameLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/itemsView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/overlap_margin_8dp"
+        android:layout_weight="1"
+        android:overScrollMode="never" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/confirmButtonView"
+        style="@style/Button.Large"
+        android:layout_marginBottom="@dimen/overlap_margin_8dp"
+        android:text="@string/events_options_chooser_button_confirm"
+        android:visibility="gone" />
+</LinearLayout>
