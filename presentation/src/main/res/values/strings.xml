@@ -232,7 +232,7 @@
     <string name="main_records_new_day_title_morning">Доброе утро</string>
     <string name="main_records_new_day_title_afternoon">Добрый день</string>
     <string name="main_records_new_day_title_evening">Добрый вечер</string>
-    <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте\nсинхронизироваться с глюкометроми\nвнести первую запись в свой дневник</string>
+    <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте\nсинхронизироваться с глюкометром\nи внести первую запись в свой дневник</string>
 
     <string name="main_records_header_title_bread">Хлебных ед</string>
     <string name="main_records_header_title_glucose">Уровень глюкозы</string>

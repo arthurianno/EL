@@ -39,7 +39,7 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
 
     return HomeModel(
         // TODO: this is only for demo remove it
-        isFirstEntrance = entranceCount++ % 2 == 0,
+        isFirstEntrance = false,
         dayPeriod = getDayPeriod(Date().time),
         lastBreadEvent = lastBreadEvent,
         lastInsulinEvent = lastInsulinEvent,
