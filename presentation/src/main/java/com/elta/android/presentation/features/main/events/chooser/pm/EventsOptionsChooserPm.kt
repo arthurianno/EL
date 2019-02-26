@@ -30,7 +30,7 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private val selectedItemIdState = State(NONE_ID)
     private val configurationState = State<ChooserConfiguration>()
-    private val loadTagsAction = Action<ChooserConfiguration>()
+    private val loadChooserOptionsAction = Action<ChooserConfiguration>()
 
     override fun onCreate() {
         super.onCreate()
@@ -38,11 +38,11 @@ class EventsOptionsChooserPm @Inject constructor(
         configurationState.observable
             .doOnNext(::setUpToolbarTitle)
             .doOnNext(::setUpAppBarBackground)
-            .doOnNext(loadTagsAction.consumer)
+            .doOnNext(loadChooserOptionsAction.consumer)
             .subscribe()
             .untilDestroy()
 
-        loadTagsAction.observable
+        loadChooserOptionsAction.observable
             .map(::createParams)
             .flatMap {
                 getChooserOptionsUseCase.execute(it)
