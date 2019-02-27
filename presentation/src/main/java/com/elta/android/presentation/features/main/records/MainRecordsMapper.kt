@@ -17,6 +17,8 @@ import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -26,18 +28,28 @@ class MainRecordsMapper @Inject constructor(
     private val resources: ResourceProvider
 ) : Mapper<HomeModel, List<ListItem>> {
 
+    private val numberFormat by lazy {
+        DecimalFormat("#.#").apply {
+            minimumFractionDigits = 1
+            decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault()).apply {
+                decimalSeparator = ','
+            }
+        }
+    }
+
     override fun mapFromObject(source: HomeModel): List<ListItem> =
         arrayListOf<ListItem>().apply {
             add(source.header())
-            addAll(source.eventsBlocks.map { it.group() })
+            addAll(source.eventsBlocks.mapIndexed { index, event -> event.group(index == 0) })
         }
 
-    private fun EventsBlock.group(): ListItem =
+    private fun EventsBlock.group(expand: Boolean): ListItem =
         RecordsGroupItem(
             id = tag?.id ?: "tag",
             icon = tag.toIcon(),
             name = tag.toName(resources),
-            items = events.map { it.record() }
+            items = events.map { it.record() },
+            isExpanded = expand
         )
 
     private fun Event.record(): ListItem =
@@ -53,10 +65,10 @@ class MainRecordsMapper @Inject constructor(
 
     private fun Event.formatValue(): String? =
         when (type) {
-            EventType.INSULIN -> resources.getString(R.string.event_type_insulin_pattern, checkNotNull(value))
-            EventType.BREAD -> resources.getString(R.string.event_type_bread_pattern, checkNotNull(value))
-            EventType.WEIGHT -> resources.getString(R.string.event_type_weight_pattern, checkNotNull(value))
-            EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_pattern, checkNotNull(value))
+            EventType.INSULIN -> resources.getString(R.string.event_type_insulin_pattern, value.format() ?: "")
+            EventType.BREAD -> resources.getString(R.string.event_type_bread_pattern, value.format() ?: "")
+            EventType.WEIGHT -> resources.getString(R.string.event_type_weight_pattern, value.format() ?: "")
+            EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_pattern, value.format() ?: "")
             EventType.ACTIVITY -> this.formatDuration(resources)
             else -> null
         }
@@ -87,11 +99,11 @@ class MainRecordsMapper @Inject constructor(
     private fun HomeModel.header(): ListItem =
         RecordsHeaderItem(
             background = glucoseLevel.toBackground(),
-            glucoseLevel = this.lastGlucoseEvent?.value,
-            glucoseLevelIndex = this.glucoseLevelDifference,
+            glucoseLevel = lastGlucoseEvent?.value.format(),
+            glucoseLevelIndex = glucoseLevelDifference.format(),
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
-            breadLevel = this.lastBreadEvent?.value,
-            insulinLevel = this.lastInsulinEvent?.value
+            breadLevel = lastBreadEvent?.value.format(),
+            insulinLevel = lastInsulinEvent?.value.format()
         )
 
     private fun GlucoseLevelDirection.icon(): Int? =
@@ -136,6 +148,12 @@ class MainRecordsMapper @Inject constructor(
 
         return time.toString()
     }
+
+    private fun Double?.format(): String? =
+        when {
+            this == null -> null
+            else -> numberFormat.format(this)
+        }
 
     private companion object {
         const val HOURS_IN_DAY = 24

@@ -12,7 +12,6 @@ import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView
 import kotlinx.android.synthetic.main.item_records_header.*
-import java.text.DecimalFormat
 
 class RecordsHeaderDelegate(
     private val bus: RxBus,
@@ -21,8 +20,6 @@ class RecordsHeaderDelegate(
 
     override val layoutResource: Int = R.layout.item_records_header
     override val itemType: Any = RecordsHeaderItem::class
-
-    private val numberFormat by lazy { DecimalFormat("#.#") }
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
         val item = items[position] as RecordsHeaderItem
@@ -59,7 +56,7 @@ class RecordsHeaderDelegate(
 
             item.glucoseLevel?.let { glucoseLevelValueView.text = it.format() }
 
-            glucoseLevelDirectionView.toggleView(item.glucoseLevelIndex != 0.0)
+            glucoseLevelDirectionView.toggleView(item.glucoseLevelIndex != null)
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
             item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
 
@@ -79,11 +76,10 @@ class RecordsHeaderDelegate(
         }
     }
 
-    private fun Double.format(): String = numberFormat.format(this)
 
-    private fun Double?.formatAsValueOrEmpty(): String =
+    private fun String?.formatAsValueOrEmpty(): String =
         when {
-            this != null -> resources.getString(R.string.main_records_mask_value, this.format())
+            this != null -> resources.getString(R.string.main_records_mask_value, this)
             else -> resources.getString(R.string.main_records_empty_value)
         }
 }

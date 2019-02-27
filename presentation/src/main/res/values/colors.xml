@@ -7,7 +7,7 @@
     <!--TODO maybe its no need to keep this color -->
     <color name="color_status_bar_dark">#f3f2f2</color>
     <color name="color_status_bar_light">#f3f2f2</color>
-    <color name="color_status_bar_transparent">#193d4556</color>
+    <color name="color_status_bar_transparent">#0c373737</color>
 
     <!-- PROJECT PALETTE, DO NOT USE THIS COLORS DIRECTLY -->
     <color name="blue">#245aa7</color>
@@ -128,4 +128,10 @@
 
     <color name="color_background_red_gradient_start">@color/g_orange_a</color>
     <color name="color_background_red_gradient_end">@color/g_orange_b</color>
+
+    <color name="color_chooser_bg_bread">@color/g_orange_a</color>
+    <color name="color_chooser_bg_activity">@color/g_purpur_b</color>
+    <color name="color_chooser_bg_weight">@color/g_green_b</color>
+    <color name="color_chooser_bg_medicaments">@color/shade_blue3</color>
+    <color name="color_chooser_bg_insulin">@color/shade_g_purpur_a</color>
 </resources>

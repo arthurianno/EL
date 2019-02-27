@@ -99,6 +99,6 @@ class HomeFlowPm @Inject constructor(
         )
 
     companion object {
-        private const val OPEN_EVENT_SCREEN_DELAY = 300L
+        private const val OPEN_EVENT_SCREEN_DELAY = 400L
     }
 }

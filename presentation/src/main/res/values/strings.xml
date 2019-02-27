@@ -154,12 +154,12 @@
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Измерение глюкозы</string>
 
-    <string name="event_type_bread_pattern">%.1f ХЕ</string>
-    <string name="event_type_insulin_pattern">%.1f ед</string>
-    <string name="event_type_weight_pattern">%.1f кг</string>
+    <string name="event_type_bread_pattern">%s ХЕ</string>
+    <string name="event_type_insulin_pattern">%s ед</string>
+    <string name="event_type_weight_pattern">%s кг</string>
     <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
     <string name="event_type_activity_pattern_short">%1$s мин</string>
-    <string name="event_type_glucose_pattern">%.1f ммоль/л</string>
+    <string name="event_type_glucose_pattern">%s ммоль/л</string>
 
     <string name="event_type_bread_no_name">Приём пищи</string>
     <string name="event_type_activity_no_name">Физическая активность</string>
