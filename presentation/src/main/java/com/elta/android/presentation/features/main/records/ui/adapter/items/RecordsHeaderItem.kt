@@ -5,11 +5,11 @@ import com.nullgr.core.adapter.items.ListItem
 
 data class RecordsHeaderItem(
     val background: Drawable?,
-    val glucoseLevel: Double?,
-    val glucoseLevelIndex: Double?,
+    val glucoseLevel: String?,
+    val glucoseLevelIndex: String?,
     val glucoseLevelIndexIcon: Int?,
-    val breadLevel: Double?,
-    val insulinLevel: Double?
+    val breadLevel: String?,
+    val insulinLevel: String?
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {

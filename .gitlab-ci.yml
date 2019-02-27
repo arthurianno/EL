@@ -27,10 +27,6 @@ beta:
   when: on_success
   script:
     - ./gradlew clean build crashlyticsUploadDistributionDebug
-  artifacts:
-    expire_in: 1 week
-    paths:
-    - app/build/outputs/
 
 # For tag v0.0.0-rc
 rc:

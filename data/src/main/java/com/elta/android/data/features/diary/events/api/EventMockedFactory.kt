@@ -30,13 +30,14 @@ object EventMockedFactory {
         mealTag: MealTagDto? = null,
         insulinType: InsulinTypeDto? = null,
         tagId: String? = null,
+        note: String? = null,
         state: StateDto = StateDto.CREATED
     ): EventDto =
         EventDto(
             id = id,
             additionTime = Date().toStringIso(),
             tagId = tagId,
-            note = "Test note",
+            note = note,
             modificationTime = Date().time,
             state = state,
             data = EventDataDto(

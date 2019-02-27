@@ -23,12 +23,12 @@ class MockedEventsApi(private val context: Context) : EventsApi {
         Observable.fromCallable {
 
             if (list.isEmpty()) {
-                EventTypeDto.values().forEachIndexed { index, type ->
-                    (0..3).forEach { inner ->
+                (0..3).forEach { inner ->
+                    EventTypeDto.values().forEachIndexed { index, type ->
                         list.add(
                             EventMockedFactory.create(
                                 type = type,
-                                value = inner * index.toDouble(),
+                                value = (1..12).random().toDouble(),
                                 activityType = if (type == EventTypeDto.ACTIVITY)
                                     ActivityTypeDto.values().random()
                                 else
@@ -45,6 +45,7 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                                     TagMockedFactory.nextId
                                 else
                                     null,
+                                note = if (index % 2 == 0) "Test note" else null,
                                 state = StateDto.values().random()
                             )
                         )

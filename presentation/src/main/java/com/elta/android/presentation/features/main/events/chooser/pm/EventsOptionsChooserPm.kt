@@ -134,12 +134,12 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun setUpAppBarBackground(configuration: ChooserConfiguration) {
         appBarBackgroundCommand.consumer.accept(
             when (configuration.eventType) {
-                EventType.BREAD -> R.drawable.bg_gradient_bread
-                EventType.ACTIVITY -> R.drawable.bg_gradient_activity
-                EventType.WEIGHT -> R.drawable.bg_gradient_weight
-                EventType.MEDICAMENTS -> R.drawable.bg_gradient_medicine
-                EventType.INSULIN -> R.drawable.bg_gradient_insulin
-                else -> R.drawable.bg_gradient_insulin
+                EventType.BREAD -> R.color.color_chooser_bg_bread
+                EventType.ACTIVITY -> R.color.color_chooser_bg_activity
+                EventType.WEIGHT -> R.color.color_chooser_bg_weight
+                EventType.MEDICAMENTS -> R.color.color_chooser_bg_medicaments
+                EventType.INSULIN -> R.color.color_chooser_bg_insulin
+                else -> R.color.color_chooser_bg_insulin
             }
         )
     }
