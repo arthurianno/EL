@@ -1,3 +1,6 @@
+### Android_v0.7.2 ###
+- [ELTA-481] - Fixed date format
+
 ### Android_v0.7.1 ###
 - [ELTA-457] - Fixed minor issues due to demo results
 
