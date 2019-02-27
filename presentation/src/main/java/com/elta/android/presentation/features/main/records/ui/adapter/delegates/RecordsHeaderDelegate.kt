@@ -76,7 +76,6 @@ class RecordsHeaderDelegate(
         }
     }
 
-
     private fun String?.formatAsValueOrEmpty(): String =
         when {
             this != null -> resources.getString(R.string.main_records_mask_value, this)
