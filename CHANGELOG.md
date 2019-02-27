@@ -1,6 +1,11 @@
+### Android_v0.7.1 ###
+- [ELTA-457] - Fixed minor issues due to demo results
+
+### Android_v0.7.0 ###
+- [ELTA-374] - Added options selection screen for events creation process
+
 ### Android_v0.6.0 ###
 - [ELTA-364] - Added home screen with list of events
-- [ELTA-374] - Added options selection screen for events creation process
 
 ### Android_v0.5.0 ###
 - [ELTA-363] - Added empty home screen
