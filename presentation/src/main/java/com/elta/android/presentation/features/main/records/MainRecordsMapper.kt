@@ -78,9 +78,13 @@ class MainRecordsMapper @Inject constructor(
 
     // TODO: rework this solution using Android310
     private fun Event.formatDate(): String {
-        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault()).parse(additionTimeString)
-        val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
-        return "в ${tokens[0]} (UTC ${tokens[1]})"
+        return try {
+            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSSXXX", Locale.getDefault()).parse(additionTimeString)
+            val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
+            "в ${tokens[0]} (UTC ${tokens[1]})"
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     private fun Event.toTitle(): String =
