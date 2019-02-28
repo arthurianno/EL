@@ -3,6 +3,7 @@ package com.elta.android.presentation
 import android.content.Context
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
@@ -11,6 +12,7 @@ import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
+import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
@@ -114,6 +116,10 @@ object Screens {
     // MAIN FLOW
     object MainRecordsScreen : SupportAppScreen() {
         override fun getFragment() = MainRecordsFragment.newInstance()
+    }
+
+    data class EventsCreationScreen(val eventType: EventType) : SupportAppScreen() {
+        override fun getFragment() = EventCreationFragment.newInstance(eventType)
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
