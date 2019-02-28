@@ -2,15 +2,17 @@ package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.CommonConditions
-import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.cache.EventsCache
 import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
+import com.elta.android.data.features.diary.events.dto.EventDto
+import io.reactivex.Completable
 import io.reactivex.Observable
 import java.util.Date
 import javax.inject.Inject
 
 class EventsCachedDataSource @Inject constructor(
+    private val toCacheMapper: Mapper<EventDto, EventCachedDto>,
     private val fromCacheMapper: Mapper<EventCachedDto, EventDto>,
     private val cache: EventsCache
 ) : EventsDataSource {
@@ -24,4 +26,19 @@ class EventsCachedDataSource @Inject constructor(
         Observable.fromCallable {
             cache.get(EventsConditions.ByPeriod(start, end))
         }.map(fromCacheMapper::mapFromObjects)
+
+    override fun addEvents(events: List<EventDto>): Completable =
+        Completable.fromCallable {
+            cache.add(toCacheMapper.mapFromObjects(events))
+        }
+
+    override fun updateEvents(events: List<EventDto>): Completable =
+        Completable.fromCallable {
+            cache.update(toCacheMapper.mapFromObjects(events))
+        }
+
+    override fun deleteEvents(events: List<EventDto>): Completable =
+        Completable.fromCallable {
+            cache.delete(CommonConditions.ByIds(events.map { it.id.hashCode().toLong() }))
+        }
 }

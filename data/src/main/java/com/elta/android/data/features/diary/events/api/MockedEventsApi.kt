@@ -11,6 +11,7 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
+import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.tags.api.TagMockedFactory
 import io.reactivex.Observable
 
@@ -57,4 +58,13 @@ class MockedEventsApi(private val context: Context) : EventsApi {
             val pageOfData = list.getPage(page, pageSize)
             EventsDto(pageOfData, MetaDto(list.size, page, pageSize))
         }.log("Events", "meta") { it.meta.toString() }
+
+    override fun addEvents(events: List<EventDto>): Observable<List<EventDto>> =
+        Observable.just(events)
+
+    override fun updateEvents(events: List<EventDto>): Observable<List<EventDto>> =
+        Observable.just(events)
+
+    override fun deleteEvents(events: List<SimpleEventDto>): Observable<List<EventDto>> =
+        Observable.empty()
 }
