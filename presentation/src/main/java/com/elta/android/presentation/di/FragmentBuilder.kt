@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.di.EventsOptionsChooserModule
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
+import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
@@ -108,6 +109,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [MainRecordsModule::class])
     abstract fun bindMainRecordsFragment(): MainRecordsFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEventCreationFragment(): EventCreationFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [EventsOptionsChooserModule::class])
