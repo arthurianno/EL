@@ -134,4 +134,6 @@
     <color name="color_chooser_bg_weight">@color/g_green_b</color>
     <color name="color_chooser_bg_medicaments">@color/shade_blue3</color>
     <color name="color_chooser_bg_insulin">@color/shade_g_purpur_a</color>
+
+    <color name="color_black_transparent">#10000000</color>
 </resources>
