@@ -9,6 +9,8 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
+import com.nullgr.core.ui.toast.showToast
 import kotlinx.android.synthetic.main.fragment_event_creation.*
 
 class EventCreationFragment : BaseFragment<EventCreationPm>() {
@@ -19,9 +21,25 @@ class EventCreationFragment : BaseFragment<EventCreationPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarView.title = "Вес"
+        toolbarView.title = "Вес" // TODO for test
         toolbarView.setNavigationIcon(R.drawable.ic_dialog_close_white)
         toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
+
+        // TODO for test
+        formPickerView.config = FormMeasurementConfig(
+            firstPickerMaxValue = 200,
+            firstPickerMinValue = 0,
+            secondPickerMaxValue = 9,
+            secondPickerMinValue = 0,
+            firstMeasureUnit = null,
+            secondMeasureUnit = "sec"
+        ) { left, right -> ((left * 10.0 + right) / 10.0) }
+    }
+
+    override fun onBindPresentationModel(pm: EventCreationPm) {
+        super.onBindPresentationModel(pm)
+        // TODO for test
+        formPickerView.valueChanges().bindTo { it.toString().showToast(activity) }
     }
 
     companion object {
