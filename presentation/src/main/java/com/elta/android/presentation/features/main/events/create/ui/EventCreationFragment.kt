@@ -13,6 +13,7 @@ import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.toast.showToast
 import kotlinx.android.synthetic.main.fragment_event_creation.*
 
+@Suppress("MagicNumber")
 class EventCreationFragment : BaseFragment<EventCreationPm>() {
 
     override val screenLayout: Int = R.layout.fragment_event_creation
@@ -33,7 +34,7 @@ class EventCreationFragment : BaseFragment<EventCreationPm>() {
             secondPickerMinValue = 0,
             firstMeasureUnit = null,
             secondMeasureUnit = "sec"
-        ) { left, right -> ((left * 10.0 + right) / 10.0) }
+        ) { left, right -> (left * 10.0 + right) / 10.0 }
     }
 
     override fun onBindPresentationModel(pm: EventCreationPm) {

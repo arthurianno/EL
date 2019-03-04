@@ -51,7 +51,6 @@ class FormPicker @JvmOverloads constructor(
             checkNotNull(config).resultMappingFunction.invoke(left, right)
         }
 
-
     private fun initPicker() {
         val c = checkNotNull(config)
         leftPickerView.maxValue = c.firstPickerMaxValue
