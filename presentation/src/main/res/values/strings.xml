@@ -249,4 +249,11 @@
     <string name="events_options_chooser_header_tags">Доступные теги</string>
     <string name="events_options_chooser_header_variants">Доступные варианты</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
+
+
+    <string name="events_creation_hint_tags">Тег для группировки</string>
+    <string name="events_creation_hint_activities">Вид активности</string>
+    <string name="events_creation_hint_insulin">Тип исулина *</string>
+    <string name="events_creation_hint_note">Добавить заметку</string>
+    <string name="events_creation_save_button">Сохранить запись</string>
 </resources>

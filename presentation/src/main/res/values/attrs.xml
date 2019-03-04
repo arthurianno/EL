@@ -20,4 +20,11 @@
         <attr name="bnm_selected_color" format="reference" />
         <attr name="bnm_normal_color" format="reference" />
     </declare-styleable>
+
+    <declare-styleable name="FormSelectorView">
+        <attr name="fsv_icon" format="reference" />
+        <attr name="fsv_hint" format="reference|string" />
+        <attr name="fsv_title" format="reference|string" />
+        <attr name="fsv_draw_arrow" format="boolean" />
+    </declare-styleable>
 </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/eventFormContainerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -49,7 +50,7 @@
                     android:layout_marginStart="8dp"
                     android:alpha="0.6"
                     android:maxLines="1"
-                    android:text="Some big text with ranges for event type" />
+                    tools:text="Some big text with ranges for event type" />
 
             </LinearLayout>
 
@@ -75,7 +76,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <View
                 android:layout_width="32dp"
@@ -85,13 +88,73 @@
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/shape_sliding_panel" />
 
-            <TextView
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/formInputView"
+                style="@style/EventFormInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Some text here" />
-        </LinearLayout>
+                android:layout_marginTop="4dp"
+                android:paddingTop="16dp" />
 
+            <com.elta.android.presentation.widgets.FormSelectorView
+                android:id="@+id/formVariantSelectorView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp" />
+
+            <com.elta.android.presentation.widgets.FormSelectorView
+                android:id="@+id/formTagSelectorView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                app:fsv_hint="@string/events_creation_hint_tags"
+                app:fsv_icon="@drawable/ic_tag_def" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    app:srcCompat="@drawable/ic_calendar" />
+
+                <com.elta.android.presentation.widgets.FormSelectorView
+                    android:id="@+id/formDateSelectorView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:layout_weight="1"
+                    app:fsv_draw_arrow="false" />
+
+                <com.elta.android.presentation.widgets.FormSelectorView
+                    android:id="@+id/formTimeSelectorView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:fsv_draw_arrow="false" />
+            </LinearLayout>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/formNoteView"
+                style="@style/EventFormInputStyle.Note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:hint="@string/events_creation_hint_note"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/formSaveButtonView"
+        style="@style/Button.Large"
+        android:layout_gravity="bottom"
+        android:text="@string/events_creation_save_button" />
 
 </android.support.design.widget.CoordinatorLayout>
