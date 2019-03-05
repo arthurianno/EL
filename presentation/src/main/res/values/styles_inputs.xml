@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="InputStyle" parent="Widget.AppCompat.EditText">
         <item name="android:textSize">@dimen/font_size_input_text</item>
         <item name="met_baseColor">@color/color_input_not_active</item>
@@ -47,4 +48,16 @@
         <item name="android:lines">1</item>
         <item name="android:imeOptions">actionDone</item>
     </style>
+
+    <style name="EventFormInputStyle" parent="InputStyle.Text">
+        <item name="met_helperText">@null</item>
+        <item name="android:inputType">textCapSentences</item>
+    </style>
+
+    <style name="EventFormInputStyle.Note" parent="EventFormInputStyle">
+        <item name="met_helperText">@null</item>
+        <item name="met_baseColor">@color/white</item>
+        <item name="met_underlineColor">@color/white</item>
+    </style>
+
 </resources>
