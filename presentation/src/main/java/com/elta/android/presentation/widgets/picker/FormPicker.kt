@@ -48,20 +48,21 @@ class FormPicker @JvmOverloads constructor(
             ValueChangeObservable(leftPickerView),
             ValueChangeObservable(rightPickerView)
         ) { left: Int, right: Int ->
-            checkNotNull(config).resultMappingFunction.invoke(left, right)
+            config?.resultMappingFunction?.invoke(left, right) ?: 0.0
         }
 
     private fun initPicker() {
-        val c = checkNotNull(config)
-        leftPickerView.maxValue = c.firstPickerMaxValue
-        leftPickerView.minValue = c.firstPickerMinValue
-        rightPickerView.maxValue = c.secondPickerMaxValue
-        rightPickerView.minValue = c.secondPickerMinValue
-        comaView.toggleView(c.firstMeasureUnit.isNullOrEmpty())
-        measurementFirstTextView.toggleView(!c.firstMeasureUnit.isNullOrEmpty())
-        c.firstMeasureUnit?.let { measurementFirstTextView.text = it }
-        measurementSecondTextView.toggleView(!c.secondMeasureUnit.isNullOrEmpty())
-        c.secondMeasureUnit?.let { measurementSecondTextView.text = it }
+        config?.let { c ->
+            leftPickerView.maxValue = c.firstPickerMaxValue
+            leftPickerView.minValue = c.firstPickerMinValue
+            rightPickerView.maxValue = c.secondPickerMaxValue
+            rightPickerView.minValue = c.secondPickerMinValue
+            comaView.toggleView(c.firstMeasureUnit == null)
+            measurementFirstTextView.toggleView(c.firstMeasureUnit != null)
+            c.firstMeasureUnit?.let { measurementFirstTextView.text = resources.getString(it) }
+            measurementSecondTextView.toggleView(c.secondMeasureUnit != null)
+            c.secondMeasureUnit?.let { measurementSecondTextView.text = resources.getString(it) }
+        }
     }
 
     companion object {

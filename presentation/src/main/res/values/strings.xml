@@ -256,4 +256,22 @@
     <string name="events_creation_hint_insulin">Тип исулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
+    <string name="events_creation_hint_bread">Название блюда или продукта</string>
+    <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
+    <string name="events_helper_text_bread">Доступный диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_insulin">Доступный диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_weight">На сколько изменился ваш вес</string>
+    <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
+
+    <string name="events_form_screen_title_bread">Хлебные единицы</string>
+    <string name="events_form_screen_title_insulin">Инсулин</string>
+    <string name="events_form_screen_title_weight">Вес</string>
+    <string name="events_form_screen_title_activity">Активность</string>
+    <string name="events_form_screen_title_medicaments">Медикаменты</string>
+
+    <string name="event_form_measure_unit_bread">ХЕ</string>
+    <string name="event_form_measure_unit_insulin">Ед.</string>
+    <string name="event_form_measure_unit_weight">Кг.</string>
+    <string name="event_form_measure_unit_hours">ч</string>
+    <string name="event_form_measure_unit_minutes">мин</string>
 </resources>
