@@ -1,3 +1,6 @@
+### Android_v0.7.4 ###
+- [ELTA-296] - Fixed screen orientation
+
 ### Android_v0.7.3 ###
 - [ELTA-413] - Fixed token refreshing after email confirmation
 
