@@ -19,6 +19,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
         formInitializer(getEventType()).init(view)
     }
 
