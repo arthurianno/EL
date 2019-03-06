@@ -4,21 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/eventFormContainerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/g_orange_b">
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayoutView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_gradient_bread"
         android:paddingTop="24dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/g_orange_b"
             app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:scrimAnimationDuration="200"
@@ -73,6 +70,10 @@
                 android:layout_height="?actionBarSize"
                 android:layout_marginBottom="8dp"
                 app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_dialog_close_white"
+                app:subtitleTextAppearance="@style/New.Caption2.White"
+                app:subtitleTextColor="@color/white"
+                app:titleTextAppearance="@style/New.Headline5.White"
                 app:titleTextColor="@color/white" />
 
         </android.support.design.widget.CollapsingToolbarLayout>

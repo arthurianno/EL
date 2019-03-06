@@ -2,6 +2,7 @@ package com.elta.android.presentation.widgets
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
@@ -21,8 +22,16 @@ class FormSelectorView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private var icon: Drawable? = null
-    private var hint: String? = null
+    var icon: Drawable? = null
+        set(value) {
+            field = value
+            bindIcon()
+        }
+    var hint: String? = null
+        set(value) {
+            field = value
+            bindValue()
+        }
     private var needDrawArrow: Boolean = true
     private var value: String? = null
 
@@ -33,6 +42,11 @@ class FormSelectorView @JvmOverloads constructor(
         inflate(context, R.layout.view_form_selector, this)
         readAttrs(attrs)
         initDefault()
+    }
+
+    fun setIconRes(@DrawableRes icon: Int) {
+        this.icon = ContextCompat.getDrawable(context, icon)
+        bindValue()
     }
 
     fun click(): Observable<Unit> = SelectorClickObservable(this)
