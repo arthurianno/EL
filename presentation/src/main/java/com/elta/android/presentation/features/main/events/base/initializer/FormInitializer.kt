@@ -43,8 +43,8 @@ val defaultDoubleConverter: (Int, Int) -> Double = { left, right ->
     (left * TEN + right) / TEN
 }
 
-fun formInitializer(eventType: EventType) =
-    when (eventType) {
+fun EventType.makeFormInitializer() =
+    when (this) {
         EventType.BREAD -> BreadFormInitializer
         EventType.INSULIN -> InsulinFormInitializer
         EventType.MEDICAMENTS -> MedicamentsFormInitializer

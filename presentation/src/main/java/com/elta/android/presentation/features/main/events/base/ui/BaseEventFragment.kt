@@ -7,7 +7,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
-import com.elta.android.presentation.features.main.events.base.initializer.formInitializer
+import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.AppBarState
 import com.elta.android.presentation.utils.appbar.observeState
@@ -23,7 +23,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
-        formInitializer(getEventType()).init(view)
+        getEventType().makeFormInitializer().init(view)
     }
 
     override fun onBindPresentationModel(pm: T) {
