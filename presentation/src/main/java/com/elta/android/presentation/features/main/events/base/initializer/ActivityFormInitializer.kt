@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.base.initializer
 
+import android.content.res.Resources
 import android.support.v4.content.ContextCompat
 import android.view.View
 import com.elta.android.presentation.R
@@ -22,6 +23,10 @@ object ActivityFormInitializer : FormInitializer() {
         (TimeUnit.HOURS.toSeconds(left.toLong()) + TimeUnit.MINUTES.toSeconds(right.toLong())).toDouble()
     }
 
+    private val formatterFunction: Resources.(Int, Int) -> String = { left, right ->
+        getString(R.string.event_form_activity_format_mask, left, right)
+    }
+
     override val pickerConfiguration = FormMeasurementConfig(
         firstPickerMaxValue = HOURS_MAX_VALUE,
         firstPickerMinValue = HOURS_MIN_VALUE,
@@ -29,7 +34,8 @@ object ActivityFormInitializer : FormInitializer() {
         secondPickerMinValue = MINUTES_MIN_VALUE,
         firstMeasureUnit = R.string.event_form_measure_unit_hours,
         secondMeasureUnit = R.string.event_form_measure_unit_minutes,
-        resultMappingFunction = converterFunction
+        resultMappingFunction = converterFunction,
+        formatter = formatterFunction
     )
 
     override fun View.initHeaderView() {

@@ -71,6 +71,9 @@
                 android:layout_marginBottom="8dp"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_dialog_close_white"
+                app:subtitleTextAppearance="@style/New.Caption2.White"
+                app:subtitleTextColor="@color/white"
+                app:titleTextAppearance="@style/New.Headline5.White"
                 app:titleTextColor="@color/white" />
 
         </android.support.design.widget.CollapsingToolbarLayout>

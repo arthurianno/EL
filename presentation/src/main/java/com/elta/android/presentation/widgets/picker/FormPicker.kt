@@ -51,6 +51,14 @@ class FormPicker @JvmOverloads constructor(
             config?.resultMappingFunction?.invoke(left, right) ?: 0.0
         }
 
+    fun valueChangesFormatted(): Observable<String> =
+        Observables.combineLatest(
+            ValueChangeObservable(leftPickerView),
+            ValueChangeObservable(rightPickerView)
+        ) { left: Int, right: Int ->
+            config?.formatter?.invoke(resources, left, right) ?: EMPTY_STRING
+        }
+
     private fun initPicker() {
         config?.let { c ->
             leftPickerView.maxValue = c.firstPickerMaxValue
@@ -67,6 +75,7 @@ class FormPicker @JvmOverloads constructor(
 
     companion object {
         private const val TEN = 10
+        private const val EMPTY_STRING = ""
     }
 
     private class ValueChangeObservable(

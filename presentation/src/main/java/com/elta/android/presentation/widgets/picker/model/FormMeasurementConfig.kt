@@ -1,5 +1,6 @@
 package com.elta.android.presentation.widgets.picker.model
 
+import android.content.res.Resources
 import android.support.annotation.StringRes
 
 open class FormMeasurementConfig(
@@ -9,5 +10,6 @@ open class FormMeasurementConfig(
     val secondPickerMinValue: Int,
     @StringRes val firstMeasureUnit: Int? = null,
     @StringRes val secondMeasureUnit: Int?,
-    val resultMappingFunction: (left: Int, right: Int) -> Double
+    val resultMappingFunction: (left: Int, right: Int) -> Double,
+    val formatter: (Resources.(left: Int, right: Int) -> String?)?
 )
