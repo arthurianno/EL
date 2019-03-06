@@ -111,13 +111,13 @@
                 android:layout_marginTop="4dp"
                 android:paddingTop="16dp" />
 
-            <com.elta.android.presentation.widgets.FormSelectorView
+            <com.elta.android.presentation.widgets.selector.FormSelectorView
                 android:id="@+id/formVariantSelectorView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp" />
 
-            <com.elta.android.presentation.widgets.FormSelectorView
+            <com.elta.android.presentation.widgets.selector.FormSelectorView
                 android:id="@+id/formTagSelectorView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                     android:layout_marginEnd="32dp"
                     app:srcCompat="@drawable/ic_calendar" />
 
-                <com.elta.android.presentation.widgets.FormSelectorView
+                <com.elta.android.presentation.widgets.selector.FormSelectorView
                     android:id="@+id/formDateSelectorView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
                     android:layout_weight="1"
                     app:fsv_draw_arrow="false" />
 
-                <com.elta.android.presentation.widgets.FormSelectorView
+                <com.elta.android.presentation.widgets.selector.FormSelectorView
                     android:id="@+id/formTimeSelectorView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

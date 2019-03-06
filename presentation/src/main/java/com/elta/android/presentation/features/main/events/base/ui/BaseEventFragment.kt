@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
@@ -11,7 +12,9 @@ import com.elta.android.presentation.features.main.events.base.initializer.makeF
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.AppBarState
 import com.elta.android.presentation.utils.appbar.observeState
-import com.nullgr.core.ui.toast.showToast
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
+import com.jakewharton.rxbinding2.widget.text
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_event_form.*
 
@@ -24,12 +27,27 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         super.onViewCreated(view, savedInstanceState)
         toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
         getEventType().makeFormInitializer().init(view)
+        presentationModel.setEventType(getEventType())
     }
 
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
-        formPickerView.valueChanges().skip(1).bindTo { it.toString().showToast(activity) }
+        observeAppBarChanges()
+        formPickerView.valueChanges().skip(1).bindTo(pm.formPickerValueChangedAction)
+        formSaveButtonView.clicks().bindTo(pm.mainAction)
+        pm.mainActionTitleState.bindTo(formSaveButtonView.text())
+        pm.mainActionVisibilityState.bindTo(formSaveButtonView.visibility())
+        pm.formInput.bindTo(formInputView)
+        pm.formSelector.bind(formVariantSelectorView, compositeUnbind)
+        pm.tagSelector.bind(formTagSelectorView, compositeUnbind)
+        pm.dateSelector.bind(formDateSelectorView, compositeUnbind)
+        pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
+        pm.noteInput.bindTo(formNoteView)
+    }
 
+    abstract fun getEventType(): EventType
+
+    private fun observeAppBarChanges() {
         Observables.combineLatest(
             formPickerView.valueChangesFormatted(),
             appBarLayoutView.observeState())
@@ -41,6 +59,4 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
                 }
             }
     }
-
-    abstract fun getEventType(): EventType
 }
