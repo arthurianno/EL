@@ -1,3 +1,6 @@
+### Android_v0.7.3 ###
+- [ELTA-296] - Fixed screen orientation
+
 ### Android_v0.7.2 ###
 - [ELTA-481] - Fixed date format
 
