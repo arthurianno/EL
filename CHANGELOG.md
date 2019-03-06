@@ -1,3 +1,6 @@
+### Android_v0.7.3 ###
+- [ELTA-413] - Fixed token refreshing after email confirmation
+
 ### Android_v0.7.2 ###
 - [ELTA-481] - Fixed date format
 
