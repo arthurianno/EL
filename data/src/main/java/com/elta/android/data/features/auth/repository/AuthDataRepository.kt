@@ -52,6 +52,14 @@ class AuthDataRepository @Inject constructor(
 
     override fun confirmEmail(token: String): Completable =
         source.confirmEmail(token)
+            .andThen(
+                source.refresh(tokenStorage.accessToken ?: "", tokenStorage.refreshToken ?: "")
+                    .doOnSuccess(::saveTokens)
+                    .flatMapCompletable {
+                        Completable.complete()
+                        // TODO: set current user
+                    }
+            )
 
     private fun saveTokens(tokens: TokensDto) {
         tokenStorage.accessToken = tokens.accessToken
