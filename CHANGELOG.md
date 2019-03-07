@@ -1,4 +1,7 @@
 ### Android_v0.7.4 ###
+- [ELTA-286] - Fixed error text language when login or password incorrect
+
+### Android_v0.7.4 ###
 - [ELTA-296] - Fixed screen orientation
 
 ### Android_v0.7.3 ###
