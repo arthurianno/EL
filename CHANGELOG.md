@@ -1,3 +1,6 @@
+### v0.8.0 ###
+- [ELTA-433] - [CR-2][Android] Убрать с требований к паролю (Авторизация/Регистрация) спец. символы
+
 ### Android_v0.7.5 ###
 - [ELTA-286] - Fixed error text language when login or password incorrect
 
