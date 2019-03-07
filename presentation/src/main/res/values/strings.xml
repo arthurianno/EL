@@ -78,6 +78,7 @@
     <string name="registration_email_confirmation_subtitle">Ваш аккаунт успешно верифицирован. Чтобы использовать этот аккаунт, необходимо войти в систему используя ваш email и пароль.</string>
     <string name="registration_email_confirmation_continue_button">Продолжить работу</string>
     <string name="registration_email_confirmation_login_button">Войти</string>
+    <string name="registration_email_sent">Письмо отправлено</string>
 
     <string name="registration_social_title">Приветствуем, %s</string>
     <string name="registration_social_title_no_name">Приветствуем</string>

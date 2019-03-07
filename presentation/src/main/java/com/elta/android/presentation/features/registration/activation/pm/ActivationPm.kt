@@ -48,7 +48,11 @@ class ActivationPm @Inject constructor(
     }
 
     private fun handleResendSuccess() {
-        Timber.d("Resend success") // TODO show some message
+        showSnackBar(
+            SnackBarMessageData.SimpleTextMessage(
+                resources.getString(R.string.registration_email_sent)
+            )
+        )
     }
 
     private fun handleEmailConfirmed(isConfirmed: Boolean) {
