@@ -40,7 +40,7 @@ class AuthPasswordRecoveryPm @Inject constructor(
     private fun handleSuccess() {
         showSnackBar(
             SnackBarMessageData.SimpleTextMessage(
-                resources.getString(R.string.auth_password_recover_success_message)
+                resources.getString(R.string.registration_email_sent)
             )
         )
 
