@@ -7,7 +7,6 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
-import timber.log.Timber
 import javax.inject.Inject
 
 class ActivationPm @Inject constructor(
@@ -48,7 +47,11 @@ class ActivationPm @Inject constructor(
     }
 
     private fun handleResendSuccess() {
-        Timber.d("Resend success") // TODO show some message
+        showSnackBar(
+            SnackBarMessageData.SimpleTextMessage(
+                resources.getString(R.string.registration_email_sent)
+            )
+        )
     }
 
     private fun handleEmailConfirmed(isConfirmed: Boolean) {
