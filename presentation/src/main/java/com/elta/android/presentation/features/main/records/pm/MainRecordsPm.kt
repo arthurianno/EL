@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
@@ -60,6 +61,7 @@ class MainRecordsPm @Inject constructor(
         }
 
         items.consumer.accept(recordsMapper.mapFromObject(model))
+        router.navigateTo(Screens.ShopsStart)
     }
 
     private fun HomeModel.launchState(): StateData? =
