@@ -20,9 +20,9 @@ interface FormValidator {
         note: String? = null
     ): Boolean
 
-    fun validateNote(note: String?): Boolean = note?.length ?: 0 <= noteMaxLength
+    fun validateNote(note: String?): Boolean = note?.length ?: 0 <= NOTE_MAX_LENGTH
 
     companion object {
-        const val noteMaxLength = 120
+        const val NOTE_MAX_LENGTH = 120
     }
 }
