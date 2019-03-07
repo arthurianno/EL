@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
 import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
+import java.util.Date
 
 fun EventType.getValidator(): FormValidator =
     when (this) {
@@ -17,3 +18,24 @@ fun EventType.getValidator(): FormValidator =
         EventType.WEIGHT -> WeightValidator
         EventType.GLUCOSE -> GlucoseValidator
     }
+
+fun Event.isChanged(
+    value: Double? = null,
+    kind: String? = null,
+    name: String? = null,
+    duration: Long? = null,
+    date: Date? = null,
+    tagId: String? = null,
+    insulin: InsulinType? = null,
+    activity: ActivityType? = null,
+    note: String? = null
+): Boolean =
+    this.value != value ||
+        this.kind != kind ||
+        this.name != name ||
+        this.duration != duration ||
+        this.additionTime != date ||
+        this.tagId != tagId ||
+        this.insulinType != insulin ||
+        this.activityType != activity ||
+        this.note != note
