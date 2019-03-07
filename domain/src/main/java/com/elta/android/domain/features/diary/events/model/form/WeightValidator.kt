@@ -8,7 +8,9 @@ import java.util.Date
 
 object WeightValidator : FormValidator {
 
-    private val valueDiapason = DoubleExclusiveRange(0.1, 201.0)
+    const val bottomLevelInclusive = 0.1
+    const val topLevelExclusive = 201.0
+    private val valueDiapason = DoubleExclusiveRange(bottomLevelInclusive, topLevelExclusive)
 
     override fun isValid(
         value: Double?,

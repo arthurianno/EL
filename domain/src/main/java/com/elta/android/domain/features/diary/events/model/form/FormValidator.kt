@@ -7,6 +7,7 @@ import java.util.Date
 
 interface FormValidator {
 
+    @Suppress("LongParameterList")
     fun isValid(
         value: Double? = null,
         kind: String? = null,

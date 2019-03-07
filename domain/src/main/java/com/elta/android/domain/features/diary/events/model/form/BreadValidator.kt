@@ -8,7 +8,9 @@ import java.util.Date
 
 object BreadValidator : FormValidator {
 
-    private val valueDiapason = DoubleExclusiveRange(0.1, 100.0)
+    const val bottomLevelInclusive = 0.1
+    const val topLevelExclusive = 100.0
+    private val valueDiapason = DoubleExclusiveRange(bottomLevelInclusive, topLevelExclusive)
     private const val kindMaxLength = 40
 
     override fun isValid(
@@ -23,8 +25,6 @@ object BreadValidator : FormValidator {
         note: String?
     ): Boolean = validateValue(value) && validateKind(kind) && date != null && validateNote(note)
 
-
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
     private fun validateKind(kind: String?): Boolean = kind?.length ?: 0 <= kindMaxLength
-
 }

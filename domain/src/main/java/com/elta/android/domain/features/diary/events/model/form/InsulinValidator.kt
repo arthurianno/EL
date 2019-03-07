@@ -8,7 +8,9 @@ import java.util.Date
 
 object InsulinValidator : FormValidator {
 
-    private val valueDiapason = DoubleExclusiveRange(0.1, 100.0)
+    const val bottomLevelInclusive = 0.1
+    const val topLevelExclusive = 100.0
+    private val valueDiapason = DoubleExclusiveRange(bottomLevelInclusive, topLevelExclusive)
 
     override fun isValid(
         value: Double?,

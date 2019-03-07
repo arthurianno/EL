@@ -19,6 +19,5 @@ object ActivityValidator : FormValidator {
         note: String?
     ): Boolean = validateDuration(duration) && date != null && validateNote(note)
 
-
     private fun validateDuration(duration: Long?): Boolean = duration != null && duration > 0
 }
