@@ -12,11 +12,14 @@ import com.elta.android.presentation.features.main.events.base.initializer.makeF
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.AppBarState
 import com.elta.android.presentation.utils.appbar.observeState
+import com.elta.android.presentation.utils.showDatePickerDialog
+import com.elta.android.presentation.utils.showTimePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_event_form.*
+import java.util.Date
 
 abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
@@ -43,9 +46,27 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.dateSelector.bind(formDateSelectorView, compositeUnbind)
         pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(formNoteView)
+        pm.bindDateSelection()
+    }
+
+    override fun handleBack() {
+        passTo(presentationModel.backHandleAction)
     }
 
     abstract fun getEventType(): EventType
+
+    private fun T.bindDateSelection() {
+        showDatePickerDialog.bindTo { originalDate ->
+            activity.showDatePickerDialog(originalDate, maxDate = Date()) {
+                dateTimeSelectedAction.consumer.accept(it)
+            }
+        }
+        showTimePickerDialog.bindTo { originalDate ->
+            activity.showTimePickerDialog(originalDate) {
+                dateTimeSelectedAction.consumer.accept(it)
+            }
+        }
+    }
 
     private fun observeAppBarChanges() {
         Observables.combineLatest(

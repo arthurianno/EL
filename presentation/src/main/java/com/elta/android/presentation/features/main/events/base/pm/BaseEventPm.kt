@@ -10,8 +10,11 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
+import com.elta.android.presentation.utils.toEventDate
+import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import me.dmdev.rxpm.widget.inputControl
+import java.util.Date
 
 abstract class BaseEventPm constructor(
     services: ServiceFacade
@@ -29,18 +32,37 @@ abstract class BaseEventPm constructor(
     val mainActionVisibilityState = State(false)
     val mainAction = Action<Unit>()
 
+    val showDatePickerDialog = Command<Date>(bufferSize = 1)
+    val showTimePickerDialog = Command<Date>(bufferSize = 1)
+
+    val dateTimeSelectedAction = Action<Date>()
+
+    val backHandleAction = Action<Unit>()
+
     private val formPickerValue = State<Double>()
     private val eventTypeState = State<EventType>()
+    private val selectedDateState = State(Date())
 
     override fun onCreate() {
         super.onCreate()
         bindFormPicker()
         bindFormVariantSelection()
         bindFormTagSelection()
+        bindDateSelectors()
+        bindHandleBack()
     }
 
     fun setEventType(eventType: EventType) {
         eventTypeState.consumer.accept(eventType)
+    }
+
+    abstract fun handleBack(i: Unit)
+
+    private fun bindHandleBack() {
+        backHandleAction.observable
+            .doOnNext(::handleBack)
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun bindFormPicker() {
@@ -73,10 +95,39 @@ abstract class BaseEventPm constructor(
             .untilDestroy()
     }
 
+    private fun bindDateSelectors() {
+        selectedDateState.observable
+            .map { it.toEventTime(resources).toSimpleSelectorOption() }
+            .subscribe(timeSelector.option.consumer)
+            .untilDestroy()
+
+        selectedDateState.observable
+            .map { it.toEventDate(resources).toSimpleSelectorOption() }
+            .subscribe(dateSelector.option.consumer)
+            .untilDestroy()
+
+        dateSelector.clickAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showDatePickerDialog.consumer)
+            .untilDestroy()
+
+        timeSelector.clickAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showTimePickerDialog.consumer)
+            .untilDestroy()
+
+        dateTimeSelectedAction.observable
+            .subscribe(selectedDateState.consumer)
+            .untilDestroy()
+    }
+
     private fun ChooserResult.toSelectorOption() =
         SelectorOption(
             text = name,
             icon = iconId?.let { id -> resources.getDrawable(id) },
             meta = id
         )
+
+    private fun String.toSimpleSelectorOption() =
+        SelectorOption(this)
 }

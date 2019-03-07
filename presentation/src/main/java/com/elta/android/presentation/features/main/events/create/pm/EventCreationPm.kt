@@ -6,4 +6,9 @@ import javax.inject.Inject
 
 class EventCreationPm @Inject constructor(
     services: ServiceFacade
-) : BaseEventPm(services)
+) : BaseEventPm(services) {
+
+    override fun handleBack(i: Unit) {
+        router.exit()
+    }
+}

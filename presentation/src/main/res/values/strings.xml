@@ -279,4 +279,8 @@
     <string name="event_form_insulin_format_mask">%d,%d Ед.</string>
     <string name="event_form_weight_format_mask">%d,%d Кг.</string>
     <string name="event_form_activity_format_mask">%d ч %d мин</string>
+
+    <string name="event_time_mask">в %s</string>
+    <string name="event_date_today">Сегодня</string>
+    <string name="event_date_yesterday">Вчера</string>
 </resources>

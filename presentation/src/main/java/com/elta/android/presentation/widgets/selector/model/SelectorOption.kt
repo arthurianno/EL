@@ -4,6 +4,6 @@ import android.graphics.drawable.Drawable
 
 data class SelectorOption(
     val text: String?,
-    val icon: Drawable?,
-    val meta: Any
+    val icon: Drawable? = null,
+    val meta: Any? = null
 )
