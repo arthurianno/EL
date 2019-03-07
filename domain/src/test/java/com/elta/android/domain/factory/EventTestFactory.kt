@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.MealTag
+import com.elta.android.domain.features.diary.events.model.State
 import java.util.Date
 import java.util.UUID
 
@@ -32,6 +33,7 @@ object EventTestFactory {
             activityType = activityType,
             mealTag = mealTag,
             insulinType = insulinType,
-            type = type
+            type = type,
+            state = State.CREATED
         )
 }
