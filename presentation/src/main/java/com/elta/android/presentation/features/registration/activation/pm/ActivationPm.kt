@@ -7,7 +7,6 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
-import timber.log.Timber
 import javax.inject.Inject
 
 class ActivationPm @Inject constructor(
