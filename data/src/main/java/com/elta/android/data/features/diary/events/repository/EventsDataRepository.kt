@@ -6,6 +6,8 @@ import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
@@ -33,6 +35,10 @@ class EventsDataRepository @Inject constructor(
             .flatMap { cacheSource.getEvents(start, end) }
             .map(toDomainMapper::mapFromObjects)
 
+    override fun getEventById(id: String): Single<Event> =
+        cacheSource.getEventById(id)
+            .map(toDomainMapper::mapFromObject)
+
     override fun addEvent(event: Event): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
@@ -41,7 +47,6 @@ class EventsDataRepository @Inject constructor(
                         .onErrorComplete { error -> error is NetworkConnectionError }
                     )
             }
-
 
     override fun updateEvent(event: Event): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
@@ -53,7 +58,7 @@ class EventsDataRepository @Inject constructor(
             }
 
     override fun deleteEvent(eventId: String, type: EventType): Completable =
-        Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
+        Single.fromCallable { listOf(SimpleEventDto(eventId, EventTypeDto.valueOf(type.name))) }
             .flatMapCompletable {
                 cacheSource.deleteEvents(it)
                     .andThen(remoteSource.deleteEvents(it)

@@ -26,7 +26,7 @@ class AddNewEventUseCase @Inject constructor(
             Event(
                 id = UUID.randomUUID().toString(),
                 additionTime = date,
-                additionTimeString = date.toString(), // iso
+                additionTimeString = date.toString(),
                 tagId = p.tag?.id,
                 note = p.note,
                 modificationTime = date,
