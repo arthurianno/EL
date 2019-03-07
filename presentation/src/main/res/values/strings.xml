@@ -73,7 +73,7 @@
     <string name="registration_send_again">Отправить письмо повторно</string>
     <string name="registration_error_input_email">Некорректный email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
-    <string name="registration_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+    <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="registration_email_confirmation_title">Аккаунт верифицирован</string>
     <string name="registration_email_confirmation_subtitle">Ваш аккаунт успешно верифицирован. Чтобы использовать этот аккаунт, необходимо войти в систему используя ваш email и пароль.</string>
     <string name="registration_email_confirmation_continue_button">Продолжить работу</string>
@@ -102,7 +102,7 @@
     <string name="auth_password_create_password_hint">Пароль</string>
     <string name="auth_password_create_login_button_title">Сохранить и войти</string>
     <string name="auth_password_create_error_input_password">Некорректный пароль</string>
-    <string name="auth_password_create_password_pattern">Не менее 8 символов (A–z, 0–9 и спецсимволы)</string>
+    <string name="auth_password_create_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
 
 

@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 val emailPattern: Pattern = Patterns.EMAIL_ADDRESS
 @Suppress("MaxLineLength")
-val passwordPattern: Pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=\\[{\\]};:<>|.?,-/])(?=\\S+\$).{8,}\$")
+val passwordPattern: Pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+\$).{8,}\$")
 
 fun isEmailValid(email: String): Boolean = emailPattern.matcher(email).matches()
 fun isPasswordValid(password: String): Boolean = passwordPattern.matcher(password).matches()
