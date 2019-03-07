@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.auth.password.recovery.pm
 
 import com.elta.android.domain.features.auth.interactor.SendPasswordResetLinkUseCase
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.messages.SnackBarMessageData
@@ -42,5 +43,7 @@ class AuthPasswordRecoveryPm @Inject constructor(
                 resources.getString(R.string.auth_password_recover_success_message)
             )
         )
+
+        router.navigateTo(Screens.Login)
     }
 }
