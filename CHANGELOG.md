@@ -1,57 +1,57 @@
 ### v0.8.0 ###
 - [ELTA-433] - [CR-2][Android] Убрать с требований к паролю (Авторизация/Регистрация) спец. символы
 
-### Android_v0.7.5 ###
+### v0.7.5 ###
 - [ELTA-286] - Fixed error text language when login or password incorrect
 
-### Android_v0.7.4 ###
+### v0.7.4 ###
 - [ELTA-296] - Fixed screen orientation
 
-### Android_v0.7.3 ###
+### v0.7.3 ###
 - [ELTA-413] - Fixed token refreshing after email confirmation
 
-### Android_v0.7.2 ###
+### v0.7.2 ###
 - [ELTA-481] - Fixed date format
 
-### Android_v0.7.1 ###
+### v0.7.1 ###
 - [ELTA-457] - Fixed minor issues due to demo results
 
-### Android_v0.7.0 ###
+### v0.7.0 ###
 - [ELTA-374] - Added options selection screen for events creation process
 
-### Android_v0.6.0 ###
+### v0.6.0 ###
 - [ELTA-364] - Added home screen with list of events
 
-### Android_v0.5.0 ###
+### v0.5.0 ###
 - [ELTA-363] - Added empty home screen
 
-### Android_v0.4.0 ###
+### v0.4.0 ###
 - [ELTA-285] - Added new credentials for Facebook
 
-### Android_v0.3.2 ###
+### v0.3.2 ###
 - [ELTA-315] - Fixed crash. Improve stability
 
-### Android_v0.3.1 ###
+### v0.3.1 ###
 - [ELTA-XXX] - Fixed default value for sale point last sync time
 - [ELTA-XXX] - Fixed navigation problems
 - [ELTA-315] - Fixed token refresh mechanism
 
-### Android_v0.3.0 ###
+### v0.3.0 ###
 - [ELTA-239] - Added search at sale points screens.
 
-### Android_v0.2.0 ###
+### v0.2.0 ###
 - [ELTA-240] - Added sale points screens.
 
-### Android_v0.1.1 ###
+### v0.1.1 ###
 - [ELTA-288] - Fixed weight screen. Fixed request params. Fixed diabetes order.
 
-### Android_v0.1.0 ###
+### v0.1.0 ###
 - [ELTA-230] - Added OnBoarding
 
-### Android_v0.0.4 ###
+### v0.0.4 ###
 - [ELTA-1209] - Added token refreshing. Improve error handling. Improve deeplinks handling.
 
-### Android_v0.0.1 ###
+### v0.0.1 ###
 - [ELTA-111] - Added auth
 - [ELTA-112] - Added registration
 - [ELTA-114] - Added password recovery
