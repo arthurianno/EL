@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- BACKEND ERRORS -->
-    <string name="error_600">Incorrect login or password</string>
+    <string name="error_600">Некорректный email или пароль</string>
     <string name="error_602">Account is locked</string>
     <string name="error_603">Внимание! Указанный email уже\nсуществует</string>
     <string name="error_604">Not found user by access token</string>
