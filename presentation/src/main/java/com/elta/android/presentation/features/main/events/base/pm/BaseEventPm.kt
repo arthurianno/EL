@@ -13,6 +13,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import com.nullgr.core.date.withoutTime
 import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
 
@@ -34,14 +35,15 @@ abstract class BaseEventPm constructor(
 
     val showDatePickerDialog = Command<Date>(bufferSize = 1)
     val showTimePickerDialog = Command<Date>(bufferSize = 1)
-
     val dateTimeSelectedAction = Action<Date>()
 
     val backHandleAction = Action<Unit>()
+    val exitConfirmedAction = Action<Unit>()
+    val confirmExitCommand = Command<Unit>()
 
-    private val formPickerValue = State<Double>()
-    private val eventTypeState = State<EventType>()
-    private val selectedDateState = State(Date())
+    protected val formPickerValue = State<Double>()
+    protected val eventTypeState = State<EventType>()
+    protected val selectedDateState = State(Date())
 
     override fun onCreate() {
         super.onCreate()
@@ -61,6 +63,11 @@ abstract class BaseEventPm constructor(
     private fun bindHandleBack() {
         backHandleAction.observable
             .doOnNext(::handleBack)
+            .subscribe()
+            .untilDestroy()
+
+        exitConfirmedAction.observable
+            .doOnNext { router.exit() }
             .subscribe()
             .untilDestroy()
     }

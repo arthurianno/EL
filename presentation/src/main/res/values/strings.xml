@@ -283,4 +283,11 @@
     <string name="event_time_mask">в %s</string>
     <string name="event_date_today">Сегодня</string>
     <string name="event_date_yesterday">Вчера</string>
+
+    <string name="event_form_exit_dialog_title">Внимание</string>
+    <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены</string>
+    <string name="event_form_exit_dialog_cancel_button">Отменить</string>
+    <string name="event_form_exit_dialog_confirm_button">Выйти</string>
+
+    <string name="event_form_save_new_entry_title">Сохранить запись</string>
 </resources>

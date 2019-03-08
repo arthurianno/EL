@@ -7,7 +7,7 @@ import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.PresentationModel
 
 class FormSelectorControl(pm: PresentationModel) {
-    val option = pm.State<SelectorOption>()
+    val option = pm.State(SelectorOption(null, null, null))
     val clickAction = pm.Action<Unit>()
 }
 

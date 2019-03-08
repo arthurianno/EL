@@ -89,7 +89,7 @@ class FormPicker @JvmOverloads constructor(
             val listener = Listener(view, observer)
             observer.onSubscribe(listener)
             listener.valueListener.onValueChange(view, view.value, view.value)
-            view.setOnValueChangedListener(listener.valueListener)
+            view.addOnValueChangedListener(listener.valueListener)
         }
 
         class Listener(
@@ -104,7 +104,7 @@ class FormPicker @JvmOverloads constructor(
             }
 
             override fun onDispose() {
-                view.setOnValueChangedListener(null)
+                view.removeOnValueChangedListener(valueListener)
             }
         }
     }

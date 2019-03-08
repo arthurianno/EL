@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.events.base.ui
 
 import android.os.Bundle
 import android.view.View
+import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -14,6 +15,7 @@ import com.elta.android.presentation.utils.appbar.AppBarState
 import com.elta.android.presentation.utils.appbar.observeState
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
+import com.elta.android.presentation.utils.shows
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
@@ -26,6 +28,17 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override val screenLayout: Int = R.layout.fragment_event_form
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
 
+    private val exitDialog by lazy {
+        MaterialDialog.Builder(activity!!)
+            .cancelable(false)
+            .title(R.string.event_form_exit_dialog_title)
+            .content(R.string.event_form_exit_dialog_body)
+            .negativeText(R.string.event_form_exit_dialog_cancel_button)
+            .positiveText(R.string.event_form_exit_dialog_confirm_button)
+            .onPositive { _, _ -> passTo(presentationModel.exitConfirmedAction) }
+            .build()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
@@ -36,7 +49,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
-        formPickerView.valueChanges().skip(1).bindTo(pm.formPickerValueChangedAction)
+        formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         formSaveButtonView.clicks().bindTo(pm.mainAction)
         pm.mainActionTitleState.bindTo(formSaveButtonView.text())
         pm.mainActionVisibilityState.bindTo(formSaveButtonView.visibility())
@@ -47,6 +60,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(formNoteView)
         pm.bindDateSelection()
+        pm.confirmExitCommand.bindTo(exitDialog.shows())
     }
 
     override fun handleBack() {
