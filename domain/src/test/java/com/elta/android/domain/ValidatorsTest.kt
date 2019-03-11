@@ -86,6 +86,20 @@ class ValidatorsTest {
     }
 
     @Test
+    fun medicaments_WithEmptyName_False() {
+        assert(!MedicamentsValidator.isValid(name = "", date = Date()))
+    }
+
+    @Test
+    fun medicaments_WithMaxName_True() {
+        val name = StringBuilder()
+        name.setLength(120)
+        assert(MedicamentsValidator.isValid(
+            name = name.toString(), date = Date())
+        )
+    }
+
+    @Test
     fun medicaments_EmptyName_False() {
         assert(!MedicamentsValidator.isValid(date = Date()))
     }

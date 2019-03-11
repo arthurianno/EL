@@ -1,15 +1,22 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
+import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
+import com.elta.android.domain.features.diary.events.model.ActivityType
+import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.getValidator
+import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import io.reactivex.rxkotlin.Observables
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
 class EventCreationPm @Inject constructor(
+    private val addNewEventUseCase: AddNewEventUseCase,
     services: ServiceFacade
 ) : BaseEventPm(services) {
 
@@ -21,6 +28,13 @@ class EventCreationPm @Inject constructor(
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
         observeFormChanges()
         observeSaveEventAction()
+    }
+
+    override fun handleBack(i: Unit) {
+        when (isFormNotEmptyState.value) {
+            true -> confirmExitCommand.consumer.accept(Unit)
+            else -> router.exit()
+        }
     }
 
     private fun observeFormChanges() {
@@ -37,11 +51,11 @@ class EventCreationPm @Inject constructor(
                 this.eventType = eventType
                 this.pickerValue = pickerValue
                 this.inputValue = inputValue
-                this.variantId = variant.meta as? String
-                this.tagId = tag.meta as? String
+                this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
                 this.note = note
+                this.meta = variant.meta
             }
         }
             .doOnNext(::checkIsEmpty)
@@ -54,30 +68,40 @@ class EventCreationPm @Inject constructor(
         isFormNotEmptyState.consumer.accept(
             eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
                 !eventFormModel.inputValue.isNullOrEmpty() ||
-                !eventFormModel.variantId.isNullOrEmpty() ||
-                !eventFormModel.tagId.isNullOrEmpty() ||
+                eventFormModel.meta != null ||
+                eventFormModel.tag != null ||
                 !eventFormModel.note.isNullOrEmpty() ||
                 eventFormModel.isDateChanged
         )
     }
 
-    private fun isFormValid(eventFormModel: EventFormModel): Boolean {
-        return isFormNotEmptyState.value //TODO use domain methods
+    private fun isFormValid(form: EventFormModel): Boolean {
+        val validator = checkNotNull(form.eventType).getValidator()
+        return validator.isValid(
+            value = form.pickerValue,
+            kind = form.inputValue,
+            name = form.inputValue,
+            duration = form.pickerValue?.toLong(),
+            insulin = form.meta as? InsulinType,
+            date = form.date,
+            note = form.note
+        )
     }
 
     private fun observeSaveEventAction() {
         mainAction.observable
-            .map { eventFormHolderState.value } // TODO and then map to UseCaseParams
-            .doOnNext { Timber.d("save $it") } // TODO Execute UseCase
+            .skipWhileInProgress()
+            .map(::createAddEventParams)
+            .flatMapCompletable { params ->
+                addNewEventUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnComplete(::handleEventAdded)
+                    .doOnError(::handleError)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
-    }
-
-    override fun handleBack(i: Unit) {
-        when (isFormNotEmptyState.value) {
-            true -> confirmExitCommand.consumer.accept(Unit)
-            else -> router.exit()
-        }
     }
 
     private fun Date?.isDateChanged(other: Date): Boolean {
@@ -85,6 +109,28 @@ class EventCreationPm @Inject constructor(
             this == null -> false
             else -> this != other
         }
+    }
+
+    private fun createAddEventParams(i: Unit): AddNewEventUseCase.Params {
+        val form = eventFormHolderState.value
+        return AddNewEventUseCase.Params(
+            value = form.pickerValue,
+            kind = form.inputValue,
+            name = form.inputValue,
+            duration = form.pickerValue?.toLong(),
+            date = form.date,
+            tag = form.tag,
+            activity = form.meta as? ActivityType,
+            insulin = form.meta as? InsulinType,
+            note = form.note,
+            eventType = checkNotNull(form.eventType)
+        )
+    }
+
+
+    private fun handleEventAdded() {
+        bus.event(Events.EventsChanged)
+        router.exit()
     }
 
     companion object {

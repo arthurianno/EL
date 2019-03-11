@@ -113,12 +113,13 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun buildChooserResult(i: Unit): ChooserResult {
         val selectedItemId = selectedItemIdState.value
-        val item = items.value
-            .find { it is ChooserItem && it.id == selectedItemId }
+        val item = items.value.find { it is ChooserItem && it.id == selectedItemId }
+        val chooserItem = item as? ChooserItem
         return ChooserResult(
-            selectedItemId,
-            (item as? ChooserItem)?.title,
-            (item as? ChooserItem)?.iconId
+            id = selectedItemId,
+            name = chooserItem?.title,
+            iconId = chooserItem?.iconId,
+            meta = chooserItem?.meta
         )
     }
 

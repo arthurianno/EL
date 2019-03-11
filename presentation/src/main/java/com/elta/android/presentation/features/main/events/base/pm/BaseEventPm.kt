@@ -13,7 +13,6 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
-import com.nullgr.core.date.withoutTime
 import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
 
@@ -132,7 +131,7 @@ abstract class BaseEventPm constructor(
         SelectorOption(
             text = name,
             icon = iconId?.let { id -> resources.getDrawable(id) },
-            meta = id
+            meta = meta
         )
 
     private fun String.toSimpleSelectorOption() =

@@ -7,11 +7,13 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.state_view.StateData
 import com.elta.android.presentation.features.main.records.MainRecordsMapper
+import io.reactivex.Observable
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -40,7 +42,10 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()

@@ -6,6 +6,7 @@ data class ChooserItem(
     val id: String,
     val title: String,
     val iconId: Int?,
+    val meta: Any,
     var isSelected: Boolean = false
 ) : ListItem {
 
