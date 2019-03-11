@@ -31,7 +31,7 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
     override fun onBindPresentationModel(pm: EditEventPm) {
         super.onBindPresentationModel(pm)
         pm.progressState.observable
-            .throttleLast(300, TimeUnit.MILLISECONDS)
+            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
             .bindTo(progressDialog.visibility(childFragmentManager))
         toolbarView.menuClicks(R.id.remove).bindTo(pm.deleteEventAction)
     }
@@ -48,5 +48,6 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
         private const val EXTRA_EVENT_TYPE = "extra_event_type"
         private const val EXTRA_EVENT_ID = "extra_event_id"
+        private const val DEBOUNCE = 300L
     }
 }

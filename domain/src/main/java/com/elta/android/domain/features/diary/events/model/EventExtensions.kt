@@ -20,6 +20,7 @@ fun EventType.getValidator(): FormValidator =
         EventType.GLUCOSE -> GlucoseValidator
     }
 
+@Suppress("LongParameterList")
 fun Event.isChanged(
     value: Double? = null,
     kind: String? = null,

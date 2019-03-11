@@ -61,6 +61,7 @@ private fun Long?.toPickerValues(): Pair<Int, Int> {
     return hours.toInt() to minutes.toInt()
 }
 
+@Suppress("MagicNumber")
 private fun Double?.toPickerValues(): Pair<Int, Int> {
     if (this == null) return 0 to 0
     val left = this.toInt()
