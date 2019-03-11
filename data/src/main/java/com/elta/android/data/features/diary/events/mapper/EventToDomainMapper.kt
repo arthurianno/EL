@@ -22,6 +22,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 additionTime = additionTime.getDate(),
                 additionTimeString = additionTime,
                 tagId = tagId,
+                tag = null,
                 note = note,
                 modificationTime = modificationTime?.dateFromTimestamp(),
                 value = data.value,

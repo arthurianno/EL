@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.diary.events.model
 
+import com.elta.android.domain.features.diary.tags.model.Tag
 import java.util.Date
 
 data class Event(
@@ -7,6 +8,7 @@ data class Event(
     val additionTime: Date,
     val additionTimeString: String,
     val tagId: String?,
+    var tag: Tag?,
     val note: String?,
     val modificationTime: Date?,
     val value: Double?,
