@@ -146,13 +146,9 @@ class FormPicker @JvmOverloads constructor(
         }
 
         companion object CREATOR : Parcelable.Creator<SavedState> {
-            override fun createFromParcel(parcel: Parcel): SavedState {
-                return SavedState(parcel)
-            }
+            override fun createFromParcel(parcel: Parcel) = SavedState(parcel)
 
-            override fun newArray(size: Int): Array<SavedState?> {
-                return arrayOfNulls(size)
-            }
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
         }
     }
 }
