@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.main.events.base.model
 
+import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
 import java.util.Date
 
@@ -13,4 +15,23 @@ data class EventFormModel(
     var date: Date? = null,
     var note: String? = null,
     var meta: Any? = null
-)
+) {
+
+    val kind: String?
+        get() = inputValue
+
+    val name: String?
+        get() = inputValue
+
+    val value: Double?
+        get() = pickerValue
+
+    val duration: Long?
+        get() = pickerValue?.toLong()
+
+    val activityType: ActivityType?
+        get() = meta as? ActivityType
+
+    val insulinType: InsulinType?
+        get() = meta as? InsulinType
+}

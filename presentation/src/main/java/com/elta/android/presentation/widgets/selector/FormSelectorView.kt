@@ -6,7 +6,6 @@ import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
-import android.view.View.*
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.checkMainThread

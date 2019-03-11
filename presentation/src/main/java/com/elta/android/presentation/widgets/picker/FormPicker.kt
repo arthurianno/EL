@@ -1,8 +1,11 @@
 package com.elta.android.presentation.widgets.picker
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.checkMainThread
@@ -29,6 +32,7 @@ class FormPicker @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_form_picker, this, true)
+        isSaveEnabled = true
     }
 
     fun setValue(value: Double) {
@@ -73,6 +77,21 @@ class FormPicker @JvmOverloads constructor(
         }
     }
 
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        val savedState = state as? SavedState
+        super.onRestoreInstanceState(state)
+        savedState?.let { setValues(it.leftValue, it.rightValue) }
+    }
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val superState = super.onSaveInstanceState()
+        val savedState = SavedState(superState)
+        savedState.leftValue = leftPickerView.value
+        savedState.rightValue = rightPickerView.value
+        return savedState
+    }
+
     companion object {
         private const val TEN = 10
         private const val EMPTY_STRING = ""
@@ -106,6 +125,30 @@ class FormPicker @JvmOverloads constructor(
             override fun onDispose() {
                 view.removeOnValueChangedListener(valueListener)
             }
+        }
+    }
+
+    private class SavedState : View.BaseSavedState {
+        var leftValue: Int = 0
+        var rightValue: Int = 0
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        constructor(parcel: Parcel) : super(parcel) {
+            leftValue = parcel.readInt()
+            rightValue = parcel.readInt()
+        }
+
+        override fun writeToParcel(outParcel: Parcel, flags: Int) {
+            super.writeToParcel(outParcel, flags)
+            outParcel.writeInt(leftValue)
+            outParcel.writeInt(rightValue)
+        }
+
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel) = SavedState(parcel)
+
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
         }
     }
 }
