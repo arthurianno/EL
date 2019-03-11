@@ -290,5 +290,6 @@
     <string name="event_form_exit_dialog_confirm_button">Выйти</string>
 
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
+    <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
 </resources>

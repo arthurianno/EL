@@ -47,8 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import timber.log.Timber;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
@@ -1457,6 +1455,10 @@ public class NumberPicker extends LinearLayout {
      */
     public void setValue(int value) {
         setValueInternal(value, false);
+    }
+
+    public void updateValue(int value) {
+        setValueInternal(value, true);
     }
 
     private float getMaxTextSize() {

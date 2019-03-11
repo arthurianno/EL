@@ -52,7 +52,7 @@ class EventCreationPm @Inject constructor(
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
-                this.note = note
+                this.noteValue = note
                 this.meta = variant.meta
             }
         }

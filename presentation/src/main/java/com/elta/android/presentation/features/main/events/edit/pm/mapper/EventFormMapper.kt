@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.edit.pm.binder
+package com.elta.android.presentation.features.main.events.edit.pm.mapper
 
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
@@ -25,7 +25,14 @@ fun Event.getFormInputText(): String? =
         else -> null
     }
 
-fun Event.getTag(): SelectorOption? = null
+fun Event.getTag(res: ResourceProvider): SelectorOption? {
+    if (tag == null) return null
+    return SelectorOption(
+        text = tag.toName(res),
+        icon = res.getDrawable(tag.toIcon()),
+        meta = tag
+    )
+}
 
 fun Event.getSelectorOption(res: ResourceProvider): SelectorOption? =
     when (type) {
@@ -45,7 +52,7 @@ private fun ActivityType?.toSelectorOption(res: ResourceProvider): SelectorOptio
 
 private fun InsulinType?.toSelectorOption(res: ResourceProvider): SelectorOption? {
     if (this == null) return null
-    return SelectorOption(res.getString(this.toName()))
+    return SelectorOption(res.getString(this.toName()), meta = this)
 }
 
 private fun Long?.toPickerValues(): Pair<Int, Int> {

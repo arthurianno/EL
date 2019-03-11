@@ -38,13 +38,13 @@ class FormPicker @JvmOverloads constructor(
     fun setValue(value: Double) {
         val left = value.toInt()
         val right = ((value - left) * TEN).toInt()
-        leftPickerView.value = left
-        rightPickerView.value = right
+        leftPickerView.updateValue(left)
+        rightPickerView.updateValue(right)
     }
 
     fun setValues(firstValue: Int, secondValue: Int) {
-        leftPickerView.value = firstValue
-        rightPickerView.value = secondValue
+        leftPickerView.updateValue(firstValue)
+        rightPickerView.updateValue(secondValue)
     }
 
     fun valueChanges(): Observable<Double> =

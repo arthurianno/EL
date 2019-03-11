@@ -62,7 +62,7 @@ class MainRecordsPm @Inject constructor(
     }
 
     private fun navigateToEventScreen(record: RecordItem) {
-        router.navigateTo(Screens.EditEventScreen(record.id as String, record.eventType))
+        router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
     }
 
     private fun handleSuccess(model: HomeModel) {

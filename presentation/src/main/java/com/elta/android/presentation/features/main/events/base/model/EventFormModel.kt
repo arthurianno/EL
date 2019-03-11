@@ -13,21 +13,32 @@ data class EventFormModel(
     var tag: Tag? = null,
     var isDateChanged: Boolean = false,
     var date: Date? = null,
-    var note: String? = null,
+    var noteValue: String? = null,
     var meta: Any? = null
 ) {
 
     val kind: String?
-        get() = inputValue
+        get() = if (eventType != EventType.BREAD || inputValue.isNullOrEmpty()) null else inputValue
 
     val name: String?
-        get() = inputValue
+        get() = if (eventType != EventType.MEDICAMENTS || inputValue.isNullOrEmpty()) null else inputValue
 
     val value: Double?
-        get() = pickerValue
+        get() = when {
+            eventType == EventType.ACTIVITY || eventType == EventType.MEDICAMENTS -> null
+            pickerValue == 0.0 -> null
+            else -> pickerValue
+        }
 
     val duration: Long?
-        get() = pickerValue?.toLong()
+        get() = when {
+            eventType != EventType.ACTIVITY -> null
+            pickerValue?.toLong() == 0L -> null
+            else -> pickerValue?.toLong()
+        }
+
+    val note: String?
+        get() = if (noteValue.isNullOrEmpty()) null else noteValue
 
     val activityType: ActivityType?
         get() = meta as? ActivityType
