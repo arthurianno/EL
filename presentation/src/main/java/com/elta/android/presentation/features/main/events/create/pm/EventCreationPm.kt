@@ -1,8 +1,6 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
-import com.elta.android.domain.features.diary.events.model.ActivityType
-import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Events
@@ -78,11 +76,11 @@ class EventCreationPm @Inject constructor(
     private fun isFormValid(form: EventFormModel): Boolean {
         val validator = checkNotNull(form.eventType).getValidator()
         return validator.isValid(
-            value = form.pickerValue,
-            kind = form.inputValue,
-            name = form.inputValue,
-            duration = form.pickerValue?.toLong(),
-            insulin = form.meta as? InsulinType,
+            value = form.value,
+            kind = form.kind,
+            name = form.name,
+            duration = form.duration,
+            insulin = form.insulinType,
             date = form.date,
             note = form.note
         )
@@ -114,19 +112,18 @@ class EventCreationPm @Inject constructor(
     private fun createAddEventParams(i: Unit): AddNewEventUseCase.Params {
         val form = eventFormHolderState.value
         return AddNewEventUseCase.Params(
-            value = form.pickerValue,
-            kind = form.inputValue,
-            name = form.inputValue,
-            duration = form.pickerValue?.toLong(),
+            value = form.value,
+            kind = form.kind,
+            name = form.name,
+            duration = form.duration,
             date = form.date,
             tag = form.tag,
-            activity = form.meta as? ActivityType,
-            insulin = form.meta as? InsulinType,
+            activity = form.activityType,
+            insulin = form.insulinType,
             note = form.note,
             eventType = checkNotNull(form.eventType)
         )
     }
-
 
     private fun handleEventAdded() {
         bus.event(Events.EventsChanged)
