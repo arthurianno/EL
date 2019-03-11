@@ -6,6 +6,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/color_window_background</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetTransparentStyle</item>
+        <item name="actionMenuTextAppearance">@style/New.Button3.White</item>
+        <item name="actionMenuTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Transparent" parent="AppTheme">

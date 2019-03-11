@@ -21,6 +21,7 @@ abstract class BaseEventPm constructor(
 ) : BasePm(services) {
 
     val formPickerValueChangedAction = Action<Double>()
+    val updateFormPickerValueCommand = Command<Pair<Int, Int>>()
 
     val formInput = inputControl()
     val formSelector = formSelectorControl()

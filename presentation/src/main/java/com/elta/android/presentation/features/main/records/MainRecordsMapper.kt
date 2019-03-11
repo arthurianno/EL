@@ -60,7 +60,8 @@ class MainRecordsMapper @Inject constructor(
             type = resources.getString(type.toName()),
             count = formatValue(),
             date = formatDate(),
-            showLabel = note != null
+            showLabel = note != null,
+            eventType = this.type
         )
 
     private fun Event.formatValue(): String? =

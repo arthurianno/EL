@@ -51,6 +51,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         observeAppBarChanges()
         formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         formSaveButtonView.clicks().bindTo(pm.mainAction)
+        pm.updateFormPickerValueCommand.bindTo { formPickerView.setValues(it.first, it.second) }
         pm.mainActionTitleState.bindTo(formSaveButtonView.text())
         pm.mainActionVisibilityState.bindTo(formSaveButtonView.visibility())
         pm.formInput.bindTo(formInputView)

@@ -13,6 +13,7 @@ import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
+import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
@@ -120,6 +121,10 @@ object Screens {
 
     data class EventsCreationScreen(val eventType: EventType) : SupportAppScreen() {
         override fun getFragment() = EventCreationFragment.newInstance(eventType)
+    }
+
+    data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
+        override fun getFragment() = EditEventFragment.newInstance(eventId, eventType)
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {

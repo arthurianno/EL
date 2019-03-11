@@ -1,10 +1,15 @@
 package com.elta.android.presentation.utils
 
 import android.support.v4.view.ViewCompat
+import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.elta.android.presentation.R
+import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.android.MainThreadDisposable
 
 fun ImageView.toggleSecureIcon(isSecure: Boolean) {
     setImageResource(when (isSecure) {
@@ -23,5 +28,41 @@ fun View.applyWindowInsetsForChildrenView() {
         val params = v.layoutParams as ViewGroup.MarginLayoutParams
         params.topMargin = insets.systemWindowInsetTop
         insets.consumeSystemWindowInsets()
+    }
+}
+
+fun Toolbar.menuClicks(): Observable<Int> = ToolbarMenuClickObservable(this)
+
+fun Toolbar.menuClicks(id: Int): Observable<Unit> =
+    ToolbarMenuClickObservable(this)
+        .filter { it == id }
+        .map { Unit }
+
+class ToolbarMenuClickObservable(private val toolbar: Toolbar) : Observable<Int>() {
+
+    override fun subscribeActual(observer: Observer<in Int>) {
+        if (!checkMainThread(observer)) {
+            return
+        }
+        val listener = Listener(toolbar, observer)
+        observer.onSubscribe(listener)
+        toolbar.setOnMenuItemClickListener(listener)
+    }
+
+    internal class Listener(
+        private val toolbar: Toolbar,
+        private val observer: Observer<in Int>
+    ) : MainThreadDisposable(), Toolbar.OnMenuItemClickListener {
+
+        override fun onMenuItemClick(item: MenuItem): Boolean {
+            if (!isDisposed) {
+                observer.onNext(item.itemId)
+            }
+            return true
+        }
+
+        override fun onDispose() {
+            toolbar.setOnMenuItemClickListener(null)
+        }
     }
 }
