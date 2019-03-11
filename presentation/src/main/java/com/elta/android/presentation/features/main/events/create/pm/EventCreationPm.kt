@@ -30,7 +30,7 @@ class EventCreationPm @Inject constructor(
 
     override fun handleBack(i: Unit) {
         when (isFormNotEmptyState.value) {
-            true -> confirmExitCommand.consumer.accept(Unit)
+            true -> exitDialogAction.consumer.accept(Unit)
             else -> router.exit()
         }
     }
