@@ -10,6 +10,7 @@ import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.menuClicks
 import com.elta.android.presentation.utils.visibility
 import kotlinx.android.synthetic.main.fragment_event_form.*
+import java.util.concurrent.TimeUnit
 
 class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
@@ -29,7 +30,9 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
     override fun onBindPresentationModel(pm: EditEventPm) {
         super.onBindPresentationModel(pm)
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
+        pm.progressState.observable
+            .throttleLast(300, TimeUnit.MILLISECONDS)
+            .bindTo(progressDialog.visibility(childFragmentManager))
         toolbarView.menuClicks(R.id.remove).bindTo(pm.deleteEventAction)
     }
 

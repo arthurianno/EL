@@ -5,8 +5,8 @@ import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import io.reactivex.Observable
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
@@ -30,7 +30,7 @@ interface EventsApi {
         @Body events: List<EventDto>
     ): Observable<List<EventDto>>
 
-    @DELETE("api/diary/v1/events")
+    @HTTP(method = "DELETE", path = "api/diary/v1/events", hasBody = true)
     fun deleteEvents(
         @Body events: List<SimpleEventDto>
     ): Observable<List<EventDto>>

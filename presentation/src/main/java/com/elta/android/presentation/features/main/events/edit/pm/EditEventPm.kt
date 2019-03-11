@@ -34,15 +34,11 @@ class EditEventPm @Inject constructor(
 
     private val eventId = State<String>()
     private val event = State<Event>()
-    private val loadScreenAction = Action<String>()
+    private val loadScreenAction = Action<Unit>()
     private val isFormChangedState = State(false)
     private val eventFormHolderState = State(EventFormModel())
 
     private val deleteDialogData: DialogData by lazy { Dialogs.EventDelete(resources) }
-
-    fun setEventId(id: String) {
-        eventId.consumer.accept(id)
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -53,11 +49,17 @@ class EditEventPm @Inject constructor(
         loadEvent()
     }
 
+    fun setEventId(id: String) {
+        eventId.consumer.accept(id)
+    }
+
     private fun loadEvent() {
         loadScreenAction.observable
+            .skipWhileInProgress()
             .map(::createGetEventUseCaseParams)
             .flatMapSingle {
                 getEventByIdUseCase.execute(it)
+                    .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess(event.consumer)
                     .doOnError(::handleError)
@@ -67,18 +69,14 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
 
         event.observable
+            .take(1)
             .doOnNext(::bindEvent)
             .subscribe()
             .untilDestroy()
 
-        Observables.combineLatest(
-            lifecycleObservable,
-            eventId.observable
-        )
-            .filter { it.first == Lifecycle.CREATED }
-            .map { it.second }
-            .doOnNext { loadScreenAction.consumer.accept(it) }
-            .subscribe()
+        eventId.observable
+            .map { Unit }
+            .subscribe(loadScreenAction.consumer)
             .untilDestroy()
     }
 
@@ -98,8 +96,8 @@ class EditEventPm @Inject constructor(
         }
     }
 
-    private fun createGetEventUseCaseParams(id: String) =
-        GetEventByIdUseCase.Params(id)
+    private fun createGetEventUseCaseParams(i: Unit) =
+        GetEventByIdUseCase.Params(eventId.value)
 
     private fun createEditEventParams(i: Unit): UpdateEventUseCase.Params {
         val form = eventFormHolderState.value
@@ -148,19 +146,18 @@ class EditEventPm @Inject constructor(
     }
 
     private fun checkIsChanged(eventFormModel: EventFormModel) {
-        isFormChangedState.consumer.accept(
-            event.valueOrNull?.isChanged(
-                value = eventFormModel.value,
-                kind = eventFormModel.kind,
-                name = eventFormModel.name,
-                duration = eventFormModel.duration,
-                date = eventFormModel.date,
-                tagId = eventFormModel.tag?.id,
-                insulin = eventFormModel.insulinType,
-                activity = eventFormModel.activityType,
-                note = eventFormModel.note
-            ) ?: false
-        )
+        val isChanged = event.valueOrNull?.isChanged(
+            value = eventFormModel.value,
+            kind = eventFormModel.kind,
+            name = eventFormModel.name,
+            duration = eventFormModel.duration,
+            date = eventFormModel.date,
+            tagId = eventFormModel.tag?.id,
+            insulin = eventFormModel.insulinType,
+            activity = eventFormModel.activityType,
+            note = eventFormModel.note
+        ) ?: false
+        isFormChangedState.consumer.accept(isChanged)
     }
 
     private fun isFormValid(form: EventFormModel): Boolean {
@@ -200,13 +197,14 @@ class EditEventPm @Inject constructor(
             .filter { it == DialogResult.POSITIVE }
             .map { event.value }
             .map(::createDeleteEventUseCaseParams)
-            .doOnNext {
-                deleteEventUseCase.execute(it)
+            .flatMapCompletable { params ->
+                deleteEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete(::handleEventChanged)
                     .doOnError(::handleError)
             }
+            .retry()
             .subscribe()
             .untilDestroy()
     }
