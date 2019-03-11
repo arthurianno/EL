@@ -16,5 +16,6 @@ data class Event(
     val activityType: ActivityType?,
     val mealTag: MealTag?,
     val insulinType: InsulinType?,
-    val type: EventType
+    val type: EventType,
+    val state: State
 )

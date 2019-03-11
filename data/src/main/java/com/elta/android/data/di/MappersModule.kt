@@ -9,6 +9,7 @@ import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.mapper.EventFromCacheMapper
 import com.elta.android.data.features.diary.events.mapper.EventToCacheMapper
 import com.elta.android.data.features.diary.events.mapper.EventToDomainMapper
+import com.elta.android.data.features.diary.events.mapper.EventToDtoMapper
 import com.elta.android.data.features.diary.events.mapper.EventToSimpleMapper
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
@@ -78,6 +79,11 @@ abstract class MappersModule {
     abstract fun bindEventToSimpleMapper(
         mapper: EventToSimpleMapper
     ): Mapper<EventDto, SimpleEventDto>
+
+    @Binds
+    abstract fun bindEventToDtoMapper(
+        mapper: EventToDtoMapper
+    ): Mapper<Event, EventDto>
 
     @Binds
     abstract fun bindTagToCacheMapper(

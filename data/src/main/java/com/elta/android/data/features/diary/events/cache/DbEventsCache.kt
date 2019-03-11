@@ -42,6 +42,7 @@ class DbEventsCache @Inject constructor(
         when (condition) {
             is CommonConditions.All -> getAll()
             is EventsConditions.ByPeriod -> getAllForPeriod(condition.start, condition.end)
+            is CommonConditions.ByIds -> getAllByIds(condition.ids)
             else -> throw IllegalGetConditionError(condition)
         }
 
@@ -78,6 +79,15 @@ class DbEventsCache @Inject constructor(
                 equal(EventCachedDto_.userId, it)
                 and()
                 between(EventCachedDto_.additionTime, start, end)
+            }.find()
+        }
+
+    private fun getAllByIds(ids: List<Long>): List<EventCachedDto> =
+        userHolder.doInUserExists {
+            box.query {
+                equal(EventCachedDto_.userId, it)
+                and()
+                inValues(EventCachedDto_.id, ids.toLongArray())
             }.find()
         }
 }
