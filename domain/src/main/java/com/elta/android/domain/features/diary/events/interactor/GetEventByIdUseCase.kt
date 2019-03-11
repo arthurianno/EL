@@ -27,6 +27,5 @@ class GetEventByIdUseCase @Inject constructor(
             event
         }
 
-
     data class Params(val id: String)
 }

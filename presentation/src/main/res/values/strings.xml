@@ -284,10 +284,12 @@
     <string name="event_date_today">Сегодня</string>
     <string name="event_date_yesterday">Вчера</string>
 
-    <string name="event_form_exit_dialog_title">Внимание</string>
+    <string name="event_form_dialog_title">Внимание</string>
     <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены</string>
-    <string name="event_form_exit_dialog_cancel_button">Отменить</string>
+    <string name="event_form_dialog_cancel_button">Отменить</string>
     <string name="event_form_exit_dialog_confirm_button">Выйти</string>
+    <string name="event_form_delete_dialog_confirm_button">Удалить</string>
+    <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
 
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>

@@ -10,7 +10,6 @@ import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.nullgr.core.resources.ResourceProvider
 import java.util.concurrent.TimeUnit
 
-
 fun Event.getPickerValues(): Pair<Int, Int>? =
     when (type) {
         EventType.ACTIVITY -> duration.toPickerValues()

@@ -7,10 +7,12 @@ import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.events.model.isChanged
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormInputText
@@ -18,7 +20,6 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getPick
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
 import io.reactivex.rxkotlin.Observables
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -37,6 +38,8 @@ class EditEventPm @Inject constructor(
     private val isFormChangedState = State(false)
     private val eventFormHolderState = State(EventFormModel())
 
+    private val deleteDialogData: DialogData by lazy { Dialogs.EventDelete(resources) }
+
     fun setEventId(id: String) {
         eventId.consumer.accept(id)
     }
@@ -46,6 +49,7 @@ class EditEventPm @Inject constructor(
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
         observeEventChanges()
         observeSaveEventAction()
+        observeDeleteEventAction()
         loadEvent()
     }
 
@@ -89,7 +93,7 @@ class EditEventPm @Inject constructor(
 
     override fun handleBack(i: Unit) {
         when (isFormChangedState.value) {
-            true -> confirmExitCommand.consumer.accept(Unit)
+            true -> exitDialogAction.consumer.accept(Unit)
             else -> router.exit()
         }
     }
@@ -180,7 +184,7 @@ class EditEventPm @Inject constructor(
                 updateEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleEventAdded)
+                    .doOnComplete(::handleEventChanged)
                     .doOnError(::handleError)
             }
             .retry()
@@ -189,8 +193,26 @@ class EditEventPm @Inject constructor(
     }
 
     private fun observeDeleteEventAction() {
-
+        deleteEventAction.observable
+            .switchMapMaybe {
+                exitDialogControl.showForResult(deleteDialogData)
+            }
+            .filter { it == DialogResult.POSITIVE }
+            .map { event.value }
+            .map(::createDeleteEventUseCaseParams)
+            .doOnNext {
+                deleteEventUseCase.execute(it)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnComplete(::handleEventChanged)
+                    .doOnError(::handleError)
+            }
+            .subscribe()
+            .untilDestroy()
     }
+
+    private fun createDeleteEventUseCaseParams(event: Event) =
+        DeleteEventUseCase.Params(event.id, event.type)
 
     private fun Date?.isDateChanged(other: Date): Boolean {
         return when {
@@ -199,7 +221,7 @@ class EditEventPm @Inject constructor(
         }
     }
 
-    private fun handleEventAdded() {
+    private fun handleEventChanged() {
         bus.event(Events.EventsChanged)
         router.exit()
     }
