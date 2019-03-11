@@ -2,17 +2,20 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
+import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
 
@@ -38,12 +41,15 @@ abstract class BaseEventPm constructor(
     val dateTimeSelectedAction = Action<Date>()
 
     val backHandleAction = Action<Unit>()
-    val exitConfirmedAction = Action<Unit>()
-    val confirmExitCommand = Command<Unit>()
+    val exitDialogAction = Action<Unit>()
+
+    val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
     protected val formPickerValue = State<Double>()
     protected val eventTypeState = State<EventType>()
     protected val selectedDateState = State(Date())
+
+    private val exitDialogData: DialogData by lazy { Dialogs.EventExit(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -66,7 +72,11 @@ abstract class BaseEventPm constructor(
             .subscribe()
             .untilDestroy()
 
-        exitConfirmedAction.observable
+        exitDialogAction.observable
+            .switchMapMaybe {
+                exitDialogControl.showForResult(exitDialogData)
+            }
+            .filter { it == DialogResult.POSITIVE }
             .doOnNext { router.exit() }
             .subscribe()
             .untilDestroy()
@@ -137,4 +147,8 @@ abstract class BaseEventPm constructor(
 
     private fun String.toSimpleSelectorOption() =
         SelectorOption(this)
+
+    enum class DialogResult {
+        NEGATIVE, POSITIVE
+    }
 }

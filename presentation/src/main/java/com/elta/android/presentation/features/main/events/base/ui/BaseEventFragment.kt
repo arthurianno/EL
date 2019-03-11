@@ -15,7 +15,6 @@ import com.elta.android.presentation.utils.appbar.AppBarState
 import com.elta.android.presentation.utils.appbar.observeState
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
-import com.elta.android.presentation.utils.shows
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
@@ -27,17 +26,6 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override val screenLayout: Int = R.layout.fragment_event_form
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
-
-    private val exitDialog by lazy {
-        MaterialDialog.Builder(activity!!)
-            .cancelable(false)
-            .title(R.string.event_form_exit_dialog_title)
-            .content(R.string.event_form_exit_dialog_body)
-            .negativeText(R.string.event_form_exit_dialog_cancel_button)
-            .positiveText(R.string.event_form_exit_dialog_confirm_button)
-            .onPositive { _, _ -> passTo(presentationModel.exitConfirmedAction) }
-            .build()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,7 +49,17 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(formNoteView)
         pm.bindDateSelection()
-        pm.confirmExitCommand.bindTo(exitDialog.shows())
+        pm.exitDialogControl.bindTo { data, dc ->
+            MaterialDialog.Builder(activity!!)
+                .cancelable(false)
+                .title(data.title)
+                .content(data.message)
+                .negativeText(data.negative)
+                .positiveText(data.positive)
+                .onPositive { _, _ -> dc.sendResult(BaseEventPm.DialogResult.POSITIVE) }
+                .onNegative { _, _ -> dc.sendResult(BaseEventPm.DialogResult.NEGATIVE) }
+                .build()
+        }
     }
 
     override fun handleBack() {
