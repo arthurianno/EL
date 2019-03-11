@@ -139,8 +139,7 @@ class EditEventPm @Inject constructor(
             }
         }
             .doOnNext(::checkIsChanged)
-            .filter { isFormChangedState.value }
-            .map(::isFormValid)
+            .map { isFormValid(it) && isFormChangedState.value }
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
     }

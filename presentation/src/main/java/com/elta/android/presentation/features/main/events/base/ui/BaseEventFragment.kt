@@ -21,6 +21,7 @@ import com.jakewharton.rxbinding2.widget.text
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
@@ -41,7 +42,9 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         formSaveButtonView.clicks().bindTo(pm.mainAction)
         pm.updateFormPickerValueCommand.bindTo { formPickerView.setValues(it.first, it.second) }
         pm.mainActionTitleState.bindTo(formSaveButtonView.text())
-        pm.mainActionVisibilityState.bindTo(formSaveButtonView.visibility())
+        pm.mainActionVisibilityState.observable
+            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
+            .bindTo(formSaveButtonView.visibility())
         pm.formInput.bindTo(formInputView)
         pm.formSelector.bind(formVariantSelectorView, compositeUnbind)
         pm.tagSelector.bind(formTagSelectorView, compositeUnbind)
@@ -92,5 +95,9 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
                     else -> toolbarView.subtitle = null
                 }
             }
+    }
+
+    private companion object {
+        const val DEBOUNCE = 100L
     }
 }
