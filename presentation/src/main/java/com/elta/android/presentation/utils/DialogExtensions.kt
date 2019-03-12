@@ -16,6 +16,10 @@ inline fun MaterialDialog.visibility(): Consumer<in Boolean> = Consumer {
     }
 }
 
+inline fun MaterialDialog.shows(): Consumer<Unit> = Consumer {
+    show()
+}
+
 inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer<in Boolean> = Consumer {
     val fragment = fragmentManager.findFragmentByTag(PROGRESS_TAG)
     if (fragment != null && !it) {

@@ -43,6 +43,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -54,21 +56,24 @@ public class NumberPicker extends LinearLayout {
 
     @Retention(SOURCE)
     @IntDef({VERTICAL, HORIZONTAL})
-    public @interface Orientation{}
+    public @interface Orientation {
+    }
 
     public static final int VERTICAL = LinearLayout.VERTICAL;
     public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
 
     @Retention(SOURCE)
     @IntDef({ASCENDING, DESCENDING})
-    public @interface Order{}
+    public @interface Order {
+    }
 
     public static final int ASCENDING = 0;
     public static final int DESCENDING = 1;
 
     @Retention(SOURCE)
     @IntDef({LEFT, CENTER, RIGHT})
-    public @interface Align{}
+    public @interface Align {
+    }
 
     public static final int RIGHT = 0;
     public static final int CENTER = 1;
@@ -348,7 +353,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * Listener to be notified upon current weight change.
      */
-    private OnValueChangeListener mOnValueChangeListener;
+    private List<OnValueChangeListener> mOnValueChangeListeners = new ArrayList<>();
 
     /**
      * Listener to be notified upon scroll state change.
@@ -627,7 +632,8 @@ public class NumberPicker extends LinearLayout {
 
         @IntDef({SCROLL_STATE_IDLE, SCROLL_STATE_TOUCH_SCROLL, SCROLL_STATE_FLING})
         @Retention(RetentionPolicy.SOURCE)
-        public @interface ScrollState{}
+        public @interface ScrollState {
+        }
 
         /**
          * The view is not scrolling.
@@ -683,7 +689,7 @@ public class NumberPicker extends LinearLayout {
      * Create a new number picker.
      *
      * @param context The application environment.
-     * @param attrs A collection of attributes.
+     * @param attrs   A collection of attributes.
      */
     public NumberPicker(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -692,8 +698,8 @@ public class NumberPicker extends LinearLayout {
     /**
      * Create a new number picker
      *
-     * @param context the application environment.
-     * @param attrs a collection of attributes.
+     * @param context  the application environment.
+     * @param attrs    a collection of attributes.
      * @param defStyle The default style to apply to this view.
      */
     public NumberPicker(Context context, AttributeSet attrs, int defStyle) {
@@ -1374,12 +1380,20 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Sets the listener to be notified on change of the current weight.
+     * Add the listener to be notified on change of the current weight.
      *
      * @param onValueChangedListener The listener.
      */
-    public void setOnValueChangedListener(OnValueChangeListener onValueChangedListener) {
-        mOnValueChangeListener = onValueChangedListener;
+    public void addOnValueChangedListener(OnValueChangeListener onValueChangedListener) {
+        mOnValueChangeListeners.add(onValueChangedListener);
+    }
+
+    public void removeOnValueChangedListener(OnValueChangeListener onValueChangedListener) {
+        mOnValueChangeListeners.remove(onValueChangedListener);
+    }
+
+    public void clearOnValueChangedListeners() {
+        mOnValueChangeListeners.clear();
     }
 
     /**
@@ -1399,8 +1413,8 @@ public class NumberPicker extends LinearLayout {
      * </p>
      *
      * @param formatter The formatter object. If formatter is <code>null</code>,
-     *            {@link String#valueOf(int)} will be used.
-     *@see #setDisplayedValues(String[])
+     *                  {@link String#valueOf(int)} will be used.
+     * @see #setDisplayedValues(String[])
      */
     public void setFormatter(Formatter formatter) {
         if (formatter == mFormatter) {
@@ -1441,6 +1455,10 @@ public class NumberPicker extends LinearLayout {
      */
     public void setValue(int value) {
         setValueInternal(value, false);
+    }
+
+    public void updateValue(int value) {
+        setValueInternal(value, true);
     }
 
     private float getMaxTextSize() {
@@ -1502,7 +1520,6 @@ public class NumberPicker extends LinearLayout {
      * Gets whether the selector wheel wraps when reaching the min/max weight.
      *
      * @return True if the selector wheel wraps.
-     *
      * @see #getMinValue()
      * @see #getMaxValue()
      */
@@ -1552,7 +1569,7 @@ public class NumberPicker extends LinearLayout {
      * </p>
      *
      * @param intervalMillis The speed (in milliseconds) at which the numbers
-     *            will be incremented and decremented.
+     *                       will be incremented and decremented.
      */
     public void setOnLongPressUpdateInterval(long intervalMillis) {
         mLongPressUpdateInterval = intervalMillis;
@@ -1581,10 +1598,10 @@ public class NumberPicker extends LinearLayout {
      *
      * @param minValue The min weight inclusive.
      *
-     * <strong>Note:</strong> The length of the displayed values array
-     * set via {@link #setDisplayedValues(String[])} must be equal to the
-     * range of selectable numbers which is equal to
-     * {@link #getMaxValue()} - {@link #getMinValue()} + 1.
+     *                 <strong>Note:</strong> The length of the displayed values array
+     *                 set via {@link #setDisplayedValues(String[])} must be equal to the
+     *                 range of selectable numbers which is equal to
+     *                 {@link #getMaxValue()} - {@link #getMinValue()} + 1.
      */
     public void setMinValue(int minValue) {
 //        if (minValue < 0) {
@@ -1616,10 +1633,10 @@ public class NumberPicker extends LinearLayout {
      *
      * @param maxValue The max weight inclusive.
      *
-     * <strong>Note:</strong> The length of the displayed values array
-     * set via {@link #setDisplayedValues(String[])} must be equal to the
-     * range of selectable numbers which is equal to
-     * {@link #getMaxValue()} - {@link #getMinValue()} + 1.
+     *                 <strong>Note:</strong> The length of the displayed values array
+     *                 set via {@link #setDisplayedValues(String[])} must be equal to the
+     *                 range of selectable numbers which is equal to
+     *                 {@link #getMaxValue()} - {@link #getMinValue()} + 1.
      */
     public void setMaxValue(int maxValue) {
         if (maxValue < 0) {
@@ -1651,9 +1668,9 @@ public class NumberPicker extends LinearLayout {
      *
      * @param displayedValues The displayed values.
      *
-     * <strong>Note:</strong> The length of the displayed values array
-     * must be equal to the range of selectable numbers which is equal to
-     * {@link #getMaxValue()} - {@link #getMinValue()} + 1.
+     *                        <strong>Note:</strong> The length of the displayed values array
+     *                        must be equal to the range of selectable numbers which is equal to
+     *                        {@link #getMaxValue()} - {@link #getMinValue()} + 1.
      */
     public void setDisplayedValues(String[] displayedValues) {
         if (mDisplayedValues == displayedValues) {
@@ -1857,7 +1874,7 @@ public class NumberPicker extends LinearLayout {
      * Makes a measure spec that tries greedily to use the max weight.
      *
      * @param measureSpec The measure spec.
-     * @param maxSize The max weight for the size.
+     * @param maxSize     The max weight for the size.
      * @return A measure spec greedily imposing the max size.
      */
     private int makeMeasureSpec(int measureSpec, int maxSize) {
@@ -1883,9 +1900,9 @@ public class NumberPicker extends LinearLayout {
      * by a MeasureSpec. Tries to respect the min size, unless a different size
      * is imposed by the constraints.
      *
-     * @param minSize The minimal desired size.
+     * @param minSize      The minimal desired size.
      * @param measuredSize The currently measured size.
-     * @param measureSpec The current measure spec.
+     * @param measureSpec  The current measure spec.
      * @return The resolved size and state.
      */
     private int resolveSizeAndStateRespectingMinSize(int minSize, int measuredSize,
@@ -1906,7 +1923,7 @@ public class NumberPicker extends LinearLayout {
      * optionally the bit {@link #MEASURED_STATE_TOO_SMALL} set if the resulting
      * size is smaller than the size the view wants to be.
      *
-     * @param size How big the view wants to be
+     * @param size        How big the view wants to be
      * @param measureSpec Constraints imposed by the parent
      * @return Size information bit mask as defined by
      * {@link #MEASURED_SIZE_MASK} and {@link #MEASURED_STATE_TOO_SMALL}.
@@ -1914,7 +1931,7 @@ public class NumberPicker extends LinearLayout {
     public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState) {
         int result = size;
         int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize =  MeasureSpec.getSize(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
         switch (specMode) {
             case MeasureSpec.UNSPECIFIED:
                 result = size;
@@ -1930,7 +1947,7 @@ public class NumberPicker extends LinearLayout {
                 result = specSize;
                 break;
         }
-        return result | (childMeasuredState&MEASURED_STATE_MASK);
+        return result | (childMeasuredState & MEASURED_STATE_MASK);
     }
 
     /**
@@ -1954,7 +1971,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * Sets the current weight of this NumberPicker.
      *
-     * @param current The new weight of the NumberPicker.
+     * @param current      The new weight of the NumberPicker.
      * @param notifyChange Whether to notify if the current weight changed.
      */
     private void setValueInternal(int current, boolean notifyChange) {
@@ -2208,8 +2225,9 @@ public class NumberPicker extends LinearLayout {
      * NumberPicker.
      */
     private void notifyChange(int previous, int current) {
-        if (mOnValueChangeListener != null) {
-            mOnValueChangeListener.onValueChange(this, previous, mValue);
+        if (!mOnValueChangeListeners.isEmpty()) {
+            for (OnValueChangeListener listener : mOnValueChangeListeners)
+                listener.onValueChange(this, previous, mValue);
         }
     }
 
@@ -2305,7 +2323,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * The numbers accepted by the input text's {@link Filter}
      */
-    private static final char[] DIGIT_CHARACTERS = new char[] {
+    private static final char[] DIGIT_CHARACTERS = new char[]{
             // Latin digits are the common case
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             // Arabic-Indic
@@ -2434,7 +2452,9 @@ public class NumberPicker extends LinearLayout {
         private int mSelectionStart;
         private int mSelectionEnd;
 
-        /** Whether this runnable is currently posted. */
+        /**
+         * Whether this runnable is currently posted.
+         */
         private boolean mPosted;
 
         public SetSelectionCommand(EditText inputText) {
@@ -2555,8 +2575,9 @@ public class NumberPicker extends LinearLayout {
 
     /**
      * Should sort numbers in ascending or descending order.
+     *
      * @param order Pass {@link #ASCENDING} or {@link #ASCENDING}.
-     * Default weight is {@link #DESCENDING}.
+     *              Default weight is {@link #DESCENDING}.
      */
     public void setOrder(@Order int order) {
         mOrder = order;

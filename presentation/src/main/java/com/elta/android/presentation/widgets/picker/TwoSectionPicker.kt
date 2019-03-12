@@ -51,7 +51,7 @@ class TwoSectionPicker @JvmOverloads constructor(
             val listener = Listener(view, observer)
             observer.onSubscribe(listener)
             listener.valueListener.onValueChange(view, view.value, view.value)
-            view.setOnValueChangedListener(listener.valueListener)
+            view.addOnValueChangedListener(listener.valueListener)
         }
 
         class Listener(
@@ -66,7 +66,7 @@ class TwoSectionPicker @JvmOverloads constructor(
             }
 
             override fun onDispose() {
-                view.setOnValueChangedListener(null)
+                view.addOnValueChangedListener(null)
             }
         }
     }

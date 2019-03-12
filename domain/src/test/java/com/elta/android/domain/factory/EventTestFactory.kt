@@ -24,6 +24,7 @@ object EventTestFactory {
             additionTime = Date(),
             additionTimeString = "",
             tagId = tagId,
+            tag = null,
             note = "Test note",
             modificationTime = Date(),
             value = value,

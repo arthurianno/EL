@@ -12,6 +12,7 @@ import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
+import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
@@ -143,4 +144,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EventsOptionsChooserPm::class)
     abstract fun bindEventsOptionsChooserPm(pm: EventsOptionsChooserPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(EditEventPm::class)
+    abstract fun bindEditEventPm(pm: EditEventPm): PresentationModel
 }

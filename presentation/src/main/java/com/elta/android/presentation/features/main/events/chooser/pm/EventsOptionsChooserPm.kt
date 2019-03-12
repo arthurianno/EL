@@ -83,7 +83,14 @@ class EventsOptionsChooserPm @Inject constructor(
 
         selectionConfirmedAction.observable
             .map(::buildChooserResult)
-            .doOnNext { bus.event(Events.ChooserOptionSelected(it)) }
+            .doOnNext {
+                bus.event(
+                    when (configurationState.value.chooserType) {
+                        ChooserType.VARIANTS -> Events.ChooserVariantSelected(it)
+                        ChooserType.GROUP_TAGS -> Events.ChooserTagSelected(it)
+                    }
+                )
+            }
             .doOnNext { router.exit() }
             .subscribe()
             .untilDestroy()
@@ -106,9 +113,14 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun buildChooserResult(i: Unit): ChooserResult {
         val selectedItemId = selectedItemIdState.value
-        val item = items.value
-            .find { it is ChooserItem && it.id == selectedItemId }
-        return ChooserResult(selectedItemId, (item as? ChooserItem)?.title)
+        val item = items.value.find { it is ChooserItem && it.id == selectedItemId }
+        val chooserItem = item as? ChooserItem
+        return ChooserResult(
+            id = selectedItemId,
+            name = chooserItem?.title,
+            iconId = chooserItem?.iconId,
+            meta = chooserItem?.meta
+        )
     }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =

@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets
+package com.elta.android.presentation.widgets.selector
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -9,12 +9,13 @@ import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.checkMainThread
+import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.nullgr.core.ui.extensions.toggleView
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.view_form_selector.view.*
-import java.util.function.Consumer
 
 class FormSelectorView @JvmOverloads constructor(
     context: Context,
@@ -34,6 +35,10 @@ class FormSelectorView @JvmOverloads constructor(
         }
     private var needDrawArrow: Boolean = true
     private var value: String? = null
+        set(value) {
+            field = value
+            bindValue()
+        }
 
     private val textColor: Int by lazy { ContextCompat.getColor(context, R.color.black_blue) }
     private val hintColor: Int by lazy { ContextCompat.getColor(context, R.color.shade_black2) }
@@ -46,14 +51,14 @@ class FormSelectorView @JvmOverloads constructor(
 
     fun setIconRes(@DrawableRes icon: Int) {
         this.icon = ContextCompat.getDrawable(context, icon)
-        bindValue()
+        bindIcon()
     }
 
     fun click(): Observable<Unit> = SelectorClickObservable(this)
 
-    fun value(): Consumer<Pair<Drawable?, String>> = Consumer {
-        icon = it.first
-        value = it.second
+    fun value(): Consumer<SelectorOption> = Consumer {
+        icon = it.icon
+        value = it.text
     }
 
     fun isEmpty(): Boolean = value.isNullOrEmpty()

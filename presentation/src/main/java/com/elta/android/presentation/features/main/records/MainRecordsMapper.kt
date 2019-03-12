@@ -60,7 +60,8 @@ class MainRecordsMapper @Inject constructor(
             type = resources.getString(type.toName()),
             count = formatValue(),
             date = formatDate(),
-            showLabel = note != null
+            showLabel = note != null,
+            eventType = this.type
         )
 
     private fun Event.formatValue(): String? =
@@ -79,7 +80,7 @@ class MainRecordsMapper @Inject constructor(
     // TODO: rework this solution using Android310
     private fun Event.formatDate(): String {
         return try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSSXXX", Locale.getDefault()).parse(additionTimeString)
+            val date = SimpleDateFormat(PATTERN, Locale.getDefault()).parse(additionTimeString)
             val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
             "в ${tokens[0]} (UTC ${tokens[1]})"
         } catch (e: Exception) {
@@ -164,5 +165,6 @@ class MainRecordsMapper @Inject constructor(
         const val MINUTES_IN_HOUR = 60
         const val SECONDS_IN_MINUTE = 60
         const val ZERO = 0
+        const val PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSSXXX"
     }
 }

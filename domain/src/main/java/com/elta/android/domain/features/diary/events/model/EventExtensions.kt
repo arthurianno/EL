@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
 import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
+import com.elta.android.domain.features.diary.tags.model.Tag
 import java.util.Date
 
 fun EventType.getValidator(): FormValidator =
@@ -19,6 +20,7 @@ fun EventType.getValidator(): FormValidator =
         EventType.GLUCOSE -> GlucoseValidator
     }
 
+@Suppress("LongParameterList")
 fun Event.isChanged(
     value: Double? = null,
     kind: String? = null,
@@ -39,3 +41,8 @@ fun Event.isChanged(
         this.insulinType != insulin ||
         this.activityType != activity ||
         this.note != note
+
+fun Event.addTag(tags: List<Tag>): Event {
+    tag = tags.firstOrNull { tagId == it.id }
+    return this
+}

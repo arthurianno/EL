@@ -56,6 +56,9 @@
     </style>
 
     <!-- BUTTON -->
+    <style name="New.Button3.White">
+        <item name="android:textColor">@color/white</item>
+    </style>
 
     <!-- OVERLINE -->
 

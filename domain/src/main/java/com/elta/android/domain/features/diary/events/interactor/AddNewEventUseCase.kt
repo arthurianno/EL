@@ -28,6 +28,7 @@ class AddNewEventUseCase @Inject constructor(
                 additionTime = date,
                 additionTimeString = date.toString(),
                 tagId = p.tag?.id,
+                tag = p.tag,
                 note = p.note,
                 modificationTime = date,
                 value = p.value,
