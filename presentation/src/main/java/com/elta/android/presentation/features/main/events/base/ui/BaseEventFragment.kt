@@ -33,10 +33,13 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     private lateinit var initializer: FormInitializer
     private val listener: AppBarLayout.OnOffsetChangedListener by lazy {
         AppBarLayout.OnOffsetChangedListener { p0, p1 ->
-            val p = p1 * 100 / p0.totalScrollRange
-            val a = 1 - Math.abs(p / 100f)
-            formPickerView.alpha = a
-            eventInfoContainerView.alpha = a
+            val totalRange = p0.totalScrollRange
+            if (totalRange > 0) {
+                val p = p1 * 100 / totalRange
+                val a = 1 - Math.abs(p / 100f)
+                formPickerView.alpha = a
+                eventInfoContainerView.alpha = a
+            }
         }
     }
 
