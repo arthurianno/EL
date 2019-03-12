@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.base.ui
 
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -9,6 +10,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
+import com.elta.android.presentation.features.main.events.base.initializer.FormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.AppBarState
@@ -28,11 +30,28 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override val screenLayout: Int = R.layout.fragment_event_form
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
 
+    private lateinit var initializer: FormInitializer
+    private val listener: AppBarLayout.OnOffsetChangedListener by lazy {
+        AppBarLayout.OnOffsetChangedListener { p0, p1 ->
+            val p = p1 * 100 / p0.totalScrollRange
+            val a = 1 - Math.abs(p / 100f)
+            formPickerView.alpha = a
+            eventInfoContainerView.alpha = a
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val eventType = getEventType()
+        initializer = eventType.makeFormInitializer()
+        presentationModel.setEventType(eventType)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
-        getEventType().makeFormInitializer().init(view)
-        presentationModel.setEventType(getEventType())
+        initializer.init(view)
+        appBarLayoutView.addOnOffsetChangedListener(listener)
     }
 
     override fun onBindPresentationModel(pm: T) {
