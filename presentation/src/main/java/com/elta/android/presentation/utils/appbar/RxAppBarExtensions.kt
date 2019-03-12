@@ -9,6 +9,21 @@ import io.reactivex.android.MainThreadDisposable
 fun AppBarLayout.observeState(): Observable<AppBarState> =
     AppBarLayoutStateChangeObservable(this)
 
+fun AppBarLayout.offsetChanges(): Observable<Pair<AppBarLayout, Int>> =
+    AppBarOffsetChangeObservable(this)
+
+fun AppBarLayout.collapseProgress(): Observable<Float> =
+    AppBarOffsetChangeObservable(this)
+        .map {
+            val totalRange = it.first.totalScrollRange
+            if (totalRange > 0) {
+                val p = it.second * 100 / totalRange
+                1 - Math.abs(p / 100f)
+            } else {
+                0f
+            }
+        }
+
 private class AppBarLayoutStateChangeObservable(
     private val view: AppBarLayout
 ) : Observable<AppBarState>() {
@@ -36,6 +51,35 @@ private class AppBarLayoutStateChangeObservable(
 
         override fun onDispose() {
             view.removeOnOffsetChangedListener(stateListener)
+        }
+    }
+}
+
+private class AppBarOffsetChangeObservable(
+    private val view: AppBarLayout
+) : Observable<Pair<AppBarLayout, Int>>() {
+
+    override fun subscribeActual(observer: Observer<in Pair<AppBarLayout, Int>>) {
+        if (!checkMainThread(observer)) {
+            return
+        }
+        val listener = Listener(view, observer)
+        observer.onSubscribe(listener)
+        view.addOnOffsetChangedListener(listener.offsetListener)
+    }
+
+    class Listener(
+        private val view: AppBarLayout,
+        observer: Observer<in Pair<AppBarLayout, Int>>
+    ) : MainThreadDisposable() {
+
+        val offsetListener = AppBarLayout.OnOffsetChangedListener { appBar, offset ->
+            if (!isDisposed)
+                observer.onNext(appBar to offset)
+        }
+
+        override fun onDispose() {
+            view.removeOnOffsetChangedListener(offsetListener)
         }
     }
 }

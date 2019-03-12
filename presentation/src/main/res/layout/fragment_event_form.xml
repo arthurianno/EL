@@ -65,19 +65,68 @@
             </LinearLayout>
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbarView"
+                style="@style/FakeToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 android:layout_marginBottom="8dp"
-                app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_dialog_close_white"
-                app:subtitleTextAppearance="@style/New.Caption2.White"
-                app:subtitleTextColor="@color/white"
-                app:titleTextAppearance="@style/New.Headline5.White"
-                app:titleTextColor="@color/white" />
+                app:layout_collapseMode="pin">
 
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/toolbarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize">
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:id="@+id/homeButtonView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_toolbar_layout"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_dialog_close_white" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/homeButtonView"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/toolbarTitleView"
+                            style="@style/New.Headline5.White"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:includeFontPadding="false"
+                            tools:text="Toolbar Title" />
+
+                        <TextView
+                            android:id="@+id/toolbarSubTitleView"
+                            style="@style/New.Caption2.White"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:includeFontPadding="false"
+                            android:visibility="gone"
+                            tools:text="Toolbar Subtitle" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/menuButtonView"
+                        style="@style/New.Button3.White"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_toolbar_layout"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </android.support.constraint.ConstraintLayout>
+            </android.support.v7.widget.Toolbar>
         </android.support.design.widget.CollapsingToolbarLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView

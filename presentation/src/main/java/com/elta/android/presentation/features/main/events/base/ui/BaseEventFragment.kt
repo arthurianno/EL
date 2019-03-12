@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.main.events.base.ui
 
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -14,7 +13,10 @@ import com.elta.android.presentation.features.main.events.base.initializer.FormI
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.AppBarState
+import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.appbar.observeState
+import com.elta.android.presentation.utils.collapse
+import com.elta.android.presentation.utils.expand
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
@@ -31,17 +33,6 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
 
     private lateinit var initializer: FormInitializer
-    private val listener: AppBarLayout.OnOffsetChangedListener by lazy {
-        AppBarLayout.OnOffsetChangedListener { p0, p1 ->
-            val totalRange = p0.totalScrollRange
-            if (totalRange > 0) {
-                val p = p1 * 100 / totalRange
-                val a = 1 - Math.abs(p / 100f)
-                formPickerView.alpha = a
-                eventInfoContainerView.alpha = a
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +43,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarView.setNavigationOnClickListener { activity?.onBackPressed() }
         initializer.init(view)
-        appBarLayoutView.addOnOffsetChangedListener(listener)
     }
 
     override fun onBindPresentationModel(pm: T) {
@@ -113,10 +102,18 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
             .filter { it.first.isNotEmpty() }
             .bindTo {
                 when (it.second) {
-                    AppBarState.COLLAPSED -> toolbarView.subtitle = it.first
-                    else -> toolbarView.subtitle = null
+                    AppBarState.COLLAPSED -> toolbarSubTitleView.apply {
+                        text = it.first
+                        expand()
+                    }
+                    else -> toolbarSubTitleView.collapse()
                 }
             }
+
+        appBarLayoutView.collapseProgress().bindTo {
+            formPickerView.alpha = it
+            eventInfoContainerView.alpha = it
+        }
     }
 
     private companion object {
