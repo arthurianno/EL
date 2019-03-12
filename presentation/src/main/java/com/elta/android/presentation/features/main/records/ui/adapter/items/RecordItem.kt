@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.nullgr.core.adapter.items.ListItem
 
 data class RecordItem(
@@ -9,7 +10,8 @@ data class RecordItem(
     val type: String,
     val count: String? = null,
     val date: String,
-    val showLabel: Boolean
+    val showLabel: Boolean,
+    val eventType: EventType
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = id

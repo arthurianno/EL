@@ -10,9 +10,12 @@ import com.elta.android.data.features.diary.events.cache.EventsCache
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
+import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.nullgr.core.date.toTimestamp
 import com.nullgr.core.hardware.NetworkChecker
+import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import java.util.Date
 import javax.inject.Inject
 
@@ -32,6 +35,24 @@ class EventsRemoteDataSource @Inject constructor(
 
     override fun getEvents(start: Date, end: Date): Observable<List<EventDto>> =
         getEvents()
+
+    override fun getEventById(id: String): Single<EventDto> =
+        throw UnsupportedOperationException("${this::class.java.simpleName} doesn't support getting event by id.")
+
+    override fun addEvents(events: List<EventDto>): Completable =
+        api.addEvents(events)
+            .checkNetwork(checker)
+            .flatMapCompletable { Completable.complete() }
+
+    override fun updateEvents(events: List<EventDto>): Completable =
+        api.updateEvents(events)
+            .checkNetwork(checker)
+            .flatMapCompletable { Completable.complete() }
+
+    override fun deleteEvents(events: List<SimpleEventDto>): Completable =
+        api.deleteEvents(events)
+            .checkNetwork(checker)
+            .flatMapCompletable { Completable.complete() }
 
     private fun getDataByPage(page: Int, size: Int): Observable<EventsDto> =
         api.getEvents(syncStorage.lastEventsSync, page, size)

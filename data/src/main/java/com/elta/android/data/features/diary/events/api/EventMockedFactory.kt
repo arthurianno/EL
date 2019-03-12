@@ -10,7 +10,7 @@ import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import java.util.Date
 
-@Suppress("MagicNumber", "ForEachOnRange")
+@Suppress("MagicNumber", "ForEachOnRange", "LongParameterList")
 object EventMockedFactory {
 
     private val ids = arrayListOf<String>().apply {

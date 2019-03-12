@@ -38,27 +38,30 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     private fun mapAsActivityItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as ActivityType
         return ChooserItem(
-            source.id,
-            resourceProvider.getString(meta.toName()),
-            meta.toIcon()
+            id = source.id,
+            title = resourceProvider.getString(meta.toName()),
+            iconId = meta.toIcon(),
+            meta = meta
         )
     }
 
     private fun mapAsInsulinItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as InsulinType
         return ChooserItem(
-            source.id,
-            resourceProvider.getString(meta.toName()),
-            null
+            id = source.id,
+            title = resourceProvider.getString(meta.toName()),
+            iconId = null,
+            meta = meta
         )
     }
 
     private fun mapAsTagItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as Tag
         return ChooserItem(
-            source.id,
-            meta.name,
-            meta.toIcon()
+            id = source.id,
+            title = meta.name,
+            iconId = meta.toIcon(),
+            meta = meta
         )
     }
 

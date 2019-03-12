@@ -3,15 +3,21 @@ package com.elta.android.presentation.features.main.records.pm
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.state_view.StateData
 import com.elta.android.presentation.features.main.records.MainRecordsMapper
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import io.reactivex.Observable
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -40,10 +46,23 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
+
+        bus.clicks<Clicks.RecordClicked>()
+            .map { it.item }
+            .doOnNext(::navigateToEventScreen)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun navigateToEventScreen(record: RecordItem) {
+        router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
     }
 
     private fun handleSuccess(model: HomeModel) {

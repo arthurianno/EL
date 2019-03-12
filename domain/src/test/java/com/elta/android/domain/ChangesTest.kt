@@ -1,0 +1,193 @@
+package com.elta.android.domain
+
+import com.elta.android.domain.factory.EventTestFactory
+import com.elta.android.domain.features.diary.events.model.ActivityType
+import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.isChanged
+import com.elta.android.domain.features.diary.home.model.atEndOfDay
+import org.junit.Test
+import java.util.Date
+
+class ChangesTest {
+
+    @Test
+    fun isChanged_SameData_False() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            !event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_ValueChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = 1000.0,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_KindChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = null,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_NameChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = null,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_DurationChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = null,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_DateChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = Date().atEndOfDay(),
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_TagIdChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = "new tag id",
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_InsulinChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = InsulinType.SHORT,
+                activity = event.activityType,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_ActivityChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = ActivityType.ANOTHER,
+                note = event.note
+            )
+        )
+    }
+
+    @Test
+    fun isChanged_NoteChanged_True() {
+        val event = EventTestFactory.create(type = EventType.INSULIN)
+        assert(
+            event.isChanged(
+                value = event.value,
+                kind = event.kind,
+                name = event.name,
+                duration = event.duration,
+                date = event.additionTime,
+                tagId = event.tagId,
+                insulin = event.insulinType,
+                activity = event.activityType,
+                note = null
+            )
+        )
+    }
+}

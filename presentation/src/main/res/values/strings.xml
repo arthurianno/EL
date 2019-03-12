@@ -249,4 +249,49 @@
     <string name="events_options_chooser_header_tags">Доступные теги</string>
     <string name="events_options_chooser_header_variants">Доступные варианты</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
+
+
+    <string name="events_creation_hint_tags">Тег для группировки</string>
+    <string name="events_creation_hint_activities">Вид активности</string>
+    <string name="events_creation_hint_insulin">Тип исулина *</string>
+    <string name="events_creation_hint_note">Добавить заметку</string>
+    <string name="events_creation_save_button">Сохранить запись</string>
+    <string name="events_creation_hint_bread">Название блюда или продукта</string>
+    <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
+    <string name="events_helper_text_bread">Доступный диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_insulin">Доступный диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_weight">На сколько изменился ваш вес</string>
+    <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
+
+    <string name="events_form_screen_title_bread">Хлебные единицы</string>
+    <string name="events_form_screen_title_insulin">Инсулин</string>
+    <string name="events_form_screen_title_weight">Вес</string>
+    <string name="events_form_screen_title_activity">Активность</string>
+    <string name="events_form_screen_title_medicaments">Медикаменты</string>
+
+    <string name="event_form_measure_unit_bread">ХЕ</string>
+    <string name="event_form_measure_unit_insulin">Ед.</string>
+    <string name="event_form_measure_unit_weight">Кг.</string>
+    <string name="event_form_measure_unit_hours">ч</string>
+    <string name="event_form_measure_unit_minutes">мин</string>
+
+    <string name="event_form_bread_format_mask">%d,%d XE</string>
+    <string name="event_form_insulin_format_mask">%d,%d Ед.</string>
+    <string name="event_form_weight_format_mask">%d,%d Кг.</string>
+    <string name="event_form_activity_format_mask">%d ч %d мин</string>
+
+    <string name="event_time_mask">в %s</string>
+    <string name="event_date_today">Сегодня</string>
+    <string name="event_date_yesterday">Вчера</string>
+
+    <string name="event_form_dialog_title">Внимание</string>
+    <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены</string>
+    <string name="event_form_dialog_cancel_button">Отменить</string>
+    <string name="event_form_exit_dialog_confirm_button">Выйти</string>
+    <string name="event_form_delete_dialog_confirm_button">Удалить</string>
+    <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
+
+    <string name="event_form_save_new_entry_title">Сохранить запись</string>
+    <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
+    <string name="event_menu_remove">Удалить</string>
 </resources>

@@ -6,6 +6,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/color_window_background</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetTransparentStyle</item>
+        <item name="actionMenuTextAppearance">@style/New.Button3.White</item>
+        <item name="actionMenuTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Transparent" parent="AppTheme">
@@ -73,6 +75,28 @@
         <item name="np_min">0</item>
     </style>
 
+    <style name="NumberPicker.Form" parent="NumberPicker">
+        <item name="np_value">0</item>
+        <item name="np_max">0</item>
+        <item name="np_min">0</item>
+        <item name="np_textColor">@color/color_picker_form_unselected_text</item>
+        <item name="np_selectedTextColor">@color/color_picker_form_selected_text</item>
+    </style>
+
+    <style name="NumberPicker.Form.MeasurementText">
+        <item name="android:textColor">@color/color_picker_form_selected_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingTop">30sp</item>
+        <item name="fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="NumberPicker.Form.Coma">
+        <item name="android:textColor">@color/color_picker_form_selected_text</item>
+        <item name="android:textSize">@dimen/weight_picker_selected_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+    </style>
+
     <style name="BottomNavigationMenuItem">
         <item name="bnm_selected_color">@color/color_bottom_menu_selected_state</item>
         <item name="bnm_normal_color">@color/color_bottom_menu_normal_state</item>
@@ -87,6 +111,11 @@
         <item name="pulse_interpolator">Decelerate</item>
         <item name="pulse_repeat">0</item>
         <item name="pulse_startFromScratch">true</item>
+    </style>
+
+    <style name="CollapsingToolbarLayoutExpandedTextStyle" parent="AppTheme">
+        <item name="android:textColor">@android:color/transparent</item>
+        <item name="android:textSize">0sp</item>
     </style>
 
 </resources>
