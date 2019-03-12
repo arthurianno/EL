@@ -30,9 +30,7 @@ object WeightFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarView.title = resources.getString(R.string.events_form_screen_title_weight)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_weight)
-        val endColor = ContextCompat.getColor(context, R.color.g_purpur_b)
-        collapsingToolbarView.setContentScrimColor(endColor)
-        eventFormContainerView.setBackgroundColor(endColor)
+        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.g_purpur_b))
     }
 
     override fun FormPicker.initPickerView() {

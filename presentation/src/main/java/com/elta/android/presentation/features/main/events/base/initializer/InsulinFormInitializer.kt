@@ -29,9 +29,7 @@ object InsulinFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarView.title = resources.getString(R.string.events_form_screen_title_insulin)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_insulin)
-        val endColor = ContextCompat.getColor(context, R.color.shade_blue)
-        collapsingToolbarView.setContentScrimColor(endColor)
-        eventFormContainerView.setBackgroundColor(endColor)
+        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.shade_blue))
     }
 
     override fun FormPicker.initPickerView() {

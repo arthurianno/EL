@@ -32,9 +32,7 @@ object BreadFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarView.title = resources.getString(R.string.events_form_screen_title_bread)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_bread)
-        val endColor = ContextCompat.getColor(context, R.color.g_orange_b)
-        collapsingToolbarView.setContentScrimColor(endColor)
-        eventFormContainerView.setBackgroundColor(endColor)
+        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.g_orange_b))
     }
 
     override fun FormPicker.initPickerView() {
