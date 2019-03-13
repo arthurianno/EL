@@ -94,7 +94,7 @@
                         app:layout_constraintStart_toEndOf="@id/homeButtonView"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
+                        <android.support.v7.widget.AppCompatTextView
                             android:id="@+id/toolbarTitleView"
                             style="@style/New.Headline5.White"
                             android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
                             android:includeFontPadding="false"
                             tools:text="Toolbar Title" />
 
-                        <TextView
+                        <android.support.v7.widget.AppCompatTextView
                             android:id="@+id/toolbarSubTitleView"
                             style="@style/New.Caption2.White"
                             android:layout_width="wrap_content"
@@ -114,7 +114,7 @@
                             tools:text="Toolbar Subtitle" />
                     </LinearLayout>
 
-                    <TextView
+                    <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/menuButtonView"
                         style="@style/New.Button3.White"
                         android:layout_width="wrap_content"

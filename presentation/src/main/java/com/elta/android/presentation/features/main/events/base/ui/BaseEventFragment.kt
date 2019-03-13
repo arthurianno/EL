@@ -111,8 +111,9 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
             }
 
         appBarLayoutView.collapseProgress().bindTo {
-            formPickerView.alpha = it
-            eventInfoContainerView.alpha = it
+            val alpha = 1 - Math.abs(it / 100f)
+            formPickerView.alpha = alpha
+            eventInfoContainerView.alpha = alpha
         }
     }
 

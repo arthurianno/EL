@@ -12,15 +12,14 @@ fun AppBarLayout.observeState(): Observable<AppBarState> =
 fun AppBarLayout.offsetChanges(): Observable<Pair<AppBarLayout, Int>> =
     AppBarOffsetChangeObservable(this)
 
-fun AppBarLayout.collapseProgress(): Observable<Float> =
+fun AppBarLayout.collapseProgress(): Observable<Int> =
     AppBarOffsetChangeObservable(this)
         .map {
             val totalRange = it.first.totalScrollRange
             if (totalRange > 0) {
-                val p = it.second * 100 / totalRange
-                1 - Math.abs(p / 100f)
+                it.second * 100 / totalRange
             } else {
-                0f
+                0
             }
         }
 
