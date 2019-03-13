@@ -3,7 +3,10 @@ package com.elta.android.presentation.utils
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.elta.android.presentation.R
@@ -17,6 +20,7 @@ private val progressEvaluator by lazy(LazyThreadSafetyMode.NONE) {
 private val progressInterpolator by lazy(LazyThreadSafetyMode.NONE) { AccelerateDecelerateInterpolator() }
 private const val ANIMATION_DURATION_MILLIS = 600L
 private const val TEXT_ANIMATION_DURATION_MILLIS = 300L
+private const val DEFAULT_EXPAND_COLLAPSE_DURATION = 100L
 
 private const val FADING_OUT = 1
 private const val FADING_IN = 2
@@ -102,4 +106,49 @@ private fun View.hideViewWithFadeAnimation(visibilityWhenFalse: Int = View.GONE)
             }
             .start()
     }
+}
+
+fun View.collapse(duration: Long = DEFAULT_EXPAND_COLLAPSE_DURATION) {
+    val initialHeight = measuredHeight
+    val a = object : Animation() {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+            if (interpolatedTime == 1f) {
+                visibility = View.GONE
+            } else {
+                layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
+                requestLayout()
+            }
+        }
+
+        override fun willChangeBounds(): Boolean {
+            return true
+        }
+    }
+
+    a.duration = duration
+    startAnimation(a)
+}
+
+fun View.expand(duration: Long = DEFAULT_EXPAND_COLLAPSE_DURATION) {
+    measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    val targetHeight = measuredHeight
+
+    layoutParams.height = 0
+    visibility = View.VISIBLE
+    val a = object : Animation() {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+            layoutParams.height = if (interpolatedTime == 1f)
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            else
+                (targetHeight * interpolatedTime).toInt()
+            requestLayout()
+        }
+
+        override fun willChangeBounds(): Boolean {
+            return true
+        }
+    }
+
+    a.duration = duration
+    startAnimation(a)
 }
