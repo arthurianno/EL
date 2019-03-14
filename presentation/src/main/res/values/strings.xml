@@ -294,4 +294,8 @@
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
+
+
+    <!-- DIARY FLOR -->
+    <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
 </resources>

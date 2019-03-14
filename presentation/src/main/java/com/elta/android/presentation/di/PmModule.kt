@@ -8,6 +8,8 @@ import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
+import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
+import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
@@ -149,4 +151,14 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EditEventPm::class)
     abstract fun bindEditEventPm(pm: EditEventPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(DiaryFlowPm::class)
+    abstract fun bindDiaryFlowPm(pm: DiaryFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(MainDiaryPm::class)
+    abstract fun bindMainDiaryPm(pm: MainDiaryPm): PresentationModel
 }
