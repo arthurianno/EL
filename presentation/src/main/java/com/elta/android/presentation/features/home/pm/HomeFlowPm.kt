@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
@@ -22,9 +23,11 @@ class HomeFlowPm @Inject constructor(
 ) : BaseFlowPm(services) {
 
     val bottomSheetItems = State<List<ListItem>>()
+
     val closeBottomSheetCommand = Command<Unit>()
     val pulseCommand = Command<Boolean>()
 
+    val menuItemSelectedAction = Action<Int>()
     private val loadEvents = Action<Unit>()
 
     override fun onCreate() {
@@ -58,7 +61,7 @@ class HomeFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.newTabs(arrayOf(Screens.MainTab))
+        router.newTabs(arrayOf(Screens.MainTab, Screens.ProfileTab))
         router.navigateToTab(Screens.MainTab)
     }
 
@@ -74,10 +77,22 @@ class HomeFlowPm @Inject constructor(
             .doOnNext(::handleAddEventClick)
             .subscribe()
             .untilDestroy()
+
+        menuItemSelectedAction.observable
+                .doOnNext(::handleBottomMenuClick)
+                .subscribe()
+                .untilDestroy()
     }
 
     private fun handleAddEventClick(event: EventType) {
         router.startFlow(Screens.EventsCreationScreen(event))
+    }
+
+    private fun handleBottomMenuClick(id: Int) {
+        when (id) {
+            R.id.mainMenuItemView -> router.navigateToTab(Screens.MainTab)
+            R.id.profileMenuItemView -> router.navigateToTab(Screens.ProfileTab)
+        }
     }
 
     private fun EventType.toListItem() =

@@ -17,6 +17,8 @@ import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragm
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
+import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -114,6 +116,10 @@ object Screens {
         override fun getFragment() = MainFlowFragment.newInstance()
     }
 
+    object ProfileTab : SupportAppScreen() {
+        override fun getFragment() = ProfileFlowFragment.newInstance()
+    }
+
     // MAIN FLOW
     object MainRecordsScreen : SupportAppScreen() {
         override fun getFragment() = MainRecordsFragment.newInstance()
@@ -129,5 +135,10 @@ object Screens {
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
+    }
+
+    // PROFILE FLOW
+    object MainProfileScreen : SupportAppScreen() {
+        override fun getFragment() = MainProfileFragment.newInstance()
     }
 }
