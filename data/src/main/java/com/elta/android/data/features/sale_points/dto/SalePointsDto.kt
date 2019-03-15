@@ -4,6 +4,6 @@ import com.elta.android.data.features.common.dto.MetaDto
 import com.google.gson.annotations.SerializedName
 
 data class SalePointsDto(
-    @SerializedName("data") val points: List<SalePointDto>,
+    @SerializedName("items") val points: List<SalePointDto>,
     @SerializedName("meta") val meta: MetaDto
 )
