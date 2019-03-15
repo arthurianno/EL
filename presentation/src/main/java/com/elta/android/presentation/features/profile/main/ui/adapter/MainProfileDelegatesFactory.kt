@@ -8,7 +8,7 @@ import javax.inject.Inject
 class MainProfileDelegatesFactory @Inject constructor() : AdapterDelegatesFactory {
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
-            when (clazz) {
-                else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
-            }
+        when (clazz) {
+            else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
+        }
 }

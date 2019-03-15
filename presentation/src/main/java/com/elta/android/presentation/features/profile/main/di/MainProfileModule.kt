@@ -23,8 +23,8 @@ class MainProfileModule {
     @Provides
     @FragmentScope
     fun dynamicAdapter(
-            factory: AdapterDelegatesFactory,
-            diffCalculator: DiffCalculator
+        factory: AdapterDelegatesFactory,
+        diffCalculator: DiffCalculator
     ): DynamicAdapter = DynamicAdapter(factory, diffCalculator)
 
     @Provides

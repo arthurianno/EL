@@ -4,8 +4,8 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import javax.inject.Inject
 
-class MainProfilePm  @Inject constructor(
-        services: ServiceFacade
+class MainProfilePm @Inject constructor(
+    services: ServiceFacade
 ) : BaseListPm(services) {
 
     override fun onCreate() {
