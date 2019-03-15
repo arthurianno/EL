@@ -57,6 +57,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
             homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
+        homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
     }
 
     override fun handleBack() {
