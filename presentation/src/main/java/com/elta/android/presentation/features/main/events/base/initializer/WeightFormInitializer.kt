@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.main.events.base.initializer
 
 import android.content.res.Resources
-import android.support.v4.content.ContextCompat
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
@@ -30,7 +29,6 @@ object WeightFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_weight)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_weight)
-        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.g_purpur_b))
     }
 
     override fun FormPicker.initPickerView() {

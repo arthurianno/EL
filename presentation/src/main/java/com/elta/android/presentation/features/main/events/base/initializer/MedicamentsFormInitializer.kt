@@ -17,7 +17,6 @@ object MedicamentsFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_medicaments)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_medicine)
-        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.shade_blue3))
         eventInfoContainerView.hide()
     }
 
