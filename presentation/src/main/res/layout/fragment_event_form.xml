@@ -86,10 +86,9 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_dialog_close_white" />
 
-                    <LinearLayout
+                    <FrameLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="?attr/actionBarSize"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/homeButtonView"
                         app:layout_constraintTop_toTopOf="parent">
@@ -99,6 +98,7 @@
                             style="@style/New.Headline5.White"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
                             android:includeFontPadding="false"
                             tools:text="Toolbar Title" />
@@ -109,10 +109,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
+                            android:layout_gravity="bottom"
                             android:includeFontPadding="false"
-                            android:visibility="gone"
                             tools:text="Toolbar Subtitle" />
-                    </LinearLayout>
+                    </FrameLayout>
 
                     <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/menuButtonView"
