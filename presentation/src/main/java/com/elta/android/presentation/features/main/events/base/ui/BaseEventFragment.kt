@@ -26,6 +26,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override val screenLayout: Int = R.layout.fragment_event_form
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
+    override val backgroundColor: Int? = null
 
     private lateinit var initializer: FormInitializer
     private var maxTranslation: Int = 0
