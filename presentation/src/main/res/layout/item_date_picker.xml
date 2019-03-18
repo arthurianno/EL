@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="21dp">
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dayOfWeekTitleView"
+        style="@style/New.Caption2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:textColor="@color/color_text_day_of_week"
+        tools:text="Чт" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dayOfMonthTitleView"
+        style="@style/New.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/color_text_day_of_month"
+        tools:text="14" />
+</LinearLayout>

@@ -298,4 +298,12 @@
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
+
+    <string name="date_picker_day_of_week_1">Пн</string>
+    <string name="date_picker_day_of_week_2">Вт</string>
+    <string name="date_picker_day_of_week_3">Ср</string>
+    <string name="date_picker_day_of_week_4">Чт</string>
+    <string name="date_picker_day_of_week_5">Пт</string>
+    <string name="date_picker_day_of_week_6">Сб</string>
+    <string name="date_picker_day_of_week_7">Вс</string>
 </resources>

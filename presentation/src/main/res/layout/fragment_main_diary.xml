@@ -8,11 +8,16 @@
     <LinearLayout
         android:id="@+id/dateSelectorContainerView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:orientation="vertical"
         android:translationZ="3dp"
         app:layout_constraintTop_toTopOf="parent">
+
+        <com.elta.android.presentation.widgets.date_picker.HorizontalDatePickerView
+            android:id="@+id/datePickerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 

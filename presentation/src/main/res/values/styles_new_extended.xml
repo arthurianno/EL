@@ -51,6 +51,10 @@
         <item name="android:textColor">@color/shade_black1</item>
     </style>
 
+    <style name="New.Caption2.ShadeBlack0">
+        <item name="android:textColor">@color/shade_black0</item>
+    </style>
+
     <style name="New.Caption2.White">
         <item name="android:textColor">@color/white</item>
     </style>
