@@ -1,12 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainProfileContainerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayoutView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:scrimAnimationDuration="200"
+            app:titleEnabled="false">
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/profileInfoView"
+                android:layout_width="match_parent"
+                android:layout_height="500dp">
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/gStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="16dp" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/gEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="16dp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/profileSettingsButtonView"
+                    style="@style/New.Button3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/profile_settings"
+                    app:layout_constraintEnd_toStartOf="@+id/gEnd"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!--todo hardcode text-->
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/userNameTextView"
+                    style="@style/New.Headline3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="36dp"
+                    android:text="Иванов Алексей"
+                    app:layout_constraintStart_toStartOf="@+id/gStart"
+                    app:layout_constraintTop_toBottomOf="@+id/profileSettingsButtonView" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/appCompatTextView"
+                    style="@style/Caption1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/profile_my_indicators"
+                    app:layout_constraintStart_toStartOf="@+id/gStart"
+                    app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.v7.widget.Toolbar
+                style="@style/FakeToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                app:layout_collapseMode="pin">
+
+                <!--todo hardcode text-->
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/toolbarUserNameTextView"
+                    style="@style/New.Headline5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:padding="@dimen/padding_toolbar_layout"
+                    android:text="Иванов алексей"
+                    android:visibility="gone" />
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-</LinearLayout>
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>
