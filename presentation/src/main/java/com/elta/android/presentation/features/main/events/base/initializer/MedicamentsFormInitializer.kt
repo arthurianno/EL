@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.events.base.initializer
 
-import android.support.v4.content.ContextCompat
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
@@ -17,7 +16,6 @@ object MedicamentsFormInitializer : FormInitializer() {
     override fun View.initHeaderView() {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_medicaments)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_medicine)
-        eventFormContainerView.setBackgroundColor(ContextCompat.getColor(context, R.color.shade_blue3))
         eventInfoContainerView.hide()
     }
 
