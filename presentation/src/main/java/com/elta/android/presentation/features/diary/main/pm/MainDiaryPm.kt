@@ -2,13 +2,51 @@ package com.elta.android.presentation.features.diary.main.pm
 
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.nullgr.core.date.toStringWithFormat
+import java.util.Date
 import javax.inject.Inject
 
 class MainDiaryPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
+    val datePickerDateState = State(Date())
+    val dateSelectedAction = Action<Date>()
+
+    val selectDateInDialogAction = Action<Unit>()
+    val dateInDialogSelectedAction = Action<Date>()
+    val showDatePickerDialogCommand = Command<Date>()
+    val monthTitleState = State<String>()
+
+    private val selectedDateState = State(Date())
+
     override fun onCreate() {
         super.onCreate()
+
+        selectDateInDialogAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showDatePickerDialogCommand.consumer)
+            .untilDestroy()
+
+        dateInDialogSelectedAction.observable
+            .doOnNext {
+                datePickerDateState.consumer.accept(it)
+                selectedDateState.consumer.accept(it)
+            }
+            .subscribe()
+            .untilDestroy()
+
+        dateSelectedAction.observable
+            .subscribe(selectedDateState.consumer)
+            .untilDestroy()
+
+        selectedDateState.observable
+            .map { it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR) }
+            .subscribe(monthTitleState.consumer)
+            .untilDestroy()
+    }
+
+    companion object {
+        const val FORMAT_MONTH_NAME_AND_YEAR = "LLL yyyy"
     }
 }

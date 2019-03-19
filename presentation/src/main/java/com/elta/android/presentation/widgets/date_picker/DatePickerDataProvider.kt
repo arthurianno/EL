@@ -1,7 +1,6 @@
 package com.elta.android.presentation.widgets.date_picker
 
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
-import com.nullgr.core.adapter.items.ListItem
 import org.joda.time.DateTime
 import java.util.Date
 
@@ -9,7 +8,7 @@ object DatePickerDataProvider {
 
     private const val DAYS_OFFSET = 3
 
-    fun buildDatePickerDates(currentDate: Date): List<ListItem> {
+    fun buildDatePickerDates(currentDate: Date): ArrayList<DatePickerItem> {
         val dates = arrayListOf<DatePickerItem>()
 
         val selectedDate = DateTime(currentDate).withTimeAtStartOfDay()

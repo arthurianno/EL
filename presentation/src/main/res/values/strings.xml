@@ -298,6 +298,8 @@
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
+    <string name="diary_screen_title">Дневник событий</string>
+    <string name="diary_button_today">Сегодня</string>
 
     <string name="date_picker_day_of_week_1">Пн</string>
     <string name="date_picker_day_of_week_2">Вт</string>

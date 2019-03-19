@@ -1,8 +1,10 @@
 package com.elta.android.presentation.widgets.date_picker
 
 import android.content.Context
+import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSnapHelper
+import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -12,10 +14,12 @@ import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDeleg
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.RxDiffCalculator
+import com.nullgr.core.collections.replace
 import com.nullgr.core.date.withoutTime
 import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.layout_horizontal_date_picker.view.*
 import java.util.Date
 
@@ -25,12 +29,13 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var initialDate: Date? = null
+    private var initialDate: Date? = null
         set(value) {
             field = value?.withoutTime()
             setUpDatePicker()
         }
 
+    private val items = arrayListOf<DatePickerItem>()
     private val adapter: DynamicAdapter
     private val snapHelper by lazy { LinearSnapHelper() }
 
@@ -54,6 +59,15 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             })
     }
 
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        // TODO save and restore selected position
+    }
+
+    fun date(): Consumer<Date> = Consumer {
+        initialDate = it
+    }
+
     fun dateChanged(): Observable<Date> =
         PageChangeListener(dateItemsView, snapHelper)
             .map {
@@ -63,14 +77,16 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     private fun setUpDatePicker() {
         initialDate?.let {
-            adapter.updateData(DatePickerDataProvider.buildDatePickerDates(it))
+            if (it !in items) {
+                items.replace(DatePickerDataProvider.buildDatePickerDates(it))
+                adapter.updateData(items, false)
+            }
             postDelayed({ scrollToDate(it) }, INVALIDATE_RECYCLER_VIEW_DELAY)
         }
     }
 
     private fun onPickerItemScrolled(position: Int) {
-        dateItemsView.layoutManager?.let {
-            it as LinearLayoutManager
+        dateItemsView.linearLayoutManager?.let {
             val firstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
             val lastVisiblePosition = it.findLastVisibleItemPosition()
             for (i in firstVisiblePosition..lastVisiblePosition) {
@@ -81,19 +97,27 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     }
 
     private fun scrollToDate(date: Date) {
-        val datePosition = adapter.items.indexOfFirst {
-            it is DatePickerItem && it.date == date
-        }
-        dateItemsView.layoutManager?.scrollToPosition(datePosition + CENTER_OFFSET)
+        val datePosition = items.indexOfFirst { it.date == date }
+        val scrollPosition = datePosition - CENTER_OFFSET
+        dateItemsView.linearLayoutManager?.scrollToPositionWithOffset(scrollPosition, SCROLL_OFFSET)
+        onPickerItemScrolled(scrollPosition)
     }
 
     private fun getSelectorWidth() =
         (getDisplaySize(context).first / ITEMS_ON_SCREEN_COUNT * SELECTOR_WIDTH_MULTIPLIER).toInt()
 
+    private val RecyclerView.linearLayoutManager: LinearLayoutManager?
+        get() = layoutManager as? LinearLayoutManager
+
+    operator fun List<DatePickerItem>.contains(date: Date): Boolean {
+        return this.any { it.date == date }
+    }
+
     companion object {
         const val ITEMS_ON_SCREEN_COUNT = 7
         private const val SELECTOR_WIDTH_MULTIPLIER = 0.8
+        private const val SCROLL_OFFSET = 0
         private const val CENTER_OFFSET = 3
-        private const val INVALIDATE_RECYCLER_VIEW_DELAY = 100L // millis
+        private const val INVALIDATE_RECYCLER_VIEW_DELAY = 50L // millis
     }
 }
