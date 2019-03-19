@@ -1,5 +1,6 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainProfileContainerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -18,56 +19,47 @@
             app:scrimAnimationDuration="200"
             app:titleEnabled="false">
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/profileInfoView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="500dp">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <android.support.constraint.Guideline
-                    android:id="@+id/gStart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_begin="16dp" />
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/profileInfoView"
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp"
+                    android:background="@color/white">
 
-                <android.support.constraint.Guideline
-                    android:id="@+id/gEnd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_end="16dp" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/titleTextView"
+                        style="@style/New.Headline3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="72dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Иванов Алексей" />
 
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/profileSettingsButtonView"
-                    style="@style/New.Button3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/profile_settings"
-                    app:layout_constraintEnd_toStartOf="@+id/gEnd"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/subTitleView"
+                        style="@style/Caption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/profile_my_indicators"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
-                <!--todo hardcode text-->
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/userNameTextView"
-                    style="@style/New.Headline3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="36dp"
-                    android:text="Иванов Алексей"
-                    app:layout_constraintStart_toStartOf="@+id/gStart"
-                    app:layout_constraintTop_toBottomOf="@+id/profileSettingsButtonView" />
+                </android.support.constraint.ConstraintLayout>
 
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/appCompatTextView"
-                    style="@style/Caption1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/profile_my_indicators"
-                    app:layout_constraintStart_toStartOf="@+id/gStart"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
-            </android.support.constraint.ConstraintLayout>
+                <View
+                    android:id="@+id/dividerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+            </LinearLayout>
 
             <android.support.v7.widget.Toolbar
                 style="@style/FakeToolbar"
@@ -75,16 +67,52 @@
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin">
 
-                <!--todo hardcode text-->
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/toolbarUserNameTextView"
-                    style="@style/New.Headline5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:padding="@dimen/padding_toolbar_layout"
-                    android:text="Иванов алексей"
-                    android:visibility="gone" />
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/toolbarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/toolbarProfileSettingsButtonView"
+                        style="@style/New.Button3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/profile_settings"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:id="@+id/toolbarProfileContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:alpha="0"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/homeButtonView"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/toolbarTitleView"
+                            style="@style/New.Title1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:includeFontPadding="false"
+                            tools:text="Иванов алексей" />
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/toolbarSubTitleView"
+                            style="@style/New.Caption2.ShadeBlack1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:includeFontPadding="false"
+                            android:text="@string/profile_my_indicators" />
+                    </LinearLayout>
+                </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -93,5 +121,8 @@
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:behavior_overlapTop="110dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </android.support.design.widget.CoordinatorLayout>
