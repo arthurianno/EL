@@ -2,8 +2,10 @@ package com.elta.android.presentation.features.profile.main.ui.adapter
 
 import com.elta.android.presentation.features.profile.main.ui.adapter.delegates.MainProfileAdditionalDelegate
 import com.elta.android.presentation.features.profile.main.ui.adapter.delegates.MainProfileHeaderAdditionalDelegate
+import com.elta.android.presentation.features.profile.main.ui.adapter.delegates.MainProfileIndicatorDelegate
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileHeaderAdditionalItem
+import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
@@ -16,6 +18,7 @@ class MainProfileDelegatesFactory @Inject constructor(
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
+            MainProfileIndicatorItem::class.java -> MainProfileIndicatorDelegate(bus)
             MainProfileHeaderAdditionalItem::class.java -> MainProfileHeaderAdditionalDelegate()
             MainProfileAdditionalItem::class.java -> MainProfileAdditionalDelegate(bus)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")

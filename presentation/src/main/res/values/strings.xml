@@ -303,4 +303,9 @@
     <string name="profile_management_and_settings">Управление и настройки</string>
     <string name="profile_where_purchase_products">Где приобрести продукцию</string>
     <string name="profile_map_of_stores">Карта магазинов и торговых точек</string>
+    <string name="profile_hba1c">HbA1C</string>
+    <string name="profile_range">Диапазон</string>
+    <string name="profile_glucose_level">Уровень глюкозы</string>
+    <string name="profile_weight">Вес</string>
+    <string name="profile_diabetes">Диабет</string>
 </resources>
