@@ -2,5 +2,8 @@
     style="@style/New.Caption1.BlackBlue"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp"
     android:text="@string/profile_additional_functions" />

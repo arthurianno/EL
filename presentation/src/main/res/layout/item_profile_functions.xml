@@ -1,0 +1,61 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/functionView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_profile_function">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/functionIconView"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_map_pin_card" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/functionNameView"
+        style="@style/New.Body2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintBottom_toTopOf="@+id/functionDescriptionNameView"
+        app:layout_constraintStart_toEndOf="@+id/functionIconView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@tools:sample/lorem" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/functionDescriptionNameView"
+        style="@style/New.Caption1.ShadeBlack2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/functionIconView"
+        app:layout_constraintTop_toBottomOf="@+id/functionNameView"
+        tools:text="@tools:sample/lorem" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/functionStateView"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:padding="12dp"
+        android:stateListAnimator="@drawable/selector_group_icon_animator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_left" />
+</android.support.constraint.ConstraintLayout>
