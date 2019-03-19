@@ -298,4 +298,5 @@
     <!--PROFILE FLOW-->
     <string name="profile_settings">Настройки профиля</string>
     <string name="profile_my_indicators">Мои медицинские покзатели</string>
+    <string name="profile_additional_functions">Дополнительные функции</string>
 </resources>
