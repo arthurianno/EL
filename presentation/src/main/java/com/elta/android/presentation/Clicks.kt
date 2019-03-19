@@ -3,6 +3,7 @@ package com.elta.android.presentation
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 
@@ -14,4 +15,5 @@ sealed class Clicks : Click {
     data class AddUserEvent(val event: EventType) : Clicks()
     data class RecordClicked(val item: RecordItem) : Clicks()
     data class ChooserOptionClicked(val id: String) : Clicks()
+    data class ProfileAdditionalClicked(val item: MainProfileAdditionalItem) : Clicks()
 }
