@@ -4,14 +4,15 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSnapHelper
 import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDelegatesFactory
-import com.elta.android.presentation.widgets.date_picker.adapter.decoration.DatePickerItemDecoration
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.RxDiffCalculator
+import com.nullgr.core.date.withoutTime
 import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
@@ -26,7 +27,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     var initialDate: Date? = null
         set(value) {
-            field = value
+            field = value?.withoutTime()
             setUpDatePicker()
         }
 
@@ -38,9 +39,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         val diffCalculator = RxDiffCalculator(ComputationToMainSchedulersFacade())
         val delegatesFactory = DatePickerDelegatesFactory()
         adapter = DynamicAdapter(delegatesFactory, diffCalculator)
-        val decor = DatePickerItemDecoration(context)
+
         dateItemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        dateItemsView.addItemDecoration(decor)
         dateItemsView.adapter = adapter
         datePickerSelectorView.layoutParams.width = getSelectorWidth()
         dateItemsView.attachSnapHelperWithListener(
@@ -48,15 +48,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
             object : OnSnapPositionChangeListener {
                 override fun onSnapPositionChange(position: Int) {
-                    dateItemsView.layoutManager?.let {
-                        it as LinearLayoutManager
-                        val firstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
-                        val lastVisiblePosition = it.findLastVisibleItemPosition()
-                        for (i in firstVisiblePosition..lastVisiblePosition) {
-                            dateItemsView.findViewHolderForAdapterPosition(i)?.itemView?.isSelected =
-                                i == position
-                        }
-                    }
+                    performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    onPickerItemScrolled(position)
                 }
             })
     }
@@ -71,13 +64,19 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private fun setUpDatePicker() {
         initialDate?.let {
             adapter.updateData(DatePickerDataProvider.buildDatePickerDates(it))
-            postDelayed(
-                {
-                    dateItemsView.invalidateItemDecorations()
-                    scrollToDate(it)
-                },
-                INVALIDATE_RECYCLER_VIEW_DELAY
-            )
+            postDelayed({ scrollToDate(it) }, INVALIDATE_RECYCLER_VIEW_DELAY)
+        }
+    }
+
+    private fun onPickerItemScrolled(position: Int) {
+        dateItemsView.layoutManager?.let {
+            it as LinearLayoutManager
+            val firstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
+            val lastVisiblePosition = it.findLastVisibleItemPosition()
+            for (i in firstVisiblePosition..lastVisiblePosition) {
+                dateItemsView.findViewHolderForAdapterPosition(i)?.itemView?.isSelected =
+                    i == position
+            }
         }
     }
 

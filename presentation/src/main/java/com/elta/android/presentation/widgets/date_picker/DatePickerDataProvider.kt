@@ -7,14 +7,18 @@ import java.util.Date
 
 object DatePickerDataProvider {
 
-    private const val FIRST_DAY = 1
     private const val DAYS_OFFSET = 3
 
     fun buildDatePickerDates(currentDate: Date): List<ListItem> {
         val dates = arrayListOf<DatePickerItem>()
-        val today = DateTime(currentDate)
-        var tempDate = DateTime(today)
-        val firstDayOfMonth = DateTime(currentDate).withDayOfMonth(FIRST_DAY)
+
+        val selectedDate = DateTime(currentDate).withTimeAtStartOfDay()
+        val todayDate = DateTime().withTimeAtStartOfDay()
+
+        var tempDate = DateTime(selectedDate)
+
+        val firstDayOfMonth = DateTime(selectedDate).dayOfMonth().withMinimumValue()
+        val lastDayOfMonth = DateTime(selectedDate).dayOfMonth().withMaximumValue()
 
         dates.add(tempDate.toItem())
 
@@ -23,15 +27,31 @@ object DatePickerDataProvider {
             dates.add(0, tempDate.toItem())
         } while (tempDate.isAfter(firstDayOfMonth))
 
-        var prevTempDate = DateTime(firstDayOfMonth)
-        var nextTempDate = DateTime(today)
+        var inFutureDateStart: DateTime
+
+        if (selectedDate.isBefore(todayDate) && selectedDate.isBefore(lastDayOfMonth)) {
+
+            val maxAvailableDate = if (todayDate.isBefore(lastDayOfMonth)) todayDate else lastDayOfMonth
+            tempDate = DateTime(selectedDate)
+
+            do {
+                tempDate = tempDate.plusDays(1)
+                dates.add(tempDate.toItem())
+            } while (tempDate.isBefore(maxAvailableDate))
+
+            inFutureDateStart = DateTime(maxAvailableDate)
+        } else {
+            inFutureDateStart = DateTime(selectedDate)
+        }
+
+        var inPastDateStart = DateTime(firstDayOfMonth)
 
         for (i in 1..DAYS_OFFSET) {
-            prevTempDate = prevTempDate.minusDays(1)
-            dates.add(0, prevTempDate.toItem(false))
+            inPastDateStart = inPastDateStart.minusDays(1)
+            dates.add(0, inPastDateStart.toItem(false))
 
-            nextTempDate = nextTempDate.plusDays(1)
-            dates.add(nextTempDate.toItem(false))
+            inFutureDateStart = inFutureDateStart.plusDays(1)
+            dates.add(inFutureDateStart.toItem(false))
         }
         return dates
     }
