@@ -3,4 +3,28 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/writeButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Write"/>
+
+    <Button
+        android:id="@+id/subscribeButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Subscribe"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/commandInputView"
+        android:hint="Enter command here"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/logView"
+        android:scrollbars = "vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
