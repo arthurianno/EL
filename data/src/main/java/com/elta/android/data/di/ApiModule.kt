@@ -11,6 +11,7 @@ import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
+import com.elta.android.data.features.user.api.MockedSettingsApi
 import com.elta.android.data.features.user.api.SettingsApi
 import dagger.Module
 import dagger.Provides
@@ -43,7 +44,11 @@ class ApiModule {
     @Singleton
     fun provideSettingsApi(
         retrofit: Retrofit
-    ): SettingsApi = retrofit.create<SettingsApi>(SettingsApi::class.java)
+    ): SettingsApi =
+        when (ApiConfig.USE_MOCKED_SETTINGS_API) {
+            true -> MockedSettingsApi()
+            else -> retrofit.create<SettingsApi>(SettingsApi::class.java)
+        }
 
     @Provides
     @Singleton
@@ -82,5 +87,6 @@ class ApiModule {
         const val USE_MOCKED_SALE_POINTS_API = false
         const val USE_MOCKED_EVENTS_API = false
         const val USE_MOCKED_TAGS_API = false
+        const val USE_MOCKED_SETTINGS_API = true
     }
 }
