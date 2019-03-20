@@ -1,7 +1,5 @@
 package com.elta.android.presentation.features.diary.main.ui
 
-import android.os.Bundle
-import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
@@ -10,6 +8,7 @@ import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_main_diary.*
 import java.util.Date
@@ -26,7 +25,7 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
         super.onBindPresentationModel(pm)
         pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
         pm.datePickerDateState.bindTo(datePickerView.date())
-        datePickerView.dateChanged().bindTo(pm.dateSelectedAction.consumer)
+        datePickerView.dateChanged().bindTo(pm.dateSelectedAction)
         selectDateButtonView.clicks().bindTo(pm.selectDateInDialogAction)
         pm.monthTitleState.bindTo(selectedMonthTitleView.text())
         pm.showDatePickerDialogCommand.bindTo { originalDate ->
@@ -34,6 +33,8 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
                 pm.dateInDialogSelectedAction.consumer.accept(it)
             }
         }
+        pm.todayButtonVisibilityState.bindTo(todayButtonView.visibility())
+        todayButtonView.clicks().bindTo(pm.todayClickedAction)
     }
 
     companion object {

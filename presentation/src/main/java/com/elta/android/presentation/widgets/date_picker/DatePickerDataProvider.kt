@@ -21,10 +21,12 @@ object DatePickerDataProvider {
 
         dates.add(tempDate.toItem())
 
-        do {
-            tempDate = tempDate.minusDays(1)
-            dates.add(0, tempDate.toItem())
-        } while (tempDate.isAfter(firstDayOfMonth))
+        if (tempDate.isAfter(firstDayOfMonth)) {
+            do {
+                tempDate = tempDate.minusDays(1)
+                dates.add(0, tempDate.toItem())
+            } while (tempDate.isAfter(firstDayOfMonth))
+        }
 
         var inFutureDateStart: DateTime
 

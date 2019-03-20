@@ -1,7 +1,6 @@
 package com.elta.android.presentation.widgets.date_picker
 
 import android.content.Context
-import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSnapHelper
 import android.support.v7.widget.RecyclerView
@@ -29,11 +28,12 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private var initialDate: Date? = null
+    private var date: Date? = null
         set(value) {
             field = value?.withoutTime()
-            setUpDatePicker()
         }
+
+    private var selectedPosition: Int = 0
 
     private val items = arrayListOf<DatePickerItem>()
     private val adapter: DynamicAdapter
@@ -59,13 +59,11 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             })
     }
 
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        super.onRestoreInstanceState(state)
-        // TODO save and restore selected position
-    }
-
     fun date(): Consumer<Date> = Consumer {
-        initialDate = it
+        if (date != it) {
+            date = it
+            setUpDatePicker()
+        }
     }
 
     fun dateChanged(): Observable<Date> =
@@ -74,9 +72,10 @@ class HorizontalDatePickerView @JvmOverloads constructor(
                 val item = adapter.items[it] as DatePickerItem
                 item.date
             }
+            .doOnNext { date = it }
 
     private fun setUpDatePicker() {
-        initialDate?.let {
+        date?.let {
             if (it !in items) {
                 items.replace(DatePickerDataProvider.buildDatePickerDates(it))
                 adapter.updateData(items, false)
@@ -94,13 +93,14 @@ class HorizontalDatePickerView @JvmOverloads constructor(
                     i == position
             }
         }
+        selectedPosition = position
     }
 
     private fun scrollToDate(date: Date) {
         val datePosition = items.indexOfFirst { it.date == date }
         val scrollPosition = datePosition - CENTER_OFFSET
         dateItemsView.linearLayoutManager?.scrollToPositionWithOffset(scrollPosition, SCROLL_OFFSET)
-        onPickerItemScrolled(scrollPosition)
+        onPickerItemScrolled(datePosition)
     }
 
     private fun getSelectorWidth() =
@@ -110,7 +110,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         get() = layoutManager as? LinearLayoutManager
 
     operator fun List<DatePickerItem>.contains(date: Date): Boolean {
-        return this.any { it.date == date }
+        return this.any { it.date == date && it.isAvailable }
     }
 
     companion object {

@@ -16,6 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
@@ -43,7 +44,6 @@
             android:id="@+id/selectDateButtonView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="16dp"
@@ -53,8 +53,7 @@
                 android:id="@+id/selectedMonthTitleView"
                 style="@style/New.Body1.BlackBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ноябрь 2018" />
+                android:layout_height="wrap_content" />
 
             <android.support.v7.widget.AppCompatImageView
                 android:layout_width="wrap_content"

@@ -80,7 +80,6 @@ class FormPicker @JvmOverloads constructor(
     override fun onRestoreInstanceState(state: Parcelable?) {
         super.onRestoreInstanceState(state)
         val savedState = state as? SavedState
-        super.onRestoreInstanceState(state)
         savedState?.let { setValues(it.leftValue, it.rightValue) }
     }
 
