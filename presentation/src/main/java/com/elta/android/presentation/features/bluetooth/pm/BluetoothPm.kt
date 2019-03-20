@@ -1,3 +1,5 @@
+@file:Suppress("VariableNaming", "MaxLineLength", "MagicNumber")
+
 package com.elta.android.presentation.features.bluetooth.pm
 
 import android.bluetooth.BluetoothAdapter
@@ -87,6 +89,7 @@ class BluetoothPm @Inject constructor(
     val requestPermissionsCommand = Command<Unit>()
     val startScanAction = Action<Unit>()
 
+    @Suppress("BluetoothPm")
     override fun onCreate() {
         super.onCreate()
 

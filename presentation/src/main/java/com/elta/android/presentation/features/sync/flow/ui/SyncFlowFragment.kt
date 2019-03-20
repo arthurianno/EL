@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.sync.flow.ui;
+package com.elta.android.presentation.features.sync.flow.ui
 
 import android.os.Bundle
 import com.elta.android.presentation.R

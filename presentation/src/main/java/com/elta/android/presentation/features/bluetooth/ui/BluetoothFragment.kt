@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.bluetooth.ui;
+package com.elta.android.presentation.features.bluetooth.ui
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod

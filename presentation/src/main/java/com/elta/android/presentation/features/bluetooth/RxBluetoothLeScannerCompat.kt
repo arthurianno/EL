@@ -39,11 +39,11 @@ fun BluetoothLeScannerCompat.startScan(
         results.distinctBy(ScanResult::getDevice).toMutableSet()
     }
     .map(MutableSet<ScanResult>::toList)
-    .distinctUntilChanged { r1, r2 -> !r1.isChanged(r2) }
+    .distinctUntilChanged { r1, r2 -> !r1.isResultChanged(r2) }
     .log("Scan", "size") { it.size.toString() }
 
 @Suppress("ReturnCount")
-fun List<ScanResult>.isChanged(other: List<ScanResult>): Boolean {
+fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {
     if (size != other.size) {
         return true
     }

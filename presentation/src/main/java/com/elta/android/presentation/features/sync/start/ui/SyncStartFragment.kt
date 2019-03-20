@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.sync.start.ui;
+package com.elta.android.presentation.features.sync.start.ui
 
 import android.os.Bundle
 import android.view.View
