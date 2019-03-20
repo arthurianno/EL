@@ -26,6 +26,8 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
 import com.nullgr.core.intents.callIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -130,6 +132,15 @@ object Screens {
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
+    }
+
+    // SYNC FLOW
+    object SyncFlow : SupportAppScreen() {
+        override fun getFragment() = SyncFlowFragment.newInstance()
+    }
+
+    object SyncStart : SupportAppScreen() {
+        override fun getFragment() = SyncStartFragment.newInstance()
     }
 
     object BluetoothScreen : SupportAppScreen() {
