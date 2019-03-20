@@ -9,5 +9,5 @@ data class ProfileDto(
     @SerializedName("person") val person: PersonDto?,
     @SerializedName("glucoseLevel") val glucoseLevel: GlucoseLevelDto?,
     @SerializedName("email") val email: String?,
-    @SerializedName("timeStamp") val timeStamp: Int?
+    @SerializedName("timeStamp") val timeStamp: Int
 )

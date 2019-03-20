@@ -10,16 +10,30 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class SettingsCachedDataSource @Inject constructor(
-    private val toCacheMapper: Mapper<ProfileDto, SettingsCacheDto>,
     private val fromCacheMapper: Mapper<SettingsCacheDto, ProfileDto>,
-    private val cache: SettingsCache) : SettingsDataSource {
+    private val cache: SettingsCache
+) : SettingsDataSource {
 
     override fun updateUserProfile(gender: String?, weight: Double?, diabetes: String?): Completable =
-    //todo realize
-        Completable.complete()
+        Completable.fromCallable {
+            val profiles = cache.get(CommonConditions.Empty)
+            if (profiles.isNotEmpty()) {
+                val profile = profiles[0]
+                val newGender = gender ?: profile.gender
+                val newWeight = weight ?: profile.weight
+                val newDiabetes = diabetes ?: profile.diabetType
+                val newProfile = profile.copy(gender = newGender, weight = newWeight, diabetType = newDiabetes)
+                cache.update(listOf(newProfile))
+            }
+        }
 
     override fun getUserProfile(): Single<ProfileDto> =
         Single.fromCallable {
-            cache.get(CommonConditions.All).first()
+            val profiles = cache.get(CommonConditions.Empty)
+            if (profiles.isNotEmpty()) {
+                profiles[0]
+            } else {
+                throw NoSuchElementException("Current user profile is empty.")
+            }
         }.map(fromCacheMapper::mapFromObject)
 }

@@ -34,6 +34,7 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindAuthSocialDataSource(source: AuthSocialRemoteDataSource): AuthSocialDataSource
 
+    @Remote
     @Binds
     @Singleton
     abstract fun bindSettingsRemoteDataSource(source: SettingsRemoteDataSource): SettingsDataSource

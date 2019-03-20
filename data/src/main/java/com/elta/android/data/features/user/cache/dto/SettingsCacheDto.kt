@@ -10,13 +10,13 @@ data class SettingsCacheDto(
     val weight: Double,
     val gender: String,
     val email: String?,
-    val timeStamp: Int?,
+    val timeStamp: Int,
 
-    //represents PersonDto
+    // represents PersonDto
     val firstName: String?,
     val lastName: String?,
 
-    //represents GlucoseLevelDto
+    // represents GlucoseLevelDto
     val minValue: Double?,
     val maxValue: Double?
 )

@@ -1,13 +1,16 @@
 package com.elta.android.data.features.user.api
 
 import com.elta.android.common.utils.log
-import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.user.api.request.ShortUserSettingsRequest
-import com.elta.android.data.features.user.dto.*
+import com.elta.android.data.features.user.dto.DiabetTypeDto
+import com.elta.android.data.features.user.dto.GenderTypeDto
+import com.elta.android.data.features.user.dto.GlucoseLevelDto
+import com.elta.android.data.features.user.dto.PersonDto
+import com.elta.android.data.features.user.dto.ProfileDto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
+import java.util.Date
 
 class MockedSettingsApi : SettingsApi {
 
