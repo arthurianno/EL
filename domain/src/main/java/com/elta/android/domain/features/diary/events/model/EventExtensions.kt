@@ -18,6 +18,7 @@ fun EventType.getValidator(): FormValidator =
         EventType.ACTIVITY -> ActivityValidator
         EventType.WEIGHT -> WeightValidator
         EventType.GLUCOSE -> GlucoseValidator
+        else -> throw IllegalArgumentException("${this.name} doesn't support validation.")
     }
 
 @Suppress("LongParameterList")

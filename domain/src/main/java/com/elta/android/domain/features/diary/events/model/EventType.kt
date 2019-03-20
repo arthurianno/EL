@@ -6,5 +6,6 @@ enum class EventType {
     MEDICAMENTS,
     ACTIVITY,
     WEIGHT,
-    GLUCOSE
+    GLUCOSE,
+    HDA1C
 }

@@ -16,7 +16,7 @@ import kotlin.math.abs
 
 fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelSettings): HomeModel {
 
-    val sortedEvents = events.sortedByDescending { it.additionTime }
+    val sortedEvents = events.sortedByDescending { it.additionTime }.filter { it.type != EventType.HDA1C }
 
     var lastBreadEvent: Event? = null
     var lastInsulinEvent: Event? = null
