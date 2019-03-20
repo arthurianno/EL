@@ -1,5 +1,6 @@
 package com.elta.android.presentation.widgets.date_picker
 
+import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
 import org.joda.time.DateTime
 import java.util.Date
@@ -7,6 +8,15 @@ import java.util.Date
 object DatePickerDataProvider {
 
     private const val DAYS_OFFSET = 3
+    private val dayOfWeekResources = arrayListOf(
+        R.string.date_picker_day_of_week_1,
+        R.string.date_picker_day_of_week_2,
+        R.string.date_picker_day_of_week_3,
+        R.string.date_picker_day_of_week_4,
+        R.string.date_picker_day_of_week_5,
+        R.string.date_picker_day_of_week_6,
+        R.string.date_picker_day_of_week_7
+    )
 
     fun buildDatePickerDates(currentDate: Date): ArrayList<DatePickerItem> {
         val dates = arrayListOf<DatePickerItem>()
@@ -62,6 +72,7 @@ object DatePickerDataProvider {
             toDate(),
             dayOfWeek,
             dayOfMonth,
+            dayOfWeekResources[dayOfWeek - 1],
             isAvailable
         )
 }

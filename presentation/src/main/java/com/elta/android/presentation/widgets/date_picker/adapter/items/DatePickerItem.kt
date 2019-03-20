@@ -7,5 +7,6 @@ data class DatePickerItem(
     val date: Date,
     val dayOfWeek: Int,
     val dayOfMonth: Int,
+    val dayOfWeekResId: Int,
     val isAvailable: Boolean = true
 ) : ListItem
