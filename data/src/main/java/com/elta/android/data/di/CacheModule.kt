@@ -8,6 +8,8 @@ import com.elta.android.data.features.diary.tags.cache.DbTagsCache
 import com.elta.android.data.features.diary.tags.cache.TagsCache
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.SalePointsCache
+import com.elta.android.data.features.user.cache.DbSettingsCache
+import com.elta.android.data.features.user.cache.SettingsCache
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +32,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindTagsCache(cache: DbTagsCache): TagsCache
+
+        @Binds
+        @Singleton
+        fun bindSettingsCache(cache: DbSettingsCache): SettingsCache
     }
 
     @Provides

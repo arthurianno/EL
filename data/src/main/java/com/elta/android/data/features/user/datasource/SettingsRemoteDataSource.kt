@@ -3,6 +3,7 @@ package com.elta.android.data.features.user.datasource
 import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.user.api.SettingsApi
 import com.elta.android.data.features.user.api.request.ShortUserSettingsRequest
+import com.elta.android.data.features.user.dto.ProfileDto
 import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -17,9 +18,7 @@ class SettingsRemoteDataSource @Inject constructor(
         api.updateUserSettings(ShortUserSettingsRequest(diabetes, weight, gender))
             .checkNetwork(checker)
 
-    override fun getUserProfile(): Single<Boolean> =
+    override fun getUserProfile(): Single<ProfileDto> =
         api.getUserSettings()
             .checkNetwork(checker)
-            .map { true }
-
 }

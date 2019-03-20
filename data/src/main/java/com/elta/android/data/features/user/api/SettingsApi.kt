@@ -1,9 +1,9 @@
 package com.elta.android.data.features.user.api
 
 import com.elta.android.data.features.user.api.request.ShortUserSettingsRequest
+import com.elta.android.data.features.user.dto.ProfileDto
 import io.reactivex.Completable
 import io.reactivex.Single
-import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -16,5 +16,5 @@ interface SettingsApi {
     fun updateUserSettings(@Body request: ShortUserSettingsRequest): Completable
 
     @GET("api/profile/v1/settings")
-    fun getUserSettings() : Single<ResponseBody>
+    fun getUserSettings(): Single<ProfileDto>
 }

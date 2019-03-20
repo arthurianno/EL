@@ -23,6 +23,10 @@ import com.elta.android.data.features.sale_points.mapper.CoordinatesToDomainMapp
 import com.elta.android.data.features.sale_points.mapper.SalePointFromCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
+import com.elta.android.data.features.user.cache.dto.SettingsCacheDto
+import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.mapper.SettingsFromCacheMapper
+import com.elta.android.data.features.user.mapper.SettingsToCacheMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -99,4 +103,14 @@ abstract class MappersModule {
     abstract fun bindTagFromCacheMapper(
         mapper: TagFromCacheMapper
     ): Mapper<TagCachedDto, TagDto>
+
+    @Binds
+    abstract fun bindSettingsFromCacheMapper(
+        mapper: SettingsFromCacheMapper
+    ): Mapper<SettingsCacheDto, ProfileDto>
+
+    @Binds
+    abstract fun bindSettingsToCacheMapper(
+        mapper: SettingsToCacheMapper
+    ): Mapper<ProfileDto, SettingsCacheDto>
 }
