@@ -214,8 +214,7 @@ dependencies {
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
     implementation commonDependencies.barcodeScanner
-    implementation "com.polidea.rxandroidble2:rxandroidble:1.8.2"
-    implementation 'no.nordicsemi.android:ble:2.0.5'
+    implementation commonDependencies.rxBluetooth
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
