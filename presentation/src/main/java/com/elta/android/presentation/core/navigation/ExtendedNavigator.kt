@@ -88,7 +88,7 @@ open class ExtendedNavigator(
 
     private fun throwInvalidConditionException(command: Command) {
         throw IllegalStateException(
-            "${command.javaClass.simpleName} connectAction supports only fragments"
+            "${command.javaClass.simpleName} command supports only fragments"
         )
     }
 }
