@@ -1,0 +1,13 @@
+package com.elta.android.data.features.user.dto
+
+import com.google.gson.annotations.SerializedName
+
+data class ProfileDto(
+    @SerializedName("diabet") val diabetType: DiabetTypeDto,
+    @SerializedName("weight") val weight: Double,
+    @SerializedName("gender") val gender: GenderTypeDto,
+    @SerializedName("person") val person: PersonDto?,
+    @SerializedName("glucoseLevel") val glucoseLevel: GlucoseLevelDto?,
+    @SerializedName("email") val email: String?,
+    @SerializedName("timeStamp") val timeStamp: Int
+)
