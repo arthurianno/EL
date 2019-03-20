@@ -11,8 +11,8 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.bluetooth.EltaDfuService
+import com.elta.android.presentation.features.bluetooth.startScan
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
-import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -22,7 +22,6 @@ import no.nordicsemi.android.dfu.DfuProgressListenerAdapter
 import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
-import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
@@ -53,34 +52,6 @@ class BluetoothPm @Inject constructor(
         ScanFilter.Builder().setDeviceName("SatelliteOnline").build(),
         ScanFilter.Builder().setDeviceName("EltaDFU").build()
     )
-    private val callback = object : ScanCallback() {
-        override fun onScanFailed(errorCode: Int) {
-            Timber.tag("SCAN").d("onScanFailed $errorCode")
-        }
-
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            Timber.tag("SCAN").d("onScanResult $callbackType, $result")
-        }
-
-        override fun onBatchScanResults(results: MutableList<ScanResult>) {
-            Timber.tag("SCAN").d("onBatchScanResults")
-            if (results.isNotEmpty()) {
-                scanResults.clear()
-                scanResults.addAll(results)
-                items.consumer.accept(
-                    scanResults.map {
-                        DeviceItem(
-                            id = it.device.address,
-                            name = if (!it.device.name.isNullOrEmpty()) it.device.name else it.scanRecord?.deviceName
-                                ?: "Unknown name",
-                            address = it.device.address,
-                            isSelected = it.device.address == device?.address
-                        )
-                    }
-                )
-            }
-        }
-    }
 
     private val dfuListener: DfuProgressListener = object : DfuProgressListenerAdapter() {
         override fun onDeviceConnected(deviceAddress: String) {
@@ -114,22 +85,40 @@ class BluetoothPm @Inject constructor(
     val commandInputControl = inputControl()
     val logState = State("Log:")
     val requestPermissionsCommand = Command<Unit>()
+    val startScanAction = Action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
 
-        val adapter = BluetoothAdapter.getDefaultAdapter()
-        if (!adapter.isEnabled) {
-            adapter.enable()
-        }
-
-        requestPermissionsCommand.consumer.accept(Unit)
+        startScanAction.observable
+            .flatMap {
+                scanner.startScan(filters, settings)
+                    .doOnNext { results ->
+                        scanResults.clear()
+                        scanResults.addAll(results)
+                        items.consumer.accept(
+                            results.map {
+                                DeviceItem(
+                                    id = it.device.address,
+                                    name = if (!it.device.name.isNullOrEmpty()) it.device.name else it.scanRecord?.deviceName
+                                        ?: "Unknown name",
+                                    address = it.device.address,
+                                    isSelected = it.device.address == device?.address
+                                )
+                            }
+                        )
+                    }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
 
         client.observeStateChanges()
             .log("Bluetooth", "state") { it.name }
             .doOnNext { state ->
                 when (state) {
-                    RxBleClient.State.READY -> scanner.startScan(filters, settings, callback)
+                    RxBleClient.State.READY -> startScanAction.consumer.accept(Unit)
                     else -> {
                     }
                 }
@@ -212,25 +201,27 @@ class BluetoothPm @Inject constructor(
             .doOnNext { click ->
                 if (click.item.address != device?.address) {
                     device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
-                    items.consumer.accept(
-                        items.value.map {
-                            if (it is ChooserItem) {
-                                return@map it.copy(isSelected = !it.isSelected)
-                            }
-                            return@map it
-                        }
-                    )
+                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
+                    items.consumer.accept(newItems)
                 }
             }
             .subscribe()
             .untilDestroy()
 
         DfuServiceListenerHelper.registerProgressListener(context, dfuListener)
+
+        val adapter = BluetoothAdapter.getDefaultAdapter()
+        if (!adapter.isEnabled) {
+            adapter.enable()
+        } else {
+            startScanAction.consumer.accept(Unit)
+        }
+
+        requestPermissionsCommand.consumer.accept(Unit)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         DfuServiceListenerHelper.unregisterProgressListener(context, dfuListener)
-        scanner.stopScan(callback)
     }
 }

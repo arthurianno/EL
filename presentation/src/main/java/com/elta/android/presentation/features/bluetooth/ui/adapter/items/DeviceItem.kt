@@ -6,7 +6,7 @@ data class DeviceItem(
     val id: Any,
     val name: String,
     val address: String,
-    var isSelected: Boolean = false
+    val isSelected: Boolean
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = id
