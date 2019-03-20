@@ -109,9 +109,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private val RecyclerView.linearLayoutManager: LinearLayoutManager?
         get() = layoutManager as? LinearLayoutManager
 
-    operator fun List<DatePickerItem>.contains(date: Date): Boolean {
-        return this.any { it.date == date && it.isAvailable }
-    }
+    operator fun List<DatePickerItem>.contains(date: Date) =
+        this.any { it.date == date && it.isAvailable }
 
     companion object {
         const val ITEMS_ON_SCREEN_COUNT = 7
