@@ -13,6 +13,10 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="New.Headline4.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
     <style name="New.Headline5.BlackBlue">
         <item name="android:textColor">@color/black_blue</item>
     </style>
@@ -51,6 +55,10 @@
         <item name="android:textColor">@color/shade_black1</item>
     </style>
 
+    <style name="New.Caption2.ShadeBlack0">
+        <item name="android:textColor">@color/shade_black0</item>
+    </style>
+
     <style name="New.Caption2.White">
         <item name="android:textColor">@color/white</item>
     </style>
@@ -63,6 +71,14 @@
     <!-- OVERLINE -->
 
     <!-- BODY -->
+    <style name="New.Body1.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
+    <style name="New.Body1.ShadeBlack2">
+        <item name="android:textColor">@color/shade_black2</item>
+    </style>
+
     <style name="New.Body2.BlackBlue">
         <item name="android:textColor">@color/black_blue</item>
     </style>

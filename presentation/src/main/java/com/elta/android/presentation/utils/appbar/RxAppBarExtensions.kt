@@ -12,6 +12,7 @@ fun AppBarLayout.observeState(): Observable<AppBarState> =
 fun AppBarLayout.offsetChanges(): Observable<Pair<AppBarLayout, Int>> =
     AppBarOffsetChangeObservable(this)
 
+@Suppress("MagicNumber")
 fun AppBarLayout.collapseProgress(): Observable<Int> =
     AppBarOffsetChangeObservable(this)
         .map {
