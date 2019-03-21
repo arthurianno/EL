@@ -73,6 +73,7 @@ class DiaryEventsMapper @Inject constructor(
         checkNotNull(duration).asTimeString(resources)
 
     // TODO: rework this solution using Android310
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     private fun Event.formatDate(): String {
         return try {
             val date = SimpleDateFormat(PATTERN, Locale.getDefault()).parse(additionTimeString)
