@@ -53,12 +53,16 @@ class MainRecordsPm @Inject constructor(
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
+    }
+
+    override fun onBind() {
+        super.onBind()
 
         bus.clicks<Clicks.RecordClicked>()
             .map { it.item }
             .doOnNext(::navigateToEventScreen)
             .subscribe()
-            .untilDestroy()
+            .untilUnbind()
     }
 
     private fun navigateToEventScreen(record: RecordItem) {
