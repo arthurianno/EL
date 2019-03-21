@@ -48,7 +48,8 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
     )
 }
 
-fun List<Event>.sortAndFilter(): List<Event> = sortedByDescending { it.additionTime }.filter { it.type != EventType.HDA1C }
+fun List<Event>.sortAndFilter(): List<Event> = sortedByDescending { it.additionTime }
+    .filter { it.type != EventType.HDA1C }
 
 fun getDayPeriod(now: Long): DayPeriod =
     when (now) {

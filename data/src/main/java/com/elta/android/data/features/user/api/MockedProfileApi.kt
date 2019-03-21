@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.elta.android.data.features.user.api
 
 import com.elta.android.common.utils.log

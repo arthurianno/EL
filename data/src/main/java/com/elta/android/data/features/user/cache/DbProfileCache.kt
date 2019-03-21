@@ -32,7 +32,7 @@ class DbProfileCache @Inject constructor(
 
     override fun get(condition: Condition): List<ProfileCacheDto> =
         userHolder.doInUserExists {
-            val result= box.get(it)
+            val result = box.get(it)
             if (result == null) emptyList() else listOf(result)
         }
 }
