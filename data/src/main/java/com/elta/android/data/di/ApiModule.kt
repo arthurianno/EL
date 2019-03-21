@@ -11,8 +11,8 @@ import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
-import com.elta.android.data.features.user.api.MockedSettingsApi
-import com.elta.android.data.features.user.api.SettingsApi
+import com.elta.android.data.features.user.api.MockedProfileApi
+import com.elta.android.data.features.user.api.ProfileApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -44,10 +44,10 @@ class ApiModule {
     @Singleton
     fun provideSettingsApi(
         retrofit: Retrofit
-    ): SettingsApi =
+    ): ProfileApi =
         when (ApiConfig.USE_MOCKED_SETTINGS_API) {
-            true -> MockedSettingsApi()
-            else -> retrofit.create<SettingsApi>(SettingsApi::class.java)
+            true -> MockedProfileApi()
+            else -> retrofit.create<ProfileApi>(ProfileApi::class.java)
         }
 
     @Provides

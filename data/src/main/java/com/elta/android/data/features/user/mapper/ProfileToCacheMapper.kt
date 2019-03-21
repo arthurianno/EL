@@ -2,20 +2,20 @@ package com.elta.android.data.features.user.mapper
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.storage.UserHolder
-import com.elta.android.data.features.user.cache.dto.SettingsCacheDto
+import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import javax.inject.Inject
 
-class SettingsToCacheMapper @Inject constructor(
+class ProfileToCacheMapper @Inject constructor(
     private val userHolder: UserHolder
-) : Mapper<ProfileDto, SettingsCacheDto> {
-    override fun mapFromObject(source: ProfileDto): SettingsCacheDto =
+) : Mapper<ProfileDto, ProfileCacheDto> {
+    override fun mapFromObject(source: ProfileDto): ProfileCacheDto =
         with(source) {
-            SettingsCacheDto(
+            ProfileCacheDto(
                 id = userHolder.currentUser ?: 0,
-                diabetType = diabetType.name,
+                diabetes = diabetes?.name,
                 weight = weight,
-                gender = gender.name,
+                gender = gender?.name,
                 email = email,
                 timeStamp = timeStamp,
                 firstName = person?.firstName,

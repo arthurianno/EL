@@ -2,7 +2,7 @@ package com.elta.android.domain.features.user.interactor
 
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.user.model.Profile
-import com.elta.android.domain.features.user.repository.UserSettingsRepository
+import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -11,7 +11,7 @@ import io.reactivex.rxkotlin.Singles
 import javax.inject.Inject
 
 class GetProfileUseCase @Inject constructor(
-    private val userRepo: UserSettingsRepository,
+    private val userRepo: ProfileRepository,
     private val eventsRepo: EventsRepository,
     private val schedulers: SchedulersFacade
 ) : SingleUseCase<Profile, Unit>(schedulers) {

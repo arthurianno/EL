@@ -1,8 +1,9 @@
 package com.elta.android.presentation.features.onboaring.pm
 
-import com.elta.android.domain.features.user.interactor.UpdateUserSettingsUseCase
+import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -13,10 +14,12 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
+import com.nullgr.core.date.toTimestamp
+import java.util.Date
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
-    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -99,7 +102,7 @@ class OnBoardingPm @Inject constructor(
             .skipWhileInProgress()
             .map(::createUseCaseParams)
             .flatMapCompletable { params ->
-                updateUserSettingsUseCase.execute(params)
+                updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete(::handleSuccess)
@@ -161,11 +164,17 @@ class OnBoardingPm @Inject constructor(
         nextPageVisibilityState.consumer.accept(isNextPageAvailable)
     }
 
-    private fun createUseCaseParams(i: Unit): UpdateUserSettingsUseCase.Params {
+    private fun createUseCaseParams(i: Unit): UpdateProfileUseCase.Params {
         val gender = params[OnBoardingGenderItem::class.java] as? Gender
         val weight = params[OnBoardingWeightItem::class.java] as? Double
         val diabetes = params[OnBoardingDiabetesItem::class.java] as? Diabetes
-        return UpdateUserSettingsUseCase.Params(gender, weight, diabetes)
+        val profile = Profile(
+            gender = gender,
+            weight = weight,
+            diabetes = diabetes,
+            timeStamp = Date().toTimestamp()
+        )
+        return UpdateProfileUseCase.Params(profile)
     }
 
     private fun handleSuccess() {

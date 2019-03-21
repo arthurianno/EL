@@ -1,29 +1,32 @@
 package com.elta.android.data.features.user.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.user.cache.dto.SettingsCacheDto
 import com.elta.android.data.features.user.dto.DiabetTypeDto
 import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.domain.features.user.model.Profile
 import javax.inject.Inject
 
-class SettingsFromCacheMapper @Inject constructor() : Mapper<SettingsCacheDto, ProfileDto> {
-    override fun mapFromObject(source: SettingsCacheDto): ProfileDto =
+class ProfileToDtoMapper @Inject constructor() : Mapper<Profile, ProfileDto> {
+
+    override fun mapFromObject(source: Profile): ProfileDto =
         with(source) {
             ProfileDto(
-                diabetType = DiabetTypeDto.valueOf(diabetType),
+                diabetes = diabetes?.let { DiabetTypeDto.valueOf(it.name) },
                 weight = weight,
-                gender = GenderTypeDto.valueOf(gender),
+                gender = gender?.let { GenderTypeDto.valueOf(it.name) },
                 person = PersonDto(
                     firstName = firstName,
-                    lastName = lastName
+                    lastName = secondName
                 ),
-                glucoseLevel = GlucoseLevelDto(
-                    minValue = minValue,
-                    maxValue = maxValue
-                ),
+                glucoseLevel = glucoseLevelSettings?.let {
+                    GlucoseLevelDto(
+                        minValue = it.normal.start,
+                        maxValue = it.normal.end
+                    )
+                },
                 email = email,
                 timeStamp = timeStamp
             )

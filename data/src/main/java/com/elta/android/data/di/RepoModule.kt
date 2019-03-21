@@ -5,13 +5,13 @@ import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
 import com.elta.android.data.features.diary.tags.repository.TagsDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
-import com.elta.android.data.features.user.repository.UserSettingsDataRepository
+import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
-import com.elta.android.domain.features.user.repository.UserSettingsRepository
+import com.elta.android.domain.features.user.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -30,7 +30,7 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindUserSettingsRepository(repo: UserSettingsDataRepository): UserSettingsRepository
+    abstract fun bindProfileRepository(repo: ProfileDataRepository): ProfileRepository
 
     @Binds
     @Singleton
