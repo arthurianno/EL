@@ -1,14 +1,14 @@
 package com.elta.android.domain.features.diary.events.model.form
 
 import com.elta.android.domain.features.diary.events.model.InsulinType
-import com.elta.android.domain.features.diary.home.model.DoubleExclusiveRange
+import com.elta.android.domain.features.diary.home.model.DoubleRange
 import java.util.Date
 
 object BreadValidator : FormValidator {
 
     const val bottomLevelInclusive = 0.1
-    const val topLevelExclusive = 100.0
-    private val valueDiapason = DoubleExclusiveRange(bottomLevelInclusive, topLevelExclusive)
+    const val topLevelInclusive = 99.9
+    private val valueDiapason = DoubleRange(bottomLevelInclusive, topLevelInclusive)
     private const val kindMaxLength = 40
 
     override fun isValid(

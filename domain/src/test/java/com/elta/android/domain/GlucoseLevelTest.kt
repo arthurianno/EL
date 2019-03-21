@@ -17,29 +17,29 @@ class GlucoseLevelTest {
     }
 
     @Test
-    fun glucoseLevel_3_99_DefaultSettings_Low() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = 3.99)
+    fun glucoseLevel_LowEnd_DefaultSettings_Low() {
+        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = GlucoseLevelSettings.LOW_END)
         val level = event.glucoseLevel(GlucoseLevelSettings())
         assert(level == GlucoseLevel.LOW)
     }
 
     @Test
-    fun glucoseLevel_4_DefaultSettings_Normal() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
+    fun glucoseLevel_NormalStart_DefaultSettings_Normal() {
+        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = GlucoseLevelSettings.NORMAL_START)
         val level = event.glucoseLevel(GlucoseLevelSettings())
         assert(level == GlucoseLevel.NORMAL)
     }
 
     @Test
-    fun glucoseLevel_10_DefaultSettings_Normal() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = 10.0)
+    fun glucoseLevel_NormalEnd_DefaultSettings_Normal() {
+        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = GlucoseLevelSettings.NORMAL_END)
         val level = event.glucoseLevel(GlucoseLevelSettings())
         assert(level == GlucoseLevel.NORMAL)
     }
 
     @Test
-    fun glucoseLevel_10_1_DefaultSettings_High() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = 10.1)
+    fun glucoseLevel_HighStart_DefaultSettings_High() {
+        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = GlucoseLevelSettings.HIGH_START)
         val level = event.glucoseLevel(GlucoseLevelSettings())
         assert(level == GlucoseLevel.HIGH)
     }
