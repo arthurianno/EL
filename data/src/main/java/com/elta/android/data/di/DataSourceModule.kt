@@ -15,9 +15,9 @@ import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
-import com.elta.android.data.features.user.datasource.SettingsCachedDataSource
-import com.elta.android.data.features.user.datasource.SettingsDataSource
-import com.elta.android.data.features.user.datasource.SettingsRemoteDataSource
+import com.elta.android.data.features.user.datasource.ProfileCachedDataSource
+import com.elta.android.data.features.user.datasource.ProfileDataSource
+import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -37,12 +37,12 @@ abstract class DataSourceModule {
     @Remote
     @Binds
     @Singleton
-    abstract fun bindSettingsRemoteDataSource(source: SettingsRemoteDataSource): SettingsDataSource
+    abstract fun bindProfileRemoteDataSource(source: ProfileRemoteDataSource): ProfileDataSource
 
     @Cache
     @Binds
     @Singleton
-    abstract fun bindSettingsCachedDataSource(source: SettingsCachedDataSource): SettingsDataSource
+    abstract fun bindProfileCachedDataSource(source: ProfileCachedDataSource): ProfileDataSource
 
     @Remote
     @Binds

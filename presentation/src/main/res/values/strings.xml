@@ -153,6 +153,7 @@
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Измерение глюкозы</string>
+    <string name="event_type_hba1c">HbA1C</string>
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s ед</string>

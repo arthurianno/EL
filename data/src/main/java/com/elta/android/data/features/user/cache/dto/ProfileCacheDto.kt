@@ -4,13 +4,13 @@ import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 
 @Entity
-data class SettingsCacheDto(
+data class ProfileCacheDto(
     @Id(assignable = true) var id: Long,
-    val diabetType: String,
-    val weight: Double,
-    val gender: String,
+    val diabetes: String?,
+    val weight: Double?,
+    val gender: String?,
     val email: String?,
-    val timeStamp: Int,
+    val timeStamp: Long,
 
     // represents PersonDto
     val firstName: String?,
