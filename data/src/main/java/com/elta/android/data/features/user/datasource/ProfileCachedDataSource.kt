@@ -18,7 +18,7 @@ class ProfileCachedDataSource @Inject constructor(
         Completable.fromCallable {
             val profiles = cache.get(CommonConditions.Empty)
             if (profiles.isNotEmpty()) {
-                val cachedProfile = profiles[0]
+                val cachedProfile = profiles.first()
                 val newProfile = cachedProfile.copy(
                     diabetes = profile.diabetes?.name ?: cachedProfile.diabetes,
                     weight = profile.weight ?: cachedProfile.weight,
@@ -38,7 +38,7 @@ class ProfileCachedDataSource @Inject constructor(
         Single.fromCallable {
             val profiles = cache.get(CommonConditions.Empty)
             if (profiles.isNotEmpty()) {
-                profiles[0]
+                profiles.first()
             } else {
                 throw NoSuchElementException("Current user profile is empty.")
             }

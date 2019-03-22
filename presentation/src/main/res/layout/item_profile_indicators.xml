@@ -1,5 +1,6 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp">
@@ -27,13 +28,12 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/glucoseLevelView"
+        style="@style/IndicatorCardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/shade_g_green_a"
-        app:cardCornerRadius="@dimen/card_corner"
-        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/shade_blue"
         app:layout_constraintBottom_toTopOf="@+id/weightView"
         app:layout_constraintDimensionRatio="h,2:3"
         app:layout_constraintEnd_toEndOf="@id/gCenter"
@@ -45,7 +45,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/glucoseLevelIcon"
+                android:id="@+id/glucoseLevelIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="16dp"
@@ -55,7 +55,7 @@
                 app:srcCompat="@drawable/ic_range_sugar" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/glucoseLevelTitle"
+                android:id="@+id/glucoseLevelTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,10 +63,10 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/profile_range"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelIcon" />
+                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelIconView" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/glucoseLevelDescription"
+                android:id="@+id/glucoseLevelDescriptionView"
                 style="@style/New.Caption1.Transparent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/profile_glucose_level"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelTitleView" />
 
             <LinearLayout
                 android:id="@+id/rangeView"
@@ -87,17 +87,17 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelDescription">
+                app:layout_constraintTop_toBottomOf="@+id/glucoseLevelDescriptionView">
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/glucoseLevelMin"
+                    android:id="@+id/glucoseLevelMinView"
                     style="@style/New.Body2.White"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="4,0" />
+                    tools:text="4,0" />
 
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="0dp"
@@ -108,14 +108,14 @@
                     app:srcCompat="@drawable/ic_img_range_2" />
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/glucoseLevelMax"
+                    android:id="@+id/glucoseLevelMaxView"
                     style="@style/New.Body2.White"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="10,0" />
+                    tools:text="10,0" />
             </LinearLayout>
 
             <android.support.v7.widget.AppCompatImageView
@@ -132,13 +132,12 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/diabetesTypeView"
+        style="@style/IndicatorCardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/black_blue"
-        app:cardCornerRadius="@dimen/card_corner"
-        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/shade_g_green_a"
         app:layout_constraintBottom_toTopOf="@+id/hemoglobinView"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toStartOf="@+id/gEnd"
@@ -150,7 +149,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/diabetesTypeIcon"
+                android:id="@+id/diabetesTypeIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="16dp"
@@ -160,7 +159,7 @@
                 app:srcCompat="@drawable/ic_diabet_type" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/diabetesTypeTitle"
+                android:id="@+id/diabetesTypeTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -168,36 +167,35 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/profile_diabetes"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/diabetesTypeIcon" />
+                app:layout_constraintTop_toBottomOf="@+id/diabetesTypeIconView" />
 
-            <!--todo hardcode text-->
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/diabetesTypeButton"
+                android:id="@+id/diabetesTypeButtonView"
                 style="@style/New.Body2.White"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="20dp"
                 android:background="@drawable/bg_item_light_transparent"
                 android:gravity="center"
-                android:text="Второй тип"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/diabetesTypeTitleView"
+                app:layout_constraintVertical_bias="0.6"
+                tools:text="Второй тип" />
 
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
         android:id="@+id/weightView"
+        style="@style/IndicatorCardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="4dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="@dimen/card_corner"
-        app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="@id/gCenter"
@@ -208,7 +206,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/weightIcon"
+                android:id="@+id/weightIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="16dp"
@@ -218,7 +216,7 @@
                 app:srcCompat="@drawable/ic_weight_type" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/weightTitle"
+                android:id="@+id/weightTitleView"
                 style="@style/New.Button2.BlackBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -226,9 +224,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/profile_weight"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/weightIcon" />
+                app:layout_constraintTop_toBottomOf="@+id/weightIconView" />
 
-            <!--todo hardcode text-->
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/weightValueView"
                 style="@style/New.Body2.BlackBlue"
@@ -239,16 +236,16 @@
                 android:gravity="center"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="90 кг"
-                android:textColor="@color/shade_blue3"
-                app:layout_constraintBottom_toBottomOf="@+id/weightTitle"
+                android:textColor="@color/g_green_b"
+                app:layout_constraintBottom_toBottomOf="@+id/weightTitleView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/weightTitle"
-                app:layout_constraintTop_toTopOf="@+id/weightTitle" />
+                app:layout_constraintStart_toEndOf="@+id/weightTitleView"
+                app:layout_constraintTop_toTopOf="@+id/weightTitleView"
+                tools:text="90 кг" />
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/weightIcon2"
+                android:id="@+id/weightIcon2View"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:scaleType="centerCrop"
@@ -262,14 +259,12 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/hemoglobinView"
+        style="@style/IndicatorCardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         app:cardBackgroundColor="@color/g_purpur_b"
-        app:cardCornerRadius="@dimen/card_corner"
-        app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,2:3"
         app:layout_constraintEnd_toStartOf="@+id/gEnd"
@@ -280,7 +275,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/hemoglobinIcon"
+                android:id="@+id/hemoglobinIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="16dp"
@@ -290,7 +285,7 @@
                 app:srcCompat="@drawable/ic_hb_a_1_c" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/hemoglobinTitle"
+                android:id="@+id/hemoglobinTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -298,9 +293,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/profile_hba1c"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/hemoglobinIcon" />
+                app:layout_constraintTop_toBottomOf="@+id/hemoglobinIconView" />
 
-            <!--todo hardcode text-->
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/hemoglobinValueView"
                 style="@style/New.Body2.White"
@@ -311,15 +305,15 @@
                 android:gravity="center"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="5,2 %"
-                app:layout_constraintBottom_toBottomOf="@+id/hemoglobinTitle"
+                app:layout_constraintBottom_toBottomOf="@+id/hemoglobinTitleView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/hemoglobinTitle"
-                app:layout_constraintTop_toTopOf="@+id/hemoglobinTitle" />
+                app:layout_constraintStart_toEndOf="@+id/hemoglobinTitleView"
+                app:layout_constraintTop_toTopOf="@+id/hemoglobinTitleView"
+                tools:text="5,2 %" />
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/hemoglobinIcon2"
+                android:id="@+id/hemoglobinIcon2View"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:cropToPadding="false"

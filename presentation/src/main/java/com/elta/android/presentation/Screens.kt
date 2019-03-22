@@ -8,6 +8,9 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
+import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
+import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
+import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -27,6 +30,8 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
 import com.nullgr.core.intents.callIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -116,6 +121,10 @@ object Screens {
         override fun getFragment() = MainFlowFragment.newInstance()
     }
 
+    object DiaryTab : SupportAppScreen() {
+        override fun getFragment() = DiaryFlowFragment.newInstance()
+    }
+
     object ProfileTab : SupportAppScreen() {
         override fun getFragment() = ProfileFlowFragment.newInstance()
     }
@@ -135,6 +144,24 @@ object Screens {
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
+    }
+
+    // SYNC FLOW
+    object SyncFlow : SupportAppScreen() {
+        override fun getFragment() = SyncFlowFragment.newInstance()
+    }
+
+    object SyncStart : SupportAppScreen() {
+        override fun getFragment() = SyncStartFragment.newInstance()
+    }
+
+    object BluetoothScreen : SupportAppScreen() {
+        override fun getFragment(): Fragment = BluetoothFragment.newInstance()
+    }
+
+    // DIARY FLOW
+    object MainDiaryScreen : SupportAppScreen() {
+        override fun getFragment() = MainDiaryFragment.newInstance()
     }
 
     // PROFILE FLOW

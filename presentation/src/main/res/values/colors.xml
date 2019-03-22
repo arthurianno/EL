@@ -20,7 +20,7 @@
     <color name="g_green_a">#43e695</color>
     <color name="g_green_b">#3bb2b8</color>
     <color name="shade_g_purpur_a">#38b7e1</color>
-    <color name="shade_g_purpur_a_016">#2838b7e1</color>
+    <color name="shade_g_green_a_016">#273ec9a8</color>
     <color name="shade_g_green_a">#3ec9a8</color>
     <color name="black_blue">#3d4556</color>
     <color name="shade_black1">#878b93</color>
@@ -141,5 +141,5 @@
     <color name="color_chooser_bg_insulin">@color/shade_g_purpur_a</color>
 
     <color name="color_black_transparent">#10000000</color>
-    <color name="transparent_10_percent">#1AFFFFFF</color>
+    <color name="transparent_20_percent">#33FFFFFF</color>
 </resources>

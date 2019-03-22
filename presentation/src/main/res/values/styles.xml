@@ -125,4 +125,13 @@
         <item name="contentInsetEnd">0dp</item>
     </style>
 
+    <style name="IndicatorCardView" parent="CardView">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="cardCornerRadius">@dimen/card_corner</item>
+        <item name="cardElevation">4dp</item>
+        <item name="android:stateListAnimator">@drawable/selector_profile_indicator_card_animator</item>
+    </style>
+
 </resources>

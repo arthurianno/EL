@@ -118,7 +118,8 @@ class ShopsMapPm @Inject constructor(
 
     private fun bindPermissionsBehaviour() {
         loadScreenAction.observable
-            // TODO: this code emits GRANTED state for each onBindPresentationModel this end up new location request and updating ui
+            // TODO: this code emits GRANTED state for each
+            // onBindPresentationModel this end up new location request and updating ui
             .flatMap { permissionStatusUpdatedAction.observable }
             .subscribe(permissionStatusState.consumer)
             .untilDestroy()
