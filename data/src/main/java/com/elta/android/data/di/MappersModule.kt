@@ -23,11 +23,18 @@ import com.elta.android.data.features.sale_points.mapper.CoordinatesToDomainMapp
 import com.elta.android.data.features.sale_points.mapper.SalePointFromCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
+import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
+import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
+import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
+import com.elta.android.data.features.user.mapper.ProfileToDtoMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.domain.features.user.model.Profile
 import dagger.Binds
 import dagger.Module
 
@@ -99,4 +106,24 @@ abstract class MappersModule {
     abstract fun bindTagFromCacheMapper(
         mapper: TagFromCacheMapper
     ): Mapper<TagCachedDto, TagDto>
+
+    @Binds
+    abstract fun bindProfileFromCacheMapper(
+        mapper: ProfileFromCacheMapper
+    ): Mapper<ProfileCacheDto, ProfileDto>
+
+    @Binds
+    abstract fun bindProfileToCacheMapper(
+        mapper: ProfileToCacheMapper
+    ): Mapper<ProfileDto, ProfileCacheDto>
+
+    @Binds
+    abstract fun bindProfileToDtoMapper(
+        mapper: ProfileToDtoMapper
+    ): Mapper<Profile, ProfileDto>
+
+    @Binds
+    abstract fun bindProfileToDomainMapper(
+        mapper: ProfileToDomainMapper
+    ): Mapper<ProfileDto, Profile>
 }

@@ -22,6 +22,9 @@ import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
+import com.elta.android.presentation.features.profile.main.di.MainProfileModule
+import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -151,4 +154,12 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [MainDiaryModule::class])
     abstract fun bindMainDiaryFragment(): MainDiaryFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileFlowFragment(): ProfileFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [MainProfileModule::class])
+    abstract fun bindMainProfileFragment(): MainProfileFragment
 }

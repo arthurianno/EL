@@ -19,6 +19,7 @@ fun EventType.toName(): Int =
         EventType.WEIGHT -> R.string.event_type_weight
         EventType.ACTIVITY -> R.string.event_type_activity
         EventType.GLUCOSE -> R.string.event_type_glucose
+        EventType.HDA1C -> R.string.event_type_hba1c
     }
 
 @DrawableRes
@@ -30,6 +31,7 @@ fun EventType.toIcon(): Int =
         EventType.WEIGHT -> R.drawable.ic_event_weight
         EventType.ACTIVITY -> R.drawable.ic_event_activity
         EventType.GLUCOSE -> R.drawable.ic_event_glucose
+        else -> throw IllegalArgumentException("${this.name} doesn't support icon resource.")
     }
 
 @DrawableRes
@@ -41,6 +43,7 @@ fun EventType.toIconWithBg(): Int =
         EventType.WEIGHT -> R.drawable.ic_event_weight_with_bg
         EventType.ACTIVITY -> R.drawable.ic_event_activity_with_bg
         EventType.GLUCOSE -> R.drawable.ic_event_glucose_with_bg
+        else -> throw IllegalArgumentException("${this.name} doesn't support icon resource.")
     }
 
 @DrawableRes

@@ -15,7 +15,6 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.pageScrolled
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
@@ -52,12 +51,13 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         pm.titleState.observable.take(1).bindTo(onBoardingHeaderTextView.text())
         pm.previousPageVisibilityState.bindTo(previewPageButtonView.fadeVisibility())
         pm.nextPageVisibilityState.bindTo(nextPageButtonView.fadeVisibility())
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
 
         previewPageButtonView.clicks().bindTo(pm.previousPageAction)
         nextPageButtonView.clicks().bindTo(pm.nextPageAction)
         menuButtonView.clicks().bindTo(pm.skipPageAction)
+
+        bindProgressDialog(pm)
     }
 
     private fun TextView.available(): Consumer<Boolean> {

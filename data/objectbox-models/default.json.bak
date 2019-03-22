@@ -66,7 +66,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "16:4534211085864672993",
+      "lastPropertyId": "17:8536437484320236218",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -132,6 +132,10 @@
         {
           "id": "16:4534211085864672993",
           "name": "userId"
+        },
+        {
+          "id": "17:8536437484320236218",
+          "name": "additionTimeString"
         }
       ],
       "relations": []
@@ -175,9 +179,57 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:7986449784983157444",
+      "lastPropertyId": "11:7302905946498198254",
+      "name": "SettingsCacheDto",
+      "properties": [
+        {
+          "id": "1:7024367445299168840",
+          "name": "id"
+        },
+        {
+          "id": "3:6636600462150201934",
+          "name": "weight"
+        },
+        {
+          "id": "4:540480903123996475",
+          "name": "gender"
+        },
+        {
+          "id": "5:5959798014926884481",
+          "name": "email"
+        },
+        {
+          "id": "6:291930954876441264",
+          "name": "timeStamp"
+        },
+        {
+          "id": "7:6609609127975389480",
+          "name": "firstName"
+        },
+        {
+          "id": "8:2592894846417217715",
+          "name": "lastName"
+        },
+        {
+          "id": "9:8171767658026678111",
+          "name": "minValue"
+        },
+        {
+          "id": "10:602119885913131796",
+          "name": "maxValue"
+        },
+        {
+          "id": "11:7302905946498198254",
+          "name": "diabetes"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:7269490173938270184",
+  "lastEntityId": "4:7986449784983157444",
   "lastIndexId": "1:5049058603170790455",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -185,7 +237,9 @@
   "modelVersionParserMinimum": 4,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    5767551688504933683
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

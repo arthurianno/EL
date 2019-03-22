@@ -8,9 +8,9 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
+import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
-import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -20,6 +20,8 @@ import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragm
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
+import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -123,6 +125,10 @@ object Screens {
         override fun getFragment() = DiaryFlowFragment.newInstance()
     }
 
+    object ProfileTab : SupportAppScreen() {
+        override fun getFragment() = ProfileFlowFragment.newInstance()
+    }
+
     // MAIN FLOW
     object MainRecordsScreen : SupportAppScreen() {
         override fun getFragment() = MainRecordsFragment.newInstance()
@@ -156,5 +162,10 @@ object Screens {
     // DIARY FLOW
     object MainDiaryScreen : SupportAppScreen() {
         override fun getFragment() = MainDiaryFragment.newInstance()
+    }
+
+    // PROFILE FLOW
+    object MainProfileScreen : SupportAppScreen() {
+        override fun getFragment() = MainProfileFragment.newInstance()
     }
 }

@@ -19,6 +19,8 @@ import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
+import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
@@ -181,4 +183,14 @@ abstract class PmModule {
     @IntoMap
     @PmKey(MainDiaryPm::class)
     abstract fun bindMainDiaryPm(pm: MainDiaryPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileFlowPm::class)
+    abstract fun bindProfileFlowPm(pm: ProfileFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(MainProfilePm::class)
+    abstract fun bindMainProfilePm(pm: MainProfilePm): PresentationModel
 }

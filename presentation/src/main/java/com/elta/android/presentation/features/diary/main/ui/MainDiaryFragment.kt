@@ -6,13 +6,11 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.utils.showDatePickerDialog
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_main_diary.*
 import java.util.Date
-import java.util.concurrent.TimeUnit
 
 class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
 
@@ -24,9 +22,6 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
 
     override fun onBindPresentationModel(pm: MainDiaryPm) {
         super.onBindPresentationModel(pm)
-        pm.progressState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(progressDialog.visibility(childFragmentManager))
         pm.datePickerDateState.bindTo(datePickerView.date())
         datePickerView.dateChanged().bindTo(pm.dateSelectedAction)
         selectDateButtonView.clicks().bindTo(pm.selectDateInDialogAction)
@@ -38,10 +33,10 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
         }
         pm.todayButtonVisibilityState.bindTo(todayButtonView.visibility())
         todayButtonView.clicks().bindTo(pm.todayClickedAction)
+        bindProgressDialog(pm)
     }
 
     companion object {
         fun newInstance() = MainDiaryFragment()
-        private const val DEBOUNCE = 300L
     }
 }

@@ -4,4 +4,5 @@ sealed class CommonConditions : Condition {
 
     data class ByIds(val ids: List<Long>) : CommonConditions()
     object All : CommonConditions()
+    object Empty : CommonConditions()
 }

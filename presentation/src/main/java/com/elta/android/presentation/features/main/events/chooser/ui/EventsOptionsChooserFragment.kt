@@ -10,13 +10,11 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBar
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.utils.bundle
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_events_options_chooser.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
-import java.util.concurrent.TimeUnit
 
 class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() {
 
@@ -43,10 +41,8 @@ class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() 
         pm.toolbarTitleCommand.bindTo(toolbarTitleView.text())
         pm.appBarBackgroundCommand.bindTo { appBarLayoutView.setBackgroundResource(it) }
         pm.confirmButtonVisibilityCommand.bindTo(confirmButtonView.visibility())
-        pm.progressState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(progressDialog.visibility(childFragmentManager))
         confirmButtonView.clicks().bindTo(pm.selectionConfirmedAction)
+        bindProgressDialog(pm)
     }
 
     companion object {
@@ -57,6 +53,5 @@ class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() 
         }
 
         private const val EXTRA_CHOOSER_DATA = "extra_chooser_config"
-        private const val DEBOUNCE = 300L
     }
 }

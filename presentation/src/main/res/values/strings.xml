@@ -153,6 +153,7 @@
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Измерение глюкозы</string>
+    <string name="event_type_hba1c">HbA1C</string>
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s ед</string>
@@ -313,4 +314,22 @@
     <string name="date_picker_day_of_week_5">Пт</string>
     <string name="date_picker_day_of_week_6">Сб</string>
     <string name="date_picker_day_of_week_7">Вс</string>
+
+    <!--PROFILE FLOW-->
+    <string name="profile_settings">Настройки профиля</string>
+    <string name="profile_my_indicators">Мои медицинские покзатели</string>
+    <string name="profile_additional_functions">Дополнительные функции</string>
+    <string name="profile_my_watchers">Мои наблюдатели</string>
+    <string name="profile_management_and_settings">Управление и настройки</string>
+    <string name="profile_where_purchase_products">Где приобрести продукцию</string>
+    <string name="profile_map_of_stores">Карта магазинов и торговых точек</string>
+    <string name="profile_hba1c">HbA1C</string>
+    <string name="profile_hba1c_value">%s %%</string>
+    <string name="profile_range">Диапазон</string>
+    <string name="profile_glucose_level">Уровень глюкозы</string>
+    <string name="profile_weight">Вес</string>
+    <string name="profile_weight_value">%s кг</string>
+    <string name="profile_diabetes">Диабет</string>
+    <string name="profile_main_empty_value">—</string>
+    <string name="profile_name_placeholder">Профиль</string>
 </resources>

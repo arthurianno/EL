@@ -51,6 +51,14 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="New.Caption1.Transparent">
+        <item name="android:textColor">@color/white_transparent</item>
+    </style>
+
+    <style name="New.Caption1.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
     <style name="New.Caption2.ShadeBlack1">
         <item name="android:textColor">@color/shade_black1</item>
     </style>
@@ -64,6 +72,14 @@
     </style>
 
     <!-- BUTTON -->
+    <style name="New.Button2.White">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="New.Button2.BlackBlue">
+        <item name="android:textColor">@color/black_blue</item>
+    </style>
+
     <style name="New.Button3.White">
         <item name="android:textColor">@color/white</item>
     </style>
@@ -85,5 +101,9 @@
 
     <style name="New.Body2.ShadeGreen">
         <item name="android:textColor">@color/shade_g_green2_a</item>
+    </style>
+
+    <style name="New.Body2.White">
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>

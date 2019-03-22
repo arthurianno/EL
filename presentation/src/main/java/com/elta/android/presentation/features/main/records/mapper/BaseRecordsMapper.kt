@@ -6,13 +6,12 @@ import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -20,14 +19,6 @@ import java.util.concurrent.TimeUnit
 open class BaseRecordsMapper(
     protected val resources: ResourceProvider
 ) {
-    private val numberFormat by lazy {
-        DecimalFormat("#.#").apply {
-            minimumFractionDigits = 1
-            decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault()).apply {
-                decimalSeparator = ','
-            }
-        }
-    }
 
     protected fun EventsBlock.group(expand: Boolean): ListItem =
         RecordsGroupItem(
@@ -123,7 +114,7 @@ open class BaseRecordsMapper(
     protected fun Double?.format(): String? =
         when {
             this == null -> null
-            else -> numberFormat.format(this)
+            else -> NumberFormatter.numberFormat.format(this)
         }
 
     private companion object {

@@ -26,8 +26,8 @@ class HomeFlowPm @Inject constructor(
     val closeBottomSheetCommand = Command<Unit>()
     val pulseCommand = Command<Boolean>()
     val menuItemSelectedAction = Action<Int>()
-
     val selectedItemIdState = State(R.id.mainMenuItemView)
+
     private val loadEvents = Action<Unit>()
 
     override fun onCreate() {
@@ -61,7 +61,7 @@ class HomeFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab))
+        router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab, Screens.ProfileTab))
         router.navigateToTab(Screens.MainTab)
     }
 
@@ -92,6 +92,7 @@ class HomeFlowPm @Inject constructor(
         when (id) {
             R.id.mainMenuItemView -> router.navigateToTab(Screens.MainTab)
             R.id.notesMenuItemView -> router.navigateToTab(Screens.DiaryTab)
+            R.id.profileMenuItemView -> router.navigateToTab(Screens.ProfileTab)
         }
     }
 

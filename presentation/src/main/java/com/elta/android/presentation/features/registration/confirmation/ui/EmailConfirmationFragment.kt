@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.utils.bundle
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import kotlinx.android.synthetic.main.fragment_email_confirmation.*
@@ -38,7 +37,7 @@ class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
         confirmationSuccessStateView.clicks().bindTo(pm.continueAction)
         pm.contentVisibilityCommand.bindTo(confirmationNextActionView.visibility())
         errorStateView.clicks().bindTo(pm.confirmEmailAction)
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
+        bindProgressDialog(pm)
     }
 
     companion object {
