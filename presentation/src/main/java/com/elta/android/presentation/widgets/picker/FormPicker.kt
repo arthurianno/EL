@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -14,8 +15,11 @@ import com.nullgr.core.ui.extensions.toggleView
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.layout_form_picker.view.*
+import java.util.concurrent.TimeUnit
 
 @Suppress("UnnecessaryParentheses")
 class FormPicker @JvmOverloads constructor(
@@ -30,9 +34,27 @@ class FormPicker @JvmOverloads constructor(
             initPicker()
         }
 
+    private val disposable = CompositeDisposable()
+
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_form_picker, this, true)
         isSaveEnabled = true
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        valueChanges()
+            .skip(PICKERS_COUNT)
+            .throttleFirst(DEBOUNCE, TimeUnit.MILLISECONDS)
+            .subscribe {
+                performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            }
+            .addTo(disposable)
+    }
+
+    override fun onDetachedFromWindow() {
+        disposable.clear()
+        super.onDetachedFromWindow()
     }
 
     fun setValue(value: Double) {
@@ -94,6 +116,8 @@ class FormPicker @JvmOverloads constructor(
     companion object {
         private const val TEN = 10
         private const val EMPTY_STRING = ""
+        private const val DEBOUNCE = 100L
+        private const val PICKERS_COUNT = 2L
     }
 
     private class ValueChangeObservable(

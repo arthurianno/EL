@@ -214,6 +214,7 @@ dependencies {
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
     implementation commonDependencies.barcodeScanner
+    implementation commonDependencies.rxBluetooth
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
