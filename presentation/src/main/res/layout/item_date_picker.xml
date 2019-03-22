@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="21dp">
+    android:paddingTop="21dp"
+    android:paddingBottom="21dp">
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/dayOfWeekTitleView"
