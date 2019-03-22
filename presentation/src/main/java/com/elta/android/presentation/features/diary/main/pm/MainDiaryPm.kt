@@ -104,7 +104,9 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun handleSuccess(blocks: List<EventsBlock>) {
-        items.consumer.accept(mapper.mapFromObjects(blocks))
+        items.consumer.accept(
+            blocks.mapIndexed { index, event -> mapper.apply { expand = index == 0 }.mapFromObject(event) }
+        )
     }
 
     private fun passSelectedDate(date: Date) {

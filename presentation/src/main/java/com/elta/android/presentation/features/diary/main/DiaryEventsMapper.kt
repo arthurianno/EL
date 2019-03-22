@@ -11,5 +11,7 @@ class DiaryEventsMapper @Inject constructor(
     resources: ResourceProvider
 ) : BaseRecordsMapper(resources), Mapper<EventsBlock, ListItem> {
 
-    override fun mapFromObject(source: EventsBlock) = source.group(false)
+    var expand: Boolean = false
+
+    override fun mapFromObject(source: EventsBlock) = source.group(expand)
 }
