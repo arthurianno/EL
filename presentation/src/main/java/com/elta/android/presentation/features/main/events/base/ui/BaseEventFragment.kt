@@ -71,7 +71,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.noteInput.bindTo(formNoteView)
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(activity!!)
+            MaterialDialog.Builder(checkNotNull(activity))
                 .cancelable(false)
                 .title(data.title)
                 .content(data.message)

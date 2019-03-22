@@ -8,6 +8,7 @@ import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
+import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
@@ -25,6 +26,8 @@ import com.elta.android.presentation.features.registration.social.pm.Registratio
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
+import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
+import com.elta.android.presentation.features.sync.start.pm.SyncStartPm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -149,4 +152,20 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EditEventPm::class)
     abstract fun bindEditEventPm(pm: EditEventPm): PresentationModel
+
+    // SYNC FLOW
+    @Binds
+    @IntoMap
+    @PmKey(SyncFlowPm::class)
+    abstract fun bindSyncFlowPm(pm: SyncFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(SyncStartPm::class)
+    abstract fun bindSyncStartPm(pm: SyncStartPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(BluetoothPm::class)
+    abstract fun bindBluetoothPm(pm: BluetoothPm): PresentationModel
 }
