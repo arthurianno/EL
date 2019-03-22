@@ -13,9 +13,6 @@ import com.elta.android.presentation.features.main.events.base.initializer.FormI
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.appbar.collapseProgress
-import com.elta.android.presentation.utils.appbar.observeState
-import com.elta.android.presentation.utils.collapse
-import com.elta.android.presentation.utils.expand
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
