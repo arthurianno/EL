@@ -11,7 +11,6 @@ import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
@@ -58,6 +57,6 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
         pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)
         menuButtonView.clicks().bindTo(pm.menuAction)
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
+        bindProgressDialog(pm)
     }
 }

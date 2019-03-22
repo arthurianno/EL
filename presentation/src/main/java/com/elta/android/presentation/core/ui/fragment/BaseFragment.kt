@@ -18,12 +18,14 @@ import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.utils.applyInsetsToContentView
 import com.elta.android.presentation.utils.makeSnackBar
+import com.elta.android.presentation.utils.visibility
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
 import me.dmdev.rxpm.base.PmSupportFragment
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
@@ -105,9 +107,19 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         }
     }
 
+    protected fun bindProgressDialog(pm: T) {
+        pm.progressState.observable
+            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
+            .bindTo(progressDialog.visibility(childFragmentManager))
+    }
+
     private fun showSnackbar(data: SnackBarData) {
         view?.let { content ->
             makeSnackBar(content, data).show()
         }
+    }
+
+    companion object {
+        const val DEBOUNCE = 300L
     }
 }

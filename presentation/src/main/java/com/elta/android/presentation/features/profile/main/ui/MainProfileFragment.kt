@@ -6,7 +6,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.utils.appbar.collapseProgress
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_main_profile.*
@@ -24,7 +23,7 @@ class MainProfileFragment : BaseListFragment<MainProfilePm>() {
         pm.userFullNameState.bindTo(toolbarTitleView.text())
         pm.userFullNameState.bindTo(titleTextView.text())
         toolbarProfileSettingsButtonView.clicks().bindTo(pm.profileSettingsAction)
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
+        bindProgressDialog(pm)
     }
 
     @Suppress("MagicNumber")

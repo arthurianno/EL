@@ -7,7 +7,6 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
 import kotlinx.android.synthetic.main.layout_state.*
@@ -27,7 +26,7 @@ class ActivationFragment : BaseFragment<ActivationPm>() {
         super.onBindPresentationModel(pm)
         menuButtonView.clicks().bindTo(pm.sendAgainAction)
         stateButtonView.clicks().bindTo(pm.continueAction)
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
+        bindProgressDialog(pm)
     }
 
     companion object {

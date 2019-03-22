@@ -11,7 +11,6 @@ import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
-import com.elta.android.presentation.utils.visibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_password_create.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
@@ -39,13 +38,13 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
         passwordVisibilityButtonView.clicks().bindTo {
             passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
         }
-        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
         pm.passwordInput.bindTo(passwordInputView)
         pm.passwordInput.error.observable
             .distinctUntilChanged()
             .bindTo(passwordInputView.error())
         pm.continueEnabledState.bindTo { saveButtonView.isEnabled = it }
         saveButtonView.clicks().bindTo(pm.continueAction)
+        bindProgressDialog(pm)
     }
 
     companion object {
