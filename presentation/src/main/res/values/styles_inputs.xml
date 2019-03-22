@@ -57,7 +57,7 @@
     <style name="EventFormInputStyle.Note" parent="EventFormInputStyle">
         <item name="met_helperText">@null</item>
         <item name="met_baseColor">@color/white</item>
-        <item name="met_underlineColor">@color/white</item>
+        <item name="android:inputType">textMultiLine</item>
     </style>
 
 </resources>
