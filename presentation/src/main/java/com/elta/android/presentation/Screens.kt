@@ -8,6 +8,8 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
+import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
+import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
@@ -117,6 +119,10 @@ object Screens {
         override fun getFragment() = MainFlowFragment.newInstance()
     }
 
+    object DiaryTab : SupportAppScreen() {
+        override fun getFragment() = DiaryFlowFragment.newInstance()
+    }
+
     // MAIN FLOW
     object MainRecordsScreen : SupportAppScreen() {
         override fun getFragment() = MainRecordsFragment.newInstance()
@@ -145,5 +151,10 @@ object Screens {
 
     object BluetoothScreen : SupportAppScreen() {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
+    }
+
+    // DIARY FLOW
+    object MainDiaryScreen : SupportAppScreen() {
+        override fun getFragment() = MainDiaryFragment.newInstance()
     }
 }

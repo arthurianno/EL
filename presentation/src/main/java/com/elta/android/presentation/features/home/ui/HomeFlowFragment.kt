@@ -30,7 +30,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initBottomSheetItemsView()
-        homeBottomNavigationView.select(R.id.mainMenuItemView)
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
                 homeBottomSheetView.show()
@@ -42,6 +41,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
+        pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
         pm.pulseCommand.bindTo {
@@ -57,6 +57,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
             homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
+        homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
     }
 
     override fun handleBack() {

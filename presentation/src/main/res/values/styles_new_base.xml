@@ -58,6 +58,10 @@
     </style>
 
     <!-- BODY -->
+    <style name="New.Body1" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="New.Body2" parent="Typography.Base.Roboto.Medium">
         <item name="android:textSize">14sp</item>
     </style>

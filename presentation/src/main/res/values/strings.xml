@@ -301,4 +301,16 @@
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
 
+    <!-- DIARY FLOR -->
+    <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
+    <string name="diary_screen_title">Дневник событий</string>
+    <string name="diary_button_today">Сегодня</string>
+
+    <string name="date_picker_day_of_week_1">Пн</string>
+    <string name="date_picker_day_of_week_2">Вт</string>
+    <string name="date_picker_day_of_week_3">Ср</string>
+    <string name="date_picker_day_of_week_4">Чт</string>
+    <string name="date_picker_day_of_week_5">Пт</string>
+    <string name="date_picker_day_of_week_6">Сб</string>
+    <string name="date_picker_day_of_week_7">Вс</string>
 </resources>
