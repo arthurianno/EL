@@ -4,6 +4,6 @@
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:paddingTop="16dp"
+    android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:text="@string/profile_additional_functions" />

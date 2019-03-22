@@ -6,6 +6,8 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.utils.appbar.collapseProgress
+import com.elta.android.presentation.utils.visibility
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_main_profile.*
 
@@ -21,6 +23,8 @@ class MainProfileFragment : BaseListFragment<MainProfilePm>() {
         observeAppBarChanges()
         pm.userFullNameState.bindTo(toolbarTitleView.text())
         pm.userFullNameState.bindTo(titleTextView.text())
+        toolbarProfileSettingsButtonView.clicks().bindTo(pm.profileSettingsAction)
+        pm.progressState.bindTo(progressDialog.visibility(childFragmentManager))
     }
 
     @Suppress("MagicNumber")
@@ -28,7 +32,7 @@ class MainProfileFragment : BaseListFragment<MainProfilePm>() {
         appBarLayoutView.collapseProgress().bindTo {
             val alpha = 1 - Math.abs(it / 100f)
             profileInfoView.alpha = if (alpha < 1) alpha - 0.7f else alpha
-            toolbarProfileContainer.alpha = 1 - alpha
+            toolbarProfileContainerView.alpha = 1 - alpha
         }
     }
 

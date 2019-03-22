@@ -5,6 +5,11 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
+import com.elta.android.presentation.features.bluetooth.di.BluetoothModule
+import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
+import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
+import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
@@ -30,6 +35,8 @@ import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -125,6 +132,28 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindEditEventFragment(): EditEventFragment
+
+    // SYNC FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindSyncFlowFragment(): SyncFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindSyncStartFragment(): SyncStartFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [BluetoothModule::class])
+    abstract fun bindBluetoothFragment(): BluetoothFragment
+
+    // DIARY FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindDiaryFlowFragment(): DiaryFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [MainDiaryModule::class])
+    abstract fun bindMainDiaryFragment(): MainDiaryFragment
 
     @FragmentScope
     @ContributesAndroidInjector

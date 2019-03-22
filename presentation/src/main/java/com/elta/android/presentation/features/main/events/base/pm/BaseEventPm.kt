@@ -18,6 +18,7 @@ import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 abstract class BaseEventPm constructor(
     services: ServiceFacade
@@ -90,6 +91,8 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormVariantSelection() {
         formSelector.clickAction.observable
+            .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
+            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value) }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
@@ -102,6 +105,8 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormTagSelection() {
         tagSelector.clickAction.observable
+            .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
+            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map { ChooserConfiguration(ChooserType.GROUP_TAGS, eventTypeState.value) }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
@@ -150,5 +155,9 @@ abstract class BaseEventPm constructor(
 
     enum class DialogResult {
         NEGATIVE, POSITIVE
+    }
+
+    companion object {
+        private const val OPEN_SCREEN_DELAY = 300L // millis
     }
 }

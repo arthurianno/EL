@@ -74,7 +74,7 @@
 
                     <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/toolbarProfileSettingsButtonView"
-                        style="@style/New.Button3"
+                        style="@style/ToolbarTextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
@@ -84,7 +84,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <LinearLayout
-                        android:id="@+id/toolbarProfileContainer"
+                        android:id="@+id/toolbarProfileContainerView"
                         android:layout_width="wrap_content"
                         android:layout_height="?attr/actionBarSize"
                         android:alpha="0"

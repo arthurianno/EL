@@ -25,13 +25,17 @@ class ProfileRemoteDataSource @Inject constructor(
     override fun getUserProfile(): Single<ProfileDto> =
         api.getUserSettings()
             .checkNetwork(checker)
-            .doOnSuccess {
-                val profiles = cache.get(CommonConditions.Empty)
-                if (profiles.isNotEmpty()) {
-                    val cached = profiles[0]
-                    if (it.timeStamp > cached.timeStamp) {
-                        cache.update(listOf(toCacheMapper.mapFromObject(it)))
-                    }
-                }
+            .doOnSuccess(::saveLocalIfNeed)
+
+    private fun saveLocalIfNeed(profileDto: ProfileDto) {
+        val profiles = cache.get(CommonConditions.Empty)
+        if (profiles.isNotEmpty()) {
+            val cached = profiles.first()
+            if (profileDto.timeStamp > cached.timeStamp) {
+                cache.update(listOf(toCacheMapper.mapFromObject(profileDto)))
             }
+        } else {
+            cache.add(listOf(toCacheMapper.mapFromObject(profileDto)))
+        }
+    }
 }
