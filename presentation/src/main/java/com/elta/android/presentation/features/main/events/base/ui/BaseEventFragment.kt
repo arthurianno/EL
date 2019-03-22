@@ -17,6 +17,7 @@ import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.appbar.observeState
 import com.elta.android.presentation.utils.collapse
 import com.elta.android.presentation.utils.expand
+import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
@@ -74,6 +75,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
                 .onNegative { _, _ -> dc.sendResult(BaseEventPm.DialogResult.NEGATIVE) }
                 .build()
         }
+        pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
 
     override fun handleBack() {

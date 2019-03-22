@@ -27,6 +27,7 @@ class HomeFlowPm @Inject constructor(
     val pulseCommand = Command<Boolean>()
     val menuItemSelectedAction = Action<Int>()
 
+    val selectedItemIdState = State(R.id.mainMenuItemView)
     private val loadEvents = Action<Unit>()
 
     override fun onCreate() {
@@ -79,7 +80,7 @@ class HomeFlowPm @Inject constructor(
 
         menuItemSelectedAction.observable
             .doOnNext(::handleBottomMenuClick)
-            .subscribe()
+            .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
     }
 

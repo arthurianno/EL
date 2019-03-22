@@ -15,7 +15,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.state_view.StateData
-import com.elta.android.presentation.features.main.records.MainRecordsMapper
+import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -53,12 +53,16 @@ class MainRecordsPm @Inject constructor(
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
+    }
+
+    override fun onBind() {
+        super.onBind()
 
         bus.clicks<Clicks.RecordClicked>()
             .map { it.item }
             .doOnNext(::navigateToEventScreen)
             .subscribe()
-            .untilDestroy()
+            .untilUnbind()
     }
 
     private fun navigateToEventScreen(record: RecordItem) {
