@@ -7,8 +7,9 @@ import android.widget.FrameLayout
 import com.elta.android.presentation.R
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nullgr.core.ui.extensions.children
+import io.reactivex.Observable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.layout_bottom_navigation_view.view.*
-import java.util.function.Consumer
 
 class BottomNavigationView @JvmOverloads constructor(
     context: Context,
@@ -35,7 +36,13 @@ class BottomNavigationView @JvmOverloads constructor(
         }
     }
 
-    fun select(tabId: Int) {
+    fun selection(): Consumer<Int> = Consumer { id ->
+        select(id)
+    }
+
+    fun tabClicks(): Observable<Int> = tabClicks.hide()
+
+    private fun select(tabId: Int) {
         if (tabId == selectedTab?.id) {
             return
         }
@@ -47,10 +54,4 @@ class BottomNavigationView @JvmOverloads constructor(
             }
         }
     }
-
-    fun selection(): Consumer<Int> = Consumer { id ->
-        select(id)
-    }
-
-    fun tabClicks() = tabClicks.hide()
 }
