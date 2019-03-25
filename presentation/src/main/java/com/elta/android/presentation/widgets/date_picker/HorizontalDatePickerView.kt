@@ -34,6 +34,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         }
 
     private var selectedPosition: Int = 0
+    private var needToPerformHapticFeedBack = false
 
     private val items = arrayListOf<DatePickerItem>()
     private val adapter: DynamicAdapter
@@ -53,7 +54,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
             object : OnSnapPositionChangeListener {
                 override fun onSnapPositionChange(position: Int) {
-                    performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    if (needToPerformHapticFeedBack)
+                        performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                     onPickerItemScrolled(position)
                 }
             })
@@ -61,6 +63,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     fun date(): Consumer<Date> = Consumer {
         if (date != it) {
+            needToPerformHapticFeedBack = false
             date = it
             setUpDatePicker()
         }
@@ -81,6 +84,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
                 adapter.updateData(items, false)
             }
             postDelayed({ scrollToDate(it) }, INVALIDATE_RECYCLER_VIEW_DELAY)
+            postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
         }
     }
 
@@ -118,5 +122,6 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         private const val SCROLL_OFFSET = 0
         private const val CENTER_OFFSET = 3
         private const val INVALIDATE_RECYCLER_VIEW_DELAY = 50L // millis
+        private const val ENABLE_HAPTIC_FEEDBACK_DELAY = 150L // millis
     }
 }
