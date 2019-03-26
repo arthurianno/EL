@@ -16,7 +16,7 @@ class ProfileCachedDataSource @Inject constructor(
 
     override fun updateProfile(profile: ProfileDto): Completable =
         Completable.fromCallable {
-            val profiles = cache.get(CommonConditions.Empty)
+            val profiles = cache.get(CommonConditions.All)
             if (profiles.isNotEmpty()) {
                 val cachedProfile = profiles.first()
                 val newProfile = cachedProfile.copy(
@@ -36,7 +36,7 @@ class ProfileCachedDataSource @Inject constructor(
 
     override fun getUserProfile(): Single<ProfileDto> =
         Single.fromCallable {
-            val profiles = cache.get(CommonConditions.Empty)
+            val profiles = cache.get(CommonConditions.All)
             if (profiles.isNotEmpty()) {
                 profiles.first()
             } else {

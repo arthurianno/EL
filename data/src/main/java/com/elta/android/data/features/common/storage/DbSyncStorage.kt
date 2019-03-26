@@ -1,5 +1,6 @@
 package com.elta.android.data.features.common.storage
 
+import com.elta.android.data.features.common.cache.BoxScope
 import com.elta.android.data.features.common.cache.BoxStoreFactory
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
@@ -12,10 +13,10 @@ class DbSyncStorage @Inject constructor(
 ) : SyncStorage {
 
     private val userBox: Box<SyncInfoDto>
-        get() = factory.getBoxStore().boxFor()
+        get() = factory.getBoxStore(BoxScope.PER_USER).boxFor()
 
     private val appBox: Box<SyncInfoDto>
-        get() = factory.getBoxStore(BoxStoreFactory.DbScope.PER_APP).boxFor()
+        get() = factory.getBoxStore(BoxScope.PER_APP).boxFor()
 
     private val userSyncInfo: SyncInfoDto?
         get() = userBox.all.firstOrNull()

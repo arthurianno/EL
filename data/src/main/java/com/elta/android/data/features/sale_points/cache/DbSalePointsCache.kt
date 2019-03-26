@@ -1,14 +1,11 @@
 package com.elta.android.data.features.sale_points.cache
 
+import com.elta.android.data.features.common.cache.BoxCache
+import com.elta.android.data.features.common.cache.BoxScope
 import com.elta.android.data.features.common.cache.BoxStoreFactory
-import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.cache.Condition
-import com.elta.android.data.features.common.cache.IllegalDeleteConditionError
-import com.elta.android.data.features.common.cache.IllegalGetConditionError
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
-import io.objectbox.Box
-import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.query
 import io.objectbox.query.QueryBuilder
 import javax.inject.Inject
@@ -16,31 +13,14 @@ import javax.inject.Singleton
 
 @Singleton
 class DbSalePointsCache @Inject constructor(
-    private val factory: BoxStoreFactory
-) : SalePointsCache {
+    factory: BoxStoreFactory
+) : BoxCache<SalePointCacheDto>(factory), SalePointsCache {
 
-    private val box: Box<SalePointCacheDto>
-        get() = factory.getBoxStore(BoxStoreFactory.DbScope.PER_APP).boxFor()
-
-    override fun add(objects: List<SalePointCacheDto>) {
-        box.put(objects)
-    }
-
-    override fun update(objects: List<SalePointCacheDto>) {
-        box.put(objects)
-    }
-
-    override fun delete(condition: Condition) {
-        when (condition) {
-            is CommonConditions.All -> box.removeAll()
-            is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
-            else -> throw IllegalDeleteConditionError(condition)
-        }
-    }
+    override val classToken: Class<SalePointCacheDto> = SalePointCacheDto::class.java
+    override val scope: BoxScope = BoxScope.PER_APP
 
     override fun get(condition: Condition): List<SalePointCacheDto> =
         when (condition) {
-            is CommonConditions.All -> box.all
             is SalePointsConditions.Bounds -> getAllInBounds(
                 southWestLatitude = condition.southWestLatitude,
                 southWestLongitude = condition.southWestLongitude,
@@ -48,7 +28,7 @@ class DbSalePointsCache @Inject constructor(
                 northEastLongitude = condition.northEastLongitude
             )
             is SalePointsConditions.Query -> getAllByQuery(condition.query)
-            else -> throw IllegalGetConditionError(condition)
+            else -> super.get(condition)
         }
 
     @Suppress("LongMethod")
@@ -74,8 +54,8 @@ class DbSalePointsCache @Inject constructor(
     }
 
     private fun getAllByQuery(query: String): List<SalePointCacheDto> {
-        if (query.isEmpty()) {
-            return emptyList()
+        return if (query.isEmpty()) {
+            emptyList()
         } else {
             val regex = Regex(TWO_AND_MORE_SPACES)
             val tokens = query.toLowerCase().trim().replace(regex, SPACE).split(SPACE)
@@ -86,7 +66,7 @@ class DbSalePointsCache @Inject constructor(
                     builder.and()
                 }
             }
-            return builder.build().find()
+            builder.build().find()
         }
     }
 

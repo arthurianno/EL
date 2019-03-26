@@ -1,0 +1,39 @@
+package com.elta.android.data.features.common.cache
+
+import io.objectbox.Box
+
+abstract class BoxCache<T>(
+    protected val factory: BoxStoreFactory
+) : Cache<T> {
+
+    abstract val classToken: Class<T>
+
+    protected open val scope: BoxScope = BoxScope.PER_USER
+
+    protected open val box: Box<T>
+        get() = factory.getBoxStore(scope).boxFor(classToken)
+
+    override fun add(objects: List<T>) {
+        box.put(objects)
+    }
+
+    override fun update(objects: List<T>) {
+        box.put(objects)
+    }
+
+    override fun delete(condition: Condition) {
+        when (condition) {
+            is CommonConditions.All -> box.removeAll()
+            is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
+            else -> throw IllegalDeleteConditionError(condition)
+        }
+    }
+
+    override fun get(condition: Condition): List<T> =
+        when (condition) {
+            is CommonConditions.All -> box.all
+            is CommonConditions.ByIds -> box[condition.ids]
+            else -> throw IllegalGetConditionError(condition)
+        }
+
+}

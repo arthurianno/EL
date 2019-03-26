@@ -19,11 +19,11 @@ class BoxStoreFactory @Inject constructor(
     private val stores = ConcurrentHashMap<Long, BoxStore>()
     private val commonId = "common".hashCode().toLong()
 
-    fun getBoxStore(level: DbScope = DbScope.PER_USER): BoxStore {
+    fun getBoxStore(level: BoxScope): BoxStore {
         synchronized(BoxStoreFactory::class.java) {
             return when (level) {
-                DbScope.PER_APP -> createOrGetStore(commonId)
-                DbScope.PER_USER -> {
+                BoxScope.PER_APP -> createOrGetStore(commonId)
+                BoxScope.PER_USER -> {
                     val user = userHolder.currentUser
                     if (user != null) createOrGetStore(user)
                     else throw AccessDeniedError
@@ -41,8 +41,4 @@ class BoxStoreFactory @Inject constructor(
                 AndroidObjectBrowser(it).start(context)
             }
         }
-
-    enum class DbScope {
-        PER_APP, PER_USER
-    }
 }
