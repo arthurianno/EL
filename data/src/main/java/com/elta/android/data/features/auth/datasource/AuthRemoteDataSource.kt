@@ -1,7 +1,6 @@
 package com.elta.android.data.features.auth.datasource
 
 import com.elta.android.common.errors.EmailAlreadyConfirmedError
-import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.request.AuthRequest
 import com.elta.android.data.features.auth.api.request.RefreshRequest
@@ -12,41 +11,39 @@ import com.elta.android.data.features.auth.dto.EmailStatusDto
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
-import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
 
 class AuthRemoteDataSource @Inject constructor(
-    private val checker: NetworkChecker,
     private val api: AuthApi
 ) : AuthDataSource {
 
     override fun register(email: String, password: String): Single<TokensDto> =
-        api.register(AuthRequest(email, password)).checkNetwork(checker)
+        api.register(AuthRequest(email, password))
 
     override fun login(email: String, password: String): Single<LoginDto> =
-        api.login(AuthRequest(email, password)).checkNetwork(checker)
+        api.login(AuthRequest(email, password))
 
     override fun refresh(accessToken: String, refreshToken: String): Single<TokensDto> =
-        api.refresh(RefreshRequest(accessToken, refreshToken)).checkNetwork(checker)
+        api.refresh(RefreshRequest(accessToken, refreshToken))
 
     override fun isEmailConfirmed(): Single<EmailStatusDto> =
-        api.isEmailConfirmed().checkNetwork(checker)
+        api.isEmailConfirmed()
 
     override fun sendConfirmationLink(): Completable =
-        api.sendConfirmationLink().checkNetwork(checker)
+        api.sendConfirmationLink()
 
     override fun sendResetPasswordLink(email: String): Completable =
-        api.sendPasswordResetLink(ResetPasswordLinkRequest(email)).checkNetwork(checker)
+        api.sendPasswordResetLink(ResetPasswordLinkRequest(email))
 
     override fun resetPassword(token: String, newPassword: String): Completable =
-        api.resetPassword(ResetPasswordRequest(token, newPassword)).checkNetwork(checker)
+        api.resetPassword(ResetPasswordRequest(token, newPassword))
 
     override fun checkTokenOwner(token: String): Single<TokenOwnerDto> =
-        api.checkTokenOwner(TokenRequest(token)).checkNetwork(checker)
+        api.checkTokenOwner(TokenRequest(token))
 
     override fun confirmEmail(token: String): Completable =
-        api.confirmEmail(TokenRequest(token)).checkNetwork(checker)
+        api.confirmEmail(TokenRequest(token))
             .onErrorComplete { error -> error is EmailAlreadyConfirmedError }
 }
