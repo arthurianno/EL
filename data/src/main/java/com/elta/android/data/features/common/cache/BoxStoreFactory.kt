@@ -1,9 +1,11 @@
 package com.elta.android.data.features.common.cache
 
 import android.content.Context
+import com.elta.android.data.BuildConfig
 import com.elta.android.data.features.MyObjectBox
 import com.elta.android.data.features.common.storage.UserHolder
 import io.objectbox.BoxStore
+import io.objectbox.android.AndroidObjectBrowser
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +36,11 @@ class BoxStoreFactory @Inject constructor(
         ?: createBoxStore(id).also { stores[id] = it }
 
     private fun createBoxStore(id: Long): BoxStore =
-        MyObjectBox.builder().androidContext(context).name("box_$id").build()
+        MyObjectBox.builder().androidContext(context).name("box_$id").build().also {
+            if (BuildConfig.DEBUG) {
+                AndroidObjectBrowser(it).start(context)
+            }
+        }
 
     enum class DbScope {
         PER_APP, PER_USER
