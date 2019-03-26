@@ -3,6 +3,7 @@ package com.elta.android.data.features.sale_points.repository
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.onConnectionErrorReturnsEmpty
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.domain.features.sale_points.model.CoordinatesBounds
@@ -19,6 +20,7 @@ class SalePointsDataRepository @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePoint>> =
         remoteSource.getSalePoints()
+            .onConnectionErrorReturnsEmpty()
             .flatMap {
                 cacheSource.getSalePoints()
                     .map { toDomainMapper.mapFromObjects(it) }

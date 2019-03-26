@@ -1,5 +1,6 @@
 package com.elta.android.data.common
 
+import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.data.features.auth.storage.TokenStorage
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -22,7 +23,7 @@ class TokenAuthenticator(
             val builder = response.request().newBuilder()
             storage.accessToken?.let { token ->
                 builder.header(AUTH_HEADER, "$PREFIX $token")
-            }
+            } ?: throw InvalidRefreshTokenError("${response.code()}")
             return builder.build()
         }
     }

@@ -1,7 +1,6 @@
 package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.checkNetwork
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.common.storage.SyncStorage
@@ -12,7 +11,6 @@ import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.nullgr.core.date.toTimestamp
-import com.nullgr.core.hardware.NetworkChecker
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -23,12 +21,11 @@ class EventsRemoteDataSource @Inject constructor(
     private val toCacheMapper: Mapper<EventDto, EventCachedDto>,
     private val eventsCache: EventsCache,
     private val syncStorage: SyncStorage,
-    private val checker: NetworkChecker,
     private val api: EventsApi
 ) : EventsDataSource {
 
     override fun getEvents(): Observable<List<EventDto>> =
-        getDataByPage(PAGE, PAGE_SIZE).checkNetwork(checker)
+        getDataByPage(PAGE, PAGE_SIZE)
             .doOnNext { syncStorage.lastEventsSync = Date().toTimestamp() }
             .map(EventsDto::events)
             .doOnNext { events -> updateCache(events, eventsCache, toCacheMapper) }
@@ -41,17 +38,14 @@ class EventsRemoteDataSource @Inject constructor(
 
     override fun addEvents(events: List<EventDto>): Completable =
         api.addEvents(events)
-            .checkNetwork(checker)
             .flatMapCompletable { Completable.complete() }
 
     override fun updateEvents(events: List<EventDto>): Completable =
         api.updateEvents(events)
-            .checkNetwork(checker)
             .flatMapCompletable { Completable.complete() }
 
     override fun deleteEvents(events: List<SimpleEventDto>): Completable =
         api.deleteEvents(events)
-            .checkNetwork(checker)
             .flatMapCompletable { Completable.complete() }
 
     private fun getDataByPage(page: Int, size: Int): Observable<EventsDto> =

@@ -1,6 +1,7 @@
 package com.elta.android.data.features.auth.storage
 
 import android.annotation.SuppressLint
+import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.nullgr.core.security.prefs.CryptoPreferences
@@ -24,12 +25,14 @@ class LocalTokenStorage(
 
     @SuppressLint("CheckResult")
     override fun refresh() {
-        api.refresh(RefreshRequest(accessToken, refreshToken))
-            .doOnSuccess { tokens ->
-                accessToken = tokens.accessToken
-                refreshToken = tokens.refreshToken
-            }
-            .blockingGet()
+        if (accessToken != null && refreshToken != null) {
+            api.refresh(RefreshRequest(accessToken, refreshToken))
+                .doOnSuccess { tokens ->
+                    accessToken = tokens.accessToken
+                    refreshToken = tokens.refreshToken
+                }
+                .blockingGet()
+        } else throw InvalidRefreshTokenError("Tokens can`t be null")
     }
 
     private companion object {

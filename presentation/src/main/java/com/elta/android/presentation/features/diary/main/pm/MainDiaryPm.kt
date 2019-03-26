@@ -24,6 +24,8 @@ class MainDiaryPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
+    override val isEmptyScreen = false
+
     val datePickerDateState = State(Date())
     val dateSelectedAction = Action<Date>()
     val selectDateInDialogAction = Action<Unit>()

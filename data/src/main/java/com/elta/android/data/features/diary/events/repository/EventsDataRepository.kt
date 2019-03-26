@@ -2,8 +2,9 @@ package com.elta.android.data.features.diary.events.repository
 
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
-import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.onConnectionErrorCompletes
+import com.elta.android.data.common.onConnectionErrorReturnsEmpty
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -27,11 +28,13 @@ class EventsDataRepository @Inject constructor(
 
     override fun getEvents(): Observable<List<Event>> =
         remoteSource.getEvents()
+            .onConnectionErrorReturnsEmpty()
             .flatMap { cacheSource.getEvents() }
             .map(toDomainMapper::mapFromObjects)
 
     override fun getEvents(start: Date, end: Date): Observable<List<Event>> =
         remoteSource.getEvents(start, end)
+            .onConnectionErrorReturnsEmpty()
             .flatMap { cacheSource.getEvents(start, end) }
             .map(toDomainMapper::mapFromObjects)
 
@@ -44,7 +47,7 @@ class EventsDataRepository @Inject constructor(
             .flatMapCompletable {
                 cacheSource.addEvents(it)
                     .andThen(remoteSource.addEvents(it)
-                        .onErrorComplete { error -> error is NetworkConnectionError }
+                        .onConnectionErrorCompletes()
                     )
             }
 
@@ -53,7 +56,7 @@ class EventsDataRepository @Inject constructor(
             .flatMapCompletable {
                 cacheSource.updateEvents(it)
                     .andThen(remoteSource.updateEvents(it)
-                        .onErrorComplete { error -> error is NetworkConnectionError }
+                        .onConnectionErrorCompletes()
                     )
             }
 
@@ -62,7 +65,7 @@ class EventsDataRepository @Inject constructor(
             .flatMapCompletable {
                 cacheSource.deleteEvents(it)
                     .andThen(remoteSource.deleteEvents(it)
-                        .onErrorComplete { error -> error is NetworkConnectionError }
+                        .onConnectionErrorCompletes()
                     )
             }
 }
