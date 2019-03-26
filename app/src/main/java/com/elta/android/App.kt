@@ -15,6 +15,7 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import io.fabric.sdk.android.Fabric
+import io.reactivex.plugins.RxJavaPlugins
 import net.danlew.android.joda.JodaTimeAndroid
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
@@ -36,6 +37,7 @@ class App : Application(), HasActivityInjector {
         initializeJodaTime()
         initializeSocialNetworks()
         initalizeYandexMapKit()
+        RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
     }
 
     override fun attachBaseContext(base: Context) {

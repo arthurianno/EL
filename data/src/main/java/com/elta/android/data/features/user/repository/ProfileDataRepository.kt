@@ -2,8 +2,9 @@ package com.elta.android.data.features.user.repository
 
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
-import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.onConnectionErrorCompletes
+import com.elta.android.data.common.onConnectionErrorResumeDefault
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.domain.features.user.model.Profile
@@ -24,18 +25,13 @@ class ProfileDataRepository @Inject constructor(
         return cachedSource.updateProfile(dto)
             .andThen(
                 remoteSource.updateProfile(dto)
-                    .onErrorComplete { error -> error is NetworkConnectionError }
+                    .onConnectionErrorCompletes()
             )
     }
 
     override fun getProfile(): Single<Profile> =
         remoteSource.getUserProfile()
-            .onErrorResumeNext { error ->
-                when (error) {
-                    is NetworkConnectionError -> cachedSource.getUserProfile()
-                    else -> Single.error(error)
-                }
-            }
+            .onConnectionErrorResumeDefault { cachedSource.getUserProfile() }
             .flatMap { cachedSource.getUserProfile() }
             .map(toDomainMapper::mapFromObject)
 }

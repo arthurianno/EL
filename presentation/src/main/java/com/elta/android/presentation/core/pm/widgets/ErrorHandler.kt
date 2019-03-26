@@ -1,6 +1,7 @@
 package com.elta.android.presentation.core.pm.widgets
 
 import com.elta.android.common.errors.InvalidRefreshTokenError
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.common.errors.SocialAuthError
 import com.elta.android.presentation.R
@@ -34,8 +35,10 @@ class ErrorHandler(private val pm: BasePm) {
                     }
                     pm.setErrorViewVisibility(true)
                 } else {
-                    pm.setErrorViewVisibility(false)
-                    pm.showSnackBar(SnackBarMessageData.SimpleTextMessage(error.message ?: ""))
+                    if (error !is NetworkConnectionError) {
+                        pm.setErrorViewVisibility(false)
+                        pm.showSnackBar(SnackBarMessageData.SimpleTextMessage(error.message ?: ""))
+                    }
                 }
         }
     }
