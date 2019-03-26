@@ -1,25 +1,24 @@
 package com.elta.android.data.features.diary.tags.cache
 
+import com.elta.android.data.features.common.cache.BoxStoreFactory
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.common.cache.IllegalDeleteConditionError
 import com.elta.android.data.features.common.cache.IllegalGetConditionError
-import com.elta.android.data.features.common.cache.doInUserExists
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto_
-import io.objectbox.BoxStore
+import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.inValues
 import io.objectbox.kotlin.query
 import javax.inject.Inject
 
 class DbTagsCache @Inject constructor(
-    private val userHolder: UserHolder,
-    boxStore: BoxStore
+    private val factory: BoxStoreFactory
 ) : TagsCache {
 
-    private val box = boxStore.boxFor<TagCachedDto>()
+    private val box: Box<TagCachedDto>
+        get() = factory.getBoxStore().boxFor()
 
     override fun add(objects: List<TagCachedDto>) {
         box.put(objects)
@@ -43,31 +42,15 @@ class DbTagsCache @Inject constructor(
         }
 
     private fun removeAll() {
-        userHolder.doInUserExists {
-            val result = box.query {
-                equal(TagCachedDto_.userId, it)
-            }.findIds()
-            box.removeByKeys(result.asList())
-        }
+        box.removeAll()
     }
 
     private fun removeByIds(ids: List<Long>) {
-        userHolder.doInUserExists {
-            val result = box.query {
-                equal(TagCachedDto_.userId, it)
-                and()
-                inValues(TagCachedDto_.id, ids.toLongArray())
-            }.findIds()
-            box.removeByKeys(result.asList())
-        }
+        val result = box.query {
+            inValues(TagCachedDto_.id, ids.toLongArray())
+        }.findIds()
+        box.removeByKeys(result.asList())
     }
 
-    private fun getAll(): List<TagCachedDto> =
-        userHolder.doInUserExists {
-            box.query {
-                equal(TagCachedDto_.isReadOnly, true)
-                or()
-                equal(TagCachedDto_.userId, it)
-            }.find()
-        }
+    private fun getAll(): List<TagCachedDto> = box.all
 }

@@ -1,7 +1,5 @@
 package com.elta.android.data.di
 
-import android.content.Context
-import com.elta.android.data.features.diary.MyObjectBox
 import com.elta.android.data.features.diary.events.cache.DbEventsCache
 import com.elta.android.data.features.diary.events.cache.EventsCache
 import com.elta.android.data.features.diary.tags.cache.DbTagsCache
@@ -12,8 +10,6 @@ import com.elta.android.data.features.user.cache.DbProfileCache
 import com.elta.android.data.features.user.cache.ProfileCache
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import io.objectbox.BoxStore
 import javax.inject.Singleton
 
 @Module(includes = [CacheModule.Declarations::class])
@@ -37,8 +33,4 @@ class CacheModule {
         @Singleton
         fun bindProfileCache(cache: DbProfileCache): ProfileCache
     }
-
-    @Provides
-    @Singleton
-    fun provideBoxStore(context: Context): BoxStore = MyObjectBox.builder().androidContext(context).build()
 }
