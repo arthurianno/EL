@@ -28,7 +28,7 @@ class ProfileRemoteDataSource @Inject constructor(
             .doOnSuccess(::saveLocalIfNeed)
 
     private fun saveLocalIfNeed(profileDto: ProfileDto) {
-        val profiles = cache.get(CommonConditions.All)
+        val profiles = cache.getAll(CommonConditions.All)
         if (profiles.isNotEmpty()) {
             val cached = profiles.first()
             if (profileDto.timeStamp > cached.timeStamp) {

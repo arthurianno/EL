@@ -24,16 +24,22 @@ abstract class BoxCache<T>(
     override fun delete(condition: Condition) {
         when (condition) {
             is CommonConditions.All -> box.removeAll()
+            is CommonConditions.ById -> box.remove(condition.id)
             is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
             else -> throw IllegalDeleteConditionError(condition)
         }
     }
 
-    override fun get(condition: Condition): List<T> =
+    override fun get(condition: Condition): T? =
         when (condition) {
-            is CommonConditions.All -> box.all
-            is CommonConditions.ByIds -> box[condition.ids]
+            is CommonConditions.ById -> box[condition.id]
             else -> throw IllegalGetConditionError(condition)
         }
 
+    override fun getAll(condition: Condition): List<T> =
+        when (condition) {
+            is CommonConditions.All -> box.all
+            is CommonConditions.ByIds -> box[condition.ids]
+            else -> throw IllegalGetAllConditionError(condition)
+        }
 }

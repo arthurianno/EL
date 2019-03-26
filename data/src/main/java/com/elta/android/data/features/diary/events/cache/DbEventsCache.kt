@@ -15,15 +15,14 @@ class DbEventsCache @Inject constructor(
 
     override val classToken: Class<EventCachedDto> = EventCachedDto::class.java
 
-    override fun get(condition: Condition): List<EventCachedDto> =
+    override fun getAll(condition: Condition): List<EventCachedDto> =
         when (condition) {
             is EventsConditions.ByPeriod -> getAllForPeriod(condition.start, condition.end)
-            else -> super.get(condition)
+            else -> super.getAll(condition)
         }
 
     private fun getAllForPeriod(start: Date, end: Date): List<EventCachedDto> =
         box.query {
             between(EventCachedDto_.additionTime, start, end)
         }.find()
-
 }

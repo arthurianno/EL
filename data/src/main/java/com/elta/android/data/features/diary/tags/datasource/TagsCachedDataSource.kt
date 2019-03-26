@@ -15,6 +15,6 @@ class TagsCachedDataSource @Inject constructor(
 
     override fun getTags(): Observable<List<TagDto>> =
         Observable.fromCallable {
-            cache.get(CommonConditions.All)
+            cache.getAll(CommonConditions.All)
         }.map(fromCacheMapper::mapFromObjects)
 }

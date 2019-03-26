@@ -19,7 +19,7 @@ class DbSalePointsCache @Inject constructor(
     override val classToken: Class<SalePointCacheDto> = SalePointCacheDto::class.java
     override val scope: BoxScope = BoxScope.PER_APP
 
-    override fun get(condition: Condition): List<SalePointCacheDto> =
+    override fun getAll(condition: Condition): List<SalePointCacheDto> =
         when (condition) {
             is SalePointsConditions.Bounds -> getAllInBounds(
                 southWestLatitude = condition.southWestLatitude,
@@ -28,7 +28,7 @@ class DbSalePointsCache @Inject constructor(
                 northEastLongitude = condition.northEastLongitude
             )
             is SalePointsConditions.Query -> getAllByQuery(condition.query)
-            else -> super.get(condition)
+            else -> super.getAll(condition)
         }
 
     @Suppress("LongMethod")
