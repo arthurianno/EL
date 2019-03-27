@@ -78,7 +78,7 @@ open class BaseRecordsMapper(
             EventType.BREAD -> kind?.let { it }
                 ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.MEDICAMENTS -> checkNotNull(name)
-            EventType.WEIGHT -> resources.getString(R.string.weight_name)
+            EventType.WEIGHT -> resources.getString(R.string.event_type_weight_no_name)
             EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_no_name)
             else -> ""
         }
