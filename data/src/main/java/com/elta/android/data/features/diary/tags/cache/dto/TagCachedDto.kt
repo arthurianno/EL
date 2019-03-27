@@ -8,7 +8,6 @@ import java.util.Date
 data class TagCachedDto(
     @Id(assignable = true) var id: Long,
     val secondaryId: String,
-    val userId: Long?,
     val name: String,
     val image: String,
     val isReadOnly: Boolean,

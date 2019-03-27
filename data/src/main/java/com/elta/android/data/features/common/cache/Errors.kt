@@ -1,5 +1,9 @@
 package com.elta.android.data.features.common.cache
 
+data class IllegalGetAllConditionError(val condition: Condition)
+    : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
+    "not supported for getAll operation.")
+
 data class IllegalGetConditionError(val condition: Condition)
     : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
     "not supported for get operation.")

@@ -182,6 +182,7 @@ ext.commonDependencies = [
         ok                    : "ru.ok:odnoklassniki-android-sdk:${libraryVersions.okVersion}",
 
         objectbox             : "io.objectbox:objectbox-kotlin:${libraryVersions.objectboxVersion}",
+        objectboxBrowser      : "io.objectbox:objectbox-android-objectbrowser:${libraryVersions.objectboxVersion}",
 
         nordicScanner         : "no.nordicsemi.android.support.v18:scanner:${libraryVersions.nordicScannerVersion}",
         nordicDfu             : "no.nordicsemi.android:dfu:${libraryVersions.nordicDfuVersion}",

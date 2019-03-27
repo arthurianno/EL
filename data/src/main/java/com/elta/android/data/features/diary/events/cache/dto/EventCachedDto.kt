@@ -8,7 +8,6 @@ import java.util.Date
 data class EventCachedDto(
     @Id(assignable = true) var id: Long,
     val secondaryId: String,
-    val userId: Long?,
     val type: String,
     val additionTime: Date,
     val additionTimeString: String,

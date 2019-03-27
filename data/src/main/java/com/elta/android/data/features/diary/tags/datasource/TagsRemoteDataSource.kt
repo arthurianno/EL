@@ -1,11 +1,11 @@
 package com.elta.android.data.features.diary.tags.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.diary.tags.api.TagsApi
-import com.elta.android.data.features.diary.tags.cache.TagsCache
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.dto.TagsDto
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class TagsRemoteDataSource @Inject constructor(
     private val toCacheMapper: Mapper<TagDto, TagCachedDto>,
-    private val cache: TagsCache,
+    private val cache: Cache<TagCachedDto>,
     private val syncStorage: SyncStorage,
     private val api: TagsApi
 ) : TagsDataSource {

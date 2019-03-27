@@ -8,5 +8,7 @@ interface Cache<T> {
 
     fun delete(condition: Condition)
 
-    fun get(condition: Condition): List<T>
+    fun get(condition: Condition): T?
+
+    fun getAll(condition: Condition): List<T>
 }
