@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.objectbox'
 
 android {
 
@@ -91,10 +92,7 @@ dependencies {
     implementation commonDependencies.ok
 
     implementation commonDependencies.objectbox
-    debugImplementation commonDependencies.objectboxBrowser
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
-
-apply plugin: 'io.objectbox'
