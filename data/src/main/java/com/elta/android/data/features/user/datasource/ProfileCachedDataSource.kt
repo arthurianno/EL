@@ -3,6 +3,7 @@ package com.elta.android.data.features.user.datasource
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
+import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import io.reactivex.Completable
@@ -10,37 +11,37 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class ProfileCachedDataSource @Inject constructor(
+    private val userHolder: UserHolder,
     private val fromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
+    private val toCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
     private val cache: Cache<ProfileCacheDto>
 ) : ProfileDataSource {
 
     override fun updateProfile(profile: ProfileDto): Completable =
         Completable.fromCallable {
-            val profiles = cache.getAll(CommonConditions.All)
-            if (profiles.isNotEmpty()) {
-                val cachedProfile = profiles.first()
-                val newProfile = cachedProfile.copy(
-                    diabetes = profile.diabetes?.name ?: cachedProfile.diabetes,
-                    weight = profile.weight ?: cachedProfile.weight,
-                    gender = profile.gender?.name ?: cachedProfile.gender,
-                    email = profile.email ?: cachedProfile.email,
-                    timeStamp = profile.timeStamp,
-                    firstName = profile.person?.firstName ?: cachedProfile.firstName,
-                    lastName = profile.person?.lastName ?: cachedProfile.lastName,
-                    minValue = profile.glucoseLevel?.minValue ?: cachedProfile.minValue,
-                    maxValue = profile.glucoseLevel?.maxValue ?: cachedProfile.maxValue
-                )
-                cache.update(listOf(newProfile))
+            userHolder.currentUser?.let {
+                cache.get(CommonConditions.ById(it))?.let { cachedProfile ->
+                    val newProfile = cachedProfile.copy(
+                        diabetes = profile.diabetes?.name ?: cachedProfile.diabetes,
+                        weight = profile.weight ?: cachedProfile.weight,
+                        gender = profile.gender?.name ?: cachedProfile.gender,
+                        email = profile.email ?: cachedProfile.email,
+                        timeStamp = profile.timeStamp,
+                        firstName = profile.person?.firstName ?: cachedProfile.firstName,
+                        lastName = profile.person?.lastName ?: cachedProfile.lastName,
+                        minValue = profile.glucoseLevel?.minValue ?: cachedProfile.minValue,
+                        maxValue = profile.glucoseLevel?.maxValue ?: cachedProfile.maxValue
+                    )
+                    cache.update(listOf(newProfile))
+                } ?: cache.add(listOf(toCacheMapper.mapFromObject(profile)))
             }
         }
 
     override fun getUserProfile(): Single<ProfileDto> =
         Single.fromCallable {
-            val profiles = cache.getAll(CommonConditions.All)
-            if (profiles.isNotEmpty()) {
-                profiles.first()
-            } else {
-                throw NoSuchElementException("Current user profile is empty.")
+            userHolder.currentUser?.let {
+                cache.get(CommonConditions.ById(it))
+                    ?: throw NoSuchElementException("Current user profile is empty.")
             }
         }.map(fromCacheMapper::mapFromObject)
 }
