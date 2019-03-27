@@ -1,11 +1,11 @@
 package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.diary.events.api.EventsApi
-import com.elta.android.data.features.diary.events.cache.EventsCache
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class EventsRemoteDataSource @Inject constructor(
     private val toCacheMapper: Mapper<EventDto, EventCachedDto>,
-    private val eventsCache: EventsCache,
+    private val eventsCache: Cache<EventCachedDto>,
     private val syncStorage: SyncStorage,
     private val api: EventsApi
 ) : EventsDataSource {

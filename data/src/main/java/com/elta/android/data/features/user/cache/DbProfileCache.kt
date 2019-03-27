@@ -9,7 +9,7 @@ import javax.inject.Singleton
 @Singleton
 class DbProfileCache @Inject constructor(
     factory: BoxStoreFactory
-) : BoxCache<ProfileCacheDto>(factory), ProfileCache {
+) : BoxCache<ProfileCacheDto>(factory) {
 
     override val classToken: Class<ProfileCacheDto> = ProfileCacheDto::class.java
 }

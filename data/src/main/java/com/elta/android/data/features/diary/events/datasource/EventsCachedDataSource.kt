@@ -1,8 +1,8 @@
 package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
-import com.elta.android.data.features.diary.events.cache.EventsCache
 import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class EventsCachedDataSource @Inject constructor(
     private val toCacheMapper: Mapper<EventDto, EventCachedDto>,
     private val fromCacheMapper: Mapper<EventCachedDto, EventDto>,
-    private val cache: EventsCache
+    private val cache: Cache<EventCachedDto>
 ) : EventsDataSource {
 
     override fun getEvents(): Observable<List<EventDto>> =

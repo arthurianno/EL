@@ -1,11 +1,11 @@
 package com.elta.android.data.features.sale_points.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.sale_points.api.SalePointsApi
-import com.elta.android.data.features.sale_points.cache.SalePointsCache
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class SalePointsRemoteDataSource @Inject constructor(
     private val toCacheMapper: Mapper<SalePointDto, SalePointCacheDto>,
-    private val salePointsCache: SalePointsCache,
+    private val salePointsCache: Cache<SalePointCacheDto>,
     private val syncStorage: SyncStorage,
     private val api: SalePointsApi
 ) : SalePointsDataSource {

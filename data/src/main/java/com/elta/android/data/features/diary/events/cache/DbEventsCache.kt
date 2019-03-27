@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class DbEventsCache @Inject constructor(
     factory: BoxStoreFactory
-) : BoxCache<EventCachedDto>(factory), EventsCache {
+) : BoxCache<EventCachedDto>(factory) {
 
     override val classToken: Class<EventCachedDto> = EventCachedDto::class.java
 

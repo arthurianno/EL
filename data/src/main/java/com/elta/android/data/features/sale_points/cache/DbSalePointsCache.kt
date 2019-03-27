@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class DbSalePointsCache @Inject constructor(
     factory: BoxStoreFactory
-) : BoxCache<SalePointCacheDto>(factory), SalePointsCache {
+) : BoxCache<SalePointCacheDto>(factory) {
 
     override val classToken: Class<SalePointCacheDto> = SalePointCacheDto::class.java
     override val scope: BoxScope = BoxScope.PER_APP

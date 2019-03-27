@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class DbTagsCache @Inject constructor(
     factory: BoxStoreFactory
-) : BoxCache<TagCachedDto>(factory), TagsCache {
+) : BoxCache<TagCachedDto>(factory) {
 
     override val classToken: Class<TagCachedDto> = TagCachedDto::class.java
 }

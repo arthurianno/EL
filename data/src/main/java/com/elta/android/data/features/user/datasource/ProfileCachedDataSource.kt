@@ -1,8 +1,8 @@
 package com.elta.android.data.features.user.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
-import com.elta.android.data.features.user.cache.ProfileCache
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import io.reactivex.Completable
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class ProfileCachedDataSource @Inject constructor(
     private val fromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
-    private val cache: ProfileCache
+    private val cache: Cache<ProfileCacheDto>
 ) : ProfileDataSource {
 
     override fun updateProfile(profile: ProfileDto): Completable =
