@@ -166,7 +166,7 @@
     <string name="event_type_activity_no_name">Физическая активность</string>
     <string name="event_type_glucose_no_name">Измерение глюкозы</string>
     <string name="tag_name_no_tag">Без тега</string>
-    <string name="weight_name">Внесение замеров</string>
+    <string name="event_type_weight_no_name">Взвешивание</string>
 
     <!-- INSULIN TYPES -->
     <string name="insulin_type_ultrashort">Ультракороткий</string>
