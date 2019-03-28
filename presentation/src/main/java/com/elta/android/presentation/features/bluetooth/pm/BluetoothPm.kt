@@ -2,18 +2,18 @@
 
 package com.elta.android.presentation.features.bluetooth.pm
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Build
-import com.elta.android.common.utils.log
-import com.elta.android.presentation.Clicks
+import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.LocationNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
+import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.bluetooth.EltaDfuService
-import com.elta.android.presentation.features.bluetooth.startScan
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -23,16 +23,13 @@ import no.nordicsemi.android.dfu.DfuProgressListener
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter
 import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper
-import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
-import no.nordicsemi.android.support.v18.scanner.ScanFilter
-import no.nordicsemi.android.support.v18.scanner.ScanResult
-import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import javax.inject.Inject
 
 class BluetoothPm @Inject constructor(
+    private val findGlucometersUseCase: FindGlucometersUseCase,
     private val context: Context,
     private val client: RxBleClient,
     services: ServiceFacade
@@ -41,19 +38,6 @@ class BluetoothPm @Inject constructor(
     private val UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
     private val UART_RX_CHARACTERISTIC_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
     private val UART_TX_CHARACTERISTIC_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-
-    private val scanner = BluetoothLeScannerCompat.getScanner()
-    private val settings = ScanSettings.Builder()
-        .setLegacy(false)
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        .setNumOfMatches(1)
-        .setReportDelay(1000)
-        .setUseHardwareBatchingIfSupported(true)
-        .build()
-    private val filters = listOf<ScanFilter>(
-        ScanFilter.Builder().setDeviceName("SatelliteOnline").build(),
-        ScanFilter.Builder().setDeviceName("EltaDFU").build()
-    )
 
     private val dfuListener: DfuProgressListener = object : DfuProgressListenerAdapter() {
         override fun onDeviceConnected(deviceAddress: String) {
@@ -82,11 +66,13 @@ class BluetoothPm @Inject constructor(
     val dfuAction = Action<Unit>()
     var device: BluetoothDevice? = null
 
-    private val scanResults = mutableSetOf<ScanResult>()
+    private val scanResults = mutableSetOf<Glucometer>()
     private val connectionObservable = State<RxBleConnection>()
     val commandInputControl = inputControl()
     val logState = State("Log:")
-    val requestPermissionsCommand = Command<Unit>()
+    val requestEnableBluetoothCommand = Command<Unit>(bufferSize = 1)
+    val requestLocationPermissionsCommand = Command<Unit>(bufferSize = 1)
+    val requestEnableLocationCommand = Command<Unit>(bufferSize = 1)
     val startScanAction = Action<Unit>()
 
     override fun onCreate() {
@@ -94,18 +80,17 @@ class BluetoothPm @Inject constructor(
 
         startScanAction.observable
             .flatMap {
-                scanner.startScan(filters, settings)
+                findGlucometersUseCase.execute()
                     .doOnNext { results ->
                         scanResults.clear()
                         scanResults.addAll(results)
                         items.consumer.accept(
-                            results.map {
+                            results.map { glucometer ->
                                 DeviceItem(
-                                    id = it.device.address,
-                                    name = if (!it.device.name.isNullOrEmpty()) it.device.name else it.scanRecord?.deviceName
-                                        ?: "Unknown name",
-                                    address = it.device.address,
-                                    isSelected = it.device.address == device?.address
+                                    id = glucometer.id,
+                                    name = glucometer.name ?: "Unknown device",
+                                    address = glucometer.address,
+                                    isSelected = glucometer.address == device?.address
                                 )
                             }
                         )
@@ -116,18 +101,18 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        client.observeStateChanges()
-            .log("Bluetooth", "state") { it.name }
-            .doOnNext { state ->
-                when (state) {
-                    RxBleClient.State.READY -> startScanAction.consumer.accept(Unit)
-                    else -> {
-                    }
-                }
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
+//        client.observeStateChanges()
+//            .log("Bluetooth", "state") { it.name }
+//            .doOnNext { state ->
+//                when (state) {
+//                    RxBleClient.State.READY -> startScanAction.consumer.accept(Unit)
+//                    else -> {
+//                    }
+//                }
+//            }
+//            .retry()
+//            .subscribe()
+//            .untilDestroy()
 
         writeAction.observable
             .flatMap {
@@ -199,31 +184,40 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.clicks<Clicks.DeviceClicked>()
-            .doOnNext { click ->
-                if (click.item.address != device?.address) {
-                    device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
-                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
-                    items.consumer.accept(newItems)
-                }
-            }
-            .subscribe()
-            .untilDestroy()
+//        bus.clicks<Clicks.DeviceClicked>()
+//            .doOnNext { click ->
+//                if (click.item.address != device?.address) {
+//                    device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
+//                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
+//                    items.consumer.accept(newItems)
+//                }
+//            }
+//            .subscribe()
+//            .untilDestroy()
 
         DfuServiceListenerHelper.registerProgressListener(context, dfuListener)
 
-        val adapter = BluetoothAdapter.getDefaultAdapter()
-        if (!adapter.isEnabled) {
-            adapter.enable()
-        } else {
-            startScanAction.consumer.accept(Unit)
-        }
+//        val adapter = BluetoothAdapter.getDefaultAdapter()
+//        if (!adapter.isEnabled) {
+//            adapter.enable()
+//        } else {
+//            startScanAction.consumer.accept(Unit)
+//        }
 
-        requestPermissionsCommand.consumer.accept(Unit)
+        startScanAction.consumer.accept(Unit)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         DfuServiceListenerHelper.unregisterProgressListener(context, dfuListener)
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
+            else -> super.handleError(error)
+        }
     }
 }

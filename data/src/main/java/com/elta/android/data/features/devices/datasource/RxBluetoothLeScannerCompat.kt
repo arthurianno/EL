@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.bluetooth
+package com.elta.android.data.features.devices.datasource
 
 import com.elta.android.common.utils.log
 import io.reactivex.Observable
