@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.profile.main.di
 
-import android.support.v7.widget.RecyclerView
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.profile.main.ui.adapter.MainProfileDelegatesFactory
 import com.nullgr.core.adapter.AdapterDelegatesFactory
@@ -26,8 +25,4 @@ class MainProfileModule {
         factory: AdapterDelegatesFactory,
         diffCalculator: DiffCalculator
     ): DynamicAdapter = DynamicAdapter(factory, diffCalculator)
-
-    @Provides
-    @FragmentScope
-    fun viewPool(): RecyclerView.RecycledViewPool = RecyclerView.RecycledViewPool()
 }

@@ -84,9 +84,9 @@ class ApiModule {
         }
 
     object ApiConfig {
-        const val USE_MOCKED_SALE_POINTS_API = true
-        const val USE_MOCKED_EVENTS_API = true
-        const val USE_MOCKED_TAGS_API = true
-        const val USE_MOCKED_SETTINGS_API = true
+        const val USE_MOCKED_SALE_POINTS_API = false
+        const val USE_MOCKED_EVENTS_API = false
+        const val USE_MOCKED_TAGS_API = false
+        const val USE_MOCKED_SETTINGS_API = false
     }
 }
