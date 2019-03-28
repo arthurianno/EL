@@ -332,4 +332,8 @@
     <string name="profile_diabetes">Диабет</string>
     <string name="profile_main_empty_value">—</string>
     <string name="profile_name_placeholder">Профиль</string>
+    <string name="profile_personal_information">Персональные данные</string>
+    <string name="profile_security">Безопасность</string>
+    <string name="profile_linked_social_networks">Привязаные соц.сети</string>
+    <string name="profile_additional_settings">Дополнительно</string>
 </resources>

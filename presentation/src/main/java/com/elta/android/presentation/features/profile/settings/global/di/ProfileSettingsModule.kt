@@ -1,7 +1,7 @@
-package com.elta.android.presentation.features.profile.settings.di
+package com.elta.android.presentation.features.profile.settings.global.di
 
 import com.elta.android.common.di.scope.FragmentScope
-import com.elta.android.presentation.features.profile.settings.ui.adapter.ProfileSettingsDelegatesFactory
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.ProfileSettingsDelegatesFactory
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.DynamicAdapter
