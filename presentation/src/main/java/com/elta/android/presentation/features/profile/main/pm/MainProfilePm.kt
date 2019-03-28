@@ -27,7 +27,9 @@ class MainProfilePm @Inject constructor(
 
     val userFullNameState = State<String>()
     val profileSettingsAction = Action<Unit>()
+    val openDiabetesTypeDialogCommand = Command<Unit>(bufferSize = 1)
 
+    private val profileState = State<Profile>()
     private val getProfileSettingsAction = Action<Unit>()
 
     override fun onCreate() {
@@ -39,6 +41,7 @@ class MainProfilePm @Inject constructor(
             .flatMapSingle {
                 getProfileUseCase.execute()
                     .bindProgress()
+                    .doOnSuccess(profileState.consumer)
                     .doOnSuccess(::setUpFullUserName)
                     .map { itemsBuilder.buildItems(it) }
                     .doOnSuccess { items.consumer.accept(it) }
@@ -79,7 +82,7 @@ class MainProfilePm @Inject constructor(
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
             Type.GLUCOSE_LEVEL -> Timber.e("GLUCOSE_LEVEL clicked")
-            Type.DIABETES -> Timber.e("DIABETES clicked")
+            Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
             Type.WEIGHT -> Timber.e("WEIGHT clicked")
             Type.HEMOGLOBIN -> Timber.e("HEMOGLOBIN clicked")
         }
