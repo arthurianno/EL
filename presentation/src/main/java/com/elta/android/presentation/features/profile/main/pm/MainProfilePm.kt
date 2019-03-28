@@ -69,8 +69,7 @@ class MainProfilePm @Inject constructor(
             .untilDestroy()
 
         profileSettingsAction.observable
-            //  todo start settings screen
-            .doOnNext { Timber.e("Profile Settings clicked") }
+            .doOnNext { router.startFlow(Screens.ProfileSettings) }
             .subscribe()
             .untilDestroy()
     }
