@@ -3,5 +3,8 @@
     style="@style/New.Caption1.ShadeBlack2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="24dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp"
     tools:text="@string/profile_additional_functions" />

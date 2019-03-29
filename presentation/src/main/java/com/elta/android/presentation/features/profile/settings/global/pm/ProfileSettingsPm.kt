@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
@@ -17,6 +19,7 @@ class ProfileSettingsPm @Inject constructor(
 
     override fun onBind() {
         super.onBind()
+        observeClicks()
 
         // todo test
         buildItemsAction.observable
@@ -33,6 +36,16 @@ class ProfileSettingsPm @Inject constructor(
             .filter { it == Lifecycle.CREATED || it == Lifecycle.BINDED }
             .map { Unit }
             .subscribe(buildItemsAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeClicks() {
+        bus.clicks<Clicks.ProfileSettingsItemClicked>()
+            .map { it.type }
+            .doOnNext {
+                Timber.e("ProfileSettingsItemClicked >> ${it.name}")
+            }
+            .subscribe()
             .untilDestroy()
     }
 }
