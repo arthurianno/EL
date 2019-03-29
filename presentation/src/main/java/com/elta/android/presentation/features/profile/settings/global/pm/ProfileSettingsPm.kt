@@ -47,5 +47,13 @@ class ProfileSettingsPm @Inject constructor(
             }
             .subscribe()
             .untilDestroy()
+
+        bus.clicks<Clicks.ProfileSettingsSocialItemClicked>()
+            .map { it.type }
+            .doOnNext {
+                Timber.e("ProfileSettingsSocialItemClicked >> ${it.name}")
+            }
+            .subscribe()
+            .untilDestroy()
     }
 }

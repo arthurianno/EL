@@ -2,8 +2,10 @@ package com.elta.android.presentation.features.profile.settings.global.ui.adapte
 
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHeaderDelegate
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsSocialDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
@@ -20,6 +22,7 @@ class ProfileSettingsDelegatesFactory @Inject constructor(
         when (clazz) {
             ProfileSettingsHeaderItem::class.java -> ProfileSettingsHeaderDelegate()
             ProfileSettingsItem::class.java -> ProfileSettingsDelegate(bus, resources)
+            ProfileSettingsSocialItem::class.java -> ProfileSettingsSocialDelegate(bus)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }

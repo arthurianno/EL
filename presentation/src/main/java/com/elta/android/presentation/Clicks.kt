@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
@@ -22,4 +23,5 @@ sealed class Clicks : Click {
     data class ProfileAdditionalClicked(val item: MainProfileAdditionalItem) : Clicks()
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
+    data class ProfileSettingsSocialItemClicked(val type: SocialNetwork) : Clicks()
 }
