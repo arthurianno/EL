@@ -18,12 +18,14 @@ class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
         when (error) {
+            is CompositeException -> error.exceptions.lastOrNull()?.let { handleErrorInternal(it) }
+            else -> handleErrorInternal(error)
+        }
+    }
+
+    private fun handleErrorInternal(error: Throwable) {
+        when (error) {
             is InvalidRefreshTokenError -> pm.router.newRootFlow(Screens.AuthFlow)
-            is CompositeException -> {
-                if (error.exceptions.firstOrNull { it is InvalidRefreshTokenError } != null) {
-                    pm.router.newRootFlow(Screens.AuthFlow)
-                }
-            }
             is SocialAuthError -> handleSocialAuthError(error)
             else ->
                 if (pm.isEmptyScreen) {
