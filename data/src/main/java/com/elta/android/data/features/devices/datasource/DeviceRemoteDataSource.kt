@@ -37,18 +37,12 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun findDevices(): Observable<List<GlucometerDto>> =
         Observable.just(client.state)
             .log("Remote", "state") { it.name }
-            .doOnNext { state ->
-                when (state) {
-                    RxBleClient.State.BLUETOOTH_NOT_AVAILABLE -> throw BluetoothNotAvailableError
-                    RxBleClient.State.BLUETOOTH_NOT_ENABLED -> throw BluetoothNotEnabledError
-                    RxBleClient.State.LOCATION_PERMISSION_NOT_GRANTED -> throw LocationPermissionNotGrantedError
-                    RxBleClient.State.LOCATION_SERVICES_NOT_ENABLED -> throw LocationNotEnabledError
-                    else -> {
-                    }
-                }
+            .flatMap { state ->
+                val error = state.toError()
+                if (error != null) Observable.error(error)
+                else Observable.just(state)
             }
-            .filter { it == RxBleClient.State.READY }
-            .switchMap {
+            .flatMap {
                 scanner.startScan(filters, settings)
                     .map {
                         it.map { result ->
@@ -61,4 +55,13 @@ class DeviceRemoteDataSource @Inject constructor(
                     }
             }
 
+
+    private fun RxBleClient.State.toError(): Throwable? =
+        when (this) {
+            RxBleClient.State.BLUETOOTH_NOT_AVAILABLE -> BluetoothNotAvailableError
+            RxBleClient.State.BLUETOOTH_NOT_ENABLED -> BluetoothNotEnabledError
+            RxBleClient.State.LOCATION_PERMISSION_NOT_GRANTED -> LocationPermissionNotGrantedError
+            RxBleClient.State.LOCATION_SERVICES_NOT_ENABLED -> LocationNotEnabledError
+            else -> null
+        }
 }
