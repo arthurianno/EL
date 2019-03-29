@@ -1,6 +1,5 @@
 package com.elta.android.data.features.devices.datasource
 
-import android.annotation.SuppressLint
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.LocationNotEnabledError
@@ -14,7 +13,6 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import javax.inject.Inject
 
-@SuppressLint("CheckResult")
 class DeviceRemoteDataSource @Inject constructor(
     private val client: RxBleClient
 ) : DeviceDataSource {
