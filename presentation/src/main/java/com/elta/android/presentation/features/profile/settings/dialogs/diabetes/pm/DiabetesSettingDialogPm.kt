@@ -9,5 +9,17 @@ class DiabetesSettingDialogPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val initialDiabetesAction = Action<Diabetes>()
+    val diabetesTypeSelectedAction = Action<Diabetes>()
+    val diabetesState = State(Diabetes.values())
+    val selectedDiabetesState = State<Diabetes>()
+    val actionButtonEnabledCommand = State(false)
+
+    override fun onCreate() {
+        super.onCreate()
+        diabetesTypeSelectedAction.observable
+            .filter { it != selectedDiabetesState.valueOrNull }
+            .doOnNext { actionButtonEnabledCommand.consumer.accept(true) }
+            .subscribe(selectedDiabetesState.consumer)
+            .untilDestroy()
+    }
 }
