@@ -9,6 +9,7 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.messages.SnackBarMessageData
+import io.reactivex.exceptions.CompositeException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
@@ -16,6 +17,13 @@ import java.net.SocketTimeoutException
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
+        when (error) {
+            is CompositeException -> error.exceptions.lastOrNull()?.let { handleErrorInternal(it) }
+            else -> handleErrorInternal(error)
+        }
+    }
+
+    private fun handleErrorInternal(error: Throwable) {
         when (error) {
             is InvalidRefreshTokenError -> pm.router.newRootFlow(Screens.AuthFlow)
             is SocialAuthError -> handleSocialAuthError(error)

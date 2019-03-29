@@ -1,7 +1,6 @@
 package com.elta.android.data.common
 
 import com.elta.android.common.errors.NetworkConnectionError
-import com.elta.android.common.errors.ServerError
 import com.elta.android.common.errors.ServiceUnavailableError
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -54,7 +53,6 @@ fun Completable.onConnectionErrorCompletes(): Completable =
 
 private fun Throwable.canIgnoreError() =
     this is NetworkConnectionError ||
-        this is ServerError ||
         this is ServiceUnavailableError ||
         this is ConnectException ||
         this is SocketTimeoutException
