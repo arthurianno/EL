@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import kotlinx.android.synthetic.main.activity_app.*
-import timber.log.Timber
 
 class AppActivity : BaseActivity<AppPm>() {
 
@@ -40,15 +39,5 @@ class AppActivity : BaseActivity<AppPm>() {
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
             .build()
             .process()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        var fragment = supportFragmentManager.findFragmentById(R.id.containerView)
-        do {
-            fragment?.onActivityResult(requestCode, resultCode, data)
-            fragment = fragment?.childFragmentManager?.findFragmentById(R.id.containerView)
-        } while (fragment != null)
-        Timber.d("onActivityResult")
     }
 }
