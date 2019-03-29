@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_top_round_rect"
+    android:orientation="vertical"
+    android:paddingTop="23dp">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/dialogIconView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_hb_a_1_c_big" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dialogTitleView"
+        style="@style/New.Headline4.BlackBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/dialogIconView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Диабет" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dialogSubTitleView"
+        style="@style/New.Caption1.ShadeBlack2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/dialogIconView"
+        app:layout_constraintTop_toBottomOf="@id/dialogTitleView"
+        tools:text="Уровень глюкозы" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/dialogCloseButtonView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dialog_close" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dialogDescriptionTitleView"
+        style="@style/New.Body1.BlackBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialogSubTitleView"
+        tools:text="Уровень глюкозы" />
+
+    <FrameLayout
+        android:id="@+id/dialogContentContainerView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="18dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@id/dialogActionButtonView"
+        app:layout_constraintTop_toBottomOf="@id/dialogDescriptionTitleView"
+        app:layout_constraintVertical_weight="1" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dialogActionButtonView"
+        style="@style/Button.Large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Выбрать" />
+</android.support.constraint.ConstraintLayout>
