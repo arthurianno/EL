@@ -13,8 +13,8 @@ import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 abstract class BaseSettingsDialogFragment<T : BasePm> : BaseBottomSheetFragment<T>() {
 
     override val screenLayout: Int = R.layout.fragment_base_settings_dialog
-    abstract val dialogType: DialogType
-    abstract val contentLayout: Int
+    protected abstract val contentLayout: Int
+    protected abstract val dialogType: DialogType
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -23,7 +23,7 @@ abstract class BaseSettingsDialogFragment<T : BasePm> : BaseBottomSheetFragment<
         dialogSubTitleView.setText(dialogType.toSubTitle())
         dialogDescriptionTitleView.setText(dialogType.toDescription())
         dialogActionButtonView.setText(dialogType.toActionButtonTitle())
-        LayoutInflater.from(activity).inflate(contentLayout, dialogContentСontainerView, true)
+        LayoutInflater.from(activity).inflate(contentLayout, dialogContentContainerView, true)
     }
 
     @CallSuper
@@ -67,7 +67,7 @@ abstract class BaseSettingsDialogFragment<T : BasePm> : BaseBottomSheetFragment<
         }
 
     @Suppress("EnumNaming")
-    enum class DialogType {
+    protected enum class DialogType {
         DIABETES, GLUCOSE, HbA1C
     }
 }
