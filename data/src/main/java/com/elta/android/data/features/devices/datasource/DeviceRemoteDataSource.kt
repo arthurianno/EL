@@ -33,10 +33,9 @@ class DeviceRemoteDataSource @Inject constructor(
         ScanFilter.Builder().setDeviceName("EltaDFU").build()
     )
 
-
     override fun findDevices(): Observable<List<GlucometerDto>> =
         Observable.just(client.state)
-            .log("Remote", "state") { it.name }
+            .log("RxBleClient", "state") { it.name }
             .flatMap { state ->
                 val error = state.toError()
                 if (error != null) Observable.error(error)
@@ -49,12 +48,12 @@ class DeviceRemoteDataSource @Inject constructor(
                             GlucometerDto(
                                 id = result.device.address,
                                 address = result.device.address,
-                                name = if (!result.device.name.isNullOrEmpty()) result.device.name else result.scanRecord?.deviceName
+                                name = if (!result.device.name.isNullOrEmpty()) result.device.name else result.scanRecord?.deviceName,
+                                device = result.device
                             )
                         }
                     }
             }
-
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {

@@ -14,5 +14,4 @@ class FindGlucometersUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Unit?): Observable<List<Glucometer>> =
         repo.findDevices()
-
 }

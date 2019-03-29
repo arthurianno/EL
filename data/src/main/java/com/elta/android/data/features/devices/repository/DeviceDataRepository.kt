@@ -16,7 +16,8 @@ class DeviceDataRepository @Inject constructor(
                 Glucometer(
                     id = it.id,
                     address = it.address,
-                    name = it.name
+                    name = it.name,
+                    device = it.device
                 )
             }
         }

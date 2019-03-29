@@ -10,7 +10,9 @@ import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.bluetooth.EltaDfuService
@@ -18,6 +20,7 @@ import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceI
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
+import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
 import no.nordicsemi.android.dfu.DfuProgressListener
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter
@@ -73,6 +76,10 @@ class BluetoothPm @Inject constructor(
     val requestEnableBluetoothCommand = Command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = Command<Unit>(bufferSize = 1)
     val requestEnableLocationCommand = Command<Unit>(bufferSize = 1)
+
+    val bluetoothEnabledAction = Action<Unit>()
+    val locationPermissionsGrantedAction = Action<Unit>()
+    val locationEnabledAction = Action<Unit>()
     val startScanAction = Action<Unit>()
 
     override fun onCreate() {
@@ -101,23 +108,10 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-//        client.observeStateChanges()
-//            .log("Bluetooth", "state") { it.name }
-//            .doOnNext { state ->
-//                when (state) {
-//                    RxBleClient.State.READY -> startScanAction.consumer.accept(Unit)
-//                    else -> {
-//                    }
-//                }
-//            }
-//            .retry()
-//            .subscribe()
-//            .untilDestroy()
-
         writeAction.observable
-            .flatMap {
+            .switchMap {
                 connectionObservable.observable
-                    .flatMapSingle {
+                    .switchMapSingle {
                         it.writeCharacteristic(UART_RX_CHARACTERISTIC_UUID, commandInputControl.text.value.toByteArray(Charset.defaultCharset()))
                             .doOnSuccess { bytes ->
                                 val command = bytes.toString(Charset.defaultCharset())
@@ -137,7 +131,7 @@ class BluetoothPm @Inject constructor(
             .untilDestroy()
 
         connectAction.observable
-            .flatMap {
+            .switchMap {
                 client.getBleDevice(device?.address ?: "")
                     .establishConnection(false)
                     .takeUntil(lifecycleObservable.filter { it == Lifecycle.DESTROYED })
@@ -147,11 +141,11 @@ class BluetoothPm @Inject constructor(
                         Timber.e(it, "establishConnection")
                     }
             }
-            .flatMap {
+            .switchMap {
                 connectionObservable.observable
-                    .flatMap {
+                    .switchMap {
                         it.setupNotification(UART_TX_CHARACTERISTIC_UUID)
-                            .flatMap { it }
+                            .switchMap { it }
                             .doOnNext { bytes ->
                                 val message = bytes.toString(Charset.defaultCharset())
                                 val log = logState.value
@@ -184,27 +178,27 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-//        bus.clicks<Clicks.DeviceClicked>()
-//            .doOnNext { click ->
-//                if (click.item.address != device?.address) {
-//                    device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
-//                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
-//                    items.consumer.accept(newItems)
-//                }
-//            }
-//            .subscribe()
-//            .untilDestroy()
+        bus.clicks<Clicks.DeviceClicked>()
+            .doOnNext { click ->
+                if (click.item.address != device?.address) {
+                    device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
+                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
+                    items.consumer.accept(newItems)
+                }
+            }
+            .subscribe()
+            .untilDestroy()
 
         DfuServiceListenerHelper.registerProgressListener(context, dfuListener)
 
-//        val adapter = BluetoothAdapter.getDefaultAdapter()
-//        if (!adapter.isEnabled) {
-//            adapter.enable()
-//        } else {
-//            startScanAction.consumer.accept(Unit)
-//        }
-
-        startScanAction.consumer.accept(Unit)
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bluetoothEnabledAction.observable,
+            locationPermissionsGrantedAction.observable,
+            locationEnabledAction.observable
+        )
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
     }
 
     override fun onDestroy() {

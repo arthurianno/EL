@@ -4,7 +4,6 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentSender
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -50,13 +49,17 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         pm.requestEnableBluetoothCommand.observable
             .log("Command", "enable bluetooth")
             .bindTo {
-                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE).launchForResult(checkNotNull(activity), 124)
+                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    .launchForResult(checkNotNull(activity), REQUEST_CODE_ENABLE_BLUETOOTH)
             }
         pm.requestLocationPermissionsCommand.observable
-            .log("Command", "permission")
-            .bindTo {
-                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION), 125)
+            .log("Command", "request permissions")
+            .switchMap {
+                rxPermissions.request(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                    .filter { it }
+                    .map { Unit }
             }
+            .bindTo(pm.locationPermissionsGrantedAction)
         pm.requestEnableLocationCommand.observable
             .log("Command", "enable location")
             .bindTo {
@@ -69,14 +72,15 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                     )
                 result.addOnCompleteListener { task ->
                     try {
-                        val response = task.getResult(ApiException::class.java)
-                        pm.startScanAction.consumer.accept(Unit)
+                        task.getResult(ApiException::class.java)
                     } catch (e: ApiException) {
-                        Timber.e(e)
                         when (e.statusCode) {
                             LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
                                 try {
-                                    (e as? ResolvableApiException)?.startResolutionForResult(checkNotNull(activity), 123)
+                                    (e as? ResolvableApiException)?.startResolutionForResult(
+                                        checkNotNull(activity),
+                                        REQUEST_CODE_ENABLE_LOCATION
+                                    )
                                 } catch (e1: IntentSender.SendIntentException) {
                                     Timber.e(e1)
                                 }
@@ -90,28 +94,21 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Timber.d("onActivityResult")
-        if (requestCode == 123 && resultCode == Activity.RESULT_OK) {
-            presentationModel.startScanAction.consumer.accept(Unit)
+        if (requestCode == REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
+            presentationModel.locationEnabledAction.consumer.accept(Unit)
             Timber.d("Location enabled")
         }
 
-        if (requestCode == 124 && resultCode == Activity.RESULT_OK) {
-            presentationModel.startScanAction.consumer.accept(Unit)
+        if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
+            presentationModel.bluetoothEnabledAction.consumer.accept(Unit)
             Timber.d("Bluetooth enabled")
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 125) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                presentationModel.startScanAction.consumer.accept(Unit)
-            }
-            return
-        }
-    }
-
     companion object {
+        private const val REQUEST_CODE_ENABLE_LOCATION = 145
+        private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
+
         fun newInstance(): BluetoothFragment {
             return BluetoothFragment().apply {
                 arguments = Bundle().apply {
