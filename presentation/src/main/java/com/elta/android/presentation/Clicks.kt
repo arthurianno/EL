@@ -6,6 +6,7 @@ import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceI
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 
@@ -20,4 +21,5 @@ sealed class Clicks : Click {
     data class DeviceClicked(val item: DeviceItem) : Clicks()
     data class ProfileAdditionalClicked(val item: MainProfileAdditionalItem) : Clicks()
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
+    data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
 }

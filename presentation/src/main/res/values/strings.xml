@@ -336,4 +336,10 @@
     <string name="profile_security">Безопасность</string>
     <string name="profile_linked_social_networks">Привязаные соц.сети</string>
     <string name="profile_additional_settings">Дополнительно</string>
+    <string name="profile_full_name_placeholder">Имя и фамилия</string>
+    <string name="profile_gender_placeholder">Пол не указан</string>
+    <string name="profile_change_password">Изменить пароль</string>
+    <string name="profile_notification">Напоминания</string>
+    <string name="profile_legal_information">Юридическая информация</string>
+    <string name="profile_app_version">Версия приложения: %s</string>
 </resources>
