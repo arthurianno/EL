@@ -37,9 +37,13 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
                 }
             }
         }
-        pm.selectedDiabetesState.bindTo { selected ->
-            diabetesViews.find { it.isSelected }?.isSelected = false
-            diabetesViews.find { it.tag as Diabetes == selected }?.isSelected = true
+        pm.selectedDiabetesState.bindTo { selectedDiabetes ->
+            diabetesViews.forEach {
+                when {
+                    it.isSelected -> it.isSelected = false
+                    it.tag as Diabetes == selectedDiabetes -> it.isSelected = true
+                }
+            }
         }
         diabetesViews.forEach { view ->
             view.clicks().bindTo { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
