@@ -35,6 +35,10 @@
         <item name="android:indeterminate">true</item>
     </style>
 
+    <style name="AppProgressBar.Accent">
+        <item name="android:indeterminateTint">@color/colorAccent</item>
+    </style>
+
     <style name="NumberPicker">
         <item name="android:layout_height">300dp</item>
         <item name="np_dividerThickness">0dp</item>
@@ -131,7 +135,8 @@
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
         <item name="cardCornerRadius">@dimen/card_corner</item>
         <item name="cardElevation">4dp</item>
-        <item name="android:stateListAnimator">@drawable/selector_profile_indicator_card_animator</item>
+        <item name="android:stateListAnimator">@drawable/selector_profile_indicator_card_animator
+        </item>
     </style>
 
 </resources>

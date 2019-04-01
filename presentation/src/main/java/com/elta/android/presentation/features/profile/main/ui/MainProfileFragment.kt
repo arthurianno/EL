@@ -5,9 +5,11 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
+import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.fragment_main_profile.*
 
 class MainProfileFragment : BaseListFragment<MainProfilePm>() {
@@ -24,6 +26,9 @@ class MainProfileFragment : BaseListFragment<MainProfilePm>() {
         pm.userFullNameState.bindTo(titleTextView.text())
         toolbarProfileSettingsButtonView.clicks().bindTo(pm.profileSettingsAction)
         bindProgressDialog(pm)
+        pm.openDiabetesTypeDialogCommand.bindTo {
+            childFragmentManager.showDialog(DiabetesSettingDialogFragment.newInstance())
+        }
     }
 
     @Suppress("MagicNumber")
