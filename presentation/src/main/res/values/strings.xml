@@ -173,7 +173,7 @@
     <string name="insulin_type_short">Короткий</string>
     <string name="insulin_type_intermidiate">Средний</string>
     <string name="insulin_type_long">Длинный</string>
-    <string name="insulin_type_ultralong">Ультрадлинный</string>
+    <string name="insulin_type_ultralong">Сверхдлинный</string>
     <string name="insulin_type_mixed">Смешанный</string>
 
     <!-- ACTIVITY TYPES -->
