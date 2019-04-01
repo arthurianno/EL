@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.records.mapper
 
+import com.elta.android.common.utils.DATE_PATTERN
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.EventsBlock
@@ -62,7 +63,7 @@ open class BaseRecordsMapper(
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     protected fun Event.formatDate(): String {
         return try {
-            val date = SimpleDateFormat(PATTERN, Locale.getDefault()).parse(additionTimeString)
+            val date = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).parse(additionTimeString)
             val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
             "в ${tokens[0]} (UTC ${tokens[1]})"
         } catch (e: Exception) {
@@ -122,6 +123,5 @@ open class BaseRecordsMapper(
         const val MINUTES_IN_HOUR = 60
         const val SECONDS_IN_MINUTE = 60
         const val ZERO = 0
-        const val PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSSXXX"
     }
 }

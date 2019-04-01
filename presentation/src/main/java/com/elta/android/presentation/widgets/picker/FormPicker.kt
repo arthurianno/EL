@@ -9,12 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
-import com.elta.android.presentation.utils.checkMainThread
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.extensions.toggleView
 import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.MainThreadDisposable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
@@ -118,37 +115,6 @@ class FormPicker @JvmOverloads constructor(
         private const val EMPTY_STRING = ""
         private const val DEBOUNCE = 100L
         private const val PICKERS_COUNT = 2L
-    }
-
-    private class ValueChangeObservable(
-        private val view: NumberPicker
-    ) : Observable<Int>() {
-
-        override fun subscribeActual(observer: Observer<in Int>) {
-            if (!checkMainThread(observer)) {
-                return
-            }
-            val listener = Listener(view, observer)
-            observer.onSubscribe(listener)
-            listener.valueListener.onValueChange(view, view.value, view.value)
-            view.addOnValueChangedListener(listener.valueListener)
-        }
-
-        class Listener(
-            private val view: NumberPicker,
-            observer: Observer<in Int>
-        ) : MainThreadDisposable() {
-
-            val valueListener = NumberPicker.OnValueChangeListener { _, _, newValue ->
-                if (!isDisposed) {
-                    observer.onNext(newValue)
-                }
-            }
-
-            override fun onDispose() {
-                view.removeOnValueChangedListener(valueListener)
-            }
-        }
     }
 
     private class SavedState : View.BaseSavedState {

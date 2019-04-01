@@ -173,7 +173,7 @@
     <string name="insulin_type_short">Короткий</string>
     <string name="insulin_type_intermidiate">Средний</string>
     <string name="insulin_type_long">Длинный</string>
-    <string name="insulin_type_ultralong">Ультрадлинный</string>
+    <string name="insulin_type_ultralong">Сверхдлинный</string>
     <string name="insulin_type_mixed">Смешанный</string>
 
     <!-- ACTIVITY TYPES -->
@@ -245,7 +245,7 @@
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
     <string name="events_options_chooser_title_activities">Вид активности</string>
-    <string name="events_options_chooser_title_insulin">Тип исулина</string>
+    <string name="events_options_chooser_title_insulin">Тип инсулина</string>
 
     <string name="events_options_chooser_header_tags">Доступные теги</string>
     <string name="events_options_chooser_header_variants">Доступные варианты</string>
@@ -254,7 +254,7 @@
 
     <string name="events_creation_hint_tags">Тег для группировки</string>
     <string name="events_creation_hint_activities">Вид активности</string>
-    <string name="events_creation_hint_insulin">Тип исулина *</string>
+    <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
     <string name="events_creation_hint_bread">Название блюда или продукта</string>
