@@ -1,7 +1,6 @@
 package com.elta.android.data.features.auth.api
 
 import com.elta.android.data.features.auth.api.request.AuthRequest
-import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.api.request.TokenRequest
@@ -24,9 +23,6 @@ interface AuthApi {
 
     @POST("api/auth/v1/accounts/login")
     fun login(@Body request: AuthRequest): Single<LoginDto>
-
-    @POST("api/auth/v1/accounts/refresh")
-    fun refresh(@Body request: RefreshRequest): Single<TokensDto>
 
     @GET("api/auth/v1/accounts/email/confirmed")
     fun isEmailConfirmed(): Single<EmailStatusDto>
