@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.widgets.SettingsMarginItemDecoration
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
@@ -18,6 +19,13 @@ class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbarTitleView.text = getString(R.string.profile_settings)
+        itemsView?.addItemDecoration(
+            SettingsMarginItemDecoration(
+                checkNotNull(context),
+                R.dimen.settings_top_margin,
+                R.dimen.settings_bottom_margin
+            )
+        )
     }
 
     override fun onBindPresentationModel(pm: ProfileSettingsPm) {
