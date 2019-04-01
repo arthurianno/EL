@@ -69,7 +69,9 @@ class ChooserOptionsItemsBuilder @Inject constructor(
         resourceProvider.getString(
             when {
                 chooserType == ChooserType.VARIANTS && eventType == EventType.INSULIN ->
-                    R.string.events_options_chooser_header_variants
+                    R.string.events_options_chooser_header_variants_insulin
+                chooserType == ChooserType.VARIANTS && eventType == EventType.ACTIVITY ->
+                    R.string.events_options_chooser_header_variants_activity
                 else -> R.string.events_options_chooser_header_tags
             }
         )

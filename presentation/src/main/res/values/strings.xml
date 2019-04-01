@@ -248,7 +248,8 @@
     <string name="events_options_chooser_title_insulin">Тип инсулина</string>
 
     <string name="events_options_chooser_header_tags">Доступные теги</string>
-    <string name="events_options_chooser_header_variants">Доступные варианты</string>
+    <string name="events_options_chooser_header_variants_insulin">Доступные варианты</string>
+    <string name="events_options_chooser_header_variants_activity">Доступные виды</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
 
 
