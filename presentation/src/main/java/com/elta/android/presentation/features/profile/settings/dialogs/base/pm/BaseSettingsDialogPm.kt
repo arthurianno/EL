@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.profile.settings.dialogs.base.pm;
+package com.elta.android.presentation.features.profile.settings.dialogs.base.pm
 
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
