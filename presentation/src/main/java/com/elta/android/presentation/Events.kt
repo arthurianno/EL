@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.core.bus.Event
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
@@ -14,4 +15,5 @@ sealed class Events : Event {
     data class ChooserVariantSelected(val chooserResult: ChooserResult) : Events()
     data class ChooserTagSelected(val chooserResult: ChooserResult) : Events()
     object EventsChanged : Events()
+    data class ProfileChanged(val profile: Profile) : Events()
 }

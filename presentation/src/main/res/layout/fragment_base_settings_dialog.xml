@@ -70,7 +70,16 @@
         android:paddingEnd="16dp"
         app:layout_constraintBottom_toTopOf="@id/dialogActionButtonView"
         app:layout_constraintTop_toBottomOf="@id/dialogDescriptionTitleView"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintVertical_weight="1">
+
+        <ProgressBar
+            android:id="@+id/progressView"
+            style="@style/AppProgressBar.Accent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/dialogActionButtonView"
