@@ -25,5 +25,4 @@ object TagsComparator : Comparator<Tag> {
 
     override fun compare(o1: Tag, o2: Tag): Int =
         order.indexOf(o1.image).compareTo(order.indexOf(o2.image))
-
 }
