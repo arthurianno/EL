@@ -5,12 +5,12 @@ import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 
-abstract class BaseSettingsDialogFragment<T : BasePm> : BaseBottomSheetFragment<T>() {
+abstract class BaseSettingsDialogFragment<T : BaseSettingsDialogPm> : BaseBottomSheetFragment<T>() {
 
     override val screenLayout: Int = R.layout.fragment_base_settings_dialog
     protected abstract val contentLayout: Int
@@ -29,6 +29,9 @@ abstract class BaseSettingsDialogFragment<T : BasePm> : BaseBottomSheetFragment<
     @CallSuper
     override fun onBindPresentationModel(pm: T) {
         dialogCloseButtonView.clicks().bindTo { dialog.dismiss() }
+        dialogActionButtonView.clicks().bindTo(pm.mainAction)
+        pm.actionButtonEnabledCommand.bindTo(dialogActionButtonView::setEnabled)
+        pm.closeDialogCommand.bindTo { dialog.dismiss() }
     }
 
     private fun DialogType.toIcon(): Int =

@@ -5,21 +5,18 @@ import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
-import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
 import javax.inject.Inject
 
 class DiabetesSettingDialogPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     services: ServiceFacade
-) : BasePm(services) {
+) : BaseSettingsDialogPm(services) {
 
     val diabetesTypeSelectedAction = Action<Diabetes>()
     val diabetesState = State(Diabetes.values())
     val selectedDiabetesState = State<Diabetes>()
-    val actionButtonEnabledCommand = State(false)
-    val selectTypeAction = Action<Unit>()
-    val closeDialogCommand = Command<Unit>(bufferSize = 1)
 
     private val profileState = State<Profile>()
     private val loadScreeAction = Action<Unit>()
@@ -41,7 +38,7 @@ class DiabetesSettingDialogPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        selectTypeAction.observable
+        mainAction.observable
             .map(::updateProfile)
             .doOnNext { bus.event(Events.ProfileChanged(it)) }
             .doOnNext { closeDialogCommand.consumer.accept(Unit) }
@@ -49,6 +46,7 @@ class DiabetesSettingDialogPm @Inject constructor(
             .untilDestroy()
 
         loadScreeAction.observable
+            .skipWhileInProgress()
             .flatMapSingle {
                 getProfileUseCase.execute(Unit)
                     .bindProgress()

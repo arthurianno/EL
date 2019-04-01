@@ -49,13 +49,10 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
         diabetesViews.forEach { view ->
             view.clicks().bindTo { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
         }
-        pm.actionButtonEnabledCommand.bindTo(dialogActionButtonView::setEnabled)
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             diabetesContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
-        dialogActionButtonView.clicks().bindTo(pm.selectTypeAction)
-        pm.closeDialogCommand.bindTo { dialog.dismiss() }
     }
 
     companion object {
