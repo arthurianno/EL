@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.
 import com.elta.android.presentation.utils.toStringRes
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.children
+import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_diabetes_settings_dialog.*
 
@@ -48,7 +49,10 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
         diabetesViews.forEach { view ->
             view.clicks().bindTo { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
         }
-        pm.actionButtonEnabledCommand.bindTo(dialogActionButtonView::setEnabled)
+        pm.progressState.bindTo {
+            progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            diabetesContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
+        }
     }
 
     companion object {
