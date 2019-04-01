@@ -5,6 +5,7 @@ import com.elta.android.domain.features.auth.model.SocialNetwork
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
@@ -34,6 +35,8 @@ class ProfileSettingsItemsBuilder @Inject constructor(
             R.drawable.ic_add, SocialNetwork.VK))
         add(createSettingsSocialItem(R.drawable.ic_ok, resources.getString(R.string.odnoklasniki),
             R.drawable.ic_add, SocialNetwork.OK))
+
+        add(ProfileSettingsSeparatorItem)
 
         add(createHeaderItem(resources.getString(R.string.profile_additional_settings)))
         add(createSettingsItem(R.drawable.ic_notification,
