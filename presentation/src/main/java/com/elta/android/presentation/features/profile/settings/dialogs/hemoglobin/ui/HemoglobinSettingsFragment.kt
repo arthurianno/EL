@@ -10,6 +10,7 @@ import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
+import org.threeten.bp.LocalDate
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
@@ -22,6 +23,10 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         arrowView.setOnClickListener {
             arrowView.isSelected = !calendarContainerView.isExpanded
             calendarContainerView.setExpanded(!calendarContainerView.isExpanded, true)
+        }
+        with(calendarView.state().edit()) {
+            setMaximumDate(LocalDate.now())
+            commit()
         }
     }
 

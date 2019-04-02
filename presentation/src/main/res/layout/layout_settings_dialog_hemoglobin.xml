@@ -50,15 +50,22 @@
             android:id="@+id/calendarContainerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:descendantFocusability="blocksDescendants"
             app:el_expanded="false">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="240dp"
-                android:background="@color/red">
-
-            </FrameLayout>
+            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:mcv_dateTextAppearance="@style/New.Caption2.Calendar"
+                app:mcv_firstDayOfWeek="monday"
+                app:mcv_headerTextAppearance="@style/New.Body1.BlackBlue"
+                app:mcv_leftArrowMask="@drawable/ic_calendar_arrow_left"
+                app:mcv_rightArrowMask="@drawable/ic_calendar_arrow_right"
+                app:mcv_selectionColor="@color/black_blue"
+                app:mcv_selectionMode="single"
+                app:mcv_showOtherDates="out_of_range"
+                app:mcv_titleAnimationOrientation="horizontal"
+                app:mcv_weekDayTextAppearance="@style/New.Caption1.ShadeBlack2" />
 
         </net.cachapa.expandablelayout.ExpandableLayout>
 
