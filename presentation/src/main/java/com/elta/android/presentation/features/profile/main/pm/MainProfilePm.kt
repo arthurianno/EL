@@ -15,7 +15,6 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
-import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem.Type
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Single
@@ -33,6 +32,7 @@ class MainProfilePm @Inject constructor(
     val userFullNameState = State<String>()
     val profileSettingsAction = Action<Unit>()
     val openDiabetesTypeDialogCommand = Command<Unit>(bufferSize = 1)
+    val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
 
     private val getProfileSettingsAction = Action<Unit>()
     private val updateProfileAction = Action<Profile>()
@@ -83,10 +83,10 @@ class MainProfilePm @Inject constructor(
 
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
-            Type.GLUCOSE_LEVEL -> Timber.e("GLUCOSE_LEVEL clicked")
-            Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
-            Type.WEIGHT -> Timber.e("WEIGHT clicked")
-            Type.HEMOGLOBIN -> Timber.e("HEMOGLOBIN clicked")
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> Timber.e("GLUCOSE_LEVEL clicked")
+            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
+            MainProfileIndicatorItem.Type.WEIGHT -> Timber.e("WEIGHT clicked")
+            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)
         }
 
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
