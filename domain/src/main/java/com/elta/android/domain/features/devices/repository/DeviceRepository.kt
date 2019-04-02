@@ -11,7 +11,7 @@ interface DeviceRepository {
 
     fun findDevices(): Observable<List<Glucometer>>
 
-    fun getDeviceInfo(fields: List<Command>): Single<GlucometerInfo>
+    fun getDeviceInfo(address: String, fields: List<Command>): Single<GlucometerInfo>
 
     fun getDeviceEvents(): Single<List<Event>>
 }

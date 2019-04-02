@@ -4,18 +4,16 @@ package com.elta.android.presentation.features.bluetooth.pm
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
+import com.elta.android.domain.features.devices.interactor.GetGlucometerInfo
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.Clicks
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.bluetooth.EltaDfuService
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -24,7 +22,6 @@ import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
 import no.nordicsemi.android.dfu.DfuProgressListener
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter
-import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper
 import timber.log.Timber
 import java.nio.charset.Charset
@@ -32,6 +29,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class BluetoothPm @Inject constructor(
+    private val getGlucometerInfo: GetGlucometerInfo,
     private val findGlucometersUseCase: FindGlucometersUseCase,
     private val context: Context,
     private val client: RxBleClient,
@@ -163,16 +161,31 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+//        dfuAction.observable
+//            .doOnNext {
+//                device?.let {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        DfuServiceInitiator.createDfuNotificationChannel(context)
+//                    }
+//                    val starter = DfuServiceInitiator(it.address)
+//                    starter.setZip(R.raw.satellite_online_16)
+//                    starter.start(context, EltaDfuService::class.java)
+//                }
+//            }
+//            .retry()
+//            .subscribe()
+//            .untilDestroy()
+
         dfuAction.observable
-            .doOnNext {
-                device?.let {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        DfuServiceInitiator.createDfuNotificationChannel(context)
-                    }
-                    val starter = DfuServiceInitiator(it.address)
-                    starter.setZip(R.raw.satellite_online_16)
-                    starter.start(context, EltaDfuService::class.java)
-                }
+            .flatMapSingle {
+                getGlucometerInfo.execute(
+                    GetGlucometerInfo.Params(device?.address ?: "",
+                        listOf(
+                            com.elta.android.domain.features.devices.model.Command.SetPin(286),
+                            com.elta.android.domain.features.devices.model.Command.GetVersion
+                        )
+                    )
+                )
             }
             .retry()
             .subscribe()

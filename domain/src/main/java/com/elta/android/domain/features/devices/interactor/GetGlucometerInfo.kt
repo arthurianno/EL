@@ -14,7 +14,7 @@ class GetGlucometerInfo @Inject constructor(
 ) : SingleUseCase<GlucometerInfo, GetGlucometerInfo.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Single<GlucometerInfo> =
-        repo.getDeviceInfo(params.validate().fields)
+        repo.getDeviceInfo(checkNotNull(params).address, checkNotNull(params).fields)
 
     private fun Params?.validate(): Params {
         if (this == null) throw NullPointerException("Params can't be null.")
@@ -27,6 +27,7 @@ class GetGlucometerInfo @Inject constructor(
     }
 
     data class Params(
+        val address: String,
         val fields: List<Command>
     )
 
