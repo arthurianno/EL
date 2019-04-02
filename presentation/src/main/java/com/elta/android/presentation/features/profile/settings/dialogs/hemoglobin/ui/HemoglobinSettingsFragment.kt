@@ -6,7 +6,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.B
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_settings_dialog_diabetes.*
+import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
@@ -18,7 +18,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         super.onBindPresentationModel(pm)
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
-            diabetesContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
+            hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
     }
 
