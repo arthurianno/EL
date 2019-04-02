@@ -245,6 +245,7 @@ dependencies {
     implementation commonDependencies.firebaseMessaging
     implementation commonDependencies.exoPlayer
     implementation commonDependencies.location
+    implementation commonDependencies.datePicker
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

@@ -10,7 +10,11 @@ import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
+import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import java.util.Date
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
@@ -40,6 +44,16 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
         minusView.clicks().bindTo(pm.minusAction)
         plusView.clicks().bindTo(pm.plusAction)
+        calendarView.setOnDateChangedListener { _, day, selected ->
+            if (selected) {
+                pm.dateSelectedAction.consumer.accept(day.date.toDate())
+            }
+        }
+    }
+
+    private fun LocalDate.toDate(): Date {
+        val instant = this.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toInstant()
+        return DateTimeUtils.toDate(instant)
     }
 
     companion object {
