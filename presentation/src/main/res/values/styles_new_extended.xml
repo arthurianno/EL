@@ -9,6 +9,10 @@
         <item name="android:textColor">@color/shade_black2</item>
     </style>
 
+    <style name="New.Headline2.ShadeGreen2">
+        <item name="android:textColor">@color/shade_g_green2_a</item>
+    </style>
+
     <style name="New.Headline3.White">
         <item name="android:textColor">@color/white</item>
     </style>
@@ -23,6 +27,10 @@
 
     <style name="New.Headline5.White">
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="New.Headline5.ShadeGreen2">
+        <item name="android:textColor">@color/shade_g_green2_a</item>
     </style>
 
     <!-- TITLE -->
