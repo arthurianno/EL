@@ -56,6 +56,7 @@
             android:id="@+id/itemsContainerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
             app:el_expanded="false">
 
             <android.support.v7.widget.RecyclerView

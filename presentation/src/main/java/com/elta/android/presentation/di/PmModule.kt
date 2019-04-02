@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
@@ -200,4 +201,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(ProfileSettingsPm::class)
     abstract fun bindProfileSettingsPm(pm: ProfileSettingsPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(DiabetesSettingDialogPm::class)
+    abstract fun bindDiabetesSettingDialogPm(pm: DiabetesSettingDialogPm): PresentationModel
 }

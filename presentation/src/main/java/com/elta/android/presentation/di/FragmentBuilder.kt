@@ -25,6 +25,7 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
@@ -169,4 +170,8 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [ProfileSettingsModule::class])
     abstract fun bindProfileSettingsFragment(): ProfileSettingsFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindDiabetesSettingDialogFragment(): DiabetesSettingDialogFragment
 }
