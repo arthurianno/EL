@@ -348,4 +348,6 @@
     <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
     <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1C</string>
     <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
+
+    <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nДиапазон будет использоваться на графике главного экрана.</string>
 </resources>
