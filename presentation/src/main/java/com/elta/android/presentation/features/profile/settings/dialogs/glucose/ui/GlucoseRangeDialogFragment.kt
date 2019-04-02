@@ -6,11 +6,11 @@ import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.B
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.pm.GlucoseRangeDialogPm
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_glucose_range_dialog.*
+import kotlinx.android.synthetic.main.layout_settings_dialog_glucose.*
 
 class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialogPm>() {
 
-    override val contentLayout = R.layout.layout_glucose_range_dialog
+    override val contentLayout = R.layout.layout_settings_dialog_glucose
     override val dialogType = DialogType.GLUCOSE
     override val classToken: Class<GlucoseRangeDialogPm> = GlucoseRangeDialogPm::class.java
 
