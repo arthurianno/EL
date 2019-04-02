@@ -12,11 +12,11 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_diabetes_settings_dialog.*
+import kotlinx.android.synthetic.main.layout_settings_dialog_diabetes.*
 
 class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSettingDialogPm>() {
 
-    override val contentLayout = R.layout.layout_diabetes_settings_dialog
+    override val contentLayout = R.layout.layout_settings_dialog_diabetes
     override val dialogType = DialogType.DIABETES
     override val classToken: Class<DiabetesSettingDialogPm> = DiabetesSettingDialogPm::class.java
 
