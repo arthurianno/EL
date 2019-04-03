@@ -17,6 +17,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
 import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Observable
 import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
@@ -54,9 +55,10 @@ class MainProfilePm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
             .subscribe(getProfileSettingsAction.consumer)
             .untilDestroy()
     }

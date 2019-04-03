@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui
 
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
@@ -8,12 +9,14 @@ import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobi
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
+import java.util.Calendar
 import java.util.Date
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
@@ -40,10 +43,17 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
+        pm.dateSelectedState.bindTo { calendarView.selectedDate = it.toCalendarDay() }
         pm.dateState.bindTo(dateView.text())
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
-        minusView.clicks().bindTo(pm.minusAction)
-        plusView.clicks().bindTo(pm.plusAction)
+        minusView.clicks().bindTo {
+            minusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            pm.minusAction.consumer.accept(Unit)
+        }
+        plusView.clicks().bindTo {
+            plusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            pm.plusAction.consumer.accept(Unit)
+        }
         calendarView.setOnDateChangedListener { _, day, selected ->
             if (selected) {
                 pm.dateSelectedAction.consumer.accept(day.date.toDate())
@@ -54,6 +64,15 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     private fun LocalDate.toDate(): Date {
         val instant = this.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toInstant()
         return DateTimeUtils.toDate(instant)
+    }
+
+    private fun Date.toCalendarDay(): CalendarDay {
+        val c = Calendar.getInstance()
+        c.time = this
+        val year = c[Calendar.YEAR]
+        val month = c[Calendar.MONTH] + 1
+        val dayOfMonth = c[Calendar.DAY_OF_MONTH]
+        return CalendarDay.from(year, month, dayOfMonth)
     }
 
     companion object {
