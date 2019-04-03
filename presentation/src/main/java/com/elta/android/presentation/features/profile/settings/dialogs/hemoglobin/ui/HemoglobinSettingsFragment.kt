@@ -38,7 +38,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         super.onBindPresentationModel(pm)
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
-            diabetesContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
+            hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
         pm.dateState.bindTo(dateView.text())
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
