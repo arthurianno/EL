@@ -8,5 +8,5 @@ enum class EventType {
     ACTIVITY,
     WEIGHT,
     GLUCOSE,
-    HDA1C
+    GLYCATEDHEMOGLOBIN
 }
