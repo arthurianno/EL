@@ -2,9 +2,13 @@ package com.elta.android.presentation.widgets.range_bar
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.VectorDrawable
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -17,6 +21,7 @@ import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChan
 import com.nullgr.core.ui.extensions.dpToPx
 import io.reactivex.Observable
 import java.util.function.Consumer
+
 
 class RangeBarView @JvmOverloads constructor(
     context: Context,
@@ -55,10 +60,14 @@ class RangeBarView @JvmOverloads constructor(
     private var indicatorsHeight = 0f
     private var indicatorsShift = 0f
     private var touchBounds = 0f
+    private var trianglesPadding = 0f
+    private var trianglesHeight = 0f
 
     private lateinit var backgroundPaint: Paint
     private lateinit var rangeBarPaint: Paint
     private lateinit var indicatorsPaint: Paint
+    private lateinit var trianglesPaint: Paint
+    private lateinit var trianglesBitmap: Bitmap
 
     private val mainRect = RectF()
     private val rangeBarRect = RectF()
@@ -103,8 +112,8 @@ class RangeBarView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         rangeBarWidth = MeasureSpec.getSize(widthMeasureSpec).toFloat()
-        //todo calc text and dots
-        val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(rangeBarHeight.toInt(), MeasureSpec.EXACTLY)
+        val height = rangeBarHeight + trianglesHeight + trianglesPadding
+        val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
         setMeasuredDimension(widthMeasureSpec, newHeightMeasureSpec)
         prepare()
     }
@@ -146,14 +155,30 @@ class RangeBarView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         canvas?.let {
-            it.drawRoundRect(mainRect, cornerRadius, cornerRadius, backgroundPaint)
-            it.drawRoundRect(rangeBarRect, cornerRadius, cornerRadius, rangeBarPaint)
+            it.drawRangeBar()
             it.drawStartIndicators()
             it.drawEndIndicators()
+            it.drawStartTriangle()
+            it.drawEndTriangle()
         }
     }
 
-    // ---- Private methods ---- //
+    // ------ Draw methods ----- //
+
+    private fun Canvas.drawRangeBar() {
+        drawRoundRect(mainRect, cornerRadius, cornerRadius, backgroundPaint)
+        drawRoundRect(rangeBarRect, cornerRadius, cornerRadius, rangeBarPaint)
+    }
+
+    private fun Canvas.drawStartTriangle() {
+        val left = rangeBarRect.left + trianglesPadding / 2
+        drawBitmap(trianglesBitmap, left, 0f, trianglesPaint)
+    }
+
+    private fun Canvas.drawEndTriangle() {
+        val left = rangeBarRect.right - trianglesBitmap.width - trianglesPadding / 2
+        drawBitmap(trianglesBitmap, left, 0f, trianglesPaint)
+    }
 
     private fun Canvas.drawStartIndicators() {
         val x1 = rangeBarRect.left + indicatorsShift * 2
@@ -168,6 +193,8 @@ class RangeBarView @JvmOverloads constructor(
         val x2 = x1 - indicatorsWidth - indicatorsShift
         drawLine(x2, indicatorsStartY, x2, indicatorsStartY + indicatorsHeight, indicatorsPaint)
     }
+
+    // ---- Init methods ---- //
 
     private fun initAttributes(attrs: AttributeSet?) {
         if (attrs != null) {
@@ -234,24 +261,31 @@ class RangeBarView @JvmOverloads constructor(
             strokeCap = Paint.Cap.ROUND
             alpha = INDICATOR_ALPHA
         }
+        trianglesPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     }
 
     private fun prepare() {
         val left = rangeBarWidth * startProgress
         val right = rangeBarWidth * endProgress
-        mainRect.set(paddingLeft.toFloat(), 0f, rangeBarWidth, rangeBarHeight)
-        rangeBarRect.set(left, 0f, right, rangeBarHeight)
+        val rangeBarTop = trianglesHeight + trianglesPadding
+        mainRect.set(paddingLeft.toFloat(), rangeBarTop, rangeBarWidth, rangeBarTop + rangeBarHeight)
+        rangeBarRect.set(left, rangeBarTop, right, rangeBarTop + rangeBarHeight)
         initIndicatorsSizes()
         touchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
+        trianglesBitmap = context.decodeBitmap(R.drawable.ic_range_bar_triangle)
+        trianglesHeight = trianglesBitmap.height.toFloat()
+        trianglesPadding = TRIANGLE_PADDING_DP.dpToPx(context)
     }
 
     private fun initIndicatorsSizes() {
         indicatorsWidth = INDICATOR_WIDTH_DP.dpToPx(context)
         indicatorsHeight = rangeBarHeight * INDICATOR_HEIGHT_PERCENTS
         indicatorsShift = INDICATOR_SHIFT_DP.dpToPx(context)
-        indicatorsStartY = (rangeBarHeight - indicatorsHeight) / 2
+        indicatorsStartY = mainRect.top + (rangeBarHeight - indicatorsHeight) / 2
         indicatorsPaint.strokeWidth = indicatorsWidth
     }
+
+    // ----- Interact methods ------ //
 
     private fun onUpdateAndInvalidate() {
         onProgressChanged()
@@ -260,9 +294,8 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun onProgressChanged() {
-        val left = rangeBarWidth * startProgress
-        val right = rangeBarWidth * endProgress
-        rangeBarRect.set(left, 0f, right, rangeBarHeight)
+        rangeBarRect.left = rangeBarWidth * startProgress
+        rangeBarRect.right = rangeBarWidth * endProgress
     }
 
     private fun onValuesChanged() {
@@ -289,6 +322,8 @@ class RangeBarView @JvmOverloads constructor(
         }
     }
 
+    // ------- Utility methods ------ //
+
     private fun Double.normalize(): Double =
         Math.round(this * 10.times(resultFraction)) / 10.times(resultFraction).toDouble()
 
@@ -311,6 +346,23 @@ class RangeBarView @JvmOverloads constructor(
         parent.requestDisallowInterceptTouchEvent(true)
     }
 
+    private fun Context.decodeBitmap(drawableId: Int): Bitmap {
+        val drawable = ContextCompat.getDrawable(this, drawableId)
+        return when (drawable) {
+            is BitmapDrawable -> BitmapFactory.decodeResource(context.resources, drawableId)
+            is VectorDrawable -> drawable.toBitmap()
+            else -> throw IllegalArgumentException("unsupported drawable type")
+        }
+    }
+
+    private fun VectorDrawable.toBitmap(): Bitmap {
+        val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        setBounds(0, 0, canvas.width, canvas.height)
+        draw(canvas)
+        return bitmap
+    }
+
     companion object {
         private const val DEFAULT_RANGE_BAR_HEIGHT_DP = 48f
         private const val DEFAULT_CORNER_RADIUS_DP = 8f
@@ -322,8 +374,7 @@ class RangeBarView @JvmOverloads constructor(
         private const val FRACTION_DIGITS_COUNT = 1
         private const val DEFAULT_START_VALUE = 0.0
         private const val DEFAULT_END_VALUE = 100.0
-        private const val TRIANGLE_HEIGHT_DP = 7
-        private const val TRIANGLE_PADDING_DP = 3
+        private const val TRIANGLE_PADDING_DP = 3f
     }
 
     private enum class MovementState {
