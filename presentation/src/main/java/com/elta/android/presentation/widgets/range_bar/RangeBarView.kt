@@ -18,10 +18,11 @@ import androidx.annotation.ColorRes
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
 import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
+import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
+import com.nullgr.core.ui.extensions.spToPx
 import io.reactivex.Observable
 import java.util.function.Consumer
-
 
 class RangeBarView @JvmOverloads constructor(
     context: Context,
@@ -43,30 +44,42 @@ class RangeBarView @JvmOverloads constructor(
     @ColorRes
     private val defaultBackgroundColorRes = R.color.pale_gray
     @ColorRes
-    private var defaultRangeBarColorRes = R.color.shade_g_green_a
+    private val defaultRangeBarColorRes = R.color.shade_g_green_a
     @ColorRes
-    private var defaultIndicatorsColorRes = R.color.white
+    private val defaultIndicatorsColorRes = R.color.white
+    @ColorRes
+    private val defaultTextColor = R.color.black_blue
     @ColorInt
     private var viewBackgroundColor = 0
     @ColorInt
     private var rangeBarColor = 0
     @ColorInt
     private var indicatorsColor = 0
+    @ColorInt
+    private var textColor = 0
 
+    private var rangeBarTopY = 0f
     private var rangeBarHeight = 0f
     private var rangeBarWidth = 0f
     private var cornerRadius = 0f
+
     private var indicatorsWidth = 0f
     private var indicatorsHeight = 0f
     private var indicatorsShift = 0f
     private var touchBounds = 0f
+
     private var trianglesPadding = 0f
     private var trianglesHeight = 0f
+    private var trianglesWidth = 0f
+
+    private var titleHeight = 0f
+    private var titlePadding = 0f
 
     private lateinit var backgroundPaint: Paint
     private lateinit var rangeBarPaint: Paint
     private lateinit var indicatorsPaint: Paint
     private lateinit var trianglesPaint: Paint
+    private lateinit var valueTextPaint: Paint
     private lateinit var trianglesBitmap: Bitmap
 
     private val mainRect = RectF()
@@ -111,11 +124,11 @@ class RangeBarView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        rangeBarWidth = MeasureSpec.getSize(widthMeasureSpec).toFloat()
-        val height = rangeBarHeight + trianglesHeight + trianglesPadding
+        beforeOnMeasure(widthMeasureSpec)
+        val height = rangeBarHeight + trianglesHeight + trianglesPadding + titleHeight + titlePadding
         val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
         setMeasuredDimension(widthMeasureSpec, newHeightMeasureSpec)
-        prepare()
+        afterOnMeasure()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -156,6 +169,8 @@ class RangeBarView @JvmOverloads constructor(
         super.onDraw(canvas)
         canvas?.let {
             it.drawRangeBar()
+            it.drawStartTitle()
+            it.drawEndTitle()
             it.drawStartIndicators()
             it.drawEndIndicators()
             it.drawStartTriangle()
@@ -170,14 +185,24 @@ class RangeBarView @JvmOverloads constructor(
         drawRoundRect(rangeBarRect, cornerRadius, cornerRadius, rangeBarPaint)
     }
 
+    private fun Canvas.drawStartTitle() {
+        val left = rangeBarRect.left + trianglesPadding / 2 + trianglesWidth / 2
+        drawText(values.start.toString(), left, titleHeight, valueTextPaint)
+    }
+
+    private fun Canvas.drawEndTitle() {
+        val left = rangeBarRect.right - trianglesWidth / 2 - trianglesPadding / 2
+        drawText(values.end.toString(), left, titleHeight, valueTextPaint)
+    }
+
     private fun Canvas.drawStartTriangle() {
         val left = rangeBarRect.left + trianglesPadding / 2
-        drawBitmap(trianglesBitmap, left, 0f, trianglesPaint)
+        drawBitmap(trianglesBitmap, left, titleHeight + titlePadding, trianglesPaint)
     }
 
     private fun Canvas.drawEndTriangle() {
-        val left = rangeBarRect.right - trianglesBitmap.width - trianglesPadding / 2
-        drawBitmap(trianglesBitmap, left, 0f, trianglesPaint)
+        val left = rangeBarRect.right - trianglesWidth - trianglesPadding / 2
+        drawBitmap(trianglesBitmap, left, titleHeight + titlePadding, trianglesPaint)
     }
 
     private fun Canvas.drawStartIndicators() {
@@ -219,6 +244,10 @@ class RangeBarView @JvmOverloads constructor(
                 R.styleable.RangeBarView_rbv_indicators_color,
                 ContextCompat.getColor(context, defaultIndicatorsColorRes)
             )
+            textColor = a.getColor(
+                R.styleable.RangeBarView_rbv_text_color,
+                ContextCompat.getColor(context, defaultTextColor)
+            )
             resultFraction = a.getInteger(
                 R.styleable.RangeBarView_rbv_fraction_digits_count, FRACTION_DIGITS_COUNT
             )
@@ -243,6 +272,7 @@ class RangeBarView @JvmOverloads constructor(
         viewBackgroundColor = ContextCompat.getColor(context, defaultBackgroundColorRes)
         rangeBarColor = ContextCompat.getColor(context, defaultRangeBarColorRes)
         indicatorsColor = ContextCompat.getColor(context, defaultIndicatorsColorRes)
+        textColor = ContextCompat.getColor(context, defaultTextColor)
     }
 
     private fun initPaints() {
@@ -262,19 +292,33 @@ class RangeBarView @JvmOverloads constructor(
             alpha = INDICATOR_ALPHA
         }
         trianglesPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        valueTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textAlign = Paint.Align.CENTER
+            textSize = DEFAULT_TEXT_SIZE.spToPx(context)
+            color = textColor
+            typeface = context.getTypeface(TYPEFACE)
+        }
     }
 
-    private fun prepare() {
-        val left = rangeBarWidth * startProgress
-        val right = rangeBarWidth * endProgress
-        val rangeBarTop = trianglesHeight + trianglesPadding
-        mainRect.set(paddingLeft.toFloat(), rangeBarTop, rangeBarWidth, rangeBarTop + rangeBarHeight)
-        rangeBarRect.set(left, rangeBarTop, right, rangeBarTop + rangeBarHeight)
-        initIndicatorsSizes()
-        touchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
+    private fun beforeOnMeasure(widthMeasureSpec: Int) {
+        rangeBarWidth = MeasureSpec.getSize(widthMeasureSpec).toFloat()
         trianglesBitmap = context.decodeBitmap(R.drawable.ic_range_bar_triangle)
         trianglesHeight = trianglesBitmap.height.toFloat()
+        trianglesWidth = trianglesBitmap.width.toFloat()
         trianglesPadding = TRIANGLE_PADDING_DP.dpToPx(context)
+        val fontMetrics = valueTextPaint.fontMetrics
+        titleHeight = fontMetrics.descent - fontMetrics.ascent
+        titlePadding = TEXT_PADDING_DP.dpToPx(context)
+    }
+
+    private fun afterOnMeasure() {
+        val left = rangeBarWidth * startProgress
+        val right = rangeBarWidth * endProgress
+        rangeBarTopY = trianglesHeight + trianglesPadding + titleHeight + titlePadding
+        mainRect.set(paddingLeft.toFloat(), rangeBarTopY, rangeBarWidth, rangeBarTopY + rangeBarHeight)
+        rangeBarRect.set(left, rangeBarTopY, right, rangeBarTopY + rangeBarHeight)
+        initIndicatorsSizes()
+        touchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
     }
 
     private fun initIndicatorsSizes() {
@@ -329,11 +373,11 @@ class RangeBarView @JvmOverloads constructor(
 
     private fun isInLeftIndicatorBounds(x: Float, y: Float) =
         x in rangeBarRect.left - touchBounds..rangeBarRect.left + touchBounds &&
-            y < rangeBarHeight
+            y > rangeBarTopY && y < rangeBarTopY + rangeBarHeight
 
     private fun isInRightIndicatorBounds(x: Float, y: Float) =
         x in rangeBarRect.right - touchBounds..rangeBarRect.right + touchBounds &&
-            y < rangeBarHeight
+            y > rangeBarTopY && y < rangeBarTopY + rangeBarHeight
 
     private fun canDragLeftEdge(x: Float) =
         x > paddingLeft && x < rangeBarRect.right - touchBounds * 2
@@ -375,6 +419,9 @@ class RangeBarView @JvmOverloads constructor(
         private const val DEFAULT_START_VALUE = 0.0
         private const val DEFAULT_END_VALUE = 100.0
         private const val TRIANGLE_PADDING_DP = 3f
+        private const val TEXT_PADDING_DP = 5f
+        private const val DEFAULT_TEXT_SIZE = 15f
+        private const val TYPEFACE = "roboto_medium.ttf"
     }
 
     private enum class MovementState {

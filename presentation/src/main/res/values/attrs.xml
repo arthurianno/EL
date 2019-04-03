@@ -31,6 +31,7 @@
     <declare-styleable name="RangeBarView">
         <attr name="rbv_height" format="dimension" />
         <attr name="rbv_corners" format="dimension" />
+        <attr name="rbv_text_color" format="reference|color" />
         <attr name="rbv_indicators_color" format="reference|color" />
         <attr name="rbv_background_color" format="reference|color" />
         <attr name="rbv_color" format="reference|color" />
