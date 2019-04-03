@@ -32,5 +32,4 @@ class HemoglobinSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
     }
-
 }
