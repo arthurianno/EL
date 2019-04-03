@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.pm
 
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
@@ -87,7 +88,7 @@ class MainProfilePm @Inject constructor(
         when (type) {
             MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> Timber.e("GLUCOSE_LEVEL clicked")
             MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
-            MainProfileIndicatorItem.Type.WEIGHT -> Timber.e("WEIGHT clicked")
+            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
             MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)
         }
 
