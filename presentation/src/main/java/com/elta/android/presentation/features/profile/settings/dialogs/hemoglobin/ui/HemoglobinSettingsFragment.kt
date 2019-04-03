@@ -1,12 +1,20 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui
 
+import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
+import org.threeten.bp.DateTimeUtils
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import java.util.Date
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
@@ -14,12 +22,38 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     override val dialogType = DialogType.HbA1C
     override val classToken: Class<HemoglobinSettingsPm> = HemoglobinSettingsPm::class.java
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        arrowView.setOnClickListener {
+            arrowView.isSelected = !calendarContainerView.isExpanded
+            calendarContainerView.setExpanded(!calendarContainerView.isExpanded, true)
+        }
+        with(calendarView.state().edit()) {
+            setMaximumDate(LocalDate.now())
+            commit()
+        }
+    }
+
     override fun onBindPresentationModel(pm: HemoglobinSettingsPm) {
         super.onBindPresentationModel(pm)
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
+        pm.dateState.bindTo(dateView.text())
+        pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
+        minusView.clicks().bindTo(pm.minusAction)
+        plusView.clicks().bindTo(pm.plusAction)
+        calendarView.setOnDateChangedListener { _, day, selected ->
+            if (selected) {
+                pm.dateSelectedAction.consumer.accept(day.date.toDate())
+            }
+        }
+    }
+
+    private fun LocalDate.toDate(): Date {
+        val instant = this.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toInstant()
+        return DateTimeUtils.toDate(instant)
     }
 
     companion object {
