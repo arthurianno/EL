@@ -116,6 +116,6 @@ class HemoglobinSettingsPm @Inject constructor(
         AddNewEventUseCase.Params(
             value = inputValueState.value,
             date = dateSelectedState.value,
-            eventType = EventType.HDA1C
+            eventType = EventType.GLYCATEDHEMOGLOBIN
         )
 }
