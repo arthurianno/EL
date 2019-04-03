@@ -8,9 +8,13 @@
     android:paddingTop="18dp"
     android:paddingBottom="39dp">
 
-    <com.elta.android.presentation.widgets.RangeBarView
+    <com.elta.android.presentation.widgets.range_bar.RangeBarView
+        android:id="@+id/glucoseRangeBarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:rbv_fraction_digits_count="1"
+        app:rbv_range_end="20.0"
+        app:rbv_range_start="1.0" />
 
     <LinearLayout
         android:layout_width="match_parent"

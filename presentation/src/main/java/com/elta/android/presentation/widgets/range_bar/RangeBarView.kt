@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets
+package com.elta.android.presentation.widgets.range_bar
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,9 +11,12 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
-import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.presentation.R
+import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
+import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
 import com.nullgr.core.ui.extensions.dpToPx
+import io.reactivex.Observable
+import java.util.function.Consumer
 
 class RangeBarView @JvmOverloads constructor(
     context: Context,
@@ -21,8 +24,16 @@ class RangeBarView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    var valuesRange: DoubleRange? = null
-    var value: Pair<Double, Double>? = null
+    val startValue: Double
+        get() = values.start
+
+    val endValue: Double
+        get() = values.end
+
+    private var valuesRange: ClosedFloatingPointRange<Double> = DEFAULT_START_VALUE..DEFAULT_END_VALUE
+    private var values: Values = Values(DEFAULT_START_VALUE, DEFAULT_END_VALUE)
+    private val listeners = arrayListOf<OnRageBarValuesChangeListener>()
+    private var resultFraction: Int = FRACTION_DIGITS_COUNT
 
     @ColorRes
     private val defaultBackgroundColorRes = R.color.pale_gray
@@ -53,8 +64,8 @@ class RangeBarView @JvmOverloads constructor(
     private val rangeBarRect = RectF()
     private var indicatorsStartY = 0f
 
-    private var startProgress = 0f // todo for test add as arguments and setter
-    private var endProgress = 1f // todo for test add as arguments and setter
+    private var startProgress = 0f
+    private var endProgress = 1f
 
     private var movementState = MovementState.IDLE
 
@@ -62,6 +73,32 @@ class RangeBarView @JvmOverloads constructor(
         initAttributes(attrs)
         initPaints()
     }
+
+    fun updateValuesRange(range: ClosedFloatingPointRange<Double>) {
+        valuesRange = range
+        setValues(range.start, range.endInclusive)
+    }
+
+    fun setValues(start: Double, end: Double) {
+        if (start !in valuesRange || end !in valuesRange)
+            throw IllegalArgumentException("Values must be in : $valuesRange")
+        values = Values(start.normalize(), end.normalize())
+        onValuesChangedOutside()
+    }
+
+    fun addOnValuesChangeListener(listener: OnRageBarValuesChangeListener) {
+        listeners.add(listener)
+    }
+
+    fun removeOnValuesChangeListener(listener: OnRageBarValuesChangeListener) {
+        listeners.remove(listener)
+    }
+
+    fun values() = Consumer<Pair<Double, Double>> {
+        setValues(it.first, it.second)
+    }
+
+    fun valuesChanges(): Observable<Pair<Double, Double>> = RangeValuesChangedObserver(this)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -92,18 +129,16 @@ class RangeBarView @JvmOverloads constructor(
                     val touchX = event.x
                     if (movementState == MovementState.DRAG_LEFT_EDGE && canDragLeftEdge(touchX)) {
                         startProgress = touchX / rangeBarWidth
-                        onProgressChanged()
+                        onUpdateAndInvalidate()
                     }
                     if (movementState == MovementState.DRAG_RIGHT_EDGE && canDragRightEdge(touchX)) {
                         endProgress = touchX / rangeBarWidth
-                        onProgressChanged()
+                        onUpdateAndInvalidate()
                     }
                     disableParentTouch()
                 }
             }
-            else -> {
-                movementState = MovementState.IDLE
-            }
+            else -> movementState = MovementState.IDLE
         }
         return true
     }
@@ -117,6 +152,8 @@ class RangeBarView @JvmOverloads constructor(
             it.drawEndIndicators()
         }
     }
+
+    // ---- Private methods ---- //
 
     private fun Canvas.drawStartIndicators() {
         val x1 = rangeBarRect.left + indicatorsShift * 2
@@ -155,6 +192,18 @@ class RangeBarView @JvmOverloads constructor(
                 R.styleable.RangeBarView_rbv_indicators_color,
                 ContextCompat.getColor(context, defaultIndicatorsColorRes)
             )
+            resultFraction = a.getInteger(
+                R.styleable.RangeBarView_rbv_fraction_digits_count, FRACTION_DIGITS_COUNT
+            )
+            val startRangeValue = a.getFloat(
+                R.styleable.RangeBarView_rbv_range_start,
+                DEFAULT_START_VALUE.toFloat()
+            )
+            val endRangeValue = a.getFloat(
+                R.styleable.RangeBarView_rbv_range_end,
+                DEFAULT_END_VALUE.toFloat()
+            )
+            updateValuesRange(startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize())
             a.recycle()
         } else {
             initDefault()
@@ -204,12 +253,44 @@ class RangeBarView @JvmOverloads constructor(
         indicatorsPaint.strokeWidth = indicatorsWidth
     }
 
+    private fun onUpdateAndInvalidate() {
+        onProgressChanged()
+        onValuesChanged()
+        invalidate()
+    }
+
     private fun onProgressChanged() {
         val left = rangeBarWidth * startProgress
         val right = rangeBarWidth * endProgress
         rangeBarRect.set(left, 0f, right, rangeBarHeight)
+    }
+
+    private fun onValuesChanged() {
+        val start = ((valuesRange.endInclusive - valuesRange.start) * startProgress + valuesRange.start).normalize()
+        val end = ((valuesRange.endInclusive - valuesRange.start) * endProgress + valuesRange.start).normalize()
+
+        if (values.start != start || values.end != end) {
+            values.start = start
+            values.end = end
+            notifyListeners()
+        }
+    }
+
+    private fun onValuesChangedOutside() {
+        startProgress = ((values.start - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
+        endProgress = ((values.end - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
+        onProgressChanged()
         invalidate()
     }
+
+    private fun notifyListeners() {
+        listeners.forEach {
+            it.onValuesChanged(values.start, values.end)
+        }
+    }
+
+    private fun Double.normalize(): Double =
+        Math.round(this * 10.times(resultFraction)) / 10.times(resultFraction).toDouble()
 
     private fun isInLeftIndicatorBounds(x: Float, y: Float) =
         x in rangeBarRect.left - touchBounds..rangeBarRect.left + touchBounds &&
@@ -238,9 +319,16 @@ class RangeBarView @JvmOverloads constructor(
         private const val INDICATOR_SHIFT_DP = 2f
         private const val INDICATOR_ALPHA = 128
         private const val TOUCH_BOUNDS_DP = 20f
+        private const val FRACTION_DIGITS_COUNT = 1
+        private const val DEFAULT_START_VALUE = 0.0
+        private const val DEFAULT_END_VALUE = 100.0
+        private const val TRIANGLE_HEIGHT_DP = 7
+        private const val TRIANGLE_PADDING_DP = 3
     }
 
     private enum class MovementState {
         DRAG_LEFT_EDGE, DRAG_RIGHT_EDGE, IDLE
     }
+
+    private class Values(var start: Double, var end: Double)
 }

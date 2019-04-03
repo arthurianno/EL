@@ -34,5 +34,8 @@
         <attr name="rbv_indicators_color" format="reference|color" />
         <attr name="rbv_background_color" format="reference|color" />
         <attr name="rbv_color" format="reference|color" />
+        <attr name="rbv_range_start" format="float" />
+        <attr name="rbv_range_end" format="float" />
+        <attr name="rbv_fraction_digits_count" format="integer" />
     </declare-styleable>
 </resources>

@@ -7,6 +7,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.glucose.p
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_glucose.*
+import timber.log.Timber
 
 class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialogPm>() {
 
@@ -20,6 +21,10 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             glucoseRangeContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
+        }
+        glucoseRangeBarView.setValues(3.9, 10.0)
+        glucoseRangeBarView.valuesChanges().bindTo {
+            Timber.d("onValues : {${it.first} / ${it.second}}")
         }
     }
 
