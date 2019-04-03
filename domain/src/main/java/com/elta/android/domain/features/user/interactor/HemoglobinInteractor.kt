@@ -13,6 +13,4 @@ fun decrement(original: Double): Double = (if (original > MIN) original.minus(ST
 
 fun Profile.getHemoglobinLevel(): Double = this.hba1cLevel ?: DEFAULT_VALUE
 
-fun Profile?.isHemoglobinLevelChanged(input: Double): Boolean = if (this?.hba1cLevel == null) true else hba1cLevel != input
-
 fun Double.round(places: Int): Double = BigDecimal(this).setScale(places, BigDecimal.ROUND_HALF_EVEN).toDouble()

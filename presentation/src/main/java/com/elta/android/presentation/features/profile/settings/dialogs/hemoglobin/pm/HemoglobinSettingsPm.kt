@@ -7,7 +7,6 @@ import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.decrement
 import com.elta.android.domain.features.user.interactor.getHemoglobinLevel
 import com.elta.android.domain.features.user.interactor.increment
-import com.elta.android.domain.features.user.interactor.isHemoglobinLevelChanged
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
@@ -40,6 +39,9 @@ class HemoglobinSettingsPm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
 
+        // always enabled for hemoglobin
+        actionButtonEnabledCommand.consumer.accept(true)
+
         dateSelectedAction.observable
             .subscribe(dateSelectedState.consumer)
             .untilDestroy()
@@ -66,10 +68,6 @@ class HemoglobinSettingsPm @Inject constructor(
             .untilDestroy()
 
         inputValueState.observable
-            .doOnNext {
-                val profile = profileState.valueOrNull
-                actionButtonEnabledCommand.consumer.accept(profile.isHemoglobinLevelChanged(it))
-            }
             .subscribe { hemoglobinValueState.consumer.accept(NumberFormatter.format(it)) }
             .untilDestroy()
 
