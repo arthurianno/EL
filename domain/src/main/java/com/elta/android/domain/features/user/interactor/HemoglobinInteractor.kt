@@ -11,3 +11,5 @@ fun increment(original: Double): Double = if (original < MAX) original.plus(STEP
 fun decrement(original: Double): Double = if (original > MIN) original.minus(STEP) else MIN
 
 fun Profile.getHemoglobinLevel(): Double = this.hba1cLevel ?: DEFAULT_VALUE
+
+fun Profile?.isHemoglobinLevelChanged(input: Double): Boolean = if (this?.hba1cLevel == null) true else hba1cLevel != input
