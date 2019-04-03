@@ -14,5 +14,5 @@ object NumberFormatter {
         }
     }
 
-    fun format(value: Double) : String = numberFormat.format(value)
+    fun format(value: Double): String = numberFormat.format(value)
 }
