@@ -6,10 +6,12 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
+import com.elta.android.presentation.utils.sequenceClicks
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
 import org.threeten.bp.DateTimeUtils
@@ -46,11 +48,11 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         pm.dateSelectedState.bindTo { calendarView.selectedDate = it.toCalendarDay() }
         pm.dateState.bindTo(dateView.text())
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
-        minusView.clicks().bindTo {
+        Observable.merge(minusView.clicks(), minusView.sequenceClicks()).bindTo {
             minusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             pm.minusAction.consumer.accept(Unit)
         }
-        plusView.clicks().bindTo {
+        Observable.merge(plusView.clicks(), plusView.sequenceClicks()).bindTo {
             plusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             pm.plusAction.consumer.accept(Unit)
         }
