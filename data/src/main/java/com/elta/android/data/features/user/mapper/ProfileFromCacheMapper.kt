@@ -1,15 +1,19 @@
 package com.elta.android.data.features.user.mapper
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.dto.DiabetTypeDto
 import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.SocialNetworkDto
 import javax.inject.Inject
 
-class ProfileFromCacheMapper @Inject constructor() : Mapper<ProfileCacheDto, ProfileDto> {
+class ProfileFromCacheMapper @Inject constructor(
+    private val mapper: Mapper<NetworkCacheDto, SocialNetworkDto>
+) : Mapper<ProfileCacheDto, ProfileDto> {
     override fun mapFromObject(source: ProfileCacheDto): ProfileDto =
         with(source) {
             ProfileDto(
@@ -25,7 +29,8 @@ class ProfileFromCacheMapper @Inject constructor() : Mapper<ProfileCacheDto, Pro
                     maxValue = maxValue
                 ),
                 email = email,
-                timeStamp = timeStamp
+                timeStamp = timeStamp,
+                socialNetworks = mapper.mapFromObjects(socialNetworks)
             )
         }
 }
