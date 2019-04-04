@@ -16,6 +16,7 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import com.elta.android.presentation.R
+import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
 import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
 import com.nullgr.core.font.getTypeface
@@ -24,6 +25,7 @@ import com.nullgr.core.ui.extensions.spToPx
 import io.reactivex.Observable
 import java.util.function.Consumer
 
+@Suppress("MagicNumbers", "TooManyFunctions")
 class RangeBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -36,10 +38,18 @@ class RangeBarView @JvmOverloads constructor(
     val endValue: Double
         get() = values.end
 
-    private var valuesRange: ClosedFloatingPointRange<Double> = DEFAULT_START_VALUE..DEFAULT_END_VALUE
-    private var values: Values = Values(DEFAULT_START_VALUE, DEFAULT_END_VALUE)
+    var valuesRange = DEFAULT_START_VALUE..DEFAULT_END_VALUE
+        set(value) {
+            field = value
+            setValues(value.start, value.endInclusive)
+        }
+
+    private var values = Values(DEFAULT_START_VALUE, DEFAULT_END_VALUE)
     private val listeners = arrayListOf<OnRageBarValuesChangeListener>()
-    private var resultFraction: Int = FRACTION_DIGITS_COUNT
+    private var resultFraction = FRACTION_DIGITS_COUNT
+    private var startProgress = 0f
+    private var endProgress = 1f
+    private var movementState = MovementState.IDLE
 
     @ColorRes
     private val defaultBackgroundColorRes = R.color.pale_gray
@@ -49,24 +59,26 @@ class RangeBarView @JvmOverloads constructor(
     private val defaultIndicatorsColorRes = R.color.white
     @ColorRes
     private val defaultTextColor = R.color.black_blue
+
     @ColorInt
     private var viewBackgroundColor = 0
     @ColorInt
     private var rangeBarColor = 0
     @ColorInt
-    private var indicatorsColor = 0
+    private var dragIndicatorsColor = 0
     @ColorInt
     private var textColor = 0
 
     private var rangeBarTopY = 0f
     private var rangeBarHeight = 0f
-    private var rangeBarWidth = 0f
+    private var fullViewWidth = 0f
     private var cornerRadius = 0f
 
-    private var indicatorsWidth = 0f
-    private var indicatorsHeight = 0f
-    private var indicatorsShift = 0f
-    private var touchBounds = 0f
+    private var dragIndicatorsWidth = 0f
+    private var dragIndicatorsHeight = 0f
+    private var dragIndicatorsPadding = 0f
+    private var dragIndicatorsTopY = 0f
+    private var dragTouchBounds = 0f
 
     private var trianglesPadding = 0f
     private var trianglesHeight = 0f
@@ -74,31 +86,21 @@ class RangeBarView @JvmOverloads constructor(
 
     private var titleHeight = 0f
     private var titlePadding = 0f
+    private var titleOffset = 0f
 
     private lateinit var backgroundPaint: Paint
     private lateinit var rangeBarPaint: Paint
-    private lateinit var indicatorsPaint: Paint
+    private lateinit var dragIndicatorsPaint: Paint
     private lateinit var trianglesPaint: Paint
     private lateinit var valueTextPaint: Paint
     private lateinit var trianglesBitmap: Bitmap
 
-    private val mainRect = RectF()
+    private val backgroundRect = RectF()
     private val rangeBarRect = RectF()
-    private var indicatorsStartY = 0f
-
-    private var startProgress = 0f
-    private var endProgress = 1f
-
-    private var movementState = MovementState.IDLE
 
     init {
         initAttributes(attrs)
         initPaints()
-    }
-
-    fun updateValuesRange(range: ClosedFloatingPointRange<Double>) {
-        valuesRange = range
-        setValues(range.start, range.endInclusive)
     }
 
     fun setValues(start: Double, end: Double) {
@@ -146,20 +148,21 @@ class RangeBarView @JvmOverloads constructor(
                     disableParentTouch()
                 }
             }
-            MotionEvent.ACTION_MOVE -> {
+
+            MotionEvent.ACTION_MOVE ->
                 if (movementState != MovementState.IDLE) {
                     val touchX = event.x
                     if (movementState == MovementState.DRAG_LEFT_EDGE && canDragLeftEdge(touchX)) {
-                        startProgress = touchX / rangeBarWidth
+                        startProgress = (touchX - backgroundRect.left) / backgroundRect.width()
                         onUpdateAndInvalidate()
                     }
                     if (movementState == MovementState.DRAG_RIGHT_EDGE && canDragRightEdge(touchX)) {
-                        endProgress = touchX / rangeBarWidth
+                        endProgress = (touchX - backgroundRect.left) / backgroundRect.width()
                         onUpdateAndInvalidate()
                     }
                     disableParentTouch()
                 }
-            }
+
             else -> movementState = MovementState.IDLE
         }
         return true
@@ -169,10 +172,10 @@ class RangeBarView @JvmOverloads constructor(
         super.onDraw(canvas)
         canvas?.let {
             it.drawRangeBar()
-            it.drawStartTitle()
-            it.drawEndTitle()
-            it.drawStartIndicators()
-            it.drawEndIndicators()
+            it.drawStartValueText()
+            it.drawEndValueText()
+            it.drawStartDragIndicators()
+            it.drawEndDragIndicators()
             it.drawStartTriangle()
             it.drawEndTriangle()
         }
@@ -181,18 +184,18 @@ class RangeBarView @JvmOverloads constructor(
     // ------ Draw methods ----- //
 
     private fun Canvas.drawRangeBar() {
-        drawRoundRect(mainRect, cornerRadius, cornerRadius, backgroundPaint)
+        drawRoundRect(backgroundRect, cornerRadius, cornerRadius, backgroundPaint)
         drawRoundRect(rangeBarRect, cornerRadius, cornerRadius, rangeBarPaint)
     }
 
-    private fun Canvas.drawStartTitle() {
+    private fun Canvas.drawStartValueText() {
         val left = rangeBarRect.left + trianglesPadding / 2 + trianglesWidth / 2
-        drawText(values.start.toString(), left, titleHeight, valueTextPaint)
+        drawText(values.start.format(), left, titleHeight, valueTextPaint)
     }
 
-    private fun Canvas.drawEndTitle() {
+    private fun Canvas.drawEndValueText() {
         val left = rangeBarRect.right - trianglesWidth / 2 - trianglesPadding / 2
-        drawText(values.end.toString(), left, titleHeight, valueTextPaint)
+        drawText(values.end.format(), left, titleHeight, valueTextPaint)
     }
 
     private fun Canvas.drawStartTriangle() {
@@ -205,18 +208,18 @@ class RangeBarView @JvmOverloads constructor(
         drawBitmap(trianglesBitmap, left, titleHeight + titlePadding, trianglesPaint)
     }
 
-    private fun Canvas.drawStartIndicators() {
-        val x1 = rangeBarRect.left + indicatorsShift * 2
-        drawLine(x1, indicatorsStartY, x1, indicatorsStartY + indicatorsHeight, indicatorsPaint)
-        val x2 = x1 + indicatorsWidth + indicatorsShift
-        drawLine(x2, indicatorsStartY, x2, indicatorsStartY + indicatorsHeight, indicatorsPaint)
+    private fun Canvas.drawStartDragIndicators() {
+        val x1 = rangeBarRect.left + dragIndicatorsPadding * 2
+        drawLine(x1, dragIndicatorsTopY, x1, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        val x2 = x1 + dragIndicatorsWidth + dragIndicatorsPadding
+        drawLine(x2, dragIndicatorsTopY, x2, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
     }
 
-    private fun Canvas.drawEndIndicators() {
-        val x1 = rangeBarRect.right - indicatorsShift * 2
-        drawLine(x1, indicatorsStartY, x1, indicatorsStartY + indicatorsHeight, indicatorsPaint)
-        val x2 = x1 - indicatorsWidth - indicatorsShift
-        drawLine(x2, indicatorsStartY, x2, indicatorsStartY + indicatorsHeight, indicatorsPaint)
+    private fun Canvas.drawEndDragIndicators() {
+        val x1 = rangeBarRect.right - dragIndicatorsPadding * 2
+        drawLine(x1, dragIndicatorsTopY, x1, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        val x2 = x1 - dragIndicatorsWidth - dragIndicatorsPadding
+        drawLine(x2, dragIndicatorsTopY, x2, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
     }
 
     // ---- Init methods ---- //
@@ -240,7 +243,7 @@ class RangeBarView @JvmOverloads constructor(
                 R.styleable.RangeBarView_rbv_color,
                 ContextCompat.getColor(context, defaultRangeBarColorRes)
             )
-            indicatorsColor = a.getColor(
+            dragIndicatorsColor = a.getColor(
                 R.styleable.RangeBarView_rbv_indicators_color,
                 ContextCompat.getColor(context, defaultIndicatorsColorRes)
             )
@@ -259,7 +262,7 @@ class RangeBarView @JvmOverloads constructor(
                 R.styleable.RangeBarView_rbv_range_end,
                 DEFAULT_END_VALUE.toFloat()
             )
-            updateValuesRange(startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize())
+            valuesRange = startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize()
             a.recycle()
         } else {
             initDefault()
@@ -271,7 +274,7 @@ class RangeBarView @JvmOverloads constructor(
         cornerRadius = DEFAULT_CORNER_RADIUS_DP.dpToPx(context)
         viewBackgroundColor = ContextCompat.getColor(context, defaultBackgroundColorRes)
         rangeBarColor = ContextCompat.getColor(context, defaultRangeBarColorRes)
-        indicatorsColor = ContextCompat.getColor(context, defaultIndicatorsColorRes)
+        dragIndicatorsColor = ContextCompat.getColor(context, defaultIndicatorsColorRes)
         textColor = ContextCompat.getColor(context, defaultTextColor)
     }
 
@@ -285,8 +288,8 @@ class RangeBarView @JvmOverloads constructor(
             style = Paint.Style.FILL
             flags = Paint.ANTI_ALIAS_FLAG
         }
-        indicatorsPaint = Paint().apply {
-            color = indicatorsColor
+        dragIndicatorsPaint = Paint().apply {
+            color = dragIndicatorsColor
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
             alpha = INDICATOR_ALPHA
@@ -301,35 +304,43 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun beforeOnMeasure(widthMeasureSpec: Int) {
-        rangeBarWidth = MeasureSpec.getSize(widthMeasureSpec).toFloat()
+        fullViewWidth = MeasureSpec.getSize(widthMeasureSpec).toFloat()
+
         trianglesBitmap = context.decodeBitmap(R.drawable.ic_range_bar_triangle)
         trianglesHeight = trianglesBitmap.height.toFloat()
         trianglesWidth = trianglesBitmap.width.toFloat()
         trianglesPadding = TRIANGLE_PADDING_DP.dpToPx(context)
+
         val fontMetrics = valueTextPaint.fontMetrics
         titleHeight = fontMetrics.descent - fontMetrics.ascent
         titlePadding = TEXT_PADDING_DP.dpToPx(context)
+        titleOffset = valueTextPaint.measureText(STUB_TEXT)
     }
 
     private fun afterOnMeasure() {
-        val left = rangeBarWidth * startProgress
-        val right = rangeBarWidth * endProgress
         rangeBarTopY = trianglesHeight + trianglesPadding + titleHeight + titlePadding
-        mainRect.set(paddingLeft.toFloat(), rangeBarTopY, rangeBarWidth, rangeBarTopY + rangeBarHeight)
-        rangeBarRect.set(left, rangeBarTopY, right, rangeBarTopY + rangeBarHeight)
-        initIndicatorsSizes()
-        touchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
+
+        val backgroundLeft = paddingLeft.toFloat() + titleOffset
+        val backgroundRight = fullViewWidth - titleOffset
+        backgroundRect.set(backgroundLeft, rangeBarTopY, backgroundRight, rangeBarTopY + rangeBarHeight)
+
+        val rangeBarLeft = backgroundRect.left + backgroundRect.width() * startProgress
+        val rangeBarRight = backgroundRect.left + backgroundRect.width() * endProgress
+        rangeBarRect.set(rangeBarLeft, rangeBarTopY, rangeBarRight, rangeBarTopY + rangeBarHeight)
+
+        initDragIndicatorsSizes()
+        dragTouchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
     }
 
-    private fun initIndicatorsSizes() {
-        indicatorsWidth = INDICATOR_WIDTH_DP.dpToPx(context)
-        indicatorsHeight = rangeBarHeight * INDICATOR_HEIGHT_PERCENTS
-        indicatorsShift = INDICATOR_SHIFT_DP.dpToPx(context)
-        indicatorsStartY = mainRect.top + (rangeBarHeight - indicatorsHeight) / 2
-        indicatorsPaint.strokeWidth = indicatorsWidth
+    private fun initDragIndicatorsSizes() {
+        dragIndicatorsWidth = INDICATOR_WIDTH_DP.dpToPx(context)
+        dragIndicatorsHeight = rangeBarHeight * INDICATOR_HEIGHT_PERCENTS
+        dragIndicatorsPadding = INDICATOR_SHIFT_DP.dpToPx(context)
+        dragIndicatorsTopY = backgroundRect.top + (rangeBarHeight - dragIndicatorsHeight) / 2
+        dragIndicatorsPaint.strokeWidth = dragIndicatorsWidth
     }
 
-    // ----- Interact methods ------ //
+    // --------- Interact methods ------ //
 
     private fun onUpdateAndInvalidate() {
         onProgressChanged()
@@ -338,8 +349,8 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun onProgressChanged() {
-        rangeBarRect.left = rangeBarWidth * startProgress
-        rangeBarRect.right = rangeBarWidth * endProgress
+        rangeBarRect.left = backgroundRect.left + backgroundRect.width() * startProgress
+        rangeBarRect.right = backgroundRect.left + backgroundRect.width() * endProgress
     }
 
     private fun onValuesChanged() {
@@ -371,20 +382,21 @@ class RangeBarView @JvmOverloads constructor(
     private fun Double.normalize(): Double =
         Math.round(this * 10.times(resultFraction)) / 10.times(resultFraction).toDouble()
 
+    private fun Double.format() = NumberFormatter.numberFormat.format(this)
+
     private fun isInLeftIndicatorBounds(x: Float, y: Float) =
-        x in rangeBarRect.left - touchBounds..rangeBarRect.left + touchBounds &&
+        x in rangeBarRect.left - dragTouchBounds..rangeBarRect.left + dragTouchBounds &&
             y > rangeBarTopY && y < rangeBarTopY + rangeBarHeight
 
     private fun isInRightIndicatorBounds(x: Float, y: Float) =
-        x in rangeBarRect.right - touchBounds..rangeBarRect.right + touchBounds &&
+        x in rangeBarRect.right - dragTouchBounds..rangeBarRect.right + dragTouchBounds &&
             y > rangeBarTopY && y < rangeBarTopY + rangeBarHeight
 
     private fun canDragLeftEdge(x: Float) =
-        x > paddingLeft && x < rangeBarRect.right - touchBounds * 2
+        x > backgroundRect.left && x < rangeBarRect.right - dragTouchBounds * 2
 
-    private fun canDragRightEdge(x: Float): Boolean {
-        return x < rangeBarWidth && x > rangeBarRect.left + touchBounds * 2
-    }
+    private fun canDragRightEdge(x: Float) =
+        x < backgroundRect.right && x > rangeBarRect.left + dragTouchBounds * 2
 
     private fun disableParentTouch() {
         parent.requestDisallowInterceptTouchEvent(true)
@@ -422,11 +434,12 @@ class RangeBarView @JvmOverloads constructor(
         private const val TEXT_PADDING_DP = 5f
         private const val DEFAULT_TEXT_SIZE = 15f
         private const val TYPEFACE = "roboto_medium.ttf"
+        private const val STUB_TEXT = "#"
     }
 
     private enum class MovementState {
         DRAG_LEFT_EDGE, DRAG_RIGHT_EDGE, IDLE
     }
 
-    private class Values(var start: Double, var end: Double)
+    private data class Values(var start: Double, var end: Double)
 }

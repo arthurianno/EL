@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="18dp"
     android:paddingBottom="39dp">
 
     <com.elta.android.presentation.widgets.range_bar.RangeBarView
         android:id="@+id/glucoseRangeBarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         app:rbv_fraction_digits_count="1"
         app:rbv_range_end="20.0"
         app:rbv_range_start="1.0" />
@@ -20,7 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
         <android.support.v7.widget.AppCompatImageView
             android:layout_width="wrap_content"
