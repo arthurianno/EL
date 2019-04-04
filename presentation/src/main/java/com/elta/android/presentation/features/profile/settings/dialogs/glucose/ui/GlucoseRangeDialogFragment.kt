@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_glucose.*
 import timber.log.Timber
 
+@Suppress("MagicNumber")
 class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialogPm>() {
 
     override val contentLayout = R.layout.layout_settings_dialog_glucose
