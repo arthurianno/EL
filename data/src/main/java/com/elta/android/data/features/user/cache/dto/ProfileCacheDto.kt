@@ -1,7 +1,9 @@
 package com.elta.android.data.features.user.cache.dto
 
+import io.objectbox.annotation.Backlink
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.relation.ToMany
 
 @Entity
 data class ProfileCacheDto(
@@ -19,4 +21,7 @@ data class ProfileCacheDto(
     // represents GlucoseLevelDto
     val minValue: Double?,
     val maxValue: Double?
-)
+) {
+    @Backlink(to = "profile")
+    lateinit var socialNetworks: ToMany<NetworkCacheDto>
+}

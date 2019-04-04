@@ -11,4 +11,6 @@ interface Cache<T> {
     fun get(condition: Condition): T?
 
     fun getAll(condition: Condition): List<T>
+
+    fun attach(entity: T)
 }

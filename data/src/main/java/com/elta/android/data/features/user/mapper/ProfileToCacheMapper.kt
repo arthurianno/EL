@@ -6,6 +6,7 @@ import com.elta.android.data.features.user.dto.ProfileDto
 import javax.inject.Inject
 
 class ProfileToCacheMapper @Inject constructor() : Mapper<ProfileDto, ProfileCacheDto> {
+
     override fun mapFromObject(source: ProfileDto): ProfileCacheDto =
         with(source) {
             ProfileCacheDto(

@@ -23,8 +23,12 @@ import com.elta.android.data.features.sale_points.mapper.CoordinatesToDomainMapp
 import com.elta.android.data.features.sale_points.mapper.SalePointFromCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
+import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.SocialNetworkDto
+import com.elta.android.data.features.user.mapper.NetworkFromCacheMapper
+import com.elta.android.data.features.user.mapper.NetworkToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
@@ -113,9 +117,19 @@ abstract class MappersModule {
     ): Mapper<ProfileCacheDto, ProfileDto>
 
     @Binds
+    abstract fun bindNetworkFromCacheMapper(
+        mapper: NetworkFromCacheMapper
+    ): Mapper<NetworkCacheDto, SocialNetworkDto>
+
+    @Binds
     abstract fun bindProfileToCacheMapper(
         mapper: ProfileToCacheMapper
     ): Mapper<ProfileDto, ProfileCacheDto>
+
+    @Binds
+    abstract fun bindNetworkToCacheMapper(
+        mapper: NetworkToCacheMapper
+    ): Mapper<SocialNetworkDto, NetworkCacheDto>
 
     @Binds
     abstract fun bindProfileToDtoMapper(

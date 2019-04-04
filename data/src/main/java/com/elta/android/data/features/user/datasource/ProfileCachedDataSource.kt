@@ -12,15 +12,15 @@ import javax.inject.Inject
 
 class ProfileCachedDataSource @Inject constructor(
     private val userHolder: UserHolder,
-    private val fromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
-    private val toCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
-    private val cache: Cache<ProfileCacheDto>
+    private val profileFromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
+    private val profileToCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
+    private val profileCache: Cache<ProfileCacheDto>
 ) : ProfileDataSource {
 
     override fun updateProfile(profile: ProfileDto): Completable =
         Completable.fromCallable {
             userHolder.currentUser?.let {
-                cache.get(CommonConditions.ById(it))?.let { cachedProfile ->
+                profileCache.get(CommonConditions.ById(it))?.let { cachedProfile ->
                     val newProfile = cachedProfile.copy(
                         diabetes = profile.diabetes?.name ?: cachedProfile.diabetes,
                         weight = profile.weight ?: cachedProfile.weight,
@@ -32,16 +32,16 @@ class ProfileCachedDataSource @Inject constructor(
                         minValue = profile.glucoseLevel?.minValue ?: cachedProfile.minValue,
                         maxValue = profile.glucoseLevel?.maxValue ?: cachedProfile.maxValue
                     )
-                    cache.update(listOf(newProfile))
-                } ?: cache.add(listOf(toCacheMapper.mapFromObject(profile)))
+                    profileCache.update(listOf(newProfile))
+                } ?: profileCache.add(listOf(profileToCacheMapper.mapFromObject(profile)))
             }
         }
 
     override fun getUserProfile(): Single<ProfileDto> =
         Single.fromCallable {
             userHolder.currentUser?.let {
-                cache.get(CommonConditions.ById(it))
+                profileCache.get(CommonConditions.ById(it))
                     ?: throw NoSuchElementException("Current user profile is empty.")
             }
-        }.map(fromCacheMapper::mapFromObject)
+        }.map(profileFromCacheMapper::mapFromObject)
 }
