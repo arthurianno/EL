@@ -19,7 +19,7 @@ fun EventType.toName(): Int =
         EventType.WEIGHT -> R.string.event_type_weight
         EventType.ACTIVITY -> R.string.event_type_activity
         EventType.GLUCOSE -> R.string.event_type_glucose
-        EventType.HDA1C -> R.string.event_type_hba1c
+        EventType.GLYCATEDHEMOGLOBIN -> R.string.event_type_hba1c
     }
 
 @DrawableRes

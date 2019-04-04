@@ -3,7 +3,6 @@ package com.elta.android.data.features.auth.datasource
 import com.elta.android.common.errors.EmailAlreadyConfirmedError
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.request.AuthRequest
-import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.api.request.TokenRequest
@@ -24,9 +23,6 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun login(email: String, password: String): Single<LoginDto> =
         api.login(AuthRequest(email, password))
-
-    override fun refresh(accessToken: String, refreshToken: String): Single<TokensDto> =
-        api.refresh(RefreshRequest(accessToken, refreshToken))
 
     override fun isEmailConfirmed(): Single<EmailStatusDto> =
         api.isEmailConfirmed()

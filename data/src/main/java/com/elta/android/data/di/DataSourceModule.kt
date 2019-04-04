@@ -6,6 +6,8 @@ import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
+import com.elta.android.data.features.devices.datasource.DeviceDataSource
+import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSource
@@ -73,4 +75,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindTagsCachedDataSource(source: TagsCachedDataSource): TagsDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDeviceDataSource(source: DeviceRemoteDataSource): DeviceDataSource
 }
