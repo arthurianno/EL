@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.registration.social.ui
 
 import android.os.Bundle
 import android.view.View
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.registration.main.ui.BaseRegistrationFragment
 import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
@@ -19,7 +19,7 @@ class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val network = arguments?.getSerializable(EXTRA_NETWORK) as? SocialNetwork
+        val network = arguments?.getSerializable(EXTRA_NETWORK) as? SocialNetworkType
         if (network != null) {
             presentationModel.setSocialNetwork(network)
         }
@@ -37,7 +37,7 @@ class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm
 
     companion object {
         private const val EXTRA_NETWORK = "extra_network"
-        fun newInstance(network: SocialNetwork): RegistrationSocialFragment =
+        fun newInstance(network: SocialNetworkType): RegistrationSocialFragment =
             RegistrationSocialFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_NETWORK, network)

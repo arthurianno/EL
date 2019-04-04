@@ -29,6 +29,7 @@ import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.mapper.NetworkFromCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToCacheMapper
+import com.elta.android.data.features.user.mapper.NetworkToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
@@ -39,6 +40,7 @@ import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.user.model.SocialNetwork
 import dagger.Binds
 import dagger.Module
 
@@ -140,4 +142,9 @@ abstract class MappersModule {
     abstract fun bindProfileToDomainMapper(
         mapper: ProfileToDomainMapper
     ): Mapper<ProfileDto, Profile>
+
+    @Binds
+    abstract fun bindNetworkToDomainMapper(
+        mapper: NetworkToDomainMapper
+    ): Mapper<SocialNetworkDto, SocialNetwork>
 }

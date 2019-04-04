@@ -4,7 +4,7 @@ import android.content.Context
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
 import com.elta.android.data.features.auth.dto.SocialUserDto
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -31,7 +31,7 @@ class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
                     }
                 }
             })
-        }.onErrorResumeNext(SocialNetwork.OK.authAndGetToken(context))
+        }.onErrorResumeNext(SocialNetworkType.OK.authAndGetToken(context))
 
     override fun getSocialUser(): Single<SocialUserDto> = Single.create { emitter ->
         ok.requestAsync("users.getCurrentUser", null, OkRequestMode.DEFAULT, object : OkListener {

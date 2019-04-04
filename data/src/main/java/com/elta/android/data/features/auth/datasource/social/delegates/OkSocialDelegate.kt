@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.elta.android.data.R
 import com.elta.android.data.features.auth.datasource.social.SocialResult
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import org.json.JSONException
 import org.json.JSONObject
 import ru.ok.android.sdk.Odnoklassniki
@@ -15,7 +15,7 @@ import ru.ok.android.sdk.util.OkScope
 
 class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
-    override val network: SocialNetwork = SocialNetwork.OK
+    override val network: SocialNetworkType = SocialNetworkType.OK
 
     private val okCallback = object : OkListener {
         override fun onSuccess(result: JSONObject) {
