@@ -20,6 +20,8 @@ internal inline fun FormSelectorControl.bind(
 ) {
     compositeDisposable.add(
         option.observable
+            // skip empty value to save initial state of view
+            .skipWhile { it.icon == null && it.meta == null && it.text == null }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(selectorView.value())
     )

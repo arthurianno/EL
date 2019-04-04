@@ -3,6 +3,7 @@ package com.elta.android.domain.features.diary.events.interactor
 import com.elta.android.domain.features.diary.events.model.addTag
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.interactor.getEventsBlocks
+import com.elta.android.domain.features.diary.home.interactor.sortAndFilter
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.domain.features.diary.home.model.atEndOfDay
 import com.elta.android.domain.features.diary.home.model.atTimeOfDay
@@ -32,7 +33,7 @@ class GetEventsByDateUseCase @Inject constructor(
             val eventsWithTags = events.map { it.addTag(tags) }
             Pair(eventsWithTags, tags)
         }.map {
-            val sortedEvents = it.first.sortedByDescending { it.additionTime }
+            val sortedEvents = it.first.sortAndFilter()
             getEventsBlocks(sortedEvents, it.second)
         }
     }

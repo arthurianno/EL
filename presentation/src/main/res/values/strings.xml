@@ -173,7 +173,7 @@
     <string name="insulin_type_short">Короткий</string>
     <string name="insulin_type_intermidiate">Средний</string>
     <string name="insulin_type_long">Длинный</string>
-    <string name="insulin_type_ultralong">Ультрадлинный</string>
+    <string name="insulin_type_ultralong">Сверхдлинный</string>
     <string name="insulin_type_mixed">Смешанный</string>
 
     <!-- ACTIVITY TYPES -->
@@ -245,16 +245,17 @@
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
     <string name="events_options_chooser_title_activities">Вид активности</string>
-    <string name="events_options_chooser_title_insulin">Тип исулина</string>
+    <string name="events_options_chooser_title_insulin">Тип инсулина</string>
 
     <string name="events_options_chooser_header_tags">Доступные теги</string>
-    <string name="events_options_chooser_header_variants">Доступные варианты</string>
+    <string name="events_options_chooser_header_variants_insulin">Доступные варианты</string>
+    <string name="events_options_chooser_header_variants_activity">Доступные виды</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
 
 
     <string name="events_creation_hint_tags">Тег для группировки</string>
     <string name="events_creation_hint_activities">Вид активности</string>
-    <string name="events_creation_hint_insulin">Тип исулина *</string>
+    <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
     <string name="events_creation_hint_bread">Название блюда или продукта</string>
@@ -332,4 +333,20 @@
     <string name="profile_diabetes">Диабет</string>
     <string name="profile_main_empty_value">—</string>
     <string name="profile_name_placeholder">Профиль</string>
+
+    <string name="profile_settings_dialog_diabetes_title">Диабет</string>
+    <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
+    <string name="profile_settings_dialog_diabetes_description">Если вам нужно изменить тип диабета, выберите нужный тип из списка</string>
+    <string name="profile_settings_dialog_diabetes_action_button">Выбрать</string>
+
+    <string name="profile_settings_dialog_glucose_title">Диапазон</string>
+    <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
+    <string name="profile_settings_dialog_glucose_description">Задайте диапазон положительных значений ваших измерений</string>
+    <string name="profile_settings_dialog_glucose_action_button">Установить</string>
+
+    <string name="profile_settings_dialog_hba1c_title">HbA1C</string>
+    <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
+    <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1C</string>
+    <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
+    <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
 </resources>
