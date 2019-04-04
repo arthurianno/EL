@@ -23,7 +23,7 @@ import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.spToPx
 import io.reactivex.Observable
-import java.util.function.Consumer
+import io.reactivex.functions.Consumer
 
 @Suppress("MagicNumbers", "TooManyFunctions")
 class RangeBarView @JvmOverloads constructor(
