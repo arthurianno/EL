@@ -9,6 +9,8 @@ import com.nullgr.core.resources.ResourceProvider
 import java.util.Calendar
 import java.util.Date
 
+const val DATE_FORMAT_WITHOUT_ZERO = "d LLL yyyy"
+
 fun Date.toEventTime(resourceProvider: ResourceProvider) =
     resourceProvider.getString(
         R.string.event_time_mask,
@@ -19,7 +21,7 @@ fun Date.toEventDate(resourceProvider: ResourceProvider) =
     when {
         isToday() -> resourceProvider.getString(R.string.event_date_today)
         isYesterday() -> resourceProvider.getString(R.string.event_date_yesterday)
-        else -> toStringWithFormat(CommonFormats.FORMAT_DATE_WITH_MONTH_NAME)
+        else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
     }
 
 fun Date.toCalendar(): Calendar = Calendar.getInstance().apply { time = this@toCalendar }

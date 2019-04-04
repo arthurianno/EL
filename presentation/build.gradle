@@ -105,6 +105,7 @@ dependencies {
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.cardView
     implementation commonDependencies.pulseView
+    implementation commonDependencies.datePicker
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
@@ -125,7 +126,6 @@ dependencies {
     implementation commonDependencies.firebaseMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location
-    implementation commonDependencies.nordicScanner
     implementation commonDependencies.nordicDfu
     implementation commonDependencies.rxBluetooth
     implementation commonDependencies.rxReplaying

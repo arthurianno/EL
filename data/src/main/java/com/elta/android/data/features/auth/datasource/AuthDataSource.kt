@@ -13,8 +13,6 @@ interface AuthDataSource {
 
     fun login(email: String, password: String): Single<LoginDto>
 
-    fun refresh(accessToken: String, refreshToken: String): Single<TokensDto>
-
     fun sendConfirmationLink(): Completable
 
     fun isEmailConfirmed(): Single<EmailStatusDto>

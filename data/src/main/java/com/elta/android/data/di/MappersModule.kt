@@ -3,6 +3,8 @@ package com.elta.android.data.di
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
+import com.elta.android.data.features.devices.dto.GlucometerDto
+import com.elta.android.data.features.devices.mapper.GlucometerToDomainMapper
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
@@ -30,6 +32,7 @@ import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileToDtoMapper
 import com.elta.android.domain.features.auth.model.SocialUser
+import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.sale_points.model.Coordinates
@@ -126,4 +129,9 @@ abstract class MappersModule {
     abstract fun bindProfileToDomainMapper(
         mapper: ProfileToDomainMapper
     ): Mapper<ProfileDto, Profile>
+
+    @Binds
+    abstract fun bindGlucometerToDomainMapper(
+        mapper: GlucometerToDomainMapper
+    ): Mapper<GlucometerDto, Glucometer>
 }

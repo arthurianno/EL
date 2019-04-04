@@ -1,12 +1,13 @@
 package com.elta.android.presentation.core.ui.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.AppNavigator
+import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
@@ -107,6 +108,15 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
 
     override fun handleBack() {
         router.exit()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        var fragment = supportFragmentManager.findFragmentById(R.id.containerView)
+        do {
+            fragment?.onActivityResult(requestCode, resultCode, data)
+            fragment = fragment?.childFragmentManager?.findFragmentById(R.id.containerView)
+        } while (fragment != null)
     }
 
     private fun showSnackbar(data: SnackBarData) {

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.main.pm
 
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
@@ -15,9 +16,9 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
-import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem.Type
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
 import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Observable
 import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,6 +34,7 @@ class MainProfilePm @Inject constructor(
     val userFullNameState = State<String>()
     val profileSettingsAction = Action<Unit>()
     val openDiabetesTypeDialogCommand = Command<Unit>(bufferSize = 1)
+    val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
     val openGlucoseRangeDialogCommand = Command<Unit>(bufferSize = 1)
 
     private val getProfileSettingsAction = Action<Unit>()
@@ -55,9 +57,10 @@ class MainProfilePm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
             .subscribe(getProfileSettingsAction.consumer)
             .untilDestroy()
     }
@@ -84,10 +87,10 @@ class MainProfilePm @Inject constructor(
 
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
-            Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(Unit)
-            Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
-            Type.WEIGHT -> Timber.e("WEIGHT clicked")
-            Type.HEMOGLOBIN -> Timber.e("HEMOGLOBIN clicked")
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(Unit)
+            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
+            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
+            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)
         }
 
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
