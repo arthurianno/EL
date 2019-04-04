@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.auth.login.pm
 
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
 import com.elta.android.domain.features.auth.interactor.LoginWithSocialNetworkUseCase
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseSocialPm
@@ -63,7 +63,7 @@ class LoginPm @Inject constructor(
     private fun createLoginParams(i: Unit): LoginUseCase.Params =
         LoginUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
-    private fun createLoginSocialParams(network: SocialNetwork): LoginWithSocialNetworkUseCase.Params =
+    private fun createLoginSocialParams(network: SocialNetworkType): LoginWithSocialNetworkUseCase.Params =
         LoginWithSocialNetworkUseCase.Params(network)
 
     private fun handleSuccess(isEmailActivated: Boolean) {

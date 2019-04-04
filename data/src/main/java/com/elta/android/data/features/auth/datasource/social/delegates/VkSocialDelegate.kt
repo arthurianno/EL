@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.elta.android.data.features.auth.datasource.social.SocialResult
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
@@ -12,7 +12,7 @@ import com.vk.sdk.api.VKError
 
 class VkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
-    override val network: SocialNetwork = SocialNetwork.VK
+    override val network: SocialNetworkType = SocialNetworkType.VK
 
     private val vkCallback: VKCallback<VKAccessToken> = object : VKCallback<VKAccessToken> {
         override fun onResult(result: VKAccessToken) {

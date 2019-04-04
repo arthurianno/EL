@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.auth.interactor
 
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.nullgr.core.interactor.SingleUseCase
@@ -16,5 +16,5 @@ class GetSocialUserUseCase @Inject constructor(
     override fun buildUseCaseObservable(params: Params?): Single<SocialUser> =
         repository.getSocialUser(checkNotNull(params).network)
 
-    data class Params(val network: SocialNetwork)
+    data class Params(val network: SocialNetworkType)
 }

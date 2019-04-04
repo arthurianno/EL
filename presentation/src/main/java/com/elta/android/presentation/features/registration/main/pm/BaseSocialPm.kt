@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.registration.main.pm
 
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.core.pm.ServiceFacade
 
 abstract class BaseSocialPm(services: ServiceFacade) : BaseRegistrationPm(services) {
@@ -9,21 +9,21 @@ abstract class BaseSocialPm(services: ServiceFacade) : BaseRegistrationPm(servic
     val vkAction = Action<Unit>()
     val okAction = Action<Unit>()
 
-    protected val socialAction = Action<SocialNetwork>()
+    protected val socialAction = Action<SocialNetworkType>()
 
     override fun onCreate() {
         super.onCreate()
 
         fbAction.observable
-            .subscribe { socialAction.consumer.accept(SocialNetwork.FB) }
+            .subscribe { socialAction.consumer.accept(SocialNetworkType.FB) }
             .untilDestroy()
 
         vkAction.observable
-            .subscribe { socialAction.consumer.accept(SocialNetwork.VK) }
+            .subscribe { socialAction.consumer.accept(SocialNetworkType.VK) }
             .untilDestroy()
 
         okAction.observable
-            .subscribe { socialAction.consumer.accept(SocialNetwork.OK) }
+            .subscribe { socialAction.consumer.accept(SocialNetworkType.OK) }
             .untilDestroy()
     }
 }

@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.builder
 
 import android.support.annotation.DrawableRes
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
@@ -30,11 +30,11 @@ class ProfileSettingsItemsBuilder @Inject constructor(
 
         add(createHeaderItem(resources.getString(R.string.profile_linked_social_networks)))
         add(createSettingsSocialItem(R.drawable.ic_facebook, resources.getString(R.string.facebook),
-            R.drawable.ic_delete, SocialNetwork.FB))
+            R.drawable.ic_delete, SocialNetworkType.FB))
         add(createSettingsSocialItem(R.drawable.ic_vk, resources.getString(R.string.vkontakte),
-            R.drawable.ic_add, SocialNetwork.VK))
+            R.drawable.ic_add, SocialNetworkType.VK))
         add(createSettingsSocialItem(R.drawable.ic_ok, resources.getString(R.string.odnoklasniki),
-            R.drawable.ic_add, SocialNetwork.OK))
+            R.drawable.ic_add, SocialNetworkType.OK))
 
         add(ProfileSettingsSeparatorItem)
 
@@ -57,6 +57,6 @@ class ProfileSettingsItemsBuilder @Inject constructor(
         @DrawableRes networkIcon: Int,
         title: String,
         @DrawableRes actionIcon: Int,
-        type: SocialNetwork
+        type: SocialNetworkType
     ) = ProfileSettingsSocialItem(networkIcon, title, actionIcon, type)
 }

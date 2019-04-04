@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.adapter.items
 
 import android.support.annotation.DrawableRes
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.nullgr.core.adapter.items.ListItem
 
 data class ProfileSettingsSocialItem(
@@ -10,7 +10,7 @@ data class ProfileSettingsSocialItem(
     val title: String,
     @DrawableRes
     val actionIcon: Int,
-    val type: SocialNetwork
+    val type: SocialNetworkType
 ) : ListItem {
 
     override fun getUniqueProperty() = title

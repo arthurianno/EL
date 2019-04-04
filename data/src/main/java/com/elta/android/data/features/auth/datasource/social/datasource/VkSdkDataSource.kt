@@ -4,7 +4,7 @@ import android.content.Context
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
 import com.elta.android.data.features.auth.dto.SocialUserDto
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.api.VKApi
 import com.vk.sdk.api.VKError
@@ -29,7 +29,7 @@ class VkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
                     emitter.onError(RuntimeException())
                 }
             }
-        }.onErrorResumeNext(SocialNetwork.VK.authAndGetToken(context))
+        }.onErrorResumeNext(SocialNetworkType.VK.authAndGetToken(context))
 
     override fun getSocialUser(): Single<SocialUserDto> = Single.create { emitter ->
         val request = VKApi.users().get()
