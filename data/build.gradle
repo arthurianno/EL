@@ -93,6 +93,10 @@ dependencies {
 
     implementation commonDependencies.objectbox
 
+    implementation commonDependencies.nordicScanner
+    implementation commonDependencies.rxBluetooth
+    implementation commonDependencies.rxReplaying
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
