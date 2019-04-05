@@ -4,6 +4,7 @@ import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.relation.ToOne
 
+@Suppress("UseDataClass")
 @Entity
 class NetworkCacheDto {
     lateinit var profile: ToOne<ProfileCacheDto>

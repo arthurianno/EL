@@ -23,7 +23,7 @@ class ProfileSettingsSocialDelegate(private val bus: RxBus) : AdapterDelegate() 
             with(this as ViewHolder) {
                 itemView.setOnClickListener {
                     withAdapterPosition<ProfileSettingsSocialItem> { _, item, _ ->
-                        bus.click(Clicks.ProfileSettingsSocialItemClicked(item.type))
+                        bus.click(Clicks.ProfileSettingsSocialItemClicked(item))
                     }
                 }
             }
@@ -35,7 +35,10 @@ class ProfileSettingsSocialDelegate(private val bus: RxBus) : AdapterDelegate() 
         with(holder as ViewHolder) {
             socialNetworkIconView.setImageResource(item.networkIcon)
             socialTitleView.text = item.title
-            socialActionIconView.setImageResource(item.actionIcon)
+            socialActionIconView.setImageResource(item.getActionIcon())
         }
     }
+
+    private fun ProfileSettingsSocialItem.getActionIcon() =
+        if (isLinked) R.drawable.ic_delete else R.drawable.ic_add
 }

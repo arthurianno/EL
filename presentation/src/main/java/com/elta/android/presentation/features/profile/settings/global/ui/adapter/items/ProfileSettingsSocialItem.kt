@@ -8,8 +8,7 @@ data class ProfileSettingsSocialItem(
     @DrawableRes
     val networkIcon: Int,
     val title: String,
-    @DrawableRes
-    val actionIcon: Int,
+    val isLinked: Boolean,
     val type: SocialNetworkType
 ) : ListItem {
 
