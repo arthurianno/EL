@@ -2,7 +2,7 @@ package com.elta.android.data.features.auth.datasource.social.datasource
 
 import android.content.Context
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,10 +19,10 @@ class SocialDataSourceFactory @Inject constructor(private val context: Context) 
         OkSdkDataSource(context)
     }
 
-    fun getDataSource(network: SocialNetwork): SocialNetworkDataSource =
+    fun getDataSource(network: SocialNetworkType): SocialNetworkDataSource =
         when (network) {
-            SocialNetwork.FB -> fbSdkDataSource
-            SocialNetwork.VK -> vkSdkDataSource
-            SocialNetwork.OK -> okSdkDataSource
+            SocialNetworkType.FB -> fbSdkDataSource
+            SocialNetworkType.VK -> vkSdkDataSource
+            SocialNetworkType.OK -> okSdkDataSource
         }
 }

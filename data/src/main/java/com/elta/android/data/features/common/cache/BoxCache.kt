@@ -42,4 +42,8 @@ abstract class BoxCache<T>(
             is CommonConditions.ByIds -> box[condition.ids]
             else -> throw IllegalGetAllConditionError(condition)
         }
+
+    override fun attach(entity: T) {
+        box.attach(entity)
+    }
 }

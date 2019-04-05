@@ -7,10 +7,10 @@ import com.elta.android.data.features.auth.datasource.social.delegates.ActivityD
 import com.elta.android.data.features.auth.datasource.social.delegates.FbSocialDelegate
 import com.elta.android.data.features.auth.datasource.social.delegates.OkSocialDelegate
 import com.elta.android.data.features.auth.datasource.social.delegates.VkSocialDelegate
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import io.reactivex.Observable
 
-fun SocialNetwork.authAndGetToken(context: Context): Observable<String> =
+fun SocialNetworkType.authAndGetToken(context: Context): Observable<String> =
     RxSocialActivity.launchForResult(context, this)
         .switchMap { result ->
             when (result) {
@@ -20,9 +20,9 @@ fun SocialNetwork.authAndGetToken(context: Context): Observable<String> =
             }
         }
 
-fun SocialNetwork.getDelegate(activity: Activity): ActivityDelegate =
+fun SocialNetworkType.getDelegate(activity: Activity): ActivityDelegate =
     when (this) {
-        SocialNetwork.FB -> FbSocialDelegate(activity)
-        SocialNetwork.VK -> VkSocialDelegate(activity)
-        SocialNetwork.OK -> OkSocialDelegate(activity)
+        SocialNetworkType.FB -> FbSocialDelegate(activity)
+        SocialNetworkType.VK -> VkSocialDelegate(activity)
+        SocialNetworkType.OK -> OkSocialDelegate(activity)
     }

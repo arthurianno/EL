@@ -39,6 +39,7 @@ class DiabetesSettingDialogPm @Inject constructor(
             .untilDestroy()
 
         mainAction.observable
+            .debounceAction()
             .map(::updateProfile)
             .doOnNext { bus.event(Events.ProfileChanged(it)) }
             .doOnNext { closeDialogCommand.consumer.accept(Unit) }

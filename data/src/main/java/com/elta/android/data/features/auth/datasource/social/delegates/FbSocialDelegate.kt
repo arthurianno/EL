@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.elta.android.data.features.auth.datasource.social.SocialResult
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -14,7 +14,7 @@ import com.facebook.login.LoginResult
 
 class FbSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
-    override val network: SocialNetwork = SocialNetwork.FB
+    override val network: SocialNetworkType = SocialNetworkType.FB
 
     private val facebookCallbackManager = CallbackManager.Factory.create()
 

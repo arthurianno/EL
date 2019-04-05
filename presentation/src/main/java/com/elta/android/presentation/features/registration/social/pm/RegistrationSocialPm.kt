@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.registration.social.pm
 
 import com.elta.android.domain.features.auth.interactor.GetSocialUserUseCase
 import com.elta.android.domain.features.auth.interactor.RegisterWithSocialNetworkUseCase
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -19,8 +19,8 @@ class RegistrationSocialPm @Inject constructor(
 
     val authTitleState = State(resources.getString(R.string.registration_social_title_no_name))
 
-    private val getSocialUserAction = Action<SocialNetwork>()
-    private val socialNetworkState = State<SocialNetwork>()
+    private val getSocialUserAction = Action<SocialNetworkType>()
+    private val socialNetworkState = State<SocialNetworkType>()
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -70,7 +70,7 @@ class RegistrationSocialPm @Inject constructor(
             .untilDestroy()
     }
 
-    fun setSocialNetwork(network: SocialNetwork) {
+    fun setSocialNetwork(network: SocialNetworkType) {
         socialNetworkState.consumer.accept(network)
     }
 
@@ -81,7 +81,7 @@ class RegistrationSocialPm @Inject constructor(
             socialNetworkState.value
         )
 
-    private fun createSocialUserParams(network: SocialNetwork): GetSocialUserUseCase.Params =
+    private fun createSocialUserParams(network: SocialNetworkType): GetSocialUserUseCase.Params =
         GetSocialUserUseCase.Params(network)
 
     private fun handleSuccess() {
