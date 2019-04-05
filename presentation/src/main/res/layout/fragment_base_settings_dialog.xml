@@ -84,9 +84,7 @@
                 android:id="@+id/dialogContentContainerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:layout_marginTop="18dp">
 
                 <ProgressBar
                     android:id="@+id/progressView"
