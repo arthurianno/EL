@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.base.initializer
 
+import android.text.InputType
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
@@ -28,6 +29,8 @@ object MedicamentsFormInitializer : FormInitializer() {
         formInputView.show()
         formInputView.setHint(R.string.events_creation_hint_medicine)
         formInputView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
+        formInputView.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        formInputView.setSingleLine(false)
     }
 
     override fun View.initNoteView() {
