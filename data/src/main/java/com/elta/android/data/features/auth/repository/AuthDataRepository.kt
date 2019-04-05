@@ -20,7 +20,9 @@ class AuthDataRepository @Inject constructor(
 
     override fun register(email: String, password: String): Completable =
         source.register(email, password)
-            .doOnSuccess(::saveTokens)
+            .doOnSuccess { response ->
+                saveUserCredentials(response, email)
+            }
             .flatMapCompletable {
                 Completable.complete()
             }
@@ -28,8 +30,7 @@ class AuthDataRepository @Inject constructor(
     override fun login(email: String, password: String): Single<Boolean> =
         source.login(email, password)
             .doOnSuccess { response ->
-                saveTokens(response.tokens)
-                userHolder.currentUser = email.hashCode().toLong()
+                saveUserCredentials(response.tokens, email)
             }
             .map(LoginDto::isEmailConfirmed)
 
@@ -53,6 +54,11 @@ class AuthDataRepository @Inject constructor(
     override fun confirmEmail(token: String): Completable =
         source.confirmEmail(token)
             .andThen(Completable.fromCallable { tokenStorage.refresh() })
+
+    private fun saveUserCredentials(tokens: TokensDto, email: String) {
+        saveTokens(tokens)
+        userHolder.currentUser = email.hashCode().toLong()
+    }
 
     private fun saveTokens(tokens: TokensDto) {
         tokenStorage.accessToken = tokens.accessToken
