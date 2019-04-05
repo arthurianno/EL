@@ -36,6 +36,7 @@ class MainProfilePm @Inject constructor(
     val profileSettingsAction = Action<Unit>()
     val openDiabetesTypeDialogCommand = Command<Unit>(bufferSize = 1)
     val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
+    val openGlucoseRangeDialogCommand = Command<Unit>(bufferSize = 1)
 
     private val getProfileSettingsAction = Action<Unit>()
     private val updateProfileAction = Action<Profile>()
@@ -86,7 +87,7 @@ class MainProfilePm @Inject constructor(
 
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
-            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> Timber.e("GLUCOSE_LEVEL clicked")
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(Unit)
             MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
             MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
             MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)

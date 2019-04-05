@@ -38,11 +38,11 @@ class HemoglobinSettingsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        observeChangeHemoglobin()
-        observeChangeDate()
-
         // always enabled for hemoglobin
         actionButtonEnabledCommand.consumer.accept(true)
+
+        observeDateSelection()
+        observeValueChanges()
 
         profileState.observable
             .doOnNext { inputValueState.consumer.accept(it.getHemoglobinLevel()) }
@@ -86,7 +86,18 @@ class HemoglobinSettingsPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun observeChangeHemoglobin() {
+    private fun observeDateSelection() {
+        dateSelectedAction.observable
+            .subscribe(dateSelectedState.consumer)
+            .untilDestroy()
+
+        dateSelectedState.observable
+            .doOnNext { dateState.consumer.accept(it.toEventDate(resources)) }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun observeValueChanges() {
         minusAction.observable
             .subscribe {
                 val original = inputValueState.value
@@ -105,17 +116,6 @@ class HemoglobinSettingsPm @Inject constructor(
 
         inputValueState.observable
             .subscribe { hemoglobinValueState.consumer.accept(NumberFormatter.format(it)) }
-            .untilDestroy()
-    }
-
-    private fun observeChangeDate() {
-        dateSelectedAction.observable
-            .subscribe(dateSelectedState.consumer)
-            .untilDestroy()
-
-        dateSelectedState.observable
-            .doOnNext { dateState.consumer.accept(it.toEventDate(resources)) }
-            .subscribe()
             .untilDestroy()
     }
 

@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.pm.GlucoseRangeDialogPm
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
@@ -212,4 +213,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(HemoglobinSettingsPm::class)
     abstract fun bindHemoglobinSettingsPm(pm: HemoglobinSettingsPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(GlucoseRangeDialogPm::class)
+    abstract fun bindGlucoseRangeDialogPm(pm: GlucoseRangeDialogPm): PresentationModel
 }
