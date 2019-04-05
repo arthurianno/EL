@@ -98,6 +98,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     }
 
     override fun handleBack() {
+        view?.hideKeyboardFun()
         passTo(presentationModel.backHandleAction)
     }
 
