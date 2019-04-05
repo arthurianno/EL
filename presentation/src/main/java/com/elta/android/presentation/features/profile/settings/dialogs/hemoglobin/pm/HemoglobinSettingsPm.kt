@@ -50,6 +50,7 @@ class HemoglobinSettingsPm @Inject constructor(
             .untilDestroy()
 
         mainAction.observable
+            .debounceAction()
             .skipWhileInProgress()
             .map(::createNewEventParams)
             .flatMapCompletable { params ->
