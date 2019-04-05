@@ -44,6 +44,6 @@ abstract class BoxCache<T>(
         }
 
     override fun attach(entity: T) {
-        return box.attach(entity)
+        box.attach(entity)
     }
 }

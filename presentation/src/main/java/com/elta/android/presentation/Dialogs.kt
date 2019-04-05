@@ -20,4 +20,12 @@ sealed class Dialogs : DialogData {
         override val negative: String = resources.getString(R.string.event_form_dialog_cancel_button),
         override val positive: String = resources.getString(R.string.event_form_delete_dialog_confirm_button)
     ) : Dialogs()
+
+    data class EventUnlinkNetwork(
+        val resources: ResourceProvider,
+        override val title: String = resources.getString(R.string.profile_unlink_network_dialog_title),
+        override val message: String = resources.getString(R.string.profile_unlink_network_dialog_body),
+        override val negative: String = resources.getString(R.string.profile_unlink_network_cancel_button),
+        override val positive: String = resources.getString(R.string.profile_unlink_network_dialog_confirm_button)
+    ) : Dialogs()
 }

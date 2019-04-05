@@ -17,6 +17,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
+import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -98,19 +99,6 @@ class MainProfilePm @Inject constructor(
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 
-    private fun setUpFullUserName(profile: Profile) {
-        val firstName = profile.firstName
-        val secondName = profile.secondName
-        val fullName: String = when {
-            firstName.isNullOrEmpty() && secondName.isNullOrEmpty() ->
-                resourceProvider.getString(R.string.profile_name_placeholder)
-            firstName.isNullOrEmpty() -> secondName ?: ""
-            secondName.isNullOrEmpty() -> firstName
-            else -> "$firstName $secondName"
-        }
-        userFullNameState.consumer.accept(fullName)
-    }
-
     private fun observeProfileUpdates() {
         bus.events<Events.ProfileChanged>()
             .map { it.profile }
@@ -135,9 +123,14 @@ class MainProfilePm @Inject constructor(
     }
 
     private fun Single<Profile>.handleProfileUseCase() =
-        this.doOnSuccess(::setUpFullUserName)
+        doOnSuccess(::updateFullNameState)
             .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
+
+    private fun updateFullNameState(profile: Profile) {
+        userFullNameState.consumer.accept(
+            profile.createFullName(resourceProvider.getString(R.string.profile_name_placeholder)))
+    }
 
     private fun createUpdateProfileUseCaseParams(profile: Profile) =
         UpdateProfileUseCase.Params(profile)

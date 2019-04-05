@@ -38,38 +38,11 @@ class HemoglobinSettingsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        observeChangeHemoglobin()
+        observeChangeDate()
 
         // always enabled for hemoglobin
         actionButtonEnabledCommand.consumer.accept(true)
-
-        dateSelectedAction.observable
-            .subscribe(dateSelectedState.consumer)
-            .untilDestroy()
-
-        dateSelectedState.observable
-            .doOnNext { dateState.consumer.accept(it.toEventDate(resources)) }
-            .subscribe()
-            .untilDestroy()
-
-        minusAction.observable
-            .subscribe {
-                val original = inputValueState.value
-                val new = decrement(original)
-                inputValueState.consumer.accept(new)
-            }
-            .untilDestroy()
-
-        plusAction.observable
-            .subscribe {
-                val original = inputValueState.value
-                val new = increment(original)
-                inputValueState.consumer.accept(new)
-            }
-            .untilDestroy()
-
-        inputValueState.observable
-            .subscribe { hemoglobinValueState.consumer.accept(NumberFormatter.format(it)) }
-            .untilDestroy()
 
         profileState.observable
             .doOnNext { inputValueState.consumer.accept(it.getHemoglobinLevel()) }
@@ -109,6 +82,39 @@ class HemoglobinSettingsPm @Inject constructor(
             .filter { it == Lifecycle.CREATED }
             .map { Unit }
             .subscribe(loadScreeAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeChangeHemoglobin() {
+        minusAction.observable
+            .subscribe {
+                val original = inputValueState.value
+                val new = decrement(original)
+                inputValueState.consumer.accept(new)
+            }
+            .untilDestroy()
+
+        plusAction.observable
+            .subscribe {
+                val original = inputValueState.value
+                val new = increment(original)
+                inputValueState.consumer.accept(new)
+            }
+            .untilDestroy()
+
+        inputValueState.observable
+            .subscribe { hemoglobinValueState.consumer.accept(NumberFormatter.format(it)) }
+            .untilDestroy()
+    }
+
+    private fun observeChangeDate() {
+        dateSelectedAction.observable
+            .subscribe(dateSelectedState.consumer)
+            .untilDestroy()
+
+        dateSelectedState.observable
+            .doOnNext { dateState.consumer.accept(it.toEventDate(resources)) }
+            .subscribe()
             .untilDestroy()
     }
 

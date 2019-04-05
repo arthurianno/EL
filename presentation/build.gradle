@@ -16,6 +16,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        versionCode rootProject.ext.applicationVersionCode
+        versionName rootProject.ext.applicationVersionName
     }
 
     dexOptions {
