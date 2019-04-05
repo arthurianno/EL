@@ -68,6 +68,7 @@ class MainProfilePm @Inject constructor(
 
     private fun observeClicks() {
         bus.clicks<Clicks.ProfileIndicatorClicked>()
+            .debounceAction()
             .map { it.item }
             .doOnNext(::navigateIndicatorScreen)
             .subscribe()
