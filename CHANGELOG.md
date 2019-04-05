@@ -1,3 +1,6 @@
+### v0.16.0 ###
+- [ELTA-672] - [Android] BottomSheet Настройки диапазона
+
 ### v0.15.0 ###
 - [ELTA-673] - [Android] BottomSheet Настройки гемоглобина
 
