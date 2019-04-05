@@ -186,6 +186,8 @@ class BluetoothPm @Inject constructor(
                         )
                     )
                 )
+                    .doOnSuccess { Timber.d(it.toString()) }
+                    .doOnError(::handleError)
             }
             .retry()
             .subscribe()
@@ -195,7 +197,7 @@ class BluetoothPm @Inject constructor(
             .doOnNext { click ->
                 if (click.item.address != device?.address) {
                     device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
-                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
+                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected =  it.address == click.item.address) }
                     items.consumer.accept(newItems)
                 }
             }
