@@ -61,7 +61,7 @@ class ProfileSettingsPm @Inject constructor(
         bus.clicks<Clicks.ProfileSettingsItemClicked>()
             .map { it.type }
             .subscribe()
-            .untilUnbind()
+            .untilDestroy()
 
         bus.clicks<Clicks.ProfileSettingsSocialItemClicked>()
             .map { it.item }
@@ -70,7 +70,7 @@ class ProfileSettingsPm @Inject constructor(
                 if (it.isLinked) unlinkSocialUserAction.consumer.accept(Unit)
                 else linkSocialUserAction.consumer.accept(Unit)
             }
-            .untilUnbind()
+            .untilDestroy()
     }
 
     private fun observeNetworksActions() {

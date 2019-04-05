@@ -32,9 +32,18 @@ class ProfileSettingsSocialDelegate(private val bus: RxBus) : AdapterDelegate() 
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
         val item = items[position] as ProfileSettingsSocialItem
+
         with(holder as ViewHolder) {
             socialNetworkIconView.setImageResource(item.networkIcon)
             socialTitleView.text = item.title
+            socialActionIconView.setImageResource(item.getActionIcon())
+        }
+    }
+
+    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+        val item = items[position] as ProfileSettingsSocialItem
+
+        with(holder as ViewHolder) {
             socialActionIconView.setImageResource(item.getActionIcon())
         }
     }

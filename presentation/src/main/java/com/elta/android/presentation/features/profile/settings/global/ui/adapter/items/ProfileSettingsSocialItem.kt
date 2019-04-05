@@ -13,4 +13,15 @@ data class ProfileSettingsSocialItem(
 ) : ListItem {
 
     override fun getUniqueProperty() = title
+
+    override fun getChangePayload(other: ListItem): Any {
+        if (other is ProfileSettingsSocialItem && isLinked != other.isLinked) {
+            return Payload.NETWORK_LINKING_CHANGED
+        }
+        return super.getChangePayload(other)
+    }
+
+    enum class Payload {
+        NETWORK_LINKING_CHANGED
+    }
 }
