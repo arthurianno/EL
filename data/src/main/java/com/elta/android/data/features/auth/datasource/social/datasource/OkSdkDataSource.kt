@@ -21,7 +21,7 @@ class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
             ok.checkValidTokens(object : OkListener {
                 override fun onSuccess(json: JSONObject) {
                     if (!emitter.isDisposed) {
-                        emitter.onNext(json.toString())
+                        emitter.onNext((json["access_token"] as String))
                     }
                 }
 

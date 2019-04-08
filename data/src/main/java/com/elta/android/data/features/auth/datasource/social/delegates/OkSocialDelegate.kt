@@ -20,7 +20,7 @@ class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
     private val okCallback = object : OkListener {
         override fun onSuccess(result: JSONObject) {
             try {
-                sendResult(SocialResult.Success(network, result.getString("access_token")))
+                sendResult(SocialResult.Success(network, (result["access_token"] as String)))
             } catch (e: JSONException) {
                 sendResult(SocialResult.Error(network, e))
             }
