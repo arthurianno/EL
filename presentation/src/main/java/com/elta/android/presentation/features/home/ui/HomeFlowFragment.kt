@@ -14,7 +14,6 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
