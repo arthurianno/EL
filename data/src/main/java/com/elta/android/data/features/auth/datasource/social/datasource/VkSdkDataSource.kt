@@ -6,12 +6,14 @@ import com.elta.android.data.features.auth.datasource.social.authAndGetToken
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.vk.sdk.VKAccessToken
+import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKApi
 import com.vk.sdk.api.VKError
 import com.vk.sdk.api.VKRequest
 import com.vk.sdk.api.VKResponse
 import com.vk.sdk.api.model.VKApiUserFull
 import com.vk.sdk.api.model.VKList
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -38,7 +40,7 @@ class VkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
             override fun onComplete(response: VKResponse) {
                 if (!emitter.isDisposed) {
                     val users = response.parsedModel as VKList<*>
-                    val user = users[0] as VKApiUserFull
+                    val user = users.first() as VKApiUserFull
                     emitter.onSuccess(SocialUserDto(user.first_name))
                 }
             }
@@ -49,5 +51,11 @@ class VkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
                 }
             }
         })
+    }
+
+    override fun logout() = Completable.fromCallable {
+        if (VKSdk.isLoggedIn()) {
+            VKSdk.logout()
+        }
     }
 }

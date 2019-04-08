@@ -8,6 +8,8 @@ import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.facebook.AccessToken
 import com.facebook.GraphRequest
+import com.facebook.login.LoginManager
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.json.JSONException
@@ -50,4 +52,9 @@ class FbSdkDataSource(private val context: Context) : SocialNetworkDataSource {
                 emitter.onSuccess(SocialUserDto(name))
             }
         }
+
+    override fun logout() = Completable.fromCallable {
+        if (AccessToken.getCurrentAccessToken() != null)
+            LoginManager.getInstance().logOut()
+    }
 }

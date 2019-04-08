@@ -7,9 +7,9 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
-import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
@@ -33,6 +33,7 @@ class SocialDataRepository @Inject constructor(
 
     override fun unLinkSocialNetwork(network: SocialNetworkType): Completable =
         source.unLinkSocialNetwork(network.name)
+            .andThen(socialFactory.getDataSource(network).logout())
 
     override fun loginWithSocialNetwork(network: SocialNetworkType): Single<Boolean> =
         socialFactory.getDataSource(network).getToken().take(1)

@@ -5,6 +5,7 @@ import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSo
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -49,4 +50,6 @@ class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
             }
         })
     }
+
+    override fun logout() = Completable.fromCallable { ok.clearTokens() }
 }
