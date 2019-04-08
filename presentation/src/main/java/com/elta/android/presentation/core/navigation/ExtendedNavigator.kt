@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentTransaction
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.commands.AddTabs
 import com.elta.android.presentation.core.navigation.commands.AttachTab
-import ru.terrakok.cicerone.Screen
+import com.nullgr.core.collections.isNotNullOrEmpty
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 import ru.terrakok.cicerone.commands.Command
@@ -18,7 +18,7 @@ open class ExtendedNavigator(
     private val containerId: Int
 ) : SupportAppNavigator(activity, fragmentManager, containerId) {
 
-    private val tabsHolder = mutableMapOf<Screen, Fragment>()
+    private val tabsHolder = mutableMapOf<String, Fragment>()
 
     override fun setupFragmentTransaction(
         command: Command?,
@@ -35,15 +35,16 @@ open class ExtendedNavigator(
     override fun applyCommand(command: Command) {
         when (checkCondition(command)) {
             is AttachTab -> attachTabFragment((command as AttachTab).screen)
-            is AddTabs -> addTabFragments((command as AddTabs).screens)
+            is AddTabs -> replaceTabFragments((command as AddTabs).screens)
             else -> super.applyCommand(command)
         }
     }
 
     private fun attachTabFragment(screen: SupportAppScreen) {
+        checkScreenExistence(screen)
         fragmentManager.beginTransaction().apply {
             tabsHolder.forEach {
-                when (screen) {
+                when (screen.screenKey) {
                     it.key -> attach(it.value)
                     else -> detach(it.value)
                 }
@@ -51,15 +52,17 @@ open class ExtendedNavigator(
         }.commitNow()
     }
 
-    private fun addTabFragments(screens: Array<SupportAppScreen>) {
+    private fun replaceTabFragments(screens: Array<SupportAppScreen>) {
         tabsHolder.clear()
-        screens.forEach {
-            tabsHolder[it] = fragmentManager.initializeSingleTab(
-                it.fragment,
-                containerId,
-                it.screenKey
-            )
-        }
+        screens.forEach { addTabFragment(it) }
+    }
+
+    private fun addTabFragment(screen: SupportAppScreen) {
+        tabsHolder[screen.screenKey] = fragmentManager.initializeSingleTab(
+            screen.fragment,
+            containerId,
+            screen.screenKey
+        )
     }
 
     private fun FragmentManager.initializeSingleTab(
@@ -73,6 +76,19 @@ open class ExtendedNavigator(
                 .detach(this)
                 .commitNow()
         }
+
+    private fun checkScreenExistence(screen: SupportAppScreen) {
+        if (tabsHolder.isEmpty() && fragmentManager.fragments.isNotNullOrEmpty()) {
+            fragmentManager.fragments.firstOrNull()?.let { fragment ->
+                fragment.tag?.let {
+                    tabsHolder[it] = fragment
+                }
+            }
+        }
+        if (!tabsHolder.containsKey(screen.screenKey)) {
+            addTabFragment(screen)
+        }
+    }
 
     private fun checkCondition(command: Command): Command {
         when (command) {
