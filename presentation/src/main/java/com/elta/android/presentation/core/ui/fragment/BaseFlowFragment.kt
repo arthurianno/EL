@@ -57,10 +57,18 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     }
 
     override fun handleBack() {
-        if (currentFragment != null) {
+        if (maybeChildrenHandleBack()) {
             currentFragment?.handleBack()
         } else {
             router.finishFlow()
         }
+    }
+
+    private fun maybeChildrenHandleBack(): Boolean {
+        currentFragment?.let {
+            return childFragmentManager.backStackEntryCount > 0 ||
+                (it is BaseFlowFragment && it.childFragmentManager.backStackEntryCount > 0)
+        }
+        return false
     }
 }
