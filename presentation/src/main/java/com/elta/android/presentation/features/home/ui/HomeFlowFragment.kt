@@ -13,6 +13,7 @@ import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
+import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
 import javax.inject.Inject
@@ -53,15 +54,21 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
-        pm.pulseCommand.bindTo {
-            if (it) {
-                homePulseView.show()
-                homePulseView.start()
-            } else {
-                homePulseView.stop()
-                homePulseView.hide()
+        Observables.combineLatest(
+            pm.pulseCommand.observable,
+            pm.selectedItemIdState.observable.map { it == R.id.mainMenuItemView }
+        )
+            .map { it.first && it.second }
+            .distinctUntilChanged()
+            .bindTo {
+                if (it) {
+                    homePulseView.show()
+                    homePulseView.start()
+                } else {
+                    homePulseView.stop()
+                    homePulseView.hide()
+                }
             }
-        }
         homeBottomSheetView.visibilityChanges().bindTo { visible ->
             homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
