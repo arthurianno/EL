@@ -13,6 +13,7 @@ import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkListener
 import ru.ok.android.sdk.OkRequestMode
 
+@Suppress("UnnecessaryParentheses")
 class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
 
     private val ok: Odnoklassniki = Odnoklassniki.getInstance()

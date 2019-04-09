@@ -23,6 +23,7 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
 
+@Suppress("LabeledExpression")
 class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
 
     override val screenLayout: Int = R.layout.fragment_onboarding

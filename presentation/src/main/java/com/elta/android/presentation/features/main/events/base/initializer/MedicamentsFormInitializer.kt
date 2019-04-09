@@ -28,9 +28,9 @@ object MedicamentsFormInitializer : FormInitializer() {
         formVariantSelectorView.hide()
         formInputView.show()
         formInputView.setHint(R.string.events_creation_hint_medicine)
-        formInputView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
         formInputView.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE
         formInputView.setSingleLine(false)
+        formInputView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
     }
 
     override fun View.initNoteView() {
