@@ -8,7 +8,9 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.widgets.SettingsMarginItemDecoration
+import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
@@ -42,6 +44,9 @@ class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
                 .onPositive { _, _ -> dc.sendResult(ProfileSettingsPm.DialogResult.POSITIVE) }
                 .onNegative { _, _ -> dc.sendResult(ProfileSettingsPm.DialogResult.NEGATIVE) }
                 .build()
+        }
+        pm.openPrivacyPolicyCommand.bindTo {
+            childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
         }
     }
 

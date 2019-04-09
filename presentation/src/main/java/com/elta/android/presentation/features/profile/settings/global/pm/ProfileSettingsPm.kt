@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
 import io.reactivex.Single
 import me.dmdev.rxpm.widget.dialogControl
@@ -25,6 +26,7 @@ class ProfileSettingsPm @Inject constructor(
 ) : BaseListPm(services) {
 
     val unlinkNetworkDialogControl = dialogControl<DialogData, DialogResult>()
+    val openPrivacyPolicyCommand = Command<Unit>(bufferSize = 1)
 
     private val socialNetworkState = State<SocialNetworkType>()
     private val getProfileSettingsAction = Action<Unit>()
@@ -60,6 +62,13 @@ class ProfileSettingsPm @Inject constructor(
     private fun observeClicks() {
         bus.clicks<Clicks.ProfileSettingsItemClicked>()
             .map { it.type }
+            .doOnNext { type ->
+                when (type) {
+                    ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
+                    else -> {
+                    }
+                }
+            }
             .subscribe()
             .untilDestroy()
 
