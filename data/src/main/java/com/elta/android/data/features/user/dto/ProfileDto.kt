@@ -7,7 +7,7 @@ data class ProfileDto(
     @SerializedName("weight") val weight: Double?,
     @SerializedName("gender") val gender: GenderTypeDto?,
     @SerializedName("person") val person: PersonDto?,
-    @SerializedName("glucoseLevel") val glucoseLevel: GlucoseLevelDto?,
+    @SerializedName("glucoseLevels") val glucoseLevel: GlucoseLevelDto?,
     @SerializedName("email") val email: String?,
     @SerializedName("socialNetworks") var socialNetworks: List<SocialNetworkDto>?,
     @SerializedName("timestamp") val timeStamp: Long
