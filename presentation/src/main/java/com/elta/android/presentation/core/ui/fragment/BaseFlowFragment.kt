@@ -64,6 +64,7 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
         }
     }
 
+    @Suppress("UnnecessaryParentheses")
     private fun maybeChildrenHandleBack(): Boolean {
         currentFragment?.let {
             return childFragmentManager.backStackEntryCount > 0 ||

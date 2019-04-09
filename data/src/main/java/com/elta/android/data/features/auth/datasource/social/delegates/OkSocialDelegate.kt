@@ -13,6 +13,7 @@ import ru.ok.android.sdk.OkListener
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
 
+@Suppress("UnnecessaryParentheses")
 class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
     override val network: SocialNetworkType = SocialNetworkType.OK
