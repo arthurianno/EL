@@ -26,6 +26,7 @@ class HomeFlowPm @Inject constructor(
     val closeBottomSheetCommand = Command<Unit>()
     val pulseCommand = Command<Boolean>()
     val menuItemSelectedAction = Action<Int>()
+    val menuItemRestoredAction = Action<Int>()
     val selectedItemIdState = State(R.id.mainMenuItemView)
 
     private val loadEvents = Action<Unit>()
@@ -44,6 +45,10 @@ class HomeFlowPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+
+        menuItemRestoredAction.observable
+            .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
 
         lifecycleObservable

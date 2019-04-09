@@ -29,6 +29,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
@@ -36,6 +37,13 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
             } else {
                 homeBottomSheetView.hide()
             }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        homeBottomNavigationView.selectedId?.let {
+            outState.putInt(KEY_SELECTED_MENU_ID, it)
         }
     }
 
@@ -73,5 +81,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     companion object {
         fun newInstance() = HomeFlowFragment()
+        private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
     }
 }
