@@ -8,6 +8,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.widgets.BottomNavigationView
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
@@ -42,7 +43,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        homeBottomNavigationView.selectedId?.let {
+        view?.findViewById<BottomNavigationView>(R.id.homeBottomNavigationView)?.selectedId?.let {
             outState.putInt(KEY_SELECTED_MENU_ID, it)
         }
     }
