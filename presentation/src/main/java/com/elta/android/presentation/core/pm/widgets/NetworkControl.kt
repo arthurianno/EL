@@ -11,7 +11,10 @@ class NetworkControl(
     pm: BasePm
 ) {
     val observable: Observable<Boolean> = network.observeNetworkConnectivity()
-        .map { it.state() == NetworkInfo.State.CONNECTED }
+        .map {
+            it.state() == NetworkInfo.State.CONNECTED ||
+                it.detailedState() == NetworkInfo.DetailedState.BLOCKED // fix doze mode bug
+        }
         .publish { u ->
             Observable.merge(u.take(1).filter { !it }, u.skip(1))
         }
