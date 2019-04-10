@@ -28,6 +28,7 @@ class ProfileToDtoMapper @Inject constructor() : Mapper<Profile, ProfileDto> {
                     )
                 },
                 email = email,
+                socialNetworks = null,
                 timeStamp = timeStamp
             )
         }

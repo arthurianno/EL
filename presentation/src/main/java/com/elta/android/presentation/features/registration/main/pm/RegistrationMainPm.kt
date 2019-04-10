@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.domain.features.auth.interactor.LoginToSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.RegisterUseCase
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
 import io.reactivex.rxkotlin.Observables
@@ -63,14 +63,14 @@ class RegistrationMainPm @Inject constructor(
     private fun createRegisterParams(i: Unit): RegisterUseCase.Params =
         RegisterUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
-    private fun createLoginSocialParams(network: SocialNetwork): LoginToSocialNetworkUseCase.Params =
+    private fun createLoginSocialParams(network: SocialNetworkType): LoginToSocialNetworkUseCase.Params =
         LoginToSocialNetworkUseCase.Params(network)
 
     private fun handleSuccess() {
         router.navigateTo(Screens.ActivateProfile)
     }
 
-    private fun handleSocialNetworkLoggedIn(network: SocialNetwork) {
+    private fun handleSocialNetworkLoggedIn(network: SocialNetworkType) {
         router.navigateTo(Screens.RegistrationSocial(network))
     }
 }

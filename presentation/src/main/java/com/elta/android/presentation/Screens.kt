@@ -2,7 +2,7 @@ package com.elta.android.presentation
 
 import android.content.Context
 import android.support.v4.app.Fragment
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.main.records.ui.MainRecordsFragmen
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
+import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -55,7 +56,7 @@ object Screens {
         override fun getFragment(): Fragment = RegistrationMainFragment.newInstance()
     }
 
-    data class RegistrationSocial(val network: SocialNetwork) : SupportAppScreen() {
+    data class RegistrationSocial(val network: SocialNetworkType) : SupportAppScreen() {
         override fun getFragment(): Fragment = RegistrationSocialFragment.newInstance(network)
     }
 
@@ -167,5 +168,9 @@ object Screens {
     // PROFILE FLOW
     object MainProfileScreen : SupportAppScreen() {
         override fun getFragment() = MainProfileFragment.newInstance()
+    }
+
+    object ProfileSettings : SupportAppScreen() {
+        override fun getFragment() = ProfileSettingsFragment.newInstance()
     }
 }

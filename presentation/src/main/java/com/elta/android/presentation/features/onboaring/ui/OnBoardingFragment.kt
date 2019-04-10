@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import com.elta.android.presentation.R
@@ -22,6 +23,7 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import kotlinx.android.synthetic.main.layout_auth_toolbar.*
 
+@Suppress("LabeledExpression")
 class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
 
     override val screenLayout: Int = R.layout.fragment_onboarding
@@ -29,6 +31,7 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     private val snapHelper = PagerSnapHelper()
+    private var lastX: Float = 0F
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,7 +40,13 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         itemsView?.let {
             snapHelper.attachToRecyclerView(it)
             indicatorsView.attachToRecyclerView(it)
-            it.setOnTouchListener { _, _ -> true }
+            it.setOnTouchListener { _, event ->
+                val action = event.action
+                if (action == MotionEvent.ACTION_DOWN) {
+                    lastX = event.x
+                }
+                return@setOnTouchListener event.x != lastX
+            }
         }
     }
 

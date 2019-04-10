@@ -37,15 +37,13 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         }
     }
 
-    private fun createMainProfileAdditionalItems(): List<ListItem> {
-        val items = mutableListOf<ListItem>()
-        items.add(MainProfileAdditionalItem(R.string.profile_my_watchers, R.string.profile_management_and_settings,
+    private fun createMainProfileAdditionalItems() = mutableListOf<ListItem>().apply {
+        add(MainProfileAdditionalItem(R.string.profile_my_watchers, R.string.profile_management_and_settings,
             R.drawable.ic_doctor, MyObservers)
         )
-        items.add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
+        add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
             R.drawable.ic_map_pin_card, WhereBuy)
         )
-        return items
     }
 
     private fun createGlucoseLevelText(item: Any?) =

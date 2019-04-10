@@ -8,10 +8,12 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.widgets.BottomNavigationView
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
+import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
 import javax.inject.Inject
@@ -29,6 +31,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
         homeActionView.setOnClickListener {
             if (!it.isSelected) {
@@ -39,20 +42,33 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        view?.findViewById<BottomNavigationView>(R.id.homeBottomNavigationView)?.selectedId?.let {
+            outState.putInt(KEY_SELECTED_MENU_ID, it)
+        }
+    }
+
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
         pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
-        pm.pulseCommand.bindTo {
-            if (it) {
-                homePulseView.show()
-                homePulseView.start()
-            } else {
-                homePulseView.stop()
-                homePulseView.hide()
+        Observables.combineLatest(
+            pm.pulseCommand.observable,
+            pm.selectedItemIdState.observable.map { it == R.id.mainMenuItemView }
+        )
+            .map { it.first && it.second }
+            .distinctUntilChanged()
+            .bindTo {
+                if (it) {
+                    homePulseView.show()
+                    homePulseView.start()
+                } else {
+                    homePulseView.stop()
+                    homePulseView.hide()
+                }
             }
-        }
         homeBottomSheetView.visibilityChanges().bindTo { visible ->
             homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
@@ -73,5 +89,6 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     companion object {
         fun newInstance() = HomeFlowFragment()
+        private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
     }
 }

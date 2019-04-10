@@ -8,6 +8,8 @@ import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.SocialNetworkDto
+import com.elta.android.data.features.user.dto.SocialNetworkTypeDto
 import com.nullgr.core.date.toTimestamp
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -33,6 +35,11 @@ class MockedProfileApi : ProfileApi {
                     1.2, 5.7
                 ),
                 email = "test@gmail.com",
+                socialNetworks = listOf(
+                    SocialNetworkDto(type = SocialNetworkTypeDto.FB, isLinked = true),
+                    SocialNetworkDto(type = SocialNetworkTypeDto.VK, isLinked = false),
+                    SocialNetworkDto(type = SocialNetworkTypeDto.OK, isLinked = false)
+                ),
                 timeStamp = Date().toTimestamp()
             )
         }.log("Settings", "profile") { it.toString() }

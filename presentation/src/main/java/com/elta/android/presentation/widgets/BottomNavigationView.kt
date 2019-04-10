@@ -17,6 +17,9 @@ class BottomNavigationView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    val selectedId
+        get() = selectedTab?.id
+
     private val tabClicks = PublishRelay.create<Int>()
     private var selectedTab: BottomNavigationMenuItem? = null
 

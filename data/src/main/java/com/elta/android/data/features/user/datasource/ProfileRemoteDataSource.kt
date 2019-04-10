@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class ProfileRemoteDataSource @Inject constructor(
     private val userHolder: UserHolder,
-    private val toCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
+    private val profileToCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
     private val cache: Cache<ProfileCacheDto>,
     private val api: ProfileApi
 ) : ProfileDataSource {
@@ -26,12 +26,13 @@ class ProfileRemoteDataSource @Inject constructor(
             .doOnSuccess(::saveLocalIfNeed)
 
     private fun saveLocalIfNeed(profileDto: ProfileDto) {
+        val profileCacheDto = profileToCacheMapper.mapFromObject(profileDto)
         userHolder.currentUser?.let {
             cache.get(CommonConditions.ById(it))?.let { cached ->
                 if (profileDto.timeStamp > cached.timeStamp) {
-                    cache.update(listOf(toCacheMapper.mapFromObject(profileDto)))
+                    cache.update(listOf(profileCacheDto))
                 }
-            } ?: cache.add(listOf(toCacheMapper.mapFromObject(profileDto)))
+            } ?: cache.add(listOf(profileCacheDto))
         }
     }
 }

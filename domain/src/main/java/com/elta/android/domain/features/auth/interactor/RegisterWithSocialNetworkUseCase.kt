@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.auth.interactor
 
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.nullgr.core.interactor.CompletableUseCase
@@ -20,5 +20,5 @@ class RegisterWithSocialNetworkUseCase @Inject constructor(
             .andThen(socialRepo.linkSocialNetwork(p.network))
     }
 
-    data class Params(val email: String, val password: String, val network: SocialNetwork)
+    data class Params(val email: String, val password: String, val network: SocialNetworkType)
 }

@@ -26,7 +26,10 @@ import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragmen
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
+import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
+import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -157,6 +160,7 @@ abstract class FragmentBuilder {
     @ContributesAndroidInjector(modules = [MainDiaryModule::class])
     abstract fun bindMainDiaryFragment(): MainDiaryFragment
 
+    // PROFILE FLOW
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindProfileFlowFragment(): ProfileFlowFragment
@@ -166,10 +170,18 @@ abstract class FragmentBuilder {
     abstract fun bindMainProfileFragment(): MainProfileFragment
 
     @FragmentScope
+    @ContributesAndroidInjector(modules = [ProfileSettingsModule::class])
+    abstract fun bindProfileSettingsFragment(): ProfileSettingsFragment
+
+    @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindDiabetesSettingDialogFragment(): DiabetesSettingDialogFragment
 
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindHemoglobinSettingsFragment(): HemoglobinSettingsFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindGlucoseRangeDialogFragment(): GlucoseRangeDialogFragment
 }

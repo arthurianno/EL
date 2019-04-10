@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.elta.android.data.features.auth.datasource.social.delegates.ActivityDelegate
-import com.elta.android.domain.features.auth.model.SocialNetwork
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.nullgr.core.intents.launch
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
@@ -19,7 +19,7 @@ class RxSocialActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val network = intent.extras[EXTRA_SOCIAL] as SocialNetwork
+        val network = intent.extras[EXTRA_SOCIAL] as SocialNetworkType
         delegate = network.getDelegate(this)
         delegate.onCreate(savedInstanceState)
     }
@@ -36,7 +36,7 @@ class RxSocialActivity : Activity() {
     companion object {
         private const val EXTRA_SOCIAL = "extra_social"
 
-        fun newInstance(context: Context, network: SocialNetwork): Intent =
+        fun newInstance(context: Context, network: SocialNetworkType): Intent =
             Intent(context, RxSocialActivity::class.java)
                 .apply {
                     putExtra(EXTRA_SOCIAL, network)
@@ -44,7 +44,7 @@ class RxSocialActivity : Activity() {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
 
-        fun launchForResult(context: Context, network: SocialNetwork): Observable<SocialResult> =
+        fun launchForResult(context: Context, network: SocialNetworkType): Observable<SocialResult> =
             Observable.fromCallable { newInstance(context, network).launch(context) }
                 .flatMap {
                     SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)

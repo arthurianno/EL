@@ -24,6 +24,7 @@ import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
+@Suppress("MagicNumber")
 class DeviceRemoteDataSource @Inject constructor(
     private val client: RxBleClient
 ) : DeviceDataSource {
@@ -64,7 +65,8 @@ class DeviceRemoteDataSource @Inject constructor(
                             GlucometerDto(
                                 id = result.device.address,
                                 address = result.device.address,
-                                name = if (!result.device.name.isNullOrEmpty()) result.device.name else result.scanRecord?.deviceName,
+                                name = if (!result.device.name.isNullOrEmpty()) result.device.name
+                                else result.scanRecord?.deviceName,
                                 device = result.device
                             )
                         }
