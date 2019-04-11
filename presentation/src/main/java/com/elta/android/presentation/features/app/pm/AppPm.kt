@@ -20,7 +20,7 @@ class AppPm @Inject constructor(
         super.onCreate()
 
         coldStartAction.observable
-            .doOnNext { router.newRootScreen(Screens.SyncFlow) }
+            .doOnNext { router.newRootScreen(Screens.GreetingFlow) }
             .retry()
             .subscribe()
             .untilDestroy()

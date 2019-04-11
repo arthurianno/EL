@@ -268,9 +268,25 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "9:1358727599450312017",
+      "lastPropertyId": "2:657907652554447407",
+      "name": "GlucometerPinWrapper",
+      "properties": [
+        {
+          "id": "1:6875425958406846896",
+          "name": "id"
+        },
+        {
+          "id": "2:657907652554447407",
+          "name": "pin"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "8:2517168649469128298",
+  "lastEntityId": "9:1358727599450312017",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
