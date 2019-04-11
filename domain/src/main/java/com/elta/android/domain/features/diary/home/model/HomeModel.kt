@@ -11,7 +11,8 @@ data class HomeModel(
     val glucoseLevel: GlucoseLevel?,
     val glucoseLevelDirection: GlucoseLevelDirection?,
     val glucoseLevelDifference: Double?,
-    val eventsBlocks: List<EventsBlock>
+    val eventsBlocks: List<EventsBlock>,
+    val dailyGlucoseModel: DailyGlucoseModel
 ) {
     val hasEvents: Boolean
         get() = eventsBlocks.isNotEmpty()
