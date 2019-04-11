@@ -9,7 +9,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 fun buildDailyGlucoseModel(list: List<Event>, glucoseLevelSettings: GlucoseLevelSettings): DailyGlucoseModel {
     val sortedEvents = list.sortGlucoseOnly()
     return DailyGlucoseModel(
-        glucoseEvents = list.sortGlucoseOnly(),
+        glucoseEvents = sortedEvents,
         glucoseLevelSettings = glucoseLevelSettings,
         maxEvent = sortedEvents.max(glucoseLevelSettings.high),
         minEvent = sortedEvents.min(glucoseLevelSettings.low),
