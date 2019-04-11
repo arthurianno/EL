@@ -2,9 +2,11 @@ package com.elta.android.presentation.features.main.records.ui.adapter
 
 import android.support.v7.widget.RecyclerView
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordDelegate
+import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsDailyGlucoseDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsGroupDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsHeaderDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsDailyGlucoseItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.AdapterDelegatesFactory
@@ -27,6 +29,7 @@ class MainRecordsDelegatesFactory @Inject constructor(
             RecordItem::class.java -> RecordDelegate(bus)
             RecordsGroupItem::class.java -> RecordsGroupDelegate(this, calculator, viewPool)
             RecordsHeaderItem::class.java -> RecordsHeaderDelegate(bus, resources)
+            RecordsDailyGlucoseItem::class.java -> RecordsDailyGlucoseDelegate()
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }

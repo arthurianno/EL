@@ -239,6 +239,8 @@
 
     <string name="main_records_mask_value">%s ед</string>
     <string name="main_records_empty_value">—</string>
+    <string name="main_records_daily_glucose_title">Мои показатели сегодня</string>
+    <string name="main_records_daily_glucose_subtitle">Последний в %s</string>
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
