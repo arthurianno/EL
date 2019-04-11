@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.datasource
+package com.elta.android.data.features.devices.glucometer
 
 import com.elta.android.common.utils.log
 import io.reactivex.Observable
@@ -12,12 +12,20 @@ import no.nordicsemi.android.support.v18.scanner.ScanSettings
 fun BluetoothLeScannerCompat.startScan(
     filters: List<ScanFilter>? = emptyList(),
     settings: ScanSettings
-): Observable<List<ScanResult>> = Observable.create<List<ScanResult>> { emitter ->
+): Observable<List<ScanResult>> = Observable.create<ScanResult> { emitter ->
     val callback = object : ScanCallback() {
+
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            if (!emitter.isDisposed) {
+                emitter.onNext(result)
+            }
+        }
 
         override fun onBatchScanResults(results: MutableList<ScanResult>) {
             if (!emitter.isDisposed) {
-                emitter.onNext(results)
+                results.forEach { result ->
+                    emitter.onNext(result)
+                }
             }
         }
 
@@ -34,8 +42,8 @@ fun BluetoothLeScannerCompat.startScan(
         stopScan(callback)
     })
 }
-    .scan(mutableSetOf<ScanResult>()) { results, newResults ->
-        results.addAll(newResults)
+    .scan(mutableSetOf<ScanResult>()) { results, result ->
+        results.add(result)
         results.distinctBy(ScanResult::getDevice).toMutableSet()
     }
     .map(MutableSet<ScanResult>::toList)
