@@ -247,6 +247,8 @@ dependencies {
     implementation commonDependencies.location
     implementation commonDependencies.datePicker
 
+    implementation commonDependencies.nordicScanner
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
