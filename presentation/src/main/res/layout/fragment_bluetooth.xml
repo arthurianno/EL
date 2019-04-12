@@ -6,16 +6,22 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/writeButtonView"
+        android:id="@+id/getInfoButtonView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Write" />
+        android:text="Get Info" />
 
     <Button
-        android:id="@+id/connectButtonView"
+        android:id="@+id/getEventsButtonView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Connect" />
+        android:text="Get events" />
+
+    <Button
+        android:id="@+id/setPinButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set pin code" />
 
     <Button
         android:id="@+id/dfuButtonView"
@@ -27,7 +33,7 @@
         android:id="@+id/commandInputView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter command here" />
+        android:hint="Enter pin here" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/logView"
