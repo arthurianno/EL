@@ -21,6 +21,8 @@ import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.mapper.TagFromCacheMapper
 import com.elta.android.data.features.diary.tags.mapper.TagToCacheMapper
 import com.elta.android.data.features.diary.tags.mapper.TagToDomainMapper
+import com.elta.android.data.features.firmware.dto.FirmwareDto
+import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.CoordinatesDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
@@ -44,6 +46,7 @@ import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.domain.features.user.model.Profile
@@ -170,4 +173,9 @@ abstract class MappersModule {
     abstract fun bindScanResultToGlucometerDtoMapper(
         mapper: ScanResultToGlucometerDtoMapper
     ): Mapper<ScanResult, GlucometerDto>
+
+    @Binds
+    abstract fun bindFirmwareToDomainMapper(
+        mapper: FirmwareToDomainMapper
+    ): Mapper<FirmwareDto, Firmware>
 }
