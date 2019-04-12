@@ -14,6 +14,8 @@ import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSo
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
@@ -79,4 +81,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindDeviceDataSource(source: DeviceRemoteDataSource): DeviceDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFirmwareDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
 }
