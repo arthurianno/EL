@@ -11,7 +11,7 @@ import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.fadeVisibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_password_recovery.*
-import kotlinx.android.synthetic.main.layout_auth_toolbar.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
 

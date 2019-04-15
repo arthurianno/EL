@@ -366,4 +366,15 @@
     <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
     <string name="profile_unlink_network_cancel_button">Отменить</string>
     <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
+
+    <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
+    <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
+    <string name="profile_reminders_create_new">Создать новое</string>
+    <string name="profile_reminders_header_text">Мои напоминания</string>
+
+    <string name="profile_reminders_periodic_not_repeat">Не повторять</string>
+    <string name="profile_reminders_periodic_day">Ежедневно</string>
+    <string name="profile_reminders_periodic_week">Еженедельно</string>
+    <string name="profile_reminders_periodic_month">Ежемесячно</string>
+    <string name="profile_reminders_periodic_year">Ежегодно</string>
 </resources>

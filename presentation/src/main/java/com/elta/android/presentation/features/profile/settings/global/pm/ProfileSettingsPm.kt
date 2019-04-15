@@ -7,6 +7,7 @@ import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -65,6 +66,7 @@ class ProfileSettingsPm @Inject constructor(
             .doOnNext { type ->
                 when (type) {
                     ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
+                    ProfileSettingsItem.Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     else -> {
                     }
                 }
