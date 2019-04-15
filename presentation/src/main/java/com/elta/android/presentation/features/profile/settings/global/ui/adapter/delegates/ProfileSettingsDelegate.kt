@@ -20,7 +20,7 @@ class ProfileSettingsDelegate(
     private val resources: ResourceProvider
 ) : AdapterDelegate() {
 
-    override val itemType = ProfileSettingsDelegate::class
+    override val itemType = ProfileSettingsItem::class
     override val layoutResource = R.layout.item_profile_settings
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {

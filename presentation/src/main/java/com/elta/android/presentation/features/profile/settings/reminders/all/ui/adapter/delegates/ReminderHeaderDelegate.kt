@@ -9,7 +9,7 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 
 class ReminderHeaderDelegate : AdapterDelegate() {
 
-    override val itemType = ReminderHeaderDelegate::class
+    override val itemType = ReminderHeaderItem::class
     override val layoutResource = R.layout.item_profile_settings_header
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
