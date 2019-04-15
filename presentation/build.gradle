@@ -129,9 +129,6 @@ dependencies {
     implementation commonDependencies.firebaseMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location
-    implementation commonDependencies.nordicDfu
-    implementation commonDependencies.rxBluetooth
-    implementation commonDependencies.rxReplaying
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

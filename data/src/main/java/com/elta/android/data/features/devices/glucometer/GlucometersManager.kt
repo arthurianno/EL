@@ -1,11 +1,15 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.content.Context
+import android.os.Build
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
+import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.common.utils.log
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.jakewharton.rx.ReplayingShare
@@ -15,6 +19,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -29,7 +34,8 @@ class GlucometersManager @Inject constructor(
     private val eventBuilder: GlucometerEventBuilder,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
-    private val client: RxBleClient
+    private val client: RxBleClient,
+    private val context: Context
 ) {
 
     private val scanner = BluetoothLeScannerCompat.getScanner()
@@ -85,12 +91,35 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
+            // TODO: pass part of device name instead of address. On iOS devices address can't be extracted so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     fun setPinCode(address: String, pinCode: String): Completable =
         Completable.fromCallable {
             pinStorage.setPin(address, pinCode)
         }
+
+    fun updateFirmware(address: String, filePath: String): Completable =
+        client.findConnection(address)
+            .checkPinAndSend(address)
+            .switchMap { connection ->
+                connection.request(address, Commands.ToDfuMode)
+                    .log("BLE", "boot")
+            }
+            .take(1)
+            .switchMapCompletable { response ->
+                when (isOk(response)) {
+                    true -> Completable.fromCallable {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            DfuServiceInitiator.createDfuNotificationChannel(context)
+                        }
+                        val starter = DfuServiceInitiator(address)
+                        starter.setZip(filePath)
+                        starter.start(context, EltaDfuService::class.java)
+                    }
+                    else -> Completable.error(GlucometerToDfuModeError)
+                }
+            }
 
     private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
         val input = cmd.toGlucometerString()
@@ -161,6 +190,7 @@ class GlucometersManager @Inject constructor(
     private fun isPinError(response: String): Boolean = response == "pin.error"
     private fun isPinCommand(command: String): Boolean = command.startsWith("pin")
     private fun isPotentialLastEvent(response: String): Boolean = response.contains("9595959595.895895")
+    private fun isOk(response: String): Boolean = response.contains("ok")
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {

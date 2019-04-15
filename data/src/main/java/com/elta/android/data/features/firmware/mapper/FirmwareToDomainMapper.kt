@@ -10,7 +10,8 @@ class FirmwareToDomainMapper @Inject constructor() : Mapper<FirmwareDto, Firmwar
         with(source) {
             Firmware(
                 version = actual.version,
-                compatible = compatible
+                compatible = compatible,
+                hash = actual.hash
             )
         }
 }

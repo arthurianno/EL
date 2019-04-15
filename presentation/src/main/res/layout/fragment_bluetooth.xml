@@ -24,10 +24,22 @@
         android:text="Set pin code" />
 
     <Button
-        android:id="@+id/dfuButtonView"
+        android:id="@+id/checkFirmwareButtonView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DFU" />
+        android:text="Check new firmware" />
+
+    <Button
+        android:id="@+id/downloadFirmwareButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download firmware" />
+
+    <Button
+        android:id="@+id/updateFirmwareButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update firmware" />
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/commandInputView"

@@ -12,5 +12,5 @@ interface FirmwareApi {
     fun getFirmwareInfo(): Single<FirmwareDto>
 
     @GET("api/glucometer/v1/firmwares/v{version}")
-    fun getFirmware(@Path("version") version: String): Single<ResponseBody>
+    fun downloadFirmware(@Path("version") version: String): Single<ResponseBody>
 }

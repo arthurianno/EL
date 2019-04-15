@@ -9,12 +9,12 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.VectorDrawable
+import android.support.annotation.ColorInt
+import android.support.annotation.ColorRes
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener

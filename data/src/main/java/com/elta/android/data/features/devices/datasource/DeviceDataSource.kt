@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.datasource
 
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -15,4 +16,6 @@ interface DeviceDataSource {
     fun getGlucometerEvents(address: String): Single<List<String>>
 
     fun setPinCode(address: String, pinCode: String): Completable
+
+    fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
 }

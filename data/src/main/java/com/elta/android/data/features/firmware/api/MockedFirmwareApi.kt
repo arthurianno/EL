@@ -1,39 +1,37 @@
 package com.elta.android.data.features.firmware.api
 
 import android.content.Context
+import com.elta.android.data.R
 import com.elta.android.data.features.firmware.dto.ActualFirmwareDto
 import com.elta.android.data.features.firmware.dto.FirmwareDto
 import io.reactivex.Single
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import java.io.DataInputStream
-import java.io.File
-import java.io.FileInputStream
+import org.greenrobot.essentials.io.IoUtils
+import timber.log.Timber
 
 class MockedFirmwareApi(
     private val context: Context
 ) : FirmwareApi {
 
     override fun getFirmwareInfo(): Single<FirmwareDto> =
-        Single.just(
+        Single.fromCallable {
+            val stream = context.resources.openRawResource(R.raw.satellite_online_16)
+            val hash = IoUtils.getMd5(stream)
+            Timber.d("firmware hash: $hash")
             FirmwareDto(
                 actual = ActualFirmwareDto(
                     version = "1.6",
                     size = 0,
-                    hash = ""
+                    hash = hash
                 ),
                 compatible = "1.6"
             )
-        )
+        }
 
-    override fun getFirmware(version: String): Single<ResponseBody> =
+    override fun downloadFirmware(version: String): Single<ResponseBody> =
         Single.fromCallable {
-            val path = "android.resource://" + context.packageName + "/" + com.elta.android.data.R.raw.satellite_online_16
-            val file = File(path)
-            val dis = DataInputStream(FileInputStream(file))
-            val data = ByteArray(file.length().toInt())
-            dis.readFully(data)
-            dis.close()
-            ResponseBody.create(MediaType.parse("application/octet-stream"), data)
+            val stream = context.resources.openRawResource(R.raw.satellite_online_16)
+            ResponseBody.create(MediaType.parse("application/octet-stream"), stream.readBytes())
         }
 }
