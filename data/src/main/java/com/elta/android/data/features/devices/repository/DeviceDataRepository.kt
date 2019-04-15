@@ -33,5 +33,4 @@ class DeviceDataRepository @Inject constructor(
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)
-
 }

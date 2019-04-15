@@ -39,7 +39,6 @@ class GlucometerModule {
         fun bindEventIdGeneratorBuilder(
             generator: DefaultGlucometerEventIdGenerator
         ): GlucometerEventIdGenerator
-
     }
 
     @Provides

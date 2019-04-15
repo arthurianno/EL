@@ -91,7 +91,9 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
-            // TODO: pass part of device name instead of address. On iOS devices address can't be extracted so events will have different id on Android and iOS platforms
+            // TODO: pass part of device name instead of address.
+            // On iOS devices address can't be extracted
+            // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     fun setPinCode(address: String, pinCode: String): Completable =

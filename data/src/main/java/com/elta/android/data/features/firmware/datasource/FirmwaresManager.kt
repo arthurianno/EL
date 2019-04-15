@@ -42,7 +42,6 @@ class FirmwaresManager @Inject constructor(context: Context) {
                 inputStream?.close()
                 outputStream?.close()
             }
-
         } catch (e: IOException) {
             null
         }
