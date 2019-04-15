@@ -8,6 +8,7 @@ import com.elta.android.presentation.features.profile.main.ui.adapter.items.Main
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
+import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 
@@ -24,4 +25,5 @@ sealed class Clicks : Click {
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
     data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
+    data class ReminderItemClicked(val item: ReminderItem) : Clicks()
 }

@@ -23,6 +23,7 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -172,5 +173,9 @@ object Screens {
 
     object ProfileSettings : SupportAppScreen() {
         override fun getFragment() = ProfileSettingsFragment.newInstance()
+    }
+
+    object Reminders : SupportAppScreen() {
+        override fun getFragment() = RemindersFragment.newInstance()
     }
 }

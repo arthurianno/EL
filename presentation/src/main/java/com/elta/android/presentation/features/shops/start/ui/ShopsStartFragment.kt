@@ -10,7 +10,7 @@ import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.hide
 import kotlinx.android.synthetic.main.fragment_shops_start.*
-import kotlinx.android.synthetic.main.layout_auth_toolbar.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class ShopsStartFragment : BaseFragment<ShopsStartPm>() {
 

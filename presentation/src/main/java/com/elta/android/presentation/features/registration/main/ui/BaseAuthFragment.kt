@@ -13,7 +13,7 @@ import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
-import kotlinx.android.synthetic.main.layout_auth_toolbar.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
 

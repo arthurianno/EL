@@ -14,7 +14,6 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
-import com.elta.android.presentation.core.ui.state_view.StateData
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import io.reactivex.Observable
@@ -71,26 +70,24 @@ class MainRecordsPm @Inject constructor(
 
     private fun handleSuccess(model: HomeModel) {
         bus.event(Events.HomeModelChanged(model))
-
-        if (model.isFirstEntrance) {
-            mainScreenState.dataState.consumer.accept(model.launchState())
-            mainScreenState.visibilityState.consumer.accept(true)
-        } else if (!model.hasEvents) {
-            mainScreenState.dataState.consumer.accept(model.launchState())
-            mainScreenState.visibilityState.consumer.accept(true)
-        } else {
-            mainScreenState.visibilityState.consumer.accept(false)
-        }
-
+        model.launchState()
         items.consumer.accept(recordsMapper.mapFromObject(model))
     }
 
-    private fun HomeModel.launchState(): StateData? =
+    private fun HomeModel.launchState() {
         when {
-            this.isFirstEntrance -> States.MainRecordsScreenFirstLaunchState(resources)
-            !this.hasEvents -> States.MainRecordsScreenNewDayState(resources, dayPeriod.greetingTitle())
-            else -> null
+            isFirstEntrance -> {
+                mainScreenState.dataState.consumer.accept(States.MainRecordsScreenFirstLaunchState(resources))
+                mainScreenState.visibilityState.consumer.accept(true)
+            }
+            !hasEvents -> {
+                mainScreenState.dataState.consumer.accept(States.MainRecordsScreenNewDayState(resources,
+                    dayPeriod.greetingTitle()))
+                mainScreenState.visibilityState.consumer.accept(true)
+            }
+            else -> mainScreenState.visibilityState.consumer.accept(false)
         }
+    }
 
     private fun DayPeriod.greetingTitle(): Int =
         when (this) {
