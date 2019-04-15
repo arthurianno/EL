@@ -19,7 +19,7 @@ class ReminderDelegate(
     private val resources: ResourceProvider
 ) : AdapterDelegate() {
 
-    override val itemType = ReminderDelegate::class
+    override val itemType = ReminderItem::class
     override val layoutResource = R.layout.item_profile_additional_settings
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
