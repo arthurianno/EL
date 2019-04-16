@@ -142,4 +142,19 @@
 
     <color name="color_black_transparent">#10000000</color>
     <color name="transparent_20_percent">#33FFFFFF</color>
+
+    <color name="chart_low_range_background_color">#f6faff</color>
+    <color name="chart_medium_range_background_color">#d9faea</color>
+    <color name="chart_high_range_background_color">#fff6f7</color>
+
+    <color name="chart_low_range_divider_color">#261c7aff</color>
+    <color name="chart_medium_range_divider_color">#503ec9a8</color>
+    <color name="chart_high_range_divider_color">#26ff505d</color>
+
+    <color name="chart_low_range_item_color">#38b7e1</color>
+    <color name="chart_medium_range_item_color">#3ec9a8</color>
+    <color name="chart_high_range_item_color">#ff505d</color>
+
+    <color name="chart_time_text_color">@color/shade_black1</color>
+    <color name="chart_future_time_text_color">@color/shade_black2</color>
 </resources>

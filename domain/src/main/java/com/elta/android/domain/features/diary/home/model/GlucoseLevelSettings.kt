@@ -19,7 +19,7 @@ data class GlucoseLevelSettings(
 
         fun fromNormalValues(normalStart: Double, normalEnd: Double): GlucoseLevelSettings =
             GlucoseLevelSettings(
-                high = DoubleRange(normalStart - STEP, HIGH_END),
+                high = DoubleRange(normalEnd - STEP, HIGH_END),
                 normal = DoubleRange(normalStart, normalEnd),
                 low = DoubleRange(LOW_START, normalStart - STEP)
             )
