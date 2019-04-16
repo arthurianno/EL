@@ -25,6 +25,7 @@ class FirmwareRemoteDataSource @Inject constructor(
                 val f = checkNotNull(file)
                 FirmwareFileDto(
                     version = firmware.version,
+                    compatible = firmware.compatible,
                     path = f.absolutePath,
                     hash = IoUtils.getMd5(FileInputStream(f))
                 )

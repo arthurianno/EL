@@ -9,6 +9,7 @@ class FirmwareFileToDomainMapper @Inject constructor() : Mapper<FirmwareFileDto,
     override fun mapFromObject(source: FirmwareFileDto): FirmwareFile =
         with(source) {
             FirmwareFile(
+                compatible = compatible,
                 path = path,
                 hash = hash
             )

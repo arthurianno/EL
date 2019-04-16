@@ -12,6 +12,7 @@ import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.utils.log
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -101,7 +102,7 @@ class GlucometersManager @Inject constructor(
             pinStorage.setPin(address, pinCode)
         }
 
-    fun updateFirmware(address: String, filePath: String): Completable =
+    fun updateFirmware(address: String, file: FirmwareFile): Completable =
         client.findConnection(address)
             .checkPinAndSend(address)
             .switchMap { connection ->
@@ -116,7 +117,7 @@ class GlucometersManager @Inject constructor(
                             DfuServiceInitiator.createDfuNotificationChannel(context)
                         }
                         val starter = DfuServiceInitiator(address)
-                        starter.setZip(filePath)
+                        starter.setZip(file.path)
                         starter.start(context, EltaDfuService::class.java)
                     }
                     else -> Completable.error(GlucometerToDfuModeError)
@@ -194,6 +195,14 @@ class GlucometersManager @Inject constructor(
     private fun isPotentialLastEvent(response: String): Boolean = response.contains("9595959595.895895")
     private fun isOk(response: String): Boolean = response.contains("ok")
 
+    private fun FirmwareFile.isSupportedByApplication(): Boolean {
+        val appVersionCode = FIRMWARE_VERSION.replace(".", "").toInt()
+        val compatibleVersionCode = compatible.replace(".", "").toInt()
+        return appVersionCode >= compatibleVersionCode
+    }
+
+    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean = batteryLevel ?: 0 >= MIN_LEVEL
+
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
             RxBleClient.State.BLUETOOTH_NOT_AVAILABLE -> BluetoothNotAvailableError
@@ -204,6 +213,8 @@ class GlucometersManager @Inject constructor(
         }
 
     companion object {
+        private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
+        private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000

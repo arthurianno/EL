@@ -30,5 +30,5 @@ class DeviceRemoteDataSource @Inject constructor(
         glucometersManager.setPinCode(address, pinCode)
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
-        glucometersManager.updateFirmware(address, firmwareFile.path)
+        glucometersManager.updateFirmware(address, firmwareFile)
 }

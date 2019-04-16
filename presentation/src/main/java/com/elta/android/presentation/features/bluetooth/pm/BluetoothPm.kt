@@ -15,7 +15,6 @@ import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareU
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
-import com.elta.android.domain.features.firmware.interactor.isSupportedByApplication
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.Clicks
@@ -144,12 +143,8 @@ class BluetoothPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess {
-                        val isCompatible = it.isSupportedByApplication()
-                        if (!isCompatible) {
-                            showSnackBar(SnackBarMessageData.SimpleTextMessage("App doesn't support ${it.version} version"))
-                        }
                         firmwareState.consumer.accept(it)
-                        downloadEnabledState.consumer.accept(isCompatible)
+                        downloadEnabledState.consumer.accept(true)
                     }
                     .map { it.toString() }
                     .doOnSuccess(::writeToLog)
@@ -259,7 +254,7 @@ class BluetoothPm @Inject constructor(
         )
 
     private fun enableUpdateButton() {
-        val enable = glucometer != null && firmwareState.valueOrNull?.isSupportedByApplication() ?: false
+        val enable = glucometer != null
         updateEnabledState.consumer.accept(enable)
     }
 }
