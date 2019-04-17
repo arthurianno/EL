@@ -125,7 +125,7 @@ class GlucometersManager @Inject constructor(
                 .take(1)
                 .switchMapCompletable { response ->
                     when (isOk(response)) {
-                        true -> startFirmwareUpdate(context, file.path, address)
+                        true -> startFirmwareUpdate(context, file.path, address.toDfuAddress())
                         else -> Completable.error(GlucometerToDfuModeError)
                     }
                 }
