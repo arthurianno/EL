@@ -48,8 +48,7 @@ class GlucometersManager @Inject constructor(
         .build()
 
     private val filters = listOf<ScanFilter>(
-        ScanFilter.Builder().setDeviceName("SatelliteOnline").build(),
-        ScanFilter.Builder().setDeviceName("EltaDFU").build()
+        ScanFilter.Builder().setDeviceName("SatelliteOnline").build()
     )
 
     private val connections = mutableMapOf<String, RxBleConnection>()
