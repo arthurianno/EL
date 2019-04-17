@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerToDfuModeError
@@ -103,26 +104,29 @@ class GlucometersManager @Inject constructor(
         }
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
-        client.findConnection(address)
-            .checkPinAndSend(address)
-            .switchMap { connection ->
-                connection.request(address, Commands.ToDfuMode)
-                    .log("BLE", "boot")
-            }
-            .take(1)
-            .switchMapCompletable { response ->
-                when (isOk(response)) {
-                    true -> Completable.fromCallable {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            DfuServiceInitiator.createDfuNotificationChannel(context)
-                        }
-                        val starter = DfuServiceInitiator(address)
-                        starter.setZip(file.path)
-                        starter.start(context, EltaDfuService::class.java)
-                    }
-                    else -> Completable.error(GlucometerToDfuModeError)
+        when {
+            !file.isSupportedByApplication() -> Completable.error(FirmwareNotSupportedByAppError(file.version))
+            else -> client.findConnection(address)
+                .checkPinAndSend(address)
+                .switchMap { connection ->
+                    connection.request(address, Commands.ToDfuMode)
+                        .log("BLE", "boot")
                 }
-            }
+                .take(1)
+                .switchMapCompletable { response ->
+                    when (isOk(response)) {
+                        true -> Completable.fromCallable {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                DfuServiceInitiator.createDfuNotificationChannel(context)
+                            }
+                            val starter = DfuServiceInitiator(address)
+                            starter.setZip(file.path)
+                            starter.start(context, EltaDfuService::class.java)
+                        }
+                        else -> Completable.error(GlucometerToDfuModeError)
+                    }
+                }
+        }
 
     private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
         val input = cmd.toGlucometerString()
