@@ -2,15 +2,18 @@ package com.elta.android.presentation.widgets.charts.daily
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
+import android.graphics.RectF
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.hourOfDay
 import com.elta.android.presentation.utils.minute
 import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
@@ -33,12 +36,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         get() = dataModel()
         set(value) {
             _chartDataModel = value
+            _chartDataModel?.chartItems?.last()?.isSelected = true
             currentDateCalendar.time = Date()
             onDataModelChanged()
         }
 
     private val currentDateCalendar = Calendar.getInstance()
     private val mapDateCalendar = Calendar.getInstance()
+    private lateinit var minTitle: String
+    private lateinit var maxTitle: String
 
     private var _chartDataModel: ChartDataModel? = null
 
@@ -61,13 +67,17 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var futureTimeTextColor = 0
     private var timeTextColor = 0
     private var timeTextSize = 0f
-    private var minMaxTitleColor = 0
-    private var minMaxTitleSize = 0
+    private var chartPointTitleColor = 0
+    private var chartPointTitleSize = 0f
+    private var chartPointTitleBackgroundWidth = 0f
+    private var chartPointTitleBackgroundHeight = 0f
+    private var chartPointTitleBackgroundCorners = 0f
 
     private var fullChartHeight = 0f
     private var fullViewHeight = 0f
     private var fullChartWidth = 0f
     private var sectionsDividerWidth = 0f
+    private var topChartOffset = 0f
 
     private var selectedChartItemRadius = 0f
     private var chartItemRadius = 0f
@@ -77,6 +87,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var timeLineOffset = 0f
     private var timeTitleY = 0f
     private var titleHeight = 0f
+    private var chartPointTitleHeight = 0f
 
     private val lowRangePaint = Paint()
     private val normalRangePaint = Paint()
@@ -85,14 +96,17 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     private val timeTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val chartItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val lastOrSelectedItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val selectedItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private val minMaxTitlePaint = Paint()
-    private val minMaxBackgroundPaint = Paint()
+    private val chartPointTitlePaint = Paint()
+    private val chartPointBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    private val selectedItemLinePaint = Paint()
 
     private val lowRangeRect = Rect()
     private val normalRangeRect = Rect()
     private val highRangeRect = Rect()
+    private val chartPointTitleBackgroundRect = RectF()
 
     private val hoursCoordinatesMap = SparseArray<Float>()
     private val hoursTitlesMap = SparseArray<String>()
@@ -122,25 +136,55 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun Canvas.drawPoints() {
-        val hasSelected = chartPoints.keys.any { it.isSelected }
         chartPoints.entries.forEach {
             chartItemPaint.color = when {
-                it.key.isSelected || (!hasSelected && it.key.isLastValue) -> selectedItemInnerColor
+                it.key.isSelected -> selectedItemInnerColor
                 it.key.valueType == ChartItemValueType.LOW -> lowRangeItemColor
                 it.key.valueType == ChartItemValueType.NORMAL -> normalRangeItemColor
                 it.key.valueType == ChartItemValueType.HIGH -> highRangeItemColor
                 else -> 0
             }
             drawCircle(it.value.x, it.value.y, chartItemRadius, chartItemPaint)
-            if (it.key.isSelected || (!hasSelected && it.key.isLastValue)) {
-                lastOrSelectedItemPaint.color = when (it.key.valueType) {
+
+            if (it.key.isSelected) {
+                val selectionColor = when (it.key.valueType) {
                     ChartItemValueType.LOW -> lowRangeSelectedItemColor
                     ChartItemValueType.NORMAL -> normalRangeSelectedItemColor
                     ChartItemValueType.HIGH -> highRangeSelectedItemColor
                 }
-                drawCircle(it.value.x, it.value.y, selectedChartItemRadius, lastOrSelectedItemPaint)
+                selectedItemPaint.color = selectionColor
+                drawCircle(it.value.x, it.value.y, selectedChartItemRadius, selectedItemPaint)
+                drawPointTitle(it.value, it.key.value.format(), selectionColor)
+                drawSelected(it.value, selectionColor)
+            }
+
+            if (it.key.isMaxValue && !it.key.isSelected) {
+                drawPointTitle(it.value, maxTitle, highRangeItemColor)
+            }
+
+            if (it.key.isMinValue && !it.key.isSelected) {
+                drawPointTitle(it.value, minTitle, lowRangeItemColor)
             }
         }
+    }
+
+    private fun Canvas.drawPointTitle(pointF: PointF, text: String, backgroundColor: Int) {
+        val bgX = pointF.x + chartItemRadius * 3
+        val bgY = pointF.y - chartPointTitleBackgroundHeight / 2
+        chartPointTitleBackgroundRect.set(bgX, bgY, bgX + chartPointTitleBackgroundWidth, bgY + chartPointTitleBackgroundHeight)
+        chartPointBackgroundPaint.color = backgroundColor
+        drawRoundRect(chartPointTitleBackgroundRect, chartPointTitleBackgroundCorners, chartPointTitleBackgroundCorners, chartPointBackgroundPaint)
+
+        val textX = chartPointTitleBackgroundRect.right - chartPointTitleBackgroundWidth / 2
+        val textY = chartPointTitleBackgroundRect.bottom - chartPointTitleBackgroundHeight / 2 + chartPointTitleHeight / 4
+        chartPointTitlePaint.color = chartPointTitleColor
+        drawText(text, textX, textY, chartPointTitlePaint)
+    }
+
+    private fun Canvas.drawSelected(pointF: PointF, backgroundColor: Int, time: String? = null) {
+        selectedItemLinePaint.color = backgroundColor
+        drawLine(pointF.x, topChartOffset, pointF.x, pointF.y - chartItemRadius, selectedItemLinePaint)
+        drawLine(pointF.x, pointF.y + chartItemRadius, pointF.x, timeTitleY, selectedItemLinePaint)
     }
 
     private fun Canvas.drawSections() {
@@ -195,17 +239,25 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
         futureTimeTextColor = getColor(R.color.chart_future_time_text_color)
         timeTextColor = getColor(R.color.chart_time_text_color)
-        minMaxTitleColor = getColor(R.color.white)
+        chartPointTitleColor = getColor(R.color.white)
 
         timeTextSize = TIME_TEXT_SIZE.spToPx(context)
+        chartPointTitleSize = POINT_TITLE_TEXT_SIZE.spToPx(context)
 
         sectionsDividerWidth = SECTIONS_DIVIDER_WIDTH.dpToPx(context)
+        topChartOffset = TOP_OFFSET.dpToPx(context)
         fullChartHeight = FULL_CHART_HEIGHT.dpToPx(context)
         singleHourWidth = SINGLE_HOUR_WIDTH.dpToPx(context)
         timeLineOffset = TIME_LINE_OFFSET.dpToPx(context)
         chartItemRadius = ITEM_RADIUS.dpToPx(context)
         selectedChartItemRadius = SELECTED_ITEM_RADIUS.dpToPx(context)
         titlePadding = TITLE_PADDING.dpToPx(context)
+        chartPointTitleBackgroundHeight = POINT_TITLE_BACKGROUND_HEIGHT.dpToPx(context)
+        chartPointTitleBackgroundWidth = POINT_TITLE_BACKGROUND_WIDTH.dpToPx(context)
+        chartPointTitleBackgroundCorners = POINT_TITLE_BACKGROUND_CORNERS.dpToPx(context)
+
+        minTitle = resources.getString(R.string.main_records_daily_chart_min_title)
+        maxTitle = resources.getString(R.string.main_records_daily_chart_max_title)
     }
 
     private fun initPaints() {
@@ -229,22 +281,41 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             textAlign = Paint.Align.CENTER
             textSize = timeTextSize
             color = timeTextColor
-            typeface = context.getTypeface(TYPEFACE)
+            typeface = context.getTypeface(TYPEFACE_MEDIUM)
+        }
+        chartPointTitlePaint.apply {
+            textAlign = Paint.Align.CENTER
+            textSize = chartPointTitleSize
+            color = chartPointTitleColor
+            typeface = context.getTypeface(TYPEFACE_BOLD)
+        }
+        chartPointBackgroundPaint.apply {
+            style = Paint.Style.FILL
         }
         chartItemPaint.apply {
             style = Paint.Style.FILL
         }
-        lastOrSelectedItemPaint.apply {
+        selectedItemPaint.apply {
             style = Paint.Style.STROKE
             strokeWidth = SELECTED_ITEM_STROKE_WIDTH.dpToPx(context)
         }
+        selectedItemLinePaint.apply {
+            style = Paint.Style.STROKE
+            strokeWidth = SELECTED_ITEM_LINE_WIDTH.dpToPx(context)
+            val gapLength = SELECTED_ITEM_GAP.dpToPx(context)
+            pathEffect = DashPathEffect(floatArrayOf(gapLength, gapLength), 0f)
+        }
+        setLayerType(View.LAYER_TYPE_SOFTWARE, selectedItemLinePaint)
     }
 
     private fun onBeforeMeasure() {
         val fontMetrics = timeTitlePaint.fontMetrics
         titleHeight = fontMetrics.descent - fontMetrics.ascent
-        fullViewHeight = fullChartHeight + titlePadding + titleHeight + titlePadding
+        fullViewHeight = topChartOffset + fullChartHeight + titlePadding + titleHeight + titlePadding
         fullChartWidth = singleHourWidth * FULL_DAY_HOURS + timeLineOffset * 2
+
+        val fontMetricsChartPoint = chartPointTitlePaint.fontMetrics
+        chartPointTitleHeight = fontMetricsChartPoint.descent - fontMetricsChartPoint.ascent
 
         hoursCoordinatesMap.put(START_HOUR, timeLineOffset)
         hoursTitlesMap.put(START_HOUR, 0.formatHour())
@@ -259,7 +330,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         if (_chartDataModel != null) {
             onDataModelChanged()
         }
-        timeTitleY = fullChartHeight + titlePadding + (titleHeight * 0.75).toInt()
+        timeTitleY = topChartOffset + fullChartHeight + titlePadding + (titleHeight * 0.75).toInt()
     }
 
     private fun onDataModelChanged() {
@@ -277,9 +348,9 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             if (highMax != null) {
                 val highRangePercents = (highMax - normalMax) / fullRange
                 val highRangeHeight = fullChartHeight * highRangePercents
-                highRangeRect.set(0, 0, fullChartWidth.toInt(), highRangeHeight.toInt())
+                highRangeRect.set(0, topChartOffset.toInt(), fullChartWidth.toInt(), topChartOffset.toInt() + highRangeHeight.toInt())
             } else {
-                highRangeRect.set(0, 0, 0, 0)
+                highRangeRect.set(0, topChartOffset.toInt(), 0, topChartOffset.toInt())
             }
 
             val nonNullLowMax = lowMax ?: start
@@ -314,9 +385,11 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
         val valuesStart = dataModel().chartRangesModel.start
         val valuesEnd = dataModel().chartRangesModel.end
-        val y = top + fullChartHeight * (1 - (value - valuesStart) / (valuesEnd - valuesStart))
+        val y = top + topChartOffset.toInt() + fullChartHeight * (1 - (value - valuesStart) / (valuesEnd - valuesStart))
         return PointF(x, y.toFloat())
     }
+
+    private fun Double.format() = NumberFormatter.numberFormat.format(this)
 
     private fun dataModel(): ChartDataModel =
         checkNotNull(_chartDataModel) { "Property `chartDataModel` did not initialized yet" }
@@ -341,12 +414,20 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val ITEM_RADIUS = 4f // dp
         private const val FULL_CHART_HEIGHT = 144f
         private const val TITLE_PADDING = 16f // dp
-        private const val TYPEFACE = "roboto_medium.ttf"
+        private const val TYPEFACE_MEDIUM = "roboto_medium.ttf"
+        private const val TYPEFACE_BOLD = "roboto_bold.ttf"
         private const val START_HOUR = 0
         private const val FULL_DAY_HOURS = 24
         private const val MINUTES_IN_HOUR = 60
         private const val SELECTED_ITEM_RADIUS = 5f // dp
         private const val SELECTED_ITEM_STROKE_WIDTH = 2f // dp
         private const val SECTIONS_DIVIDER_WIDTH = 1f // dp
+        private const val POINT_TITLE_TEXT_SIZE = 10f // sp
+        private const val POINT_TITLE_BACKGROUND_HEIGHT = 16f // dp
+        private const val POINT_TITLE_BACKGROUND_WIDTH = 32f // dp
+        private const val POINT_TITLE_BACKGROUND_CORNERS = 4f // dp
+        private const val TOP_OFFSET = 5f // dp
+        private const val SELECTED_ITEM_LINE_WIDTH = 1.5f // dp
+        private const val SELECTED_ITEM_GAP = 4f // dp
     }
 }
