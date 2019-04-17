@@ -1,7 +1,6 @@
 package com.elta.android.data.features.devices.glucometer
 
 import android.content.Context
-import android.os.Build
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.FirmwareNotSupportedByAppError
@@ -21,7 +20,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
-import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -115,14 +113,7 @@ class GlucometersManager @Inject constructor(
                 .take(1)
                 .switchMapCompletable { response ->
                     when (isOk(response)) {
-                        true -> Completable.fromCallable {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                DfuServiceInitiator.createDfuNotificationChannel(context)
-                            }
-                            val starter = DfuServiceInitiator(address)
-                            starter.setZip(file.path)
-                            starter.start(context, EltaDfuService::class.java)
-                        }
+                        true -> startFirmwareUpdate(context, file.path, address)
                         else -> Completable.error(GlucometerToDfuModeError)
                     }
                 }
