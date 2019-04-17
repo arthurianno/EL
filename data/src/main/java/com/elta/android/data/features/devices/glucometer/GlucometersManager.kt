@@ -4,6 +4,7 @@ import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.FirmwareNotSupportedByAppError
+import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerToDfuModeError
@@ -106,8 +107,20 @@ class GlucometersManager @Inject constructor(
             else -> client.findConnection(address)
                 .checkPinAndSend(address)
                 .switchMap { connection ->
-                    connection.request(address, Commands.ToDfuMode)
-                        .log("BLE", "boot")
+                    connection.request(address, Commands.GetBatteryAndTemperature)
+                        .map { infoBuilder.buildFrom(listOf(it)) }
+                        .switchMap { info ->
+                            when {
+                                !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
+                                    GlucometerLowBatteryLevelError(
+                                        current = info.batteryLevel ?: 0,
+                                        required = MIN_LEVEL
+                                    )
+                                )
+                                else -> connection.request(address, Commands.ToDfuMode)
+                                    .log("BLE", "boot")
+                            }
+                        }
                 }
                 .take(1)
                 .switchMapCompletable { response ->
