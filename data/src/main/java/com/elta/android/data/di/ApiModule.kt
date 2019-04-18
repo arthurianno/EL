@@ -101,6 +101,6 @@ class ApiModule {
         const val USE_MOCKED_EVENTS_API = false
         const val USE_MOCKED_TAGS_API = false
         const val USE_MOCKED_SETTINGS_API = false
-        const val USE_MOCKED_FIRMWARE_API = true
+        const val USE_MOCKED_FIRMWARE_API = false
     }
 }
