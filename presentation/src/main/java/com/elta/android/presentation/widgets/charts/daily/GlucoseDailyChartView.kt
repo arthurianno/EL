@@ -1,5 +1,6 @@
 package com.elta.android.presentation.widgets.charts.daily
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
@@ -12,9 +13,11 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.util.SparseArray
+import android.view.MotionEvent
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
+import com.elta.android.presentation.utils.distanceBetween
 import com.elta.android.presentation.utils.hourOfDay
 import com.elta.android.presentation.utils.minute
 import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
@@ -134,6 +137,23 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
         super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
         onAfterMeasure()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) {
+            val pointOfTouch = PointF(event.x, event.y)
+            var clickedItem: ChartItemModel? = null
+            chartPoints.entries.forEach {
+                when {
+                    it.key.isSelected -> it.key.isSelected = false
+                    isPointClicked(it.value, pointOfTouch) -> clickedItem = it.key
+                }
+            }
+            clickedItem?.isSelected = true
+            invalidate()
+        }
+        return true
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -453,6 +473,9 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         checkNotNull(_chartDataModel) { "Property `chartDataModel` did not initialized yet" }
 
     private fun getColor(color: Int) = ContextCompat.getColor(context, color)
+
+    private fun isPointClicked(point1: PointF, point2: PointF) =
+        point1 distanceBetween point2 <= chartItemRadius * 3
 
     private fun Int.formatHour(): String {
         val stringHour = this.toString()
