@@ -2,14 +2,17 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.utils.toEventDate
@@ -52,6 +55,10 @@ abstract class BaseEventPm constructor(
 
     private val exitDialogData: DialogData by lazy { Dialogs.EventExit(resources) }
 
+    abstract fun handleBack(i: Unit)
+
+    abstract fun observeEventChanges()
+
     override fun onCreate() {
         super.onCreate()
         bindFormPicker()
@@ -59,13 +66,37 @@ abstract class BaseEventPm constructor(
         bindFormTagSelection()
         bindDateSelectors()
         bindHandleBack()
+        observeEventChanges()
     }
 
     fun setEventType(eventType: EventType) {
         eventTypeState.consumer.accept(eventType)
     }
 
-    abstract fun handleBack(i: Unit)
+    protected fun isFormValid(form: EventFormModel): Boolean {
+        val validator = checkNotNull(form.eventType).getValidator()
+        return validator.isValid(
+            value = form.value,
+            kind = form.kind,
+            name = form.name,
+            duration = form.duration,
+            insulin = form.insulinType,
+            date = form.date,
+            note = form.note
+        )
+    }
+
+    protected fun Date?.isDateChanged(other: Date): Boolean {
+        return when {
+            this == null -> false
+            else -> this != other
+        }
+    }
+
+    protected fun handleSuccess() {
+        bus.event(Events.EventsChanged)
+        router.exit()
+    }
 
     private fun bindHandleBack() {
         backHandleAction.observable
