@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
@@ -36,7 +37,6 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         get() = dataModel()
         set(value) {
             _chartDataModel = value
-            _chartDataModel?.chartItems?.last()?.isSelected = true
             currentDateCalendar.time = Date()
             onDataModelChanged()
         }
@@ -81,6 +81,11 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     private var selectedChartItemRadius = 0f
     private var chartItemRadius = 0f
+    private var selectedItemTimeBgWidth = 0f
+    private var selectedItemTimeBgHeight = 0f
+    private var selectedItemTimeBgPadding = 0f
+    private var selectedItemTriangleWidth = 0f
+    private var selectedItemTriangleHeight = 0f
 
     private var titlePadding = 0f
     private var singleHourWidth = 0f
@@ -97,16 +102,22 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private val timeTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val chartItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val selectedItemTimeTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val selectedItemTimeBgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val selectedItemTrianglePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val selectedItemLinePaint = Paint()
 
     private val chartPointTitlePaint = Paint()
     private val chartPointBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-
-    private val selectedItemLinePaint = Paint()
 
     private val lowRangeRect = Rect()
     private val normalRangeRect = Rect()
     private val highRangeRect = Rect()
     private val chartPointTitleBackgroundRect = RectF()
+    private val selectedItemTimeBgRect = RectF()
+
+    private val selectedItemTriangleTop = Path()
+    private val selectedItemTriangleBottom = Path()
 
     private val hoursCoordinatesMap = SparseArray<Float>()
     private val hoursTitlesMap = SparseArray<String>()
@@ -155,7 +166,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
                 selectedItemPaint.color = selectionColor
                 drawCircle(it.value.x, it.value.y, selectedChartItemRadius, selectedItemPaint)
                 drawPointTitle(it.value, it.key.value.format(), selectionColor)
-                drawSelected(it.value, selectionColor)
+                drawSelected(it.value, selectionColor, it.key.formattedTime)
             }
 
             if (it.key.isMaxValue && !it.key.isSelected) {
@@ -181,10 +192,39 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         drawText(text, textX, textY, chartPointTitlePaint)
     }
 
-    private fun Canvas.drawSelected(pointF: PointF, backgroundColor: Int, time: String? = null) {
-        selectedItemLinePaint.color = backgroundColor
+    private fun Canvas.drawSelected(pointF: PointF, selectionColor: Int, time: String) {
+        selectedItemLinePaint.color = selectionColor
         drawLine(pointF.x, topChartOffset, pointF.x, pointF.y - chartItemRadius, selectedItemLinePaint)
         drawLine(pointF.x, pointF.y + chartItemRadius, pointF.x, timeTitleY, selectedItemLinePaint)
+
+        val bgBottom = timeTitleY + selectedItemTimeBgPadding
+        selectedItemTimeBgRect.set(
+            pointF.x - selectedItemTimeBgWidth / 2,
+            bgBottom - selectedItemTimeBgHeight,
+            pointF.x + selectedItemTimeBgWidth / 2,
+            bgBottom
+        )
+        selectedItemTimeBgPaint.color = selectionColor
+        drawRoundRect(selectedItemTimeBgRect, chartPointTitleBackgroundCorners, chartPointTitleBackgroundCorners, selectedItemTimeBgPaint)
+        drawText(time, pointF.x, timeTitleY, selectedItemTimeTitlePaint)
+
+        selectedItemTrianglePaint.color = selectionColor
+
+        selectedItemTriangleTop.moveTo(pointF.x - selectedItemTriangleWidth / 2, topChartOffset)
+        selectedItemTriangleTop.lineTo(pointF.x + selectedItemTriangleWidth / 2, topChartOffset)
+        selectedItemTriangleTop.lineTo(pointF.x, topChartOffset + selectedItemTriangleHeight)
+        selectedItemTriangleTop.lineTo(pointF.x - selectedItemTriangleWidth / 2, topChartOffset)
+        selectedItemTriangleTop.close()
+        drawPath(selectedItemTriangleTop, selectedItemTrianglePaint)
+        selectedItemTriangleTop.reset()
+
+        selectedItemTriangleBottom.moveTo(pointF.x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
+        selectedItemTriangleBottom.lineTo(pointF.x + selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
+        selectedItemTriangleBottom.lineTo(pointF.x, selectedItemTimeBgRect.top - selectedItemTriangleHeight)
+        selectedItemTriangleBottom.lineTo(pointF.x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
+        selectedItemTriangleBottom.close()
+        drawPath(selectedItemTriangleBottom, selectedItemTrianglePaint)
+        selectedItemTriangleBottom.reset()
     }
 
     private fun Canvas.drawSections() {
@@ -252,9 +292,17 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         chartItemRadius = ITEM_RADIUS.dpToPx(context)
         selectedChartItemRadius = SELECTED_ITEM_RADIUS.dpToPx(context)
         titlePadding = TITLE_PADDING.dpToPx(context)
+
         chartPointTitleBackgroundHeight = POINT_TITLE_BACKGROUND_HEIGHT.dpToPx(context)
         chartPointTitleBackgroundWidth = POINT_TITLE_BACKGROUND_WIDTH.dpToPx(context)
         chartPointTitleBackgroundCorners = POINT_TITLE_BACKGROUND_CORNERS.dpToPx(context)
+
+        selectedItemTimeBgWidth = SELECTED_ITEM_TIME_BG_WIDTH.dpToPx(context)
+        selectedItemTimeBgHeight = SELECTED_ITEM_TIME_BG_HEIGHT.dpToPx(context)
+        selectedItemTimeBgPadding = SELECTED_ITEM_TIME_BG_PADDING.dpToPx(context)
+
+        selectedItemTriangleWidth = SELECTED_ITEM_TRIANGLE_WIDTH.dpToPx(context)
+        selectedItemTriangleHeight = SELECTED_ITEM_TRIANGLE_HEIGHT.dpToPx(context)
 
         minTitle = resources.getString(R.string.main_records_daily_chart_min_title)
         maxTitle = resources.getString(R.string.main_records_daily_chart_max_title)
@@ -305,6 +353,16 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             val gapLength = SELECTED_ITEM_GAP.dpToPx(context)
             pathEffect = DashPathEffect(floatArrayOf(gapLength, gapLength), 0f)
         }
+        selectedItemTimeBgPaint.apply {
+            style = Paint.Style.FILL
+        }
+        selectedItemTimeTitlePaint.apply {
+            textAlign = Paint.Align.CENTER
+            textSize = timeTextSize
+            color = chartPointTitleColor
+            typeface = context.getTypeface(TYPEFACE_MEDIUM)
+        }
+        selectedItemTrianglePaint.style = Paint.Style.FILL
         setLayerType(View.LAYER_TYPE_SOFTWARE, selectedItemLinePaint)
     }
 
@@ -381,7 +439,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         val hours = mapDateCalendar.hourOfDay
         val minutes = mapDateCalendar.minute
         val startX = hoursCoordinatesMap[hours]
-        val x = startX + singleHourWidth * (minutes / MINUTES_IN_HOUR)
+        val x = startX + singleHourWidth * (minutes.toFloat() / MINUTES_IN_HOUR)
 
         val valuesStart = dataModel().chartRangesModel.start
         val valuesEnd = dataModel().chartRangesModel.end
@@ -429,5 +487,10 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val TOP_OFFSET = 5f // dp
         private const val SELECTED_ITEM_LINE_WIDTH = 1.5f // dp
         private const val SELECTED_ITEM_GAP = 4f // dp
+        private const val SELECTED_ITEM_TIME_BG_WIDTH = 46f // dp
+        private const val SELECTED_ITEM_TIME_BG_HEIGHT = 22f // dp
+        private const val SELECTED_ITEM_TIME_BG_PADDING = 6f // dp
+        private const val SELECTED_ITEM_TRIANGLE_WIDTH = 9f // dp
+        private const val SELECTED_ITEM_TRIANGLE_HEIGHT = 7f // dp
     }
 }

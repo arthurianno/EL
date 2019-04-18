@@ -5,6 +5,7 @@ import java.util.Date
 data class ChartItemModel(
     val value: Double,
     val dateTime: Date,
+    val formattedTime: String,
     val valueType: ChartItemValueType,
     val isMaxValue: Boolean = false,
     val isMinValue: Boolean = false,

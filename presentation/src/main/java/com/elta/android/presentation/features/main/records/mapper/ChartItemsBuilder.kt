@@ -6,6 +6,8 @@ import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueType
 import com.elta.android.presentation.widgets.charts.daily.models.ChartRangesModel
+import com.nullgr.core.date.CommonFormats
+import com.nullgr.core.date.toStringWithFormat
 
 object ChartItemsBuilder {
 
@@ -22,6 +24,7 @@ object ChartItemsBuilder {
                     ChartItemModel(
                         value = it.value ?: 0.0,
                         dateTime = it.additionTime,
+                        formattedTime = it.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME),
                         valueType = it.value.toValueType(glucoseLevelSettings),
                         isMaxValue = it == maxEvent,
                         isMinValue = it == minEvent,

@@ -3,12 +3,9 @@ package com.elta.android.presentation.widgets.range_bar
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.VectorDrawable
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -17,6 +14,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
+import com.elta.android.presentation.utils.decodeBitmap
 import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
 import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
 import com.nullgr.core.font.getTypeface
@@ -400,23 +398,6 @@ class RangeBarView @JvmOverloads constructor(
 
     private fun disableParentTouch() {
         parent.requestDisallowInterceptTouchEvent(true)
-    }
-
-    private fun Context.decodeBitmap(drawableId: Int): Bitmap {
-        val drawable = ContextCompat.getDrawable(this, drawableId)
-        return when (drawable) {
-            is BitmapDrawable -> BitmapFactory.decodeResource(context.resources, drawableId)
-            is VectorDrawable -> drawable.toBitmap()
-            else -> throw IllegalArgumentException("unsupported drawable type")
-        }
-    }
-
-    private fun VectorDrawable.toBitmap(): Bitmap {
-        val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        setBounds(0, 0, canvas.width, canvas.height)
-        draw(canvas)
-        return bitmap
     }
 
     companion object {
