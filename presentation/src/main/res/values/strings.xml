@@ -370,11 +370,23 @@
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
     <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
     <string name="profile_reminders_create_new">Создать новое</string>
+    <string name="profile_reminders_create_new_title">Новое напоминание</string>
     <string name="profile_reminders_header_text">Мои напоминания</string>
+    <string name="profile_reminders_create">Создать напоминание</string>
+    <string name="profile_reminders_reminder_name_hint">Название</string>
+    <string name="profile_reminders_edit_title">Напоминание</string>
+    <string name="profile_reminders_delete">Удалить</string>
+    <string name="profile_reminders_save_changes">Сохранить изменение</string>
+    <string name="profile_reminders_message_deleted">Напоминание удалено</string>
 
-    <string name="profile_reminders_periodic_not_repeat">Не повторять</string>
-    <string name="profile_reminders_periodic_day">Ежедневно</string>
-    <string name="profile_reminders_periodic_week">Еженедельно</string>
-    <string name="profile_reminders_periodic_month">Ежемесячно</string>
-    <string name="profile_reminders_periodic_year">Ежегодно</string>
+    <string name="profile_reminders_schedule_not_repeat">Не повторять</string>
+    <string name="profile_reminders_schedule_day">Ежедневно</string>
+    <string name="profile_reminders_schedule_week">Еженедельно</string>
+    <string name="profile_reminders_schedule_month">Ежемесячно</string>
+    <string name="profile_reminders_schedule_year">Ежегодно</string>
+
+    <string name="profile_delete_reminder_dialog_title">Внимание</string>
+    <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
+    <string name="profile_delete_reminder_cancel_button">Отменить</string>
+    <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
 </resources>

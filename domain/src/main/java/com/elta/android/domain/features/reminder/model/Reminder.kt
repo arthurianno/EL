@@ -6,5 +6,5 @@ data class Reminder(
     val id: String,
     val title: String,
     val time: Date?,
-    val periodic: PeriodicType
+    val scheduleType: ScheduleType
 )

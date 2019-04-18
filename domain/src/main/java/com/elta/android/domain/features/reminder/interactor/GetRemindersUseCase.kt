@@ -14,4 +14,5 @@ class GetRemindersUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Unit?): Observable<List<Reminder>> =
         repo.getReminders()
+            .map { it.sortByTime() }
 }

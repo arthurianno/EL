@@ -14,7 +14,7 @@ class ReminderToCacheMapper @Inject constructor() : Mapper<ReminderDto, Reminder
                 secondaryId = id,
                 title = title,
                 time = time,
-                periodic = periodic.name
+                schedule = scheduleType.name
             )
         }
 }

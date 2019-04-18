@@ -10,5 +10,5 @@ data class ReminderCacheDto(
     val secondaryId: String,
     val title: String,
     val time: Date?,
-    val periodic: String
+    val schedule: String
 )

@@ -26,12 +26,14 @@ import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragmen
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
-import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
-import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.di.RemindersModule
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
+import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
+import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -190,4 +192,12 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [RemindersModule::class])
     abstract fun bindRemindersFragment(): RemindersFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindCreateRemindFragment(): CreateRemindFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEditRemindFragment(): EditRemindFragment
 }

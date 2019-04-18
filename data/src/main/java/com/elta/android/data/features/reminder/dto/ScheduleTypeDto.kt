@@ -1,6 +1,6 @@
 package com.elta.android.data.features.reminder.dto
 
-enum class PeriodicTypeDto {
+enum class ScheduleTypeDto {
     NONE,
     DAY,
     WEEK,

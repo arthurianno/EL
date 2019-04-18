@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.reminder.interactor
 
-import com.elta.android.domain.features.reminder.model.PeriodicType
+import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.nullgr.core.interactor.CompletableUseCase
@@ -17,13 +17,12 @@ class AddNewReminderUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Completable {
         val p = checkNotNull(params)
-        val date = checkNotNull(p.date)
         return repo.addReminder(
             Reminder(
                 id = UUID.randomUUID().toString(),
                 title = p.title,
-                time = date,
-                periodic = p.periodic
+                time = p.date,
+                scheduleType = p.schedule
             )
         )
     }
@@ -31,6 +30,6 @@ class AddNewReminderUseCase @Inject constructor(
     data class Params(
         val title: String,
         val date: Date?,
-        val periodic: PeriodicType
+        val schedule: ScheduleType
     )
 }
