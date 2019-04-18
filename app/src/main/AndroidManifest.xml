@@ -43,10 +43,6 @@
             android:name="com.nullgr.core.intents.rxresult.RxResolveResultActivity"
             android:theme="@style/AppTheme.Transparent" />
 
-        <service
-            android:name=".presentation.features.bluetooth.EltaDfuService"
-            android:exported="false" />
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="920aba3e4b6a09e14708096e535391e22085e85f" />

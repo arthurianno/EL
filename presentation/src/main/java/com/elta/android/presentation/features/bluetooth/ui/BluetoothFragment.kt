@@ -44,7 +44,11 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         getInfoButtonView.clicks().bindTo(pm.getInfoAction)
         getEventsButtonView.clicks().bindTo(pm.getEventsAction)
         setPinButtonView.clicks().bindTo(pm.setPinAction)
-        dfuButtonView.clicks().bindTo(pm.dfuAction)
+        checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
+        downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
+        updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
+        pm.updateEnabledState.bindTo { updateFirmwareButtonView.isEnabled = it }
+        pm.downloadEnabledState.bindTo { downloadFirmwareButtonView.isEnabled = it }
         pm.pinEnabledState.bindTo { setPinButtonView.isEnabled = it }
         pm.pinInputControl.bindTo(commandInputView)
         pm.logState.bindTo(logView.text())

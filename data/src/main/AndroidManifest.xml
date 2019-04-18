@@ -9,13 +9,13 @@
 
         <activity
             android:name=".features.auth.datasource.social.RxSocialActivity"
-            android:theme="@style/SocialTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/SocialTheme" />
 
         <activity
             android:name="ru.ok.android.sdk.OkAuthActivity"
-            android:theme="@style/SocialTheme"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/SocialTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -49,5 +49,9 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
+        <service
+            android:name=".features.devices.glucometer.EltaDfuService"
+            android:exported="false" />
     </application>
 </manifest>

@@ -1,13 +1,18 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.FirmwareNotSupportedByAppError
+import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
+import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -29,7 +34,8 @@ class GlucometersManager @Inject constructor(
     private val eventBuilder: GlucometerEventBuilder,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
-    private val client: RxBleClient
+    private val client: RxBleClient,
+    private val context: Context
 ) {
 
     private val scanner = BluetoothLeScannerCompat.getScanner()
@@ -42,8 +48,7 @@ class GlucometersManager @Inject constructor(
         .build()
 
     private val filters = listOf<ScanFilter>(
-        ScanFilter.Builder().setDeviceName("SatelliteOnline").build(),
-        ScanFilter.Builder().setDeviceName("EltaDFU").build()
+        ScanFilter.Builder().setDeviceName("Satellite").build()
     )
 
     private val connections = mutableMapOf<String, RxBleConnection>()
@@ -85,11 +90,43 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
+            // TODO: pass part of device name instead of address.
+            // On iOS devices address can't be extracted
+            // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     fun setPinCode(address: String, pinCode: String): Completable =
         Completable.fromCallable {
             pinStorage.setPin(address, pinCode)
+        }
+
+    fun updateFirmware(address: String, file: FirmwareFile): Completable =
+        when {
+            !file.isSupportedByApplication() -> Completable.error(FirmwareNotSupportedByAppError(file.version))
+            else -> client.findConnection(address)
+                .checkPinAndSend(address)
+                .switchMap { connection ->
+                    connection.request(address, Commands.GetBatteryAndTemperature)
+                        .map { infoBuilder.buildFrom(listOf(it)) }
+                        .switchMap { info ->
+                            when {
+                                !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
+                                    GlucometerLowBatteryLevelError(
+                                        current = info.batteryLevel ?: 0,
+                                        required = MIN_LEVEL
+                                    )
+                                )
+                                else -> connection.request(address, Commands.ToDfuMode)
+                            }
+                        }
+                }
+                .take(1)
+                .switchMapCompletable { response ->
+                    when (isOk(response)) {
+                        true -> startFirmwareUpdate(context, file.path, address.toDfuAddress())
+                        else -> Completable.error(GlucometerToDfuModeError)
+                    }
+                }
         }
 
     private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
@@ -161,6 +198,15 @@ class GlucometersManager @Inject constructor(
     private fun isPinError(response: String): Boolean = response == "pin.error"
     private fun isPinCommand(command: String): Boolean = command.startsWith("pin")
     private fun isPotentialLastEvent(response: String): Boolean = response.contains("9595959595.895895")
+    private fun isOk(response: String): Boolean = response.contains("ok")
+
+    private fun FirmwareFile.isSupportedByApplication(): Boolean {
+        val appVersionCode = FIRMWARE_VERSION.replace(".", "").toInt()
+        val compatibleVersionCode = compatible.replace(".", "").toInt()
+        return appVersionCode >= compatibleVersionCode
+    }
+
+    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean = batteryLevel ?: 0 >= MIN_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
@@ -172,6 +218,8 @@ class GlucometersManager @Inject constructor(
         }
 
     companion object {
+        private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
+        private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000

@@ -27,6 +27,10 @@ import com.elta.android.data.features.reminder.mapper.ReminderFromCacheMapper
 import com.elta.android.data.features.reminder.mapper.ReminderToCacheMapper
 import com.elta.android.data.features.reminder.mapper.ReminderToDomainMapper
 import com.elta.android.data.features.reminder.mapper.ReminderToDtoMapper
+import com.elta.android.data.features.firmware.dto.FirmwareDto
+import com.elta.android.data.features.firmware.dto.FirmwareFileDto
+import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
+import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.CoordinatesDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
@@ -51,6 +55,8 @@ import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.reminder.model.Reminder
+import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.domain.features.user.model.Profile
@@ -197,4 +203,14 @@ abstract class MappersModule {
     abstract fun bindReminderToDomainMapper(
         mapper: ReminderToDomainMapper
     ): Mapper<ReminderDto, Reminder>
+
+    @Binds
+    abstract fun bindFirmwareToDomainMapper(
+        mapper: FirmwareToDomainMapper
+    ): Mapper<FirmwareDto, Firmware>
+
+    @Binds
+    abstract fun bindFirmwareFileToDomainMapper(
+        mapper: FirmwareFileToDomainMapper
+    ): Mapper<FirmwareFileDto, FirmwareFile>
 }

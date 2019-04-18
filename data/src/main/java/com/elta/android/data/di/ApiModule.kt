@@ -9,6 +9,8 @@ import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
+import com.elta.android.data.features.firmware.api.FirmwareApi
+import com.elta.android.data.features.firmware.api.MockedFirmwareApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.user.api.MockedProfileApi
@@ -83,10 +85,22 @@ class ApiModule {
             else -> retrofit.create<TagsApi>(TagsApi::class.java)
         }
 
+    @Provides
+    @Singleton
+    fun provideFirmwareApi(
+        context: Context,
+        retrofit: Retrofit
+    ): FirmwareApi =
+        when (ApiConfig.USE_MOCKED_FIRMWARE_API) {
+            true -> MockedFirmwareApi(context)
+            else -> retrofit.create<FirmwareApi>(FirmwareApi::class.java)
+        }
+
     object ApiConfig {
         const val USE_MOCKED_SALE_POINTS_API = false
         const val USE_MOCKED_EVENTS_API = false
         const val USE_MOCKED_TAGS_API = false
         const val USE_MOCKED_SETTINGS_API = false
+        const val USE_MOCKED_FIRMWARE_API = false
     }
 }

@@ -7,6 +7,7 @@ import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -29,4 +30,7 @@ class DeviceDataRepository @Inject constructor(
 
     override fun setPinCode(address: String, pinCode: String): Completable =
         source.setPinCode(address, pinCode)
+
+    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
+        source.updateFirmware(address, firmwareFile)
 }
