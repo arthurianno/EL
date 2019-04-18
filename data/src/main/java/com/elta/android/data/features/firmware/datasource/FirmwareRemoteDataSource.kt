@@ -32,7 +32,7 @@ class FirmwareRemoteDataSource @Inject constructor(
             }
             .compose { files ->
                 files.flatMap { file ->
-                    if (file.hash == firmware.hash) Single.just(file)
+                    if (file.hash.equals(firmware.hash, true)) Single.just(file)
                     else Single.error(FirmwareDownloadingError)
                 }
             }
