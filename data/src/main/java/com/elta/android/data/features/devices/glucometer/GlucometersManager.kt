@@ -10,7 +10,6 @@ import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
-import com.elta.android.common.utils.log
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -49,7 +48,7 @@ class GlucometersManager @Inject constructor(
         .build()
 
     private val filters = listOf<ScanFilter>(
-        ScanFilter.Builder().setDeviceName("SatelliteOnline").build()
+        ScanFilter.Builder().setDeviceName("Satellite").build()
     )
 
     private val connections = mutableMapOf<String, RxBleConnection>()
@@ -118,7 +117,6 @@ class GlucometersManager @Inject constructor(
                                     )
                                 )
                                 else -> connection.request(address, Commands.ToDfuMode)
-                                    .log("BLE", "boot")
                             }
                         }
                 }

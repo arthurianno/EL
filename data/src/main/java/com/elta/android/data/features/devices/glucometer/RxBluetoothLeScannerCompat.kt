@@ -10,7 +10,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 
 fun BluetoothLeScannerCompat.startScan(
-    filters: List<ScanFilter>? = emptyList(),
+    filters: List<ScanFilter> = emptyList(),
     settings: ScanSettings
 ): Observable<List<ScanResult>> = Observable.create<ScanResult> { emitter ->
     val callback = object : ScanCallback() {
@@ -36,12 +36,14 @@ fun BluetoothLeScannerCompat.startScan(
         }
     }
 
-    startScan(filters, settings, callback)
+    // pass empty list to organize own filter
+    startScan(emptyList(), settings, callback)
 
     emitter.setDisposable(Disposables.fromAction {
         stopScan(callback)
     })
 }
+    .filter { it.isFiltered(filters) }
     .scan(mutableSetOf<ScanResult>()) { results, result ->
         results.add(result)
         results.distinctBy(ScanResult::getDevice).toMutableSet()
@@ -60,6 +62,20 @@ fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {
         return item.device != other[index].device
     }
 
+    return false
+}
+
+fun ScanResult.isFiltered(filters: List<ScanFilter>): Boolean {
+    val deviceName = device.name ?: scanRecord?.deviceName
+    filters.forEach { filter ->
+        val nameToFilter = filter.deviceName
+        if (nameToFilter != null && deviceName != null) {
+            if (deviceName.contains(nameToFilter)) {
+                return true
+            }
+        }
+        return false
+    }
     return false
 }
 

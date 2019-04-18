@@ -31,6 +31,7 @@ fun startFirmwareUpdate(context: Context, path: String, address: String): Comple
         DfuServiceInitiator.createDfuNotificationChannel(context)
     }
     val starter = DfuServiceInitiator(address)
+    starter.setDeviceName("SatelliteOnline")
     starter.setZip(path)
     starter.start(context, EltaDfuService::class.java)
 
