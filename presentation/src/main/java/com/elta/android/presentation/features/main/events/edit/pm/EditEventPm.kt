@@ -36,6 +36,14 @@ class EditEventPm @Inject constructor(
 
     private val deleteDialogData: DialogData by lazy { Dialogs.EventDelete(resources) }
 
+    override fun onCreate() {
+        super.onCreate()
+        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
+        observeSaveEventAction()
+        observeDeleteEventAction()
+        loadEvent()
+    }
+
     override fun handleBack(i: Unit) {
         when (isFormChangedState.value) {
             true -> exitDialogAction.consumer.accept(Unit)
@@ -68,14 +76,6 @@ class EditEventPm @Inject constructor(
             .map { isFormValid(it) && isFormChangedState.value }
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
-        observeSaveEventAction()
-        observeDeleteEventAction()
-        loadEvent()
     }
 
     fun setEventId(id: String) {
