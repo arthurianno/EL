@@ -46,6 +46,5 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
         private const val EXTRA_EVENT_TYPE = "extra_event_type"
         private const val EXTRA_EVENT_ID = "extra_event_id"
-        private const val DEBOUNCE = 300L
     }
 }
