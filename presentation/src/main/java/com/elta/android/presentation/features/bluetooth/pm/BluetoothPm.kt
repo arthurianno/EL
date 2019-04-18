@@ -129,7 +129,7 @@ class BluetoothPm @Inject constructor(
                 setPinCodeUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete { writeToLog("Pin set") }
+                    .doOnComplete { writeToLog("Pin set ok") }
                     .doOnError(::handleError)
             }
             .retry()
@@ -181,7 +181,7 @@ class BluetoothPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete {
-                        writeToLog("Firmware update started")
+                        writeToLog("Firmware updated")
                     }
                     .doOnError(::handleError)
             }
