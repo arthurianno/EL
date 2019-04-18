@@ -9,7 +9,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
-import com.elta.android.presentation.widgets.SettingsMarginItemDecoration
+import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.layout_toolbar.*
 

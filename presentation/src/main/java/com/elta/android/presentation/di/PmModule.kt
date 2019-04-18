@@ -26,6 +26,8 @@ import com.elta.android.presentation.features.profile.settings.dialogs.glucose.p
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
+import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
+import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
@@ -224,4 +226,14 @@ abstract class PmModule {
     @IntoMap
     @PmKey(RemindersPm::class)
     abstract fun bindRemindersPm(pm: RemindersPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(CreateRemindPm::class)
+    abstract fun bindCreateRemindPm(pm: CreateRemindPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(EditRemindPm::class)
+    abstract fun bindEditRemindPm(pm: EditRemindPm): PresentationModel
 }

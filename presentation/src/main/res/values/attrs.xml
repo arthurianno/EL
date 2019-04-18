@@ -39,4 +39,9 @@
         <attr name="rbv_range_end" format="float" />
         <attr name="rbv_fraction_digits_count" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="SpinnerView">
+        <attr name="showArrow" format="boolean" />
+        <attr name="topicDrawable" format="reference|color" />
+    </declare-styleable>
 </resources>

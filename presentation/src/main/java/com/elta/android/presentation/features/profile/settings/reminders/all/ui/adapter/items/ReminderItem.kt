@@ -4,7 +4,7 @@ import android.support.annotation.DrawableRes
 import com.nullgr.core.adapter.items.ListItem
 
 data class ReminderItem(
-    val id: Any,
+    val id: String,
     @DrawableRes
     val type: Int,
     val title: String,
@@ -17,7 +17,7 @@ data class ReminderItem(
 
     override fun getChangePayload(other: ListItem): Any {
         if (other is ReminderItem) {
-            return mutableSetOf<ReminderItem.Payload>().apply {
+            return mutableSetOf<Payload>().apply {
                 if (title != other.title) add(Payload.TITLE_CHANGED)
                 if (description != other.description) add(Payload.DESCRIPTION_CHANGED)
             }

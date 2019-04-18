@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.reminder.model
 
-enum class PeriodicType {
+enum class ScheduleType {
     NONE,
     DAY,
     WEEK,

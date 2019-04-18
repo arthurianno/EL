@@ -150,6 +150,4 @@
             android:text="@string/profile_settings_hemoglobin_description" />
 
     </LinearLayout>
-
 </LinearLayout>
-

@@ -2,7 +2,7 @@ package com.elta.android.data.features.reminder.mapper
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.reminder.cache.dto.ReminderCacheDto
-import com.elta.android.data.features.reminder.dto.PeriodicTypeDto
+import com.elta.android.data.features.reminder.dto.ScheduleTypeDto
 import com.elta.android.data.features.reminder.dto.ReminderDto
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ class ReminderFromCacheMapper @Inject constructor() : Mapper<ReminderCacheDto, R
                 id = secondaryId,
                 title = title,
                 time = time,
-                periodic = PeriodicTypeDto.valueOf(periodic)
+                scheduleType = ScheduleTypeDto.valueOf(schedule)
             )
         }
 }

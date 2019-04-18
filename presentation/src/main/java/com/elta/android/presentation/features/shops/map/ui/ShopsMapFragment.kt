@@ -18,7 +18,7 @@ import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.toPoint
-import com.elta.android.presentation.widgets.MarginItemDecoration
+import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter

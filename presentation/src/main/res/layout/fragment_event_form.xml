@@ -137,6 +137,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scrollableView"
         android:layout_width="match_parent"
@@ -221,6 +222,7 @@
                 android:paddingBottom="16dp" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/formSaveButtonView"

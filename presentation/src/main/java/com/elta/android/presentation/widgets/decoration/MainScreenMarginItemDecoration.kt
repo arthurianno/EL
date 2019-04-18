@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets
+package com.elta.android.presentation.widgets.decoration
 
 import android.content.Context
 import android.content.res.Resources

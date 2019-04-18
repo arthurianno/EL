@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
+import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class RemindersFragment : BaseListFragment<RemindersPm>() {
@@ -23,6 +24,7 @@ class RemindersFragment : BaseListFragment<RemindersPm>() {
     override fun onBindPresentationModel(pm: RemindersPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+        menuButtonView.clicks().bindTo(pm.newReminderAction)
     }
 
     companion object {
