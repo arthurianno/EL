@@ -69,12 +69,7 @@ fun ScanResult.isFiltered(filters: List<ScanFilter>): Boolean {
     val deviceName = device.name ?: scanRecord?.deviceName
     filters.forEach { filter ->
         val nameToFilter = filter.deviceName
-        if (nameToFilter != null && deviceName != null) {
-            if (deviceName.contains(nameToFilter)) {
-                return true
-            }
-        }
-        return false
+        return nameToFilter != null && deviceName != null && deviceName.contains(nameToFilter)
     }
     return false
 }
