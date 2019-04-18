@@ -1,0 +1,29 @@
+package com.elta.android.domain.features.statistics.model
+
+import com.elta.android.domain.features.diary.home.model.atEndOfDay
+import com.nullgr.core.date.minusDay
+import com.nullgr.core.date.withoutTime
+import java.util.Date
+
+sealed class Periods(override val start: Date, override val end: Date) : StatisticPeriod {
+
+    class SevenDays : Periods(
+        start = Date().minusDay(7).withoutTime(),
+        end = Date().atEndOfDay()
+    )
+
+    class FourteenDays : Periods(
+        start = Date().minusDay(14).withoutTime(),
+        end = Date().atEndOfDay()
+    )
+
+    class ThirtyDays : Periods(
+        start = Date().minusDay(30).withoutTime(),
+        end = Date().atEndOfDay()
+    )
+
+    class NinetyDays : Periods(
+        start = Date().minusDay(90).withoutTime(),
+        end = Date().atEndOfDay()
+    )
+}
