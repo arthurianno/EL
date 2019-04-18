@@ -17,6 +17,12 @@ class EventCreationPm @Inject constructor(
     private val isFormNotEmptyState = State(false)
     private val eventFormHolderState = State(EventFormModel())
 
+    override fun onCreate() {
+        super.onCreate()
+        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
+        observeSaveEventAction()
+    }
+
     override fun handleBack(i: Unit) {
         when (isFormNotEmptyState.value) {
             true -> exitDialogAction.consumer.accept(Unit)
@@ -49,12 +55,6 @@ class EventCreationPm @Inject constructor(
             .map(::isFormValid)
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
-        observeSaveEventAction()
     }
 
     private fun checkIsEmpty(eventFormModel: EventFormModel) {
