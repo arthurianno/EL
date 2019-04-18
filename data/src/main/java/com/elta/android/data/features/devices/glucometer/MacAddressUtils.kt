@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.glucometer
 
 import java.math.BigInteger
 
+@Suppress("MagicNumber")
 fun String.toDfuAddress(): String {
     val tokens = this.split(":")
     val token = tokens.last()
