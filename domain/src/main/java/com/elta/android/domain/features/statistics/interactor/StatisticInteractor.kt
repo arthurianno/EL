@@ -5,10 +5,10 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
-import com.elta.android.domain.features.statistics.model.BreadStatisticModel
+import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
+import com.elta.android.domain.features.statistics.model.DailyStatisticModel
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
-import com.elta.android.domain.features.statistics.model.InsulinStatisticModel
-import com.elta.android.domain.features.statistics.model.StatisticByDateModel
+import com.elta.android.domain.features.statistics.model.InsulinStatisticModelByPeriod
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.nullgr.core.date.withoutTime
@@ -22,15 +22,15 @@ fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: 
     val eventsByDay = eventsContainer.byDate
     val eventsByType = eventsContainer.byType
 
-    val statisticByDay = mutableMapOf<Date, StatisticByDateModel>()
+    val statisticByDay = mutableMapOf<Date, DailyStatisticModel>()
 
-    var dayWithMaxLevel: StatisticByDateModel? = null
-    var dayWithMinLevel: StatisticByDateModel? = null
+    var dayWithMaxLevel: DailyStatisticModel? = null
+    var dayWithMinLevel: DailyStatisticModel? = null
 
     eventsByDay.entries.forEach { entry ->
         val day = entry.key
         val eventsPerDay = entry.value
-        val dayStatistic = buildDayStatisticModel(day, eventsPerDay, settings) // O(4N)
+        val dayStatistic = buildDailyStatisticModel(day, eventsPerDay, settings) // O(4N)
 
         dayWithMaxLevel = dayWithMaxLevel?.let { dayStatistic.checkMax(it) } ?: dayStatistic
         dayWithMinLevel = dayWithMinLevel?.let { dayStatistic.checkMin(it) } ?: dayStatistic
@@ -45,18 +45,18 @@ fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: 
         dayWithMinLevel = dayWithMinLevel,
         allDays = statisticByDay,
         glucose = buildGlucoseStatisticModel(eventsByType[EventType.GLUCOSE], settings),
-        insulin = buildInsulinStatisticModel(eventsByType[EventType.INSULIN]),
-        bread = buildBreadStatisticModel(eventsByType[EventType.BREAD]),
+        insulin = buildInsulinStatisticModelByPeriod(eventsByType[EventType.INSULIN]),
+        bread = buildBreadStatisticModelByPeriod(eventsByType[EventType.BREAD]),
         activity = buildActivityStatisticModel(eventsByType[EventType.ACTIVITY])
     )
 }
 
-fun buildDayStatisticModel(date: Date, events: List<Event>, settings: GlucoseLevelSettings): StatisticByDateModel {
-    return StatisticByDateModel(
+fun buildDailyStatisticModel(date: Date, events: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
+    return DailyStatisticModel(
         date = date,
         glucose = buildGlucoseStatisticModel(events, settings),
-        insulin = buildInsulinStatisticModel(events),
-        bread = buildBreadStatisticModel(events),
+        insulin = buildInsulinStatisticModelByPeriod(events),
+        bread = buildBreadStatisticModelByPeriod(events),
         activity = buildActivityStatisticModel(events)
     )
 }
@@ -137,7 +137,7 @@ fun buildGlucoseStatisticModel(events: List<Event>? = null, settings: GlucoseLev
     )
 }
 
-fun buildInsulinStatisticModel(events: List<Event>?): InsulinStatisticModel {
+fun buildInsulinStatisticModelByPeriod(events: List<Event>?): InsulinStatisticModelByPeriod {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
@@ -169,14 +169,14 @@ fun buildInsulinStatisticModel(events: List<Event>?): InsulinStatisticModel {
         }
     }
 
-    return InsulinStatisticModel(
+    return InsulinStatisticModelByPeriod(
         averageBolusLevel = totalBolusLevel.average(bolusCount),
         averageBasalLevel = totalBasalLevel.average(basalCount),
         averageLevel = totalLevel.average(count)
     )
 }
 
-fun buildBreadStatisticModel(events: List<Event>?): BreadStatisticModel {
+fun buildBreadStatisticModelByPeriod(events: List<Event>?): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
     var count = 0
 
@@ -191,7 +191,7 @@ fun buildBreadStatisticModel(events: List<Event>?): BreadStatisticModel {
         }
     }
 
-    return BreadStatisticModel(
+    return BreadStatisticModelByPeriod(
         averageLevel = totalLevel.average(count)
     )
 }
@@ -223,8 +223,8 @@ internal inline fun Int.percent(total: Int): Double = this * 100.0 / total
 internal inline fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal inline fun Double.checkMin(min: Double): Double = if (min > this) this else min
 
-internal inline fun StatisticByDateModel.checkMax(max: StatisticByDateModel): StatisticByDateModel = if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
-internal inline fun StatisticByDateModel.checkMin(min: StatisticByDateModel): StatisticByDateModel = if (min.glucose.minLevel > this.glucose.minLevel) this else min
+internal inline fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatisticModel = if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
+internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel = if (min.glucose.minLevel > this.glucose.minLevel) this else min
 
 internal inline fun Event.isBolusInsulin(): Boolean = insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
 internal inline fun Event.isBasalInsulin(): Boolean = insulinType == InsulinType.INTERMIDIATE || insulinType == InsulinType.LONG || insulinType == InsulinType.ULTRALONG

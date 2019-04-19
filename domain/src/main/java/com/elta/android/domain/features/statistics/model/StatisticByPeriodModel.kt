@@ -4,12 +4,12 @@ import java.util.Date
 
 data class StatisticByPeriodModel(
     val period: StatisticPeriod,
-    val dayWithMaxLevel: StatisticByDateModel?,
-    val dayWithMinLevel: StatisticByDateModel?,
-    val allDays: Map<Date, StatisticByDateModel>,
+    val dayWithMaxLevel: DailyStatisticModel?,
+    val dayWithMinLevel: DailyStatisticModel?,
+    val allDays: Map<Date, DailyStatisticModel>,
 
     val glucose: GlucoseStatisticModel,
-    val insulin: InsulinStatisticModel,
-    val bread: BreadStatisticModel,
+    val insulin: InsulinStatisticModelByPeriod,
+    val bread: BreadStatisticModelByPeriod,
     val activity: ActivityStatisticModel
 )

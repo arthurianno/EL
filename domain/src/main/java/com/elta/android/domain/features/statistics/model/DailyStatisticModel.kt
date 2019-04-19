@@ -2,10 +2,10 @@ package com.elta.android.domain.features.statistics.model
 
 import java.util.Date
 
-data class StatisticByDateModel(
+data class DailyStatisticModel(
     val date: Date,
     val glucose: GlucoseStatisticModel,
-    val insulin: InsulinStatisticModel,
-    val bread: BreadStatisticModel,
+    val insulin: InsulinStatisticModelByPeriod,
+    val bread: BreadStatisticModelByPeriod,
     val activity: ActivityStatisticModel
 )
