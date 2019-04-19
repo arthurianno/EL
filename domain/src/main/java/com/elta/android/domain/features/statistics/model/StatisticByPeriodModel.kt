@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.statistics.model
 
+import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import java.util.Date
 
 data class StatisticByPeriodModel(

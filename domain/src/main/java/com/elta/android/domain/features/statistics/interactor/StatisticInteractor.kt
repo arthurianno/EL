@@ -6,11 +6,11 @@ import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
 import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
-import com.elta.android.domain.features.statistics.model.DailyStatisticModel
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.InsulinStatisticModelByPeriod
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
+import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.nullgr.core.date.withoutTime
 import timber.log.Timber
 import java.util.Date
