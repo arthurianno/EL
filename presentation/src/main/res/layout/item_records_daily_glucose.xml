@@ -30,17 +30,11 @@
         app:layout_constraintTop_toBottomOf="@id/dailyRecordsTitleView"
         tools:text="@string/main_records_daily_glucose_subtitle" />
 
-    <HorizontalScrollView
+    <com.elta.android.presentation.widgets.charts.daily.GlucoseDailyView
+        android:id="@+id/glucoseDailyView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/dailyRecordsSubTitleView">
-
-        <com.elta.android.presentation.widgets.charts.daily.GlucoseDailyChartView
-            android:id="@+id/dailyGlucoseChartView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
+        app:layout_constraintTop_toBottomOf="@id/dailyRecordsSubTitleView" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions", "MaxLineLength")
 package com.elta.android.presentation.widgets.charts.daily
 
 import android.annotation.SuppressLint
@@ -26,11 +27,10 @@ import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueT
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.spToPx
-import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 
-@Suppress("MagicNumbers", "TooManyFunctions")
+@Suppress("LongMethod", "MagicNumber")
 class GlucoseDailyChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -45,6 +45,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             onDataModelChanged()
         }
 
+    private var glucoseRangesOverlayView: GlucoseRangesOverlayView? = null
+
     private val currentDateCalendar = Calendar.getInstance()
     private val mapDateCalendar = Calendar.getInstance()
     private lateinit var minTitle: String
@@ -58,33 +60,30 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var lowRangeDividerColor = 0
     private var normalRangeDividerColor = 0
     private var highRangeDividerColor = 0
-
     private var lowRangeItemColor = 0
     private var normalRangeItemColor = 0
     private var highRangeItemColor = 0
-
     private var lowRangeSelectedItemColor = 0
     private var normalRangeSelectedItemColor = 0
     private var highRangeSelectedItemColor = 0
     private var selectedItemInnerColor = 0
-
     private var futureTimeTextColor = 0
     private var timeTextColor = 0
-    private var timeTextSize = 0f
     private var chartPointTitleColor = 0
-    private var chartPointTitleSize = 0f
-    private var chartPointTitleBackgroundWidth = 0f
-    private var chartPointTitleBackgroundHeight = 0f
-    private var chartPointTitleBackgroundCorners = 0f
 
     private var clearChartHeight = 0f
     private var fullViewHeight = 0f
     private var fullViewWidth = 0f
     private var sectionsDividerWidth = 0f
     private var chartOffset = 0f
+    private var chartItemRadius = 0f
+    private var chartPointTitleSize = 0f
+    private var chartPointTitleBackgroundWidth = 0f
+    private var chartPointTitleBackgroundHeight = 0f
+    private var chartPointTitleBackgroundCorners = 0f
+    private var timeTextSize = 0f
 
     private var selectedChartItemRadius = 0f
-    private var chartItemRadius = 0f
     private var selectedItemTimeBgWidth = 0f
     private var selectedItemTimeBgHeight = 0f
     private var selectedItemTimeBgPadding = 0f
@@ -127,6 +126,13 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     init {
         initDefault()
         initPaints()
+    }
+
+    fun attachRangesOverlay(glucoseRangesOverlayView: GlucoseRangesOverlayView) {
+        this.glucoseRangesOverlayView = glucoseRangesOverlayView
+        if (_chartDataModel != null) {
+            onDataModelChanged()
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -448,6 +454,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             } else {
                 lowRangeRect.set(0, 0, 0, 0)
             }
+
+            glucoseRangesOverlayView?.applyParentRanges(highRangeRect, normalRangeRect, lowRangeRect)
         }
     }
 
@@ -493,11 +501,13 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     companion object {
+        const val FULL_CHART_HEIGHT = 144f
+        const val CHART_OFFSET = 12f // dp
+
         private const val TIME_TEXT_SIZE = 12f // sp
         private const val SINGLE_HOUR_WIDTH = 54f // dp
         private const val TIME_LINE_OFFSET = 33f // dp
         private const val ITEM_RADIUS = 4f // dp
-        private const val FULL_CHART_HEIGHT = 144f
         private const val TITLE_PADDING = 16f // dp
         private const val TYPEFACE_MEDIUM = "roboto_medium.ttf"
         private const val TYPEFACE_BOLD = "roboto_bold.ttf"
@@ -511,7 +521,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val POINT_TITLE_BACKGROUND_HEIGHT = 16f // dp
         private const val POINT_TITLE_BACKGROUND_WIDTH = 32f // dp
         private const val POINT_TITLE_BACKGROUND_CORNERS = 4f // dp
-        private const val CHART_OFFSET = 12f // dp
+
         private const val SELECTED_ITEM_LINE_WIDTH = 1.5f // dp
         private const val SELECTED_ITEM_GAP = 4f // dp
         private const val SELECTED_ITEM_TIME_BG_WIDTH = 46f // dp

@@ -155,6 +155,10 @@
     <color name="chart_medium_range_item_color">#3ec9a8</color>
     <color name="chart_high_range_item_color">#ff505d</color>
 
+    <color name="chart_high_range_bar_color">@color/g_orange_b</color>
+    <color name="chart_medium_range_bar_color">@color/g_green_a</color>
+    <color name="chart_low_range_bar_color">@color/shade_g_purpur_a</color>
+
     <color name="chart_time_text_color">@color/shade_black1</color>
     <color name="chart_future_time_text_color">@color/shade_black2</color>
 </resources>

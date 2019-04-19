@@ -11,12 +11,11 @@ import com.nullgr.core.date.toStringWithFormat
 
 object ChartItemsBuilder {
 
-    fun build(glucoseModel: DailyGlucoseModel): ChartDataModel {
-        return ChartDataModel(glucoseModel.items(), glucoseModel.ranges())
-    }
+    fun build(glucoseModel: DailyGlucoseModel) =
+        ChartDataModel(glucoseModel.items(), glucoseModel.ranges())
 
-    private fun DailyGlucoseModel.items(): List<ChartItemModel> {
-        return arrayListOf<ChartItemModel>().apply {
+    private fun DailyGlucoseModel.items() =
+        arrayListOf<ChartItemModel>().apply {
             glucoseEvents.forEach {
                 add(
                     ChartItemModel(
@@ -31,7 +30,6 @@ object ChartItemsBuilder {
                 )
             }
         }
-    }
 
     private fun Double?.toValueType(glucoseLevelSettings: GlucoseLevelSettings) =
         when (this ?: 0.0) {
