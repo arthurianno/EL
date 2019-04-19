@@ -20,20 +20,10 @@ internal inline fun DailyStatisticModel.checkMax(max: DailyStatisticModel): Dail
 internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel = if (min.glucose.minLevel > this.glucose.minLevel) this else min
 
 internal fun List<Event>.toEventsContainer(): EventsContainer {
-    val byDate = hashMapOf<Date, List<Event>>()
     val byType = hashMapOf<EventType, List<Event>>()
     val byTypePerDay = hashMapOf<Date, Map<EventType, List<Event>>>()
 
     for (element in this) {
-        // split by date
-        val day = element.additionTime.withoutTime()
-        var destinationByDate = byDate[day]
-        if (destinationByDate == null) {
-            destinationByDate = arrayListOf()
-            byDate[day] = destinationByDate
-        }
-        (destinationByDate as MutableList).add(element)
-
         // split by type
         val type = element.type
         var destinationByType = byType[type]
@@ -44,6 +34,7 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
         (destinationByType as MutableList).add(element)
 
         // split by type per day
+        val day = element.additionTime.withoutTime()
         var destinationByDay1 = byTypePerDay[day]
         if (destinationByDay1 == null) {
             destinationByDay1 = hashMapOf()
@@ -58,11 +49,10 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
         (destinationByType1 as MutableList).add(element)
     }
 
-    return EventsContainer(byDate = byDate, byType = byType, byTypePerDay = byTypePerDay)
+    return EventsContainer(byType = byType, byTypePerDay = byTypePerDay)
 }
 
 data class EventsContainer(
-    val byDate: Map<Date, List<Event>>,
     val byType: Map<EventType, List<Event>>,
     val byTypePerDay: Map<Date, Map<EventType, List<Event>>>
 )
