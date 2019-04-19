@@ -17,11 +17,12 @@ object EventTestFactory {
         activityType: ActivityType? = null,
         mealTag: MealTag? = null,
         insulinType: InsulinType? = null,
-        tagId: String? = null
+        tagId: String? = null,
+        date: Date = Date()
     ): Event =
         Event(
             id = UUID.randomUUID().toString(),
-            additionTime = Date(),
+            additionTime = date,
             additionTimeString = "",
             tagId = tagId,
             tag = null,

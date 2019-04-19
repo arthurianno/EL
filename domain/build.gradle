@@ -77,4 +77,5 @@ dependencies {
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
+    testImplementation commonTestDependencies.jodaTime
 }
