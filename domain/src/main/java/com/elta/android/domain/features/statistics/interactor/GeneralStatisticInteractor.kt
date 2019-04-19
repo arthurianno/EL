@@ -4,10 +4,11 @@ import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
+import com.elta.android.domain.features.user.interactor.round
 import com.nullgr.core.date.withoutTime
 import java.util.Date
 
-internal inline fun Double.average(total: Int): Double = this / total
+internal inline fun Double.average(total: Int): Double = (this / total).round(2)
 internal inline fun Long.average(total: Int): Long = this / total
 internal inline fun Int.percent(total: Int): Double = this * 100.0 / total
 internal inline fun Double.checkMax(max: Double): Double = if (max < this) this else max
