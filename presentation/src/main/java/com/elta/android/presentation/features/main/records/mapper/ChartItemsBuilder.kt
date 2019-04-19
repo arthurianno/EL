@@ -11,8 +11,6 @@ import com.nullgr.core.date.toStringWithFormat
 
 object ChartItemsBuilder {
 
-    private const val HIGH_RANGE_OFFSET = 1
-
     fun build(glucoseModel: DailyGlucoseModel): ChartDataModel {
         return ChartDataModel(glucoseModel.items(), glucoseModel.ranges())
     }
@@ -44,7 +42,7 @@ object ChartItemsBuilder {
 
     private fun DailyGlucoseModel.ranges(): ChartRangesModel {
         val start = when {
-            minEvent != null -> glucoseLevelSettings.low.start
+            minEvent != null -> minEvent?.value ?: glucoseLevelSettings.low.start
             else -> glucoseLevelSettings.normal.start
         }
         val lowMax = when {
@@ -52,7 +50,7 @@ object ChartItemsBuilder {
             else -> null
         }
         val normalMax = glucoseLevelSettings.normal.end
-        val highMax = maxEvent?.value?.plus(HIGH_RANGE_OFFSET)
+        val highMax = maxEvent?.value
         val end = highMax ?: glucoseLevelSettings.normal.end
         return ChartRangesModel(start, end, normalMax, lowMax, highMax)
     }
