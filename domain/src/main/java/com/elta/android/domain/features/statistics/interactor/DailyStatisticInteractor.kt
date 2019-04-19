@@ -1,19 +1,20 @@
 package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import java.util.Date
 
-fun buildDailyStatisticModel(date: Date, eventsPerDay: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
+fun buildDailyStatisticModel(date: Date, eventsPerDay: Map<EventType, List<Event>>, settings: GlucoseLevelSettings): DailyStatisticModel {
     return DailyStatisticModel(
         date = date,
-        glucose = buildGlucoseStatisticModel(eventsPerDay, settings),
-        insulin = buildDailyInsulinStatisticModel(eventsPerDay),
-        bread = buildDailyBreadStatisticModel(eventsPerDay),
-        activity = buildActivityStatisticModel(eventsPerDay)
+        glucose = buildGlucoseStatisticModel(eventsPerDay[EventType.GLUCOSE], settings),
+        insulin = buildDailyInsulinStatisticModel(eventsPerDay[EventType.INSULIN]),
+        bread = buildDailyBreadStatisticModel(eventsPerDay[EventType.BREAD]),
+        activity = buildActivityStatisticModel(eventsPerDay[EventType.ACTIVITY])
     )
 }
 

@@ -13,22 +13,21 @@ import com.elta.android.domain.features.statistics.model.daily.DailyStatisticMod
 import timber.log.Timber
 import java.util.Date
 
-// O(6N)
 fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: GlucoseLevelSettings): StatisticByPeriodModel {
-    val eventsContainer = events.toEventsContainer() // O(N)
+    val eventsContainer = events.toEventsContainer()
 
-    val eventsByDay = eventsContainer.byDate
     val eventsByType = eventsContainer.byType
+    val eventsByTypePerDay = eventsContainer.byTypePerDay
 
     val statisticByDay = mutableMapOf<Date, DailyStatisticModel>()
 
     var dayWithMaxLevel: DailyStatisticModel? = null
     var dayWithMinLevel: DailyStatisticModel? = null
 
-    eventsByDay.entries.forEach { entry ->
+    eventsByTypePerDay.entries.forEach { entry ->
         val day = entry.key
         val eventsPerDay = entry.value
-        val dayStatistic = buildDailyStatisticModel(day, eventsPerDay, settings) // O(4N)
+        val dayStatistic = buildDailyStatisticModel(day, eventsPerDay, settings)
 
         dayWithMaxLevel = dayWithMaxLevel?.let { dayStatistic.checkMax(it) } ?: dayStatistic
         dayWithMinLevel = dayWithMinLevel?.let { dayStatistic.checkMin(it) } ?: dayStatistic
@@ -49,8 +48,8 @@ fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: 
     )
 }
 
-fun buildGlucoseStatisticModel(events: List<Event>? = null, settings: GlucoseLevelSettings): GlucoseStatisticModel {
-    val count = events?.size ?: 0
+fun buildGlucoseStatisticModel(glucoseEventsPerPeriod: List<Event>?, settings: GlucoseLevelSettings): GlucoseStatisticModel {
+    val count = glucoseEventsPerPeriod?.size ?: 0
     var totalLevel = 0.0
 
     var maxLevel = 0.0
@@ -69,32 +68,30 @@ fun buildGlucoseStatisticModel(events: List<Event>? = null, settings: GlucoseLev
     var eventsNormalCount = 0
     var eventsLowCount = 0
 
-    events?.forEach { event ->
-        if (event.type == EventType.GLUCOSE) {
-            event.value?.let { value ->
-                totalLevel += value
+    glucoseEventsPerPeriod?.forEach { event ->
+        event.value?.let { value ->
+            totalLevel += value
 
-                maxLevel = value.checkMax(maxLevel)
-                minLevel = value.checkMin(minLevel)
+            maxLevel = value.checkMax(maxLevel)
+            minLevel = value.checkMin(minLevel)
 
-                when (value) {
-                    in settings.high -> {
-                        eventsHighCount++
-                        maxHighLevel = value.checkMax(maxHighLevel)
-                        minHighLevel = value.checkMin(minHighLevel)
-                    }
-                    in settings.normal -> {
-                        eventsNormalCount++
-                        maxNormalLevel = value.checkMax(maxNormalLevel)
-                        minNormalLevel = value.checkMin(minNormalLevel)
-                    }
-                    in settings.low -> {
-                        eventsLowCount++
-                        maxLowLevel = value.checkMax(maxLowLevel)
-                        minLowLevel = value.checkMin(minLowLevel)
-                    }
-                    else -> Timber.w("$value doesn't enter in any diapason")
+            when (value) {
+                in settings.high -> {
+                    eventsHighCount++
+                    maxHighLevel = value.checkMax(maxHighLevel)
+                    minHighLevel = value.checkMin(minHighLevel)
                 }
+                in settings.normal -> {
+                    eventsNormalCount++
+                    maxNormalLevel = value.checkMax(maxNormalLevel)
+                    minNormalLevel = value.checkMin(minNormalLevel)
+                }
+                in settings.low -> {
+                    eventsLowCount++
+                    maxLowLevel = value.checkMax(maxLowLevel)
+                    minLowLevel = value.checkMin(minLowLevel)
+                }
+                else -> Timber.w("$value doesn't enter in any diapason")
             }
         }
     }
@@ -125,7 +122,7 @@ fun buildGlucoseStatisticModel(events: List<Event>? = null, settings: GlucoseLev
     )
 }
 
-fun buildInsulinStatisticModelByPeriod(events: List<Event>?): InsulinStatisticModelByPeriod {
+fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): InsulinStatisticModelByPeriod {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
@@ -134,24 +131,22 @@ fun buildInsulinStatisticModelByPeriod(events: List<Event>?): InsulinStatisticMo
     var basalCount = 0
     var count = 0
 
-    events?.forEach { event ->
-        if (event.type == EventType.INSULIN) {
-            event.value?.let { value ->
-                if (value != 0.0) {
-                    if (event.isBolusInsulin()) {
-                        totalBolusLevel += value
-                        bolusCount++
-                    }
+    insulinEventsPerPeriod?.forEach { event ->
+        event.value?.let { value ->
+            if (value != 0.0) {
+                if (event.isBolusInsulin()) {
+                    totalBolusLevel += value
+                    bolusCount++
+                }
 
-                    if (event.isBasalInsulin()) {
-                        totalBasalLevel += value
-                        basalCount++
-                    }
+                if (event.isBasalInsulin()) {
+                    totalBasalLevel += value
+                    basalCount++
+                }
 
-                    if (event.isNotMixedInsulin()) {
-                        totalLevel += value
-                        count++
-                    }
+                if (event.isNotMixedInsulin()) {
+                    totalLevel += value
+                    count++
                 }
             }
         }
@@ -164,17 +159,15 @@ fun buildInsulinStatisticModelByPeriod(events: List<Event>?): InsulinStatisticMo
     )
 }
 
-fun buildBreadStatisticModelByPeriod(events: List<Event>?): BreadStatisticModelByPeriod {
+fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
     var count = 0
 
-    events?.forEach { event ->
-        if (event.type == EventType.BREAD) {
-            event.value?.let { value ->
-                if (value != 0.0) {
-                    totalLevel += value
-                    count++
-                }
+    breadEventsPerPeriod?.forEach { event ->
+        event.value?.let { value ->
+            if (value != 0.0) {
+                totalLevel += value
+                count++
             }
         }
     }
@@ -184,18 +177,14 @@ fun buildBreadStatisticModelByPeriod(events: List<Event>?): BreadStatisticModelB
     )
 }
 
-fun buildActivityStatisticModel(events: List<Event>?): ActivityStatisticModel {
+fun buildActivityStatisticModel(activityEventsPerPeriod: List<Event>?): ActivityStatisticModel {
     var totalDuration = 0L
     var count = 0
 
-    events?.forEach { event ->
-        if (event.type == EventType.ACTIVITY) {
-            event.duration?.let { duration ->
-                if (duration != 0L) {
-                    totalDuration += duration
-                    count++
-                }
-            }
+    activityEventsPerPeriod?.forEach { event ->
+        event.duration?.let { duration ->
+            totalDuration += duration
+            count++
         }
     }
 
