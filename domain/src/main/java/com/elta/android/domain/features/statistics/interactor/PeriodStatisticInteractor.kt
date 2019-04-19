@@ -2,7 +2,6 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
 import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
@@ -11,7 +10,6 @@ import com.elta.android.domain.features.statistics.model.InsulinStatisticModelBy
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
-import com.nullgr.core.date.withoutTime
 import timber.log.Timber
 import java.util.Date
 
@@ -48,16 +46,6 @@ fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: 
         insulin = buildInsulinStatisticModelByPeriod(eventsByType[EventType.INSULIN]),
         bread = buildBreadStatisticModelByPeriod(eventsByType[EventType.BREAD]),
         activity = buildActivityStatisticModel(eventsByType[EventType.ACTIVITY])
-    )
-}
-
-fun buildDailyStatisticModel(date: Date, events: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
-    return DailyStatisticModel(
-        date = date,
-        glucose = buildGlucoseStatisticModel(events, settings),
-        insulin = buildInsulinStatisticModelByPeriod(events),
-        bread = buildBreadStatisticModelByPeriod(events),
-        activity = buildActivityStatisticModel(events)
     )
 }
 
@@ -216,94 +204,3 @@ fun buildActivityStatisticModel(events: List<Event>?): ActivityStatisticModel {
         averageDuration = totalDuration.average(count)
     )
 }
-
-internal inline fun Double.average(total: Int): Double = this / total
-internal inline fun Long.average(total: Int): Long = this / total
-internal inline fun Int.percent(total: Int): Double = this * 100.0 / total
-internal inline fun Double.checkMax(max: Double): Double = if (max < this) this else max
-internal inline fun Double.checkMin(min: Double): Double = if (min > this) this else min
-
-internal inline fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatisticModel = if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
-internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel = if (min.glucose.minLevel > this.glucose.minLevel) this else min
-
-internal inline fun Event.isBolusInsulin(): Boolean = insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
-internal inline fun Event.isBasalInsulin(): Boolean = insulinType == InsulinType.INTERMIDIATE || insulinType == InsulinType.LONG || insulinType == InsulinType.ULTRALONG
-internal inline fun Event.isNotMixedInsulin(): Boolean = insulinType != InsulinType.MIXED
-
-internal fun List<Event>.splitByDate(): Map<Date, List<Event>> {
-    val destinations = hashMapOf<Date, List<Event>>()
-    for (element in this) {
-        val day = element.additionTime.withoutTime()
-        var destination = destinations[day]
-        if (destination == null) {
-            destination = arrayListOf()
-            destinations[day] = destination
-        }
-        (destination as MutableList).add(element)
-    }
-    return destinations
-}
-
-internal fun List<Event>.splitByType(): Map<EventType, List<Event>> {
-    val destinations = hashMapOf<EventType, List<Event>>()
-    val predicates = EventType.values()
-    for (element in this) {
-        for (predicate in predicates) {
-            var destination = destinations[predicate]
-            if (destination == null) {
-                destination = arrayListOf()
-                destinations[predicate] = destination
-            }
-            if (element.type == predicate) (destination as MutableList).add(element)
-        }
-    }
-    return destinations
-}
-
-internal fun List<Event>.toEventsContainer(): EventsContainer {
-    val byDate = hashMapOf<Date, List<Event>>()
-    val byType = hashMapOf<EventType, List<Event>>()
-    val byTypePerDay = hashMapOf<Date, Map<EventType, List<Event>>>()
-
-    for (element in this) {
-        // split by date
-        val day = element.additionTime.withoutTime()
-        var destinationByDate = byDate[day]
-        if (destinationByDate == null) {
-            destinationByDate = arrayListOf()
-            byDate[day] = destinationByDate
-        }
-        (destinationByDate as MutableList).add(element)
-
-        // split by type
-        val type = element.type
-        var destinationByType = byType[type]
-        if (destinationByType == null) {
-            destinationByType = arrayListOf()
-            byType[type] = destinationByType
-        }
-        (destinationByType as MutableList).add(element)
-
-        // split by type per day
-        var destinationByDay1 = byTypePerDay[day]
-        if (destinationByDay1 == null) {
-            destinationByDay1 = hashMapOf()
-            byTypePerDay[day] = destinationByDay1
-        }
-
-        var destinationByType1 = destinationByDay1[type]
-        if (destinationByType1 == null) {
-            destinationByType1 = arrayListOf()
-            (destinationByDay1 as MutableMap)[type] = destinationByType1
-        }
-        (destinationByType1 as MutableList).add(element)
-    }
-
-    return EventsContainer(byDate = byDate, byType = byType, byTypePerDay = byTypePerDay)
-}
-
-data class EventsContainer(
-    val byDate: Map<Date, List<Event>>,
-    val byType: Map<EventType, List<Event>>,
-    val byTypePerDay: Map<Date, Map<EventType, List<Event>>>
-)
