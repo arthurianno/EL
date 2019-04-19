@@ -263,6 +263,7 @@ internal fun List<Event>.splitByType(): Map<EventType, List<Event>> {
 internal fun List<Event>.toEventsContainer(): EventsContainer {
     val byDate = hashMapOf<Date, List<Event>>()
     val byType = hashMapOf<EventType, List<Event>>()
+    val byTypePerDay = hashMapOf<Date, Map<EventType, List<Event>>>()
 
     for (element in this) {
         // split by date
@@ -282,12 +283,27 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
             byType[type] = destinationByType
         }
         (destinationByType as MutableList).add(element)
+
+        // split by type per day
+        var destinationByDay1 = byTypePerDay[day]
+        if (destinationByDay1 == null) {
+            destinationByDay1 = hashMapOf()
+            byTypePerDay[day] = destinationByDay1
+        }
+
+        var destinationByType1 = destinationByDay1[type]
+        if (destinationByType1 == null) {
+            destinationByType1 = arrayListOf()
+            (destinationByDay1 as MutableMap)[type] = destinationByType1
+        }
+        (destinationByType1 as MutableList).add(element)
     }
 
-    return EventsContainer(byDate = byDate, byType = byType)
+    return EventsContainer(byDate = byDate, byType = byType, byTypePerDay = byTypePerDay)
 }
 
 data class EventsContainer(
     val byDate: Map<Date, List<Event>>,
-    val byType: Map<EventType, List<Event>>
+    val byType: Map<EventType, List<Event>>,
+    val byTypePerDay: Map<Date, Map<EventType, List<Event>>>
 )
