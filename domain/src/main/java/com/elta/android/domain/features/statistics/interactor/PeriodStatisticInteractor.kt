@@ -53,16 +53,16 @@ fun buildGlucoseStatisticModel(glucoseEventsPerPeriod: List<Event>?, settings: G
     var totalLevel = 0.0
 
     var maxLevel = 0.0
-    var minLevel = 0.0
+    var minLevel = Double.MAX_VALUE
 
     var maxHighLevel = 0.0
-    var minHighLevel = 0.0
+    var minHighLevel = Double.MAX_VALUE
 
     var maxNormalLevel = 0.0
-    var minNormalLevel = 0.0
+    var minNormalLevel = Double.MAX_VALUE
 
     var maxLowLevel = 0.0
-    var minLowLevel = 0.0
+    var minLowLevel = Double.MAX_VALUE
 
     var eventsHighCount = 0
     var eventsNormalCount = 0
