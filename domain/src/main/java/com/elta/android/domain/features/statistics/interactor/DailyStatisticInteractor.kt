@@ -7,27 +7,58 @@ import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStati
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import java.util.Date
 
-fun buildDailyStatisticModel(date: Date, events: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
+fun buildDailyStatisticModel(date: Date, eventsPerDay: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
     return DailyStatisticModel(
         date = date,
-        glucose = buildGlucoseStatisticModel(events, settings),
-        insulin = buildDailyInsulinStatisticModel(events),
-        bread = buildDailyBreadStatisticModel(events),
-        activity = buildActivityStatisticModel(events)
+        glucose = buildGlucoseStatisticModel(eventsPerDay, settings),
+        insulin = buildDailyInsulinStatisticModel(eventsPerDay),
+        bread = buildDailyBreadStatisticModel(eventsPerDay),
+        activity = buildActivityStatisticModel(eventsPerDay)
     )
 }
 
-fun buildDailyInsulinStatisticModel(events: List<Event>?): DailyInsulinStatisticModel {
+fun buildDailyInsulinStatisticModel(insulinEventsPerDay: List<Event>?): DailyInsulinStatisticModel {
+    var totalBolusLevel = 0.0
+    var totalBasalLevel = 0.0
+    var totalLevel = 0.0
+
+    insulinEventsPerDay?.forEach { event ->
+        event.value?.let { value ->
+            if (value != 0.0) {
+                if (event.isBolusInsulin()) {
+                    totalBolusLevel += value
+                }
+
+                if (event.isBasalInsulin()) {
+                    totalBasalLevel += value
+                }
+
+                if (event.isNotMixedInsulin()) {
+                    totalLevel += value
+                }
+            }
+        }
+    }
 
     return DailyInsulinStatisticModel(
-        totalBolusLevel = 0.0,
-        totalBasalLevel = 0.0,
-        totalLevel = 0.0
+        totalBolusLevel = totalBolusLevel,
+        totalBasalLevel = totalBasalLevel,
+        totalLevel = totalLevel
     )
 }
 
-fun buildDailyBreadStatisticModel(events: List<Event>?): DailyBreadStatisticModel {
+fun buildDailyBreadStatisticModel(breadEventsPerDay: List<Event>?): DailyBreadStatisticModel {
+    var totalLevel = 0.0
+
+    breadEventsPerDay?.forEach { event ->
+        event.value?.let { value ->
+            if (value != 0.0) {
+                totalLevel += value
+            }
+        }
+    }
+
     return DailyBreadStatisticModel(
-        totalLevel = 0.0
+        totalLevel = totalLevel
     )
 }
