@@ -24,7 +24,7 @@ class StatisticFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.navigateTo(Screens.PeriodScreen(Period.SEVEN))
+        router.navigateToTab(Screens.PeriodScreen(Period.SEVEN))
     }
 
     private fun handlePeriodTabClick(id: Int) {
