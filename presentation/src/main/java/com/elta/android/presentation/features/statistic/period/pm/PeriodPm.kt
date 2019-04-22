@@ -6,6 +6,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.nullgr.core.adapter.items.ListItem
 import javax.inject.Inject
 
@@ -24,9 +25,15 @@ class PeriodPm @Inject constructor(
                 items.consumer.accept(
                     arrayListOf<ListItem>().apply {
                         add(ProfileSettingsHeaderItem("$it"))
-                        GlucoseIndexItem.Type.values().forEach {
-                            add(GlucoseIndexItem(it, resources.getDrawable(it.getBg()), "value", "unit", resources.getString(it.getDescription())))
-                        }
+                        add(
+                            GlucoseIndexesItem(
+                                arrayListOf<ListItem>().apply {
+                                    GlucoseIndexItem.Type.values().forEach {
+                                        add(GlucoseIndexItem(it, resources.getDrawable(it.getBg()), "value", "unit", resources.getString(it.getDescription())))
+                                    }
+                                }
+                            )
+                        )
                     }
                 )
             }
