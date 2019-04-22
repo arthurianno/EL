@@ -389,4 +389,7 @@
     <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!-- STATISTICS -->
+    <string name="statistic_title">Статистика</string>
 </resources>

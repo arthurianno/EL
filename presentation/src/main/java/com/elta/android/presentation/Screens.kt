@@ -34,6 +34,7 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
@@ -123,6 +124,10 @@ object Screens {
     // TABS
     object MainTab : SupportAppScreen() {
         override fun getFragment() = MainFlowFragment.newInstance()
+    }
+
+    object StatisticTab: SupportAppScreen() {
+        override fun getFragment() = StatisticFlowFragment.newInstance()
     }
 
     object DiaryTab : SupportAppScreen() {
