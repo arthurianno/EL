@@ -1,3 +1,5 @@
+@file:Suppress("MaxLineLength", "LongMethod")
+
 package com.elta.android.presentation.features.statistic.period.pm
 
 import com.elta.android.presentation.R
@@ -5,6 +7,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.nullgr.core.adapter.items.ListItem
@@ -32,6 +35,47 @@ class PeriodPm @Inject constructor(
                                         add(GlucoseIndexItem(it, resources.getDrawable(it.getBg()), "value", "unit", resources.getString(it.getDescription())))
                                     }
                                 }
+                            )
+                        )
+                        add(
+                            GeneralIndexItem(
+                                R.drawable.ic_event_bread_with_bg,
+                                resources.getString(R.string.statistic_general_index_title_by_period_bread),
+                                resources.getString(R.string.statistic_general_index_description_by_period_bread, "3"),
+                                "3"
+                            )
+                        )
+                        add(
+                            GeneralIndexItem(
+                                R.drawable.ic_event_insulin_with_bg,
+                                resources.getString(R.string.statistic_general_index_title_insulin),
+                                resources.getString(R.string.statistic_general_index_description_by_period_insulin, "3"),
+                                "3"
+                            )
+                        )
+                        add(
+                            GeneralIndexItem(
+                                R.drawable.ic_event_insulin_with_bg,
+                                resources.getString(R.string.statistic_general_index_title_bolus_insulin),
+                                resources.getString(R.string.statistic_general_index_description_by_period_bolus_insulin, "3"),
+                                "3"
+                            )
+                        )
+                        add(
+                            GeneralIndexItem(
+                                R.drawable.ic_event_insulin_with_bg,
+                                resources.getString(R.string.statistic_general_index_title_basal_insulin),
+                                resources.getString(R.string.statistic_general_index_description_by_period_basal_insulin, "3"),
+                                "3"
+                            )
+                        )
+                        add(
+                            GeneralIndexItem(
+                                R.drawable.ic_event_activity_with_bg,
+                                resources.getString(R.string.statistic_general_index_title_activity),
+                                resources.getString(R.string.statistic_general_index_description_by_day_activity, "3", "3"),
+                                "3",
+                                true
                             )
                         )
                     }
