@@ -396,4 +396,10 @@
     <string name="statistic_period_fourteen_days">14 дней</string>
     <string name="statistic_period_thirty_days">30 дней</string>
     <string name="statistic_period_ninety_days">90 дней</string>
+
+    <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
+    <string name="statistic_glucose_index_description_total">Количество измерений</string>
+    <string name="statistic_glucose_index_description_high">Измерений выше нормы</string>
+    <string name="statistic_glucose_index_description_normal">Измерений ниже нормы</string>
+    <string name="statistic_glucose_index_description_low">Измерений в норме</string>
 </resources>
