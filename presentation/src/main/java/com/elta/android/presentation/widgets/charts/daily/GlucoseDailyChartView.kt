@@ -1,4 +1,5 @@
 @file:Suppress("TooManyFunctions", "MaxLineLength")
+
 package com.elta.android.presentation.widgets.charts.daily
 
 import android.annotation.SuppressLint
@@ -20,7 +21,6 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.distanceBetween
 import com.elta.android.presentation.utils.hourOfDay
-import com.elta.android.presentation.utils.minute
 import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueType
@@ -48,7 +48,6 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var glucoseRangesOverlayView: GlucoseRangesOverlayView? = null
 
     private val currentDateCalendar = Calendar.getInstance()
-    private val mapDateCalendar = Calendar.getInstance()
     private lateinit var minTitle: String
     private lateinit var maxTitle: String
 
@@ -133,6 +132,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         if (_chartDataModel != null) {
             onDataModelChanged()
         }
+    }
+
+    fun getScrollPosition(): Float {
+        val lastEventEntry = chartPoints.entries.maxBy { it.value.x }
+        if (lastEventEntry != null) {
+            val scrollToHour = lastEventEntry.key.hourOfEvent - 2
+            return if (scrollToHour >= 1) hoursCoordinatesMap[scrollToHour] else 0f
+        }
+        return 0f
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -467,11 +475,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun ChartItemModel.toPoint(): PointF {
-        mapDateCalendar.time = dateTime
-        val hours = mapDateCalendar.hourOfDay
-        val minutes = mapDateCalendar.minute
-        val startX = hoursCoordinatesMap[hours]
-        val x = startX + singleHourWidth * (minutes.toFloat() / MINUTES_IN_HOUR)
+        val startX = hoursCoordinatesMap[hourOfEvent]
+        val x = startX + singleHourWidth * (minutesOfEvent.toFloat() / MINUTES_IN_HOUR)
 
         val valuesStart = dataModel().chartRangesModel.start
         val valuesEnd = dataModel().chartRangesModel.end
