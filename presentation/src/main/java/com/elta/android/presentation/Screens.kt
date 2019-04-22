@@ -201,7 +201,7 @@ object Screens {
         override fun getFragment() = PeriodFragment.newInstance(period)
         override fun getScreenKey(): String {
             val superKey = super.getScreenKey()
-            return  "$superKey-${period.name}"
+            return "$superKey-${period.name}"
         }
     }
 }

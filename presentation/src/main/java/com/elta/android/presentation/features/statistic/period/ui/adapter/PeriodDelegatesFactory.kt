@@ -7,7 +7,7 @@ import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
 import javax.inject.Inject
 
-class PeriodDelegatesFactory @Inject constructor(): AdapterDelegatesFactory {
+class PeriodDelegatesFactory @Inject constructor() : AdapterDelegatesFactory {
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
