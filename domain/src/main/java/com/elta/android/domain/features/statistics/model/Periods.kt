@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.elta.android.domain.features.statistics.model
 
 import com.elta.android.domain.features.diary.home.model.atEndOfDay

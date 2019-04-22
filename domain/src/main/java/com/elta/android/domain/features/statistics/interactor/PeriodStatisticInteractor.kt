@@ -13,7 +13,11 @@ import com.elta.android.domain.features.statistics.model.daily.DailyStatisticMod
 import timber.log.Timber
 import java.util.Date
 
-fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: GlucoseLevelSettings): StatisticByPeriodModel {
+fun buildStatisticModel(
+    period: StatisticPeriod,
+    events: List<Event>,
+    settings: GlucoseLevelSettings
+): StatisticByPeriodModel {
     val eventsContainer = events.toEventsContainer()
 
     val eventsByType = eventsContainer.byType
@@ -48,7 +52,11 @@ fun buildStatisticModel(period: StatisticPeriod, events: List<Event>, settings: 
     )
 }
 
-fun buildGlucoseStatisticModel(glucoseEventsPerPeriod: List<Event>?, settings: GlucoseLevelSettings): GlucoseStatisticModel {
+@Suppress("LongMethod")
+fun buildGlucoseStatisticModel(
+    glucoseEventsPerPeriod: List<Event>?,
+    settings: GlucoseLevelSettings
+): GlucoseStatisticModel {
     val count = glucoseEventsPerPeriod?.size ?: 0
     var totalLevel = 0.0
 
@@ -132,22 +140,21 @@ fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): In
     var count = 0
 
     insulinEventsPerPeriod?.forEach { event ->
-        event.value?.let { value ->
-            if (value != 0.0) {
-                if (event.isBolusInsulin()) {
-                    totalBolusLevel += value
-                    bolusCount++
-                }
+        val value = event.value
+        if (value != null && value != 0.0) {
+            if (event.isBolusInsulin()) {
+                totalBolusLevel += value
+                bolusCount++
+            }
 
-                if (event.isBasalInsulin()) {
-                    totalBasalLevel += value
-                    basalCount++
-                }
+            if (event.isBasalInsulin()) {
+                totalBasalLevel += value
+                basalCount++
+            }
 
-                if (event.isNotMixedInsulin()) {
-                    totalLevel += value
-                    count++
-                }
+            if (event.isNotMixedInsulin()) {
+                totalLevel += value
+                count++
             }
         }
     }
@@ -164,11 +171,10 @@ fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadS
     var count = 0
 
     breadEventsPerPeriod?.forEach { event ->
-        event.value?.let { value ->
-            if (value != 0.0) {
-                totalLevel += value
-                count++
-            }
+        val value = event.value
+        if (value != null && value != 0.0) {
+            totalLevel += value
+            count++
         }
     }
 

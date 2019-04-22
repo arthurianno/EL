@@ -13,12 +13,21 @@ internal inline fun Long.average(total: Int): Long = this / total
 internal inline fun Int.percent(total: Int): Double = this * 100.0 / total
 internal inline fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal inline fun Double.checkMin(min: Double): Double = if (min > this) this else min
-internal inline fun Event.isBolusInsulin(): Boolean = insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
-internal inline fun Event.isBasalInsulin(): Boolean = insulinType == InsulinType.INTERMIDIATE || insulinType == InsulinType.LONG || insulinType == InsulinType.ULTRALONG
+internal inline fun Event.isBolusInsulin(): Boolean =
+    insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
+
+internal inline fun Event.isBasalInsulin(): Boolean =
+    insulinType == InsulinType.INTERMIDIATE ||
+        insulinType == InsulinType.LONG ||
+        insulinType == InsulinType.ULTRALONG
+
 internal inline fun Event.isNotMixedInsulin(): Boolean = insulinType != InsulinType.MIXED
 
-internal inline fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatisticModel = if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
-internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel = if (min.glucose.minLevel > this.glucose.minLevel) this else min
+internal inline fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatisticModel =
+    if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
+
+internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel =
+    if (min.glucose.minLevel > this.glucose.minLevel) this else min
 
 internal fun List<Event>.toEventsContainer(): EventsContainer {
     val byType = hashMapOf<EventType, List<Event>>()

@@ -8,7 +8,11 @@ import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStati
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import java.util.Date
 
-fun buildDailyStatisticModel(date: Date, eventsPerDay: Map<EventType, List<Event>>, settings: GlucoseLevelSettings): DailyStatisticModel {
+fun buildDailyStatisticModel(
+    date: Date,
+    eventsPerDay: Map<EventType, List<Event>>,
+    settings: GlucoseLevelSettings
+): DailyStatisticModel {
     return DailyStatisticModel(
         date = date,
         glucose = buildGlucoseStatisticModel(eventsPerDay[EventType.GLUCOSE], settings),
@@ -24,19 +28,18 @@ fun buildDailyInsulinStatisticModel(insulinEventsPerDay: List<Event>?): DailyIns
     var totalLevel = 0.0
 
     insulinEventsPerDay?.forEach { event ->
-        event.value?.let { value ->
-            if (value != 0.0) {
-                if (event.isBolusInsulin()) {
-                    totalBolusLevel += value
-                }
+        val value = event.value
+        if (value != null && value != 0.0) {
+            if (event.isBolusInsulin()) {
+                totalBolusLevel += value
+            }
 
-                if (event.isBasalInsulin()) {
-                    totalBasalLevel += value
-                }
+            if (event.isBasalInsulin()) {
+                totalBasalLevel += value
+            }
 
-                if (event.isNotMixedInsulin()) {
-                    totalLevel += value
-                }
+            if (event.isNotMixedInsulin()) {
+                totalLevel += value
             }
         }
     }
@@ -52,10 +55,9 @@ fun buildDailyBreadStatisticModel(breadEventsPerDay: List<Event>?): DailyBreadSt
     var totalLevel = 0.0
 
     breadEventsPerDay?.forEach { event ->
-        event.value?.let { value ->
-            if (value != 0.0) {
-                totalLevel += value
-            }
+        val value = event.value
+        if (value != null && value != 0.0) {
+            totalLevel += value
         }
     }
 
