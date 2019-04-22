@@ -15,7 +15,7 @@ class BuildDailyGlucoseModelText {
 
         val model = buildDailyGlucoseModel(arrayListOf(event), GlucoseLevelSettings())
 
-        assert(!model.isEmpty)
+        assert(model.hasEvents)
         assert(model.lastEvent != null)
     }
 
@@ -26,7 +26,7 @@ class BuildDailyGlucoseModelText {
 
         val model = buildDailyGlucoseModel(arrayListOf(event, event2), GlucoseLevelSettings())
 
-        assert(model.isEmpty)
+        assert(!model.hasEvents)
         assert(model.lastEvent == null)
     }
 
@@ -40,7 +40,7 @@ class BuildDailyGlucoseModelText {
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings())
 
-        assert(!model.isEmpty)
+        assert(model.hasEvents)
         assert(model.glucoseEvents.all { it.type == EventType.GLUCOSE })
         assert(model.lastEvent != null)
     }
@@ -48,7 +48,7 @@ class BuildDailyGlucoseModelText {
     @Test
     fun buildDailyGlucoseModel_noGlucoseEvents_isEmpty() {
         val model = buildDailyGlucoseModel(arrayListOf(), GlucoseLevelSettings())
-        assert(model.isEmpty)
+        assert(!model.hasEvents)
         assert(model.lastEvent == null)
     }
 
@@ -62,7 +62,7 @@ class BuildDailyGlucoseModelText {
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings())
 
-        assert(!model.isEmpty)
+        assert(model.hasEvents)
         assert(model.lastEvent != null)
         assert(model.maxEvent == null)
         assert(model.minEvent == null)
@@ -82,7 +82,7 @@ class BuildDailyGlucoseModelText {
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings())
 
-        assert(!model.isEmpty)
+        assert(model.hasEvents)
         assert(model.lastEvent != null)
         assert(model.maxEvent != null)
         assert(model.minEvent != null)

@@ -17,6 +17,7 @@ class RecordsDailyGlucoseDelegate : AdapterDelegate() {
         val item = items[position] as RecordsDailyGlucoseItem
         with(holder as ViewHolder) {
             dailyRecordsSubTitleView.text = item.lastEventTimeTitle
+            glucoseDailyView.setChartDataModel(item.chartDataModel)
         }
     }
 
@@ -27,6 +28,8 @@ class RecordsDailyGlucoseDelegate : AdapterDelegate() {
             when (payload) {
                 RecordsDailyGlucoseItem.Payload.LAST_EVENT_CHANGED ->
                     dailyRecordsSubTitleView.text = item.lastEventTimeTitle
+                RecordsDailyGlucoseItem.Payload.CHART_DATA_CHANGED ->
+                    glucoseDailyView.setChartDataModel(item.chartDataModel)
             }
         }
     }

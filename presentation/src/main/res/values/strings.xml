@@ -241,6 +241,10 @@
     <string name="main_records_empty_value">—</string>
     <string name="main_records_daily_glucose_title">Мои показатели сегодня</string>
     <string name="main_records_daily_glucose_subtitle">Последний в %s</string>
+    <string name="main_records_daily_chart_time_mask">0%s:00</string>
+    <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
+    <string name="main_records_daily_chart_min_title">min</string>
+    <string name="main_records_daily_chart_max_title">max</string>
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
