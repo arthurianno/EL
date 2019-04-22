@@ -26,7 +26,7 @@ class PeriodTabsView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_period_tabs, this, true)
-        periodTabsView.children().forEach { child ->
+        periodsView.children().forEach { child ->
             if (child is TextView) {
                 child.setOnClickListener { item ->
                     if (item.id != selectedTab?.id) {
@@ -50,7 +50,7 @@ class PeriodTabsView @JvmOverloads constructor(
         if (tabId == selectedTab?.id) {
             return
         }
-        periodTabsView.children().forEach { child ->
+        periodsView.children().forEach { child ->
             if (child is TextView && tabId == child.id) {
                 selectedTab?.isSelected = false
                 selectedTab = child

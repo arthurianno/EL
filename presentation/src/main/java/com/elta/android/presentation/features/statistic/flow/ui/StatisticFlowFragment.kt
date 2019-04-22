@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.nullgr.core.ui.extensions.hide
+import kotlinx.android.synthetic.main.fragment_statistic_flow.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class StatisticFlowFragment : BaseFlowFragment<StatisticFlowPm>() {
@@ -26,6 +27,12 @@ class StatisticFlowFragment : BaseFlowFragment<StatisticFlowPm>() {
         toolbarTitleView.setText(R.string.statistic_title)
         toolbarView.setBackgroundColor(ContextCompat.getColor(view.context, R.color.white))
         toolbarView.applyWindowInsetsForChildrenView()
+    }
+
+    override fun onBindPresentationModel(pm: StatisticFlowPm) {
+        super.onBindPresentationModel(pm)
+        periodTabsView.tabClicks().bindTo(pm.periodSelectedAction)
+        pm.selectedPeriodIdState.bindTo(periodTabsView.selection())
     }
 
     companion object {

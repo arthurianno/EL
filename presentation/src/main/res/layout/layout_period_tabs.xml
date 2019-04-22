@@ -6,7 +6,7 @@
     tools:parentTag="android.widget.FrameLayout">
 
     <LinearLayout
-        android:id="@+id/periodTabsView"
+        android:id="@+id/periodsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"

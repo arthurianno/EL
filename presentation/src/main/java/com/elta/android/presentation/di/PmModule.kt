@@ -38,6 +38,7 @@ import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
+import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
 import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
 import com.elta.android.presentation.features.sync.start.pm.SyncStartPm
 import dagger.Binds
@@ -243,4 +244,9 @@ abstract class PmModule {
     @IntoMap
     @PmKey(StatisticFlowPm::class)
     abstract fun bindStatisticFlowPm(pm: StatisticFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(PeriodPm::class)
+    abstract fun bindPeriodPm(pm: PeriodPm): PresentationModel
 }
