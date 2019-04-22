@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="20dp"
+    android:paddingStart="16dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="18dp"
+    tools:background="@color/blue">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/indexValueView"
+        style="@style/New.Headline2.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="8,6" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/indexUnitView"
+        style="@style/New.Body2.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/indexValueView"
+        app:layout_constraintStart_toEndOf="@+id/indexValueView"
+        tools:text="ммоль/л" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/indexDescriptionView"
+        style="@style/New.Caption1.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/indexValueView"
+        tools:text="Средний уровень глюкозы" />
+
+</android.support.constraint.ConstraintLayout>
