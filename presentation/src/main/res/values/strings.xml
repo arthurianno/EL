@@ -389,4 +389,11 @@
     <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!-- STATISTICS -->
+    <string name="statistic_title">Статистика</string>
+    <string name="statistic_period_seven_days">7 дней</string>
+    <string name="statistic_period_fourteen_days">14 дней</string>
+    <string name="statistic_period_thirty_days">30 дней</string>
+    <string name="statistic_period_ninety_days">90 дней</string>
 </resources>

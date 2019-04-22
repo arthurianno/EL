@@ -34,6 +34,9 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
+import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
@@ -125,6 +128,10 @@ object Screens {
         override fun getFragment() = MainFlowFragment.newInstance()
     }
 
+    object StatisticTab : SupportAppScreen() {
+        override fun getFragment() = StatisticFlowFragment.newInstance()
+    }
+
     object DiaryTab : SupportAppScreen() {
         override fun getFragment() = DiaryFlowFragment.newInstance()
     }
@@ -187,5 +194,14 @@ object Screens {
 
     data class EditRemind(val reminderId: String) : SupportAppScreen() {
         override fun getFragment() = EditRemindFragment.newInstance(reminderId)
+    }
+
+    // STATISTICS FLOW
+    data class PeriodScreen(val period: Period) : SupportAppScreen() {
+        override fun getFragment() = PeriodFragment.newInstance(period)
+        override fun getScreenKey(): String {
+            val superKey = super.getScreenKey()
+            return "$superKey-${period.name}"
+        }
     }
 }
