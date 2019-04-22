@@ -12,6 +12,7 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -128,6 +129,7 @@ class MainProfilePm @Inject constructor(
         doOnSuccess(::updateFullNameState)
             .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
+            .doOnSuccess { bus.event(Events.ProfileUpdated) }
 
     private fun updateFullNameState(profile: Profile) {
         userFullNameState.consumer.accept(

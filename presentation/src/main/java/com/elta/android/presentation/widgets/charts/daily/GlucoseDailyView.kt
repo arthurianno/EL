@@ -21,5 +21,17 @@ class GlucoseDailyView @JvmOverloads constructor(
 
     fun setChartDataModel(chartDataModel: ChartDataModel) {
         dailyGlucoseChartView.chartDataModel = chartDataModel
+        scrollToLastEvent()
+    }
+
+    private fun scrollToLastEvent() {
+        postDelayed({
+            val scrollX = dailyGlucoseChartView.getScrollPosition()
+            dailyGlucoseHorizontalView.scrollTo(scrollX.toInt(), 0)
+        }, SCROLL_DELAY)
+    }
+
+    companion object {
+        private const val SCROLL_DELAY = 200L
     }
 }
