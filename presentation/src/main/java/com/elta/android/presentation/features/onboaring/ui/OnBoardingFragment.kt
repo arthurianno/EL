@@ -21,7 +21,7 @@ import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
-import kotlinx.android.synthetic.main.layout_auth_toolbar.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 @Suppress("LabeledExpression")
 class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {

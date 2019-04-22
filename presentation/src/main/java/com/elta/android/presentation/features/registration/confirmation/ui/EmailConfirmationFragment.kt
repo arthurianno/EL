@@ -11,7 +11,7 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import kotlinx.android.synthetic.main.fragment_email_confirmation.*
-import kotlinx.android.synthetic.main.layout_auth_toolbar.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
 

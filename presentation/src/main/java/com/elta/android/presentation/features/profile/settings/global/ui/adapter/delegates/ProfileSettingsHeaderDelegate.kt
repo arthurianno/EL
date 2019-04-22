@@ -9,7 +9,7 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 
 class ProfileSettingsHeaderDelegate : AdapterDelegate() {
 
-    override val itemType = ProfileSettingsHeaderDelegate::class
+    override val itemType = ProfileSettingsHeaderItem::class
     override val layoutResource = R.layout.item_profile_settings_header
 
     override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {

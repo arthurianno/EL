@@ -94,6 +94,7 @@ dependencies {
     implementation commonDependencies.objectbox
 
     implementation commonDependencies.nordicScanner
+    implementation commonDependencies.nordicDfu
     implementation commonDependencies.rxBluetooth
     implementation commonDependencies.rxReplaying
 

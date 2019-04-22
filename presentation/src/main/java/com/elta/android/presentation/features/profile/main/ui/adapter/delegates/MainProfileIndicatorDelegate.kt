@@ -18,7 +18,7 @@ class MainProfileIndicatorDelegate(
     private val bus: RxBus
 ) : AdapterDelegate() {
 
-    override val itemType = MainProfileIndicatorDelegate::class
+    override val itemType = MainProfileIndicatorItem::class
     override val layoutResource = R.layout.item_profile_indicators
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {

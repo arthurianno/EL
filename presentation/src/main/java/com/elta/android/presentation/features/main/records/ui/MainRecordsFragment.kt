@@ -11,7 +11,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenTransparentStatusBarConfigProvider
-import com.elta.android.presentation.widgets.MainScreenMarginItemDecoration
+import com.elta.android.presentation.widgets.decoration.MainScreenMarginItemDecoration
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.RxBus
 import io.reactivex.rxkotlin.Observables

@@ -5,6 +5,7 @@ import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.ApiModule
 import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.DataSourceModule
+import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.MappersModule
 import com.elta.android.data.di.NetworkModule
@@ -36,6 +37,7 @@ import javax.inject.Singleton
     MappersModule::class,
     CacheModule::class,
     StorageModule::class,
+    GlucometerModule::class,
     // domain
     RepoModule::class,
     // presentation

@@ -41,10 +41,16 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
 
     override fun onBindPresentationModel(pm: BluetoothPm) {
         super.onBindPresentationModel(pm)
-        writeButtonView.clicks().bindTo(pm.writeAction)
-        connectButtonView.clicks().bindTo(pm.connectAction)
-        dfuButtonView.clicks().bindTo(pm.dfuAction)
-        pm.commandInputControl.bindTo(commandInputView)
+        getInfoButtonView.clicks().bindTo(pm.getInfoAction)
+        getEventsButtonView.clicks().bindTo(pm.getEventsAction)
+        setPinButtonView.clicks().bindTo(pm.setPinAction)
+        checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
+        downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
+        updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
+        pm.updateEnabledState.bindTo { updateFirmwareButtonView.isEnabled = it }
+        pm.downloadEnabledState.bindTo { downloadFirmwareButtonView.isEnabled = it }
+        pm.pinEnabledState.bindTo { setPinButtonView.isEnabled = it }
+        pm.pinInputControl.bindTo(commandInputView)
         pm.logState.bindTo(logView.text())
         pm.requestEnableBluetoothCommand.observable
             .log("Command", "enable bluetooth")
@@ -75,7 +81,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                         task.getResult(ApiException::class.java)
                     } catch (e: ApiException) {
                         when (e.statusCode) {
-                            LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                            LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
                                 try {
                                     (e as? ResolvableApiException)?.startResolutionForResult(
                                         checkNotNull(activity),
@@ -84,7 +90,6 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                                 } catch (e1: IntentSender.SendIntentException) {
                                     Timber.e(e1)
                                 }
-                            }
                         }
                     }
                 }

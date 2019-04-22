@@ -42,7 +42,7 @@ def libraryVersions = [
         retrofitVersion            : '2.5.0',
 
         //DI
-        daggerVersion              : '2.20',
+        daggerVersion              : '2.22.1',
         javaxAnnotationVersion     : '1.0',
         javaxInjectVersion         : '1',
         glassfishAnnotationVersion : '10.0-b28',

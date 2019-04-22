@@ -18,7 +18,7 @@ class MainProfileAdditionalDelegate(
     private val bus: RxBus
 ) : AdapterDelegate() {
 
-    override val itemType = MainProfileAdditionalDelegate::class
+    override val itemType = MainProfileAdditionalItem::class
     override val layoutResource = R.layout.item_profile_functions
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {

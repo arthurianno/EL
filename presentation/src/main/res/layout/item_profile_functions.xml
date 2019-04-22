@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/functionView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="56dp"
     android:layout_marginTop="8dp"
     android:background="@drawable/bg_profile_function">
 
@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_map_pin_card" />
+        tools:src="@drawable/ic_map_pin_bg" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/functionNameView"
@@ -50,10 +50,9 @@
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/functionStateView"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:padding="12dp"
-        android:stateListAnimator="@drawable/selector_group_icon_animator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

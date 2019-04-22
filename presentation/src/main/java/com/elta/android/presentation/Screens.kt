@@ -2,8 +2,8 @@ package com.elta.android.presentation
 
 import android.content.Context
 import android.support.v4.app.Fragment
-import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
@@ -23,6 +23,9 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
+import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
+import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -172,5 +175,17 @@ object Screens {
 
     object ProfileSettings : SupportAppScreen() {
         override fun getFragment() = ProfileSettingsFragment.newInstance()
+    }
+
+    object Reminders : SupportAppScreen() {
+        override fun getFragment() = RemindersFragment.newInstance()
+    }
+
+    object CreateRemind : SupportAppScreen() {
+        override fun getFragment() = CreateRemindFragment.newInstance()
+    }
+
+    data class EditRemind(val reminderId: String) : SupportAppScreen() {
+        override fun getFragment() = EditRemindFragment.newInstance(reminderId)
     }
 }

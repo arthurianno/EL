@@ -18,7 +18,6 @@ import com.nullgr.core.rx.schedulers.ComputationSchedulersFacade
 import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import com.nullgr.core.security.prefs.CryptoPreferences
-import com.polidea.rxandroidble2.RxBleClient
 import dagger.Module
 import dagger.Provides
 import timber.log.Timber
@@ -74,8 +73,4 @@ class AppModule(private val enableLog: Boolean) {
     @Singleton
     fun provideRxLocationManager(context: Context): RxLocationManager =
         RxLocationManager(context, updatesInterval = 1100, updateCount = 1)
-
-    @Provides
-    @Singleton
-    fun provideRxBleClient(context: Context): RxBleClient = RxBleClient.create(context)
 }

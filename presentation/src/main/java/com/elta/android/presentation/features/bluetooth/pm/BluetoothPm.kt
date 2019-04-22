@@ -2,76 +2,60 @@
 
 package com.elta.android.presentation.features.bluetooth.pm
 
-import android.bluetooth.BluetoothDevice
-import android.content.Context
-import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.FirmwareDownloadingError
+import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
+import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUseCase
+import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
+import com.elta.android.domain.features.devices.interactor.SetPinCodeUseCase
+import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
+import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
+import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.Clicks
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.bluetooth.EltaDfuService
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
-import com.jakewharton.rx.ReplayingShare
-import com.polidea.rxandroidble2.RxBleClient
-import com.polidea.rxandroidble2.RxBleConnection
+import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
-import no.nordicsemi.android.dfu.DfuProgressListener
-import no.nordicsemi.android.dfu.DfuProgressListenerAdapter
-import no.nordicsemi.android.dfu.DfuServiceInitiator
-import no.nordicsemi.android.dfu.DfuServiceListenerHelper
-import timber.log.Timber
-import java.nio.charset.Charset
-import java.util.UUID
 import javax.inject.Inject
 
 class BluetoothPm @Inject constructor(
+    private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
+    private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
+    private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
+    private val setPinCodeUseCase: SetPinCodeUseCase,
+    private val getGlucometerEventsUseCase: GetGlucometerEventsUseCase,
+    private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
     private val findGlucometersUseCase: FindGlucometersUseCase,
-    private val context: Context,
-    private val client: RxBleClient,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    private val UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
-    private val UART_RX_CHARACTERISTIC_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
-    private val UART_TX_CHARACTERISTIC_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+    val getInfoAction = Action<Unit>()
+    val getEventsAction = Action<Unit>()
+    val setPinAction = Action<Unit>()
+    val pinEnabledState = State(false)
 
-    private val dfuListener: DfuProgressListener = object : DfuProgressListenerAdapter() {
-        override fun onDeviceConnected(deviceAddress: String) {
-            Timber.d("onDeviceConnected $deviceAddress")
-        }
+    val checkFirmwareAction = Action<Unit>()
+    val downloadFirmwareAction = Action<Unit>()
+    val updateFirmwareAction = Action<Unit>()
 
-        override fun onDeviceDisconnected(deviceAddress: String) {
-            Timber.d("onDeviceDisconnected $deviceAddress")
-        }
+    val firmwareState = State<Firmware>()
+    val firmwareFileState = State<FirmwareFile>()
+    val downloadEnabledState = State(false)
+    val updateEnabledState = State(false)
 
-        override fun onDfuProcessStarted(deviceAddress: String) {
-            Timber.d("onDfuProcessStarted $deviceAddress")
-        }
-
-        override fun onProgressChanged(deviceAddress: String?, percent: Int, speed: Float, avgSpeed: Float, currentPart: Int, partsTotal: Int) {
-            Timber.d("onProgressChanged $percent")
-        }
-
-        override fun onDfuCompleted(deviceAddress: String?) {
-            Timber.d("onDfuCompleted")
-        }
-    }
-
-    val writeAction = Action<Unit>()
-    val connectAction = Action<Unit>()
-    val dfuAction = Action<Unit>()
-    var device: BluetoothDevice? = null
+    var glucometer: Glucometer? = null
 
     private val scanResults = mutableSetOf<Glucometer>()
-    private val connectionObservable = State<RxBleConnection>()
-    val commandInputControl = inputControl()
+    val pinInputControl = inputControl()
     val logState = State("Log:")
     val requestEnableBluetoothCommand = Command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = Command<Unit>(bufferSize = 1)
@@ -92,12 +76,12 @@ class BluetoothPm @Inject constructor(
                         scanResults.clear()
                         scanResults.addAll(results)
                         items.consumer.accept(
-                            results.map { glucometer ->
+                            results.map { meter ->
                                 DeviceItem(
-                                    id = glucometer.id,
-                                    name = glucometer.name ?: "Unknown device",
-                                    address = glucometer.address,
-                                    isSelected = glucometer.address == device?.address
+                                    id = meter.id,
+                                    name = meter.name ?: "Unknown device",
+                                    address = meter.address,
+                                    isSelected = meter.address == glucometer?.address
                                 )
                             }
                         )
@@ -108,71 +92,98 @@ class BluetoothPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        writeAction.observable
-            .switchMap {
-                connectionObservable.observable
-                    .switchMapSingle {
-                        it.writeCharacteristic(UART_RX_CHARACTERISTIC_UUID, commandInputControl.text.value.toByteArray(Charset.defaultCharset()))
-                            .doOnSuccess { bytes ->
-                                val command = bytes.toString(Charset.defaultCharset())
-                                val log = logState.value
-                                logState.consumer.accept("$log\nWrite: $command")
-                                Timber.d("writeCharacteristic: $command")
-                            }
-                            .doOnError { error ->
-                                val log = logState.value
-                                logState.consumer.accept("$log\nWrite Error: ${error.message}")
-                                Timber.e(error, "writeCharacteristic")
-                            }
-                    }
+        getInfoAction.observable
+            .skipWhileInProgress()
+            .map(::createInfoUseCaseParams)
+            .flatMapSingle { params ->
+                getGlucometerInfoUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .map { it.toString() }
+                    .doOnSuccess(::writeToLog)
+                    .doOnError(::handleError)
             }
             .retry()
             .subscribe()
             .untilDestroy()
 
-        connectAction.observable
-            .switchMap {
-                client.getBleDevice(device?.address ?: "")
-                    .establishConnection(false)
-                    .takeUntil(lifecycleObservable.filter { it == Lifecycle.DESTROYED })
-                    .compose(ReplayingShare.instance())
-                    .doOnNext { connectionObservable.consumer.accept(it) }
-                    .doOnError {
-                        Timber.e(it, "establishConnection")
-                    }
-            }
-            .switchMap {
-                connectionObservable.observable
-                    .switchMap {
-                        it.setupNotification(UART_TX_CHARACTERISTIC_UUID)
-                            .switchMap { it }
-                            .doOnNext { bytes ->
-                                val message = bytes.toString(Charset.defaultCharset())
-                                val log = logState.value
-                                logState.consumer.accept("$log\nRead: $message")
-                                Timber.d("readCharacteristic: $message")
-                            }
-                            .doOnError { error ->
-                                val log = logState.value
-                                logState.consumer.accept("$log\nRead Error: ${error.message}")
-                                Timber.e(error, "readCharacteristic")
-                            }
-                    }
+        getEventsAction.observable
+            .skipWhileInProgress()
+            .map(::createEventsUseCaseParams)
+            .flatMapSingle { params ->
+                getGlucometerEventsUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .map { it.joinToString("\n") }
+                    .doOnSuccess(::writeToLog)
+                    .doOnError(::handleError)
             }
             .retry()
             .subscribe()
             .untilDestroy()
 
-        dfuAction.observable
-            .doOnNext {
-                device?.let {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        DfuServiceInitiator.createDfuNotificationChannel(context)
+        setPinAction.observable
+            .skipWhileInProgress()
+            .map(::createPinCodeUseCaseParams)
+            .flatMapCompletable { params ->
+                setPinCodeUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnComplete { writeToLog("Pin set ok") }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        checkFirmwareAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle { params ->
+                getFirmwareInfoUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnSuccess {
+                        firmwareState.consumer.accept(it)
+                        downloadEnabledState.consumer.accept(true)
                     }
-                    val starter = DfuServiceInitiator(it.address)
-                    starter.setZip(R.raw.satellite_online_16)
-                    starter.start(context, EltaDfuService::class.java)
-                }
+                    .map { it.toString() }
+                    .doOnSuccess(::writeToLog)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        downloadFirmwareAction.observable
+            .skipWhileInProgress()
+            .map(::createGetFirmwareUseCaseParams)
+            .flatMapSingle { params ->
+                downloadFirmwareUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnSuccess {
+                        firmwareFileState.consumer.accept(it)
+                        enableUpdateButton()
+                    }
+                    .map { it.toString() }
+                    .doOnSuccess(::writeToLog)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        updateFirmwareAction.observable
+            .skipWhileInProgress()
+            .map(::createUpdateFirmwareUseCaseParams)
+            .flatMapCompletable { params ->
+                updateDeviceFirmwareUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnComplete {
+                        writeToLog("Firmware updated")
+                    }
+                    .doOnError(::handleError)
             }
             .retry()
             .subscribe()
@@ -180,16 +191,20 @@ class BluetoothPm @Inject constructor(
 
         bus.clicks<Clicks.DeviceClicked>()
             .doOnNext { click ->
-                if (click.item.address != device?.address) {
-                    device = scanResults.map { it.device }.firstOrNull { it.address == click.item.address }
-                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = !it.isSelected) }
+                if (click.item.address != glucometer?.address) {
+                    glucometer = scanResults.firstOrNull { it.address == click.item.address }
+                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = it.address == click.item.address) }
                     items.consumer.accept(newItems)
                 }
+                enableUpdateButton()
             }
             .subscribe()
             .untilDestroy()
 
-        DfuServiceListenerHelper.registerProgressListener(context, dfuListener)
+        pinInputControl.textChanges.observable
+            .map { it.length == 3 }
+            .subscribe(pinEnabledState.consumer)
+            .untilDestroy()
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
@@ -201,17 +216,45 @@ class BluetoothPm @Inject constructor(
             .untilDestroy()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        DfuServiceListenerHelper.unregisterProgressListener(context, dfuListener)
-    }
-
     override fun handleError(error: Throwable) {
         when (error) {
             is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
+            is GlucometerPinIncorrectOrNotFoundError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
+            is FirmwareDownloadingError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Firmware file is invalid"))
             else -> super.handleError(error)
         }
+    }
+
+    private fun writeToLog(response: String) {
+        val log = logState.value
+        logState.consumer.accept("$log\n====================\n$response")
+    }
+
+    private fun createInfoUseCaseParams(i: Unit): GetGlucometerInfoUseCase.Params =
+        GetGlucometerInfoUseCase.Params(address = glucometer?.address ?: "")
+
+    private fun createEventsUseCaseParams(i: Unit): GetGlucometerEventsUseCase.Params =
+        GetGlucometerEventsUseCase.Params(address = glucometer?.address ?: "")
+
+    private fun createPinCodeUseCaseParams(i: Unit): SetPinCodeUseCase.Params =
+        SetPinCodeUseCase.Params(
+            address = glucometer?.address ?: "",
+            pinCode = pinInputControl.text.valueOrNull ?: ""
+        )
+
+    private fun createGetFirmwareUseCaseParams(i: Unit): DownloadFirmwareUseCase.Params =
+        DownloadFirmwareUseCase.Params(firmwareState.value)
+
+    private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
+        UpdateDeviceFirmwareUseCase.Params(
+            address = glucometer?.address ?: "",
+            file = firmwareFileState.value
+        )
+
+    private fun enableUpdateButton() {
+        val enable = glucometer != null
+        updateEnabledState.consumer.accept(enable)
     }
 }

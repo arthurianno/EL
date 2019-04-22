@@ -5,6 +5,8 @@ import com.elta.android.data.features.diary.events.cache.DbEventsCache
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.tags.cache.DbTagsCache
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
+import com.elta.android.data.features.reminder.cache.DbReminderCache
+import com.elta.android.data.features.reminder.cache.dto.ReminderCacheDto
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.user.cache.DbProfileCache
@@ -33,5 +35,9 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindProfileCache(cache: DbProfileCache): Cache<ProfileCacheDto>
+
+        @Binds
+        @Singleton
+        fun bindReminderCache(cache: DbReminderCache): Cache<ReminderCacheDto>
     }
 }

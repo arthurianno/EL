@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.item_profile_settings_social.*
 
 class ProfileSettingsSocialDelegate(private val bus: RxBus) : AdapterDelegate() {
 
-    override val itemType = ProfileSettingsSocialDelegate::class
+    override val itemType = ProfileSettingsSocialItem::class
     override val layoutResource = R.layout.item_profile_settings_social
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
