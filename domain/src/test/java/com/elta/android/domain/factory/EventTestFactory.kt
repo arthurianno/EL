@@ -14,14 +14,16 @@ object EventTestFactory {
     fun create(
         type: EventType,
         value: Double? = null,
+        duration: Long = 2 * 60 * 60 + 30 * 60,
         activityType: ActivityType? = null,
         mealTag: MealTag? = null,
         insulinType: InsulinType? = null,
-        tagId: String? = null
+        tagId: String? = null,
+        date: Date = Date()
     ): Event =
         Event(
             id = UUID.randomUUID().toString(),
-            additionTime = Date(),
+            additionTime = date,
             additionTimeString = "",
             tagId = tagId,
             tag = null,
@@ -30,7 +32,7 @@ object EventTestFactory {
             value = value,
             name = "Test name",
             kind = "Test kind",
-            duration = 2 * 60 * 60 + 30 * 60,
+            duration = duration,
             activityType = activityType,
             mealTag = mealTag,
             insulinType = insulinType,
