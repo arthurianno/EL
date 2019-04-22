@@ -17,4 +17,5 @@ sealed class Events : Event {
     object EventsChanged : Events()
     data class ProfileChanged(val profile: Profile) : Events()
     object ReminderDeleted : Events()
+    object ProfileUpdated : Events()
 }

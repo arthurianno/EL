@@ -6,8 +6,11 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.presentation.R
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsDailyGlucoseItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.date.CommonFormats
+import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 
@@ -18,8 +21,20 @@ class MainRecordsMapper @Inject constructor(
     override fun mapFromObject(source: HomeModel): List<ListItem> =
         arrayListOf<ListItem>().apply {
             add(source.header())
+            if (source.dailyGlucoseModel.hasEvents) {
+                add(source.dailyChart())
+            }
             addAll(source.eventsBlocks.mapIndexed { index, event -> event.group(index == 0) })
         }
+
+    private fun HomeModel.dailyChart(): RecordsDailyGlucoseItem {
+        val lastEventTime =
+            dailyGlucoseModel.lastEvent?.additionTime?.toStringWithFormat(CommonFormats.FORMAT_TIME)
+        return RecordsDailyGlucoseItem(
+            ChartItemsBuilder.build(dailyGlucoseModel),
+            resources.getString(R.string.main_records_daily_glucose_subtitle, lastEventTime ?: "")
+        )
+    }
 
     private fun HomeModel.header(): ListItem =
         RecordsHeaderItem(
