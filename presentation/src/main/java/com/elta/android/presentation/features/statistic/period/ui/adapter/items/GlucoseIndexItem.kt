@@ -17,6 +17,8 @@ data class GlucoseIndexItem(
         if (other is GlucoseIndexItem) {
             return mutableSetOf<Payload>().apply {
                 if (type != other.type) add(Payload.TYPE_CHANGED)
+                if (bg != other.bg) add(Payload.BG_CHANGED)
+                if (unit != other.unit) add(Payload.UNIT_CHANGED)
                 if (value != other.value) add(Payload.VALUE_CHANGED)
             }
         }
@@ -24,7 +26,7 @@ data class GlucoseIndexItem(
     }
 
     enum class Payload {
-        TYPE_CHANGED, VALUE_CHANGED
+        TYPE_CHANGED, BG_CHANGED, UNIT_CHANGED, VALUE_CHANGED
     }
 
     enum class Type {

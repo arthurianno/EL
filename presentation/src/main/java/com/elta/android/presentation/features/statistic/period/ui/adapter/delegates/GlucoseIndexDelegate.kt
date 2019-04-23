@@ -28,15 +28,10 @@ class GlucoseIndexDelegate : AdapterDelegate() {
         val item = items[position] as GlucoseIndexItem
         with(holder as ViewHolder) {
             when (payload) {
-                GlucoseIndexItem.Payload.TYPE_CHANGED -> {
-                    itemView.background = item.bg
-                    indexDescriptionView.text = item.description
-                    indexUnitView.text = item.unit
-                }
-                GlucoseIndexItem.Payload.VALUE_CHANGED -> {
-                    itemView.background = item.bg
-                    indexValueView.text = item.value
-                }
+                GlucoseIndexItem.Payload.TYPE_CHANGED -> indexDescriptionView.text = item.description
+                GlucoseIndexItem.Payload.VALUE_CHANGED -> indexValueView.text = item.value
+                GlucoseIndexItem.Payload.BG_CHANGED -> itemView.background = item.bg
+                GlucoseIndexItem.Payload.UNIT_CHANGED -> indexUnitView.text = item.unit
             }
         }
     }
