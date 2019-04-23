@@ -1,5 +1,6 @@
 package com.elta.android.domain
 
+import com.elta.android.common.utils.isSortedBy
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -105,21 +106,5 @@ class BuildDailyGlucoseModelText {
         val model = buildDailyGlucoseModel(events.shuffled(), GlucoseLevelSettings())
 
         assert(model.glucoseEvents.isSortedBy { it.additionTime })
-    }
-
-    private inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (T) -> R): Boolean {
-        val iter = iterator()
-        if (!iter.hasNext()) {
-            return true
-        }
-        var t = iter.next()
-        while (iter.hasNext()) {
-            val t2 = iter.next()
-            if (selector(t) > selector(t2)) {
-                return false
-            }
-            t = t2
-        }
-        return true
     }
 }

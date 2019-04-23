@@ -367,6 +367,9 @@
     <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1C</string>
     <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
     <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
+    <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
+    <string name="profile_settings_hemoglobin_date_mask">- %s</string>
+    <string name="profile_settings_hemoglobin_header">Последние замеры</string>
 
     <string name="profile_unlink_network_dialog_title">Внимание</string>
     <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
