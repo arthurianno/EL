@@ -208,7 +208,7 @@ ext.commonTestDependencies = [
         espressoContrib: "com.android.support.test.espresso:espresso-contrib:${libraryVersions.espressoVersion}",
         androidRunner  : "com.android.support.test:runner:${libraryVersions.runnerVersion}",
         androidRules   : "com.android.support.test:rules:${libraryVersions.runnerVersion}",
-        workMagerTest  : "android.arch.work:work-testing:${libraryVersions.workVersion}"
-        jodaTime       : "joda-time:joda-time:${libraryVersions.jodaTimeVersion}",
+        workMagerTest  : "android.arch.work:work-testing:${libraryVersions.workVersion}",
+        jodaTime       : "joda-time:joda-time:${libraryVersions.jodaTimeVersion}"
 ]
 
