@@ -1,11 +1,11 @@
 package com.elta.android.domain.features.reminder.interactor
 
-import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.domain.features.reminder.model.Reminder
+import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
-import com.nullgr.core.interactor.CompletableUseCase
+import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
-import io.reactivex.Completable
+import io.reactivex.Single
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -13,9 +13,9 @@ import javax.inject.Inject
 class AddNewReminderUseCase @Inject constructor(
     private val repo: RemindersRepository,
     schedulers: SchedulersFacade
-) : CompletableUseCase<AddNewReminderUseCase.Params>(schedulers) {
+) : SingleUseCase<String, AddNewReminderUseCase.Params>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Params?): Completable {
+    override fun buildUseCaseObservable(params: Params?): Single<String> {
         val p = checkNotNull(params)
         return repo.addReminder(
             Reminder(
@@ -29,7 +29,7 @@ class AddNewReminderUseCase @Inject constructor(
 
     data class Params(
         val title: String,
-        val date: Date?,
+        val date: Date,
         val schedule: ScheduleType
     )
 }

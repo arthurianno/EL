@@ -4,12 +4,15 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.jobs.factory.JobInjectorFactory
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -29,6 +32,9 @@ class App : Application(), HasActivityInjector {
     @Inject
     lateinit var logTree: Timber.Tree
 
+    @Inject
+    lateinit var workerInjectorFactory: JobInjectorFactory
+
     override fun onCreate() {
         super.onCreate()
         initializeCrashlytics()
@@ -37,6 +43,7 @@ class App : Application(), HasActivityInjector {
         initializeJodaTime()
         initializeSocialNetworks()
         initalizeYandexMapKit()
+        initializeWorkManager()
         RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
     }
 
@@ -80,4 +87,10 @@ class App : Application(), HasActivityInjector {
     private fun initializeSocialNetworks() {
         SocialNetworks.initialize(this)
     }
+
+    private fun initializeWorkManager() = WorkManager.initialize(
+        this, Configuration.Builder()
+        .setWorkerFactory(workerInjectorFactory)
+        .build()
+    )
 }

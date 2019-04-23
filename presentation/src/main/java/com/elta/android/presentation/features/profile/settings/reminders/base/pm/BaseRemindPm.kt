@@ -11,7 +11,6 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
-import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import com.nullgr.core.adapter.items.ListItem
@@ -53,18 +52,9 @@ abstract class BaseRemindPm constructor(
         bindHandleBack()
         bindDateSelectors()
         observeFormChanges()
-
-        lifecycleObservable
-            .map { Unit }
-            .retry()
-            .subscribe {
-                createScheduleItems()
-                setDefaultScheduler()
-            }
-            .untilDestroy()
     }
 
-    protected fun handleSuccess() {
+    protected fun handleSuccess(i: Unit) {
         hideKeyBoardCommand.consumer.accept(Unit)
         bus.event(Events.EventsChanged)
         router.exit()
@@ -79,6 +69,18 @@ abstract class BaseRemindPm constructor(
 
     protected fun isFormValid(reminderModel: ReminderFormModel) =
         !reminderModel.inputValue.isNullOrEmpty()
+
+    protected fun createScheduleItems() {
+        schedulesState.consumer.accept(
+            listOf(
+                SpinnerItem(ScheduleType.NONE),
+                SpinnerItem(ScheduleType.DAY),
+                SpinnerItem(ScheduleType.WEEK),
+                SpinnerItem(ScheduleType.MONTH),
+                SpinnerItem(ScheduleType.YEAR)
+            )
+        )
+    }
 
     private fun bindHandleBack() {
         backHandleAction.observable
@@ -123,23 +125,6 @@ abstract class BaseRemindPm constructor(
     }
 
     private fun String.toSimpleSelectorOption() = SelectorOption(this)
-
-    private fun createScheduleItems() {
-        schedulesState.consumer.accept(
-            listOf(
-                SpinnerItem(ScheduleType.NONE),
-                SpinnerItem(ScheduleType.DAY),
-                SpinnerItem(ScheduleType.WEEK),
-                SpinnerItem(ScheduleType.MONTH),
-                SpinnerItem(ScheduleType.YEAR)
-            )
-        )
-    }
-
-    private fun setDefaultScheduler() {
-        selectedScheduleAction.consumer.accept(schedulesState.value.first())
-        schedulesDefaultState.consumer.accept(schedulesState.value.first().type.toString(resources))
-    }
 
     enum class DialogResult {
         NEGATIVE, POSITIVE

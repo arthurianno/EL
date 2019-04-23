@@ -381,6 +381,7 @@
     <string name="profile_reminders_create">Создать напоминание</string>
     <string name="profile_reminders_reminder_name_hint">Название</string>
     <string name="profile_reminders_edit_title">Напоминание</string>
+    <string name="profile_reminders_notification_title">Напоминание</string>
     <string name="profile_reminders_delete">Удалить</string>
     <string name="profile_reminders_save_changes">Сохранить изменение</string>
     <string name="profile_reminders_message_deleted">Напоминание удалено</string>
