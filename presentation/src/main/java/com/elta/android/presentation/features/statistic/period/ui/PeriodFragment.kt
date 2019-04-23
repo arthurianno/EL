@@ -12,6 +12,7 @@ class PeriodFragment : BaseListFragment<PeriodPm>() {
     override val screenLayout: Int = R.layout.fragment_statistic_period
     override val classToken: Class<PeriodPm> = PeriodPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider? = null
+    override val backgroundColor: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
