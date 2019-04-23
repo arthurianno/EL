@@ -9,8 +9,8 @@
         android:id="@+id/dateSelectorContainerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         android:background="@color/white"
+        android:fitsSystemWindows="true"
         android:orientation="vertical"
         android:translationZ="4dp"
         app:layout_constraintTop_toTopOf="parent">
@@ -82,7 +82,9 @@
             android:id="@+id/itemsView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never" />
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingBottom="16dp" />
 
         <com.elta.android.presentation.features.diary.main.ui.widgets.DiaryEmptyStateView
             android:id="@+id/emptyStateView"

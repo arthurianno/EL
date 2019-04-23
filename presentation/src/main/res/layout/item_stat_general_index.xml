@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/shade_black3" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="18dp">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/generalIndexIconView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_event_medicaments" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/generalIndexTitleView"
+            style="@style/New.Title1.BlackBlue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/generalIndexIconView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Короткий" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/generalIndexDescriptionView"
+            style="@style/New.Caption1.ShadeBlack0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/generalIndexIconView"
+            app:layout_constraintTop_toBottomOf="@+id/generalIndexTitleView"
+            tools:text="Инсулин" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:id="@+id/bottomDividerView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/shade_black3" />
+</LinearLayout>
