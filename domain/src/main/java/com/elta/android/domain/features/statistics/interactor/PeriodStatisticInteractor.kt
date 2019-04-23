@@ -105,6 +105,8 @@ fun buildGlucoseStatisticModel(
     }
 
     return GlucoseStatisticModel(
+        settings = settings,
+
         averageLevel = totalLevel.average(count),
 
         maxLevel = maxLevel,

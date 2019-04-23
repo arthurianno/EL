@@ -74,10 +74,10 @@ class BuildStatisticModelTest {
 
         val expected = StatisticByPeriodModel(
             period = period,
-            dayWithMaxLevel = getExpectedDayWithMaxLevel(day, glucoseEvents),
-            dayWithMinLevel = getExpectedDayWithMinLevel(day, glucoseEvents),
-            allDays = getExpectedAllDays(day, glucoseEvents),
-            glucose = getExpectedGlucoseStatistic(glucoseEvents),
+            dayWithMaxLevel = getExpectedDayWithMaxLevel(day, glucoseEvents, settings),
+            dayWithMinLevel = getExpectedDayWithMinLevel(day, glucoseEvents, settings),
+            allDays = getExpectedAllDays(day, glucoseEvents, settings),
+            glucose = getExpectedGlucoseStatistic(glucoseEvents, settings),
             insulin = getExpectedInsulinStatistic(),
             bread = getExpectedBreadStatistic(),
             activity = getExpectedActivityStatistic()
@@ -88,23 +88,24 @@ class BuildStatisticModelTest {
         assert(model == expected)
     }
 
-    private fun getExpectedDayWithMaxLevel(day: Date, glucoseEvents: List<Event>): DailyStatisticModel {
-        return getExpectedDailyStatisticModel(day, glucoseEvents)
+    private fun getExpectedDayWithMaxLevel(day: Date, glucoseEvents: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
+        return getExpectedDailyStatisticModel(day, glucoseEvents, settings)
     }
 
-    private fun getExpectedDayWithMinLevel(day: Date, glucoseEvents: List<Event>): DailyStatisticModel {
-        return getExpectedDailyStatisticModel(day, glucoseEvents)
+    private fun getExpectedDayWithMinLevel(day: Date, glucoseEvents: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
+        return getExpectedDailyStatisticModel(day, glucoseEvents, settings)
     }
 
-    private fun getExpectedAllDays(day: Date, glucoseEvents: List<Event>): Map<Date, DailyStatisticModel> {
-        val dailyStatisticModel = getExpectedDailyStatisticModel(day, glucoseEvents)
+    private fun getExpectedAllDays(day: Date, glucoseEvents: List<Event>, settings: GlucoseLevelSettings): Map<Date, DailyStatisticModel> {
+        val dailyStatisticModel = getExpectedDailyStatisticModel(day, glucoseEvents, settings)
         return mapOf(day to dailyStatisticModel)
     }
 
-    private fun getExpectedDailyStatisticModel(day: Date, glucoseEvents: List<Event>): DailyStatisticModel {
+    private fun getExpectedDailyStatisticModel(day: Date, glucoseEvents: List<Event>, settings: GlucoseLevelSettings): DailyStatisticModel {
         return DailyStatisticModel(
             date = day,
             glucose = GlucoseStatisticModel(
+                settings = settings,
                 averageLevel = (glucoseEvents.sumByDouble {
                     it.value ?: 0.0
                 } / glucoseEvents.size).round(2),
@@ -144,9 +145,10 @@ class BuildStatisticModelTest {
         )
     }
 
-    private fun getExpectedGlucoseStatistic(events: List<Event>): GlucoseStatisticModel {
+    private fun getExpectedGlucoseStatistic(events: List<Event>, settings: GlucoseLevelSettings): GlucoseStatisticModel {
         return GlucoseStatisticModel(
-            averageLevel = (events.sumByDouble { it.value ?: 0.0 } / events.size).round(2),
+            settings = settings,
+            averageLevel = (events.sumByDouble { it.value ?: 0.0 } / events.size).round(1),
             maxLevel = 100.0,
             minLevel = 2.0,
 

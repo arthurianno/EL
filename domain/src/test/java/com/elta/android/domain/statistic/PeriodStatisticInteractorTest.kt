@@ -88,6 +88,7 @@ class PeriodStatisticInteractorTest {
         )
 
         val expected = GlucoseStatisticModel(
+            settings = settings,
             averageLevel = (events.sumByDouble { it.value ?: 0.0 } / events.size).round(2),
             maxLevel = 100.0,
             minLevel = 2.0,

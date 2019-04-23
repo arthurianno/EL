@@ -30,4 +30,8 @@ data class GeneralIndexItem(
         DESCRIPTION_CHANGED,
         POSITION_CHANGED
     }
+
+    enum class Type {
+        BREAD, TOTAL, BOLUS, BASAL, ACTIVITY
+    }
 }

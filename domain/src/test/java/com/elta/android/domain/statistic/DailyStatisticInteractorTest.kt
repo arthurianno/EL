@@ -110,6 +110,7 @@ class DailyStatisticInteractorTest {
         val expected = DailyStatisticModel(
             date = day,
             glucose = GlucoseStatisticModel(
+                settings = settings,
                 averageLevel = (glucoseEvents.sumByDouble {
                     it.value ?: 0.0
                 } / glucoseEvents.size).round(2),
