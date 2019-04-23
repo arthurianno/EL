@@ -7,10 +7,11 @@ import com.elta.android.domain.features.statistics.model.daily.DailyStatisticMod
 import com.elta.android.domain.features.user.interactor.round
 import com.nullgr.core.date.withoutTime
 import java.util.Date
+import kotlin.math.roundToInt
 
-internal inline fun Double.average(total: Int): Double = (this / total).round(2)
-internal inline fun Long.average(total: Int): Long = this / total
-internal inline fun Int.percent(total: Int): Double = this * 100.0 / total
+internal inline fun Double.average(total: Int): Double = if (total == 0) 0.0 else (this / total).round(1)
+internal inline fun Long.average(total: Int): Long = if (total == 0) 0L else this / total
+internal inline fun Int.percent(total: Int): Int = if (total == 0) 0 else (this * 100.0 / total).roundToInt()
 internal inline fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal inline fun Double.checkMin(min: Double): Double = if (min > this) this else min
 internal inline fun Event.isBolusInsulin(): Boolean =
