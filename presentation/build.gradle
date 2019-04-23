@@ -110,6 +110,9 @@ dependencies {
     implementation commonDependencies.pulseView
     implementation commonDependencies.datePicker
 
+    implementation commonDependencies.work
+    implementation commonDependencies.rxWork
+
     // Dagger2
     kapt commonDependencies.daggerCompiler
     kapt commonDependencies.daggerAndroidProcessor

@@ -6,7 +6,6 @@ import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.reminder.dto.ReminderDto
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -25,17 +24,20 @@ class ReminderDataRepository @Inject constructor(
         source.getReminderById(id)
             .map(toDomainMapper::mapFromObject)
 
-    override fun addReminder(reminder: Reminder): Completable =
+    override fun addReminder(reminder: Reminder): Single<String> =
         createSingleRemindersDto(reminder)
             .flatMapCompletable { source.addReminders(it) }
+            .toSingleDefault(reminder.id)
 
-    override fun updateReminder(reminder: Reminder): Completable =
+    override fun updateReminder(reminder: Reminder): Single<String> =
         createSingleRemindersDto(reminder)
             .flatMapCompletable { source.updateReminders(it) }
+            .toSingleDefault(reminder.id)
 
-    override fun deleteReminder(reminder: Reminder): Completable =
+    override fun deleteReminder(reminder: Reminder): Single<String> =
         createSingleRemindersDto(reminder)
             .flatMapCompletable { source.deleteReminders(it) }
+            .toSingleDefault(reminder.id)
 
     private fun createSingleRemindersDto(reminder: Reminder) =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(reminder)) }

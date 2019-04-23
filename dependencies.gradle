@@ -70,6 +70,8 @@ def libraryVersions = [
         nordicDfuVersion           : '1.8.1',
         rxBluetoothVersion         : '1.8.2',
 
+        workVersion                : '1.0.1',
+
         //Testing
         robolectricVersion         : '3.4.2',
         jUnitVersion               : '4.12',
@@ -186,7 +188,10 @@ ext.commonDependencies = [
 
         nordicScanner         : "no.nordicsemi.android.support.v18:scanner:${libraryVersions.nordicScannerVersion}",
         nordicDfu             : "no.nordicsemi.android:dfu:${libraryVersions.nordicDfuVersion}",
-        rxBluetooth           : "com.polidea.rxandroidble2:rxandroidble:${libraryVersions.rxBluetoothVersion}"
+        rxBluetooth           : "com.polidea.rxandroidble2:rxandroidble:${libraryVersions.rxBluetoothVersion}",
+
+        work                  : "android.arch.work:work-runtime:${libraryVersions.workVersion}",
+        rxWork                : "android.arch.work:work-rxjava2:${libraryVersions.workVersion}"
 ]
 
 ext.commonTestDependencies = [
@@ -203,5 +208,6 @@ ext.commonTestDependencies = [
         espressoContrib: "com.android.support.test.espresso:espresso-contrib:${libraryVersions.espressoVersion}",
         androidRunner  : "com.android.support.test:runner:${libraryVersions.runnerVersion}",
         androidRules   : "com.android.support.test:rules:${libraryVersions.runnerVersion}",
+        workMagerTest  : "android.arch.work:work-testing:${libraryVersions.workVersion}"
 ]
 

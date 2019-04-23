@@ -12,6 +12,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
+import com.elta.android.presentation.jobs.ReminderWorker
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
@@ -47,11 +48,15 @@ class EditRemindPm @Inject constructor(
             .filter { it == DialogResult.POSITIVE }
             .map { reminderState.value }
             .map(::createDeleteReminderUseCaseParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 deleteReminderUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleDeleted)
+                    .doOnSuccess { id ->
+                        ReminderWorker.startReminder(id, true)
+                    }
+                    .map { Unit }
+                    .doOnSuccess(::handleDeleted)
                     .doOnError(::handleError)
             }
             .retry()
@@ -61,15 +66,27 @@ class EditRemindPm @Inject constructor(
         saveReminderAction.observable
             .skipWhileInProgress()
             .map(::createUpdateReminderParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 updateReminderUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .doOnSuccess { id ->
+                        ReminderWorker.cancelReminder(id)
+                        ReminderWorker.startReminder(id)
+                    }
+                    .map { Unit }
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .retry()
+            .subscribe { createScheduleItems() }
             .untilDestroy()
     }
 
@@ -150,7 +167,7 @@ class EditRemindPm @Inject constructor(
         return UpdateReminderUseCase.Params(
             reminderState.value.copy(
                 title = checkNotNull(form.inputValue),
-                time = form.date,
+                time = checkNotNull(form.date),
                 scheduleType = checkNotNull(form.schedule)
             )
         )
@@ -160,9 +177,10 @@ class EditRemindPm @Inject constructor(
         formInput.text.consumer.accept(reminder.title)
         dateTimeSelectedAction.consumer.accept(reminder.time)
         defaultScheduleState.consumer.accept(reminder.scheduleType.toString(resources))
+        selectedScheduleAction.consumer.accept(SpinnerItem(reminder.scheduleType))
     }
 
-    private fun handleDeleted() {
+    private fun handleDeleted(i: Unit) {
         bus.event(Events.ReminderDeleted)
         router.exit()
     }
