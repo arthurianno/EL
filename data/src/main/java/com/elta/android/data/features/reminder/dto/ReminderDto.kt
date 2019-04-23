@@ -5,6 +5,6 @@ import java.util.Date
 data class ReminderDto(
     val id: String,
     val title: String,
-    val time: Date?,
+    val time: Date,
     val scheduleType: ScheduleTypeDto
 )

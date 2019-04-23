@@ -44,7 +44,8 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
         glucoseLevel = lastGlucoseEvent?.glucoseLevel(settings),
         glucoseLevelDirection = lastGlucoseEvent?.glucoseLevelDirection(preLastGlucoseEvent),
         glucoseLevelDifference = lastGlucoseEvent?.glucoseLevelDifference(preLastGlucoseEvent),
-        eventsBlocks = getEventsBlocks(sortedEvents, tags)
+        eventsBlocks = getEventsBlocks(sortedEvents, tags),
+        dailyGlucoseModel = buildDailyGlucoseModel(events, settings)
     )
 }
 

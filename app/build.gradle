@@ -249,6 +249,9 @@ dependencies {
 
     implementation commonDependencies.nordicScanner
 
+    implementation commonDependencies.work
+    implementation commonDependencies.rxWork
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }

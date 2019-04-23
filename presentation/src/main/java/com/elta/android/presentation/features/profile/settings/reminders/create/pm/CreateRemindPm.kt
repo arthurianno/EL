@@ -4,6 +4,8 @@ import com.elta.android.domain.features.reminder.interactor.AddNewReminderUseCas
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
+import com.elta.android.presentation.jobs.ReminderWorker
+import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
@@ -21,15 +23,29 @@ class CreateRemindPm @Inject constructor(
         saveReminderAction.observable
             .skipWhileInProgress()
             .map(::createAddReminderParams)
-            .flatMapCompletable {
+            .flatMapSingle {
                 addNewReminderUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .doOnSuccess { id ->
+                        ReminderWorker.startReminder(id)
+                    }
+                    .map { Unit }
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .retry()
+            .subscribe {
+                createScheduleItems()
+                setDefaultScheduler()
+            }
             .untilDestroy()
     }
 
@@ -59,6 +75,11 @@ class CreateRemindPm @Inject constructor(
             .untilDestroy()
     }
 
+    private fun setDefaultScheduler() {
+        selectedScheduleAction.consumer.accept(schedulesState.value.first())
+        schedulesDefaultState.consumer.accept(schedulesState.value.first().type.toString(resources))
+    }
+
     private fun checkIsEmpty(reminderModel: ReminderFormModel) {
         isFormNotEmptyState.consumer.accept(
             !reminderModel.inputValue.isNullOrEmpty()
@@ -69,7 +90,7 @@ class CreateRemindPm @Inject constructor(
         val form = reminderFormHolderState.value
         return AddNewReminderUseCase.Params(
             title = checkNotNull(form.inputValue),
-            date = form.date,
+            date = checkNotNull(form.date),
             schedule = checkNotNull(form.schedule)
         )
     }
