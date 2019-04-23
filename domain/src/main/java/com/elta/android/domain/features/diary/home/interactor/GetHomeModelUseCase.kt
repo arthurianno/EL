@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.home.model.atEndOfDay
 import com.elta.android.domain.features.diary.home.model.atTimeOfDay
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
+import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -18,21 +19,21 @@ import javax.inject.Inject
 class GetHomeModelUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     private val tagsRepo: TagsRepository,
+    private val profileRepo: ProfileRepository,
     private val schedulers: SchedulersFacade
 ) : ObservableUseCase<HomeModel, Unit>(schedulers) {
     override fun buildUseCaseObservable(params: Unit?): Observable<HomeModel> {
         val now = Date()
         return Observables.zip(
             eventsRepo.getEvents(now.atTimeOfDay(), now.atEndOfDay()).applyScheduler(schedulers),
-            tagsRepo.getTags().applyScheduler(schedulers)
-        ).map { pair ->
-            val events = pair.first
-            val tags = pair.second
+            tagsRepo.getTags().applyScheduler(schedulers),
+            profileRepo.getProfile().toObservable().applyScheduler(schedulers)
+        ).map { triple ->
+            val events = triple.first
+            val tags = triple.second
             val eventsWithTags = events.map { it.addTag(tags) }
-            Pair(eventsWithTags, tags)
-        }.map {
-            // TODO: add real glucose level settings
-            buildHomeModel(it.first, it.second, GlucoseLevelSettings())
+            val glucoseLevelSettings = triple.third.glucoseLevelSettings ?: GlucoseLevelSettings()
+            buildHomeModel(eventsWithTags, tags, glucoseLevelSettings)
         }
     }
 }

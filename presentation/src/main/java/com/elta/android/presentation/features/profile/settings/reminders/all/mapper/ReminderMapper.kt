@@ -37,13 +37,9 @@ class ReminderMapper @Inject constructor(
 
     private fun Reminder.formatSchedule(): String {
         return try {
-            if (time == null) {
-                scheduleType.toString(resources)
-            } else {
-                val time = dateFormat.format(time)
-                "${scheduleType.toString(resources)} в $time"
-            }
-        } catch (e: Exception) {
+            val time = dateFormat.format(time)
+            "${scheduleType.toString(resources)} в $time"
+        } catch (ignored: Exception) {
             ""
         }
     }

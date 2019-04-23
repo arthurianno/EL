@@ -1,5 +1,12 @@
 package com.elta.android.presentation.utils
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.VectorDrawable
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
@@ -83,4 +90,21 @@ class ToolbarMenuClickObservable(private val toolbar: Toolbar) : Observable<Int>
             toolbar.setOnMenuItemClickListener(null)
         }
     }
+}
+
+fun Context.decodeBitmap(drawableId: Int): Bitmap {
+    val drawable = ContextCompat.getDrawable(this, drawableId)
+    return when (drawable) {
+        is BitmapDrawable -> BitmapFactory.decodeResource(resources, drawableId)
+        is VectorDrawable -> drawable.toBitmap()
+        else -> throw IllegalArgumentException("unsupported drawable type")
+    }
+}
+
+fun VectorDrawable.toBitmap(): Bitmap {
+    val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    setBounds(0, 0, canvas.width, canvas.height)
+    draw(canvas)
+    return bitmap
 }

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.records.pm
 
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
@@ -47,7 +48,8 @@ class MainRecordsPm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit }
+            bus.events<Events.EventsChanged>().map { Unit },
+            bus.events<Events.ProfileUpdated>().map { Unit }
         )
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
@@ -59,6 +61,7 @@ class MainRecordsPm @Inject constructor(
 
         bus.clicks<Clicks.RecordClicked>()
             .map { it.item }
+            .filter { it.eventType != EventType.GLUCOSE } // TODO
             .doOnNext(::navigateToEventScreen)
             .subscribe()
             .untilUnbind()

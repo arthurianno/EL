@@ -9,6 +9,6 @@ data class ReminderCacheDto(
     @Id(assignable = true) var id: Long,
     val secondaryId: String,
     val title: String,
-    val time: Date?,
+    val time: Date,
     val schedule: String
 )
