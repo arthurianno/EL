@@ -45,6 +45,9 @@ import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
+import com.elta.android.presentation.features.statistic.period.di.PeriodModule
+import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import dagger.Module
@@ -201,4 +204,13 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindEditRemindFragment(): EditRemindFragment
+
+    // STATISTICS FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindStatisticFlowFragment(): StatisticFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [PeriodModule::class])
+    abstract fun bindPeriodFragment(): PeriodFragment
 }

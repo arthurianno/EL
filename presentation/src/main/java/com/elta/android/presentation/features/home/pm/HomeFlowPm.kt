@@ -66,7 +66,7 @@ class HomeFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab, Screens.ProfileTab))
+        router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab, Screens.StatisticTab, Screens.ProfileTab))
         router.navigateToTab(Screens.MainTab)
     }
 
@@ -97,6 +97,7 @@ class HomeFlowPm @Inject constructor(
         when (id) {
             R.id.mainMenuItemView -> router.navigateToTab(Screens.MainTab)
             R.id.notesMenuItemView -> router.navigateToTab(Screens.DiaryTab)
+            R.id.statsMenuItemView -> router.navigateToTab(Screens.StatisticTab)
             R.id.profileMenuItemView -> router.navigateToTab(Screens.ProfileTab)
         }
     }
