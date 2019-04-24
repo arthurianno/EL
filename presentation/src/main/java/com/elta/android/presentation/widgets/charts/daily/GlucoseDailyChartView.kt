@@ -395,7 +395,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             typeface = context.getTypeface(TYPEFACE_MEDIUM)
         }
         selectedItemTrianglePaint.style = Paint.Style.FILL
-        setLayerType(View.LAYER_TYPE_SOFTWARE, selectedItemLinePaint)
+        //setLayerType(View.LAYER_TYPE_SOFTWARE, selectedItemLinePaint)
     }
 
     private fun onBeforeMeasure() {
