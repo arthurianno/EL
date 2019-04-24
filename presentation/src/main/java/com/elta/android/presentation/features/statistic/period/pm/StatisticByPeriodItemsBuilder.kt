@@ -83,9 +83,18 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> resources.getString(R.string.statistic_glucose_index_average_unit)
             GlucoseIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_glucose_index_total_unit)
-            GlucoseIndexItem.Type.HIGH -> resources.getString(R.string.statistic_glucose_index_level_unit, glucose.eventsHighPercent.toString())
-            GlucoseIndexItem.Type.NORMAL -> resources.getString(R.string.statistic_glucose_index_level_unit, glucose.eventsNormalPercent.toString())
-            GlucoseIndexItem.Type.LOW -> resources.getString(R.string.statistic_glucose_index_level_unit, glucose.eventsLowPercent.toString())
+            GlucoseIndexItem.Type.HIGH -> resources.getString(
+                R.string.statistic_glucose_index_level_unit,
+                glucose.eventsHighPercent.toString()
+            )
+            GlucoseIndexItem.Type.NORMAL -> resources.getString(
+                R.string.statistic_glucose_index_level_unit,
+                glucose.eventsNormalPercent.toString()
+            )
+            GlucoseIndexItem.Type.LOW -> resources.getString(
+                R.string.statistic_glucose_index_level_unit,
+                glucose.eventsLowPercent.toString()
+            )
         }
 
     private inline fun GlucoseIndexItem.Type.getDescription(): String =
@@ -117,19 +126,47 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private inline fun GeneralIndexItem.Type.getDescription(stat: StatisticByPeriodModel, value: String): String =
         when (this) {
-            GeneralIndexItem.Type.BREAD -> resources.getString(R.string.statistic_general_index_description_by_period_bread, value)
-            GeneralIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_general_index_description_by_period_insulin, value)
-            GeneralIndexItem.Type.BOLUS -> resources.getString(R.string.statistic_general_index_description_by_period_bolus_insulin, value)
-            GeneralIndexItem.Type.BASAL -> resources.getString(R.string.statistic_general_index_description_by_period_basal_insulin, value)
-            GeneralIndexItem.Type.ACTIVITY -> resources.getString(R.string.statistic_general_index_description_by_period_activity, stat.activity.eventsCount.toString(), value)
+            GeneralIndexItem.Type.BREAD -> resources.getString(
+                R.string.statistic_general_index_description_by_period_bread,
+                value
+            )
+            GeneralIndexItem.Type.TOTAL -> resources.getString(
+                R.string.statistic_general_index_description_by_period_insulin,
+                value
+            )
+            GeneralIndexItem.Type.BOLUS -> resources.getString(
+                R.string.statistic_general_index_description_by_period_bolus_insulin,
+                value
+            )
+            GeneralIndexItem.Type.BASAL -> resources.getString(
+                R.string.statistic_general_index_description_by_period_basal_insulin,
+                value
+            )
+            GeneralIndexItem.Type.ACTIVITY -> resources.getString(
+                R.string.statistic_general_index_description_by_period_activity,
+                stat.activity.eventsCount.toString(),
+                value
+            )
         }
 
     private inline fun GeneralIndexItem.Type.getValue(stat: StatisticByPeriodModel): String =
         when (this) {
-            GeneralIndexItem.Type.BREAD -> resources.getString(R.string.statistic_general_index_description_value_by_period_bread, NumberFormatter.format(stat.bread.averageLevel))
-            GeneralIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_general_index_description_value_by_period_insulin, NumberFormatter.format(stat.insulin.averageLevel))
-            GeneralIndexItem.Type.BOLUS -> resources.getString(R.string.statistic_general_index_description_value_by_period_insulin, NumberFormatter.format(stat.insulin.averageBolusLevel))
-            GeneralIndexItem.Type.BASAL -> resources.getString(R.string.statistic_general_index_description_value_by_period_insulin, NumberFormatter.format(stat.insulin.averageBasalLevel))
+            GeneralIndexItem.Type.BREAD -> resources.getString(
+                R.string.statistic_general_index_description_value_by_period_bread,
+                NumberFormatter.format(stat.bread.averageLevel)
+            )
+            GeneralIndexItem.Type.TOTAL -> resources.getString(
+                R.string.statistic_general_index_description_value_by_period_insulin,
+                NumberFormatter.format(stat.insulin.averageLevel)
+            )
+            GeneralIndexItem.Type.BOLUS -> resources.getString(
+                R.string.statistic_general_index_description_value_by_period_insulin,
+                NumberFormatter.format(stat.insulin.averageBolusLevel)
+            )
+            GeneralIndexItem.Type.BASAL -> resources.getString(
+                R.string.statistic_general_index_description_value_by_period_insulin,
+                NumberFormatter.format(stat.insulin.averageBasalLevel)
+            )
             GeneralIndexItem.Type.ACTIVITY -> stat.activity.averageDuration.asTimeString(resources)
         }
 
