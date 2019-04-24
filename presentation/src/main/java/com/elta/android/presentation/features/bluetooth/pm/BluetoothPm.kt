@@ -25,6 +25,7 @@ import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceI
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
+import timber.log.Timber
 import javax.inject.Inject
 
 class BluetoothPm @Inject constructor(
@@ -65,6 +66,8 @@ class BluetoothPm @Inject constructor(
     val locationPermissionsGrantedAction = Action<Unit>()
     val locationEnabledAction = Action<Unit>()
     val startScanAction = Action<Unit>()
+
+    val openPinCodeDialogCommand = Command<Unit>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -221,7 +224,11 @@ class BluetoothPm @Inject constructor(
             is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
-            is GlucometerPinIncorrectOrNotFoundError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
+            is GlucometerPinIncorrectOrNotFoundError -> {
+                openPinCodeDialogCommand.consumer.accept(Unit)
+                Timber.e(error)
+//                showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
+            }
             is FirmwareDownloadingError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Firmware file is invalid"))
             else -> super.handleError(error)
         }

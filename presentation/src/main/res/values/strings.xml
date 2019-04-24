@@ -302,10 +302,23 @@
     <string name="event_menu_remove">Удалить</string>
 
     <!-- SYNC -->
-    <string name="sync_start_title">Синхронизация</string>
+    <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
+
+    <string name="sync_state_title_how_to_connect">Как подключить?</string>
+    <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
+    <string name="sync_state_title_progress_connect">Идет процесс поиска устройства…</string>
+
+    <string name="sync_state_title_connected">Подключено!</string>
+    <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
+    <string name="sync_state_title_progress_connected">Идет процесс синхронизации…</string>
+
+    <string name="sync_state_pin_dialog_title">Устройство найдено</string>
+    <string name="sync_state_pin_dialog_description">Чтобы продолжить, введите ПИН-код,\nкоторый отобразился на экране глюкометра</string>
+    <string name="sync_state_pin_dialog_device_pattern">Подключаемое устройство %s</string>
+    <string name="sync_state_pin_dialog_button">Подключить</string>
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>

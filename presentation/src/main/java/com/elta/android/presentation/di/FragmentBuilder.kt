@@ -46,6 +46,7 @@ import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -155,6 +156,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [BluetoothModule::class])
     abstract fun bindBluetoothFragment(): BluetoothFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindPinDialogFragment(): PinDialogFragment
 
     // DIARY FLOW
     @FragmentScope
