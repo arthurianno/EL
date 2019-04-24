@@ -117,6 +117,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private val selectedItemTimeBgRect = RectF()
     private val selectedItemTriangleTop = Path()
     private val selectedItemTriangleBottom = Path()
+    private val selectedItemLinePath = Path()
 
     private val hoursCoordinatesMap = SparseArray<Float>()
     private val hoursTitlesMap = SparseArray<String>()
@@ -226,8 +227,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     private fun Canvas.drawSelected(pointF: PointF, selectionColor: Int, time: String) {
         selectedItemLinePaint.color = selectionColor
-        drawLine(pointF.x, 0f, pointF.x, pointF.y - chartItemRadius, selectedItemLinePaint)
-        drawLine(pointF.x, pointF.y + chartItemRadius, pointF.x, timeTitleY, selectedItemLinePaint)
+        selectedItemLinePath.moveTo(pointF.x, 0f)
+        selectedItemLinePath.lineTo(pointF.x, pointF.y - chartItemRadius)
+        drawPath(selectedItemLinePath, selectedItemLinePaint)
+        selectedItemLinePath.reset()
+
+        selectedItemLinePath.moveTo(pointF.x, pointF.y + chartItemRadius)
+        selectedItemLinePath.lineTo(pointF.x, timeTitleY)
+        drawPath(selectedItemLinePath, selectedItemLinePaint)
+        selectedItemLinePath.reset()
 
         val bgBottom = timeTitleY + selectedItemTimeBgPadding
         selectedItemTimeBgRect.set(
@@ -395,7 +403,6 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             typeface = context.getTypeface(TYPEFACE_MEDIUM)
         }
         selectedItemTrianglePaint.style = Paint.Style.FILL
-        //setLayerType(View.LAYER_TYPE_SOFTWARE, selectedItemLinePaint)
     }
 
     private fun onBeforeMeasure() {
@@ -507,7 +514,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     companion object {
         const val FULL_CHART_HEIGHT = 144f
-        const val CHART_OFFSET = 12f // dp
+        const val CHART_OFFSET = 16f // dp
 
         private const val TIME_TEXT_SIZE = 12f // sp
         private const val SINGLE_HOUR_WIDTH = 54f // dp
