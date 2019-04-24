@@ -104,7 +104,13 @@ fun buildGlucoseStatisticModel(
         }
     }
 
+    val eventsHighPercent = eventsHighCount.percent(count)
+    val eventsNormalPercent = eventsNormalCount.percent(count)
+    val eventsLowPercent = if (eventsLowCount != 0) 100 - eventsHighPercent - eventsNormalPercent else 0
+
     return GlucoseStatisticModel(
+        settings = settings,
+
         averageLevel = totalLevel.average(count),
 
         maxLevel = maxLevel,
@@ -124,9 +130,9 @@ fun buildGlucoseStatisticModel(
         eventsNormalCount = eventsNormalCount,
         eventsLowCount = eventsLowCount,
 
-        eventsHighPercent = eventsHighCount.percent(count),
-        eventsNormalPercent = eventsNormalCount.percent(count),
-        eventsLowPercent = eventsLowCount.percent(count)
+        eventsHighPercent = eventsHighPercent,
+        eventsNormalPercent = eventsNormalPercent,
+        eventsLowPercent = eventsLowPercent
     )
 }
 

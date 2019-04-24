@@ -45,7 +45,7 @@ class StatisticExtensionFunctionsTest {
     fun intPercent_correct() {
         val value = 10
         val total = 100
-        val expected = 10.0
+        val expected = 10
         val percent = value.percent(total)
         assert(percent == expected)
     }
