@@ -17,7 +17,7 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
-import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.mapper.HemoglobinEventsMapper
+import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.mapper.HemoglobinItemsBuilder
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.nullgr.core.adapter.items.ListItem
@@ -30,7 +30,7 @@ class HemoglobinSettingsPm @Inject constructor(
     private val deleteEventUseCase: DeleteEventUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val getHemoglobinEventsUseCase: GetGlycatedHemoglobinEventsUseCase,
-    private val hemoglobinEventsMapper: HemoglobinEventsMapper,
+    private val hemoglobinItemsBuilder: HemoglobinItemsBuilder,
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
@@ -111,9 +111,7 @@ class HemoglobinSettingsPm @Inject constructor(
 
     private fun handleSuccess(result: Pair<Profile, List<Event>>) {
         profileState.consumer.accept(result.first)
-        hemoglobinItemsState.consumer.accept(
-            hemoglobinEventsMapper.mapFromObjects(result.second)
-        )
+        hemoglobinItemsState.consumer.accept(hemoglobinItemsBuilder.buildItems(result.second))
     }
 
     private fun observeDateSelection() {
