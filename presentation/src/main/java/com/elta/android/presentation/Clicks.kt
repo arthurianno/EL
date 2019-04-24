@@ -26,4 +26,5 @@ sealed class Clicks : Click {
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
     data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
     data class ReminderItemClicked(val item: ReminderItem) : Clicks()
+    data class DeleteHemoglobinEventClicked(val id: String) : Clicks()
 }

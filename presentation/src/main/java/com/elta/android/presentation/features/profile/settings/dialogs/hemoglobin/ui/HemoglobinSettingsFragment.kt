@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui
 
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.view.HapticFeedbackConstants
 import android.view.View
 import com.elta.android.presentation.R
@@ -9,6 +10,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobi
 import com.elta.android.presentation.utils.sequenceClicks
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import io.reactivex.Observable
@@ -20,6 +22,7 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
@@ -27,8 +30,14 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     override val dialogType = DialogType.HbA1C
     override val classToken: Class<HemoglobinSettingsPm> = HemoglobinSettingsPm::class.java
 
+    @Inject
+    lateinit var adapter: DynamicAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        itemsView.layoutManager = LinearLayoutManager(activity)
+        itemsView.adapter = adapter
+
         arrowView.setOnClickListener {
             arrowView.isSelected = !calendarContainerView.isExpanded
             calendarContainerView.setExpanded(!calendarContainerView.isExpanded, true)
@@ -61,6 +70,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
                 pm.dateSelectedAction.consumer.accept(day.date.toDate())
             }
         }
+        pm.hemoglobinItemsState.bindTo { items -> adapter.updateData(items) }
     }
 
     private fun LocalDate.toDate(): Date {

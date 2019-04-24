@@ -27,6 +27,7 @@ import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.di.HemoglobinSettingsModule
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
@@ -185,7 +186,7 @@ abstract class FragmentBuilder {
     abstract fun bindDiabetesSettingDialogFragment(): DiabetesSettingDialogFragment
 
     @FragmentScope
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [HemoglobinSettingsModule::class])
     abstract fun bindHemoglobinSettingsFragment(): HemoglobinSettingsFragment
 
     @FragmentScope

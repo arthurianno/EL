@@ -127,6 +127,10 @@
         <item name="android:textColor">@color/black_blue</item>
     </style>
 
+    <style name="New.Body2.ShadeBlack0">
+        <item name="android:textColor">@color/shade_black0</item>
+    </style>
+
     <style name="New.Body2.ShadeGreen">
         <item name="android:textColor">@color/shade_g_green2_a</item>
     </style>
