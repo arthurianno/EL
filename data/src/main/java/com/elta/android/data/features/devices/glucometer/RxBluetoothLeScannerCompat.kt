@@ -1,13 +1,16 @@
 package com.elta.android.data.features.devices.glucometer
 
-import com.elta.android.common.utils.log
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
+import io.reactivex.schedulers.Schedulers
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
+import java.util.concurrent.TimeUnit
+
+private const val SCAN_TIMEOUT = 60L // seconds
 
 fun BluetoothLeScannerCompat.startScan(
     filters: List<ScanFilter> = emptyList(),
@@ -50,7 +53,8 @@ fun BluetoothLeScannerCompat.startScan(
     }
     .map(MutableSet<ScanResult>::toList)
     .distinctUntilChanged { r1, r2 -> !r1.isResultChanged(r2) }
-    .log("Scan", "size") { it.size.toString() }
+    .skip(1)
+    .timeout(SCAN_TIMEOUT, TimeUnit.SECONDS, Schedulers.computation())
 
 @Suppress("ReturnCount")
 fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {
