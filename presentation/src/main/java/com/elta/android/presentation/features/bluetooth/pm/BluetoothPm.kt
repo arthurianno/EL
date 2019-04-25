@@ -67,7 +67,7 @@ class BluetoothPm @Inject constructor(
     val locationEnabledAction = Action<Unit>()
     val startScanAction = Action<Unit>()
 
-    val openPinCodeDialogCommand = Command<Unit>(bufferSize = 1)
+    val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -225,7 +225,7 @@ class BluetoothPm @Inject constructor(
             is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
             is GlucometerPinIncorrectOrNotFoundError -> {
-                openPinCodeDialogCommand.consumer.accept(Unit)
+                openPinCodeDialogCommand.consumer.accept("SatelliteOnline")
                 Timber.e(error)
 //                showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
             }

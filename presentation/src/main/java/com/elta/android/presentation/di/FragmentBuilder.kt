@@ -45,6 +45,8 @@ import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
+import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
@@ -160,6 +162,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindPinDialogFragment(): PinDialogFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
+    abstract fun bindConnectDeviceFragment(): ConnectDeviceFragment
 
     // DIARY FLOW
     @FragmentScope

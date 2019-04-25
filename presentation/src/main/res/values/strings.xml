@@ -320,6 +320,12 @@
     <string name="sync_state_pin_dialog_device_pattern">Подключаемое устройство %s</string>
     <string name="sync_state_pin_dialog_button">Подключить</string>
 
+    <string name="sync_state_title_device_found">Устройство найдено</string>
+    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете прододжить\nпроцесс подключения</string>
+    <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
+
+    <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
+
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
     <string name="diary_screen_title">Дневник событий</string>

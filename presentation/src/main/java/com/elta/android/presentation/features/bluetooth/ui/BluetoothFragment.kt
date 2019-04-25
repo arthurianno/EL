@@ -97,7 +97,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                 }
             }
         pm.openPinCodeDialogCommand.bindTo {
-            fragmentManager?.showDialog(PinDialogFragment.newInstance())
+            childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
     }
 

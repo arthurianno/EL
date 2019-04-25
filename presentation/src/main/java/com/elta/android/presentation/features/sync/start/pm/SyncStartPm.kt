@@ -16,7 +16,7 @@ class SyncStartPm @Inject constructor(
         super.onCreate()
 
         mainAction.observable
-            .doOnNext(::navigateToBluetoothScreen)
+            .doOnNext(::navigateToConnectDeviceScreen)
             .subscribe()
             .untilDestroy()
 
@@ -26,8 +26,8 @@ class SyncStartPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun navigateToBluetoothScreen(i: Unit) {
-        router.navigateTo(Screens.BluetoothScreen)
+    private fun navigateToConnectDeviceScreen(i: Unit) {
+        router.navigateTo(Screens.ConnectDevice)
     }
 
     private fun navigateToShopsFlow(i: Unit) {

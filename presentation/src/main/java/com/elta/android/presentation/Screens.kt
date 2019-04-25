@@ -34,6 +34,7 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
@@ -161,6 +162,10 @@ object Screens {
 
     object BluetoothScreen : SupportAppScreen() {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
+    }
+
+    object ConnectDevice: SupportAppScreen() {
+        override fun getFragment(): Fragment = ConnectDeviceFragment.newInstance()
     }
 
     // DIARY FLOW

@@ -6,38 +6,24 @@
 
     <include layout="@layout/layout_toolbar" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/connectTitleView"
-        style="@style/Headline1"
+    <FrameLayout
+        android:id="@+id/syncStateContainerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/sync_start_title"
-        app:layout_constraintBottom_toTopOf="@+id/connectMessageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/connectMessageView"
-        style="@style/Subtitle1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="36dp"
-        android:text="@string/sync_start_subtitle"
-        app:layout_constraintBottom_toTopOf="@+id/actionButtonView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/actionButtonView"
-        style="@style/Button.Large"
-        android:text="@string/sync_start_action_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <include layout="@layout/layout_sync_state_connect" />
+
+        <include
+            layout="@layout/layout_sync_state_device_found"
+            android:visibility="gone" />
+
+        <include
+            layout="@layout/layout_sync_state_connected"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>
