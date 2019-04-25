@@ -2,7 +2,6 @@ package com.elta.android.presentation
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
-import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
@@ -11,6 +10,7 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
+import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
 
 sealed class Clicks : Click {
 

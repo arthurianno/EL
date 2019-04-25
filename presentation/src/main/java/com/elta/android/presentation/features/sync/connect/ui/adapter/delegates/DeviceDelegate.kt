@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.bluetooth.ui.adapter.delegates
+package com.elta.android.presentation.features.sync.connect.ui.adapter.delegates
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
-import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
