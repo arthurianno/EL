@@ -312,9 +312,45 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "11:2672464361589836854",
+      "lastPropertyId": "7:5486485348885741996",
+      "name": "ObserverCacheDto",
+      "properties": [
+        {
+          "id": "1:6534346994157213235",
+          "name": "id"
+        },
+        {
+          "id": "2:5626098089724851404",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:8432849502964397699",
+          "name": "email"
+        },
+        {
+          "id": "4:4247834290607105604",
+          "name": "name"
+        },
+        {
+          "id": "5:4281746726435778337",
+          "name": "status"
+        },
+        {
+          "id": "6:412025849003372876",
+          "name": "modificationTime"
+        },
+        {
+          "id": "7:5486485348885741996",
+          "name": "state"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "10:8095044604429020731",
+  "lastEntityId": "11:2672464361589836854",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

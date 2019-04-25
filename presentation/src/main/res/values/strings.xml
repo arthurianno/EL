@@ -400,6 +400,28 @@
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
 
+    <!--OBSERVERS FLOW-->
+    <string name="profile_observers_empty_state_title">У вас нет ни одного наблюдателя</string>
+    <string name="profile_observers_header_active">Активные</string>
+    <string name="profile_observers_header_pending">Ожидают</string>
+    <string name="profile_observers_description">Держите в курсе друзей и близких о состоянии своего здоровья</string>
+    <string name="profile_observers_title">Мои наблюдатели</string>
+    <string name="profile_observers_invite">Добавить</string>
+    <string name="profile_observers_user_name_placeholder">Пользователь</string>
+    <string name="profile_observers_delete_with_success">Наблюдатель удален</string>
+
+    <string name="profile_observer_invite_new_title">Новый наблюдатель</string>
+    <string name="profile_observer_invite_new_description">Чтобы пригласить наблюдателя,\nвведите его email</string>
+    <string name="profile_observer_invite_new_send_invite">Отправить</string>
+    <string name="profile_observer_invite_new_invite_description">После отправки запроса на email, пользователь должен принять ваше приглашение. После этого он будет отображаться в списке доступных наблюдателей</string>
+    <string name="profile_observer_invite_new_email_hint">Email наблюдателя</string>
+    <string name="profile_observer_invite_with_success">Приглашение отправлено</string>
+
+    <string name="profile_delete_observer_dialog_title">Внимание</string>
+    <string name="profile_delete_observer_dialog_body">Вы уверены, что хотите удалить наблюдателя?</string>
+    <string name="profile_delete_observer_cancel_button">Отменить</string>
+    <string name="profile_delete_observer_dialog_confirm_button">Удалить</string>
+
     <!-- STATISTICS -->
     <string name="statistic_title">Статистика</string>
     <string name="statistic_period_seven_days">7 дней</string>

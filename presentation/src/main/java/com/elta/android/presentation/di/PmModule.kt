@@ -18,6 +18,8 @@ import com.elta.android.presentation.features.main.events.create.pm.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
+import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
+import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
@@ -203,6 +205,16 @@ abstract class PmModule {
     @IntoMap
     @PmKey(MainProfilePm::class)
     abstract fun bindMainProfilePm(pm: MainProfilePm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ObserversPm::class)
+    abstract fun bindObserversPm(pm: ObserversPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(InviteObserverPm::class)
+    abstract fun bindInviteObserverPm(pm: InviteObserverPm): PresentationModel
 
     @Binds
     @IntoMap

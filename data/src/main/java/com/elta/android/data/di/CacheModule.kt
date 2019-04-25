@@ -9,7 +9,9 @@ import com.elta.android.data.features.reminder.cache.DbReminderCache
 import com.elta.android.data.features.reminder.cache.dto.ReminderCacheDto
 import com.elta.android.data.features.sale_points.cache.DbSalePointsCache
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
+import com.elta.android.data.features.observers.cache.DbObserverCache
 import com.elta.android.data.features.user.cache.DbProfileCache
+import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import dagger.Binds
 import dagger.Module
@@ -31,6 +33,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindTagsCache(cache: DbTagsCache): Cache<TagCachedDto>
+
+        @Binds
+        @Singleton
+        fun bindObserverCache(cache: DbObserverCache): Cache<ObserverCacheDto>
 
         @Binds
         @Singleton

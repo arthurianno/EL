@@ -21,6 +21,9 @@ import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSour
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
+import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
+import com.elta.android.data.features.observers.datasource.ObserverDataSource
+import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
 import com.elta.android.data.features.user.datasource.ProfileCachedDataSource
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
@@ -49,6 +52,16 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindProfileCachedDataSource(source: ProfileCachedDataSource): ProfileDataSource
+
+    @Remote
+    @Binds
+    @Singleton
+    abstract fun bindObserverRemoteDataSource(source: ObserverRemoteDataSource): ObserverDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindObserverCachedDataSource(source: ObserverCachedDataSource): ObserverDataSource
 
     @Remote
     @Binds

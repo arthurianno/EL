@@ -22,7 +22,6 @@ import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainProfilePm @Inject constructor(
@@ -98,7 +97,7 @@ class MainProfilePm @Inject constructor(
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
         when (type) {
             WhereBuy -> router.startFlow(Screens.ShopsMap)
-            MyObservers -> Timber.e("MY_OBSERVERS clicked")
+            MyObservers -> router.startFlow(Screens.Observers)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 
