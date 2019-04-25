@@ -27,8 +27,24 @@ fun Context?.showDatePickerDialog(
     }
 }
 
+fun Context?.showTimePickerDialog(
+    currentDate: Date,
+    onDateSelectedFunction: (Date) -> Unit
+) {
+    if (this == null) return
+    val c = currentDate.toCalendar()
+    val onTimeSelectedListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+        c.set(c.year, c.month, c.dayOfMonth, hourOfDay, minute)
+        onDateSelectedFunction.invoke(c.time)
+    }
+    TimePickerDialog(this, onTimeSelectedListener, c.hourOfDay, c.minute, true).show()
+}
+
 @Suppress("MagicNumber")
-fun Context?.showTimePickerDialog(selectedDate: Date, onDateSelectedFunction: (Date) -> Unit) {
+fun Context?.showTimePickerWithoutPastTimeDialog(
+    selectedDate: Date,
+    onDateSelectedFunction: (Date) -> Unit
+) {
     if (this == null) return
     val c = selectedDate.toCalendar()
     val onTimeSelectedListener =

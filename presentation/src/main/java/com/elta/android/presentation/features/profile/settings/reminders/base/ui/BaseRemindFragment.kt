@@ -11,7 +11,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.showDatePickerDialog
-import com.elta.android.presentation.utils.showTimePickerDialog
+import com.elta.android.presentation.utils.showTimePickerWithoutPastTimeDialog
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_reminder_form.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -65,7 +65,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> : BaseFragment<T>() {
             }
         }
         showTimePickerDialog.bindTo { originalDate ->
-            activity.showTimePickerDialog(originalDate) {
+            activity.showTimePickerWithoutPastTimeDialog(originalDate) {
                 dateTimeSelectedAction.consumer.accept(it)
             }
         }
