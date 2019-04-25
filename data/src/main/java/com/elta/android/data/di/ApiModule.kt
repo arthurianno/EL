@@ -11,11 +11,11 @@ import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.firmware.api.FirmwareApi
 import com.elta.android.data.features.firmware.api.MockedFirmwareApi
+import com.elta.android.data.features.observers.api.MockedObserverApi
+import com.elta.android.data.features.observers.api.ObserverApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
-import com.elta.android.data.features.observers.api.MockedObserverApi
 import com.elta.android.data.features.user.api.MockedProfileApi
-import com.elta.android.data.features.observers.api.ObserverApi
 import com.elta.android.data.features.user.api.ProfileApi
 import dagger.Module
 import dagger.Provides
