@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
@@ -27,4 +28,5 @@ sealed class Clicks : Click {
     data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
     data class ReminderItemClicked(val item: ReminderItem) : Clicks()
     data class DeleteHemoglobinEventClicked(val id: String) : Clicks()
+    data class ObserverItemClicked(val item: ObserverItem) : Clicks()
 }

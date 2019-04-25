@@ -20,6 +20,9 @@ import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragm
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.observers.all.di.ObserversModule
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
+import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
@@ -178,6 +181,10 @@ abstract class FragmentBuilder {
     abstract fun bindMainProfileFragment(): MainProfileFragment
 
     @FragmentScope
+    @ContributesAndroidInjector(modules = [ObserversModule::class])
+    abstract fun bindObserversFragment(): ObserversFragment
+
+    @FragmentScope
     @ContributesAndroidInjector(modules = [ProfileSettingsModule::class])
     abstract fun bindProfileSettingsFragment(): ProfileSettingsFragment
 
@@ -204,6 +211,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindEditRemindFragment(): EditRemindFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindInviteObserverFragment(): InviteObserverFragment
 
     // STATISTICS FLOW
     @FragmentScope

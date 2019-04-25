@@ -19,6 +19,8 @@ import com.elta.android.presentation.features.main.events.create.ui.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
+import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
@@ -182,6 +184,14 @@ object Screens {
 
     object ProfileSettings : SupportAppScreen() {
         override fun getFragment() = ProfileSettingsFragment.newInstance()
+    }
+
+    object Observers : SupportAppScreen() {
+        override fun getFragment() = ObserversFragment.newInstance()
+    }
+
+    object InviteObserver : SupportAppScreen() {
+        override fun getFragment() = InviteObserverFragment.newInstance()
     }
 
     object Reminders : SupportAppScreen() {
