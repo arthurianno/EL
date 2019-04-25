@@ -18,4 +18,5 @@ sealed class Events : Event {
     data class ProfileChanged(val profile: Profile) : Events()
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()
+    data class PinCodeEntered(val pin: String): Events()
 }
