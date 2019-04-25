@@ -68,7 +68,8 @@ abstract class BaseRemindPm constructor(
     }
 
     protected fun isFormValid(reminderModel: ReminderFormModel) =
-        !reminderModel.inputValue.isNullOrEmpty()
+        !reminderModel.inputValue.isNullOrEmpty() &&
+                checkNotNull(reminderModel.date).after(Date())
 
     protected fun createScheduleItems() {
         schedulesState.consumer.accept(
