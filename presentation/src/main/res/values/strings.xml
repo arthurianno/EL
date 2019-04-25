@@ -326,6 +326,10 @@
 
     <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
 
+    <string name="sync_connect_device_not_found">Устройство не найдено</string>
+    <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
+    <string name="sync_connect_button_retry">Повторить</string>
+
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
     <string name="diary_screen_title">Дневник событий</string>
