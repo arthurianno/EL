@@ -18,12 +18,12 @@ import com.elta.android.data.features.reminder.datasource.RemindersCacheDataSour
 import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
-import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
-import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
-import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
 import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
 import com.elta.android.data.features.observers.datasource.ObserverDataSource
 import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
+import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
+import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
+import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
 import com.elta.android.data.features.user.datasource.ProfileCachedDataSource
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource

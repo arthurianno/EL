@@ -336,6 +336,9 @@
     <string name="profile_weight_value">%s кг</string>
     <string name="profile_diabetes">Диабет</string>
     <string name="profile_main_empty_value">—</string>
+    <string name="profile_observer_empty_state_title">У вас нет ни одного наблюдателя</string>
+    <string name="profile_observer_description">Держите в курсе друзей и близких о состоянии своего здоровья</string>
+    <string name="profile_observer_title">Мои наблюдатели</string>
     <string name="profile_name_placeholder">Профиль</string>
     <string name="profile_personal_information">Персональные данные</string>
     <string name="profile_security">Безопасность</string>
