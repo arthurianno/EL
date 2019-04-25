@@ -41,7 +41,7 @@ class ObserversPm @Inject constructor(
 
         bus.clicks<Clicks.ObserverItemClicked>()
             .map { it.item.id }
-            .doOnNext { selectedObserverState.consumer.accept(it) }
+            .doOnNext(selectedObserverState.consumer)
             .map { Unit }
             .subscribe(deleteObserverAction.consumer)
             .untilDestroy()
