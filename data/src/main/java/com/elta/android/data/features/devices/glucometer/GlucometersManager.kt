@@ -96,9 +96,19 @@ class GlucometersManager @Inject constructor(
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     fun setPinCode(address: String, pinCode: String): Completable =
-        Completable.fromCallable {
-            pinStorage.setPin(address, pinCode)
-        }
+        client.findConnection(address)
+            .switchMap { connection ->
+                connection.simpleRequest(address, Commands.SetPin(pinCode))
+            }
+            .take(1)
+            .switchMapCompletable { response ->
+                when {
+                    isPinError(response) -> Completable.error(GlucometerPinIncorrectOrNotFoundError)
+                    else -> Completable.fromCallable {
+                        pinStorage.setPin(address, pinCode)
+                    }
+                }
+            }
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {
@@ -129,6 +139,16 @@ class GlucometersManager @Inject constructor(
                 }
         }
 
+    private fun RxBleConnection.simpleRequest(address: String, cmd: GlucometerCommand): Observable<String> {
+        val input = cmd.toGlucometerString()
+        val notification = setupNotification(UART_TX)
+            .switchMap { it }
+            .map { it.toString(Charset.defaultCharset()) }
+        val command = writeCharacteristic(UART_RX, input.toByteArray(Charset.defaultCharset()))
+            .toObservable().map { it.toString(Charset.defaultCharset()) }
+        return Observables.combineLatest(notification.take(1), command) { response, _ -> response }
+    }
+
     private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
         val input = cmd.toGlucometerString()
         val notification = setupNotification(UART_TX)
@@ -141,8 +161,10 @@ class GlucometersManager @Inject constructor(
             .compose {
                 it.switchMap { response ->
                     when {
-                        isPinCommand(input)
-                            && isPinError(response) -> Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        isPinCommand(input) && isPinError(response) -> {
+                            pinStorage.setPin(address, "")
+                            Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        }
                         isPinError(response) -> Observable.error(GlucometerPinRequireError)
                         else -> Observable.just(response)
                     }
