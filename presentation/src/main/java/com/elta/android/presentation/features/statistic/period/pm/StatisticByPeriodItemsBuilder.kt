@@ -7,8 +7,11 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.date.CommonFormats
+import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -19,6 +22,8 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     fun build(model: StatisticByPeriodModel): List<ListItem> {
         val items = arrayListOf<ListItem>()
+
+        items.add(model.toChartItem())
 
         val glucoseIndexItems = arrayListOf<ListItem>()
 
@@ -201,6 +206,16 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
         return time.toString()
     }
+
+    private fun StatisticByPeriodModel.toChartItem() =
+        GlucoseStatisticChartItem(
+            datesTitle = resources.getString(
+                R.string.statistic_chart_period_dates_mask,
+                period.start.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE),
+                period.end.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE)
+            ),
+            chartModel = Any() // TODO provide builder and real model
+        )
 
     companion object {
         const val HOURS_IN_DAY = 24
