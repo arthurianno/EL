@@ -29,10 +29,12 @@ class ConnectDevicePm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val mainAction = Action<Unit>()
     val skipAction = Action<Unit>()
+
     val connectDeviceAction = Action<Unit>()
     val connectDeviceEnabledState = State(false)
+
+    val toAppAction = Action<Unit>()
 
     val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
 
@@ -126,6 +128,10 @@ class ConnectDevicePm @Inject constructor(
             .debounceAction()
             .map { glucometer?.name ?: "SatelliteOnline" }
             .subscribe(openPinCodeDialogCommand.consumer)
+            .untilDestroy()
+
+        toAppAction.observable
+            .subscribe { router.newRootFlow(Screens.HomeFlow) }
             .untilDestroy()
 
         bus.events<Events.PinCodeEntered>()

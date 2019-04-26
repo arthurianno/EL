@@ -30,6 +30,7 @@ import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_sync_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_device_found.*
+import kotlinx.android.synthetic.main.layout_sync_state_sync_completed.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
 import timber.log.Timber
 
@@ -52,6 +53,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
         bindProgressDialog(pm)
         menuButtonView.clicks().bindTo(pm.skipAction)
         actionButtonView.clicks().bindTo(pm.connectDeviceAction)
+        toAppButtonView.clicks().bindTo(pm.toAppAction)
         pm.connectDeviceEnabledState.bindTo(actionButtonView::setEnabled)
         pm.state.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
