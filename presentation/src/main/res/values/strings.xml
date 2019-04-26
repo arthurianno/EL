@@ -324,9 +324,9 @@
     <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете прододжить\nпроцесс подключения</string>
     <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
 
-    <string name="sync_state_title_sync_completed">Поздравляем!</string>
-    <string name="sync_state_subtitle_sync_completed">Поздравляем!</string>
-    <string name="sync_state_action_sync_completed">В приложение</string>
+    <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
+    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
+    <string name="sync_state_action_sync_completed">Перейти к приложению</string>
 
     <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
 

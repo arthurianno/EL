@@ -24,9 +24,10 @@
         <android.support.v7.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="top"
             android:layout_marginStart="12dp"
-            tools:src="@drawable/ic_device_found" />
+            android:layout_marginTop="8dp"
+            tools:src="@drawable/ic_connected" />
 
     </LinearLayout>
 
@@ -41,7 +42,7 @@
         android:text="@string/sync_state_subtitle_sync_completed" />
 
     <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/actionButtonView"
+        android:id="@+id/toAppButtonView"
         style="@style/Button.Large"
         android:text="@string/sync_state_action_sync_completed" />
 

@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="12dp"
-            tools:src="@drawable/ic_device_found" />
+            tools:src="@drawable/ic_congrats" />
 
     </LinearLayout>
 
