@@ -49,8 +49,10 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
     override fun onBindPresentationModel(pm: ConnectDevicePm) {
         super.onBindPresentationModel(pm)
+        bindProgressDialog(pm)
         menuButtonView.clicks().bindTo(pm.skipAction)
         actionButtonView.clicks().bindTo(pm.connectDeviceAction)
+        pm.connectDeviceEnabledState.bindTo(actionButtonView::setEnabled)
         pm.state.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
@@ -58,16 +60,16 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
         }
 
         pm.retrySearchControl.bindTo { data, sc ->
-            makeSnackBar(view!!, data)
+            makeSnackBar(checkNotNull(view), data)
                 .setDuration(Snackbar.LENGTH_INDEFINITE)
-                .setActionTextColor(ContextCompat.getColor(context!!, R.color.shade_blue))
+                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
                 .setAction(data.button) { sc.sendResult() }
         }
 
         pm.retryPinControl.bindTo { data, sc ->
-            makeSnackBar(view!!, data)
+            makeSnackBar(checkNotNull(view), data)
                 .setDuration(Snackbar.LENGTH_INDEFINITE)
-                .setActionTextColor(ContextCompat.getColor(context!!, R.color.shade_blue))
+                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
                 .setAction(data.button) { sc.sendResult() }
         }
 

@@ -32,8 +32,7 @@ class ConnectDevicePm @Inject constructor(
     val mainAction = Action<Unit>()
     val skipAction = Action<Unit>()
     val connectDeviceAction = Action<Unit>()
-
-    val sendPinCodeToDeviceAction = Action<String>()
+    val connectDeviceEnabledState = State(false)
 
     val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
 
@@ -46,6 +45,9 @@ class ConnectDevicePm @Inject constructor(
     val bluetoothEnabledAction = Action<Unit>()
     val locationPermissionsGrantedAction = Action<Unit>()
     val locationEnabledAction = Action<Unit>()
+
+    val retrySearchControl = snackBarControl<SnackBarData>()
+    val retryPinControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
@@ -69,9 +71,6 @@ class ConnectDevicePm @Inject constructor(
     private val showRetrySearchAction = Action<Unit>()
     private val showRetryPinAction = Action<Unit>()
 
-    val retrySearchControl = snackBarControl<SnackBarData>()
-    val retryPinControl = snackBarControl<SnackBarData>()
-
     override fun onCreate() {
         super.onCreate()
 
@@ -86,12 +85,13 @@ class ConnectDevicePm @Inject constructor(
                         scanResults.clear()
                         scanResults.addAll(results)
                         items.consumer.accept(
-                            results.map { meter ->
+                            results.mapIndexed { index, meter ->
                                 DeviceItem(
                                     id = meter.id,
                                     name = meter.name ?: "Unknown device",
                                     address = meter.address,
-                                    isSelected = meter.address == glucometer?.address
+                                    isSelected = meter.address == glucometer?.address,
+                                    isTheLast = index == results.size - 1
                                 )
                             }
                         )
@@ -122,6 +122,8 @@ class ConnectDevicePm @Inject constructor(
             .untilDestroy()
 
         connectDeviceAction.observable
+            .skipWhileInProgress()
+            .debounceAction()
             .map { glucometer?.name ?: "SatelliteOnline" }
             .subscribe(openPinCodeDialogCommand.consumer)
             .untilDestroy()
@@ -146,9 +148,18 @@ class ConnectDevicePm @Inject constructor(
 
         bus.clicks<Clicks.DeviceClicked>()
             .doOnNext { click ->
-                glucometer = scanResults.firstOrNull { it.address == click.item.address }
-                val newItems = items.value.map { (it as DeviceItem).copy(isSelected = it.address == click.item.address && !it.isSelected) }
+                glucometer = if (glucometer?.address != click.item.address) {
+                    scanResults.firstOrNull { it.address == click.item.address }
+                } else null
+                val prevItems = items.value
+                val newItems = prevItems.mapIndexed { index, item ->
+                    (item as DeviceItem).copy(
+                        isSelected = item.address == click.item.address && !item.isSelected,
+                        isTheLast = index == prevItems.size - 1
+                    )
+                }
                 items.consumer.accept(newItems)
+                connectDeviceEnabledState.consumer.accept(glucometer != null)
             }
             .subscribe()
             .untilDestroy()

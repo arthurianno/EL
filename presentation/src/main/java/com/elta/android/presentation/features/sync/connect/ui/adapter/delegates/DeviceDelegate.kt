@@ -40,6 +40,7 @@ class DeviceDelegate(
             deviceNameView.text = item.name
             deviceAddressView.text = item.address
             deviceChooserView.toggleView(item.isSelected)
+            dividerView.toggleView(!item.isTheLast)
         }
     }
 
@@ -50,6 +51,7 @@ class DeviceDelegate(
         with(holder as ViewHolder) {
             when (payload) {
                 DeviceItem.Payload.SELECTION_CHANGED -> deviceChooserView.toggleView(item.isSelected)
+                DeviceItem.Payload.POSITION_CHANGED -> dividerView.toggleView(!item.isTheLast)
             }
         }
     }

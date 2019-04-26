@@ -84,7 +84,8 @@ class BluetoothPm @Inject constructor(
                                     id = meter.id,
                                     name = meter.name ?: "Unknown device",
                                     address = meter.address,
-                                    isSelected = meter.address == glucometer?.address
+                                    isSelected = meter.address == glucometer?.address,
+                                    isTheLast = false
                                 )
                             }
                         )
