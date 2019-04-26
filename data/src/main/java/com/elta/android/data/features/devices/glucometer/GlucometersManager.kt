@@ -114,10 +114,14 @@ class GlucometersManager @Inject constructor(
                     else -> Completable.fromCallable {
                         pinStorage.setPin(device.address, pinCode)
                         val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
-                        val glucometerDevice = glucometerToCacheMapper.mapFromObject(device).apply {
-                            isPrimary = primaryDevice == null
+
+                        if (primaryDevice == null) {
+                            glucometersCache.add(listOf(glucometerToCacheMapper.mapFromObject(device).apply { isPrimary = true }))
                         }
-                        glucometersCache.add(listOf(glucometerDevice))
+
+                        if (primaryDevice != null && !primaryDevice.address.equals(device.address, true)) {
+                            glucometersCache.add(listOf(glucometerToCacheMapper.mapFromObject(device)))
+                        }
                     }
                 }
             }
