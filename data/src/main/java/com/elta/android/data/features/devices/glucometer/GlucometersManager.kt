@@ -10,6 +10,7 @@ import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.devices.cache.GlucometersConditions
@@ -125,6 +126,11 @@ class GlucometersManager @Inject constructor(
                     }
                 }
             }
+
+    fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
+        device?.let { getGlucometerEvents(it.address) }
+            ?: glucometersCache.get(GlucometersConditions.Primary)?.let { getGlucometerEvents(it.address) }
+            ?: Single.error(PrimaryGlucometerNotFoundError)
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {

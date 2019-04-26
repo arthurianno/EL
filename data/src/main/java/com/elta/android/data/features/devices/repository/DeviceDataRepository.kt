@@ -32,6 +32,9 @@ class DeviceDataRepository @Inject constructor(
     override fun connectDevice(device: Glucometer, pinCode: String): Completable =
         source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
 
+    override fun syncWithDevice(device: Glucometer?): Completable =
+        source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) }).ignoreElement()
+
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)
 }

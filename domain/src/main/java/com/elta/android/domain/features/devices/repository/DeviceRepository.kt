@@ -17,5 +17,7 @@ interface DeviceRepository {
 
     fun connectDevice(device: Glucometer, pinCode: String): Completable
 
+    fun syncWithDevice(device: Glucometer?): Completable
+
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
 }

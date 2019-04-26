@@ -11,3 +11,5 @@ data class GlucometerLowBatteryLevelError(
     val current: Int,
     val required: Int
 ) : RuntimeException("Battery level $current not enough to update firmware.")
+
+object PrimaryGlucometerNotFoundError : RuntimeException()
