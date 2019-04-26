@@ -130,9 +130,10 @@ class ConnectDevicePm @Inject constructor(
 
         bus.events<Events.PinCodeEntered>()
             .skipWhileInProgress()
+            .filter { glucometer != null }
             .map(Events.PinCodeEntered::pin)
             .map { pin ->
-                ConnectDeviceUseCase.Params(glucometer?.address ?: "", pin)
+                ConnectDeviceUseCase.Params(checkNotNull(glucometer), pin)
             }
             .flatMapCompletable { params ->
                 connectDeviceUseCase.execute(params)

@@ -10,6 +10,11 @@ import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
+import com.elta.android.data.features.devices.cache.GlucometersConditions
+import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
+import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -31,6 +36,8 @@ import javax.inject.Singleton
 
 @Singleton
 class GlucometersManager @Inject constructor(
+    private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
+    private val glucometersCache: Cache<GlucometerCachedDto>,
     private val eventBuilder: GlucometerEventBuilder,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
@@ -95,17 +102,22 @@ class GlucometersManager @Inject constructor(
             // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
-    fun connectDevice(address: String, pinCode: String): Completable =
-        client.findConnection(address)
+    fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
+        client.findConnection(device.address)
             .switchMap { connection ->
-                connection.simpleRequest(address, Commands.SetPin(pinCode))
+                connection.simpleRequest(device.address, Commands.SetPin(pinCode))
             }
             .take(1)
             .switchMapCompletable { response ->
                 when {
                     isPinError(response) -> Completable.error(GlucometerPinIncorrectOrNotFoundError)
                     else -> Completable.fromCallable {
-                        pinStorage.setPin(address, pinCode)
+                        pinStorage.setPin(device.address, pinCode)
+                        val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
+                        val glucometerDevice = glucometerToCacheMapper.mapFromObject(device).apply {
+                            isPrimary = primaryDevice == null
+                        }
+                        glucometersCache.add(listOf(glucometerDevice))
                     }
                 }
             }

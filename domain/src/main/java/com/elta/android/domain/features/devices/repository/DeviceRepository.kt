@@ -15,7 +15,7 @@ interface DeviceRepository {
 
     fun getDeviceEvents(address: String): Single<List<String>>
 
-    fun connectDevice(address: String, pinCode: String): Completable
+    fun connectDevice(device: Glucometer, pinCode: String): Completable
 
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
 }

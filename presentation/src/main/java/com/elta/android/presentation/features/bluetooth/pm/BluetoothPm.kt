@@ -7,10 +7,10 @@ import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
-import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
@@ -128,6 +128,7 @@ class BluetoothPm @Inject constructor(
 
         setPinAction.observable
             .skipWhileInProgress()
+            .filter { glucometer != null }
             .map(::createPinCodeUseCaseParams)
             .flatMapCompletable { params ->
                 setPinCodeUseCase.execute(params)
@@ -248,7 +249,7 @@ class BluetoothPm @Inject constructor(
 
     private fun createPinCodeUseCaseParams(i: Unit): ConnectDeviceUseCase.Params =
         ConnectDeviceUseCase.Params(
-            address = glucometer?.address ?: "",
+            device = checkNotNull(glucometer),
             pinCode = pinInputControl.text.valueOrNull ?: ""
         )
 

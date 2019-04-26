@@ -14,6 +14,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
+    private val glucometerToDtoMapper: Mapper<Glucometer, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
     private val source: DeviceDataSource
@@ -28,8 +29,8 @@ class DeviceDataRepository @Inject constructor(
     override fun getDeviceEvents(address: String): Single<List<String>> =
         source.getGlucometerEvents(address)
 
-    override fun connectDevice(address: String, pinCode: String): Completable =
-        source.connectDevice(address, pinCode)
+    override fun connectDevice(device: Glucometer, pinCode: String): Completable =
+        source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)

@@ -9,5 +9,5 @@ data class GlucometerCachedDto(
     val secondaryId: String,
     val address: String,
     val name: String?,
-    val isPrimary: Boolean
+    var isPrimary: Boolean
 )
