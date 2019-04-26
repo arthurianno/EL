@@ -10,7 +10,7 @@ import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
-import com.elta.android.domain.features.devices.interactor.SetPinCodeUseCase
+import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
@@ -32,7 +32,7 @@ class BluetoothPm @Inject constructor(
     private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
     private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
-    private val setPinCodeUseCase: SetPinCodeUseCase,
+    private val setPinCodeUseCase: ConnectDeviceUseCase,
     private val getGlucometerEventsUseCase: GetGlucometerEventsUseCase,
     private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
     private val findGlucometersUseCase: FindGlucometersUseCase,
@@ -246,8 +246,8 @@ class BluetoothPm @Inject constructor(
     private fun createEventsUseCaseParams(i: Unit): GetGlucometerEventsUseCase.Params =
         GetGlucometerEventsUseCase.Params(address = glucometer?.address ?: "")
 
-    private fun createPinCodeUseCaseParams(i: Unit): SetPinCodeUseCase.Params =
-        SetPinCodeUseCase.Params(
+    private fun createPinCodeUseCaseParams(i: Unit): ConnectDeviceUseCase.Params =
+        ConnectDeviceUseCase.Params(
             address = glucometer?.address ?: "",
             pinCode = pinInputControl.text.valueOrNull ?: ""
         )

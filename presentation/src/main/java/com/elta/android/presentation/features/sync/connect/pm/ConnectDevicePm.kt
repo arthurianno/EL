@@ -5,7 +5,7 @@ import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
-import com.elta.android.domain.features.devices.interactor.SetPinCodeUseCase
+import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class ConnectDevicePm @Inject constructor(
-    private val setPinCodeUseCase: SetPinCodeUseCase,
+    private val connectDeviceUseCase: ConnectDeviceUseCase,
     private val findGlucometersUseCase: FindGlucometersUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -132,10 +132,10 @@ class ConnectDevicePm @Inject constructor(
             .skipWhileInProgress()
             .map(Events.PinCodeEntered::pin)
             .map { pin ->
-                SetPinCodeUseCase.Params(glucometer?.address ?: "", pin)
+                ConnectDeviceUseCase.Params(glucometer?.address ?: "", pin)
             }
             .flatMapCompletable { params ->
-                setPinCodeUseCase.execute(params)
+                connectDeviceUseCase.execute(params)
                     .bindProgress()
                     .doOnComplete {
                         state.consumer.accept(ViewState.CONNECTED)

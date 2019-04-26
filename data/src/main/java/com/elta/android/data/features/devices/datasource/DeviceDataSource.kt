@@ -15,7 +15,7 @@ interface DeviceDataSource {
 
     fun getGlucometerEvents(address: String): Single<List<String>>
 
-    fun setPinCode(address: String, pinCode: String): Completable
+    fun connectDevice(address: String, pinCode: String): Completable
 
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
 }

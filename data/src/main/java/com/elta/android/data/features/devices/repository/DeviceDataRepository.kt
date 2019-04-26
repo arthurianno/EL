@@ -28,8 +28,8 @@ class DeviceDataRepository @Inject constructor(
     override fun getDeviceEvents(address: String): Single<List<String>> =
         source.getGlucometerEvents(address)
 
-    override fun setPinCode(address: String, pinCode: String): Completable =
-        source.setPinCode(address, pinCode)
+    override fun connectDevice(address: String, pinCode: String): Completable =
+        source.connectDevice(address, pinCode)
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)

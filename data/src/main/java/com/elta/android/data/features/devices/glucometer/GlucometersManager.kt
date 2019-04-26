@@ -95,7 +95,7 @@ class GlucometersManager @Inject constructor(
             // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
-    fun setPinCode(address: String, pinCode: String): Completable =
+    fun connectDevice(address: String, pinCode: String): Completable =
         client.findConnection(address)
             .switchMap { connection ->
                 connection.simpleRequest(address, Commands.SetPin(pinCode))
