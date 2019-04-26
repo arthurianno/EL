@@ -6,6 +6,7 @@ import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
+import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -19,11 +20,14 @@ import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.messages.SnackBarMessageData
+import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
+import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class ConnectDevicePm @Inject constructor(
+    private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
     private val connectDeviceUseCase: ConnectDeviceUseCase,
     private val findGlucometersUseCase: FindGlucometersUseCase,
     services: ServiceFacade
@@ -55,6 +59,8 @@ class ConnectDevicePm @Inject constructor(
     private var glucometer: Glucometer? = null
 
     private val startScanAction = Action<Unit>()
+    private val startSyncAction = Action<Unit>()
+    private val syncProgressState = State(false)
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -134,6 +140,24 @@ class ConnectDevicePm @Inject constructor(
             .subscribe { router.newRootFlow(Screens.HomeFlow) }
             .untilDestroy()
 
+        startSyncAction.observable
+            .skipWhileInProgress(syncProgressState.observable)
+            .filter { glucometer != null }
+            .map {
+                SyncWithGlucometerUseCase.Params(glucometer)
+            }
+            .flatMapCompletable { params ->
+                syncWithGlucometerUseCase.execute(params)
+                    .bindProgress(syncProgressState.consumer)
+                    .doOnComplete {
+                        state.consumer.accept(ViewState.SYNC_COMPLETED)
+                    }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
         bus.events<Events.PinCodeEntered>()
             .skipWhileInProgress()
             .filter { glucometer != null }
@@ -145,6 +169,7 @@ class ConnectDevicePm @Inject constructor(
                 connectDeviceUseCase.execute(params)
                     .bindProgress()
                     .doOnComplete {
+                        startSyncAction.consumer.accept(Unit)
                         state.consumer.accept(ViewState.CONNECTED)
                     }
                     .doOnError(::handleError)
