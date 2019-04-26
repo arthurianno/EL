@@ -4,8 +4,8 @@ import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
-import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
+import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -195,6 +195,6 @@ class ConnectDevicePm @Inject constructor(
     }
 
     enum class ViewState {
-        SEARCH, FOUND, CONNECTED,
+        SEARCH, FOUND, CONNECTED, SYNC_COMPLETED
     }
 }

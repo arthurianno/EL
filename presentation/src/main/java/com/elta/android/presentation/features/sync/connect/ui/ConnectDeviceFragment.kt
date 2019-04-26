@@ -133,6 +133,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
             ConnectDevicePm.ViewState.SEARCH -> R.id.stateConnectView
             ConnectDevicePm.ViewState.FOUND -> R.id.stateDeviceFoundView
             ConnectDevicePm.ViewState.CONNECTED -> R.id.stateConnectedView
+            ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.stateSyncCompletedView
         }
 
     companion object {
