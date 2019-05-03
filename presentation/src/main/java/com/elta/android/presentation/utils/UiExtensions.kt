@@ -57,7 +57,7 @@ fun View.sequenceClicks(period: Long = SEQUENCE_CLICKS_PERIOD): Observable<Unit>
             Observable.interval(period, TimeUnit.MILLISECONDS)
                 .takeUntil(
                     touches()
-                        .filter { it.action == MotionEvent.ACTION_UP }
+                        .filter { it.action == MotionEvent.ACTION_UP || it.action == MotionEvent.ACTION_CANCEL }
                         .doOnNext { isPressed = false }
                 )
         }
