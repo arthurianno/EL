@@ -53,7 +53,7 @@ abstract class BaseEventPm constructor(
     protected val eventTypeState = State<EventType>()
     protected val selectedDateState = State(Date())
 
-    private val exitDialogData: DialogData by lazy { Dialogs.EventExit(resources) }
+    private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
     abstract fun handleBack(i: Unit)
 

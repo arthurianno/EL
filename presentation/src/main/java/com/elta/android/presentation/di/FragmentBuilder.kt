@@ -21,8 +21,8 @@ import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.di.ObserversModule
-import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
@@ -32,8 +32,11 @@ import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.di.HemoglobinSettingsModule
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
+import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
+import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.di.RemindersModule
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
@@ -215,6 +218,18 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindInviteObserverFragment(): InviteObserverFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileSetNameFragment(): ProfileSetNameFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileChangePasswordFragment(): ProfileChangePasswordFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileSetGenderFragment(): ProfileSetGenderFragment
 
     // STATISTICS FLOW
     @FragmentScope

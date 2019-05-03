@@ -18,15 +18,18 @@ import com.elta.android.presentation.features.main.events.create.pm.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
-import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
+import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.pm.GlucoseRangeDialogPm
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
+import com.elta.android.presentation.features.profile.settings.gender.pm.ProfileSetGenderPm
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.features.profile.settings.name.pm.ProfileSetNamePm
+import com.elta.android.presentation.features.profile.settings.password.pm.ProfileChangePasswordPm
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
 import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
@@ -250,6 +253,21 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EditRemindPm::class)
     abstract fun bindEditRemindPm(pm: EditRemindPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileSetNamePm::class)
+    abstract fun bindProfileSetNamePm(pm: ProfileSetNamePm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileChangePasswordPm::class)
+    abstract fun bindProfileChangePasswordPm(pm: ProfileChangePasswordPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileSetGenderPm::class)
+    abstract fun bindProfileSetGenderPm(pm: ProfileSetGenderPm): PresentationModel
 
     // STATISTICS FLOW
     @Binds

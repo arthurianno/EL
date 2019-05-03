@@ -1,6 +1,7 @@
 package com.elta.android.data.features.auth.api
 
 import com.elta.android.data.features.auth.api.request.AuthRequest
+import com.elta.android.data.features.auth.api.request.ChangePasswordRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.api.request.TokenRequest
@@ -35,6 +36,9 @@ interface AuthApi {
 
     @POST("api/auth/v1/accounts/password/reset")
     fun resetPassword(@Body request: ResetPasswordRequest): Completable
+
+    @PUT("api/auth/v1/accounts/password")
+    fun changePassword(@Body request: ChangePasswordRequest): Completable
 
     @PUT("api/auth/v1/accounts/email/confirm/token")
     fun checkTokenOwner(@Body request: TokenRequest): Single<TokenOwnerDto>

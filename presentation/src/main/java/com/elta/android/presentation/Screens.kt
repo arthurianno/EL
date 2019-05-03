@@ -19,12 +19,15 @@ import com.elta.android.presentation.features.main.events.create.ui.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
-import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
+import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
+import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
@@ -204,6 +207,18 @@ object Screens {
 
     data class EditRemind(val reminderId: String) : SupportAppScreen() {
         override fun getFragment() = EditRemindFragment.newInstance(reminderId)
+    }
+
+    object SetName : SupportAppScreen() {
+        override fun getFragment() = ProfileSetNameFragment.newInstance()
+    }
+
+    object ChangePassword : SupportAppScreen() {
+        override fun getFragment() = ProfileChangePasswordFragment.newInstance()
+    }
+
+    object SetGender : SupportAppScreen() {
+        override fun getFragment() = ProfileSetGenderFragment.newInstance()
     }
 
     // STATISTICS FLOW

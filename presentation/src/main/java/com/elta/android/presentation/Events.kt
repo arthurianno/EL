@@ -19,4 +19,5 @@ sealed class Events : Event {
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()
     object ObserverInvited : Events()
+    object ProfileDataChanged : Events()
 }
