@@ -41,7 +41,7 @@ abstract class BaseRemindPm constructor(
     protected val selectedDateState = State(Date())
     protected val reminderFormHolderState = State(ReminderFormModel())
 
-    private val exitDialogData: DialogData by lazy { Dialogs.EventExit(resources) }
+    private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
     abstract fun handleBack(i: Unit)
 

@@ -7,13 +7,16 @@ import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
+import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
@@ -53,9 +56,10 @@ class ProfileSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.ProfileDataChanged>().map { Unit }
+        )
             .subscribe(getProfileSettingsAction.consumer)
             .untilDestroy()
     }
@@ -65,10 +69,12 @@ class ProfileSettingsPm @Inject constructor(
             .map { it.type }
             .doOnNext { type ->
                 when (type) {
+                    ProfileSettingsItem.Type.NAME -> router.navigateTo(Screens.SetName)
+                    ProfileSettingsItem.Type.GENDER -> router.navigateTo(Screens.SetGender)
+                    ProfileSettingsItem.Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
                     ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     ProfileSettingsItem.Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
-                    else -> {
-                    }
+                    else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }
             }
             .subscribe()

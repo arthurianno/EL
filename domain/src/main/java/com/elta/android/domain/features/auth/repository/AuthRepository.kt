@@ -17,6 +17,8 @@ interface AuthRepository {
 
     fun resetPassword(token: String, newPassword: String): Completable
 
+    fun changePassword(currentPassword: String, newPassword: String): Completable
+
     fun checkTokenOwner(token: String): Single<Boolean>
 
     fun confirmEmail(token: String): Completable
