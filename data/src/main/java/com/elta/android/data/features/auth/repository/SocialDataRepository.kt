@@ -17,6 +17,7 @@ import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class SocialDataRepository @Inject constructor(
@@ -52,6 +53,7 @@ class SocialDataRepository @Inject constructor(
                             .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
                             .map { login }
                     }
+                    .subscribeOn(Schedulers.io())
             }
             .map(LoginDto::isEmailConfirmed)
             .single(false)
