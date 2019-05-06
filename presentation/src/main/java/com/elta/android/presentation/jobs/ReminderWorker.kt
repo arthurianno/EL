@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
 import com.elta.android.domain.features.reminder.interactor.GetReminderByIdUseCase
+import com.elta.android.domain.features.reminder.interactor.UpdateReminderUseCase
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.Events
@@ -16,7 +17,12 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.notification.NotificationSource
 import com.elta.android.presentation.jobs.factory.JobFactory
+import com.elta.android.presentation.utils.dayOfMonth
+import com.elta.android.presentation.utils.hourOfDay
+import com.elta.android.presentation.utils.minute
+import com.elta.android.presentation.utils.month
 import com.elta.android.presentation.utils.toCalendar
+import com.elta.android.presentation.utils.year
 import com.nullgr.core.rx.RxBus
 import io.reactivex.Single
 import java.util.Calendar
@@ -29,6 +35,7 @@ class ReminderWorker(
     workerParams: WorkerParameters,
     private val getReminderByIdUseCase: GetReminderByIdUseCase,
     private val deleteReminderUseCase: DeleteReminderUseCase,
+    private val updateReminderUseCase: UpdateReminderUseCase,
     private val bus: RxBus,
     private val notificationSource: NotificationSource
 ) : RxWorker(context, workerParams) {
@@ -47,12 +54,7 @@ class ReminderWorker(
             .flatMap {
                 getReminderByIdUseCase.execute(it)
                     .doOnSuccess { reminder -> sendNotificationIfNeed(isShowNotification, reminder) }
-                    .flatMap { reminder -> deleteAndReturnOneTimeReminder(reminder, isShowNotification) }
-                    .map(::calculateDelay)
-                    .map { delay ->
-                        if (delay > 0) startWithDelay(id = reminderId, delay = delay)
-                        else cancelByName(reminderId)
-                    }
+                    .flatMap { reminder -> deleteOrUpdateReminder(reminder, isShowNotification) }
             }
             .map { Result.success() }
             .onErrorReturn { Result.success() }
@@ -75,17 +77,26 @@ class ReminderWorker(
         }
     }
 
-    private fun deleteAndReturnOneTimeReminder(reminder: Reminder, isShowNotification: Boolean) =
+    private fun deleteOrUpdateReminder(reminder: Reminder, isShowNotification: Boolean) =
         if (reminder.scheduleType == ScheduleType.NONE && isShowNotification) {
             deleteReminderUseCase.execute(createDeleteReminderUseCaseParams(reminder))
                 .doOnSuccess { bus.event(Events.ReminderDeleted) }
-                .map { reminder }
+                .map { Unit }
         } else {
             Single.just(reminder)
+                .map(::calculateDelay)
+                .flatMap { updatedReminder ->
+                    updateReminderUseCase.execute(UpdateReminderUseCase.Params(updatedReminder))
+                        .map { updatedReminder.time.time - System.currentTimeMillis() }
+                        .map { delay ->
+                            if (delay > 0) startWithDelay(id = reminder.id, delay = delay)
+                            else cancelByName(reminder.id)
+                        }
+                }
         }
 
     @Suppress("LongMethod")
-    private fun calculateDelay(reminder: Reminder): Long {
+    private fun calculateDelay(reminder: Reminder): Reminder {
         val reminderCalendar = reminder.time.toCalendar()
         val currentCalendar = Calendar.getInstance()
         currentCalendar.timeInMillis = System.currentTimeMillis()
@@ -94,40 +105,40 @@ class ReminderWorker(
         if (reminderCalendar.before(currentCalendar)) {
             delayCalendar = Calendar.getInstance()
             when (reminder.scheduleType) {
-                ScheduleType.NONE -> return -1L
+                ScheduleType.NONE -> delayCalendar.timeInMillis = -1
                 ScheduleType.DAY -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar[Calendar.YEAR])
-                    delayCalendar.set(Calendar.MONTH, currentCalendar[Calendar.MONTH])
-                    delayCalendar.set(Calendar.DATE, currentCalendar[Calendar.DATE])
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar[Calendar.HOUR])
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar[Calendar.MINUTE])
+                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
+                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
+                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
+                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
+                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
                     delayCalendar.set(Calendar.SECOND, 0)
                     delayCalendar.add(Calendar.DATE, 1)
                 }
                 ScheduleType.WEEK -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar[Calendar.YEAR])
-                    delayCalendar.set(Calendar.MONTH, currentCalendar[Calendar.MONTH])
-                    delayCalendar.set(Calendar.DATE, currentCalendar[Calendar.DATE])
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar[Calendar.HOUR])
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar[Calendar.MINUTE])
+                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
+                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
+                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
+                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
+                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
                     delayCalendar.set(Calendar.SECOND, 0)
                     delayCalendar.add(Calendar.DATE, 7)
                 }
                 ScheduleType.MONTH -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar[Calendar.YEAR])
-                    delayCalendar.set(Calendar.MONTH, currentCalendar[Calendar.MONTH])
-                    delayCalendar.set(Calendar.DATE, currentCalendar[Calendar.DATE])
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar[Calendar.HOUR])
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar[Calendar.MINUTE])
+                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
+                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
+                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
+                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
+                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
                     delayCalendar.set(Calendar.SECOND, 0)
                     delayCalendar.add(Calendar.MONTH, 1)
                 }
                 ScheduleType.YEAR -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar[Calendar.YEAR])
-                    delayCalendar.set(Calendar.MONTH, reminderCalendar[Calendar.MONTH])
-                    delayCalendar.set(Calendar.DATE, reminderCalendar[Calendar.DATE])
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar[Calendar.HOUR])
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar[Calendar.MINUTE])
+                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
+                    delayCalendar.set(Calendar.MONTH, reminderCalendar.month)
+                    delayCalendar.set(Calendar.DATE, reminderCalendar.dayOfMonth)
+                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
+                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
                     delayCalendar.set(Calendar.SECOND, 0)
                     delayCalendar.add(Calendar.YEAR, 1)
                 }
@@ -136,7 +147,7 @@ class ReminderWorker(
             delayCalendar = reminderCalendar
         }
 
-        return delayCalendar.timeInMillis - System.currentTimeMillis()
+        return reminder.apply { time = delayCalendar.time }
     }
 
     private fun startWithDelay(id: String, delay: Long) {
@@ -158,6 +169,7 @@ class ReminderWorker(
     class Factory @Inject constructor(
         private val getReminderByIdUseCase: GetReminderByIdUseCase,
         private val deleteReminderUseCase: DeleteReminderUseCase,
+        private val updateReminderUseCase: UpdateReminderUseCase,
         private val bus: RxBus,
         private val notificationSource: NotificationSource
     ) : JobFactory<ReminderWorker> {
@@ -167,6 +179,7 @@ class ReminderWorker(
                 params,
                 getReminderByIdUseCase,
                 deleteReminderUseCase,
+                updateReminderUseCase,
                 bus,
                 notificationSource
             )
