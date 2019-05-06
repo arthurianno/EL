@@ -54,8 +54,7 @@ fun Context?.showTimePickerWithoutPastTimeDialog(
                 add(Calendar.MINUTE, 1)
             }
             val pickedCalendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, hourOfDay)
-                set(Calendar.MINUTE, minute)
+                set(c.year, c.month, c.dayOfMonth, hourOfDay, minute)
             }
             if (pickedCalendar.before(currentCalendar)) {
                 Toast.makeText(
@@ -64,18 +63,9 @@ fun Context?.showTimePickerWithoutPastTimeDialog(
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                c.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                c.set(Calendar.MINUTE, minute)
-                onDateSelectedFunction.invoke(c.time)
+                onDateSelectedFunction.invoke(pickedCalendar.time)
             }
         }
 
-    TimePickerDialog(
-        this,
-        onTimeSelectedListener,
-        c.hourOfDay,
-        c.minute,
-        true
-    )
-        .show()
+    TimePickerDialog(this, onTimeSelectedListener, c.hourOfDay, c.minute, true).show()
 }
