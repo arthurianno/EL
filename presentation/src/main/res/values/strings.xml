@@ -451,8 +451,8 @@
     <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
     <string name="statistic_glucose_index_description_total">Количество измерений</string>
     <string name="statistic_glucose_index_description_high">Измерения выше диапазона</string>
-    <string name="statistic_glucose_index_description_normal">Измерения ниже диапазона</string>
-    <string name="statistic_glucose_index_description_low">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_normal">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_low">Измерения ниже диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
     <string name="statistic_general_index_title_insulin">Количество инсулина</string>
