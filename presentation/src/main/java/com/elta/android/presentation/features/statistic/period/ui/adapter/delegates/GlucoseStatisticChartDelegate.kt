@@ -18,6 +18,7 @@ class GlucoseStatisticChartDelegate(val bus: RxBus) : AdapterDelegate() {
         val item = items[position] as GlucoseStatisticChartItem
         with(holder as ViewHolder) {
             periodDatesTitleView.text = item.datesTitle
+            statisticsChartView.setChartModel(item.chartModel)
         }
     }
 }

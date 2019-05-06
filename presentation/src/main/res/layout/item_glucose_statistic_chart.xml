@@ -25,8 +25,9 @@
         android:layout_height="1dp"
         android:background="@color/shade_black3" />
 
-    <View
+    <com.elta.android.presentation.widgets.charts.statistics.StatisticsChartCompoundView
+        android:id="@+id/statisticsChartView"
         android:layout_width="match_parent"
-        android:layout_height="240dp" />
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

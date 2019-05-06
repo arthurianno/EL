@@ -6,5 +6,13 @@ data class DateModel(
     val date: Date?,
     val formattedDate: String?,
     val needDrawDateTile: Boolean,
-    val isStub: Boolean
-)
+    val isStub: Boolean = false
+) : Comparable<DateModel> {
+
+    override fun compareTo(other: DateModel) =
+        when {
+            this.date == null -> -1
+            other.date == null -> 1
+            else -> this.date.compareTo(other.date)
+        }
+}
