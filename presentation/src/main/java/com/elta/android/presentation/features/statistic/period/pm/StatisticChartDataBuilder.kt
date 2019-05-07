@@ -38,7 +38,8 @@ fun StatisticByPeriodModel.toChartModel(): StatisticsChartDataModel {
         maxValue = maxLevel,
         minValue = minLevel,
         values = values,
-        statisticsPerDate = modelsMap
+        statisticsPerDate = modelsMap,
+        period = period
     )
 }
 
