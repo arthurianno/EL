@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.Shader
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
@@ -18,6 +21,7 @@ import android.view.View
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.charts.statistics.models.DateModel
+import com.elta.android.presentation.widgets.charts.statistics.models.SectionDataModel
 import com.elta.android.presentation.widgets.charts.statistics.models.SectionModel
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
 import com.nullgr.core.font.getTypeface
@@ -41,6 +45,8 @@ class StatisticsChartView @JvmOverloads constructor(
 
     private var _chartDataModel: StatisticsChartDataModel? = null
     private val dateToSectionsMap = TreeMap<DateModel, SectionModel>()
+    private val sectionsData = mutableListOf<SectionDataModel>()
+    private val pointsOfAverage = mutableListOf<Point>()
 
     // COLORS
     private var sectionLineColor = 0
@@ -61,6 +67,8 @@ class StatisticsChartView @JvmOverloads constructor(
     private var dateTitlePadding = 0f
     private var dateTitleY = 0f
     private var titleHeight = 0f
+    private var glucoseBlockCorner = 0f
+    private var glucoseBlockMargin = 0f
 
     private var selectedItemTimeBgWidth = 0f
     private var selectedItemTimeBgHeight = 0f
@@ -78,6 +86,8 @@ class StatisticsChartView @JvmOverloads constructor(
     private val selectedDateTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedItemShapePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    private val glucosePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     // DRAW OBJECTS
     private val sectionLinePath = Path()
@@ -108,7 +118,7 @@ class StatisticsChartView @JvmOverloads constructor(
             dateToSectionsMap.values.forEach {
                 when {
                     it.isSelected -> it.performSelection(false)
-                    isSectionClicked(it.sectionRect, pointOfTouch) -> it.performSelection(true)
+                    it.isClicked(pointOfTouch) -> it.performSelection(true)
                 }
             }
             invalidate()
@@ -121,6 +131,25 @@ class StatisticsChartView @JvmOverloads constructor(
         canvas?.let {
             it.drawBottomLine()
             it.drawSections()
+            it.drawGlucose()
+        }
+    }
+
+    private fun Canvas.drawGlucose() {
+        sectionsData.forEach { model ->
+            model.lowRect?.let {
+                glucosePaint.shader = model.lowShader
+                drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
+            }
+
+            model.normalRect?.let {
+                glucosePaint.shader = model.normalShader
+                drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
+            }
+            model.highRect?.let {
+                glucosePaint.shader = model.highShader
+                drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
+            }
         }
     }
 
@@ -209,6 +238,8 @@ class StatisticsChartView @JvmOverloads constructor(
         chartOffset = CHART_OFFSET.dpToPx(context)
         sectionsLineWidth = SECTIONS_LINE_WIDTH.dpToPx(context)
         dateTitlePadding = DATE_TITLE_PADDING.dpToPx(context)
+        glucoseBlockCorner = GLUCOSE_BLOCK_CORNER.dpToPx(context)
+        glucoseBlockMargin = GLUCOSE_BLOCK_MARGIN.dpToPx(context)
 
         selectedItemTimeBgWidth = SELECTED_ITEM_TIME_BG_WIDTH.dpToPx(context)
         selectedItemTimeBgHeight = SELECTED_ITEM_TIME_BG_HEIGHT.dpToPx(context)
@@ -257,6 +288,8 @@ class StatisticsChartView @JvmOverloads constructor(
             color = selectedSectionAttrsColor
             style = Paint.Style.FILL
         }
+
+        glucosePaint.apply { style = Paint.Style.FILL }
     }
 
     private fun onBeforeMeasure() {
@@ -292,12 +325,56 @@ class StatisticsChartView @JvmOverloads constructor(
             val left = (singleSectionWidth * index).toInt()
             val right = (singleSectionWidth * (index + 1)).toInt()
             val sectionRect = Rect(left, 0, right, clearChartHeight.toInt())
-            dateToSectionsMap[entry.key] = SectionModel(sectionRect)
+            dateToSectionsMap[entry.key] = SectionModel(sectionRect, isStub = entry.key.isStub)
         }
     }
 
     private fun processItems() {
+        sectionsData.clear()
+        pointsOfAverage.clear()
 
+        val max = dataModel().maxValue
+        val min = dataModel().minValue
+
+        dataModel().statisticsPerDate.entries.forEach { entry ->
+            entry.value?.let { model ->
+
+                val originSectionRect = checkNotNull(dateToSectionsMap[entry.key]).sectionRect
+                val left = originSectionRect.left + glucoseBlockMargin
+                val right = originSectionRect.right - glucoseBlockMargin
+
+                var lowRect: RectF? = null
+                var normalRect: RectF? = null
+                var highRect: RectF? = null
+
+                if (model.eventsLowCount > 0) {
+                    // TODO create low rect
+                }
+                if (model.eventsNormalCount > 0) {
+                    // TODO create normal  rect
+                }
+                if (model.eventsHighCount > 0) {
+                    // TODO create high rect
+                }
+
+                if (model.averageLevel > 0) {
+
+                }
+
+                if (lowRect != null || normalRect != null || highRect != null) {
+                    sectionsData.add(
+                        SectionDataModel(
+                            lowRect = lowRect,
+                            normalRect = normalRect,
+                            highRect = highRect,
+                            lowShader = lowRect?.lowLevelShader(),
+                            normalShader = normalRect?.normalLevelShader(),
+                            highShader = highRect?.highLevelShader()
+                        )
+                    )
+                }
+            }
+        }
     }
 
     private fun SectionModel.performSelection(state: Boolean) {
@@ -305,13 +382,35 @@ class StatisticsChartView @JvmOverloads constructor(
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
     }
 
-    private fun isSectionClicked(rect: Rect, pointF: PointF) =
-        pointF.x.toInt() in rect.left..rect.right && pointF.y.toInt() < rect.bottom
+    private fun SectionModel.isClicked(pointF: PointF) =
+        pointF.x.toInt() in sectionRect.left..sectionRect.right
+            && pointF.y.toInt() < sectionRect.bottom
+            && !isStub
 
     private fun dataModel(): StatisticsChartDataModel =
         checkNotNull(_chartDataModel) { "Property `chartDataModel` did not initialized yet" }
 
     private fun getColor(color: Int) = ContextCompat.getColor(context, color)
+
+    private fun RectF.lowLevelShader() =
+        makeShader(this, getColor(R.color.g_purpur_a), getColor(R.color.g_purpur_b))
+
+    private fun RectF.normalLevelShader() =
+        makeShader(this, getColor(R.color.g_green_a), getColor(R.color.g_green_b))
+
+    private fun RectF.highLevelShader() =
+        makeShader(this, getColor(R.color.g_orange_a), getColor(R.color.g_orange_b))
+
+    private fun makeShader(originRect: RectF, colorStart: Int, colorEnd: Int) =
+        LinearGradient(
+            originRect.left,
+            originRect.top,
+            originRect.left,
+            originRect.bottom,
+            colorStart,
+            colorEnd,
+            Shader.TileMode.CLAMP
+        )
 
     companion object {
         private const val FULL_CHART_HEIGHT = 194f
@@ -332,7 +431,10 @@ class StatisticsChartView @JvmOverloads constructor(
         private const val SELECTED_ITEM_TIME_BG_PADDING = 8f // dp
         private const val SELECTED_ITEM_TRIANGLE_WIDTH = 9f // dp
         private const val SELECTED_ITEM_TRIANGLE_HEIGHT = 7f // dp
-        private const val SELECTED_ITEM_CORNER_RADIUS = 4f
+        private const val SELECTED_ITEM_CORNER_RADIUS = 4f // dp
+
+        private const val GLUCOSE_BLOCK_CORNER = 2f // dp
+        private const val GLUCOSE_BLOCK_MARGIN = 12f // dp
 
         private const val TYPEFACE_BOLD = "roboto_bold.ttf"
     }

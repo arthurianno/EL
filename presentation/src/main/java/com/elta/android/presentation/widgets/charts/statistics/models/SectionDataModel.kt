@@ -1,9 +1,13 @@
 package com.elta.android.presentation.widgets.charts.statistics.models
 
-import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.Shader
 
 data class SectionDataModel(
-    val lowRect: Rect,
-    val normalRect: Rect,
-    val highRect: Rect
+    val lowRect: RectF?,
+    val normalRect: RectF?,
+    val highRect: RectF?,
+    val lowShader: Shader?,
+    val normalShader: Shader?,
+    val highShader: Shader?
 )

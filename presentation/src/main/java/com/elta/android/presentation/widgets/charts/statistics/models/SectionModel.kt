@@ -4,5 +4,6 @@ import android.graphics.Rect
 
 data class SectionModel(
     val sectionRect: Rect,
-    var isSelected: Boolean = false
+    var isSelected: Boolean = false,
+    var isStub: Boolean = false
 )
