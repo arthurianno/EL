@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCas
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -15,9 +16,11 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
+import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import io.reactivex.Observable
+import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -27,11 +30,20 @@ class MainRecordsPm @Inject constructor(
 ) : BaseListPm(services) {
 
     val mainScreenState = stateControl()
+    val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
+    val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
 
     private val loadScreenAction = Action<Unit>()
+    private val googlePlayDialogAction = Action<Unit>()
+    private val feedbackDialogAction = Action<Unit>()
+    private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
+    private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
 
     override fun onCreate() {
         super.onCreate()
+
+        bindGooglePlayRateDialog()
+        bindFeedbackDialog()
 
         loadScreenAction.observable
             .skipWhileInProgress()
@@ -98,4 +110,20 @@ class MainRecordsPm @Inject constructor(
             DayPeriod.AFTERNOON -> R.string.main_records_new_day_title_afternoon
             DayPeriod.EVENING -> R.string.main_records_new_day_title_evening
         }
+
+    private fun bindGooglePlayRateDialog() =
+        googlePlayDialogAction.observable
+            .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
+            .subscribe()
+            .untilDestroy()
+
+    private fun bindFeedbackDialog() =
+        feedbackDialogAction.observable
+            .switchMapMaybe { feedbackDialogControl.showForResult(feedbackDialogData) }
+            .subscribe()
+            .untilDestroy()
+
+    enum class DialogResult {
+        NEGATIVE, POSITIVE
+    }
 }
