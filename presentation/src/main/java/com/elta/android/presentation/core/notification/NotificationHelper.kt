@@ -1,12 +1,12 @@
 package com.elta.android.presentation.core.notification
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.RingtoneManager
 import android.net.Uri
 import android.support.v4.app.NotificationCompat
 import com.elta.android.presentation.R
@@ -33,26 +33,36 @@ class NotificationHelper @Inject constructor(
         }
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title, NotificationManager.IMPORTANCE_HIGH)
-            channel.lightColor = Color.BLUE
-            channel.enableLights(true)
-            channel.enableVibration(true)
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            manager.createNotificationChannel(channel)
-        }
-
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(pendingIntent)
-            .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title,
+                NotificationManager.IMPORTANCE_HIGH).apply {
+                enableLights(true)
+                lightColor = Color.BLUE
+                enableVibration(true)
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null)
+                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            }
+            manager.createNotificationChannel(channel)
+        } else {
+            notification
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLights(Color.BLUE, LIGHTS_DURATION, LIGHTS_DURATION)
+        }
 
         manager.notify(id.hashCode(), notification.build())
     }
 
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "ELTA Notification"
+        private const val LIGHTS_DURATION = 5000
     }
 }
