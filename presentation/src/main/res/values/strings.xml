@@ -297,6 +297,16 @@
     <string name="event_form_delete_dialog_confirm_button">Удалить</string>
     <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
 
+    <string name="google_play_rate_dialog_title">Внимание</string>
+    <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
+    <string name="google_play_rate_dialog_negative_button">Нет</string>
+    <string name="google_play_rate_dialog_positive_button">Да, конечно</string>
+
+    <string name="feedback_dialog_title">Внимание</string>
+    <string name="feedback_dialog_body">Хотели бы вы оставить обратную связь?</string>
+    <string name="feedback_dialog_negative_button">Нет</string>
+    <string name="feedback_dialog_positive_button">Да, конечно</string>
+
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
