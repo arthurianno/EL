@@ -44,6 +44,7 @@ class ProfileChangePasswordPm @Inject constructor(
         ) { isOldPasswordValid, isNewPasswordValid ->
             isOldPasswordValid && isNewPasswordValid
         }
+            .map { it && isPasswordsFilled() }
             .subscribe(changePasswordEnabledState.consumer)
             .untilDestroy()
 
@@ -60,6 +61,9 @@ class ProfileChangePasswordPm @Inject constructor(
             .subscribe()
             .untilDestroy()
     }
+
+    private fun isPasswordsFilled() =
+        oldPasswordInput.text.value.isNotEmpty() && newPasswordInput.text.value.isNotEmpty()
 
     private fun bindHandleBack() {
         exitDialogAction.observable
