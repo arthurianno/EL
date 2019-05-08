@@ -1,0 +1,84 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_toolbar" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/nameInputView"
+                style="@style/EventFormInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/feedback_input_name_hint"
+                android:paddingTop="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/emailInputView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/emailInputView"
+                style="@style/InputStyle.Email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="@string/feedback_input_feedback_hint"
+                android:paddingTop="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/feedbackInputView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/nameInputView" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/emailErrorIconView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/feedbackInputView"
+                app:layout_constraintEnd_toEndOf="@+id/feedbackInputView"
+                app:layout_constraintTop_toTopOf="@+id/feedbackInputView"
+                app:srcCompat="@drawable/ic_warning" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/feedbackInputView"
+                style="@style/InputStyle.Text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/feedback_description_text"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLength="500"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/emailInputView"
+                app:met_helperTextAlwaysShown="false"
+                app:met_hideUnderline="true" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/sendFeedbackButtonView"
+        style="@style/Button.Large"
+        android:enabled="false"
+        android:text="@string/feedback_send"
+        android:visibility="visible" />
+</LinearLayout>

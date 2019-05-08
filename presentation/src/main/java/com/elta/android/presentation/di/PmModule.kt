@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPass
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
+import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
@@ -279,4 +280,10 @@ abstract class PmModule {
     @IntoMap
     @PmKey(PeriodPm::class)
     abstract fun bindPeriodPm(pm: PeriodPm): PresentationModel
+
+    // FEEDBACK FLOW
+    @Binds
+    @IntoMap
+    @PmKey(FeedbackPm::class)
+    abstract fun bindFeedbackPm(pm: FeedbackPm): PresentationModel
 }
