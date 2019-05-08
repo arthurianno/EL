@@ -7,9 +7,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.support.v4.app.NotificationCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.app.ui.AppActivity
+import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_AUTHORITY
+import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_SCHEME
 import javax.inject.Inject
 
 class NotificationHelper @Inject constructor(
@@ -20,9 +23,14 @@ class NotificationHelper @Inject constructor(
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    override fun sendNotification(title: String, text: String, id: String) {
-        val intent = Intent(context, AppActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    override fun sendNotification(screen: String, title: String, text: String, id: String) {
+        val intent = Intent(context, AppActivity::class.java).apply {
+            data = Uri.Builder()
+                .scheme(NOTIFICATION_URI_SCHEME)
+                .authority(NOTIFICATION_URI_AUTHORITY)
+                .appendPath(screen)
+                .build()
+        }
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -44,7 +52,7 @@ class NotificationHelper @Inject constructor(
         manager.notify(id.hashCode(), notification.build())
     }
 
-    private companion object {
-        const val NOTIFICATION_CHANNEL_ID = "ELTA Notification"
+    companion object {
+        private const val NOTIFICATION_CHANNEL_ID = "ELTA Notification"
     }
 }

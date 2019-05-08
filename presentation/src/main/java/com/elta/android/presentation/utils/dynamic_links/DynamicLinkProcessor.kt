@@ -12,6 +12,7 @@ class DynamicLinkProcessor private constructor(
     private val ignoreColdStart: Boolean,
     private val savedState: Bundle? = null,
     private val coldStartAction: PresentationModel.Action<Unit>?,
+    private val notificationStartAction: PresentationModel.Action<Uri>?,
     private val deepLinkOpenAction: PresentationModel.Action<Uri>?,
     private val coldStartByDeepLinkAction: PresentationModel.Action<Uri>?
 ) {
@@ -28,7 +29,13 @@ class DynamicLinkProcessor private constructor(
                             } else {
                                 deepLinkOpenAction?.consumer?.accept(this)
                             }
-                        } else processColdStartIfNeed()
+                        } else {
+                            if (initialIntent.data.isNotificationUriValid()) {
+                                notificationStartAction?.consumer?.accept(initialIntent.data)
+                            } else {
+                                processColdStartIfNeed()
+                            }
+                        }
                     }
                 }
                 .addOnFailureListener {
@@ -56,6 +63,7 @@ class DynamicLinkProcessor private constructor(
         private var ignoreColdStart: Boolean = true
         private var savedState: Bundle? = null
         private var coldStartAction: PresentationModel.Action<Unit>? = null
+        private var notificationStartAction: PresentationModel.Action<Uri>? = null
         private var deepLinkOpenAction: PresentationModel.Action<Uri>? = null
         private var coldStartByDeepLinkAction: PresentationModel.Action<Uri>? = null
 
@@ -71,6 +79,11 @@ class DynamicLinkProcessor private constructor(
 
         fun coldStartPassTo(action: PresentationModel.Action<Unit>): Builder {
             this.coldStartAction = action
+            return this
+        }
+
+        fun notificationStartPassTo(action: PresentationModel.Action<Uri>): Builder {
+            this.notificationStartAction = action
             return this
         }
 
@@ -90,6 +103,7 @@ class DynamicLinkProcessor private constructor(
                 ignoreColdStart,
                 savedState,
                 coldStartAction,
+                notificationStartAction,
                 deepLinkOpenAction,
                 coldStartByDeepLinkAction
             )
