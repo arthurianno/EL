@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -25,6 +26,7 @@ import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val shouldSendFeedbackUseCase: ShouldSendFeedbackUseCase,
     private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -34,6 +36,7 @@ class MainRecordsPm @Inject constructor(
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
 
     private val loadScreenAction = Action<Unit>()
+    private val feedbackAction = Action<Unit>()
     private val googlePlayDialogAction = Action<Unit>()
     private val feedbackDialogAction = Action<Unit>()
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
@@ -44,26 +47,20 @@ class MainRecordsPm @Inject constructor(
 
         bindGooglePlayRateDialog()
         bindFeedbackDialog()
-
-        loadScreenAction.observable
-            .skipWhileInProgress()
-            .flatMap { params ->
-                getHomeModelUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .doOnNext(::handleSuccess)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
+        bindLoadScreenAction()
+        bindFeedbackAction()
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit },
             bus.events<Events.ProfileUpdated>().map { Unit }
         )
-            .doOnNext { loadScreenAction.consumer.accept(Unit) }
+            .doOnNext(loadScreenAction.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.EventsChanged>().map { Unit }
+            .doOnNext(loadScreenAction.consumer)
+            .doOnNext(feedbackAction.consumer)
             .subscribe()
             .untilDestroy()
     }
@@ -78,6 +75,34 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilUnbind()
     }
+
+    private fun bindFeedbackAction() =
+        feedbackAction.observable
+            .flatMap {
+                shouldSendFeedbackUseCase.execute(Unit)
+                    .doOnSuccess {
+                        // TODO show dialog if true
+                    }
+                    .doOnError(::handleError)
+                    .toObservable()
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+    private fun bindLoadScreenAction() =
+        loadScreenAction.observable
+            .skipWhileInProgress()
+            .flatMap { params ->
+                getHomeModelUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnNext(::handleSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
 
     private fun navigateToEventScreen(record: RecordItem) {
         router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
