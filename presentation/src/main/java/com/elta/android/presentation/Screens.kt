@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPass
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
+import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -228,5 +229,10 @@ object Screens {
             val superKey = super.getScreenKey()
             return "$superKey-${period.name}"
         }
+    }
+
+    // FEEDBACK
+    object Feedback : SupportAppScreen() {
+        override fun getFragment() = FeedbackFragment.newInstance()
     }
 }
