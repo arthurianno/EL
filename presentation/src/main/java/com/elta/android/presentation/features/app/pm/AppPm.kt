@@ -6,6 +6,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
+import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
@@ -13,6 +14,7 @@ class AppPm @Inject constructor(
 ) : BasePm(services), ConnectionListener {
 
     val coldStartAction = Action<Unit>()
+    val notificationStartAction = Action<Uri>()
     val deepLinkAction = Action<Uri>()
     val coldStartDeepLinkAction = Action<Uri>()
 
@@ -34,6 +36,13 @@ class AppPm @Inject constructor(
         coldStartDeepLinkAction.observable
             .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
             .doOnNext { router.newRootChain(Screens.GreetingFlow, it) }
+            .subscribe()
+            .untilDestroy()
+
+        notificationStartAction.observable
+            .map { NotificationNavigationMapper.notificationDataToScreen(it) }
+            .doOnNext { screen -> screen?.let { router.newRootFlow(it) } }
+            .retry()
             .subscribe()
             .untilDestroy()
     }

@@ -72,8 +72,10 @@ class ReminderWorker(
 
     private fun sendNotificationIfNeed(isShowNotification: Boolean, reminder: Reminder) {
         if (isShowNotification) {
-            notificationSource.sendNotification(applicationContext
-                .getString(R.string.profile_reminders_notification_title), reminder.title, reminder.id)
+            notificationSource.sendNotification(
+                title = applicationContext.getString(R.string.profile_reminders_notification_title),
+                text = reminder.title,
+                id = reminder.id)
         }
     }
 
