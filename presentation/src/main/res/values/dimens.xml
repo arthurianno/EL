@@ -8,6 +8,7 @@
     <dimen name="font_size_subtitle_2">14sp</dimen>
     <dimen name="font_size_headline_1">24sp</dimen>
     <dimen name="font_size_headline_2">20sp</dimen>
+    <dimen name="font_size_headline_4">20sp</dimen>
     <dimen name="font_size_caption_1">12sp</dimen>
     <dimen name="font_size_snakbar_text">15sp</dimen>
     <dimen name="font_size_toolbar_button">14sp</dimen>
