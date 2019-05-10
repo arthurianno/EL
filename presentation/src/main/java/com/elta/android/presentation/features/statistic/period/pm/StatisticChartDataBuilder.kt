@@ -17,8 +17,10 @@ import java.util.TreeMap
 private const val VALUES_COUNT = 5
 private const val DEFAULT_MIN_LEVEL = 0.6
 private const val DEFAULT_MAX_LEVEL = 35.0
+private const val STEP_SEVEN_DAYS = 7
+private const val STEP_SIX_DAYS = 6
 private const val DATE_FORMAT = "dd.MM"
-private val STUB_DATE = DateModel(null, null, false, true)
+private val stubDate = DateModel(null, null, false, true)
 
 fun StatisticByPeriodModel.toChartModel(): StatisticsChartDataModel {
     val minLevel = dayWithMinLevel?.glucose.minLevel()
@@ -27,7 +29,7 @@ fun StatisticByPeriodModel.toChartModel(): StatisticsChartDataModel {
     val values = buildValues(minLevel, maxLevel)
     val modelsMap = TreeMap<DateModel, GlucoseStatisticModel?>()
     if (period is Periods.SevenDays) {
-        modelsMap[STUB_DATE] = null
+        modelsMap[stubDate] = null
     }
     var date = period.start
     while (!date.after(period.end)) {
@@ -47,7 +49,7 @@ private fun buildValues(min: Double, max: Double): List<Double> {
     val step = (max - min) / VALUES_COUNT
     val resultList = arrayListOf<Double>()
     for (i in 0..VALUES_COUNT) {
-        resultList.add((min + step * i))
+        resultList.add(min + step * i)
     }
     resultList.sort()
     return resultList
@@ -66,8 +68,8 @@ private fun Date.toDateModel(period: StatisticPeriod) =
     )
 
 private fun StatisticPeriod.datesStep() = when {
-    this is Periods.FourteenDays -> 7
-    else -> 6
+    this is Periods.FourteenDays -> STEP_SEVEN_DAYS
+    else -> STEP_SIX_DAYS
 }
 
 private fun GlucoseStatisticModel?.minLevel(): Double {

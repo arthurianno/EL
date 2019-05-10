@@ -8,7 +8,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.7dp"
         android:background="@color/shade_black3" />
 
     <android.support.v7.widget.AppCompatTextView
@@ -22,7 +22,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.7dp"
         android:background="@color/shade_black3" />
 
     <com.elta.android.presentation.widgets.charts.statistics.StatisticsChartCompoundView

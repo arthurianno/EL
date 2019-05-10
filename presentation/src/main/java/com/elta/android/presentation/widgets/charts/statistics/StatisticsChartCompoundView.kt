@@ -6,10 +6,13 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
+import com.elta.android.presentation.widgets.charts.statistics.listeners.StatisticsDateChangedObserver
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
-import kotlinx.android.synthetic.main.layout_glucose_daily_view.view.*
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.layout_statistics_chart_compound_view.view.*
+import java.util.Date
 
+@Suppress("MagicNumber")
 class StatisticsChartCompoundView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -19,6 +22,8 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_statistics_chart_compound_view, this, true)
     }
+
+    fun dateChanged(): Observable<Date> = StatisticsDateChangedObserver(chartView)
 
     fun setChartModel(model: StatisticsChartDataModel) {
         bindValues(model.values)
@@ -43,6 +48,6 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val SCROLL_DELAY = 200L
+        private const val SCROLL_DELAY = 100L
     }
 }

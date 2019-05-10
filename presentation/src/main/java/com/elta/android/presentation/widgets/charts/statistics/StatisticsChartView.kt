@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions", "MaxLineLength")
+
 package com.elta.android.presentation.widgets.charts.statistics
 
 import android.annotation.SuppressLint
@@ -7,7 +9,6 @@ import android.graphics.DashPathEffect
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
@@ -20,6 +21,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.presentation.R
+import com.elta.android.presentation.widgets.charts.statistics.listeners.OnStatisticsDateChangedListener
 import com.elta.android.presentation.widgets.charts.statistics.models.DateModel
 import com.elta.android.presentation.widgets.charts.statistics.models.SectionDataModel
 import com.elta.android.presentation.widgets.charts.statistics.models.SectionModel
@@ -28,8 +30,10 @@ import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.getDisplaySize
 import com.nullgr.core.ui.extensions.spToPx
+import java.util.Date
 import java.util.TreeMap
 
+@Suppress("LongMethod", "MagicNumber", "NestedBlockDepth")
 class StatisticsChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -46,7 +50,8 @@ class StatisticsChartView @JvmOverloads constructor(
     private var _chartDataModel: StatisticsChartDataModel? = null
     private val dateToSectionsMap = TreeMap<DateModel, SectionModel>()
     private val sectionsData = mutableListOf<SectionDataModel>()
-    private val pointsOfAverage = mutableListOf<Point>()
+    private val pointsOfAverage = mutableListOf<PointF>()
+    private var listener: OnStatisticsDateChangedListener? = null
 
     // COLORS
     private var sectionLineColor = 0
@@ -69,6 +74,10 @@ class StatisticsChartView @JvmOverloads constructor(
     private var titleHeight = 0f
     private var glucoseBlockCorner = 0f
     private var glucoseBlockMargin = 0f
+    private var glucoseMinBlockHeight = 0f
+    private var averageLineWidth = 0f
+    private var averagePointRadius = 0f
+    private var averagePointCircleWidth = 0f
 
     private var selectedItemTimeBgWidth = 0f
     private var selectedItemTimeBgHeight = 0f
@@ -88,6 +97,9 @@ class StatisticsChartView @JvmOverloads constructor(
     private val selectedItemShapePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private val glucosePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val averageLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val averagePointPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val averagePointCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     // DRAW OBJECTS
     private val sectionLinePath = Path()
@@ -95,10 +107,15 @@ class StatisticsChartView @JvmOverloads constructor(
     private val selectedItemTriangleTop = Path()
     private val selectedItemTriangleBottom = Path()
     private val selectedItemLinePath = Path()
+    private val averageLinePath = Path()
 
     init {
         initDefault()
         initPaints()
+    }
+
+    fun setOnStatisticsDateChangedListener(listener: OnStatisticsDateChangedListener?) {
+        this.listener = listener
     }
 
     fun getScrollPosition() = fullViewWidth
@@ -108,17 +125,16 @@ class StatisticsChartView @JvmOverloads constructor(
         val newWidthMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewWidth.toInt(), MeasureSpec.EXACTLY)
         val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
         super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
-        onAfterMeasure()
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
             val pointOfTouch = PointF(event.x, event.y)
-            dateToSectionsMap.values.forEach {
+            dateToSectionsMap.entries.forEach {
                 when {
-                    it.isSelected -> it.performSelection(false)
-                    it.isClicked(pointOfTouch) -> it.performSelection(true)
+                    it.value.isSelected -> it.value.performSelection(false, it.key.date)
+                    it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date)
                 }
             }
             invalidate()
@@ -132,6 +148,7 @@ class StatisticsChartView @JvmOverloads constructor(
             it.drawBottomLine()
             it.drawSections()
             it.drawGlucose()
+            it.drawAverageLevel()
         }
     }
 
@@ -141,7 +158,6 @@ class StatisticsChartView @JvmOverloads constructor(
                 glucosePaint.shader = model.lowShader
                 drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
             }
-
             model.normalRect?.let {
                 glucosePaint.shader = model.normalShader
                 drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
@@ -150,6 +166,21 @@ class StatisticsChartView @JvmOverloads constructor(
                 glucosePaint.shader = model.highShader
                 drawRoundRect(it, glucoseBlockCorner, glucoseBlockCorner, glucosePaint)
             }
+        }
+    }
+
+    private fun Canvas.drawAverageLevel() {
+        if (pointsOfAverage.size > 2) {
+            averageLinePath.reset()
+            averageLinePath.moveTo(pointsOfAverage[0].x, pointsOfAverage[0].y)
+            for (i in 1 until pointsOfAverage.size) {
+                averageLinePath.lineTo(pointsOfAverage[i].x, pointsOfAverage[i].y)
+            }
+            drawPath(averageLinePath, averageLinePaint)
+        }
+        pointsOfAverage.forEach {
+            drawCircle(it.x, it.y, averagePointRadius, averagePointPaint)
+            drawCircle(it.x, it.y, averagePointRadius, averagePointCirclePaint)
         }
     }
 
@@ -239,7 +270,10 @@ class StatisticsChartView @JvmOverloads constructor(
         sectionsLineWidth = SECTIONS_LINE_WIDTH.dpToPx(context)
         dateTitlePadding = DATE_TITLE_PADDING.dpToPx(context)
         glucoseBlockCorner = GLUCOSE_BLOCK_CORNER.dpToPx(context)
-        glucoseBlockMargin = GLUCOSE_BLOCK_MARGIN.dpToPx(context)
+        glucoseMinBlockHeight = GLUCOSE_MIN_BLOCK_HEIGHT.dpToPx(context)
+        averageLineWidth = AVERAGE_LINE_WIDTH.dpToPx(context)
+        averagePointCircleWidth = AVERAGE_POINT_LINE_WIDTH.dpToPx(context)
+        averagePointRadius = AVERAGE_POINT_RADIUS.dpToPx(context)
 
         selectedItemTimeBgWidth = SELECTED_ITEM_TIME_BG_WIDTH.dpToPx(context)
         selectedItemTimeBgHeight = SELECTED_ITEM_TIME_BG_HEIGHT.dpToPx(context)
@@ -256,12 +290,12 @@ class StatisticsChartView @JvmOverloads constructor(
         sectionBottomLinePaint.apply {
             style = Paint.Style.STROKE
             color = sectionLineColor
-            strokeWidth = SECTIONS_LINE_WIDTH.dpToPx(context)
+            strokeWidth = sectionsLineWidth
         }
         sectionLinePaint.apply {
             style = Paint.Style.STROKE
             color = sectionLineColor
-            strokeWidth = SECTIONS_LINE_WIDTH.dpToPx(context)
+            strokeWidth = sectionsLineWidth
             val gapLength = SECTION_LINE_GAP.dpToPx(context)
             pathEffect = DashPathEffect(floatArrayOf(gapLength, gapLength), 0f)
         }
@@ -288,8 +322,21 @@ class StatisticsChartView @JvmOverloads constructor(
             color = selectedSectionAttrsColor
             style = Paint.Style.FILL
         }
-
         glucosePaint.apply { style = Paint.Style.FILL }
+        averageLinePaint.apply {
+            style = Paint.Style.STROKE
+            color = getColor(R.color.g_green_b)
+            strokeWidth = averageLineWidth
+        }
+        averagePointPaint.apply {
+            style = Paint.Style.FILL
+            color = getColor(R.color.white)
+        }
+        averagePointCirclePaint.apply {
+            style = Paint.Style.STROKE
+            color = getColor(R.color.g_green_b)
+            strokeWidth = averagePointCircleWidth
+        }
     }
 
     private fun onBeforeMeasure() {
@@ -302,10 +349,6 @@ class StatisticsChartView @JvmOverloads constructor(
         dateTitleY = clearChartHeight + dateTitlePadding + (titleHeight * 0.75).toInt()
     }
 
-    private fun onAfterMeasure() {
-
-    }
-
     private fun onDataModelChanged() {
         if (ViewCompat.isAttachedToWindow(this)) {
             processSections()
@@ -316,11 +359,12 @@ class StatisticsChartView @JvmOverloads constructor(
 
     private fun processSections() {
         dateToSectionsMap.clear()
+        val availableScreenWidth = getDisplaySize(context).first - CHART_VALUES_WIDTH.dpToPx(context)
         singleSectionWidth = when {
-            dataModel().period is Periods.SevenDays ->
-                (getDisplaySize(context).first - CHART_VALUES_WIDTH.dpToPx(context)) / 8
-            else -> SINGLE_SECTION_OTHER_WIDTH.dpToPx(context)
+            dataModel().period is Periods.SevenDays -> availableScreenWidth / 8
+            else -> availableScreenWidth / 14
         }
+        glucoseBlockMargin = (singleSectionWidth * 0.3).toFloat()
         dataModel().statisticsPerDate.entries.forEachIndexed { index, entry ->
             val left = (singleSectionWidth * index).toInt()
             val right = (singleSectionWidth * (index + 1)).toInt()
@@ -335,6 +379,8 @@ class StatisticsChartView @JvmOverloads constructor(
 
         val max = dataModel().maxValue
         val min = dataModel().minValue
+        val fullRange = max - min
+        val availableChartHeight = clearChartHeight - 2 * chartOffset
 
         dataModel().statisticsPerDate.entries.forEach { entry ->
             entry.value?.let { model ->
@@ -342,23 +388,52 @@ class StatisticsChartView @JvmOverloads constructor(
                 val originSectionRect = checkNotNull(dateToSectionsMap[entry.key]).sectionRect
                 val left = originSectionRect.left + glucoseBlockMargin
                 val right = originSectionRect.right - glucoseBlockMargin
+                val originTop = originSectionRect.top + chartOffset
 
                 var lowRect: RectF? = null
                 var normalRect: RectF? = null
                 var highRect: RectF? = null
 
                 if (model.eventsLowCount > 0) {
-                    // TODO create low rect
+                    val minLow = model.minLowLevel ?: 0.0
+                    val lowBottom = originTop + availableChartHeight * (1 - (minLow - min) / fullRange)
+                    val maxLow = model.maxLowLevel ?: 0.0
+                    var lowTop = originTop + availableChartHeight * (1 - (maxLow - min) / fullRange)
+
+                    if (lowBottom - lowTop < glucoseMinBlockHeight) {
+                        lowTop = lowBottom - glucoseMinBlockHeight
+                    }
+                    lowRect = RectF(left, lowTop.toFloat(), right, lowBottom.toFloat())
                 }
+                
                 if (model.eventsNormalCount > 0) {
-                    // TODO create normal  rect
+                    val minNormal = model.minNormalLevel ?: 0.0
+                    val normalBottom = originTop + availableChartHeight * (1 - (minNormal - min) / fullRange)
+                    val maxNormal = model.maxNormalLevel ?: 0.0
+                    var normalTop = originTop + availableChartHeight * (1 - (maxNormal - min) / fullRange)
+
+                    if (normalBottom - normalTop < glucoseMinBlockHeight) {
+                        normalTop = normalBottom - glucoseMinBlockHeight
+                    }
+                    normalRect = RectF(left, normalTop.toFloat(), right, normalBottom.toFloat())
                 }
+
                 if (model.eventsHighCount > 0) {
-                    // TODO create high rect
+                    val minHigh = model.minHighLevel ?: 0.0
+                    val highBottom = originTop + availableChartHeight * (1 - (minHigh - min) / fullRange)
+                    val maxHigh = model.maxHighLevel ?: 0.0
+                    var highTop = originTop + availableChartHeight * (1 - (maxHigh - min) / fullRange)
+
+                    if (highBottom - highTop < glucoseMinBlockHeight) {
+                        highTop = highBottom - glucoseMinBlockHeight
+                    }
+                    highRect = RectF(left, highTop.toFloat(), right, highBottom.toFloat())
                 }
 
                 if (model.averageLevel > 0) {
-
+                    val pointX = originSectionRect.left + originSectionRect.width() / 2
+                    val pointY = originTop + availableChartHeight * (1 - (model.averageLevel - min) / fullRange)
+                    pointsOfAverage.add(PointF(pointX.toFloat(), pointY.toFloat()))
                 }
 
                 if (lowRect != null || normalRect != null || highRect != null) {
@@ -377,15 +452,17 @@ class StatisticsChartView @JvmOverloads constructor(
         }
     }
 
-    private fun SectionModel.performSelection(state: Boolean) {
+    private fun SectionModel.performSelection(state: Boolean, date: Date?) {
         isSelected = state
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        if (isSelected)
+            date?.let { listener?.onDateChanged(date) }
     }
 
     private fun SectionModel.isClicked(pointF: PointF) =
-        pointF.x.toInt() in sectionRect.left..sectionRect.right
-            && pointF.y.toInt() < sectionRect.bottom
-            && !isStub
+        pointF.x.toInt() in sectionRect.left..sectionRect.right &&
+            pointF.y.toInt() < sectionRect.bottom &&
+            !isStub
 
     private fun dataModel(): StatisticsChartDataModel =
         checkNotNull(_chartDataModel) { "Property `chartDataModel` did not initialized yet" }
@@ -415,14 +492,16 @@ class StatisticsChartView @JvmOverloads constructor(
     companion object {
         private const val FULL_CHART_HEIGHT = 194f
         private const val FULL_VIEW_HEIGHT = 230f
-        private const val CHART_OFFSET = 16f // dp
+        private const val CHART_OFFSET = 8f // dp
 
         private const val CHART_VALUES_WIDTH = 45f // dp
-        private const val SINGLE_SECTION_OTHER_WIDTH = 34f // dp
         private const val SECTION_LINE_GAP = 2f // dp
-        private const val SECTIONS_LINE_WIDTH = 1f // dp
+        private const val SECTIONS_LINE_WIDTH = 1.3f // dp
         private const val DATE_TITLE_PADDING = 12f // dp
         private const val DATE_TEXT_SIZE = 10f // sp
+        private const val AVERAGE_LINE_WIDTH = 1f // dp
+        private const val AVERAGE_POINT_RADIUS = 3f // dp
+        private const val AVERAGE_POINT_LINE_WIDTH = 1f // dp
 
         private const val SELECTED_ITEM_LINE_WIDTH = 1f // dp
         private const val SELECTED_ITEM_GAP = 4f // dp
@@ -434,7 +513,7 @@ class StatisticsChartView @JvmOverloads constructor(
         private const val SELECTED_ITEM_CORNER_RADIUS = 4f // dp
 
         private const val GLUCOSE_BLOCK_CORNER = 2f // dp
-        private const val GLUCOSE_BLOCK_MARGIN = 12f // dp
+        private const val GLUCOSE_MIN_BLOCK_HEIGHT = 3f // dp
 
         private const val TYPEFACE_BOLD = "roboto_bold.ttf"
     }
