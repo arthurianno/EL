@@ -405,7 +405,7 @@ class StatisticsChartView @JvmOverloads constructor(
                     }
                     lowRect = RectF(left, lowTop.toFloat(), right, lowBottom.toFloat())
                 }
-                
+
                 if (model.eventsNormalCount > 0) {
                     val minNormal = model.minNormalLevel ?: 0.0
                     val normalBottom = originTop + availableChartHeight * (1 - (minNormal - min) / fullRange)
