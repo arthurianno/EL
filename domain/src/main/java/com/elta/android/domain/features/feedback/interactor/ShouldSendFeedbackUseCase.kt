@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.feedback.interactor
 
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.feedback.model.FeedbackDataModel
 import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -11,13 +12,13 @@ class ShouldSendFeedbackUseCase @Inject constructor(
     private val emailRepo: FeedbackRepository,
     private val eventsRepo: EventsRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<Boolean, Unit>(schedulers) {
+) : SingleUseCase<FeedbackDataModel, Unit>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Unit?): Single<Boolean> =
+    override fun buildUseCaseObservable(params: Unit?): Single<FeedbackDataModel> =
         emailRepo.isFeedbackWasSent()
             .flatMap { isFeedbackWasSent ->
                 if (isFeedbackWasSent) {
-                    Single.just(false)
+                    Single.just(noneFeedbackModel())
                 } else {
                     eventsRepo.getEvents()
                         .singleOrError()

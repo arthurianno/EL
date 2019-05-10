@@ -47,6 +47,7 @@ import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
 import com.nullgr.core.intents.callIntent
+import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -234,5 +235,10 @@ object Screens {
     // FEEDBACK
     object Feedback : SupportAppScreen() {
         override fun getFragment() = FeedbackFragment.newInstance()
+    }
+
+    object PlayMarketScreen : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            webIntent("market://details?id=com.elta.android")
     }
 }

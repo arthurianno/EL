@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.feedback.interactor.SetFeedbackWasSentUseCase
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
     private val shouldSendFeedbackUseCase: ShouldSendFeedbackUseCase,
+    private val setFeedbackWasSentUseCase: SetFeedbackWasSentUseCase,
     private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -40,10 +42,9 @@ class MainRecordsPm @Inject constructor(
     private val feedbackAction = Action<Unit>()
     private val feedbackDialogAction = Action<Unit>()
     private val googlePlayDialogAction = Action<Unit>()
-    private val likeAppDialogAction = Action<Unit>()
+    private val likeAppDialogAction = Action<Int>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
-    private val likeAppDialogData by lazy { Dialogs.LikeAppRateData(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -84,9 +85,9 @@ class MainRecordsPm @Inject constructor(
         feedbackAction.observable
             .flatMap {
                 shouldSendFeedbackUseCase.execute(Unit)
-                    .doOnSuccess {
-                        // TODO show dialog if true
-                    }
+                    .filter { it.isSendFeedback }
+                    .map { it.step }
+                    .doOnSuccess(likeAppDialogAction.consumer)
                     .doOnError(::handleError)
                     .toObservable()
             }
@@ -143,18 +144,34 @@ class MainRecordsPm @Inject constructor(
     private fun bindGooglePlayRateDialog() =
         googlePlayDialogAction.observable
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
+            .filter { it == DialogResult.POSITIVE }
+            .flatMap { setFeedbackWasSentUseCase.execute().toObservable<Unit>() }
+            .map { Screens.PlayMarketScreen }
+            .doOnNext(router::navigateTo)
             .subscribe()
             .untilDestroy()
 
+    @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
     private fun bindLikeAppDialog() =
         likeAppDialogAction.observable
-            .switchMapMaybe { likeAppDialogControl.showForResult(likeAppDialogData) }
+            .switchMapMaybe { step ->
+                likeAppDialogControl.showForResult(Dialogs.LikeAppRateData(resources, step))
+            }
+            .doOnNext { result ->
+                when (result) {
+                    DialogResult.POSITIVE -> googlePlayDialogAction.consumer.accept(Unit)
+                    DialogResult.NEGATIVE -> feedbackDialogAction.consumer.accept(Unit)
+                }
+            }
             .subscribe()
             .untilDestroy()
 
     private fun bindFeedbackDialog() =
         feedbackDialogAction.observable
             .switchMapMaybe { feedbackDialogControl.showForResult(feedbackDialogData) }
+            .filter { it == DialogResult.POSITIVE }
+            .map { Screens.Feedback }
+            .doOnNext(router::startFlow)
             .subscribe()
             .untilDestroy()
 

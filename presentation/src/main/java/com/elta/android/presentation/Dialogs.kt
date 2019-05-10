@@ -23,11 +23,14 @@ sealed class Dialogs : DialogData {
 
     data class LikeAppRateData(
         val resources: ResourceProvider,
-        override val title: String = resources.getString(R.string.like_app_dialog_title),
+        val step: Int,
         override val message: String = resources.getString(R.string.like_app_dialog_body),
         override val negative: String = resources.getString(R.string.like_app_dialog_negative_button),
         override val positive: String = resources.getString(R.string.like_app_dialog_positive_button)
-    ) : Dialogs()
+    ) : Dialogs() {
+        override val title: String
+            get() = resources.getString(R.string.like_app_dialog_title, step)
+    }
 
     data class FeedbackData(
         val resources: ResourceProvider,
