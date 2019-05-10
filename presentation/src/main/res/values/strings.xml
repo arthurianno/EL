@@ -302,6 +302,11 @@
     <string name="google_play_rate_dialog_negative_button">Нет</string>
     <string name="google_play_rate_dialog_positive_button">Да, конечно</string>
 
+    <string name="like_app_dialog_title">Ваша первая запись!</string>
+    <string name="like_app_dialog_body">Понравилось ли Вам пользоваться нашим приложением?</string>
+    <string name="like_app_dialog_negative_button">Не очень</string>
+    <string name="like_app_dialog_positive_button">Да, конечно</string>
+
     <string name="feedback_dialog_title">Внимание</string>
     <string name="feedback_dialog_body">Хотели бы вы оставить обратную связь?</string>
     <string name="feedback_dialog_negative_button">Нет</string>

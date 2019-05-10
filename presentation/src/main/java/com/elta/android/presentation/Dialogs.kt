@@ -21,6 +21,14 @@ sealed class Dialogs : DialogData {
         override val positive: String = resources.getString(R.string.google_play_rate_dialog_positive_button)
     ) : Dialogs()
 
+    data class LikeAppRateData(
+        val resources: ResourceProvider,
+        override val title: String = resources.getString(R.string.like_app_dialog_title),
+        override val message: String = resources.getString(R.string.like_app_dialog_body),
+        override val negative: String = resources.getString(R.string.like_app_dialog_negative_button),
+        override val positive: String = resources.getString(R.string.like_app_dialog_positive_button)
+    ) : Dialogs()
+
     data class FeedbackData(
         val resources: ResourceProvider,
         override val title: String = resources.getString(R.string.feedback_dialog_title),

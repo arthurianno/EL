@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.Events
@@ -18,6 +19,7 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.RxBus
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_main_records.*
+import kotlinx.android.synthetic.main.layout_like_app_dialog.view.*
 import me.dmdev.rxpm.widget.DialogControl
 import javax.inject.Inject
 
@@ -68,16 +70,36 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
                 }
             }
 
+        pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindDialog()
         pm.feedbackDialogControl.bindDialog()
     }
 
     private fun DialogControl<DialogData, MainRecordsPm.DialogResult>.bindDialog() =
         bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
+            MaterialDialog.Builder(requireActivity())
                 .cancelable(false)
                 .title(data.title)
                 .content(data.message)
+                .negativeText(data.negative)
+                .positiveText(data.positive)
+                .onPositive { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.POSITIVE) }
+                .onNegative { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.NEGATIVE) }
+                .build()
+        }
+
+    private fun DialogControl<DialogData, MainRecordsPm.DialogResult>.bindLikeAppDialog() =
+        bindTo { data, dc ->
+            val dialogView =
+                LayoutInflater
+                    .from(requireContext())
+                    .inflate(R.layout.layout_like_app_dialog, null)
+            dialogView.titleView.text = data.title
+            dialogView.contentView.text = data.message
+
+            MaterialDialog.Builder(requireActivity())
+                .customView(dialogView, false)
+                .cancelable(false)
                 .negativeText(data.negative)
                 .positiveText(data.positive)
                 .onPositive { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.POSITIVE) }

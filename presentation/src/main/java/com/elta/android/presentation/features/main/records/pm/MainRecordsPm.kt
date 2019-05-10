@@ -34,17 +34,21 @@ class MainRecordsPm @Inject constructor(
     val mainScreenState = stateControl()
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
+    val likeAppDialogControl = dialogControl<DialogData, DialogResult>()
 
     private val loadScreenAction = Action<Unit>()
     private val feedbackAction = Action<Unit>()
-    private val googlePlayDialogAction = Action<Unit>()
     private val feedbackDialogAction = Action<Unit>()
-    private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
+    private val googlePlayDialogAction = Action<Unit>()
+    private val likeAppDialogAction = Action<Unit>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
+    private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
+    private val likeAppDialogData by lazy { Dialogs.LikeAppRateData(resources) }
 
     override fun onCreate() {
         super.onCreate()
 
+        bindLikeAppDialog()
         bindGooglePlayRateDialog()
         bindFeedbackDialog()
         bindLoadScreenAction()
@@ -139,6 +143,12 @@ class MainRecordsPm @Inject constructor(
     private fun bindGooglePlayRateDialog() =
         googlePlayDialogAction.observable
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
+            .subscribe()
+            .untilDestroy()
+
+    private fun bindLikeAppDialog() =
+        likeAppDialogAction.observable
+            .switchMapMaybe { likeAppDialogControl.showForResult(likeAppDialogData) }
             .subscribe()
             .untilDestroy()
 
