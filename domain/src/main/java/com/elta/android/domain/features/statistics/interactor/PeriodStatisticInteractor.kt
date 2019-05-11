@@ -132,7 +132,9 @@ fun buildGlucoseStatisticModel(
 
         eventsHighPercent = eventsHighPercent,
         eventsNormalPercent = eventsNormalPercent,
-        eventsLowPercent = eventsLowPercent
+        eventsLowPercent = eventsLowPercent,
+
+        glucoseEvents = glucoseEventsPerPeriod
     )
 }
 

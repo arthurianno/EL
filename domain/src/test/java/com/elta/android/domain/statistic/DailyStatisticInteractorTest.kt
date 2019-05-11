@@ -133,7 +133,9 @@ class DailyStatisticInteractorTest {
 
                 eventsHighPercent = 2.percent(glucoseEvents.size),
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
-                eventsLowPercent = 1.percent(glucoseEvents.size)
+                eventsLowPercent = 1.percent(glucoseEvents.size),
+
+                glucoseEvents = glucoseEvents
             ),
             insulin = DailyInsulinStatisticModel(
                 totalBolusLevel = 20.0,

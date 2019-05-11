@@ -22,7 +22,7 @@ private const val STEP_SIX_DAYS = 6
 private const val DATE_FORMAT = "dd.MM"
 private val stubDate = DateModel(null, null, false, true)
 
-fun StatisticByPeriodModel.toChartModel(): StatisticsChartDataModel {
+fun StatisticByPeriodModel.toChartModel(selectedDate: Date?): StatisticsChartDataModel {
     val minLevel = dayWithMinLevel?.glucose.minLevel()
     val maxLevel = dayWithMaxLevel?.glucose.maxLevel()
 
@@ -41,6 +41,7 @@ fun StatisticByPeriodModel.toChartModel(): StatisticsChartDataModel {
         minValue = minLevel,
         values = values,
         statisticsPerDate = modelsMap,
+        selectedDate = selectedDate,
         period = period
     )
 }

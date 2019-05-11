@@ -137,7 +137,7 @@ class StatisticsChartView @JvmOverloads constructor(
                     it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date)
                 }
             }
-            checkMaybeAllUselected()
+            checkMaybeAllUnselected()
             invalidate()
         }
         return true
@@ -374,7 +374,11 @@ class StatisticsChartView @JvmOverloads constructor(
             val left = (singleSectionWidth * index).toInt()
             val right = (singleSectionWidth * (index + 1)).toInt()
             val sectionRect = Rect(left, 0, right, clearChartHeight.toInt())
-            dateToSectionsMap[entry.key] = SectionModel(sectionRect, isStub = entry.key.isStub)
+            dateToSectionsMap[entry.key] = SectionModel(
+                sectionRect = sectionRect,
+                isSelected = !entry.key.isStub && entry.key.date == dataModel().selectedDate,
+                isStub = entry.key.isStub
+            )
         }
     }
 
@@ -464,7 +468,7 @@ class StatisticsChartView @JvmOverloads constructor(
             date?.let { listener?.onDateChanged(date) }
     }
 
-    private fun checkMaybeAllUselected() {
+    private fun checkMaybeAllUnselected() {
         if (dateToSectionsMap.all { !it.value.isSelected }) {
             listener?.onUnselectedAll()
         }
