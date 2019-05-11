@@ -96,8 +96,8 @@ abstract class BaseEventPm constructor(
         }
     }
 
-    protected fun handleSuccess() {
-        bus.event(Events.EventsChanged)
+    protected fun handleSuccess(isCreate: Boolean) {
+        bus.event(Events.EventsChanged(isCreate))
         router.exit()
     }
 

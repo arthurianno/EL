@@ -30,7 +30,7 @@ class CreateRemindPm @Inject constructor(
                     .doOnSuccess { id ->
                         ReminderWorker.startReminder(id)
                     }
-                    .map { Unit }
+                    .map { true }
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }

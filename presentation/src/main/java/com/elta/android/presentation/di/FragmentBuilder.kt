@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
+import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
@@ -239,4 +240,9 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [PeriodModule::class])
     abstract fun bindPeriodFragment(): PeriodFragment
+
+    // FEEDBACK FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFeedbackFragment(): FeedbackFragment
 }
