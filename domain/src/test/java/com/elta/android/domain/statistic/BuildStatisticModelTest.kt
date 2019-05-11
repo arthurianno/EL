@@ -128,7 +128,9 @@ class BuildStatisticModelTest {
 
                 eventsHighPercent = 2.percent(glucoseEvents.size),
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
-                eventsLowPercent = 1.percent(glucoseEvents.size)
+                eventsLowPercent = 1.percent(glucoseEvents.size),
+
+                glucoseEvents = glucoseEvents
             ),
             insulin = DailyInsulinStatisticModel(
                 totalBolusLevel = 20.0,
@@ -168,7 +170,9 @@ class BuildStatisticModelTest {
 
             eventsHighPercent = 2.percent(events.size),
             eventsNormalPercent = 2.percent(events.size),
-            eventsLowPercent = 1.percent(events.size)
+            eventsLowPercent = 1.percent(events.size),
+
+            glucoseEvents = events
         )
     }
 
