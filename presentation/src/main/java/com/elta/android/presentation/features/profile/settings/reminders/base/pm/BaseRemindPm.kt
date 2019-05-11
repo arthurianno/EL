@@ -54,9 +54,9 @@ abstract class BaseRemindPm constructor(
         observeFormChanges()
     }
 
-    protected fun handleSuccess(i: Unit) {
+    protected fun handleSuccess(isCreate: Boolean) {
         hideKeyBoardCommand.consumer.accept(Unit)
-        bus.event(Events.EventsChanged)
+        bus.event(Events.EventsChanged(isCreate))
         router.exit()
     }
 
@@ -69,7 +69,7 @@ abstract class BaseRemindPm constructor(
 
     protected fun isFormValid(reminderModel: ReminderFormModel) =
         !reminderModel.inputValue.isNullOrEmpty() &&
-                checkNotNull(reminderModel.date).after(Date())
+            checkNotNull(reminderModel.date).after(Date())
 
     protected fun createScheduleItems() {
         schedulesState.consumer.accept(

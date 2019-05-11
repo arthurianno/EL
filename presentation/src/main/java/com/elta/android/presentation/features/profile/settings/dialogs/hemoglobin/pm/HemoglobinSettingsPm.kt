@@ -70,7 +70,7 @@ class HemoglobinSettingsPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete {
-                        bus.event(Events.EventsChanged)
+                        bus.event(Events.EventsChanged(true))
                         closeDialogCommand.consumer.accept(Unit)
                     }
                     .doOnError(::handleError)
@@ -94,7 +94,7 @@ class HemoglobinSettingsPm @Inject constructor(
                     .hideErrorContainer()
                     .andThen(
                         loadScreenData()
-                            .doOnNext { bus.event(Events.EventsChanged) }
+                            .doOnNext { bus.event(Events.EventsChanged(false)) }
                     )
                     .bindProgress()
                     .doOnError(::handleError)
