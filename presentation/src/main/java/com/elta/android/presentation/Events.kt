@@ -14,7 +14,7 @@ sealed class Events : Event {
     data class RecordsAttachedStateChanged(val attached: Boolean) : Events()
     data class ChooserVariantSelected(val chooserResult: ChooserResult) : Events()
     data class ChooserTagSelected(val chooserResult: ChooserResult) : Events()
-    object EventsChanged : Events()
+    data class EventsChanged(val isCreated: Boolean) : Events()
     data class ProfileChanged(val profile: Profile) : Events()
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()

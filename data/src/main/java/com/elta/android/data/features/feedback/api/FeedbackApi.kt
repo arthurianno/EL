@@ -7,6 +7,6 @@ import retrofit2.http.PUT
 
 interface FeedbackApi {
 
-    @PUT("api/auth/v1/emails/feedback")
+    @PUT("api/notifications/v1/emails/feedback")
     fun sendFeedback(@Body request: FeedbackRequest): Completable
 }

@@ -21,6 +21,7 @@ import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import io.reactivex.Completable
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
@@ -63,9 +64,10 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.events<Events.EventsChanged>().map { Unit }
-            .doOnNext(loadScreenAction.consumer)
-            .doOnNext(feedbackAction.consumer)
+        bus.events<Events.EventsChanged>()
+            .doOnNext { loadScreenAction.consumer.accept(Unit) }
+            .filter { it.isCreated }
+            .doOnNext { feedbackAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
     }
@@ -145,9 +147,12 @@ class MainRecordsPm @Inject constructor(
         googlePlayDialogAction.observable
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
             .filter { it == DialogResult.POSITIVE }
-            .flatMap { setFeedbackWasSentUseCase.execute().toObservable<Unit>() }
-            .map { Screens.PlayMarketScreen }
-            .doOnNext(router::navigateTo)
+            .flatMapCompletable {
+                setFeedbackWasSentUseCase.execute()
+                    .andThen(Completable.fromAction {
+                        router.navigateTo(Screens.PlayMarketScreen)
+                    })
+            }
             .subscribe()
             .untilDestroy()
 

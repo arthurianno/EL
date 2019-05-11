@@ -39,7 +39,7 @@
                 android:layout_marginBottom="8dp"
                 android:hint="@string/feedback_input_feedback_hint"
                 android:paddingTop="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/feedbackInputView"
+                app:layout_constraintBottom_toTopOf="@+id/messageInputView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -52,13 +52,13 @@
                 android:layout_gravity="top|end"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/feedbackInputView"
-                app:layout_constraintEnd_toEndOf="@+id/feedbackInputView"
-                app:layout_constraintTop_toTopOf="@+id/feedbackInputView"
+                app:layout_constraintBottom_toBottomOf="@+id/emailInputView"
+                app:layout_constraintEnd_toEndOf="@+id/emailInputView"
+                app:layout_constraintTop_toTopOf="@+id/emailInputView"
                 app:srcCompat="@drawable/ic_warning" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/feedbackInputView"
+                android:id="@+id/messageInputView"
                 style="@style/InputStyle.Text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
