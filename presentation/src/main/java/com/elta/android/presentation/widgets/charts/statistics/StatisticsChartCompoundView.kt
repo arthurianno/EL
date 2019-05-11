@@ -24,6 +24,12 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
     }
 
     fun dateChanged(): Observable<Date> = StatisticsDateChangedObserver(chartView)
+        .flatMap {
+            when (it.date != null) {
+                true -> Observable.just(it.date)
+                else -> Observable.empty()
+            }
+        }
 
     fun setChartModel(model: StatisticsChartDataModel) {
         bindValues(model.values)

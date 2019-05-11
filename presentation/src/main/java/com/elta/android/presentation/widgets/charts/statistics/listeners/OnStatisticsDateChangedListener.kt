@@ -4,5 +4,7 @@ import java.util.Date
 
 interface OnStatisticsDateChangedListener {
 
+    fun onUnselectedAll()
+
     fun onDateChanged(date: Date)
 }

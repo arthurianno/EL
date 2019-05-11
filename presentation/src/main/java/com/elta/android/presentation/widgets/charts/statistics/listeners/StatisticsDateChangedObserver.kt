@@ -9,9 +9,9 @@ import java.util.Date
 
 class StatisticsDateChangedObserver(
     private val view: StatisticsChartView
-) : Observable<Date>() {
+) : Observable<StatisticsSelectionResult>() {
 
-    override fun subscribeActual(observer: Observer<in Date>) {
+    override fun subscribeActual(observer: Observer<in StatisticsSelectionResult>) {
         if (!checkMainThread(observer)) {
             return
         }
@@ -24,13 +24,18 @@ class StatisticsDateChangedObserver(
 
     class Listener(
         private val view: StatisticsChartView,
-        observer: Observer<in Date>
+        observer: Observer<in StatisticsSelectionResult>
     ) : MainThreadDisposable() {
 
         var valueListener: OnStatisticsDateChangedListener? = object : OnStatisticsDateChangedListener {
             override fun onDateChanged(date: Date) {
                 if (!isDisposed)
-                    observer.onNext(date)
+                    observer.onNext(StatisticsSelectionResult(date))
+            }
+
+            override fun onUnselectedAll() {
+                if (isDisposed)
+                    observer.onNext(StatisticsSelectionResult(null))
             }
         }
 

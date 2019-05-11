@@ -137,6 +137,7 @@ class StatisticsChartView @JvmOverloads constructor(
                     it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date)
                 }
             }
+            checkMaybeAllUselected()
             invalidate()
         }
         return true
@@ -147,6 +148,7 @@ class StatisticsChartView @JvmOverloads constructor(
         canvas?.let {
             it.drawBottomLine()
             it.drawSections()
+            it.drawSelected()
             it.drawGlucose()
             it.drawAverageLevel()
         }
@@ -209,9 +211,12 @@ class StatisticsChartView @JvmOverloads constructor(
             if (dateModel.needDrawDateTile && !dateModel.formattedDate.isNullOrEmpty()) {
                 drawDateTitle(dateModel.formattedDate, sectionModel.sectionRect)
             }
-            if (sectionModel.isSelected && !dateModel.formattedDate.isNullOrEmpty()) {
-                drawSelectedSectionAttributes(dateModel.formattedDate, sectionModel.sectionRect)
-            }
+        }
+    }
+
+    private fun Canvas.drawSelected() {
+        dateToSectionsMap.entries.find { !it.key.formattedDate.isNullOrEmpty() && it.value.isSelected }?.let {
+            drawSelectedSectionAttributes(checkNotNull(it.key.formattedDate), it.value.sectionRect)
         }
     }
 
@@ -457,6 +462,12 @@ class StatisticsChartView @JvmOverloads constructor(
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         if (isSelected)
             date?.let { listener?.onDateChanged(date) }
+    }
+
+    private fun checkMaybeAllUselected() {
+        if (dateToSectionsMap.all { !it.value.isSelected }) {
+            listener?.onUnselectedAll()
+        }
     }
 
     private fun SectionModel.isClicked(pointF: PointF) =
