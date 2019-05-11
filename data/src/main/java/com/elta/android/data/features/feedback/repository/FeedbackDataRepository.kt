@@ -13,7 +13,7 @@ class FeedbackDataRepository @Inject constructor(
 ) : FeedbackRepository {
 
     override fun sendFeedback(name: String, email: String, message: String): Completable =
-        remoteSource.sendFeedback(name, email, message).andThen { setFeedbackWasSent() }
+        remoteSource.sendFeedback(name, email, message).andThen(setFeedbackWasSent())
 
     override fun isFeedbackWasSent(): Single<Boolean> =
         Single.just(storage.isFeedbackWasSent)
