@@ -6,6 +6,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -72,11 +73,12 @@ class EventCreationPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createAddEventParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .andThen(Single.just(true))
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()
