@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
+import com.elta.android.presentation.widgets.charts.statistics.listeners.OnStatisticsDateChangedListener
 import com.elta.android.presentation.widgets.charts.statistics.listeners.StatisticsDateChangedObserver
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
 import io.reactivex.Observable
@@ -21,6 +22,10 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_statistics_chart_compound_view, this, true)
+    }
+
+    fun setOnStatisticsDateChangedListener(listener: OnStatisticsDateChangedListener) {
+        chartView.setOnStatisticsDateChangedListener(listener)
     }
 
     fun dateChanged(): Observable<Date> = StatisticsDateChangedObserver(chartView)
