@@ -214,7 +214,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 period.start.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE),
                 period.end.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE)
             ),
-            chartModel = Any() // TODO provide builder and real model
+            chartModel = this.toChartModel()
         )
 
     companion object {
