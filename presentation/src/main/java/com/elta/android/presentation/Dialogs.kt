@@ -5,7 +5,7 @@ import com.nullgr.core.resources.ResourceProvider
 
 sealed class Dialogs : DialogData {
 
-    data class EventExit(
+    data class ExitAndLoseData(
         val resources: ResourceProvider,
         override val title: String = resources.getString(R.string.event_form_dialog_title),
         override val message: String = resources.getString(R.string.event_form_exit_dialog_body),

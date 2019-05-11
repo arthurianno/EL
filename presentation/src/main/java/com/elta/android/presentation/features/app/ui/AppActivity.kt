@@ -24,6 +24,7 @@ class AppActivity : BaseActivity<AppPm>() {
             .coldStartPassTo(presentationModel.coldStartAction)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
             .coldStartByDeepLinkPassTo(presentationModel.coldStartDeepLinkAction)
+            .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
     }
@@ -37,6 +38,7 @@ class AppActivity : BaseActivity<AppPm>() {
         super.onNewIntent(intent)
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
+            .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
     }

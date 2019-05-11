@@ -64,4 +64,10 @@
         <item name="android:layout_margin">@dimen/padding_base</item>
         <item name="elevation">@dimen/card_elevation</item>
     </style>
+
+    <style name="Button.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">15sp</item>
+    </style>
 </resources>

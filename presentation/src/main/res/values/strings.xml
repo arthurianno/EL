@@ -371,6 +371,24 @@
     <string name="profile_settings_hemoglobin_date_mask">- %s</string>
     <string name="profile_settings_hemoglobin_header">Последние замеры</string>
 
+    <string name="profile_settings_change_name_title">Имя и Фамилия</string>
+    <string name="profile_settings_change_name_description">Изменение персональных данных</string>
+    <string name="profile_settings_change_name_first_hint">Имя</string>
+    <string name="profile_settings_change_name_second_hint">Фамилия</string>
+    <string name="profile_settings_apply_changes">Изменить</string>
+    <string name="profile_settings_save_changes">Сохранить</string>
+
+     <string name="profile_settings_change_gender_title">Пол</string>
+    <string name="profile_settings_change_gender_description">Изменение персональных данных</string>
+    <string name="profile_settings_change_gender_button_not_specified">Не указан</string>
+    <string name="profile_settings_change_gender_button_male">Мужской</string>
+    <string name="profile_settings_change_gender_button_female">Женский</string>
+
+    <string name="profile_settings_change_password_title">Новый пароль</string>
+    <string name="profile_settings_change_password_description">Придумайте новый пароль для входа в приложение</string>
+    <string name="profile_settings_change_password_old_hint">Старый пароль</string>
+    <string name="profile_settings_change_password_new_hint">Новый пароль</string>
+
     <string name="profile_unlink_network_dialog_title">Внимание</string>
     <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
     <string name="profile_unlink_network_cancel_button">Отменить</string>
@@ -433,8 +451,8 @@
     <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
     <string name="statistic_glucose_index_description_total">Количество измерений</string>
     <string name="statistic_glucose_index_description_high">Измерения выше диапазона</string>
-    <string name="statistic_glucose_index_description_normal">Измерения ниже диапазона</string>
-    <string name="statistic_glucose_index_description_low">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_normal">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_low">Измерения ниже диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
     <string name="statistic_general_index_title_insulin">Количество инсулина</string>

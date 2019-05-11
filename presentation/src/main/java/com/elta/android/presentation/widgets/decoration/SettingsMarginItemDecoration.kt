@@ -29,6 +29,7 @@ class SettingsMarginItemDecoration(
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val position = parent.getChildAdapterPosition(view)
+        if (position == RecyclerView.NO_POSITION) return
         val currentItem = getItemByPosition(parent, position)
         val previousItem = getItemByPosition(parent, if (position > 0) position.minus(1) else 0)
         when {
