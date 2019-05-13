@@ -37,6 +37,7 @@ class ProfileSetGenderPm @Inject constructor(
     private val isGenderChangedState = State(false)
     private val getProfileAction = Action<Unit>()
     private val exitDialogAction = Action<Unit>()
+    private val profileState = State<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -50,6 +51,7 @@ class ProfileSetGenderPm @Inject constructor(
                 getProfileUseCase.execute()
                     .bindProgress()
                     .hideErrorContainer()
+                    .doOnSuccess(profileState.consumer)
                     .doOnSuccess(::handleProfile)
                     .doOnError(::handleError)
             }
@@ -130,7 +132,7 @@ class ProfileSetGenderPm @Inject constructor(
             else -> null
         }
         return UpdateProfileUseCase.Params(
-            Profile(
+            profileState.value.copy(
                 gender = profileGender,
                 timeStamp = Date().toTimestamp()
             )
