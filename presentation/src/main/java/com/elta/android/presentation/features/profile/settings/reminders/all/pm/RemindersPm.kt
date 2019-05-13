@@ -61,7 +61,7 @@ class RemindersPm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit }
+            bus.events<Events.ReminderChanged>().map { Unit }
         )
             .subscribe(getReminders.consumer)
             .untilDestroy()

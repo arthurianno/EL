@@ -54,9 +54,9 @@ abstract class BaseRemindPm constructor(
         observeFormChanges()
     }
 
-    protected fun handleSuccess(isCreate: Boolean) {
+    protected fun handleSuccess(i: Unit) {
         hideKeyBoardCommand.consumer.accept(Unit)
-        bus.event(Events.EventsChanged(isCreate))
+        bus.event(Events.ReminderChanged)
         router.exit()
     }
 
