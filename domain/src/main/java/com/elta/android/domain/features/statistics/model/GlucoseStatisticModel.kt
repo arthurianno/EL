@@ -1,6 +1,5 @@
 package com.elta.android.domain.features.statistics.model
 
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 
