@@ -2,6 +2,7 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
 import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
@@ -55,7 +56,8 @@ fun buildStatisticModel(
 @Suppress("LongMethod")
 fun buildGlucoseStatisticModel(
     glucoseEventsPerPeriod: List<Event>?,
-    settings: GlucoseLevelSettings
+    settings: GlucoseLevelSettings,
+    forPeriod: Boolean = true
 ): GlucoseStatisticModel {
     val count = glucoseEventsPerPeriod?.size ?: 0
     var totalLevel = 0.0
@@ -134,7 +136,10 @@ fun buildGlucoseStatisticModel(
         eventsNormalPercent = eventsNormalPercent,
         eventsLowPercent = eventsLowPercent,
 
-        glucoseEvents = glucoseEventsPerPeriod
+        dailyGlucoseModel = when (forPeriod) {
+            true -> null
+            else -> glucoseEventsPerPeriod?.let { buildDailyGlucoseModel(it, settings) }
+        }
     )
 }
 

@@ -4,10 +4,12 @@ import android.support.v7.widget.RecyclerView
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHeaderDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GeneralIndexDelegate
+import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseDailyChartDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseIndexDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseIndexesDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseStatisticChartDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseDailyChartItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
@@ -26,6 +28,7 @@ class PeriodDelegatesFactory @Inject constructor(
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
+            GlucoseDailyChartItem::class.java -> GlucoseDailyChartDelegate()
             GlucoseStatisticChartItem::class.java -> GlucoseStatisticChartDelegate(bus)
             GlucoseIndexItem::class.java -> GlucoseIndexDelegate()
             GlucoseIndexesItem::class.java -> GlucoseIndexesDelegate(this, calculator, viewPool)

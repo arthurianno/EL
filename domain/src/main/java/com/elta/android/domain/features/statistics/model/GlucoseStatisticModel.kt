@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.statistics.model
 
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 
 data class GlucoseStatisticModel(
@@ -26,5 +27,5 @@ data class GlucoseStatisticModel(
     val eventsNormalPercent: Int,
     val eventsLowPercent: Int,
 
-    val glucoseEvents: List<Event>?
+    val dailyGlucoseModel: DailyGlucoseModel?
 )
