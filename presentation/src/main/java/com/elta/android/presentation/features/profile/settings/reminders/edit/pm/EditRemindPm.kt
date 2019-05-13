@@ -74,7 +74,7 @@ class EditRemindPm @Inject constructor(
                         ReminderWorker.cancelReminder(id)
                         ReminderWorker.startReminder(id)
                     }
-                    .map { false }
+                    .map { Unit }
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
