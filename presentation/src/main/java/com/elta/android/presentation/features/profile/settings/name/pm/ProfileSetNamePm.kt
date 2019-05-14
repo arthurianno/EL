@@ -37,6 +37,7 @@ class ProfileSetNamePm @Inject constructor(
     private val isNameNotEmptyState = State(false)
     private val isNameChangedState = State(false)
     private val changedFullNameSate = State(PersonNameModel())
+    private val profileState = State<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -50,6 +51,7 @@ class ProfileSetNamePm @Inject constructor(
                 getProfileUseCase.execute()
                     .bindProgress()
                     .hideErrorContainer()
+                    .doOnSuccess(profileState.consumer)
                     .doOnSuccess(::handleProfile)
                     .doOnError(::handleError)
             }
@@ -117,7 +119,7 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun createUpdateProfileUseCase(i: Unit) = UpdateProfileUseCase.Params(
-        Profile(
+        profileState.value.copy(
             firstName = changedFullNameSate.value.firstName,
             secondName = changedFullNameSate.value.secondName,
             timeStamp = Date().toTimestamp()
