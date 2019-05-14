@@ -34,7 +34,7 @@ class StatisticsDateChangedObserver(
             }
 
             override fun onUnselectedAll() {
-                if (isDisposed)
+                if (!isDisposed)
                     observer.onNext(StatisticsSelectionResult(null))
             }
         }
