@@ -1,18 +1,20 @@
 package com.elta.android.presentation.features.statistic.period.pm
 
 import android.graphics.drawable.Drawable
+import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.presentation.R
+import com.elta.android.presentation.features.main.records.mapper.ChartItemsBuilder
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseDailyChartItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import java.util.Date
@@ -47,7 +49,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         }
 
         items.add(GlucoseIndexesItem(glucoseIndexItems))
-
+        glucoseStatisticModel?.dailyGlucoseModel?.dailyChart(date)?.let { items.add(it) }
         val types = GeneralIndexItem.Type.values()
         types.forEachIndexed { index, type ->
             val value = type.getValueByDate(model, date)
@@ -62,6 +64,12 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
         return items
+    }
+
+    private fun DailyGlucoseModel.dailyChart(date: Date?): GlucoseDailyChartItem? {
+        if (date == null) return null
+        val dateTitle = date.toStringWithFormat(DAILY_CHART_DATE_FORMAT)
+        return GlucoseDailyChartItem(ChartItemsBuilder.build(this), dateTitle)
     }
 
     private inline fun GlucoseIndexItem.Type.getBg(glucose: GlucoseStatisticModel?): Drawable? =
@@ -255,8 +263,8 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         GlucoseStatisticChartItem(
             datesTitle = resources.getString(
                 R.string.statistic_chart_period_dates_mask,
-                period.start.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE),
-                period.end.toStringWithFormat(CommonFormats.FORMAT_SIMPLE_DATE)
+                period.start.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT),
+                period.end.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT)
             ),
             chartModel = this.toChartModel(selectedDate)
         )
@@ -273,5 +281,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         const val MINUTES_IN_HOUR = 60
         const val SECONDS_IN_MINUTE = 60
         const val ZERO = 0L
+        const val DAILY_CHART_DATE_FORMAT = "dd MMM. EEEE"
+        const val STATISTIC_CHART_DATE_FORMAT = "dd MMM"
     }
 }

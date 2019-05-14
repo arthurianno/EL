@@ -172,11 +172,14 @@ class StatisticsChartView @JvmOverloads constructor(
     }
 
     private fun Canvas.drawAverageLevel() {
-        if (pointsOfAverage.size > 2) {
+        if (pointsOfAverage.size >= 2) {
             averageLinePath.reset()
-            averageLinePath.moveTo(pointsOfAverage[0].x, pointsOfAverage[0].y)
-            for (i in 1 until pointsOfAverage.size) {
-                averageLinePath.lineTo(pointsOfAverage[i].x, pointsOfAverage[i].y)
+            pointsOfAverage.forEachIndexed { index, pointF ->
+                if (index == 0) {
+                    averageLinePath.moveTo(pointF.x, pointF.y)
+                } else {
+                    averageLinePath.lineTo(pointF.x, pointF.y)
+                }
             }
             drawPath(averageLinePath, averageLinePaint)
         }
