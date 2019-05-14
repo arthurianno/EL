@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
@@ -244,6 +245,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(RemindersPm::class)
     abstract fun bindRemindersPm(pm: RemindersPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(DevicesPm::class)
+    abstract fun bindDevicesPm(pm: DevicesPm): PresentationModel
 
     @Binds
     @IntoMap

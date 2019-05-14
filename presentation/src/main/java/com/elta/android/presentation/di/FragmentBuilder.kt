@@ -26,6 +26,8 @@ import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.devices.all.di.DevicesModule
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
@@ -203,6 +205,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindGlucoseRangeDialogFragment(): GlucoseRangeDialogFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [DevicesModule::class])
+    abstract fun bindDevicesFragment(): DevicesFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [RemindersModule::class])
