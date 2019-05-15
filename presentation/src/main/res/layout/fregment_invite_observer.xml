@@ -1,0 +1,106 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_toolbar" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/titleTextView"
+                style="@style/New.Headline3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/profile_observer_invite_new_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/descriptionTextView"
+                style="@style/New.Title2.ShadeBlack0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/profile_observer_invite_new_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/emailInputView"
+                style="@style/EventFormInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/profile_observer_invite_new_email_hint"
+                android:paddingTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/emailErrorIconView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/emailInputView"
+                app:layout_constraintTop_toTopOf="@+id/emailInputView"
+                app:srcCompat="@drawable/ic_warning"
+                tools:visibility="visible" />
+
+            <com.elta.android.presentation.widgets.SimpleErrorView
+                android:id="@+id/errorStateView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/emailInputView" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/descriptionImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/errorStateView"
+                app:srcCompat="@drawable/ic_info" />
+
+            <android.support.v7.widget.AppCompatTextView
+                style="@style/New.Caption1.ShadeBlack2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/profile_observer_invite_new_invite_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/descriptionImageView"
+                app:layout_constraintTop_toBottomOf="@+id/emailInputView"
+                app:layout_constraintTop_toTopOf="@+id/descriptionImageView" />
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/continueButtonView"
+        style="@style/Button.Large"
+        android:enabled="false"
+        android:text="@string/profile_observer_invite_new_send_invite"
+        android:visibility="visible" />
+</LinearLayout>

@@ -21,6 +21,8 @@ interface AuthDataSource {
 
     fun resetPassword(token: String, newPassword: String): Completable
 
+    fun changePassword(currentPassword: String, newPassword: String): Completable
+
     fun checkTokenOwner(token: String): Single<TokenOwnerDto>
 
     fun confirmEmail(token: String): Completable

@@ -14,10 +14,15 @@ import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSo
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
-import com.elta.android.data.features.reminder.datasource.RemindersCacheDataSource
-import com.elta.android.data.features.reminder.datasource.RemindersDataSource
+import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
+import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
+import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
+import com.elta.android.data.features.observers.datasource.ObserverDataSource
+import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
+import com.elta.android.data.features.reminder.datasource.RemindersCacheDataSource
+import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
@@ -49,6 +54,16 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindProfileCachedDataSource(source: ProfileCachedDataSource): ProfileDataSource
+
+    @Remote
+    @Binds
+    @Singleton
+    abstract fun bindObserverRemoteDataSource(source: ObserverRemoteDataSource): ObserverDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindObserverCachedDataSource(source: ObserverCachedDataSource): ObserverDataSource
 
     @Remote
     @Binds
@@ -92,4 +107,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindFirmwareDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFeedbackRemoteDataSource(source: FeedbackRemoteDataSource): FeedbackDataSource
 }

@@ -16,6 +16,7 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getForm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getPickerValues
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
+import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -158,11 +159,12 @@ class EditEventPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createEditEventParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 updateEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .andThen(Single.just(false))
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()
@@ -178,11 +180,12 @@ class EditEventPm @Inject constructor(
             .filter { it == DialogResult.POSITIVE }
             .map { eventState.value }
             .map(::createDeleteEventUseCaseParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 deleteEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .andThen(Single.just(false))
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()

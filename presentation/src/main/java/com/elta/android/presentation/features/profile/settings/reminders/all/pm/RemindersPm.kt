@@ -31,12 +31,12 @@ class RemindersPm @Inject constructor(
 
         bus.clicks<Clicks.ReminderItemClicked>()
             .map { it.item.id }
-            .doOnNext { router.startFlow(Screens.EditRemind(it)) }
+            .doOnNext { router.navigateTo(Screens.EditRemind(it)) }
             .subscribe()
             .untilDestroy()
 
         newReminderAction.observable
-            .doOnNext { router.startFlow(Screens.CreateRemind) }
+            .doOnNext { router.navigateTo(Screens.CreateRemind) }
             .subscribe()
             .untilDestroy()
 
@@ -61,7 +61,7 @@ class RemindersPm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit }
+            bus.events<Events.ReminderChanged>().map { Unit }
         )
             .subscribe(getReminders.consumer)
             .untilDestroy()

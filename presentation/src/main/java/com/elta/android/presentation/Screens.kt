@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPass
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
+import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -19,10 +20,15 @@ import com.elta.android.presentation.features.main.events.create.ui.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
+import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
+import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
@@ -34,11 +40,15 @@ import com.elta.android.presentation.features.registration.social.ui.Registratio
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
+import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
 import com.nullgr.core.intents.callIntent
+import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -126,6 +136,10 @@ object Screens {
         override fun getFragment() = MainFlowFragment.newInstance()
     }
 
+    object StatisticTab : SupportAppScreen() {
+        override fun getFragment() = StatisticFlowFragment.newInstance()
+    }
+
     object DiaryTab : SupportAppScreen() {
         override fun getFragment() = DiaryFlowFragment.newInstance()
     }
@@ -164,7 +178,7 @@ object Screens {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
     }
 
-    object ConnectDevice: SupportAppScreen() {
+    object ConnectDevice : SupportAppScreen() {
         override fun getFragment(): Fragment = ConnectDeviceFragment.newInstance()
     }
 
@@ -182,6 +196,14 @@ object Screens {
         override fun getFragment() = ProfileSettingsFragment.newInstance()
     }
 
+    object Observers : SupportAppScreen() {
+        override fun getFragment() = ObserversFragment.newInstance()
+    }
+
+    object InviteObserver : SupportAppScreen() {
+        override fun getFragment() = InviteObserverFragment.newInstance()
+    }
+
     object Reminders : SupportAppScreen() {
         override fun getFragment() = RemindersFragment.newInstance()
     }
@@ -192,5 +214,36 @@ object Screens {
 
     data class EditRemind(val reminderId: String) : SupportAppScreen() {
         override fun getFragment() = EditRemindFragment.newInstance(reminderId)
+    }
+
+    object SetName : SupportAppScreen() {
+        override fun getFragment() = ProfileSetNameFragment.newInstance()
+    }
+
+    object ChangePassword : SupportAppScreen() {
+        override fun getFragment() = ProfileChangePasswordFragment.newInstance()
+    }
+
+    object SetGender : SupportAppScreen() {
+        override fun getFragment() = ProfileSetGenderFragment.newInstance()
+    }
+
+    // STATISTICS FLOW
+    data class PeriodScreen(val period: Period) : SupportAppScreen() {
+        override fun getFragment() = PeriodFragment.newInstance(period)
+        override fun getScreenKey(): String {
+            val superKey = super.getScreenKey()
+            return "$superKey-${period.name}"
+        }
+    }
+
+    // FEEDBACK
+    object Feedback : SupportAppScreen() {
+        override fun getFragment() = FeedbackFragment.newInstance()
+    }
+
+    object PlayMarketScreen : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) =
+            webIntent("market://details?id=com.elta.android")
     }
 }

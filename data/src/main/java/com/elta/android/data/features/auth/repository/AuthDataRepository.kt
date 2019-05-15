@@ -47,6 +47,9 @@ class AuthDataRepository @Inject constructor(
     override fun resetPassword(token: String, newPassword: String): Completable =
         source.resetPassword(token, newPassword)
 
+    override fun changePassword(currentPassword: String, newPassword: String): Completable =
+        source.changePassword(currentPassword, newPassword)
+
     override fun checkTokenOwner(token: String): Single<Boolean> =
         source.checkTokenOwner(token)
             .map(TokenOwnerDto::isOwner)

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.bluetooth.ui
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -43,17 +44,34 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
 
     override fun onBindPresentationModel(pm: BluetoothPm) {
         super.onBindPresentationModel(pm)
-        getInfoButtonView.clicks().bindTo(pm.getInfoAction)
-        getEventsButtonView.clicks().bindTo(pm.getEventsAction)
-        setPinButtonView.clicks().bindTo(pm.setPinAction)
-        checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
-        downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
-        updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
+        bindClicks(pm)
+        bindViews(pm)
+        observeCommands(pm)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Timber.d("onActivityResult")
+        if (requestCode == REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
+            presentationModel.locationEnabledAction.consumer.accept(Unit)
+            Timber.d("Location enabled")
+        }
+
+        if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
+            presentationModel.bluetoothEnabledAction.consumer.accept(Unit)
+            Timber.d("Bluetooth enabled")
+        }
+    }
+
+    private fun bindViews(pm: BluetoothPm) {
         pm.updateEnabledState.bindTo { updateFirmwareButtonView.isEnabled = it }
         pm.downloadEnabledState.bindTo { downloadFirmwareButtonView.isEnabled = it }
         pm.pinEnabledState.bindTo { setPinButtonView.isEnabled = it }
         pm.pinInputControl.bindTo(commandInputView)
         pm.logState.bindTo(logView.text())
+    }
+
+    private fun observeCommands(pm: BluetoothPm) {
         pm.requestEnableBluetoothCommand.observable
             .log("Command", "enable bluetooth")
             .bindTo {
@@ -63,7 +81,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         pm.requestLocationPermissionsCommand.observable
             .log("Command", "request permissions")
             .switchMap {
-                rxPermissions.request(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                rxPermissions.request(Manifest.permission.ACCESS_COARSE_LOCATION)
                     .filter { it }
                     .map { Unit }
             }
@@ -101,18 +119,13 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Timber.d("onActivityResult")
-        if (requestCode == REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
-            presentationModel.locationEnabledAction.consumer.accept(Unit)
-            Timber.d("Location enabled")
-        }
-
-        if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
-            presentationModel.bluetoothEnabledAction.consumer.accept(Unit)
-            Timber.d("Bluetooth enabled")
-        }
+    private fun bindClicks(pm: BluetoothPm) {
+        getInfoButtonView.clicks().bindTo(pm.getInfoAction)
+        getEventsButtonView.clicks().bindTo(pm.getEventsAction)
+        setPinButtonView.clicks().bindTo(pm.setPinAction)
+        checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
+        downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
+        updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
     }
 
     companion object {

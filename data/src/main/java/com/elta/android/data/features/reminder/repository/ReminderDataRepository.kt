@@ -4,6 +4,7 @@ import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.reminder.dto.ReminderDto
+import com.elta.android.data.features.reminder.dto.ScheduleTypeDto
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import io.reactivex.Observable
@@ -18,6 +19,7 @@ class ReminderDataRepository @Inject constructor(
 
     override fun getReminders(): Observable<List<Reminder>> =
         source.getReminders()
+            .flatMap(::deleteUselessReminders)
             .map(toDomainMapper::mapFromObjects)
 
     override fun getReminderById(id: String): Single<Reminder> =
@@ -38,6 +40,20 @@ class ReminderDataRepository @Inject constructor(
         createSingleRemindersDto(reminder)
             .flatMapCompletable { source.deleteReminders(it) }
             .toSingleDefault(reminder.id)
+
+    private fun deleteUselessReminders(reminders: List<ReminderDto>): Observable<MutableList<ReminderDto>> {
+        val filteredReminders = mutableListOf<ReminderDto>()
+        val uselessReminders = mutableListOf<ReminderDto>()
+        reminders.forEach {
+            if (it.scheduleType == ScheduleTypeDto.NONE && it.time.time < System.currentTimeMillis()) {
+                uselessReminders.add(it)
+            } else {
+                filteredReminders.add(it)
+            }
+        }
+        return source.deleteReminders(uselessReminders)
+            .andThen(Observable.just(filteredReminders))
+    }
 
     private fun createSingleRemindersDto(reminder: Reminder) =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(reminder)) }

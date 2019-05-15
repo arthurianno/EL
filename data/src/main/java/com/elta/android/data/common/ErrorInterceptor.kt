@@ -2,6 +2,7 @@ package com.elta.android.data.common
 
 import android.content.Context
 import com.elta.android.common.errors.EmailAlreadyConfirmedError
+import com.elta.android.common.errors.EmailAlreadyInvitedError
 import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.InvalidRefreshTokenError
@@ -32,6 +33,7 @@ class ErrorInterceptor @Inject constructor(
                     ERROR_CODE_603 -> throw EmailAlreadyRegisteredError(message)
                     ERROR_CODE_605 -> throw InvalidRefreshTokenError(message)
                     ERROR_CODE_606 -> throw EmailAlreadyConfirmedError(message)
+                    ERROR_CODE_700 -> throw EmailAlreadyInvitedError(message)
                     else -> throw ServerError(message)
                 }
             }
@@ -46,6 +48,7 @@ class ErrorInterceptor @Inject constructor(
         const val ERROR_CODE_603 = 603
         const val ERROR_CODE_605 = 605
         const val ERROR_CODE_606 = 606
+        const val ERROR_CODE_700 = 700
 
         fun getStringByCode(context: Context, code: Int): String {
             val res = context.resources.getIdentifier("error_$code", "string", context.packageName)

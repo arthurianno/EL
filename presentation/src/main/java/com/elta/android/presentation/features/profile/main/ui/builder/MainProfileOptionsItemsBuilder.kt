@@ -29,7 +29,7 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
             val glucoseLevelMin = createGlucoseLevelText(glucoseLevelSettings?.normal?.start)
             val glucoseLevelMax = createGlucoseLevelText(glucoseLevelSettings?.normal?.end)
             val diabetesType = diabetes?.toString(resources)
-                ?: resources.getString(R.string.profile_main_empty_value)
+                ?: resources.getString(R.string.profile_diabetes_empty_value)
             val weight = createIndicatorText(weight, R.string.profile_weight_value)
             val hemoglobin = createIndicatorText(hba1cLevel, R.string.profile_hba1c_value)
             return MainProfileIndicatorItem(glucoseLevelMin, glucoseLevelMax, diabetesType,

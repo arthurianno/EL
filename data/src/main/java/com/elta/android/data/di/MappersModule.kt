@@ -42,12 +42,17 @@ import com.elta.android.data.features.sale_points.mapper.SalePointFromCacheMappe
 import com.elta.android.data.features.sale_points.mapper.SalePointToCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
+import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.mapper.NetworkFromCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToDomainMapper
+import com.elta.android.data.features.observers.mapper.ObserverFromCacheMapper
+import com.elta.android.data.features.observers.mapper.ObserverToCacheMapper
+import com.elta.android.data.features.observers.mapper.ObserverToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
@@ -62,6 +67,7 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
 import dagger.Binds
@@ -136,6 +142,21 @@ abstract class MappersModule {
     abstract fun bindTagFromCacheMapper(
         mapper: TagFromCacheMapper
     ): Mapper<TagCachedDto, TagDto>
+
+    @Binds
+    abstract fun bindObserverToCacheMapper(
+        mapper: ObserverToCacheMapper
+    ): Mapper<ObserverDto, ObserverCacheDto>
+
+    @Binds
+    abstract fun bindObserverFromCacheMapper(
+        mapper: ObserverFromCacheMapper
+    ): Mapper<ObserverCacheDto, ObserverDto>
+
+    @Binds
+    abstract fun bindObserverToDomainMapper(
+        mapper: ObserverToDomainMapper
+    ): Mapper<ObserverDto, Observer>
 
     @Binds
     abstract fun bindProfileFromCacheMapper(

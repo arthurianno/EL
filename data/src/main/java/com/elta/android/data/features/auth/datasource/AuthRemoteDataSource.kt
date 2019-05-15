@@ -3,6 +3,7 @@ package com.elta.android.data.features.auth.datasource
 import com.elta.android.common.errors.EmailAlreadyConfirmedError
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.request.AuthRequest
+import com.elta.android.data.features.auth.api.request.ChangePasswordRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
 import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
 import com.elta.android.data.features.auth.api.request.TokenRequest
@@ -35,6 +36,9 @@ class AuthRemoteDataSource @Inject constructor(
 
     override fun resetPassword(token: String, newPassword: String): Completable =
         api.resetPassword(ResetPasswordRequest(token, newPassword))
+
+    override fun changePassword(currentPassword: String, newPassword: String): Completable =
+        api.changePassword(ChangePasswordRequest(currentPassword, newPassword))
 
     override fun checkTokenOwner(token: String): Single<TokenOwnerDto> =
         api.checkTokenOwner(TokenRequest(token))

@@ -314,6 +314,42 @@
       "relations": []
     },
     {
+      "id": "11:2672464361589836854",
+      "lastPropertyId": "7:5486485348885741996",
+      "name": "ObserverCacheDto",
+      "properties": [
+        {
+          "id": "1:6534346994157213235",
+          "name": "id"
+        },
+        {
+          "id": "2:5626098089724851404",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:8432849502964397699",
+          "name": "email"
+        },
+        {
+          "id": "4:4247834290607105604",
+          "name": "name"
+        },
+        {
+          "id": "5:4281746726435778337",
+          "name": "status"
+        },
+        {
+          "id": "6:412025849003372876",
+          "name": "modificationTime"
+        },
+        {
+          "id": "7:5486485348885741996",
+          "name": "state"
+        }
+      ],
+      "relations": []
+    },
+    {
       "id": "11:5744976252600729029",
       "lastPropertyId": "5:2158988122783585889",
       "name": "GlucometerCachedDto",
@@ -342,6 +378,7 @@
       "relations": []
     }
   ],
+  "lastEntityId": "11:2672464361589836854",
   "lastEntityId": "11:5744976252600729029",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",

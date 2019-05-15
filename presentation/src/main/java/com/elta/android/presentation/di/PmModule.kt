@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPass
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
+import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
@@ -18,13 +19,18 @@ import com.elta.android.presentation.features.main.events.create.pm.EventCreatio
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
+import com.elta.android.presentation.features.observers.all.pm.ObserversPm
+import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.pm.GlucoseRangeDialogPm
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
+import com.elta.android.presentation.features.profile.settings.gender.pm.ProfileSetGenderPm
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.features.profile.settings.name.pm.ProfileSetNamePm
+import com.elta.android.presentation.features.profile.settings.password.pm.ProfileChangePasswordPm
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
 import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
@@ -37,6 +43,8 @@ import com.elta.android.presentation.features.registration.social.pm.Registratio
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
+import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
+import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
 import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
@@ -216,6 +224,16 @@ abstract class PmModule {
 
     @Binds
     @IntoMap
+    @PmKey(ObserversPm::class)
+    abstract fun bindObserversPm(pm: ObserversPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(InviteObserverPm::class)
+    abstract fun bindInviteObserverPm(pm: InviteObserverPm): PresentationModel
+
+    @Binds
+    @IntoMap
     @PmKey(ProfileSettingsPm::class)
     abstract fun bindProfileSettingsPm(pm: ProfileSettingsPm): PresentationModel
 
@@ -248,4 +266,36 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EditRemindPm::class)
     abstract fun bindEditRemindPm(pm: EditRemindPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileSetNamePm::class)
+    abstract fun bindProfileSetNamePm(pm: ProfileSetNamePm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileChangePasswordPm::class)
+    abstract fun bindProfileChangePasswordPm(pm: ProfileChangePasswordPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ProfileSetGenderPm::class)
+    abstract fun bindProfileSetGenderPm(pm: ProfileSetGenderPm): PresentationModel
+
+    // STATISTICS FLOW
+    @Binds
+    @IntoMap
+    @PmKey(StatisticFlowPm::class)
+    abstract fun bindStatisticFlowPm(pm: StatisticFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(PeriodPm::class)
+    abstract fun bindPeriodPm(pm: PeriodPm): PresentationModel
+
+    // FEEDBACK FLOW
+    @Binds
+    @IntoMap
+    @PmKey(FeedbackPm::class)
+    abstract fun bindFeedbackPm(pm: FeedbackPm): PresentationModel
 }

@@ -22,7 +22,6 @@ import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainProfilePm @Inject constructor(
@@ -39,7 +38,7 @@ class MainProfilePm @Inject constructor(
     val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
     val openGlucoseRangeDialogCommand = Command<Unit>(bufferSize = 1)
 
-    private val getProfileSettingsAction = Action<Unit>()
+    private val getProfileSettingsAction = Action<Boolean>()
     private val updateProfileAction = Action<Profile>()
 
     override fun onCreate() {
@@ -49,8 +48,14 @@ class MainProfilePm @Inject constructor(
 
         getProfileSettingsAction.observable
             .skipWhileInProgress()
-            .flatMapSingle {
+            .flatMapSingle { isUpdateProfile ->
                 getProfileUseCase.execute()
+                    .flatMap { profile ->
+                        if (!isUpdateProfile) return@flatMap Single.just(profile)
+                        updateProfileUseCase.execute(
+                            createUpdateProfileUseCaseParams(profile)
+                        ).toSingle { profile }
+                    }
                     .bindProgress()
                     .handleProfileUseCase()
                     .doOnError(::handleError)
@@ -60,8 +65,8 @@ class MainProfilePm @Inject constructor(
             .untilDestroy()
 
         Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit }
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { false },
+            bus.events<Events.EventsChanged>().map { true }
         )
             .subscribe(getProfileSettingsAction.consumer)
             .untilDestroy()
@@ -98,7 +103,7 @@ class MainProfilePm @Inject constructor(
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
         when (type) {
             WhereBuy -> router.startFlow(Screens.ShopsMap)
-            MyObservers -> Timber.e("MY_OBSERVERS clicked")
+            MyObservers -> router.startFlow(Screens.Observers)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 

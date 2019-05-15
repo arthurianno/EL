@@ -41,7 +41,7 @@ abstract class BaseRemindPm constructor(
     protected val selectedDateState = State(Date())
     protected val reminderFormHolderState = State(ReminderFormModel())
 
-    private val exitDialogData: DialogData by lazy { Dialogs.EventExit(resources) }
+    private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
     abstract fun handleBack(i: Unit)
 
@@ -56,7 +56,7 @@ abstract class BaseRemindPm constructor(
 
     protected fun handleSuccess(i: Unit) {
         hideKeyBoardCommand.consumer.accept(Unit)
-        bus.event(Events.EventsChanged)
+        bus.event(Events.ReminderChanged)
         router.exit()
     }
 
@@ -68,7 +68,8 @@ abstract class BaseRemindPm constructor(
     }
 
     protected fun isFormValid(reminderModel: ReminderFormModel) =
-        !reminderModel.inputValue.isNullOrEmpty()
+        !reminderModel.inputValue.isNullOrEmpty() &&
+            checkNotNull(reminderModel.date).after(Date())
 
     protected fun createScheduleItems() {
         schedulesState.consumer.accept(

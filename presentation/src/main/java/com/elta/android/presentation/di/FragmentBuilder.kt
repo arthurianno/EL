@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
+import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
@@ -20,6 +21,9 @@ import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragm
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.observers.all.di.ObserversModule
+import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
@@ -29,8 +33,11 @@ import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.di.HemoglobinSettingsModule
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
+import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.di.ProfileSettingsModule
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
+import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.di.RemindersModule
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
@@ -47,6 +54,9 @@ import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
 import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
+import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
+import com.elta.android.presentation.features.statistic.period.di.PeriodModule
+import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
@@ -186,6 +196,10 @@ abstract class FragmentBuilder {
     abstract fun bindMainProfileFragment(): MainProfileFragment
 
     @FragmentScope
+    @ContributesAndroidInjector(modules = [ObserversModule::class])
+    abstract fun bindObserversFragment(): ObserversFragment
+
+    @FragmentScope
     @ContributesAndroidInjector(modules = [ProfileSettingsModule::class])
     abstract fun bindProfileSettingsFragment(): ProfileSettingsFragment
 
@@ -212,4 +226,34 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindEditRemindFragment(): EditRemindFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindInviteObserverFragment(): InviteObserverFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileSetNameFragment(): ProfileSetNameFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileChangePasswordFragment(): ProfileChangePasswordFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindProfileSetGenderFragment(): ProfileSetGenderFragment
+
+    // STATISTICS FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindStatisticFlowFragment(): StatisticFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [PeriodModule::class])
+    abstract fun bindPeriodFragment(): PeriodFragment
+
+    // FEEDBACK FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFeedbackFragment(): FeedbackFragment
 }

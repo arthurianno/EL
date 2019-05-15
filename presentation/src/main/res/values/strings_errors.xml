@@ -13,6 +13,8 @@
     <string name="error_610">Social network account is already linked</string>
     <string name="error_611">User had not been linked to this social network</string>
     <string name="error_612">Not found. New account</string>
+    <string name="error_613">Неверный текущий пароль</string>
+    <string name="error_700">Внимание! Данный пользователь уже\nявляется вашим наблюдателем</string>
 
     <!-- DEFAULT ERRORS -->
     <string name="error_test_error">Internal error</string>
