@@ -5,6 +5,7 @@ import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseC
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -24,9 +25,10 @@ class DeviceInfoPm @Inject constructor(
     val deleteDeviceDialogControl = dialogControl<DialogData, DialogResult>()
     val deleteDeviceAction = Action<Unit>()
     val checkUpdateAction = Action<Unit>()
-    val addressState = State<String>()
     val nameDeviceState = State<String>()
+    val descriptionAddressState = State<String>()
 
+    private val addressState = State<String>()
     private val getDeviceInfoAction = Action<Unit>()
 
     private val deleteDeviceDialogData: DialogData by lazy { Dialogs.DeleteDevice(resources) }
@@ -64,6 +66,11 @@ class DeviceInfoPm @Inject constructor(
                     .doOnError(::handleError)
             }
             .retry()
+            .subscribe()
+            .untilDestroy()
+
+        addressState.observable
+            .map { resources.getString(R.string.profile_device_info_description, it) }
             .subscribe()
             .untilDestroy()
 

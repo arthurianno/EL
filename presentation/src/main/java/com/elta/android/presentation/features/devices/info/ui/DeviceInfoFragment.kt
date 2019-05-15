@@ -36,11 +36,9 @@ class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
         menuButtonView.clicks().bindTo(pm.deleteDeviceAction)
-        pm.nameDeviceState.bindTo(titleTextView.text())
-        pm.addressState.bindTo {
-            descriptionTextView.text = getString(R.string.profile_device_info_description, it)
-        }
         checkUpdateButtonView.clicks().bindTo(pm.checkUpdateAction)
+        pm.nameDeviceState.bindTo(titleTextView.text())
+        pm.descriptionAddressState.bindTo(descriptionTextView.text())
 
         pm.deleteDeviceDialogControl.bindTo { data, dc ->
             MaterialDialog.Builder(checkNotNull(activity))
