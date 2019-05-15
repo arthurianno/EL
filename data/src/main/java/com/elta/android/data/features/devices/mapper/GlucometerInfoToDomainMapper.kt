@@ -10,7 +10,7 @@ class GlucometerInfoToDomainMapper @Inject constructor() : Mapper<GlucometerInfo
     override fun mapFromObject(source: GlucometerInfoDto): GlucometerInfo =
         with(source) {
             GlucometerInfo(
-                date = date,
+                deviceDate = deviceDate,
                 temperature = temperature,
                 batteryLevel = batteryLevel,
                 softwareVersion = version?.software,

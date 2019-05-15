@@ -29,7 +29,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         }
 
         return GlucometerInfoDto(
-            date = date,
+            deviceDate = date,
             temperature = temperature,
             batteryLevel = batteryLevel,
             version = version
