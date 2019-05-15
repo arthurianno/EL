@@ -4,6 +4,7 @@ import java.util.Date
 
 data class GlucometerInfoDto(
     val deviceDate: Date? = null,
+    val syncDate: Date? = null,
     val temperature: Int? = null,
     val batteryLevel: Int? = null,
     val version: VersionDto? = null

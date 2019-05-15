@@ -11,6 +11,7 @@ class GlucometerInfoToDomainMapper @Inject constructor() : Mapper<GlucometerInfo
         with(source) {
             GlucometerInfo(
                 deviceDate = deviceDate,
+                syncDate = syncDate,
                 temperature = temperature,
                 batteryLevel = batteryLevel,
                 softwareVersion = version?.software,

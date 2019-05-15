@@ -84,7 +84,7 @@ class GlucometersManager @Inject constructor(
                 connection.batchRequest(address, infoCommands)
             }
             .take(1)
-            .map(infoBuilder::buildFrom)
+            .map { infoBuilder.buildFrom(it) }
             .singleOrError()
 
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
