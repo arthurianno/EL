@@ -31,7 +31,9 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import java.nio.charset.Charset
+import java.util.Date
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -98,9 +100,6 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
-            // TODO: pass part of device name instead of address.
-            // On iOS devices address can't be extracted
-            // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
@@ -128,9 +127,12 @@ class GlucometersManager @Inject constructor(
             }
 
     fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
-        device?.let { getGlucometerEvents(it.address) }
-            ?: glucometersCache.get(GlucometersConditions.Primary)?.let { getGlucometerEvents(it.address) }
-            ?: Single.error(PrimaryGlucometerNotFoundError)
+        Single.just(Unit).delay(500, TimeUnit.MILLISECONDS)
+            .flatMap {
+                device?.let { syncInternal(it.address) }
+                    ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
+                    ?: Single.error(PrimaryGlucometerNotFoundError)
+            }
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {
@@ -260,6 +262,25 @@ class GlucometersManager @Inject constructor(
             RxBleClient.State.LOCATION_SERVICES_NOT_ENABLED -> LocationNotEnabledError
             else -> null
         }
+
+    private fun syncInternal(address: String): Single<List<GlucometerEventDto>> =
+        client.findConnection(address)
+            .checkPinAndSend(address)
+            .switchMap { connection ->
+                connection.request(address, Commands.SetTime(Date()))
+                Observable.just(connection)
+            }
+            .switchMap { connection ->
+                Observable.range(0, EVENTS_COUNT)
+                    .concatMap {
+                        connection.request(address, Commands.ReadEvent(it))
+                    }
+            }
+            .takeUntil { isPotentialLastEvent(it) }
+            .collectInto(mutableListOf<String>()) { responses, response ->
+                if (!isPotentialLastEvent(response)) responses.add(response)
+            }
+            .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application

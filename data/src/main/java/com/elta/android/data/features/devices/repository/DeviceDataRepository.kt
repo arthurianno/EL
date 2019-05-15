@@ -3,10 +3,13 @@ package com.elta.android.data.features.devices.repository
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.dto.GlucometerDto
+import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -14,6 +17,8 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
+    private val eventsRepository: EventsRepository,
+    private val eventsFromGlucometerMapper: Mapper<GlucometerEventDto, Event>,
     private val glucometerToDtoMapper: Mapper<Glucometer, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
@@ -33,7 +38,11 @@ class DeviceDataRepository @Inject constructor(
         source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
 
     override fun syncWithDevice(device: Glucometer?): Completable =
-        source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) }).ignoreElement()
+        source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) })
+            .map(eventsFromGlucometerMapper::mapFromObjects)
+            .flatMapCompletable { events ->
+                eventsRepository.addEvents(events)
+            }
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)
