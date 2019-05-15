@@ -7,6 +7,10 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.di.BluetoothModule
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.devices.all.di.DevicesModule
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.info.di.DeviceInfoModule
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
@@ -26,8 +30,6 @@ import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
-import com.elta.android.presentation.features.devices.all.di.DevicesModule
-import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
@@ -209,6 +211,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [DevicesModule::class])
     abstract fun bindDevicesFragment(): DevicesFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [DeviceInfoModule::class])
+    abstract fun bindDeviceInfoFragment(): DeviceInfoFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [RemindersModule::class])

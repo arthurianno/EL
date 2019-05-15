@@ -431,6 +431,11 @@
     <string name="profile_devices_active_glucometers">Активный глюкометр</string>
     <string name="profile_devices_new_device">Новое устройство</string>
 
+    <string name="profile_device_info_title">СателлитOnline</string>
+    <string name="profile_device_info_description"> Адрес устройства: %s</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
+    <string name="profile_device_info_delete">Удалить устройство</string>
+
     <string name="profile_reminders_schedule_not_repeat">Не повторять</string>
     <string name="profile_reminders_schedule_day">Ежедневно</string>
     <string name="profile_reminders_schedule_week">Еженедельно</string>
