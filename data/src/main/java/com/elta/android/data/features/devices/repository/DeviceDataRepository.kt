@@ -31,6 +31,9 @@ class DeviceDataRepository @Inject constructor(
     override fun getDeviceInfo(address: String): Single<GlucometerInfo> =
         source.getGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
 
+    override fun getLastDeviceInfo(address: String): Single<GlucometerInfo> =
+        source.getLastGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
+
     override fun getDeviceEvents(address: String): Single<List<String>> =
         source.getGlucometerEvents(address)
 

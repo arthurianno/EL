@@ -24,6 +24,9 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         glucometersManager.getGlucometerInfo(address)
 
+    override fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto> =
+        glucometersManager.getLastGlucometerInfo(address)
+
     override fun getGlucometerEvents(address: String): Single<List<String>> =
         glucometersManager.getGlucometerEvents(address).map { it.map { it.toString() } }
 

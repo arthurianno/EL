@@ -13,6 +13,8 @@ interface DeviceRepository {
 
     fun getDeviceInfo(address: String): Single<GlucometerInfo>
 
+    fun getLastDeviceInfo(address: String): Single<GlucometerInfo>
+
     fun getDeviceEvents(address: String): Single<List<String>>
 
     fun connectDevice(device: Glucometer, pinCode: String): Completable

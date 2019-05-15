@@ -13,8 +13,10 @@ import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
+import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.devices.cache.GlucometersConditions
 import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
+import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
@@ -39,8 +41,11 @@ import javax.inject.Singleton
 
 @Singleton
 class GlucometersManager @Inject constructor(
+    private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
+    private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
     private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
     private val glucometersCache: Cache<GlucometerCachedDto>,
+    private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
     private val eventBuilder: GlucometerEventBuilder,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
@@ -84,8 +89,14 @@ class GlucometersManager @Inject constructor(
                 connection.batchRequest(address, infoCommands)
             }
             .take(1)
-            .map { infoBuilder.buildFrom(it) }
+            .map { infoBuilder.buildFrom(address, it) }
             .singleOrError()
+
+    fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto> =
+        Single.fromCallable {
+            val id = address.hashCode().toLong()
+            glucometersInfoCache.get(CommonConditions.ById(id)) ?: GlucometerInfoCachedDto(id = id, secondaryId = address)
+        }.map(glucometersInfoFromCacheMapper::mapFromObject)
 
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
         client.findConnection(address)
@@ -141,7 +152,7 @@ class GlucometersManager @Inject constructor(
                 .checkPinAndSend(address)
                 .switchMap { connection ->
                     connection.request(address, Commands.GetBatteryAndTemperature)
-                        .map { infoBuilder.buildFrom(listOf(it)) }
+                        .map { infoBuilder.buildFrom(address, listOf(it)) }
                         .switchMap { info ->
                             when {
                                 !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
@@ -281,6 +292,12 @@ class GlucometersManager @Inject constructor(
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
+            .doOnSuccess {
+                val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                if (info == null) {
+
+                }
+            }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application

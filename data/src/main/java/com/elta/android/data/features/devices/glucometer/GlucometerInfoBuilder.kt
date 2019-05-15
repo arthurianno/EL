@@ -5,5 +5,5 @@ import java.util.Date
 
 interface GlucometerInfoBuilder {
 
-    fun buildFrom(params: List<String>, syncDate: Date? = null): GlucometerInfoDto
+    fun buildFrom(id: String, params: List<String>, syncDate: Date? = null): GlucometerInfoDto
 }

@@ -4,9 +4,12 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
 import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
+import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.mapper.GlucometerInfoFromCacheMapper
+import com.elta.android.data.features.devices.mapper.GlucometerInfoToCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerInfoToDomainMapper
 import com.elta.android.data.features.devices.mapper.GlucometerToCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerToDomainMapper
@@ -219,6 +222,16 @@ abstract class MappersModule {
     abstract fun bindGlucometerInfoToDomainMapper(
         mapper: GlucometerInfoToDomainMapper
     ): Mapper<GlucometerInfoDto, GlucometerInfo>
+
+    @Binds
+    abstract fun bindGlucometerInfoToCacheMapper(
+        mapper: GlucometerInfoToCacheMapper
+    ): Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>
+
+    @Binds
+    abstract fun bindGlucometerInfoFromCacheMapper(
+        mapper: GlucometerInfoFromCacheMapper
+    ): Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>
 
     @Binds
     abstract fun bindScanResultToGlucometerDtoMapper(
