@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.devices.all.ui.builder
 
+import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.DevicesHeaderItem
@@ -10,12 +11,17 @@ import javax.inject.Inject
 class DevicesOptionsItemsBuilder @Inject constructor(
     private val resources: ResourceProvider
 ) {
-    fun buildItems() = mutableListOf<ListItem>().apply {
+    fun buildItems(glucometers: List<Glucometer>) = mutableListOf<ListItem>().apply {
         add(DevicesHeaderItem(resources.getString(R.string.profile_devices_active_glucometers)))
-        add(ActiveDeviceItem(
-            icon = R.drawable.ic_devices,
-            name = "СателлитOnline",
-            address = "45:89:21:44"
-        ))
+        addAll(glucometers.map(::mapFromGlucometer))
     }
+
+    private fun mapFromGlucometer(source: Glucometer): ListItem =
+        with(source) {
+            ActiveDeviceItem(
+                icon = R.drawable.ic_devices,
+                name = name ?: "",
+                address = address
+            )
+        }
 }
