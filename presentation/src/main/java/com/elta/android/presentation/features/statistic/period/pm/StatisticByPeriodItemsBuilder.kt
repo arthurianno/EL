@@ -83,9 +83,9 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private inline fun GlucoseStatisticModel?.getAverageBg(): Drawable? =
         when {
-            this isAverageIn this?.settings?.high -> resources.getDrawable(R.drawable.bg_glucose_index_high)
-            this isAverageIn this?.settings?.normal -> resources.getDrawable(R.drawable.bg_glucose_index_normal)
-            this isAverageIn this?.settings?.low -> resources.getDrawable(R.drawable.bg_glucose_index_low)
+            this.isAverageIn(this?.settings?.high) -> resources.getDrawable(R.drawable.bg_glucose_index_high)
+            this.isAverageIn(this?.settings?.normal) -> resources.getDrawable(R.drawable.bg_glucose_index_normal)
+            this.isAverageIn(this?.settings?.low) -> resources.getDrawable(R.drawable.bg_glucose_index_low)
             else -> resources.getDrawable(R.drawable.bg_glucose_index_total)
         }
 
@@ -273,7 +273,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private fun Double?.format() = NumberFormatter.format(this ?: 0.0)
 
-    private infix fun GlucoseStatisticModel?.isAverageIn(range: DoubleRange?) =
+    private fun GlucoseStatisticModel?.isAverageIn(range: DoubleRange?) =
         this != null && this.eventsCount > 0 && range?.contains(this.averageLevel) ?: false
 
     companion object {
