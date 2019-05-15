@@ -412,6 +412,7 @@
     <string name="profile_unlink_network_cancel_button">Отменить</string>
     <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
 
+    <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
     <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
     <string name="profile_reminders_create_new">Создать новое</string>
@@ -426,16 +427,6 @@
     <string name="profile_reminders_message_deleted">Напоминание удалено</string>
     <string name="profile_reminders_wrong_time">Вы выбрали время в прошлом. Пожалуйста, выбирите время в будущем.</string>
 
-    <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
-    <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
-    <string name="profile_devices_active_glucometers">Активный глюкометр</string>
-    <string name="profile_devices_new_device">Новое устройство</string>
-
-    <string name="profile_device_info_title">СателлитOnline</string>
-    <string name="profile_device_info_description"> Адрес устройства: %s</string>
-    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
-    <string name="profile_device_info_delete">Удалить устройство</string>
-
     <string name="profile_reminders_schedule_not_repeat">Не повторять</string>
     <string name="profile_reminders_schedule_day">Ежедневно</string>
     <string name="profile_reminders_schedule_week">Еженедельно</string>
@@ -446,6 +437,23 @@
     <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!--DEVICE-->
+    <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
+    <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
+    <string name="profile_devices_active_glucometers">Активный глюкометр</string>
+    <string name="profile_devices_new_device">Новое устройство</string>
+
+    <string name="profile_device_info_title">СателлитOnline</string>
+    <string name="profile_device_info_description"> Адрес устройства: %s</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
+    <string name="profile_device_info_delete">Удалить устройство</string>
+
+    <string name="profile_delete_device_dialog_title">Внимание</string>
+    <!--todo уточнить текст-->
+    <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_device_cancel_button">Отменить</string>
+    <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
 
     <!--OBSERVERS FLOW-->
     <string name="profile_observers_empty_state_title">У вас нет ни одного наблюдателя</string>
