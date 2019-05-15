@@ -7,5 +7,6 @@ data class GlucometerInfo(
     val temperature: Int? = null,
     val batteryLevel: Int? = null,
     val softwareVersion: Double? = null,
-    val hardwareVersion: Double? = null
+    val hardwareVersion: Double? = null,
+    val modificationTime: Date? = null
 )

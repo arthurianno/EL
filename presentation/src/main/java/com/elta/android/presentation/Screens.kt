@@ -209,8 +209,8 @@ object Screens {
         override fun getFragment() = DevicesFragment.newInstance()
     }
 
-    object DeviceInfo : SupportAppScreen() {
-        override fun getFragment() = DeviceInfoFragment.newInstance()
+    data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {
+        override fun getFragment() = DeviceInfoFragment.newInstance(name, address)
     }
 
     object CreateRemind : SupportAppScreen() {

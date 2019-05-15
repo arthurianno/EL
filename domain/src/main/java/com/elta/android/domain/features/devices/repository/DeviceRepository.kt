@@ -13,7 +13,7 @@ interface DeviceRepository {
 
     fun getDevices(): Observable<List<Glucometer>>
 
-    fun deleteDevices(address: String): Completable
+    fun deleteDevice(address: String): Completable
 
     fun getDeviceInfo(address: String): Single<GlucometerInfo>
 

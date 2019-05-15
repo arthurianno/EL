@@ -25,7 +25,7 @@ class DeviceDataRepository @Inject constructor(
     override fun getDevices(): Observable<List<Glucometer>> =
         Observable.just(emptyList())
 
-    override fun deleteDevices(address: String): Completable =
+    override fun deleteDevice(address: String): Completable =
         Completable.complete()
 
     override fun getDeviceInfo(address: String): Single<GlucometerInfo> =
