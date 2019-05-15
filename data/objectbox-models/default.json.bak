@@ -348,9 +348,37 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "12:2241636644992725676",
+      "lastPropertyId": "5:3490367012322743610",
+      "name": "GlucometerCachedDto",
+      "properties": [
+        {
+          "id": "1:1542682869767898369",
+          "name": "id"
+        },
+        {
+          "id": "2:3895628364884474168",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:4084723739578882284",
+          "name": "address"
+        },
+        {
+          "id": "4:6009268326789608252",
+          "name": "name"
+        },
+        {
+          "id": "5:3490367012322743610",
+          "name": "isPrimary"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "11:2672464361589836854",
+  "lastEntityId": "12:2241636644992725676",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

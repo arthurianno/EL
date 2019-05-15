@@ -66,7 +66,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "17:8536437484320236218",
+      "lastPropertyId": "18:6594923039236404749",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -132,6 +132,10 @@
         {
           "id": "17:8536437484320236218",
           "name": "additionTimeString"
+        },
+        {
+          "id": "18:6594923039236404749",
+          "name": "temperature"
         }
       ],
       "relations": []
