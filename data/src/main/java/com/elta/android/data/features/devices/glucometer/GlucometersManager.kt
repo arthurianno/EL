@@ -3,10 +3,12 @@ package com.elta.android.data.features.devices.glucometer
 import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
@@ -95,7 +97,8 @@ class GlucometersManager @Inject constructor(
     fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         Single.fromCallable {
             val id = address.hashCode().toLong()
-            glucometersInfoCache.get(CommonConditions.ById(id)) ?: GlucometerInfoCachedDto(id = id, secondaryId = address)
+            glucometersInfoCache.get(CommonConditions.ById(id))
+                ?: GlucometerInfoCachedDto(id = id, secondaryId = address)
         }.map(glucometersInfoFromCacheMapper::mapFromObject)
 
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
@@ -279,25 +282,45 @@ class GlucometersManager @Inject constructor(
             .checkPinAndSend(address)
             .switchMap { connection ->
                 connection.request(address, Commands.SetTime(Date()))
-                Observable.just(connection)
+                    .take(1)
+                    .flatMap { response ->
+                        if (isOk(response)) Observable.just(connection)
+                        else Observable.error(CommandError)
+                    }
             }
             .switchMap { connection ->
                 Observable.range(0, EVENTS_COUNT)
                     .concatMap {
                         connection.request(address, Commands.ReadEvent(it))
                     }
+                    .takeUntil { isPotentialLastEvent(it) }
+                    .collectInto(mutableListOf<String>()) { responses, response ->
+                        if (!isPotentialLastEvent(response)) responses.add(response)
+                    }
+                    .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
+                    .map { Pair(connection, it) }
+                    .toObservable()
+                    .take(1)
             }
-            .takeUntil { isPotentialLastEvent(it) }
-            .collectInto(mutableListOf<String>()) { responses, response ->
-                if (!isPotentialLastEvent(response)) responses.add(response)
+            .switchMap { pair ->
+                pair.first.batchRequest(address, infoCommands)
+                    .take(1)
+                    .map { infoBuilder.buildFrom(address, it, Date()) }
+                    .map { Pair(pair.second, it) }
             }
-            .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
-            .doOnSuccess {
+            .doOnNext {
                 val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                val newInfo = glucometersInfoToCacheMapper.mapFromObject(it.second)
                 if (info == null) {
-
+                    glucometersInfoCache.add(listOf(newInfo))
+                } else {
+                    glucometersInfoCache.update(listOf(newInfo))
                 }
             }
+            .take(1)
+            .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError) }
+            .map { it.first }
+            .singleOrError()
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
