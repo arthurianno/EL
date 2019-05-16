@@ -92,6 +92,7 @@ class ConnectDevicePm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         bindActions()
+        bindRetryActions()
         bindClicksAndEvents()
 
         Observable.merge(
@@ -125,50 +126,11 @@ class ConnectDevicePm @Inject constructor(
         startScanAction.observable
             .flatMap {
                 findGlucometersUseCase.execute()
-                    .doOnNext { results ->
-                        if (results.isNotEmpty()) {
-                            state.consumer.accept(ViewState.FOUND)
-                            retrySearchControl.dismiss()
-                        }
-                        scanResults.clear()
-                        scanResults.addAll(results)
-                        items.consumer.accept(
-                            results.mapIndexed { index, meter ->
-                                DeviceItem(
-                                    id = meter.id,
-                                    name = meter.name ?: "Unknown device",
-                                    address = meter.address,
-                                    isSelected = meter.address == glucometer?.address,
-                                    isTheLast = index == results.size - 1
-                                )
-                            }
-                        )
-                    }
+                    .doOnNext(::handleSearchResults)
                     .doOnError(::handleError)
             }
             .retry()
             .subscribe()
-            .untilDestroy()
-
-        showRetrySearchAction.observable
-            .switchMapMaybe {
-                retrySearchControl.showForResult(deviceNotFound)
-            }
-            .subscribe(startScanAction.consumer)
-            .untilDestroy()
-
-        showRetryPinAction.observable
-            .switchMapMaybe {
-                retryPinControl.showForResult(incorrectPinCode)
-            }
-            .subscribe(connectDeviceAction.consumer)
-            .untilDestroy()
-
-        showRetrySyncAction.observable
-            .switchMapMaybe {
-                retrySyncControl.showForResult(syncError)
-            }
-            .subscribe(startSyncAction.consumer)
             .untilDestroy()
 
         skipAction.observable
@@ -203,6 +165,29 @@ class ConnectDevicePm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindRetryActions() {
+        showRetrySearchAction.observable
+            .switchMapMaybe {
+                retrySearchControl.showForResult(deviceNotFound)
+            }
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
+
+        showRetryPinAction.observable
+            .switchMapMaybe {
+                retryPinControl.showForResult(incorrectPinCode)
+            }
+            .subscribe(connectDeviceAction.consumer)
+            .untilDestroy()
+
+        showRetrySyncAction.observable
+            .switchMapMaybe {
+                retrySyncControl.showForResult(syncError)
+            }
+            .subscribe(startSyncAction.consumer)
             .untilDestroy()
     }
 
@@ -249,6 +234,29 @@ class ConnectDevicePm @Inject constructor(
     private fun navigateToShopsFlow(i: Unit) {
         router.newRootFlow(Screens.ShopsFlow)
     }
+
+    private fun handleSearchResults(results: List<Glucometer>) {
+        if (results.isNotEmpty()) {
+            state.consumer.accept(ViewState.FOUND)
+            retrySearchControl.dismiss()
+        }
+        scanResults.clear()
+        scanResults.addAll(results)
+        items.consumer.accept(
+            results.mapIndexed { index, meter ->
+                mapToDeviceItem(meter, results.size, index)
+            }
+        )
+    }
+
+    private fun mapToDeviceItem(meter: Glucometer, size: Int, index: Int): DeviceItem =
+        DeviceItem(
+            id = meter.id,
+            name = meter.name ?: "Unknown device",
+            address = meter.address,
+            isSelected = meter.address == glucometer?.address,
+            isTheLast = index == size - 1
+        )
 
     enum class ViewState {
         SEARCH, FOUND, CONNECTED, SYNC_COMPLETED
