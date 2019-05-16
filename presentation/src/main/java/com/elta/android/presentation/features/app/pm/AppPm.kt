@@ -1,7 +1,9 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
@@ -44,6 +46,12 @@ class AppPm @Inject constructor(
             .doOnNext { screen -> screen?.let { router.newRootFlow(it) } }
             .retry()
             .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.SyncProgress>()
+            .subscribe {
+                // TODO: pass progress to view
+            }
             .untilDestroy()
     }
 }
