@@ -5,8 +5,6 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
@@ -14,7 +12,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
-import com.elta.android.presentation.utils.makeSnackBar
+import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -61,26 +59,9 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
             }
         }
 
-        pm.retrySearchControl.bindTo { data, sc ->
-            makeSnackBar(checkNotNull(view), data)
-                .setDuration(Snackbar.LENGTH_INDEFINITE)
-                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
-                .setAction(data.button) { sc.sendResult() }
-        }
-
-        pm.retryPinControl.bindTo { data, sc ->
-            makeSnackBar(checkNotNull(view), data)
-                .setDuration(Snackbar.LENGTH_INDEFINITE)
-                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
-                .setAction(data.button) { sc.sendResult() }
-        }
-
-        pm.retrySyncControl.bindTo { data, sc ->
-            makeSnackBar(checkNotNull(view), data)
-                .setDuration(Snackbar.LENGTH_INDEFINITE)
-                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
-                .setAction(data.button) { sc.sendResult() }
-        }
+        pm.retrySearchControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.retryPinControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.retrySyncControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
 
         pm.requestEnableBluetoothCommand.observable
             .bindTo {
@@ -94,33 +75,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
                     .map { Unit }
             }
             .bindTo(pm.locationPermissionsGrantedAction)
-        pm.requestEnableLocationCommand.observable
-            .bindTo {
-                val result = SettingsClient(checkNotNull(context))
-                    .checkLocationSettings(
-                        LocationSettingsRequest.Builder()
-                            .addLocationRequest(LocationRequest.create())
-                            .setNeedBle(true)
-                            .build()
-                    )
-                result.addOnCompleteListener { task ->
-                    try {
-                        task.getResult(ApiException::class.java)
-                    } catch (e: ApiException) {
-                        when (e.statusCode) {
-                            LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
-                                try {
-                                    (e as? ResolvableApiException)?.startResolutionForResult(
-                                        checkNotNull(activity),
-                                        REQUEST_CODE_ENABLE_LOCATION
-                                    )
-                                } catch (e1: IntentSender.SendIntentException) {
-                                    Timber.e(e1)
-                                }
-                        }
-                    }
-                }
-            }
+        pm.requestEnableLocationCommand.observable.bindTo(::enableLocation)
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
@@ -144,6 +99,33 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
             ConnectDevicePm.ViewState.CONNECTED -> R.id.stateConnectedView
             ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.stateSyncCompletedView
         }
+
+    private fun enableLocation(i: Unit) {
+        val result = SettingsClient(checkNotNull(context))
+            .checkLocationSettings(
+                LocationSettingsRequest.Builder()
+                    .addLocationRequest(LocationRequest.create())
+                    .setNeedBle(true)
+                    .build()
+            )
+        result.addOnCompleteListener { task ->
+            try {
+                task.getResult(ApiException::class.java)
+            } catch (e: ApiException) {
+                when (e.statusCode) {
+                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
+                        try {
+                            (e as? ResolvableApiException)?.startResolutionForResult(
+                                checkNotNull(activity),
+                                REQUEST_CODE_ENABLE_LOCATION
+                            )
+                        } catch (e1: IntentSender.SendIntentException) {
+                            Timber.e(e1)
+                        }
+                }
+            }
+        }
+    }
 
     companion object {
         private const val REQUEST_CODE_ENABLE_LOCATION = 145

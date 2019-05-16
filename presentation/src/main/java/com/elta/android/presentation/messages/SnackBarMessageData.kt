@@ -10,5 +10,5 @@ sealed class SnackBarMessageData(
 
     class SimpleTextMessage(message: String) : SnackBarMessageData(message = message)
 
-    class WithButton(message: String, button: String): SnackBarMessageData(message = message, button = button)
+    class WithButton(message: String, button: String) : SnackBarMessageData(message = message, button = button)
 }

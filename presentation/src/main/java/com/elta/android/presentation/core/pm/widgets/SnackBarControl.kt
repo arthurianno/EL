@@ -2,7 +2,6 @@ package com.elta.android.presentation.core.pm.widgets
 
 import android.support.design.widget.BaseTransientBottomBar
 import android.support.design.widget.Snackbar
-import com.elta.android.presentation.core.pm.widgets.SnackBarControl.Display.*
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Maybe
@@ -21,7 +20,7 @@ class SnackBarControl<T> internal constructor(pm: PresentationModel) {
 
     fun show(data: T) {
         dismiss()
-        displayed.accept(Displayed(data))
+        displayed.accept(Display.Displayed(data))
     }
 
     fun showForResult(data: T): Maybe<Unit> {
@@ -30,12 +29,12 @@ class SnackBarControl<T> internal constructor(pm: PresentationModel) {
 
         return result
             .doOnSubscribe {
-                displayed.accept(Displayed(data))
+                displayed.accept(Display.Displayed(data))
             }
             .takeUntil(
                 displayed
                     .skip(1)
-                    .filter { it == Absent }
+                    .filter { it == Display.Absent }
             )
             .firstElement()
     }
@@ -46,8 +45,8 @@ class SnackBarControl<T> internal constructor(pm: PresentationModel) {
     }
 
     fun dismiss() {
-        if (displayed.value != null && displayed.value is Displayed<*>) {
-            displayed.accept(Absent)
+        if (displayed.value != null && displayed.value is Display.Displayed<*>) {
+            displayed.accept(Display.Absent)
         }
     }
 
@@ -57,9 +56,7 @@ class SnackBarControl<T> internal constructor(pm: PresentationModel) {
     }
 }
 
-fun <T> PresentationModel.snackBarControl(): SnackBarControl<T> {
-    return SnackBarControl(this)
-}
+fun <T> PresentationModel.snackBarControl(): SnackBarControl<T> = SnackBarControl(this)
 
 internal inline fun <T> SnackBarControl<T>.bind(
     crossinline createSnackBar: (data: T, dc: SnackBarControl<T>) -> Snackbar,
@@ -67,11 +64,12 @@ internal inline fun <T> SnackBarControl<T>.bind(
 ) {
 
     var snackbar: Snackbar? = null
-    val callback: BaseTransientBottomBar.BaseCallback<Snackbar> = object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-            dismiss()
+    val callback: BaseTransientBottomBar.BaseCallback<Snackbar> =
+        object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                dismiss()
+            }
         }
-    }
 
     val closeDialog: () -> Unit = {
         snackbar?.removeCallback(callback)
@@ -85,11 +83,11 @@ internal inline fun <T> SnackBarControl<T>.bind(
             .doFinally { closeDialog() }
             .subscribe {
                 @Suppress("UNCHECKED_CAST")
-                if (it is Displayed<*>) {
+                if (it is SnackBarControl.Display.Displayed<*>) {
                     snackbar = createSnackBar(it.data as T, this)
                     snackbar?.addCallback(callback)
                     snackbar?.show()
-                } else if (it === Absent) {
+                } else if (it === SnackBarControl.Display.Absent) {
                     closeDialog()
                 }
             }

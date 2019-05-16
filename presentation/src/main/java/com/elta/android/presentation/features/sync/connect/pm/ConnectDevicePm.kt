@@ -91,7 +91,37 @@ class ConnectDevicePm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        bindActions()
+        bindClicksAndEvents()
 
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bluetoothEnabledAction.observable,
+            locationPermissionsGrantedAction.observable,
+            locationEnabledAction.observable
+        )
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
+            is TimeoutException -> {
+                val devices = items.valueOrNull
+                if (devices == null || devices.isEmpty()) {
+                    showRetrySearchAction.consumer.accept(Unit)
+                }
+            }
+            is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
+            is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
+            else -> super.handleError(error)
+        }
+    }
+
+    private fun bindActions() {
         startScanAction.observable
             .flatMap {
                 findGlucometersUseCase.execute()
@@ -174,7 +204,9 @@ class ConnectDevicePm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
 
+    private fun bindClicksAndEvents() {
         bus.events<Events.PinCodeEntered>()
             .skipWhileInProgress()
             .filter { glucometer != null }
@@ -212,32 +244,6 @@ class ConnectDevicePm @Inject constructor(
             }
             .subscribe()
             .untilDestroy()
-
-        Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bluetoothEnabledAction.observable,
-            locationPermissionsGrantedAction.observable,
-            locationEnabledAction.observable
-        )
-            .subscribe(startScanAction.consumer)
-            .untilDestroy()
-    }
-
-    override fun handleError(error: Throwable) {
-        when (error) {
-            is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
-            is TimeoutException -> {
-                val devices = items.valueOrNull
-                if (devices == null || devices.isEmpty()) {
-                    showRetrySearchAction.consumer.accept(Unit)
-                }
-            }
-            is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
-            is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
-            else -> super.handleError(error)
-        }
     }
 
     private fun navigateToShopsFlow(i: Unit) {

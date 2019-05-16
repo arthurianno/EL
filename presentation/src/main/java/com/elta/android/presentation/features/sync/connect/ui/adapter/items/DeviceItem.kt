@@ -16,7 +16,7 @@ data class DeviceItem(
         if (other is DeviceItem) {
             return mutableSetOf<Payload>().apply {
                 if (isSelected != other.isSelected) add(Payload.SELECTION_CHANGED)
-                if(isTheLast != other.isTheLast) add(Payload.POSITION_CHANGED)
+                if (isTheLast != other.isTheLast) add(Payload.POSITION_CHANGED)
             }
         }
         return super.getChangePayload(other)

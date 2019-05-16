@@ -42,6 +42,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@Suppress("TooManyFunctions")
 class GlucometersManager @Inject constructor(
     private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
     private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
@@ -133,20 +134,21 @@ class GlucometersManager @Inject constructor(
                     else -> Completable.fromCallable {
                         pinStorage.setPin(device.address, pinCode)
                         val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
+                        val newDevice = glucometerToCacheMapper.mapFromObject(device)
 
                         if (primaryDevice == null) {
-                            glucometersCache.add(listOf(glucometerToCacheMapper.mapFromObject(device).apply { isPrimary = true }))
+                            glucometersCache.add(listOf(newDevice.apply { isPrimary = true }))
                         }
 
                         if (primaryDevice != null && !primaryDevice.address.equals(device.address, true)) {
-                            glucometersCache.add(listOf(glucometerToCacheMapper.mapFromObject(device)))
+                            glucometersCache.add(listOf(newDevice))
                         }
                     }
                 }
             }
 
     fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
-        Single.just(Unit).delay(500, TimeUnit.MILLISECONDS)
+        Single.just(Unit).delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
             .flatMap {
                 device?.let { syncInternal(it.address) }
                     ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
@@ -333,5 +335,6 @@ class GlucometersManager @Inject constructor(
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000
+        private const val SYNC_DELAY = 500L
     }
 }
