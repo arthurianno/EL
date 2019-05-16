@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,8 +11,12 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <com.elta.android.presentation.widgets.ConnectionStatusView
+    <com.elta.android.presentation.widgets.TwoStateStatusView
         android:id="@+id/connectionStatusView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:state1_color="@color/color_background_disconnected"
+        app:state1_text="@string/title_connection_lost"
+        app:state2_color="@color/color_background_connected"
+        app:state2_text="@string/title_connection_found" />
 </LinearLayout>
