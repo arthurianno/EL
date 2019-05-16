@@ -8,6 +8,7 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.mapper.GlucometerFromCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerInfoFromCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerInfoToCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerInfoToDomainMapper
@@ -217,6 +218,11 @@ abstract class MappersModule {
     abstract fun bindGlucometerToCacheMapper(
         mapper: GlucometerToCacheMapper
     ): Mapper<GlucometerDto, GlucometerCachedDto>
+
+    @Binds
+    abstract fun bindGlucometerFromCacheMapper(
+        mapper: GlucometerFromCacheMapper
+    ): Mapper<GlucometerCachedDto, GlucometerDto>
 
     @Binds
     abstract fun bindGlucometerInfoToDomainMapper(

@@ -28,6 +28,9 @@ class DeviceDataRepository @Inject constructor(
     override fun findDevices(): Observable<List<Glucometer>> =
         source.findDevices().map(glucometerToDomainMapper::mapFromObjects)
 
+    override fun getDevices(): Single<List<Glucometer>> =
+        source.getDevices().map(glucometerToDomainMapper::mapFromObjects)
+
     override fun getDeviceInfo(address: String): Single<GlucometerInfo> =
         source.getGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
 

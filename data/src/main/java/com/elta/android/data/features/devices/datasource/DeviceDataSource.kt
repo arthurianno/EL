@@ -12,6 +12,8 @@ interface DeviceDataSource {
 
     fun findDevices(): Observable<List<GlucometerDto>>
 
+    fun getDevices(): Single<List<GlucometerDto>>
+
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto>
 
     fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto>

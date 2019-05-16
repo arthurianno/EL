@@ -45,6 +45,7 @@ import javax.inject.Singleton
 class GlucometersManager @Inject constructor(
     private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
     private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
+    private val glucometerFromCacheMapper: Mapper<GlucometerCachedDto, GlucometerDto>,
     private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
     private val glucometersCache: Cache<GlucometerCachedDto>,
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
@@ -83,6 +84,10 @@ class GlucometersManager @Inject constructor(
             .flatMap {
                 scanner.startScan(filters, settings)
             }
+
+    fun getDevices(): Single<List<GlucometerDto>> =
+        Single.just(glucometersCache.getAll(CommonConditions.All))
+            .map(glucometerFromCacheMapper::mapFromObjects)
 
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         client.findConnection(address)
