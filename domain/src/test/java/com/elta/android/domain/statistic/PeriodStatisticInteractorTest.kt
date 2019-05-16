@@ -109,7 +109,9 @@ class PeriodStatisticInteractorTest {
 
             eventsHighPercent = 2.percent(events.size),
             eventsNormalPercent = 2.percent(events.size),
-            eventsLowPercent = 1.percent(events.size)
+            eventsLowPercent = 1.percent(events.size),
+
+            dailyGlucoseModel = null
         )
 
         val model = buildGlucoseStatisticModel(events, settings)

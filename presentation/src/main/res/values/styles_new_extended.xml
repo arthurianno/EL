@@ -146,4 +146,8 @@
     <style name="New.Body2.White">
         <item name="android:textColor">@color/white</item>
     </style>
+
+    <style name="New.Overline.ShadeBlack2">
+        <item name="android:textColor">@color/shade_black2</item>
+    </style>
 </resources>

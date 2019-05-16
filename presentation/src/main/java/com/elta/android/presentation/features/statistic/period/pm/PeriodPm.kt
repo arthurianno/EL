@@ -5,12 +5,15 @@ package com.elta.android.presentation.features.statistic.period.pm
 import com.elta.android.domain.features.statistics.interactor.GetStatisticByPeriodUseCase
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import io.reactivex.Observable
+import java.util.Date
 import javax.inject.Inject
 
 class PeriodPm @Inject constructor(
@@ -19,9 +22,9 @@ class PeriodPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val loadScreenAction = Action<Period>()
-
+    private val loadScreenAction = Action<Period>()
     private val periodState = State<Period>()
+    private val statisticsByPeriodState = State<StatisticByPeriodModel>()
 
     override fun onCreate() {
         super.onCreate()
@@ -33,7 +36,7 @@ class PeriodPm @Inject constructor(
                 getStatisticByPeriodUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess(::handleSuccess)
+                    .doOnSuccess(statisticsByPeriodState.consumer)
                     .doOnError(::handleError)
             }
             .retry()
@@ -48,6 +51,19 @@ class PeriodPm @Inject constructor(
             .map { periodState.value }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
+
+        statisticsByPeriodState.observable
+            .map { buildItems(it) }
+            .subscribe(items.consumer)
+            .untilDestroy()
+    }
+
+    override fun onBind() {
+        super.onBind()
+        bus.clicks<Clicks.DateInStatisticsClicked>()
+            .map { buildItems(statisticsByPeriodState.value, it.date) }
+            .subscribe(items.consumer)
+            .untilUnbind()
     }
 
     fun setPeriod(period: Period) {
@@ -65,7 +81,6 @@ class PeriodPm @Inject constructor(
             }
         )
 
-    private fun handleSuccess(model: StatisticByPeriodModel) {
-        items.consumer.accept(periodBuilder.build(model))
-    }
+    private fun buildItems(model: StatisticByPeriodModel, date: Date? = null) =
+        periodBuilder.build(model, date)
 }
