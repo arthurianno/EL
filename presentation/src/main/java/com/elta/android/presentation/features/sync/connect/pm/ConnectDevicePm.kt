@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.sync.connect.pm
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
@@ -54,6 +55,7 @@ class ConnectDevicePm @Inject constructor(
 
     val retrySearchControl = snackBarControl<SnackBarData>()
     val retryPinControl = snackBarControl<SnackBarData>()
+    val retrySyncControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
@@ -76,8 +78,16 @@ class ConnectDevicePm @Inject constructor(
         )
     }
 
+    private val syncError: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            resources.getString(R.string.sync_connect_sync_error),
+            resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
+
     private val showRetrySearchAction = Action<Unit>()
     private val showRetryPinAction = Action<Unit>()
+    private val showRetrySyncAction = Action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -122,6 +132,13 @@ class ConnectDevicePm @Inject constructor(
                 retryPinControl.showForResult(incorrectPinCode)
             }
             .subscribe(connectDeviceAction.consumer)
+            .untilDestroy()
+
+        showRetrySyncAction.observable
+            .switchMapMaybe {
+                retrySyncControl.showForResult(syncError)
+            }
+            .subscribe(startSyncAction.consumer)
             .untilDestroy()
 
         skipAction.observable
@@ -218,6 +235,7 @@ class ConnectDevicePm @Inject constructor(
                 }
             }
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
+            is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
     }

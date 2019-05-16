@@ -75,6 +75,13 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
                 .setAction(data.button) { sc.sendResult() }
         }
 
+        pm.retrySyncControl.bindTo { data, sc ->
+            makeSnackBar(checkNotNull(view), data)
+                .setDuration(Snackbar.LENGTH_INDEFINITE)
+                .setActionTextColor(ContextCompat.getColor(checkNotNull(context), R.color.shade_blue))
+                .setAction(data.button) { sc.sendResult() }
+        }
+
         pm.requestEnableBluetoothCommand.observable
             .bindTo {
                 Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
