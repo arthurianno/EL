@@ -129,8 +129,8 @@ class ProfileSetNamePm @Inject constructor(
     private fun handleProfile(profile: Profile) {
         fullNameSate.consumer.accept(
             PersonNameModel(
-                firstName = profile.firstName?.let { it } ?: "",
-                secondName = profile.secondName?.let { it } ?: ""
+                firstName = profile.firstName ?: "",
+                secondName = profile.secondName ?: ""
             )
         )
     }
