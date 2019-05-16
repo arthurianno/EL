@@ -23,8 +23,27 @@ private const val DATE_FORMAT = "dd.MM"
 private val stubDate = DateModel(null, null, false, true)
 
 fun StatisticByPeriodModel.toChartModel(selectedDate: Date?): StatisticsChartDataModel {
-    val minLevel = dayWithMinLevel?.glucose.minLevel()
-    val maxLevel = dayWithMaxLevel?.glucose.maxLevel()
+    var minLevel = dayWithMinLevel?.glucose.minLevel()
+    var maxLevel = dayWithMaxLevel?.glucose.maxLevel()
+
+    if (minLevel == maxLevel) {
+        val settings = glucose.settings
+        val value = minLevel
+        when (value) {
+            in settings.normal -> {
+                minLevel = settings.normal.start
+                maxLevel = settings.normal.end
+            }
+            in settings.low -> {
+                minLevel = value
+                maxLevel = settings.normal.end
+            }
+            in settings.high -> {
+                minLevel = settings.normal.start
+                maxLevel = value
+            }
+        }
+    }
 
     val values = buildValues(minLevel, maxLevel)
     val modelsMap = TreeMap<DateModel, GlucoseStatisticModel?>()
