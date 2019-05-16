@@ -12,7 +12,7 @@ class DeleteGlucometerUseCase @Inject constructor(
 ) : CompletableUseCase<DeleteGlucometerUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Completable =
-        repo.deleteDevices(checkNotNull(params).address)
+        repo.deleteDevice(checkNotNull(params).address)
 
     data class Params(val address: String)
 }
