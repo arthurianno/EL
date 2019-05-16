@@ -34,6 +34,7 @@ class AddNewEventUseCase @Inject constructor(
                 value = p.value,
                 name = p.name,
                 kind = p.kind,
+                temperature = null,
                 duration = p.duration,
                 activityType = p.activity,
                 insulinType = p.insulin,

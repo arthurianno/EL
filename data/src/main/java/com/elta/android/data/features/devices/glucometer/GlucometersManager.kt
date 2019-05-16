@@ -3,13 +3,23 @@ package com.elta.android.data.features.devices.glucometer
 import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
+import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
+import com.elta.android.data.features.common.cache.CommonConditions
+import com.elta.android.data.features.devices.cache.GlucometersConditions
+import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
+import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
+import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -25,12 +35,21 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import java.nio.charset.Charset
+import java.util.Date
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@Suppress("TooManyFunctions")
 class GlucometersManager @Inject constructor(
+    private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
+    private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
+    private val glucometerFromCacheMapper: Mapper<GlucometerCachedDto, GlucometerDto>,
+    private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
+    private val glucometersCache: Cache<GlucometerCachedDto>,
+    private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
     private val eventBuilder: GlucometerEventBuilder,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
@@ -67,6 +86,10 @@ class GlucometersManager @Inject constructor(
                 scanner.startScan(filters, settings)
             }
 
+    fun getDevices(): Single<List<GlucometerDto>> =
+        Single.just(glucometersCache.getAll(CommonConditions.All))
+            .map(glucometerFromCacheMapper::mapFromObjects)
+
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         client.findConnection(address)
             .checkPinAndSend(address)
@@ -74,8 +97,15 @@ class GlucometersManager @Inject constructor(
                 connection.batchRequest(address, infoCommands)
             }
             .take(1)
-            .map(infoBuilder::buildFrom)
+            .map { infoBuilder.buildFrom(address, it) }
             .singleOrError()
+
+    fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto> =
+        Single.fromCallable {
+            val id = address.hashCode().toLong()
+            glucometersInfoCache.get(CommonConditions.ById(id))
+                ?: GlucometerInfoCachedDto(id = id, secondaryId = address)
+        }.map(glucometersInfoFromCacheMapper::mapFromObject)
 
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
         client.findConnection(address)
@@ -90,15 +120,40 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
-            // TODO: pass part of device name instead of address.
-            // On iOS devices address can't be extracted
-            // so events will have different id on Android and iOS platforms
             .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
 
-    fun setPinCode(address: String, pinCode: String): Completable =
-        Completable.fromCallable {
-            pinStorage.setPin(address, pinCode)
-        }
+    fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
+        client.findConnection(device.address)
+            .switchMap { connection ->
+                connection.simpleRequest(device.address, Commands.SetPin(pinCode))
+            }
+            .take(1)
+            .switchMapCompletable { response ->
+                when {
+                    isPinError(response) -> Completable.error(GlucometerPinIncorrectOrNotFoundError)
+                    else -> Completable.fromCallable {
+                        pinStorage.setPin(device.address, pinCode)
+                        val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
+                        val newDevice = glucometerToCacheMapper.mapFromObject(device)
+
+                        if (primaryDevice == null) {
+                            glucometersCache.add(listOf(newDevice.apply { isPrimary = true }))
+                        }
+
+                        if (primaryDevice != null && !primaryDevice.address.equals(device.address, true)) {
+                            glucometersCache.add(listOf(newDevice))
+                        }
+                    }
+                }
+            }
+
+    fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
+        Single.just(Unit).delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
+            .flatMap {
+                device?.let { syncInternal(it.address) }
+                    ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
+                    ?: Single.error(PrimaryGlucometerNotFoundError)
+            }
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {
@@ -107,7 +162,7 @@ class GlucometersManager @Inject constructor(
                 .checkPinAndSend(address)
                 .switchMap { connection ->
                     connection.request(address, Commands.GetBatteryAndTemperature)
-                        .map { infoBuilder.buildFrom(listOf(it)) }
+                        .map { infoBuilder.buildFrom(address, listOf(it)) }
                         .switchMap { info ->
                             when {
                                 !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
@@ -129,6 +184,16 @@ class GlucometersManager @Inject constructor(
                 }
         }
 
+    private fun RxBleConnection.simpleRequest(address: String, cmd: GlucometerCommand): Observable<String> {
+        val input = cmd.toGlucometerString()
+        val notification = setupNotification(UART_TX)
+            .switchMap { it }
+            .map { it.toString(Charset.defaultCharset()) }
+        val command = writeCharacteristic(UART_RX, input.toByteArray(Charset.defaultCharset()))
+            .toObservable().map { it.toString(Charset.defaultCharset()) }
+        return Observables.combineLatest(notification.take(1), command) { response, _ -> response }
+    }
+
     private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
         val input = cmd.toGlucometerString()
         val notification = setupNotification(UART_TX)
@@ -141,8 +206,10 @@ class GlucometersManager @Inject constructor(
             .compose {
                 it.switchMap { response ->
                     when {
-                        isPinCommand(input)
-                            && isPinError(response) -> Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        isPinCommand(input) && isPinError(response) -> {
+                            pinStorage.setPin(address, "")
+                            Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        }
                         isPinError(response) -> Observable.error(GlucometerPinRequireError)
                         else -> Observable.just(response)
                     }
@@ -217,11 +284,57 @@ class GlucometersManager @Inject constructor(
             else -> null
         }
 
+    private fun syncInternal(address: String): Single<List<GlucometerEventDto>> =
+        client.findConnection(address)
+            .checkPinAndSend(address)
+            .switchMap { connection ->
+                connection.request(address, Commands.SetTime(Date()))
+                    .take(1)
+                    .flatMap { response ->
+                        if (isOk(response)) Observable.just(connection)
+                        else Observable.error(CommandError)
+                    }
+            }
+            .switchMap { connection ->
+                Observable.range(0, EVENTS_COUNT)
+                    .concatMap {
+                        connection.request(address, Commands.ReadEvent(it))
+                    }
+                    .takeUntil { isPotentialLastEvent(it) }
+                    .collectInto(mutableListOf<String>()) { responses, response ->
+                        if (!isPotentialLastEvent(response)) responses.add(response)
+                    }
+                    .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
+                    .map { Pair(connection, it) }
+                    .toObservable()
+                    .take(1)
+            }
+            .switchMap { pair ->
+                pair.first.batchRequest(address, infoCommands)
+                    .take(1)
+                    .map { infoBuilder.buildFrom(address, it, Date()) }
+                    .map { Pair(pair.second, it) }
+            }
+            .doOnNext {
+                val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                val newInfo = glucometersInfoToCacheMapper.mapFromObject(it.second)
+                if (info == null) {
+                    glucometersInfoCache.add(listOf(newInfo))
+                } else {
+                    glucometersInfoCache.update(listOf(newInfo))
+                }
+            }
+            .take(1)
+            .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError) }
+            .map { it.first }
+            .singleOrError()
+
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
         private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000
+        private const val SYNC_DELAY = 500L
     }
 }

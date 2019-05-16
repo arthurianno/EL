@@ -3,6 +3,7 @@ package com.elta.android.presentation.core.ui.fragment
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.CallSuper
+import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
+import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
@@ -117,6 +119,10 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         view?.let { content ->
             makeSnackBar(content, data).show()
         }
+    }
+
+    fun <T> SnackBarControl<T>.bindTo(createSnackBar: (data: T, sc: SnackBarControl<T>) -> Snackbar) {
+        bind({ data, sc -> createSnackBar(data, sc) }, compositeUnbind)
     }
 
     companion object {

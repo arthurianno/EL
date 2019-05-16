@@ -1,7 +1,7 @@
-package com.elta.android.presentation.features.bluetooth.ui.adapter
+package com.elta.android.presentation.features.sync.connect.ui.adapter
 
-import com.elta.android.presentation.features.bluetooth.ui.adapter.delegates.DeviceDelegate
-import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.ui.adapter.delegates.DeviceDelegate
+import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem

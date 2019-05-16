@@ -21,7 +21,7 @@ class SyncStartFragment : BaseFragment<SyncStartPm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         homeButtonView.hide()
-        menuButtonView.text = getString(R.string.shops_start_menu_button_text)
+        menuButtonView.text = getString(R.string.sync_start_menu_button_text)
     }
 
     override fun onBindPresentationModel(pm: SyncStartPm) {

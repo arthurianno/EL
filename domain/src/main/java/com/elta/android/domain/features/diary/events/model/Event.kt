@@ -14,6 +14,7 @@ data class Event(
     val value: Double?,
     val name: String?,
     val kind: String?,
+    val temperature: Double?,
     val duration: Long?,
     val activityType: ActivityType?,
     val mealTag: MealTag?,

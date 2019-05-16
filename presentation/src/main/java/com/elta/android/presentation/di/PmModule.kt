@@ -45,7 +45,9 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
+import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
+import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.features.sync.start.pm.SyncStartPm
 import dagger.Binds
 import dagger.Module
@@ -187,6 +189,16 @@ abstract class PmModule {
     @IntoMap
     @PmKey(BluetoothPm::class)
     abstract fun bindBluetoothPm(pm: BluetoothPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(PinDialogPm::class)
+    abstract fun bindPinDialogPm(pm: PinDialogPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ConnectDevicePm::class)
+    abstract fun bindConnectDevicePm(pm: ConnectDevicePm): PresentationModel
 
     // DIARY FLOW
     @Binds

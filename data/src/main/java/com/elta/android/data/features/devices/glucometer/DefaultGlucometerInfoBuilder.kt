@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBuilder {
 
-    override fun buildFrom(params: List<String>): GlucometerInfoDto {
+    override fun buildFrom(id: String, params: List<String>, syncDate: Date?): GlucometerInfoDto {
         var date: Date? = null
         var temperature: Int? = null
         var batteryLevel: Int? = null
@@ -29,7 +29,9 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         }
 
         return GlucometerInfoDto(
-            date = date,
+            id = id,
+            deviceDate = date,
+            syncDate = syncDate,
             temperature = temperature,
             batteryLevel = batteryLevel,
             version = version
