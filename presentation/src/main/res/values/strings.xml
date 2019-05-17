@@ -479,7 +479,7 @@
     <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
     <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
-    <string name="profile_device_info_charge_level_field">%d/4</string>
+    <string name="profile_device_info_charge_level_field">%d/3</string>
 
     <string name="profile_delete_device_dialog_title">Внимание</string>
     <!--todo уточнить текст-->
