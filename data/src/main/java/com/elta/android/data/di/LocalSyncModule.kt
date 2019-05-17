@@ -17,7 +17,7 @@ class LocalSyncModule {
 
     @Provides
     @Singleton
-    fun provideProfileCoiniguration(): ClassConfiguration<Profile> =
+    fun provideProfileConfiguration(): ClassConfiguration<Profile> =
         ClassConfiguration(
             supportedState = arrayListOf(StateDto.UPDATED),
             mapper = ProfileSyncMapper()
@@ -25,7 +25,7 @@ class LocalSyncModule {
 
     @Provides
     @Singleton
-    fun provideEventsCoiniguration(): ClassConfiguration<Event> =
+    fun provideEventsConfiguration(): ClassConfiguration<Event> =
         ClassConfiguration(
             supportedState = arrayListOf(StateDto.UPDATED, StateDto.CREATED, StateDto.DELETED),
             mapper = EventsSyncMapper()

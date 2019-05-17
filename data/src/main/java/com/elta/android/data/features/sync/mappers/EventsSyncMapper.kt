@@ -9,24 +9,24 @@ class EventsSyncMapper : LocalSyncMapper<Event> {
 
     override fun mapToUpdate(entity: Event): LocalSyncCachedDto =
         LocalSyncCachedDto(
-            _id = entity.id.hashCode().toLong(),
-            id = entity.id,
+            id = entity.id.hashCode().toLong(),
+            secondaryId = entity.id,
             className = Event::class.java.simpleName,
             state = StateDto.UPDATED
         )
 
     override fun mapToCreate(entity: Event): LocalSyncCachedDto =
         LocalSyncCachedDto(
-            _id = entity.id.hashCode().toLong(),
-            id = entity.id,
+            id = entity.id.hashCode().toLong(),
+            secondaryId = entity.id,
             className = Event::class.java.simpleName,
             state = StateDto.CREATED
         )
 
     override fun mapToDelete(entity: Event): LocalSyncCachedDto =
         LocalSyncCachedDto(
-            _id = entity.id.hashCode().toLong(),
-            id = entity.id,
+            id = entity.id.hashCode().toLong(),
+            secondaryId = entity.id,
             className = Event::class.java.simpleName,
             state = StateDto.DELETED,
             meta = entity.type.toString()

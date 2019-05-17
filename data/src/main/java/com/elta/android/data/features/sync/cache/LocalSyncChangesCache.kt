@@ -58,18 +58,18 @@ class LocalSyncChangesCache @Inject constructor(
     private fun getForClassAndId(id: String, className: String): LocalSyncCachedDto? = box.query {
         equal(LocalSyncCachedDto_.className, className)
         and()
-        equal(LocalSyncCachedDto_.id, id)
+        equal(LocalSyncCachedDto_.secondaryId, id)
     }.findFirst()
 
     private fun deleteForClassAndId(id: String, className: String) = box.query {
         equal(LocalSyncCachedDto_.className, className)
         and()
-        equal(LocalSyncCachedDto_.id, id)
+        equal(LocalSyncCachedDto_.secondaryId, id)
     }.remove()
 
     private fun containsForClassAndId(id: String, className: String) = box.query {
         equal(LocalSyncCachedDto_.className, className)
         and()
-        equal(LocalSyncCachedDto_.id, id)
+        equal(LocalSyncCachedDto_.secondaryId, id)
     }.count() > 0
 }
