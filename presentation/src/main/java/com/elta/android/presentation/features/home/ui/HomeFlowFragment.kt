@@ -8,6 +8,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.widgets.BottomNavigationView
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
@@ -74,6 +75,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
+        pm.retryDeviceNotFoundControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
     }
 
     override fun handleBack() {

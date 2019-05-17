@@ -350,7 +350,8 @@
 
     <string name="sync_connect_device_not_found">Устройство не найдено</string>
     <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
-    <string name="sync_connect_sync_error">Ошибка синхронизации</string>
+    <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
+    <string name="sync_connect_sync_error">Ошибка синхронизации с устройством</string>
     <string name="sync_connect_button_retry">Повторить</string>
 
     <!-- DIARY FLOR -->

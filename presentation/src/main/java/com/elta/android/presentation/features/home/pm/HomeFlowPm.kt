@@ -1,5 +1,8 @@
 package com.elta.android.presentation.features.home.pm
 
+import com.elta.android.common.errors.GlucometerOfflineError
+import com.elta.android.common.errors.GlucometerSyncError
+import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
@@ -12,7 +15,10 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.snackBarControl
+import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
+import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
@@ -34,9 +40,19 @@ class HomeFlowPm @Inject constructor(
     val menuItemRestoredAction = Action<Int>()
     val selectedItemIdState = State(R.id.mainMenuItemView)
 
+    val retryDeviceNotFoundControl = snackBarControl<SnackBarData>()
+
     private val loadEvents = Action<Unit>()
     private val startSyncAction = Action<Unit>()
     private val syncProgressState = State(false)
+    private val showRetrySyncAction = Action<Unit>()
+
+    private val deviceNotFound: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            resources.getString(R.string.sync_connect_device_not_found),
+            resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -73,6 +89,13 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        showRetrySyncAction.observable
+            .switchMapMaybe {
+                retryDeviceNotFoundControl.showForResult(deviceNotFound)
+            }
+            .subscribe(startSyncAction.consumer)
+            .untilDestroy()
+
         menuItemRestoredAction.observable
             .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
@@ -94,6 +117,20 @@ class HomeFlowPm @Inject constructor(
     override fun navigateToLaunchScreen() {
         router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab, Screens.StatisticTab, Screens.ProfileTab))
         router.navigateToTab(Screens.MainTab)
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.ConnectDevice)
+            is GlucometerSyncError -> {
+                if (error.cause is GlucometerOfflineError) {
+                    showRetrySyncAction.consumer.accept(Unit)
+                } else {
+                    super.handleError(error)
+                }
+            }
+            else -> super.handleError(error)
+        }
     }
 
     private fun handleSuccess(events: List<EventType>) {
