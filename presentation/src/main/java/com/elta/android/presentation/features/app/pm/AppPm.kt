@@ -20,11 +20,13 @@ class AppPm @Inject constructor(
     val deepLinkAction = Action<Uri>()
     val coldStartDeepLinkAction = Action<Uri>()
 
+    val syncProgress = Command<Boolean>(bufferSize = 1)
+
     override fun onCreate() {
         super.onCreate()
 
         coldStartAction.observable
-            .doOnNext { router.newRootScreen(Screens.GreetingFlow) }
+            .doOnNext { router.newRootScreen(Screens.HomeFlow) }
             .retry()
             .subscribe()
             .untilDestroy()
@@ -49,9 +51,10 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.SyncProgress>()
-            .subscribe {
-                // TODO: pass progress to view
-            }
+            .skip(1)
+            .map(Events.SyncProgress::inProgress)
+            .map { !it }
+            .subscribe(syncProgress.consumer)
             .untilDestroy()
     }
 }

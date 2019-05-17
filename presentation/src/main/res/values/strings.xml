@@ -322,6 +322,8 @@
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
+    <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>
+    <string name="sync_completed">Синхронизация с глюкометром завершена</string>
 
     <string name="sync_state_title_how_to_connect">Как подключить?</string>
     <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
@@ -423,7 +425,7 @@
     <string name="profile_settings_apply_changes">Изменить</string>
     <string name="profile_settings_save_changes">Сохранить</string>
 
-     <string name="profile_settings_change_gender_title">Пол</string>
+    <string name="profile_settings_change_gender_title">Пол</string>
     <string name="profile_settings_change_gender_description">Изменение персональных данных</string>
     <string name="profile_settings_change_gender_button_not_specified">Не указан</string>
     <string name="profile_settings_change_gender_button_male">Мужской</string>
