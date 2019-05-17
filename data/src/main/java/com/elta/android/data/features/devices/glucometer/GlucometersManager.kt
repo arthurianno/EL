@@ -90,6 +90,13 @@ class GlucometersManager @Inject constructor(
         Single.just(glucometersCache.getAll(CommonConditions.All))
             .map(glucometerFromCacheMapper::mapFromObjects)
 
+    fun deleteDevice(address: String): Completable =
+        Completable.fromCallable {
+            val id = address.hashCode().toLong()
+            glucometersCache.delete(CommonConditions.ById(id))
+            glucometersInfoCache.delete(CommonConditions.ById(id))
+        }
+
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         client.findConnection(address)
             .checkPinAndSend(address)
