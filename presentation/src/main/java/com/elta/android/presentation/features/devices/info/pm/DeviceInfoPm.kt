@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.devices.info.pm
 
 import com.elta.android.domain.features.devices.interactor.DeleteGlucometerUseCase
-import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
+import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -16,7 +16,7 @@ import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
 class DeviceInfoPm @Inject constructor(
-    private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
+    private val getGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
     private val deleteGlucometerUseCase: DeleteGlucometerUseCase,
     private val itemsBuilder: DeviceInfoItemsBuilder,
     services: ServiceFacade
@@ -71,7 +71,7 @@ class DeviceInfoPm @Inject constructor(
 
         addressState.observable
             .map { resources.getString(R.string.profile_device_info_description, it) }
-            .subscribe()
+            .subscribe(descriptionAddressState.consumer)
             .untilDestroy()
 
         checkUpdateAction.observable
@@ -95,7 +95,7 @@ class DeviceInfoPm @Inject constructor(
         DeleteGlucometerUseCase.Params(address)
 
     private fun createGetDeviceInfoParams(address: String) =
-        GetGlucometerInfoUseCase.Params(address)
+        GetLastGlucometerInfoUseCase.Params(address)
 
     private fun handleDeletingSuccess() {
         bus.event(Events.DeviceChanged)

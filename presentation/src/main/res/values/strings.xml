@@ -469,11 +469,11 @@
     <!--DEVICE-->
     <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
     <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
-    <string name="profile_devices_active_glucometers">Активный глюкометр</string>
+    <string name="profile_devices_active_glucometers">Активные глюкометры</string>
     <string name="profile_devices_new_device">Новое устройство</string>
 
     <string name="profile_device_info_title">СателлитOnline</string>
-    <string name="profile_device_info_description"> Адрес устройства: %s</string>
+    <string name="profile_device_info_description">Адрес устройства: %s</string>
     <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
     <string name="profile_device_info_delete">Удалить устройство</string>
     <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
