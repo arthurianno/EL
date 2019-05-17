@@ -315,7 +315,7 @@
     },
     {
       "id": "11:2672464361589836854",
-      "lastPropertyId": "5:4281746726435778337",
+      "lastPropertyId": "7:5486485348885741996",
       "name": "ObserverCacheDto",
       "properties": [
         {
@@ -337,12 +337,44 @@
         {
           "id": "5:4281746726435778337",
           "name": "status"
+        },
+        {
+          "id": "6:412025849003372876",
+          "name": "modificationTime"
+        },
+        {
+          "id": "7:5486485348885741996",
+          "name": "state"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "12:7204781443854468654",
+      "lastPropertyId": "4:9092295103695510101",
+      "name": "SyncChangesHolderDto",
+      "properties": [
+        {
+          "id": "1:1924456084803945490",
+          "name": "_id"
+        },
+        {
+          "id": "2:8182186292559192655",
+          "name": "id"
+        },
+        {
+          "id": "3:3395764118929366016",
+          "name": "state"
+        },
+        {
+          "id": "4:9092295103695510101",
+          "name": "className"
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "11:2672464361589836854",
+  "lastEntityId": "12:7204781443854468654",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

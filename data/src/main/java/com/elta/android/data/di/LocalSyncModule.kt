@@ -1,0 +1,45 @@
+package com.elta.android.data.di
+
+import com.elta.android.data.features.common.dto.StateDto
+import com.elta.android.data.features.sync.configuration.ClassConfiguration
+import com.elta.android.data.features.sync.configuration.LocalSyncConfig
+import com.elta.android.data.features.sync.mappers.EventsSyncMapper
+import com.elta.android.data.features.sync.mappers.ProfileSyncMapper
+import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.user.model.Profile
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
+
+@Module
+@Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
+class LocalSyncModule {
+
+    @Provides
+    @Singleton
+    fun provideProfileCoiniguration(): ClassConfiguration<Profile> =
+        ClassConfiguration(
+            supportedState = arrayListOf(StateDto.UPDATED),
+            mapper = ProfileSyncMapper()
+        )
+
+    @Provides
+    @Singleton
+    fun provideEventsCoiniguration(): ClassConfiguration<Event> =
+        ClassConfiguration(
+            supportedState = arrayListOf(StateDto.UPDATED, StateDto.CREATED, StateDto.DELETED),
+            mapper = EventsSyncMapper()
+        )
+
+    @Provides
+    @Singleton
+    fun provideSyncConfiguration(
+        eventsConfiguration: ClassConfiguration<Event>,
+        profileConfiguration: ClassConfiguration<Profile>
+    ): LocalSyncConfig = LocalSyncConfig(
+        hashMapOf(
+            Event::class.java to eventsConfiguration,
+            Profile::class.java to profileConfiguration
+        )
+    )
+}
