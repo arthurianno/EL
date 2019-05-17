@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.devices.all.ui.builder.DevicesOptionsItemsBuilder
+import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -19,6 +20,8 @@ class DevicesPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
+    val addNewDeviceAction = Action<Unit>()
+
     private val getGlucometersAction = Action<Unit>()
 
     override fun onCreate() {
@@ -26,6 +29,14 @@ class DevicesPm @Inject constructor(
 
         bindClicks()
         bindGlucometersAction()
+
+        addNewDeviceAction.observable
+            .subscribe {
+                showSnackBar(
+                    SnackBarMessageData.SimpleTextMessage("Add new device clicked")
+                )
+            }
+            .untilDestroy()
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
@@ -42,7 +53,6 @@ class DevicesPm @Inject constructor(
             .subscribe(router::navigateTo)
             .untilDestroy()
     }
-
 
     private fun bindGlucometersAction() {
         getGlucometersAction.observable
