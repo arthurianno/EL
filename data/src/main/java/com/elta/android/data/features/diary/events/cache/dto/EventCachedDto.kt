@@ -16,6 +16,7 @@ data class EventCachedDto(
     val modificationTime: Date?,
 
     // represents EventDataDto
+    val temperature: Double?,
     val value: Double?,
     val name: String?,
     val kind: String?,

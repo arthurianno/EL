@@ -317,10 +317,38 @@
     <string name="event_menu_remove">Удалить</string>
 
     <!-- SYNC -->
-    <string name="sync_start_title">Синхронизация</string>
+    <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
+
+    <string name="sync_state_title_how_to_connect">Как подключить?</string>
+    <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
+    <string name="sync_state_title_progress_connect">Идет процесс поиска устройства…</string>
+
+    <string name="sync_state_title_connected">Подключено!</string>
+    <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
+    <string name="sync_state_title_progress_connected">Идет процесс синхронизации…</string>
+
+    <string name="sync_state_pin_dialog_title">Устройство найдено</string>
+    <string name="sync_state_pin_dialog_description">Чтобы продолжить, введите ПИН-код,\nкоторый отобразился на экране глюкометра</string>
+    <string name="sync_state_pin_dialog_device_pattern">Подключаемое устройство %s</string>
+    <string name="sync_state_pin_dialog_button">Подключить</string>
+
+    <string name="sync_state_title_device_found">Устройство найдено</string>
+    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете прододжить\nпроцесс подключения</string>
+    <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
+
+    <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
+    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
+    <string name="sync_state_action_sync_completed">Перейти к приложению</string>
+
+    <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
+
+    <string name="sync_connect_device_not_found">Устройство не найдено</string>
+    <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
+    <string name="sync_connect_sync_error">Ошибка синхронизации</string>
+    <string name="sync_connect_button_retry">Повторить</string>
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
@@ -514,6 +542,8 @@
     <string name="statistic_glucose_index_average_unit">ммоль/л</string>
     <string name="statistic_glucose_index_total_unit">за&#160;период</string>
     <string name="statistic_glucose_index_level_unit">(%s\%% от замеров)</string>
+    <string name="statistic_chart_period_dates_mask">%s - %s</string>
+    <string name="statistic_daily_glucose_title">Мои показатели</string>
 
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>

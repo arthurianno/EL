@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.bluetooth.di
 
 import com.elta.android.common.di.scope.FragmentScope
-import com.elta.android.presentation.features.bluetooth.ui.adapter.DeviceDelegatesFactory
+import com.elta.android.presentation.features.sync.connect.ui.adapter.DeviceDelegatesFactory
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.DynamicAdapter

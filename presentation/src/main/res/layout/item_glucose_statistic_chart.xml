@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:background="@color/shade_black3" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/periodDatesTitleView"
+        style="@style/New.Caption1.BlackBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/padding_base"
+        tools:text="23.04.19 - 30.03.19" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:background="@color/shade_black3" />
+
+    <com.elta.android.presentation.widgets.charts.statistics.StatisticsChartCompoundView
+        android:id="@+id/statisticsChartView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

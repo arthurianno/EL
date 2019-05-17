@@ -12,7 +12,8 @@ class GlucometerToDomainMapper @Inject constructor() : Mapper<GlucometerDto, Glu
             Glucometer(
                 id = id,
                 address = address,
-                name = name
+                name = name,
+                isPrimary = isPrimary
             )
         }
 }

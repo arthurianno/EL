@@ -19,6 +19,7 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
             EventDto(
                 id = secondaryId,
                 data = EventDataDto(
+                    temperature = temperature,
                     duration = duration,
                     value = value,
                     kind = kind,

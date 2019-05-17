@@ -33,7 +33,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
             add(createSettingsItem(R.drawable.ic_key_pass,
                 resources.getString(R.string.profile_change_password), ProfileSettingsItem.Type.PASSWORD))
             add(createSettingsItem(R.drawable.ic_mail,
-                this.email?.let { it } ?: "", ProfileSettingsItem.Type.EMAIL))
+                this.email ?: "", ProfileSettingsItem.Type.EMAIL))
 
             add(createHeaderItem(resources.getString(R.string.profile_linked_social_networks)))
             addAll(createSocialItems(this))

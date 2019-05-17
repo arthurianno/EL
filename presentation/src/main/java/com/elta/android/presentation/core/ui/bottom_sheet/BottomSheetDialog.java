@@ -283,7 +283,7 @@ public class BottomSheetDialog extends AppCompatDialog {
     }
 
     private void animateOut() {
-        if (!isDismissing) {
+        if (!isDismissing && !outAnimator.isStarted()) {
             outAnimator.start();
         }
     }

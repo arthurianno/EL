@@ -8,6 +8,7 @@ import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import java.util.Calendar
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 const val DATE_FORMAT_WITHOUT_ZERO = "d LLL yyyy"
 
@@ -40,3 +41,8 @@ val Calendar.hourOfDay
 
 val Calendar.minute
     get() = this.get(Calendar.MINUTE)
+
+infix fun Date.daysTo(other: Date): Long {
+    val millisDiff = Math.abs(other.time - this.time)
+    return TimeUnit.MILLISECONDS.toDays(millisDiff)
+}
