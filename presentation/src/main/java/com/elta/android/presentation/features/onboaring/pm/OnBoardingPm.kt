@@ -7,6 +7,10 @@ import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventParam
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -67,6 +71,7 @@ class OnBoardingPm @Inject constructor(
 
         nextPageAction.observable
             .debounceAction()
+            .trackEvent { createOnBoardingEvent() }
             .subscribe(::nextPage)
             .untilDestroy()
 
@@ -105,6 +110,7 @@ class OnBoardingPm @Inject constructor(
                 updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .doOnComplete { updateStableParam(profile = params.profile) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -179,6 +185,29 @@ class OnBoardingPm @Inject constructor(
 
     private fun handleSuccess() {
         router.newRootScreen(Screens.SyncFlow)
+    }
+
+    private fun createOnBoardingEvent(): AnalyticsEvent? {
+        val currentPage = currentPageState.value
+        val item = items.value[currentPage] as OnBoardingItem
+        val data = checkNotNull(params[item::class.java]).toString()
+        return when (item) {
+            is OnBoardingGenderItem ->
+                AnalyticsEvent(
+                    AnalyticsEventType.ONB_GENDER_ADD,
+                    hashMapOf(AnalyticsEventParam.GENDER to data)
+                )
+            is OnBoardingWeightItem ->
+                AnalyticsEvent(
+                    AnalyticsEventType.ONB_WEIGHT_ADD
+                )
+            is OnBoardingDiabetesItem ->
+                AnalyticsEvent(
+                    AnalyticsEventType.ONB_DIABETES_ADD,
+                    hashMapOf(AnalyticsEventParam.TYPE to data)
+                )
+            else -> null
+        }
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size

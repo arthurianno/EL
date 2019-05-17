@@ -4,6 +4,7 @@ import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
@@ -41,6 +42,7 @@ class DiabetesSettingDialogPm @Inject constructor(
         mainAction.observable
             .debounceAction()
             .map(::updateProfile)
+            .doOnNext { updateStableParam(profile = it) }
             .doOnNext { bus.event(Events.ProfileChanged(it)) }
             .doOnNext { closeDialogCommand.consumer.accept(Unit) }
             .subscribe()

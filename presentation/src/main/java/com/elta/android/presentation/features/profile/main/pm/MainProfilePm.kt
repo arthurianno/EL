@@ -12,6 +12,8 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytics.trackEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -39,24 +41,20 @@ class MainProfilePm @Inject constructor(
     val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
     val openGlucoseRangeDialogCommand = Command<Unit>(bufferSize = 1)
 
-    private val getProfileSettingsAction = Action<Boolean>()
+    private val getProfileSettingsAction = Action<Unit>()
+    private val updateProfileByEventAction = Action<Unit>()
     private val updateProfileAction = Action<Profile>()
 
     override fun onCreate() {
         super.onCreate()
         observeClicks()
         observeProfileUpdates()
+        bindEventsChangedAction()
 
         getProfileSettingsAction.observable
             .skipWhileInProgress()
-            .flatMapSingle { isUpdateProfile ->
+            .flatMapSingle {
                 getProfileUseCase.execute()
-                    .flatMap { profile ->
-                        if (!isUpdateProfile) return@flatMap Single.just(profile)
-                        updateProfileUseCase.execute(
-                            createUpdateProfileUseCaseParams(profile)
-                        ).toSingle { profile }
-                    }
                     .bindProgress()
                     .handleProfileUseCase()
                     .doOnError(::handleError)
@@ -66,10 +64,14 @@ class MainProfilePm @Inject constructor(
             .untilDestroy()
 
         Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { false },
-            bus.events<Events.EventsChanged>().map { true }
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
         )
             .subscribe(getProfileSettingsAction.consumer)
+            .untilDestroy()
+
+        bus.events<Events.ShouldUpdateProfile>().map { Unit }
+            .subscribe(updateProfileByEventAction.consumer)
             .untilDestroy()
     }
 
@@ -101,9 +103,30 @@ class MainProfilePm @Inject constructor(
             MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)
         }
 
+    private fun bindEventsChangedAction() =
+        updateProfileByEventAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle {
+                getProfileUseCase.execute()
+                    .flatMap {
+                        updateProfileUseCase.execute(
+                            createUpdateProfileUseCaseParams(it)
+                        ).toSingle { it }
+                    }
+                    .bindProgress()
+                    .handleProfileUseCase()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
         when (type) {
-            WhereBuy -> router.startFlow(Screens.ShopsMap)
+            WhereBuy -> {
+                trackEvent(AnalyticsEventType.MAP_OPEN)
+                router.startFlow(Screens.ShopsMap)
+            }
             MyObservers -> router.startFlow(Screens.Observers)
             MyDevices -> router.startFlow(Screens.Devices)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
