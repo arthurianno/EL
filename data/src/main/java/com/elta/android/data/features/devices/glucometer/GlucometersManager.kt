@@ -83,12 +83,21 @@ class GlucometersManager @Inject constructor(
                 else Observable.just(state)
             }
             .flatMap {
+                val connectedDevices = glucometersCache.getAll(CommonConditions.All)
                 scanner.startScan(filters, settings)
+                    .map { filterConnectedDevices(connectedDevices, it) }
             }
 
     fun getDevices(): Single<List<GlucometerDto>> =
         Single.just(glucometersCache.getAll(CommonConditions.All))
             .map(glucometerFromCacheMapper::mapFromObjects)
+
+    fun deleteDevice(address: String): Completable =
+        Completable.fromCallable {
+            val id = address.hashCode().toLong()
+            glucometersCache.delete(CommonConditions.ById(id))
+            glucometersInfoCache.delete(CommonConditions.ById(id))
+        }
 
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         client.findConnection(address)
@@ -328,6 +337,19 @@ class GlucometersManager @Inject constructor(
             .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError) }
             .map { it.first }
             .singleOrError()
+
+    private fun filterConnectedDevices(
+        connected: List<GlucometerCachedDto>,
+        results: List<ScanResult>
+    ): List<ScanResult> {
+        val filtered = mutableListOf<ScanResult>()
+        results.forEach { result ->
+            if (connected.firstOrNull { it.address.equals(result.device.address, true) } == null) {
+                filtered.add(result)
+            }
+        }
+        return filtered
+    }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application

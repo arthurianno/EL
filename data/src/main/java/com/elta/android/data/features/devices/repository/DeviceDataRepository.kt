@@ -31,6 +31,9 @@ class DeviceDataRepository @Inject constructor(
     override fun getDevices(): Single<List<Glucometer>> =
         source.getDevices().map(glucometerToDomainMapper::mapFromObjects)
 
+    override fun deleteDevice(address: String): Completable =
+        source.deleteDevice(address)
+
     override fun getDeviceInfo(address: String): Single<GlucometerInfo> =
         source.getGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
 

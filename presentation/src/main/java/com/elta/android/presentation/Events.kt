@@ -22,5 +22,6 @@ sealed class Events : Event {
     object ObserverInvited : Events()
     object ProfileDataChanged : Events()
     data class PinCodeEntered(val pin: String) : Events()
+    object DeviceChanged : Events()
     data class SyncProgress(val inProgress: Boolean): Events()
 }

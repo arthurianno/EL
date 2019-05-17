@@ -390,6 +390,8 @@
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
     <string name="profile_gender_placeholder">Пол не указан</string>
+    <string name="profile_my_devices">Мои устройства</string>
+    <string name="profile_manage_glucometer">Управление глюкометром</string>
     <string name="profile_change_password">Изменить пароль</string>
     <string name="profile_notification">Напоминания</string>
     <string name="profile_legal_information">Юридическая информация</string>
@@ -441,6 +443,7 @@
     <string name="profile_unlink_network_cancel_button">Отменить</string>
     <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
 
+    <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
     <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
     <string name="profile_reminders_create_new">Создать новое</string>
@@ -465,6 +468,27 @@
     <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!--DEVICE-->
+    <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
+    <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
+    <string name="profile_devices_active_glucometers">Активные глюкометры</string>
+    <string name="profile_devices_new_device">Новое устройство</string>
+
+    <string name="profile_device_info_title">СателлитOnline</string>
+    <string name="profile_device_info_description">Адрес устройства: %s</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
+    <string name="profile_device_info_delete">Удалить устройство</string>
+    <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
+    <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
+    <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
+    <string name="profile_device_info_charge_level_field">%d/3</string>
+
+    <string name="profile_delete_device_dialog_title">Внимание</string>
+    <!--todo уточнить текст-->
+    <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_device_cancel_button">Отменить</string>
+    <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
 
     <!--OBSERVERS FLOW-->
     <string name="profile_observers_empty_state_title">У вас нет ни одного наблюдателя</string>

@@ -14,6 +14,8 @@ interface DeviceDataSource {
 
     fun getDevices(): Single<List<GlucometerDto>>
 
+    fun deleteDevice(address: String): Completable
+
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto>
 
     fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto>
