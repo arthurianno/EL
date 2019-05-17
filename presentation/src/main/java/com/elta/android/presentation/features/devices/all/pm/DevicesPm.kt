@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.devices.all.ui.builder.DevicesOptionsItemsBuilder
+import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -19,7 +20,9 @@ class DevicesPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    private val getGlucometers = Action<Unit>()
+    val addNewDeviceAction = Action<Unit>()
+
+    private val getGlucometersAction = Action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -27,34 +30,43 @@ class DevicesPm @Inject constructor(
         bindClicks()
         bindGlucometersAction()
 
+        addNewDeviceAction.observable
+            .subscribe {
+                showSnackBar(
+                    SnackBarMessageData.SimpleTextMessage("Add new device clicked")
+                )
+            }
+            .untilDestroy()
+
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
             bus.events<Events.DeviceChanged>().map { Unit }
         )
-            .subscribe(getGlucometers.consumer)
+            .subscribe(getGlucometersAction.consumer)
             .untilDestroy()
     }
 
-    private fun bindClicks() =
+    private fun bindClicks() {
         bus.clicks<Clicks.ActiveDeviceItemClicked>()
             .map { it.item }
             .map { Screens.DeviceInfo(it.name, it.address) }
-            .doOnNext(router::navigateTo)
-            .subscribe()
+            .subscribe(router::navigateTo)
             .untilDestroy()
+    }
 
-    private fun bindGlucometersAction() =
-        getGlucometers.observable
+    private fun bindGlucometersAction() {
+        getGlucometersAction.observable
             .skipWhileInProgress()
-            .flatMap {
+            .flatMapSingle {
                 getGlucometersUseCase.execute()
                     .bindProgress()
                     .bindEmpty(emptyControl.visibilityState.consumer)
                     .map(itemsBuilder::buildItems)
-                    .doOnNext(items.consumer)
+                    .doOnSuccess(items.consumer)
                     .doOnError(::handleError)
             }
             .retry()
             .subscribe()
             .untilDestroy()
+    }
 }
