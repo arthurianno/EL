@@ -338,7 +338,10 @@ class GlucometersManager @Inject constructor(
             .map { it.first }
             .singleOrError()
 
-    private fun filterConnectedDevices(connected: List<GlucometerCachedDto>, results: List<ScanResult>): List<ScanResult> {
+    private fun filterConnectedDevices(
+        connected: List<GlucometerCachedDto>,
+        results: List<ScanResult>
+    ): List<ScanResult> {
         val filtered = mutableListOf<ScanResult>()
         results.forEach { result ->
             if (connected.firstOrNull { it.address.equals(result.device.address, true) } == null) {
