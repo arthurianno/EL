@@ -83,7 +83,9 @@ class GlucometersManager @Inject constructor(
                 else Observable.just(state)
             }
             .flatMap {
+                val connectedDevices = glucometersCache.getAll(CommonConditions.All)
                 scanner.startScan(filters, settings)
+                    .map { filterConnectedDevices(connectedDevices, it) }
             }
 
     fun getDevices(): Single<List<GlucometerDto>> =
@@ -335,6 +337,16 @@ class GlucometersManager @Inject constructor(
             .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError) }
             .map { it.first }
             .singleOrError()
+
+    private fun filterConnectedDevices(connected: List<GlucometerCachedDto>, results: List<ScanResult>): List<ScanResult> {
+        val filtered = mutableListOf<ScanResult>()
+        results.forEach { result ->
+            if (connected.firstOrNull { it.address.equals(result.device.address, true) } == null) {
+                filtered.add(result)
+            }
+        }
+        return filtered
+    }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
