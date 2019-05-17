@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
+import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.WhereBuy
@@ -104,6 +105,7 @@ class MainProfilePm @Inject constructor(
         when (type) {
             WhereBuy -> router.startFlow(Screens.ShopsMap)
             MyObservers -> router.startFlow(Screens.Observers)
+            MyDevices -> router.startFlow(Screens.Devices)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 

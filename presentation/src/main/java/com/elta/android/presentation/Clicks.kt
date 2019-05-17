@@ -2,6 +2,7 @@ package com.elta.android.presentation
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
+import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
@@ -28,6 +29,7 @@ sealed class Clicks : Click {
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
     data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
     data class ReminderItemClicked(val item: ReminderItem) : Clicks()
+    data class ActiveDeviceItemClicked(val item: ActiveDeviceItem) : Clicks()
     data class DeleteHemoglobinEventClicked(val id: String) : Clicks()
     data class ObserverItemClicked(val item: ObserverItem) : Clicks()
     data class DateInStatisticsClicked(val date: Date?) : Clicks()

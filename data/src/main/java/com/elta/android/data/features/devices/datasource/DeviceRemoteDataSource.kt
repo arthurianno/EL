@@ -24,6 +24,9 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun getDevices(): Single<List<GlucometerDto>> =
         glucometersManager.getDevices()
 
+    override fun deleteDevice(address: String): Completable =
+        glucometersManager.deleteDevice(address)
+
     override fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         glucometersManager.getGlucometerInfo(address)
 
