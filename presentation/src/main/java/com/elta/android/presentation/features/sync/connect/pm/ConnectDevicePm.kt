@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.pm
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
@@ -55,6 +56,7 @@ class ConnectDevicePm @Inject constructor(
 
     val retrySearchControl = snackBarControl<SnackBarData>()
     val retryPinControl = snackBarControl<SnackBarData>()
+    val retryConnectControl = snackBarControl<SnackBarData>()
     val retrySyncControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
@@ -78,6 +80,13 @@ class ConnectDevicePm @Inject constructor(
         )
     }
 
+    private val connectError: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            resources.getString(R.string.sync_connect_connect_error),
+            resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
+
     private val syncError: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
             resources.getString(R.string.sync_connect_sync_error),
@@ -88,6 +97,10 @@ class ConnectDevicePm @Inject constructor(
     private val showRetrySearchAction = Action<Unit>()
     private val showRetryPinAction = Action<Unit>()
     private val showRetrySyncAction = Action<Unit>()
+    private val showRetryConnectAction = Action<Unit>()
+
+    private val internalConnectDeviceAction = Action<Unit>()
+    private val pinState = State<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -118,6 +131,7 @@ class ConnectDevicePm @Inject constructor(
             }
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
             is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
+            is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
     }
@@ -144,6 +158,22 @@ class ConnectDevicePm @Inject constructor(
             .map { glucometer?.name ?: "SatelliteOnline" }
             .subscribe(openPinCodeDialogCommand.consumer)
             .untilDestroy()
+
+        internalConnectDeviceAction.observable
+            .skipWhileInProgress()
+            .filter { glucometer != null && pinState.hasValue() }
+            .map { ConnectDeviceUseCase.Params(checkNotNull(glucometer), pinState.value) }
+            .flatMapCompletable { params ->
+                connectDeviceUseCase.execute(params)
+                    .bindProgress()
+                    .doOnComplete {
+                        startSyncAction.consumer.accept(Unit)
+                        state.consumer.accept(ViewState.CONNECTED)
+                    }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
 
         toAppAction.observable
             .subscribe { router.newRootFlow(Screens.HomeFlow) }
@@ -183,6 +213,13 @@ class ConnectDevicePm @Inject constructor(
             .subscribe(connectDeviceAction.consumer)
             .untilDestroy()
 
+        showRetryConnectAction.observable
+            .switchMapMaybe {
+                retryConnectControl.showForResult(connectError)
+            }
+            .subscribe(internalConnectDeviceAction.consumer)
+            .untilDestroy()
+
         showRetrySyncAction.observable
             .switchMapMaybe {
                 retrySyncControl.showForResult(syncError)
@@ -193,23 +230,10 @@ class ConnectDevicePm @Inject constructor(
 
     private fun bindClicksAndEvents() {
         bus.events<Events.PinCodeEntered>()
-            .skipWhileInProgress()
-            .filter { glucometer != null }
             .map(Events.PinCodeEntered::pin)
-            .map { pin ->
-                ConnectDeviceUseCase.Params(checkNotNull(glucometer), pin)
-            }
-            .flatMapCompletable { params ->
-                connectDeviceUseCase.execute(params)
-                    .bindProgress()
-                    .doOnComplete {
-                        startSyncAction.consumer.accept(Unit)
-                        state.consumer.accept(ViewState.CONNECTED)
-                    }
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
+            .doOnNext(pinState.consumer)
+            .map { Unit }
+            .subscribe(internalConnectDeviceAction.consumer)
             .untilDestroy()
 
         bus.clicks<Clicks.DeviceClicked>()
