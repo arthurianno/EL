@@ -88,6 +88,8 @@ dependencies {
     implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
 
+    implementation commonDependencies.guava
+
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
     implementation commonDependencies.rxPm
@@ -130,6 +132,7 @@ dependencies {
 
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseInAppMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location
 
