@@ -1,15 +1,20 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.domain.features.auth.interactor.CheckEmailUseCase
+import com.elta.android.domain.features.auth.interactor.IsUserLoggedInUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
+import io.reactivex.Single
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
+    private val checkEmailUseCase: CheckEmailUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -22,7 +27,27 @@ class AppPm @Inject constructor(
         super.onCreate()
 
         coldStartAction.observable
-            .doOnNext { router.newRootScreen(Screens.GreetingFlow) }
+            .skipWhileInProgress()
+            .flatMapSingle {
+                isUserLoggedInUseCase.execute()
+                    .flatMap { isUserLoggedIn ->
+                        if (isUserLoggedIn) {
+                            checkEmailUseCase.execute()
+                                .doOnSuccess { isEmailConfirmed ->
+                                    if (isEmailConfirmed) {
+                                        router.newRootScreen(Screens.HomeFlow)
+                                    } else {
+                                        router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
+                                    }
+                                }
+                                .map { Unit }
+                        } else {
+                            router.newRootScreen(Screens.GreetingFlow)
+                            Single.just(Unit)
+                        }
+                    }
+                    .bindProgress()
+            }
             .retry()
             .subscribe()
             .untilDestroy()

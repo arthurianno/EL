@@ -58,6 +58,10 @@ class AuthDataRepository @Inject constructor(
         source.confirmEmail(token)
             .andThen(Completable.fromCallable { tokenStorage.refresh() })
 
+    override fun isUserLoggedIn(): Single<Boolean> =
+        Single.just(!tokenStorage.accessToken.isNullOrEmpty() &&
+            !tokenStorage.refreshToken.isNullOrEmpty())
+
     private fun saveUserCredentials(tokens: TokensDto, email: String) {
         saveTokens(tokens)
         userHolder.currentUser = email.hashCode().toLong()
