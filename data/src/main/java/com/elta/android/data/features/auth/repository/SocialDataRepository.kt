@@ -39,14 +39,14 @@ class SocialDataRepository @Inject constructor(
     override fun unLinkSocialNetwork(network: SocialNetworkType): Completable =
         authSocialSource.unLinkSocialNetwork(network.name)
             .andThen(socialFactory.getDataSource(network).logout())
+            .applyScheduler(schedulersFacade)
 
     override fun loginWithSocialNetwork(network: SocialNetworkType): Single<Boolean> =
         socialFactory.getDataSource(network).getToken().take(1)
             .switchMapSingle { token ->
                 authSocialSource.loginSocialNetwork(network.name, token)
-                    .doOnSuccess { response ->
-                        saveTokens(response.tokens)
-                    }
+                    .applyScheduler(schedulersFacade)
+                    .doOnSuccess { saveTokens(it.tokens) }
                     .flatMap { login ->
                         profileSource.getUserProfile()
                             .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }

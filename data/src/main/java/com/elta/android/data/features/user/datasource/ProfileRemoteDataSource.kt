@@ -21,9 +21,10 @@ class ProfileRemoteDataSource @Inject constructor(
     override fun updateProfile(profile: ProfileDto): Completable =
         api.updateUserSettings(profile)
 
+    @Suppress("MagicNumber")
     override fun getUserProfile(): Single<ProfileDto> =
         api.getUserSettings()
-            .doOnSuccess(::saveLocalIfNeed)
+            .doOnSuccess { if (userHolder.currentUser != -1L) saveLocalIfNeed(it) } // todo hot fix
 
     private fun saveLocalIfNeed(profileDto: ProfileDto) {
         val profileCacheDto = profileToCacheMapper.mapFromObject(profileDto)
