@@ -6,6 +6,8 @@ import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.feedback.storage.FeedbackDataStorage
 import com.elta.android.data.features.feedback.storage.FeedbackStorage
+import com.elta.android.data.features.user.storage.OnboardingDataStorage
+import com.elta.android.data.features.user.storage.OnboardingStorage
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -24,4 +26,8 @@ abstract class StorageModule {
     @Binds
     @Singleton
     abstract fun bindFeedbackStorage(storage: FeedbackDataStorage): FeedbackStorage
+
+    @Binds
+    @Singleton
+    abstract fun bindOnboardingStorage(storage: OnboardingDataStorage): OnboardingStorage
 }

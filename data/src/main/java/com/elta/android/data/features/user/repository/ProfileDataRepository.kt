@@ -7,6 +7,7 @@ import com.elta.android.data.common.onConnectionErrorCompletes
 import com.elta.android.data.common.onConnectionErrorResumeDefault
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.storage.OnboardingStorage
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Completable
@@ -17,7 +18,8 @@ class ProfileDataRepository @Inject constructor(
     private val toDtoMapper: Mapper<Profile, ProfileDto>,
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
-    @Remote private val remoteSource: ProfileDataSource
+    @Remote private val remoteSource: ProfileDataSource,
+    private val onboardingStorage: OnboardingStorage
 ) : ProfileRepository {
 
     override fun updateProfile(profile: Profile): Completable {
@@ -27,6 +29,9 @@ class ProfileDataRepository @Inject constructor(
                 remoteSource.updateProfile(dto)
                     .onConnectionErrorCompletes()
             )
+            .andThen(
+                Completable.fromAction { onboardingStorage.isOnboardingPassed = true }
+            )
     }
 
     override fun getProfile(): Single<Profile> =
@@ -34,4 +39,7 @@ class ProfileDataRepository @Inject constructor(
             .onConnectionErrorResumeDefault { cachedSource.getUserProfile() }
             .flatMap { cachedSource.getUserProfile() }
             .map(toDomainMapper::mapFromObject)
+
+    override fun isOnboardingPassed(): Single<Boolean> =
+        Single.just(onboardingStorage.isOnboardingPassed)
 }

@@ -9,4 +9,6 @@ interface ProfileRepository {
     fun updateProfile(profile: Profile): Completable
 
     fun getProfile(): Single<Profile>
+
+    fun isOnboardingPassed(): Single<Boolean>
 }

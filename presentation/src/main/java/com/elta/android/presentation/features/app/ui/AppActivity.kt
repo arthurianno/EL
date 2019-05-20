@@ -31,6 +31,7 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
+
         pm.networkStateCommand.bindTo(connectionStatusView.connectionState())
     }
 

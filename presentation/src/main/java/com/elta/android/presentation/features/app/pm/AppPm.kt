@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.app.pm
 import android.net.Uri
 import com.elta.android.domain.features.auth.interactor.CheckEmailUseCase
 import com.elta.android.domain.features.auth.interactor.IsUserLoggedInUseCase
+import com.elta.android.domain.features.user.interactor.IsOnboardingPassedUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -10,11 +11,13 @@ import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
 import io.reactivex.Single
+import timber.log.Timber
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val checkEmailUseCase: CheckEmailUseCase,
+    private val isOnboardingPassedUseCase: IsOnboardingPassedUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -32,6 +35,10 @@ class AppPm @Inject constructor(
                 isUserLoggedInUseCase.execute()
                     .flatMap { isUserLoggedIn ->
                         if (isUserLoggedIn) {
+//                            Timber.e("AppPm >> ${networkStateAction.observable.blockingLast()}")
+//                            if (networkStateAction.observable.blockingLast()) {
+//
+//                            }
                             checkEmailUseCase.execute()
                                 .doOnSuccess { isEmailConfirmed ->
                                     if (isEmailConfirmed) {
@@ -40,10 +47,13 @@ class AppPm @Inject constructor(
                                         router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
                                     }
                                 }
+                                .doOnError {
+                                    router.newRootScreen(Screens.HomeFlow)
+                                }
                                 .map { Unit }
                         } else {
-                            router.newRootScreen(Screens.GreetingFlow)
                             Single.just(Unit)
+                                .doOnSuccess { router.newRootScreen(Screens.GreetingFlow) }
                         }
                     }
                     .bindProgress()
