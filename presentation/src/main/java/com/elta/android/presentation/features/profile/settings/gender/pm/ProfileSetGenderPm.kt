@@ -6,6 +6,7 @@ import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -66,6 +67,7 @@ class ProfileSetGenderPm @Inject constructor(
                 updateProfileUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
+                    .doOnComplete { updateStableParam(profile = it.profile) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }

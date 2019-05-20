@@ -1,5 +1,7 @@
-package com.elta.android.presentation.analytics
+package com.elta.android.presentation.analytics.core
 
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.di.AnalyticsModule
 import javax.inject.Inject
 
 class Analytics @Inject constructor(
@@ -23,6 +25,11 @@ class Analytics @Inject constructor(
         setStableParams(stableParams, config)
     }
 
+    fun updateStableParams(vararg params: Pair<String, String>, config: Config = defaultConfig) {
+        params.forEach { stableParams[it.first] = it.second }
+        setStableParams(stableParams, config)
+    }
+
     private fun setStableParams(stableParams: Map<String, String>, config: Config = defaultConfig) {
         config.usedTrackers.forEach { name -> trackers[name]?.setStableParams(stableParams) }
     }
@@ -31,5 +38,5 @@ class Analytics @Inject constructor(
         config.usedTrackers.forEach { name -> trackers[name]?.track(event) }
     }
 
-    data class Config(val usedTrackers: List<String> = listOf())
+    data class Config(val usedTrackers: List<String> = listOf(AnalyticsModule.FIREBASE))
 }
