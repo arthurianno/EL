@@ -1,7 +1,10 @@
 package com.elta.android.presentation.features.home.pm
 
+import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
+import com.elta.android.common.errors.LocationNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -18,10 +21,12 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
+import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
+import io.reactivex.Observable
 import me.dmdev.rxpm.bindProgress
 import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeUnit
@@ -40,6 +45,7 @@ class HomeFlowPm @Inject constructor(
     val menuItemRestoredAction = Action<Int>()
     val selectedItemIdState = State(R.id.mainMenuItemView)
 
+    val bluetoothControl = bluetoothControl()
     val retryDeviceNotFoundControl = snackBarControl<SnackBarData>()
 
     private val loadEvents = Action<Unit>()
@@ -76,7 +82,12 @@ class HomeFlowPm @Inject constructor(
             }
             .untilDestroy()
 
-        startSyncAction.observable
+        Observable.merge(
+            startSyncAction.observable,
+            bluetoothControl.bluetoothEnabledAction.observable,
+            bluetoothControl.locationPermissionsGrantedAction.observable,
+            bluetoothControl.locationEnabledAction.observable
+        )
             .skipWhileInProgress(syncProgressState.observable)
             .map { SyncWithGlucometerUseCase.Params() }
             .flatMapCompletable { params ->
@@ -121,6 +132,9 @@ class HomeFlowPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
+            is BluetoothNotEnabledError -> bluetoothControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> bluetoothControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> bluetoothControl.requestEnableLocationCommand.consumer.accept(Unit)
             is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.ConnectDevice)
             is GlucometerSyncError -> {
                 if (error.cause is GlucometerOfflineError) {
