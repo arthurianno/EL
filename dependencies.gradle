@@ -25,8 +25,6 @@ def libraryVersions = [
         androidAnnotationsVersion  : '21.0.3',
         multiDexVersion            : '1.0.3',
 
-        guavaVersion               : '27.1-android',
-
         //Rx Libraries
         rxJavaVersion              : '2.2.5',
         rxKotlinVersion            : '2.3.0',
@@ -113,8 +111,6 @@ ext.commonDependencies = [
         supportConstraint     : "com.android.support.constraint:constraint-layout:${libraryVersions.constraintVersion}",
         supportCustomTabs     : "com.android.support:customtabs:${libraryVersions.customTabsVersion}",
         multiDex              : "com.android.support:multidex:${libraryVersions.multiDexVersion}",
-
-        guava                 : "com.google.guava:guava:${libraryVersions.guavaVersion}",
 
         rxKotlin              : "io.reactivex.rxjava2:rxkotlin:${libraryVersions.rxKotlinVersion}",
         rxAndroid             : "io.reactivex.rxjava2:rxandroid:${libraryVersions.rxAndroidVersion}",

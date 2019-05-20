@@ -88,8 +88,6 @@ dependencies {
     implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
 
-    implementation commonDependencies.guava
-
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
     implementation commonDependencies.rxPm
@@ -112,8 +110,12 @@ dependencies {
     implementation commonDependencies.pulseView
     implementation commonDependencies.datePicker
 
-    implementation commonDependencies.work
-    implementation commonDependencies.rxWork
+    implementation(commonDependencies.work) {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    implementation (commonDependencies.rxWork) {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
