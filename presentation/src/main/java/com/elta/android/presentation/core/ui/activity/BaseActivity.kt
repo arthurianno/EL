@@ -53,7 +53,7 @@ abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
 
     protected open val navigator: Navigator = AppNavigator(this)
 
-    private val currentFragment: BaseFragment<*>?
+    protected val currentFragment: BaseFragment<*>?
         get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
 
     private var errorStateView: StateView? = null

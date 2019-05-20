@@ -6,6 +6,8 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
@@ -24,7 +26,9 @@ class HomeFlowPm @Inject constructor(
 
     val bottomSheetItems = State<List<ListItem>>()
     val closeBottomSheetCommand = Command<Unit>()
+    val showBottomSheetCommand = Command<Unit>()
     val pulseCommand = Command<Boolean>()
+    val homeAction = Action<Boolean>()
     val menuItemSelectedAction = Action<Int>()
     val menuItemRestoredAction = Action<Int>()
     val selectedItemIdState = State(R.id.mainMenuItemView)
@@ -49,6 +53,15 @@ class HomeFlowPm @Inject constructor(
 
         menuItemRestoredAction.observable
             .subscribe(selectedItemIdState.consumer)
+            .untilDestroy()
+
+        homeAction.observable
+            .doOnNext {
+                (if (it) showBottomSheetCommand else closeBottomSheetCommand).consumer.accept(Unit)
+            }
+            .filter { it }
+            .trackEvent(AnalyticsEventType.NEW_EVENT_OPEN)
+            .subscribe()
             .untilDestroy()
 
         lifecycleObservable
@@ -84,7 +97,10 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         menuItemSelectedAction.observable
-            .doOnNext(::handleBottomMenuClick)
+            .map { it to handleBottomMenuClick(it) }
+            .trackEvent { AnalyticsEvent(it.second.second) }
+            .doOnNext { router.navigateToTab(it.second.first) }
+            .map { it.first }
             .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
     }
@@ -93,14 +109,14 @@ class HomeFlowPm @Inject constructor(
         router.startFlow(Screens.EventsCreationScreen(event))
     }
 
-    private fun handleBottomMenuClick(id: Int) {
+    private fun handleBottomMenuClick(id: Int) =
         when (id) {
-            R.id.mainMenuItemView -> router.navigateToTab(Screens.MainTab)
-            R.id.notesMenuItemView -> router.navigateToTab(Screens.DiaryTab)
-            R.id.statsMenuItemView -> router.navigateToTab(Screens.StatisticTab)
-            R.id.profileMenuItemView -> router.navigateToTab(Screens.ProfileTab)
+            R.id.mainMenuItemView -> Screens.MainTab to AnalyticsEventType.HOMEPAGE
+            R.id.notesMenuItemView -> Screens.DiaryTab to AnalyticsEventType.DIARY_OPEN
+            R.id.statsMenuItemView -> Screens.StatisticTab to AnalyticsEventType.STATISTICS_OPEN
+            R.id.profileMenuItemView -> Screens.ProfileTab to AnalyticsEventType.PROFILE_OPEN
+            else -> throw IllegalArgumentException("$id is not supported.")
         }
-    }
 
     private fun EventType.toListItem() =
         UserEventItem(
