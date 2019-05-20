@@ -21,6 +21,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
@@ -46,13 +47,7 @@ class ConnectDevicePm @Inject constructor(
 
     val state = State(ViewState.SEARCH)
 
-    val requestEnableBluetoothCommand = Command<Unit>(bufferSize = 1)
-    val requestLocationPermissionsCommand = Command<Unit>(bufferSize = 1)
-    val requestEnableLocationCommand = Command<Unit>(bufferSize = 1)
-
-    val bluetoothEnabledAction = Action<Unit>()
-    val locationPermissionsGrantedAction = Action<Unit>()
-    val locationEnabledAction = Action<Unit>()
+    val bluetoothControl = bluetoothControl()
 
     val retrySearchControl = snackBarControl<SnackBarData>()
     val retryPinControl = snackBarControl<SnackBarData>()
@@ -110,9 +105,9 @@ class ConnectDevicePm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bluetoothEnabledAction.observable,
-            locationPermissionsGrantedAction.observable,
-            locationEnabledAction.observable
+            bluetoothControl.bluetoothEnabledAction.observable,
+            bluetoothControl.locationPermissionsGrantedAction.observable,
+            bluetoothControl.locationEnabledAction.observable
         )
             .subscribe(startScanAction.consumer)
             .untilDestroy()
@@ -120,9 +115,9 @@ class ConnectDevicePm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
+            is BluetoothNotEnabledError -> bluetoothControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> bluetoothControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> bluetoothControl.requestEnableLocationCommand.consumer.accept(Unit)
             is TimeoutException -> {
                 val devices = items.valueOrNull
                 if (devices == null || devices.isEmpty()) {
