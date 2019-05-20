@@ -49,7 +49,6 @@ class SocialDataRepository @Inject constructor(
                     .doOnSuccess { saveTokens(it.tokens) }
                     .flatMap { login ->
                         profileSource.getUserProfile()
-                            .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
                             .map { login }
                     }
             }
