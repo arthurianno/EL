@@ -3,24 +3,32 @@ package com.elta.android.presentation.features.devices.firmware.pm
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.common.utils.log
 import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
+import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.interactor.isFirmwareNewer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Completable
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.dialogControl
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class FirmwarePm @Inject constructor(
     private val getLastGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
+    private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
+    private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -35,6 +43,10 @@ class FirmwarePm @Inject constructor(
     private val getDeviceInfoAction = Action<String>()
     private val checkUpdatesAction = Action<Unit>()
     private val startUpdateAction = Action<Unit>()
+    private val downloadFirmwareAction = Action<Unit>()
+
+    private val firmwareState = State<Firmware>()
+    private val firmwareFileState = State<FirmwareFile>()
 
     override fun onCreate() {
         super.onCreate()
@@ -42,6 +54,11 @@ class FirmwarePm @Inject constructor(
         buttonAction.observable
             .filter { updateState.value is UpdateState.NotFound }
             .subscribe(checkUpdatesAction.consumer)
+            .untilDestroy()
+
+        buttonAction.observable
+            .filter { updateState.value is UpdateState.Found }
+            .subscribe(downloadFirmwareAction.consumer)
             .untilDestroy()
 
         checkUpdatesAction.observable
@@ -70,15 +87,51 @@ class FirmwarePm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        downloadFirmwareAction.observable
+            .skipWhileInProgress()
+            .map(::createDownloadFirmwareUseCaseParams)
+            .flatMapSingle { params ->
+                downloadFirmwareUseCase.execute(params)
+                    .bindProgress()
+                    .doOnSubscribe {
+                        updateState.consumer.accept(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                    }
+                    .doOnSuccess(::handleFirmwareDownloaded)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        startUpdateAction.observable
+            .log("FirmwarePm", "before")
+            .log("FirmwarePm", "after")
+            .map(::createUpdateFirmwareUseCaseParams)
+            .flatMapCompletable { params ->
+                updateDeviceFirmwareUseCase.execute(params)
+                    .bindProgress()
+                    .doOnSubscribe {
+                        updateState.consumer.accept(UpdateState.Updating(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                    }
+                    .doOnComplete(::handleFirmwareUpdated)
+                    .doOnError(::handleError)
+                    .andThen(
+                        Completable.fromCallable {
+                            router.exit()
+                        }.delay(5, TimeUnit.SECONDS)
+                    )
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
         Observable.merge(
-            buttonAction.observable.filter { updateState.value is UpdateState.Found },
             btControl.bluetoothEnabledAction.observable,
             btControl.locationPermissionsGrantedAction.observable,
             btControl.locationEnabledAction.observable
         )
             .subscribe(startUpdateAction.consumer)
             .untilDestroy()
-
     }
 
     override fun handleError(error: Throwable) {
@@ -105,6 +158,7 @@ class FirmwarePm @Inject constructor(
     }
 
     private fun handleFirmwareInfo(firmware: Firmware) {
+        firmwareState.consumer.accept(firmware)
         deviceInfo.valueOrNull?.let {
             val deviceVersionString = deviceInfo.valueOrNull?.softwareVersion?.toString() ?: "0"
             if (it.isFirmwareNewer(firmware)) {
@@ -113,6 +167,24 @@ class FirmwarePm @Inject constructor(
                 updateState.consumer.accept(UpdateState.NotFound(resources, deviceVersionString))
             }
         }
+    }
+
+    private fun createDownloadFirmwareUseCaseParams(i: Unit): DownloadFirmwareUseCase.Params =
+        DownloadFirmwareUseCase.Params(firmwareState.value)
+
+    private fun handleFirmwareDownloaded(file: FirmwareFile) {
+        firmwareFileState.consumer.accept(file)
+        startUpdateAction.consumer.accept(Unit)
+    }
+
+    private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
+        UpdateDeviceFirmwareUseCase.Params(
+            address = deviceAddressState.valueOrNull ?: "",
+            file = firmwareFileState.value
+        )
+
+    private fun handleFirmwareUpdated() {
+        updateState.consumer.accept(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
     }
 
     sealed class UpdateState {
@@ -148,6 +220,33 @@ class FirmwarePm @Inject constructor(
             override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = resources.getString(R.string.firmware_updates_hint),
             override val button: String? = resources.getString(R.string.firmware_button_update)
+        ) : UpdateState()
+
+        data class Downloading(
+            val resources: ResourceProvider,
+            val currentVersion: String? = null,
+            override val title: String = resources.getString(R.string.firmware_title_downloading),
+            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val hint: String? = null,
+            override val button: String? = null
+        ) : UpdateState()
+
+        data class Updating(
+            val resources: ResourceProvider,
+            val currentVersion: String? = null,
+            override val title: String = resources.getString(R.string.firmware_title_updating),
+            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val hint: String? = null,
+            override val button: String? = null
+        ) : UpdateState()
+
+        data class Updated(
+            val resources: ResourceProvider,
+            val newVersion: String? = null,
+            override val title: String = resources.getString(R.string.firmware_title_updated),
+            override val version: String? = newVersion?.let { resources.getString(R.string.firmware_version_new, it) },
+            override val hint: String? = null,
+            override val button: String? = null
         ) : UpdateState()
     }
 }

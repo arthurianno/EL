@@ -560,7 +560,11 @@
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>
     <string name="firmware_title_checking_updates">Проверка обновлений…</string>
     <string name="firmware_title_updates_found">Найдена новая версия\nПО глюкометра: %s</string>
+    <string name="firmware_title_downloading">Загрузка обновлений…</string>
+    <string name="firmware_title_updating">Обновление ПО…</string>
+    <string name="firmware_title_updated">Обновление ПО завершено</string>
     <string name="firmware_version_current">Текущая версия: %s</string>
+    <string name="firmware_version_new">Новая версия: %s</string>
     <string name="firmware_button_update">Обновить</string>
     <string name="firmware_button_check_updates">Проверить обновления прошивки</string>
     <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка прошивки, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
