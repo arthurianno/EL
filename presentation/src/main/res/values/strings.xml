@@ -150,8 +150,9 @@
     <string name="event_type_medicaments">Медикаменты</string>
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
-    <string name="event_type_glucose">Измерение глюкозы</string>
+    <string name="event_type_glucose">Запись с глюкометра</string>
     <string name="event_type_hba1c">HbA1C</string>
+    <string name="event_type_sync">Синхронизация с устройством</string>
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s ед</string>
@@ -297,15 +298,61 @@
     <string name="event_form_delete_dialog_confirm_button">Удалить</string>
     <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
 
+    <string name="google_play_rate_dialog_title">Внимание</string>
+    <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
+    <string name="google_play_rate_dialog_negative_button">Нет</string>
+    <string name="google_play_rate_dialog_positive_button">Да, конечно</string>
+
+    <string name="like_app_dialog_title">Вы добавили %d записей!</string>
+    <string name="like_app_dialog_body">Понравилось ли Вам пользоваться нашим приложением?</string>
+    <string name="like_app_dialog_negative_button">Не очень</string>
+    <string name="like_app_dialog_positive_button">Да, конечно</string>
+
+    <string name="feedback_dialog_title">Внимание</string>
+    <string name="feedback_dialog_body">Хотели бы вы оставить обратную связь?</string>
+    <string name="feedback_dialog_negative_button">Нет</string>
+    <string name="feedback_dialog_positive_button">Да, конечно</string>
+
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
 
     <!-- SYNC -->
-    <string name="sync_start_title">Синхронизация</string>
+    <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
+    <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>
+    <string name="sync_completed">Синхронизация с глюкометром завершена</string>
+
+    <string name="sync_state_title_how_to_connect">Как подключить?</string>
+    <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
+    <string name="sync_state_title_progress_connect">Идет процесс поиска устройства…</string>
+
+    <string name="sync_state_title_connected">Подключено!</string>
+    <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
+    <string name="sync_state_title_progress_connected">Идет процесс синхронизации…</string>
+
+    <string name="sync_state_pin_dialog_title">Устройство найдено</string>
+    <string name="sync_state_pin_dialog_description">Чтобы продолжить, введите ПИН-код,\nкоторый отобразился на экране глюкометра</string>
+    <string name="sync_state_pin_dialog_device_pattern">Подключаемое устройство %s</string>
+    <string name="sync_state_pin_dialog_button">Подключить</string>
+
+    <string name="sync_state_title_device_found">Устройство найдено</string>
+    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете прододжить\nпроцесс подключения</string>
+    <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
+
+    <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
+    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
+    <string name="sync_state_action_sync_completed">Перейти к приложению</string>
+
+    <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
+
+    <string name="sync_connect_device_not_found">Устройство не найдено</string>
+    <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
+    <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
+    <string name="sync_connect_sync_error">Ошибка синхронизации с устройством</string>
+    <string name="sync_connect_button_retry">Повторить</string>
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
@@ -335,6 +382,7 @@
     <string name="profile_weight">Вес</string>
     <string name="profile_weight_value">%s кг</string>
     <string name="profile_diabetes">Диабет</string>
+    <string name="profile_diabetes_empty_value">Не выбран</string>
     <string name="profile_main_empty_value">—</string>
     <string name="profile_name_placeholder">Профиль</string>
     <string name="profile_personal_information">Персональные данные</string>
@@ -343,6 +391,8 @@
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
     <string name="profile_gender_placeholder">Пол не указан</string>
+    <string name="profile_my_devices">Мои устройства</string>
+    <string name="profile_manage_glucometer">Управление глюкометром</string>
     <string name="profile_change_password">Изменить пароль</string>
     <string name="profile_notification">Напоминания</string>
     <string name="profile_legal_information">Юридическая информация</string>
@@ -378,7 +428,7 @@
     <string name="profile_settings_apply_changes">Изменить</string>
     <string name="profile_settings_save_changes">Сохранить</string>
 
-     <string name="profile_settings_change_gender_title">Пол</string>
+    <string name="profile_settings_change_gender_title">Пол</string>
     <string name="profile_settings_change_gender_description">Изменение персональных данных</string>
     <string name="profile_settings_change_gender_button_not_specified">Не указан</string>
     <string name="profile_settings_change_gender_button_male">Мужской</string>
@@ -394,6 +444,7 @@
     <string name="profile_unlink_network_cancel_button">Отменить</string>
     <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
 
+    <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
     <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
     <string name="profile_reminders_create_new">Создать новое</string>
@@ -418,6 +469,27 @@
     <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
     <string name="profile_delete_reminder_cancel_button">Отменить</string>
     <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!--DEVICE-->
+    <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
+    <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
+    <string name="profile_devices_active_glucometers">Активные глюкометры</string>
+    <string name="profile_devices_new_device">Новое устройство</string>
+
+    <string name="profile_device_info_title">СателлитOnline</string>
+    <string name="profile_device_info_description">Адрес устройства: %s</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
+    <string name="profile_device_info_delete">Удалить устройство</string>
+    <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
+    <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
+    <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
+    <string name="profile_device_info_charge_level_field">%d/3</string>
+
+    <string name="profile_delete_device_dialog_title">Внимание</string>
+    <!--todo уточнить текст-->
+    <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_device_cancel_button">Отменить</string>
+    <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
 
     <!--OBSERVERS FLOW-->
     <string name="profile_observers_empty_state_title">У вас нет ни одного наблюдателя</string>
@@ -451,8 +523,8 @@
     <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
     <string name="statistic_glucose_index_description_total">Количество измерений</string>
     <string name="statistic_glucose_index_description_high">Измерения выше диапазона</string>
-    <string name="statistic_glucose_index_description_normal">Измерения ниже диапазона</string>
-    <string name="statistic_glucose_index_description_low">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_normal">Измерения в диапазоне</string>
+    <string name="statistic_glucose_index_description_low">Измерения ниже диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
     <string name="statistic_general_index_title_insulin">Количество инсулина</string>
@@ -474,4 +546,13 @@
     <string name="statistic_glucose_index_average_unit">ммоль/л</string>
     <string name="statistic_glucose_index_total_unit">за&#160;период</string>
     <string name="statistic_glucose_index_level_unit">(%s\%% от замеров)</string>
+    <string name="statistic_chart_period_dates_mask">%s - %s</string>
+    <string name="statistic_daily_glucose_title">Мои показатели</string>
+
+    <!--FEEDBACK-->
+    <string name="feedback_title">Оставить отзыв</string>
+    <string name="feedback_input_name_hint">Ваше имя *</string>
+    <string name="feedback_input_feedback_hint">Ваш email *</string>
+    <string name="feedback_description_text">Что вам не понравилось в приложении?</string>
+    <string name="feedback_send">Отправить</string>
 </resources>

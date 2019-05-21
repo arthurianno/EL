@@ -14,6 +14,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
+import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -23,6 +24,7 @@ import com.google.android.gms.location.SettingsClient
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.intents.launchForResult
+import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_bluetooth.*
 import timber.log.Timber
@@ -112,6 +114,9 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                     }
                 }
             }
+        pm.openPinCodeDialogCommand.bindTo {
+            childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
+        }
     }
 
     private fun bindClicks(pm: BluetoothPm) {

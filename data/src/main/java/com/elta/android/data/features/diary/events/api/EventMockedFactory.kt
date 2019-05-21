@@ -41,6 +41,7 @@ object EventMockedFactory {
             modificationTime = Date().time,
             state = state,
             data = EventDataDto(
+                temperature = 0.0,
                 value = value,
                 name = "Test name",
                 kind = "Test kind",

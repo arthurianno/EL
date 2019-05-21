@@ -28,6 +28,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 value = data.value,
                 kind = data.kind,
                 name = data.name,
+                temperature = data.temperature,
                 duration = data.duration,
                 activityType = data.activityType?.let { ActivityType.valueOf(it.name) },
                 mealTag = data.mealTag?.let { MealTag.valueOf(it.name) },

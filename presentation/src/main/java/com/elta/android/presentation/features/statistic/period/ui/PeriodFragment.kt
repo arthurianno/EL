@@ -20,6 +20,11 @@ class PeriodFragment : BaseListFragment<PeriodPm>() {
         presentationModel.setPeriod(period)
     }
 
+    override fun onBindPresentationModel(pm: PeriodPm) {
+        super.onBindPresentationModel(pm)
+        bindProgressDialog(pm)
+    }
+
     companion object {
         private const val EXTRA_PERIOD = "extra_period"
         fun newInstance(period: Period): PeriodFragment {

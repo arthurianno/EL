@@ -8,5 +8,6 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class ChooserConfiguration(
     val chooserType: ChooserType,
-    val eventType: EventType
+    val eventType: EventType,
+    val id: String? = null
 ) : Parcelable

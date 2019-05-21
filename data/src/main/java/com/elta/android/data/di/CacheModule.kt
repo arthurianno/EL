@@ -1,6 +1,10 @@
 package com.elta.android.data.di
 
 import com.elta.android.data.features.common.cache.Cache
+import com.elta.android.data.features.devices.cache.DbGlucometersCache
+import com.elta.android.data.features.devices.cache.DbGlucometersInfoCache
+import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
+import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.diary.events.cache.DbEventsCache
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.tags.cache.DbTagsCache
@@ -45,5 +49,13 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindReminderCache(cache: DbReminderCache): Cache<ReminderCacheDto>
+
+        @Binds
+        @Singleton
+        fun bindGlucometersCache(cache: DbGlucometersCache): Cache<GlucometerCachedDto>
+
+        @Binds
+        @Singleton
+        fun bindGlucometersInfoCache(cache: DbGlucometersInfoCache): Cache<GlucometerInfoCachedDto>
     }
 }

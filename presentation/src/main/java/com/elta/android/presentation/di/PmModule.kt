@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPass
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
+import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
@@ -21,6 +22,8 @@ import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.devices.all.pm.DevicesPm
+import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
@@ -44,7 +47,9 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
+import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
+import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.features.sync.start.pm.SyncStartPm
 import dagger.Binds
 import dagger.Module
@@ -187,6 +192,16 @@ abstract class PmModule {
     @PmKey(BluetoothPm::class)
     abstract fun bindBluetoothPm(pm: BluetoothPm): PresentationModel
 
+    @Binds
+    @IntoMap
+    @PmKey(PinDialogPm::class)
+    abstract fun bindPinDialogPm(pm: PinDialogPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ConnectDevicePm::class)
+    abstract fun bindConnectDevicePm(pm: ConnectDevicePm): PresentationModel
+
     // DIARY FLOW
     @Binds
     @IntoMap
@@ -246,6 +261,16 @@ abstract class PmModule {
 
     @Binds
     @IntoMap
+    @PmKey(DevicesPm::class)
+    abstract fun bindDevicesPm(pm: DevicesPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(DeviceInfoPm::class)
+    abstract fun bindDeviceInfoPm(pm: DeviceInfoPm): PresentationModel
+
+    @Binds
+    @IntoMap
     @PmKey(CreateRemindPm::class)
     abstract fun bindCreateRemindPm(pm: CreateRemindPm): PresentationModel
 
@@ -279,4 +304,10 @@ abstract class PmModule {
     @IntoMap
     @PmKey(PeriodPm::class)
     abstract fun bindPeriodPm(pm: PeriodPm): PresentationModel
+
+    // FEEDBACK FLOW
+    @Binds
+    @IntoMap
+    @PmKey(FeedbackPm::class)
+    abstract fun bindFeedbackPm(pm: FeedbackPm): PresentationModel
 }

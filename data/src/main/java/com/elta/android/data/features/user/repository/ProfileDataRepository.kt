@@ -5,6 +5,7 @@ import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.common.onConnectionErrorCompletes
 import com.elta.android.data.common.onConnectionErrorResumeDefault
+import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.domain.features.user.model.Profile
@@ -17,7 +18,8 @@ class ProfileDataRepository @Inject constructor(
     private val toDtoMapper: Mapper<Profile, ProfileDto>,
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
-    @Remote private val remoteSource: ProfileDataSource
+    @Remote private val remoteSource: ProfileDataSource,
+    private val userHolder: UserHolder
 ) : ProfileRepository {
 
     override fun updateProfile(profile: Profile): Completable {
@@ -34,4 +36,7 @@ class ProfileDataRepository @Inject constructor(
             .onConnectionErrorResumeDefault { cachedSource.getUserProfile() }
             .flatMap { cachedSource.getUserProfile() }
             .map(toDomainMapper::mapFromObject)
+
+    override fun getUserId(): Single<Long> =
+        Single.just(userHolder.currentUser)
 }

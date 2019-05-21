@@ -3,6 +3,7 @@ package com.elta.android.domain.statistic
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildDailyBreadStatisticModel
 import com.elta.android.domain.features.statistics.interactor.buildDailyInsulinStatisticModel
@@ -133,7 +134,9 @@ class DailyStatisticInteractorTest {
 
                 eventsHighPercent = 2.percent(glucoseEvents.size),
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
-                eventsLowPercent = 1.percent(glucoseEvents.size)
+                eventsLowPercent = 1.percent(glucoseEvents.size),
+
+                dailyGlucoseModel = buildDailyGlucoseModel(glucoseEvents, settings)
             ),
             insulin = DailyInsulinStatisticModel(
                 totalBolusLevel = 20.0,

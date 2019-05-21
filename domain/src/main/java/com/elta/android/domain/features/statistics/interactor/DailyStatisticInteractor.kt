@@ -15,7 +15,7 @@ fun buildDailyStatisticModel(
 ): DailyStatisticModel {
     return DailyStatisticModel(
         date = date,
-        glucose = buildGlucoseStatisticModel(eventsPerDay[EventType.GLUCOSE], settings),
+        glucose = buildGlucoseStatisticModel(eventsPerDay[EventType.GLUCOSE], settings, false),
         insulin = buildDailyInsulinStatisticModel(eventsPerDay[EventType.INSULIN]),
         bread = buildDailyBreadStatisticModel(eventsPerDay[EventType.BREAD]),
         activity = buildActivityStatisticModel(eventsPerDay[EventType.ACTIVITY])

@@ -7,10 +7,10 @@ import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
-import com.elta.android.domain.features.devices.interactor.SetPinCodeUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
@@ -21,17 +21,18 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.bluetooth.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
+import timber.log.Timber
 import javax.inject.Inject
 
 class BluetoothPm @Inject constructor(
     private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
     private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
-    private val setPinCodeUseCase: SetPinCodeUseCase,
+    private val setPinCodeUseCase: ConnectDeviceUseCase,
     private val getGlucometerEventsUseCase: GetGlucometerEventsUseCase,
     private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
     private val findGlucometersUseCase: FindGlucometersUseCase,
@@ -66,6 +67,8 @@ class BluetoothPm @Inject constructor(
     val locationEnabledAction = Action<Unit>()
     val startScanAction = Action<Unit>()
 
+    val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
+
     override fun onCreate() {
         super.onCreate()
 
@@ -81,7 +84,8 @@ class BluetoothPm @Inject constructor(
                                     id = meter.id,
                                     name = meter.name ?: "Unknown device",
                                     address = meter.address,
-                                    isSelected = meter.address == glucometer?.address
+                                    isSelected = meter.address == glucometer?.address,
+                                    isTheLast = false
                                 )
                             }
                         )
@@ -124,6 +128,7 @@ class BluetoothPm @Inject constructor(
 
         setPinAction.observable
             .skipWhileInProgress()
+            .filter { glucometer != null }
             .map(::createPinCodeUseCaseParams)
             .flatMapCompletable { params ->
                 setPinCodeUseCase.execute(params)
@@ -221,7 +226,11 @@ class BluetoothPm @Inject constructor(
             is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
-            is GlucometerPinIncorrectOrNotFoundError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
+            is GlucometerPinIncorrectOrNotFoundError -> {
+                openPinCodeDialogCommand.consumer.accept("SatelliteOnline")
+                Timber.e(error)
+//                showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
+            }
             is FirmwareDownloadingError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Firmware file is invalid"))
             else -> super.handleError(error)
         }
@@ -238,9 +247,9 @@ class BluetoothPm @Inject constructor(
     private fun createEventsUseCaseParams(i: Unit): GetGlucometerEventsUseCase.Params =
         GetGlucometerEventsUseCase.Params(address = glucometer?.address ?: "")
 
-    private fun createPinCodeUseCaseParams(i: Unit): SetPinCodeUseCase.Params =
-        SetPinCodeUseCase.Params(
-            address = glucometer?.address ?: "",
+    private fun createPinCodeUseCaseParams(i: Unit): ConnectDeviceUseCase.Params =
+        ConnectDeviceUseCase.Params(
+            device = checkNotNull(glucometer),
             pinCode = pinInputControl.text.valueOrNull ?: ""
         )
 

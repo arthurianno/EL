@@ -4,10 +4,12 @@ import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.support.annotation.StyleRes
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.TextViewCompat
 import android.view.View
 import android.widget.TextView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 
 fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {
@@ -55,3 +57,13 @@ fun makeSnackBar(view: View, data: SnackBarData): Snackbar =
         .applyBackgroundColor(R.color.black)
         .applyTextAppearance(R.style.SnackbarText)
         .applyTextDrawable(data.icon)
+
+fun makeSnackBarWithAction(
+    view: View,
+    data: SnackBarData,
+    control: SnackBarControl<SnackBarData>
+): Snackbar =
+    makeSnackBar(checkNotNull(view), data)
+        .setDuration(Snackbar.LENGTH_INDEFINITE)
+        .setActionTextColor(ContextCompat.getColor(view.context, R.color.shade_blue))
+        .setAction(data.button) { control.sendResult() }

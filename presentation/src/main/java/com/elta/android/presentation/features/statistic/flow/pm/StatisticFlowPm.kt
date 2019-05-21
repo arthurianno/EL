@@ -2,6 +2,10 @@ package com.elta.android.presentation.features.statistic.flow.pm
 
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.getPeriodParam
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventParam
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
@@ -18,7 +22,14 @@ class StatisticFlowPm @Inject constructor(
         super.onCreate()
 
         periodSelectedAction.observable
-            .doOnNext(::handlePeriodTabClick)
+            .map { it to handlePeriodTabClick(it) }
+            .trackEvent {
+                AnalyticsEvent(
+                    AnalyticsEventType.PERIOD_TAB,
+                    hashMapOf(AnalyticsEventParam.PERIOD to getPeriodParam(it.second.count)))
+            }
+            .doOnNext { router.navigateToTab(Screens.PeriodScreen(it.second)) }
+            .map { it.first }
             .subscribe(selectedPeriodIdState.consumer)
             .untilDestroy()
     }
@@ -27,12 +38,12 @@ class StatisticFlowPm @Inject constructor(
         router.navigateToTab(Screens.PeriodScreen(Period.SEVEN))
     }
 
-    private fun handlePeriodTabClick(id: Int) {
+    private fun handlePeriodTabClick(id: Int): Period =
         when (id) {
-            R.id.periodSevenDaysView -> router.navigateToTab(Screens.PeriodScreen(Period.SEVEN))
-            R.id.periodFourteenDaysView -> router.navigateToTab(Screens.PeriodScreen(Period.FOURTEEN))
-            R.id.periodThirtyDaysView -> router.navigateToTab(Screens.PeriodScreen(Period.THIRTY))
-            R.id.periodNinetyDaysView -> router.navigateToTab(Screens.PeriodScreen(Period.NINETY))
+            R.id.periodSevenDaysView -> Period.SEVEN
+            R.id.periodFourteenDaysView -> Period.FOURTEEN
+            R.id.periodThirtyDaysView -> Period.THIRTY
+            R.id.periodNinetyDaysView -> Period.NINETY
+            else -> throw IllegalArgumentException("$id is not supported.")
         }
-    }
 }

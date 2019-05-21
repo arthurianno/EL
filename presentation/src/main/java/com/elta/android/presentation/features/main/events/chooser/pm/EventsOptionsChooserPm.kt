@@ -29,6 +29,7 @@ class EventsOptionsChooserPm @Inject constructor(
     val selectionConfirmedAction = Action<Unit>()
 
     private val selectedItemIdState = State(NONE_ID)
+    private val previousSelectionState = State<String>()
     private val configurationState = State<ChooserConfiguration>()
     private val loadChooserOptionsAction = Action<ChooserConfiguration>()
 
@@ -38,6 +39,7 @@ class EventsOptionsChooserPm @Inject constructor(
         configurationState.observable
             .doOnNext(::setUpToolbarTitle)
             .doOnNext(::setUpAppBarBackground)
+            .doOnNext(::setPreviousSelection)
             .doOnNext(loadChooserOptionsAction.consumer)
             .subscribe()
             .untilDestroy()
@@ -50,6 +52,11 @@ class EventsOptionsChooserPm @Inject constructor(
                     .bindProgress()
                     .map { options -> itemsBuilder.buildItems(configurationState.value, options) }
                     .doOnNext(items.consumer)
+                    .doOnNext {
+                        previousSelectionState.valueOrNull?.let { previousId ->
+                            selectedItemIdState.consumer.accept(previousId)
+                        }
+                    }
                     .doOnError(::handleError)
             }
             .retry()
@@ -67,7 +74,7 @@ class EventsOptionsChooserPm @Inject constructor(
         selectedItemIdState.observable
             .skip(1)
             .doOnNext(::performSelection)
-            .map { it != NONE_ID }
+            .map { it != NONE_ID && it != previousSelectionState.valueOrNull }
             .doOnNext(confirmButtonVisibilityCommand.consumer)
             .subscribe()
             .untilDestroy()
@@ -154,6 +161,10 @@ class EventsOptionsChooserPm @Inject constructor(
                 else -> R.color.color_chooser_bg_insulin
             }
         )
+    }
+
+    private fun setPreviousSelection(configuration: ChooserConfiguration) {
+        previousSelectionState.consumer.accept(configuration.id ?: NONE_ID)
     }
 
     companion object {

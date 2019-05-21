@@ -1,11 +1,18 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventParam
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -72,11 +79,14 @@ class EventCreationPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createAddEventParams)
-            .flatMapCompletable { params ->
+            .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnComplete(::handleSuccess)
+                    .trackEvent { createCreationEvent(params) }
+                    .doOnComplete { sendEventIfNeed(params) }
+                    .andThen(Single.just(true))
+                    .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
             .retry()
@@ -98,6 +108,32 @@ class EventCreationPm @Inject constructor(
             note = form.note,
             eventType = checkNotNull(form.eventType)
         )
+    }
+
+    private fun createCreationEvent(params: AddNewEventUseCase.Params): AnalyticsEvent? {
+        val data = hashMapOf(AnalyticsEventParam.COMMENT to (params.note != null).toString())
+        val name = when (params.eventType) {
+            EventType.BREAD -> AnalyticsEventType.EVENT_BREAD_ADD
+            EventType.WEIGHT -> AnalyticsEventType.EVENT_WEIGHT_ADD
+            EventType.MEDICAMENTS -> {
+                data[AnalyticsEventParam.COMMENT] = (params.name != null).toString()
+                AnalyticsEventType.EVENT_MEDICAMENTS_ADD
+            }
+            EventType.ACTIVITY -> {
+                params.activity?.let { data[AnalyticsEventParam.TYPE] = it.name }
+                AnalyticsEventType.EVENT_ACTIVITY_ADD
+            }
+            EventType.INSULIN -> {
+                data[AnalyticsEventParam.TYPE] = checkNotNull(params.insulin).name
+                AnalyticsEventType.EVENT_INSULIN_ADD
+            }
+            else -> null
+        }
+        return if (name == null) null else AnalyticsEvent(name, data)
+    }
+
+    private fun sendEventIfNeed(params: AddNewEventUseCase.Params) {
+        if (params.eventType == EventType.WEIGHT) bus.event(Events.ShouldUpdateProfile)
     }
 
     companion object {

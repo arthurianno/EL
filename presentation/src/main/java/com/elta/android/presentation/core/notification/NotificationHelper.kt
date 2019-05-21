@@ -1,15 +1,18 @@
 package com.elta.android.presentation.core.notification
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.RingtoneManager
+import android.net.Uri
 import android.support.v4.app.NotificationCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.app.ui.AppActivity
+import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_AUTHORITY
+import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_SCHEME
 import javax.inject.Inject
 
 class NotificationHelper @Inject constructor(
@@ -20,31 +23,46 @@ class NotificationHelper @Inject constructor(
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    override fun sendNotification(title: String, text: String, id: String) {
-        val intent = Intent(context, AppActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title, NotificationManager.IMPORTANCE_HIGH)
-            channel.lightColor = Color.BLUE
-            channel.enableLights(true)
-            channel.enableVibration(true)
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            manager.createNotificationChannel(channel)
+    override fun sendNotification(screen: String, title: String, text: String, id: String) {
+        val intent = Intent(context, AppActivity::class.java).apply {
+            data = Uri.Builder()
+                .scheme(NOTIFICATION_URI_SCHEME)
+                .authority(NOTIFICATION_URI_AUTHORITY)
+                .appendPath(screen)
+                .build()
         }
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(pendingIntent)
-            .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title,
+                NotificationManager.IMPORTANCE_HIGH).apply {
+                enableLights(true)
+                lightColor = Color.BLUE
+                enableVibration(true)
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null)
+                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            }
+            manager.createNotificationChannel(channel)
+        } else {
+            notification
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLights(Color.BLUE, LIGHTS_DURATION, LIGHTS_DURATION)
+        }
 
         manager.notify(id.hashCode(), notification.build())
     }
 
-    private companion object {
-        const val NOTIFICATION_CHANNEL_ID = "ELTA Notification"
+    companion object {
+        private const val NOTIFICATION_CHANNEL_ID = "ELTA Notification"
+        private const val LIGHTS_DURATION = 5000
     }
 }

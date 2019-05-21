@@ -11,7 +11,8 @@ class ScanResultToGlucometerDtoMapper @Inject constructor() : Mapper<ScanResult,
             GlucometerDto(
                 id = device.address,
                 address = device.address,
-                name = if (!device.name.isNullOrEmpty()) device.name else scanRecord?.deviceName
+                name = if (!device.name.isNullOrEmpty()) device.name else scanRecord?.deviceName,
+                isPrimary = false
             )
         }
 }

@@ -2,7 +2,10 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventType.ACTIVITY
+import com.elta.android.domain.features.diary.events.model.EventType.INSULIN
 import com.elta.android.domain.features.diary.events.model.getValidator
+import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
@@ -93,8 +96,8 @@ abstract class BaseEventPm constructor(
         }
     }
 
-    protected fun handleSuccess() {
-        bus.event(Events.EventsChanged)
+    protected fun handleSuccess(isCreate: Boolean) {
+        bus.event(Events.EventsChanged(isCreate))
         router.exit()
     }
 
@@ -124,7 +127,7 @@ abstract class BaseEventPm constructor(
         formSelector.clickAction.observable
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
-            .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value) }
+            .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value, generateChooserId()) }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
 
@@ -138,7 +141,10 @@ abstract class BaseEventPm constructor(
         tagSelector.clickAction.observable
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
-            .map { ChooserConfiguration(ChooserType.GROUP_TAGS, eventTypeState.value) }
+            .map {
+                ChooserConfiguration(ChooserType.GROUP_TAGS, eventTypeState.value,
+                    (tagSelector.option.value.meta as? Tag)?.id)
+            }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
 
@@ -172,6 +178,11 @@ abstract class BaseEventPm constructor(
         dateTimeSelectedAction.observable
             .subscribe(selectedDateState.consumer)
             .untilDestroy()
+    }
+
+    private fun generateChooserId() = when (eventTypeState.value) {
+        INSULIN, ACTIVITY -> formSelector.option.value.meta.toString()
+        else -> null
     }
 
     private fun ChooserResult.toSelectorOption() =

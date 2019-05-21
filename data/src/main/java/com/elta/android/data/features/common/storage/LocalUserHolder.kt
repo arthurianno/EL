@@ -10,7 +10,10 @@ class LocalUserHolder @Inject constructor(
 ) : UserHolder {
 
     override var currentUser: Long?
-        get() = pref[CURRENT_USER]
+        get() {
+            val userId: Long? = pref[CURRENT_USER]
+            return if (userId == -1L) null else userId
+        }
         set(value) {
             pref[CURRENT_USER] = value
         }
