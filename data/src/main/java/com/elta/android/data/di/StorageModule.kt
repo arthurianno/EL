@@ -1,5 +1,7 @@
 package com.elta.android.data.di
 
+import com.elta.android.data.features.auth.storage.EmailDataStorage
+import com.elta.android.data.features.auth.storage.EmailStorage
 import com.elta.android.data.features.common.storage.DbSyncStorage
 import com.elta.android.data.features.common.storage.LocalUserHolder
 import com.elta.android.data.features.common.storage.SyncStorage
@@ -30,4 +32,8 @@ abstract class StorageModule {
     @Binds
     @Singleton
     abstract fun bindOnboardingStorage(storage: OnboardingDataStorage): OnboardingStorage
+
+    @Binds
+    @Singleton
+    abstract fun bindEmailStorage(storage: EmailDataStorage): EmailStorage
 }

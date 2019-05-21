@@ -7,13 +7,17 @@ import com.nullgr.core.preferences.set
 import javax.inject.Inject
 
 class FeedbackDataStorage @Inject constructor(
-    private val userHolder: UserHolder,
-    private val pref: SharedPreferences
+    private val pref: SharedPreferences,
+    private val userHolder: UserHolder
 ) : FeedbackStorage {
 
     override var isFeedbackWasSent: Boolean
-        get() = pref[userHolder.currentUser.toString()] ?: false
+        get() = pref["$IS_FEEDBACK_SENT${userHolder.currentUser}"] ?: false
         set(value) {
-            pref[userHolder.currentUser.toString()] = value
+            pref["$IS_FEEDBACK_SENT${userHolder.currentUser}"] = value
         }
+
+    private companion object {
+        const val IS_FEEDBACK_SENT = "is_feedback_sent"
+    }
 }

@@ -25,8 +25,7 @@ class SocialDataRepository @Inject constructor(
     private val schedulersFacade: SchedulersFacade,
     private val tokenStorage: TokenStorage,
     private val authSocialSource: AuthSocialDataSource,
-    @Remote private val profileSource: ProfileDataSource,
-    private val userHolder: UserHolder
+    @Remote private val profileSource: ProfileDataSource
 ) : SocialRepository {
 
     override fun linkSocialNetwork(network: SocialNetworkType): Completable =
