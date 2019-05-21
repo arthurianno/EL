@@ -90,7 +90,7 @@ class EventsDataRepository @Inject constructor(
             .flatMap { toSync ->
                 remoteSource.deleteEvents(
                     toSync.filter { it.state == StateDto.DELETED }
-                        .map { SimpleEventDto(it.secondaryId, EventTypeDto.valueOf(it.meta!!)) }
+                        .map { SimpleEventDto(it.secondaryId, EventTypeDto.valueOf(checkNotNull(it.meta))) }
                 )
                     .andThen(syncManager.setAllSynced<Event>(StateDto.DELETED))
                     .andThen(Observable.just(toSync))

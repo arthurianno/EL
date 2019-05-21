@@ -1,3 +1,4 @@
+@file:Suppress("MaxLineLength")
 package com.elta.android.data.features.sync.cache
 
 import com.elta.android.data.features.common.cache.BoxCache

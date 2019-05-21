@@ -25,4 +25,5 @@ sealed class Events : Event {
     data class PinCodeEntered(val pin: String) : Events()
     object DeviceChanged : Events()
     data class SyncProgress(val inProgress: Boolean) : Events()
+    data class BackendSyncProgress(val inProgress: Boolean) : Events()
 }
