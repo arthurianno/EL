@@ -1,5 +1,8 @@
 package com.elta.android.presentation.features.devices.firmware.pm
 
+import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.LocationNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
 import com.elta.android.domain.features.devices.interactor.isFirmwareNewer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
@@ -76,6 +79,15 @@ class FirmwarePm @Inject constructor(
             .subscribe(startUpdateAction.consumer)
             .untilDestroy()
 
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            else -> super.handleError(error)
+        }
     }
 
     fun setDeviceAddress(address: String) {

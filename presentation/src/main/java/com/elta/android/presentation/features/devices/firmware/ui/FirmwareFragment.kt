@@ -1,14 +1,18 @@
 package com.elta.android.presentation.features.devices.firmware.ui
 
+import android.content.Intent
 import android.os.Bundle
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
+import com.elta.android.presentation.features.sync.control.bindTo
+import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.toggleView
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_update_firmware.*
 
 class FirmwareFragment : BaseFragment<FirmwarePm>() {
@@ -16,6 +20,8 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
     override val screenLayout: Int = R.layout.fragment_update_firmware
     override val classToken: Class<FirmwarePm> = FirmwarePm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+
+    private val rxPermissions by lazy { RxPermissions(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +41,12 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
                 actionButtonView.toggleView(button != null)
             }
         }
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
     companion object {
