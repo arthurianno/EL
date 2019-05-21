@@ -8,7 +8,6 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
@@ -17,7 +16,6 @@ import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class SocialDataRepository @Inject constructor(
@@ -26,8 +24,7 @@ class SocialDataRepository @Inject constructor(
     private val schedulersFacade: SchedulersFacade,
     private val tokenStorage: TokenStorage,
     private val authSocialSource: AuthSocialDataSource,
-    @Remote private val profileSource: ProfileDataSource,
-    private val userHolder: UserHolder
+    @Remote private val profileSource: ProfileDataSource
 ) : SocialRepository {
 
     override fun linkSocialNetwork(network: SocialNetworkType): Completable =
@@ -52,7 +49,6 @@ class SocialDataRepository @Inject constructor(
                         profileSource.getUserProfile()
                             .map { login }
                     }
-                    .subscribeOn(Schedulers.io())
             }
             .map(LoginDto::isEmailConfirmed)
             .single(false)
