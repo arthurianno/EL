@@ -55,7 +55,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
         pm.retryConnectControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
         pm.retrySyncControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
 
-        pm.bluetoothControl.bindTo(compositeUnbind, rxPermissions, this)
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
 
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
@@ -64,7 +64,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        presentationModel.bluetoothControl.resolveResults(requestCode, resultCode)
+        presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
     private inline fun ConnectDevicePm.ViewState.getId() =

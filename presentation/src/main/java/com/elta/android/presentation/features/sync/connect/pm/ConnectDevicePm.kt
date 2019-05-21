@@ -47,7 +47,7 @@ class ConnectDevicePm @Inject constructor(
 
     val state = State(ViewState.SEARCH)
 
-    val bluetoothControl = bluetoothControl()
+    val btControl = bluetoothControl()
 
     val retrySearchControl = snackBarControl<SnackBarData>()
     val retryPinControl = snackBarControl<SnackBarData>()
@@ -105,9 +105,9 @@ class ConnectDevicePm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bluetoothControl.bluetoothEnabledAction.observable,
-            bluetoothControl.locationPermissionsGrantedAction.observable,
-            bluetoothControl.locationEnabledAction.observable
+            btControl.bluetoothEnabledAction.observable,
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.locationEnabledAction.observable
         )
             .subscribe(startScanAction.consumer)
             .untilDestroy()
@@ -115,9 +115,9 @@ class ConnectDevicePm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> bluetoothControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> bluetoothControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> bluetoothControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
             is TimeoutException -> {
                 val devices = items.valueOrNull
                 if (devices == null || devices.isEmpty()) {
@@ -169,6 +169,7 @@ class ConnectDevicePm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
 
         toAppAction.observable
             .subscribe { router.newRootFlow(Screens.HomeFlow) }
@@ -177,15 +178,11 @@ class ConnectDevicePm @Inject constructor(
         startSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
-            .map {
-                SyncWithGlucometerUseCase.Params(glucometer)
-            }
+            .map { SyncWithGlucometerUseCase.Params(glucometer) }
             .flatMapCompletable { params ->
                 syncWithGlucometerUseCase.execute(params)
                     .bindProgress(syncProgressState.consumer)
-                    .doOnComplete {
-                        state.consumer.accept(ViewState.SYNC_COMPLETED)
-                    }
+                    .doOnComplete { state.consumer.accept(ViewState.SYNC_COMPLETED) }
                     .doOnError(::handleError)
             }
             .retry()

@@ -1,3 +1,5 @@
+@file:Suppress("UseDataClass")
+
 package com.elta.android.presentation.features.sync.control
 
 import android.app.Activity

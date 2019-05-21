@@ -45,7 +45,7 @@ class HomeFlowPm @Inject constructor(
     val menuItemRestoredAction = Action<Int>()
     val selectedItemIdState = State(R.id.mainMenuItemView)
 
-    val bluetoothControl = bluetoothControl()
+    val btControl = bluetoothControl()
     val retryDeviceNotFoundControl = snackBarControl<SnackBarData>()
 
     private val loadEvents = Action<Unit>()
@@ -63,6 +63,8 @@ class HomeFlowPm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
 
+        bindSyncAction()
+
         loadEvents.observable
             .skipWhileInProgress()
             .flatMapSingle { params ->
@@ -74,37 +76,6 @@ class HomeFlowPm @Inject constructor(
             }
             .retry()
             .subscribe()
-            .untilDestroy()
-
-        syncProgressState.observable
-            .subscribe { inProgress ->
-                bus.event(Events.SyncProgress(inProgress))
-            }
-            .untilDestroy()
-
-        Observable.merge(
-            startSyncAction.observable,
-            bluetoothControl.bluetoothEnabledAction.observable,
-            bluetoothControl.locationPermissionsGrantedAction.observable,
-            bluetoothControl.locationEnabledAction.observable
-        )
-            .skipWhileInProgress(syncProgressState.observable)
-            .map { SyncWithGlucometerUseCase.Params() }
-            .flatMapCompletable { params ->
-                syncWithGlucometerUseCase.execute(params)
-                    .bindProgress(syncProgressState.consumer)
-                    .doOnComplete(::handleSyncCompleted)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        showRetrySyncAction.observable
-            .switchMapMaybe {
-                retryDeviceNotFoundControl.showForResult(deviceNotFound)
-            }
-            .subscribe(startSyncAction.consumer)
             .untilDestroy()
 
         menuItemRestoredAction.observable
@@ -132,17 +103,16 @@ class HomeFlowPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> bluetoothControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> bluetoothControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> bluetoothControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
             is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.ConnectDevice)
-            is GlucometerSyncError -> {
+            is GlucometerSyncError ->
                 if (error.cause is GlucometerOfflineError) {
                     showRetrySyncAction.consumer.accept(Unit)
                 } else {
                     super.handleError(error)
                 }
-            }
             else -> super.handleError(error)
         }
     }
@@ -166,6 +136,39 @@ class HomeFlowPm @Inject constructor(
         menuItemSelectedAction.observable
             .doOnNext(::handleBottomMenuClick)
             .subscribe(selectedItemIdState.consumer)
+            .untilDestroy()
+    }
+
+    private fun bindSyncAction() {
+        syncProgressState.observable
+            .subscribe { inProgress ->
+                bus.event(Events.SyncProgress(inProgress))
+            }
+            .untilDestroy()
+
+        Observable.merge(
+            startSyncAction.observable,
+            btControl.bluetoothEnabledAction.observable,
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.locationEnabledAction.observable
+        )
+            .skipWhileInProgress(syncProgressState.observable)
+            .map { SyncWithGlucometerUseCase.Params() }
+            .flatMapCompletable { params ->
+                syncWithGlucometerUseCase.execute(params)
+                    .bindProgress(syncProgressState.consumer)
+                    .doOnComplete(::handleSyncCompleted)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        showRetrySyncAction.observable
+            .switchMapMaybe {
+                retryDeviceNotFoundControl.showForResult(deviceNotFound)
+            }
+            .subscribe(startSyncAction.consumer)
             .untilDestroy()
     }
 

@@ -318,9 +318,7 @@ class GlucometersManager @Inject constructor(
                     }
                     .switchMap { connection ->
                         Observable.range(0, EVENTS_COUNT)
-                            .concatMap {
-                                connection.request(address, Commands.ReadEvent(it))
-                            }
+                            .concatMap { connection.request(address, Commands.ReadEvent(it)) }
                             .takeUntil { isPotentialLastEvent(it) }
                             .collectInto(mutableListOf<String>()) { responses, response ->
                                 if (!isPotentialLastEvent(response)) responses.add(response)
@@ -339,11 +337,8 @@ class GlucometersManager @Inject constructor(
                     .doOnNext {
                         val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                         val newInfo = glucometersInfoToCacheMapper.mapFromObject(it.second)
-                        if (info == null) {
-                            glucometersInfoCache.add(listOf(newInfo))
-                        } else {
-                            glucometersInfoCache.update(listOf(newInfo))
-                        }
+                        if (info == null) glucometersInfoCache.add(listOf(newInfo))
+                        else glucometersInfoCache.update(listOf(newInfo))
                     }
                     .take(1)
                     .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError(e)) }

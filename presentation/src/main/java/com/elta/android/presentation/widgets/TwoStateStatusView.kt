@@ -21,7 +21,7 @@ class TwoStateStatusView @JvmOverloads constructor(
         statusExpandableLayout.collapse(true)
     }
 
-    private var сolorAnimator: ValueAnimator
+    private var colorAnimator: ValueAnimator
 
     private var state1Text: String? = null
     private var state2Text: String? = null
@@ -42,7 +42,7 @@ class TwoStateStatusView @JvmOverloads constructor(
 
             array.recycle()
         }
-        сolorAnimator = ObjectAnimator.ofInt(
+        colorAnimator = ObjectAnimator.ofInt(
             statusBackgroundView,
             "backgroundColor",
             state1Color,
@@ -63,8 +63,8 @@ class TwoStateStatusView @JvmOverloads constructor(
     }
 
     private fun drawState1() {
-        if (сolorAnimator.isRunning)
-            сolorAnimator.cancel()
+        if (colorAnimator.isRunning)
+            colorAnimator.cancel()
         removeCallbacks(hideViewCallback)
         statusBackgroundView.setBackgroundColor(state1Color)
         statusTextView.text = state1Text
@@ -73,7 +73,7 @@ class TwoStateStatusView @JvmOverloads constructor(
 
     private fun drawState2() {
         statusTextView.text = state2Text
-        сolorAnimator.start()
+        colorAnimator.start()
         postDelayed(hideViewCallback, HIDE_VIEW_DELAY)
     }
 

@@ -82,7 +82,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         }
         homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
         pm.retryDeviceNotFoundControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
-        pm.bluetoothControl.bindTo(compositeUnbind, rxPermissions, this)
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
     }
 
     override fun handleBack() {
@@ -93,7 +93,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        presentationModel.bluetoothControl.resolveResults(requestCode, resultCode)
+        presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
     private fun initBottomSheetItemsView() {
