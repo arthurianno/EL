@@ -50,7 +50,6 @@ class AuthDataRepository @Inject constructor(
                 }
             }
 
-
     override fun sendConfirmationLink(): Completable =
         source.sendConfirmationLink()
 

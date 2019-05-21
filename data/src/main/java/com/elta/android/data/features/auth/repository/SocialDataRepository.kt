@@ -8,7 +8,6 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository

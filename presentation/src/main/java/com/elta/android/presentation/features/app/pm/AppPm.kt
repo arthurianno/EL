@@ -33,6 +33,7 @@ class AppPm @Inject constructor(
 
     val syncProgress = Command<Boolean>(bufferSize = 1)
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 
@@ -99,10 +100,8 @@ class AppPm @Inject constructor(
     private fun checkEmailAndOnboarding(isEmailConfirmed: Boolean) =
         when (isEmailConfirmed) {
             true -> checkIsOnboardingPassed()
-            false -> {
-                Single.just(Unit)
-                    .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
-            }
+            false -> Single.just(Unit)
+                .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
         }
 
     private fun checkIsOnboardingPassed(): Single<Unit> =
