@@ -9,6 +9,9 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -23,8 +26,6 @@ import com.elta.android.presentation.features.main.records.ui.MainRecordsFragmen
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
-import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
-import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
@@ -216,6 +217,10 @@ object Screens {
 
     data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {
         override fun getFragment() = DeviceInfoFragment.newInstance(name, address)
+    }
+
+    data class UpdateFirmware(val address: String) : SupportAppScreen() {
+        override fun getFragment() = FirmwareFragment.newInstance(address)
     }
 
     object CreateRemind : SupportAppScreen() {
