@@ -9,7 +9,6 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.devices.all.ui.builder.DevicesOptionsItemsBuilder
-import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -31,11 +30,7 @@ class DevicesPm @Inject constructor(
         bindGlucometersAction()
 
         addNewDeviceAction.observable
-            .subscribe {
-                showSnackBar(
-                    SnackBarMessageData.SimpleTextMessage("Add new device clicked")
-                )
-            }
+            .subscribe { router.startFlow(Screens.ConnectDevice) }
             .untilDestroy()
 
         Observable.merge(

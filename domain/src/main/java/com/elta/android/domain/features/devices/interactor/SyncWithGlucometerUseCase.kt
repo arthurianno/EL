@@ -17,5 +17,5 @@ class SyncWithGlucometerUseCase @Inject constructor(
         return repo.syncWithDevice(p.device)
     }
 
-    data class Params(val device: Glucometer?)
+    data class Params(val device: Glucometer? = null)
 }

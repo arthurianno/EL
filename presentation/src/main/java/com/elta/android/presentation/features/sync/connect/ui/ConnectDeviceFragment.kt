@@ -1,9 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.ui
 
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.IntentSender
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
@@ -11,16 +8,11 @@ import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
+import com.elta.android.presentation.features.sync.control.bindTo
+import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.android.gms.location.SettingsClient
 import com.jakewharton.rxbinding2.view.clicks
-import com.nullgr.core.intents.launchForResult
 import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.toggleView
@@ -30,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_sync_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_device_found.*
 import kotlinx.android.synthetic.main.layout_sync_state_sync_completed.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
-import timber.log.Timber
 
 class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
@@ -61,21 +52,11 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
         pm.retrySearchControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
         pm.retryPinControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.retryConnectControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
         pm.retrySyncControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
 
-        pm.requestEnableBluetoothCommand.observable
-            .bindTo {
-                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                    .launchForResult(checkNotNull(activity), REQUEST_CODE_ENABLE_BLUETOOTH)
-            }
-        pm.requestLocationPermissionsCommand.observable
-            .switchMap {
-                rxPermissions.request(android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                    .filter { it }
-                    .map { Unit }
-            }
-            .bindTo(pm.locationPermissionsGrantedAction)
-        pm.requestEnableLocationCommand.observable.bindTo(::enableLocation)
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
@@ -83,13 +64,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
-            presentationModel.locationEnabledAction.consumer.accept(Unit)
-        }
-
-        if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
-            presentationModel.bluetoothEnabledAction.consumer.accept(Unit)
-        }
+        presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
     private inline fun ConnectDevicePm.ViewState.getId() =
@@ -100,37 +75,7 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
             ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.stateSyncCompletedView
         }
 
-    private fun enableLocation(i: Unit) {
-        val result = SettingsClient(checkNotNull(context))
-            .checkLocationSettings(
-                LocationSettingsRequest.Builder()
-                    .addLocationRequest(LocationRequest.create())
-                    .setNeedBle(true)
-                    .build()
-            )
-        result.addOnCompleteListener { task ->
-            try {
-                task.getResult(ApiException::class.java)
-            } catch (e: ApiException) {
-                when (e.statusCode) {
-                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
-                        try {
-                            (e as? ResolvableApiException)?.startResolutionForResult(
-                                checkNotNull(activity),
-                                REQUEST_CODE_ENABLE_LOCATION
-                            )
-                        } catch (e1: IntentSender.SendIntentException) {
-                            Timber.e(e1)
-                        }
-                }
-            }
-        }
-    }
-
     companion object {
-        private const val REQUEST_CODE_ENABLE_LOCATION = 145
-        private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
-
         fun newInstance(): ConnectDeviceFragment = ConnectDeviceFragment()
     }
 }

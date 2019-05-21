@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TwoStateStatusView">
+        <attr name="state1_text" format="reference|string" />
+        <attr name="state2_text" format="reference|string" />
+        <attr name="state1_color" format="reference|color" />
+        <attr name="state2_color" format="reference|color" />
+    </declare-styleable>
+</resources>

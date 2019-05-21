@@ -1,6 +1,5 @@
 package com.elta.android.presentation
 
-import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
@@ -20,7 +19,7 @@ sealed class Clicks : Click {
     data class ShopMakeRoute(val item: ShopItem) : Clicks()
     data class ShopMakeCall(val item: ShopItem) : Clicks()
     data class SearchResult(val item: SearchResultItem) : Clicks()
-    data class AddUserEvent(val event: EventType) : Clicks()
+    data class AddUserEvent(val meta: Any) : Clicks()
     data class RecordClicked(val item: RecordItem) : Clicks()
     data class ChooserOptionClicked(val id: String) : Clicks()
     data class DeviceClicked(val item: DeviceItem) : Clicks()

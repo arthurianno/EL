@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
@@ -21,6 +23,8 @@ class AppPm @Inject constructor(
     val deepLinkAction = Action<Uri>()
     val coldStartDeepLinkAction = Action<Uri>()
     val onStopAction = Action<String>()
+
+    val syncProgress = Command<Boolean>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -63,6 +67,13 @@ class AppPm @Inject constructor(
         lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit }
             .trackEvent(AnalyticsEventType.APP_LAUNCH)
             .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.SyncProgress>()
+            .skip(1)
+            .map(Events.SyncProgress::inProgress)
+            .map { !it }
+            .subscribe(syncProgress.consumer)
             .untilDestroy()
     }
 }
