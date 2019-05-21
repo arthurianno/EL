@@ -194,7 +194,7 @@ class HomeFlowPm @Inject constructor(
         )
 
     private fun handleSyncCompleted() {
-
+        bus.event(Events.EventsChanged(true))
     }
 
     companion object {
