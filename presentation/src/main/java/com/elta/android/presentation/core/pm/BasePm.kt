@@ -2,6 +2,9 @@
 
 package com.elta.android.presentation.core.pm
 
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytics.trackEvent
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.core.pm.listeners.Trackable
@@ -20,6 +23,7 @@ import me.dmdev.rxpm.skipWhileInProgress
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+@Suppress("SpreadOperator")
 abstract class BasePm(
     protected val services: ServiceFacade
 ) : PresentationModel() {
@@ -112,6 +116,28 @@ abstract class BasePm(
 
     protected inline fun Completable.bindProgress(): Completable =
         this.bindProgress(progressState.consumer)
+
+    protected inline fun <T> Single<T>.trackEvent(
+        @AnalyticsEventType name: String,
+        vararg pairs: Pair<String, String>
+    ): Single<T> =
+        this.doOnSuccess { this@BasePm.trackEvent(name, *pairs) }
+
+    protected inline fun <T> Observable<T>.trackEvent(@AnalyticsEventType name: String): Observable<T> =
+        this.doOnNext { this@BasePm.trackEvent(name) }
+
+    protected inline fun <T> Observable<T>.trackEvent(
+        crossinline event: (T) -> AnalyticsEvent?
+    ): Observable<T> =
+        this.doOnNext { this@BasePm.trackEvent(event(it)) }
+
+    protected inline fun Completable.trackEvent(@AnalyticsEventType name: String): Completable =
+        this.andThen(Completable.fromAction { this@BasePm.trackEvent(name) })
+
+    protected inline fun Completable.trackEvent(
+        crossinline event: () -> AnalyticsEvent?
+    ): Completable =
+        this.doOnComplete { this@BasePm.trackEvent(event()) }
 
     companion object {
         const val ACTION_DEBOUNCE_MILLIS = 500L

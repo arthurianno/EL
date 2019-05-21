@@ -14,4 +14,5 @@ data class GlucometerLowBatteryLevelError(
 
 object PrimaryGlucometerNotFoundError : RuntimeException()
 object CommandError : RuntimeException()
-object GlucometerSyncError : RuntimeException()
+class GlucometerSyncError(exception: Throwable) : RuntimeException(exception)
+object GlucometerOfflineError : RuntimeException()

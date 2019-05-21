@@ -7,28 +7,27 @@
         android:layout_height="wrap_content">
 
         <net.cachapa.expandablelayout.ExpandableLayout
-            android:id="@+id/connectionStatusExpandableLayout"
+            android:id="@+id/statusExpandableLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:el_duration="500"
             app:el_expanded="false">
 
             <FrameLayout
-                android:id="@+id/connectionStatusBackgroundView"
+                android:id="@+id/statusBackgroundView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 tools:background="@color/black">
 
                 <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/connectionStatusTextView"
-                    style="@style/Typography.Base.Roboto.Regular"
+                    android:id="@+id/statusTextView"
+                    style="@style/New.Caption1.White"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textColor="@color/color_text_white"
-                    android:textSize="12sp"
                     tools:text="Нет подключения" />
+
             </FrameLayout>
 
         </net.cachapa.expandablelayout.ExpandableLayout>

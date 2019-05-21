@@ -152,6 +152,7 @@
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Запись с глюкометра</string>
     <string name="event_type_hba1c">HbA1C</string>
+    <string name="event_type_sync">Синхронизация с устройством</string>
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s ед</string>
@@ -321,6 +322,8 @@
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
+    <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>
+    <string name="sync_completed">Синхронизация с глюкометром завершена</string>
 
     <string name="sync_state_title_how_to_connect">Как подключить?</string>
     <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
@@ -347,7 +350,8 @@
 
     <string name="sync_connect_device_not_found">Устройство не найдено</string>
     <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
-    <string name="sync_connect_sync_error">Ошибка синхронизации</string>
+    <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
+    <string name="sync_connect_sync_error">Ошибка синхронизации с устройством</string>
     <string name="sync_connect_button_retry">Повторить</string>
 
     <!-- DIARY FLOR -->

@@ -1,5 +1,9 @@
 package com.elta.android.presentation.features.statistic.period.ui
 
-enum class Period {
-    SEVEN, FOURTEEN, THIRTY, NINETY
+@Suppress("MagicNumber")
+enum class Period constructor(val count: Int) {
+    SEVEN(7),
+    FOURTEEN(14),
+    THIRTY(30),
+    NINETY(90)
 }

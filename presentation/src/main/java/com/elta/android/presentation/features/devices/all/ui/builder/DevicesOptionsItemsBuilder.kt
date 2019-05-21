@@ -12,8 +12,10 @@ class DevicesOptionsItemsBuilder @Inject constructor(
     private val resources: ResourceProvider
 ) {
     fun buildItems(glucometers: List<Glucometer>) = mutableListOf<ListItem>().apply {
-        add(DevicesHeaderItem(resources.getString(R.string.profile_devices_active_glucometers)))
-        addAll(glucometers.map(::mapFromGlucometer))
+        if (glucometers.isNotEmpty()) {
+            add(DevicesHeaderItem(resources.getString(R.string.profile_devices_active_glucometers)))
+            addAll(glucometers.map(::mapFromGlucometer))
+        }
     }
 
     private fun mapFromGlucometer(source: Glucometer): ListItem =

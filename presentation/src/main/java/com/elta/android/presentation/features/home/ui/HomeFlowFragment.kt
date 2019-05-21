@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
@@ -8,11 +9,16 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.features.sync.control.bindTo
+import com.elta.android.presentation.features.sync.control.resolveResults
+import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.widgets.BottomNavigationView
+import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
+import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
@@ -29,17 +35,12 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     @Inject
     lateinit var bus: RxBus
 
+    private val rxPermissions by lazy { RxPermissions(this) }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
-        homeActionView.setOnClickListener {
-            if (!it.isSelected) {
-                homeBottomSheetView.show()
-            } else {
-                homeBottomSheetView.hide()
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -51,9 +52,11 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
+        homeActionView.clicks().bindTo { homeActionView.isSelected.not().passTo(pm.homeAction) }
         pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
         pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
+        pm.showBottomSheetCommand.bindTo { homeBottomSheetView.show() }
         Observables.combineLatest(
             pm.pulseCommand.observable,
             pm.selectedItemIdState.observable.map { it == R.id.mainMenuItemView }
@@ -74,12 +77,19 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
+        pm.retryDeviceNotFoundControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
     }
 
     override fun handleBack() {
         if (!homeBottomSheetView.handleBack()) {
             super.handleBack()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
     private fun initBottomSheetItemsView() {

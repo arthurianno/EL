@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.activity.BaseActivity
+import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import kotlinx.android.synthetic.main.activity_app.*
@@ -31,8 +32,8 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
-
-        pm.networkStateCommand.bindTo(connectionStatusView.connectionState())
+        pm.networkStateCommand.bindTo(connectionStatusView.changeState())
+        pm.syncProgress.bindTo(syncStatusView.changeState())
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -42,5 +43,23 @@ class AppActivity : BaseActivity<AppPm>() {
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        findLastNestedFragmentAndSendEvent(currentFragment)
+    }
+
+    private tailrec fun findLastNestedFragmentAndSendEvent(parentFragment: BaseFragment<*>?) {
+        val nestedFragment = parentFragment
+            ?.childFragmentManager
+            ?.findFragmentById(R.id.containerView)
+            as? BaseFragment<*>
+
+        if (nestedFragment == null) {
+            parentFragment?.javaClass?.simpleName?.passTo(presentationModel.onStopAction)
+        } else {
+            findLastNestedFragmentAndSendEvent(nestedFragment)
+        }
     }
 }

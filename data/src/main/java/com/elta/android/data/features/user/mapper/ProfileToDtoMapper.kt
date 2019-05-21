@@ -17,10 +17,12 @@ class ProfileToDtoMapper @Inject constructor() : Mapper<Profile, ProfileDto> {
                 diabetes = diabetes?.let { DiabetTypeDto.valueOf(it.name) },
                 weight = weight,
                 gender = gender?.let { GenderTypeDto.valueOf(it.name) },
-                person = PersonDto(
-                    firstName = firstName,
-                    lastName = secondName
-                ),
+                person = if (firstName == null && secondName == null) null else {
+                    PersonDto(
+                        firstName = firstName,
+                        lastName = secondName
+                    )
+                },
                 glucoseLevel = glucoseLevelSettings?.let {
                     GlucoseLevelDto(
                         minValue = it.normal.start,
