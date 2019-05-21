@@ -143,8 +143,7 @@ class ConnectDevicePm @Inject constructor(
             .untilDestroy()
 
         skipAction.observable
-            .doOnNext(::navigateToShopsFlow)
-            .subscribe()
+            .subscribe(::navigateToShopsFlow)
             .untilDestroy()
 
         connectDeviceAction.observable
