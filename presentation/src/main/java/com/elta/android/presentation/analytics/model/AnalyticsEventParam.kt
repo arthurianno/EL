@@ -7,7 +7,6 @@ import android.support.annotation.StringDef
     AnalyticsEventParam.GENDER,
     AnalyticsEventParam.TYPE,
     AnalyticsEventParam.SOURCE,
-    AnalyticsEventParam.COMMENT,
     AnalyticsEventParam.PERIOD,
     AnalyticsEventParam.SCREEN_NAME,
     AnalyticsEventParam.ACCOUNT,
@@ -20,7 +19,6 @@ annotation class AnalyticsEventParam {
         const val GENDER = "gender"
         const val TYPE = "type"
         const val SOURCE = "source"
-        const val COMMENT = "comment"
         const val PERIOD = "period"
         const val SCREEN_NAME = "screen_name"
         const val ACCOUNT = "account"
