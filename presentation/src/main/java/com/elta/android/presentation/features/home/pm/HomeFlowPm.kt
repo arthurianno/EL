@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.home.pm
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
+import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -14,11 +15,13 @@ import com.elta.android.presentation.features.home.ui.adapter.items.UserEventIte
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class HomeFlowPm @Inject constructor(
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
+    private val syncLocalChangesUseCase: SyncLocalChangesUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services) {
 
@@ -30,6 +33,7 @@ class HomeFlowPm @Inject constructor(
     val selectedItemIdState = State(R.id.mainMenuItemView)
 
     private val loadEvents = Action<Unit>()
+    private val syncAction = Action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -51,18 +55,21 @@ class HomeFlowPm @Inject constructor(
             .subscribe(selectedItemIdState.consumer)
             .untilDestroy()
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
-            .subscribe(loadEvents.consumer)
-            .untilDestroy()
-
         bus.events<Events.HomeModelChanged>()
             .map { it.model.isFirstEntrance || !it.model.hasEvents }
             .subscribe(pulseCommand.consumer)
             .untilDestroy()
 
         observeClicks()
+        bindSync()
+
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .doOnNext(syncAction.consumer)
+            .doOnNext(loadEvents.consumer)
+            .subscribe()
+            .untilDestroy()
     }
 
     override fun navigateToLaunchScreen() {
@@ -108,6 +115,17 @@ class HomeFlowPm @Inject constructor(
             iconRes = this.toIcon(),
             event = this
         )
+
+    private fun bindSync() {
+        syncAction.observable
+            .flatMapCompletable {
+                syncLocalChangesUseCase.execute()
+                    .doOnComplete { Timber.d("Everything complete")}
+                    .doOnError { Timber.e("Error while sync $it") }
+            }
+            .subscribe()
+            .untilDestroy()
+    }
 
     companion object {
         private const val OPEN_EVENT_SCREEN_DELAY = 400L

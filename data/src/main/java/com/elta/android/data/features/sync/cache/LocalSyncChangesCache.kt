@@ -3,6 +3,7 @@ package com.elta.android.data.features.sync.cache
 import com.elta.android.data.features.common.cache.BoxCache
 import com.elta.android.data.features.common.cache.BoxStoreFactory
 import com.elta.android.data.features.common.cache.Condition
+import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.sync.cache.dto.LocalSyncCachedDto
 import com.elta.android.data.features.sync.cache.dto.LocalSyncCachedDto_
 import io.objectbox.kotlin.query
@@ -33,6 +34,7 @@ class LocalSyncChangesCache @Inject constructor(
         when (condition) {
             is LocalSyncChangesConditions.ByClassName -> deleteAllForClass(condition.className)
             is LocalSyncChangesConditions.ByClassNameAndId -> deleteForClassAndId(condition.id, condition.className)
+            is LocalSyncChangesConditions.ByClassAndState -> deleteForClassAndState(condition.className, condition.state)
             else -> super.delete(condition)
         }
     }
@@ -40,6 +42,7 @@ class LocalSyncChangesCache @Inject constructor(
     override fun contains(condition: Condition): Boolean =
         when (condition) {
             is LocalSyncChangesConditions.ByClassNameAndId -> containsForClassAndId(condition.id, condition.className)
+            is LocalSyncChangesConditions.ByClassName -> containsForClass(condition.className)
             else -> super.contains(condition)
         }
 
@@ -67,9 +70,19 @@ class LocalSyncChangesCache @Inject constructor(
         equal(LocalSyncCachedDto_.secondaryId, id)
     }.remove()
 
+    private fun deleteForClassAndState(className: String, stateDto: StateDto) = box.query {
+        equal(LocalSyncCachedDto_.className, className)
+        and()
+        equal(LocalSyncCachedDto_.state, stateDto.toString())
+    }.remove()
+
     private fun containsForClassAndId(id: String, className: String) = box.query {
         equal(LocalSyncCachedDto_.className, className)
         and()
         equal(LocalSyncCachedDto_.secondaryId, id)
+    }.count() > 0
+
+    private fun containsForClass(className: String) = box.query {
+        equal(LocalSyncCachedDto_.className, className)
     }.count() > 0
 }

@@ -47,6 +47,7 @@ class HemoglobinSettingsPm @Inject constructor(
     private val profileState = State<Profile>()
     private val inputValueState = State(DEFAULT_VALUE)
     private val loadScreeAction = Action<Unit>()
+    private val hemoglobinEventsState = State<List<Event>>()
 
     override fun onCreate() {
         super.onCreate()
@@ -88,7 +89,8 @@ class HemoglobinSettingsPm @Inject constructor(
 
         bus.clicks<Clicks.DeleteHemoglobinEventClicked>()
             .skipWhileInProgress()
-            .map { createDeleteEventParams(it.id) }
+            .map { clickEvent -> hemoglobinEventsState.value.first { it.id == clickEvent.id } }
+            .map { createDeleteEventParams(it) }
             .flatMap {
                 deleteEventUseCase.execute(it)
                     .hideErrorContainer()
@@ -112,6 +114,7 @@ class HemoglobinSettingsPm @Inject constructor(
     private fun handleSuccess(result: Pair<Profile, List<Event>>) {
         profileState.consumer.accept(result.first)
         hemoglobinItemsState.consumer.accept(hemoglobinItemsBuilder.buildItems(result.second))
+        hemoglobinEventsState.consumer.accept(result.second)
     }
 
     private fun observeDateSelection() {
@@ -163,6 +166,6 @@ class HemoglobinSettingsPm @Inject constructor(
             eventType = EventType.GLYCATEDHEMOGLOBIN
         )
 
-    private fun createDeleteEventParams(id: String): DeleteEventUseCase.Params =
-        DeleteEventUseCase.Params(id, EventType.GLYCATEDHEMOGLOBIN)
+    private fun createDeleteEventParams(event: Event): DeleteEventUseCase.Params =
+        DeleteEventUseCase.Params(event)
 }

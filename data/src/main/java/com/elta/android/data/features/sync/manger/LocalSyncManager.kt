@@ -69,8 +69,16 @@ class LocalSyncManager @Inject constructor(
         }
     }
 
+    inline fun <reified T : Any> needToSync() = Single.fromCallable {
+        dataSource.hasByClass(T::class.java.simpleName)
+    }
+
     inline fun <reified T : Any> setAllSynced() = Completable.fromCallable {
         dataSource.clear(T::class.java.simpleName)
+    }
+
+    inline fun <reified T : Any> setAllSynced(state: StateDto) = Completable.fromCallable {
+        dataSource.remove(T::class.java.simpleName, state)
     }
 
     fun setSynced(dto: LocalSyncCachedDto) = Completable.fromCallable {

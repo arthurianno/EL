@@ -3,8 +3,7 @@ package com.elta.android.data.features.user.repository
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.onConnectionErrorCompletes
-import com.elta.android.data.common.onConnectionErrorResumeDefault
+import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.domain.features.user.model.Profile
@@ -17,7 +16,8 @@ class ProfileDataRepository @Inject constructor(
     private val toDtoMapper: Mapper<Profile, ProfileDto>,
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
-    @Remote private val remoteSource: ProfileDataSource
+    @Remote private val remoteSource: ProfileDataSource,
+    private val syncManger: LocalSyncManager
 ) : ProfileRepository {
 
     override fun updateProfile(profile: Profile): Completable {
@@ -25,13 +25,29 @@ class ProfileDataRepository @Inject constructor(
         return cachedSource.updateProfile(dto)
             .andThen(
                 remoteSource.updateProfile(dto)
-                    .onConnectionErrorCompletes()
+                    .onErrorResumeNext {
+                        syncManger.saveAsUpdated(profile)
+                    }
             )
     }
 
     override fun getProfile(): Single<Profile> =
-        remoteSource.getUserProfile()
-            .onConnectionErrorResumeDefault { cachedSource.getUserProfile() }
-            .flatMap { cachedSource.getUserProfile() }
+        cachedSource.getUserProfile()
             .map(toDomainMapper::mapFromObject)
+
+    override fun sync(): Completable =
+        remoteSource.getUserProfile()
+            .flatMapCompletable {
+                syncManger.needToSync<Profile>()
+                    .flatMapCompletable { needToSync ->
+                        when (needToSync) {
+                            true -> cachedSource.getUserProfile()
+                                .flatMapCompletable { profile ->
+                                    remoteSource.updateProfile(profile)
+                                }
+                                .andThen(syncManger.setAllSynced<Profile>())
+                            else -> Completable.complete()
+                        }
+                    }
+            }
 }
