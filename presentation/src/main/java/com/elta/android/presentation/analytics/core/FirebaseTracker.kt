@@ -1,7 +1,8 @@
-package com.elta.android.presentation.analytics
+package com.elta.android.presentation.analytics.core
 
 import android.content.Context
 import android.os.Bundle
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.google.firebase.analytics.FirebaseAnalytics
 import javax.inject.Inject
 

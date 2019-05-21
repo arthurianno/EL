@@ -16,6 +16,7 @@ sealed class Events : Event {
     data class ChooserTagSelected(val chooserResult: ChooserResult) : Events()
     data class EventsChanged(val isCreated: Boolean) : Events()
     data class ProfileChanged(val profile: Profile) : Events()
+    object ShouldUpdateProfile : Events()
     object ReminderChanged : Events()
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()
