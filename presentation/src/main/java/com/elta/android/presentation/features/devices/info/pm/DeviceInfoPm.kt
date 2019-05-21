@@ -6,12 +6,12 @@ import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.devices.info.ui.builder.DeviceInfoItemsBuilder
-import com.elta.android.presentation.messages.SnackBarMessageData
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
@@ -52,6 +52,7 @@ class DeviceInfoPm @Inject constructor(
             .untilDestroy()
 
         deleteDeviceAction.observable
+            .skipWhileInProgress()
             .switchMapMaybe {
                 deleteDeviceDialogControl.showForResult(deleteDeviceDialogData)
             }
@@ -75,13 +76,8 @@ class DeviceInfoPm @Inject constructor(
             .untilDestroy()
 
         checkUpdateAction.observable
-            .doOnNext {
-                showSnackBar(
-                    SnackBarMessageData.SimpleTextMessage("Update firmware clicked...")
-                )
-            }
-            .retry()
-            .subscribe()
+            .skipWhileInProgress()
+            .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value))}
             .untilDestroy()
     }
 
