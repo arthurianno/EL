@@ -160,6 +160,7 @@
     <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
     <string name="event_type_activity_pattern_short">%1$s мин</string>
     <string name="event_type_glucose_pattern">%s ммоль/л</string>
+    <string name="event_type_glucose_measurement_value">ммоль/л</string>
 
     <string name="event_type_bread_no_name">Приём пищи</string>
     <string name="event_type_activity_no_name">Физическая активность</string>
@@ -287,6 +288,7 @@
     <string name="event_form_weight_format_mask">%d,%d Кг.</string>
     <string name="event_form_activity_format_mask">%d ч %d мин</string>
 
+    <string name="event_time_in_mask">%s в %s</string>
     <string name="event_time_mask">в %s</string>
     <string name="event_date_today">Сегодня</string>
     <string name="event_date_yesterday">Вчера</string>
@@ -316,6 +318,7 @@
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
+    <string name="event_share_dialog_title">Поделиться с помощью</string>
 
     <!-- SYNC -->
     <string name="sync_start_title">Подключение</string>

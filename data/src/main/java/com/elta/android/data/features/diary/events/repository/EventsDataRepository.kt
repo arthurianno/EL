@@ -1,8 +1,10 @@
 package com.elta.android.data.features.diary.events.repository
 
+import android.graphics.Bitmap
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.saveBitmap
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.EventDto
@@ -14,6 +16,7 @@ import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import java.io.File
 import java.util.Date
 import javax.inject.Inject
 
@@ -110,4 +113,9 @@ class EventsDataRepository @Inject constructor(
                     .flatMapCompletable { remoteSource.updateEvents(it) }
                     .andThen(syncManager.setAllSynced<Event>(StateDto.UPDATED))
             }
+
+    override fun saveEventBitmap(eventHash: String, path: String, bitmap: Bitmap): Single<File> =
+        Single.fromCallable {
+            saveBitmap(eventHash, path, bitmap)
+        }
 }

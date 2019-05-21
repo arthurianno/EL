@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import android.content.Context
+import android.net.Uri
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -9,6 +10,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -23,8 +26,6 @@ import com.elta.android.presentation.features.main.records.ui.MainRecordsFragmen
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
-import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
-import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
@@ -49,6 +50,7 @@ import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragm
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
+import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
 import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -165,6 +167,10 @@ object Screens {
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
+    }
+
+    data class ShareEventScreen(val uri: Uri, val title: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) = shareIntent(uri, title)
     }
 
     // SYNC FLOW
