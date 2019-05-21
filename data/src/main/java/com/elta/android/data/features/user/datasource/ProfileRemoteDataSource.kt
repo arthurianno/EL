@@ -21,8 +21,10 @@ class ProfileRemoteDataSource @Inject constructor(
     override fun updateProfile(profile: ProfileDto): Completable =
         api.updateUserSettings(profile)
 
+    @Suppress("MagicNumber")
     override fun getUserProfile(): Single<ProfileDto> =
         api.getUserSettings()
+            .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
             .doOnSuccess(::saveLocalIfNeed)
 
     private fun saveLocalIfNeed(profileDto: ProfileDto) {
