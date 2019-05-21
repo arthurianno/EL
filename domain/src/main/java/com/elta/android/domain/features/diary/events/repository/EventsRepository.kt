@@ -16,6 +16,8 @@ interface EventsRepository {
 
     fun addEvent(event: Event): Completable
 
+    fun addEvents(events: List<Event>): Completable
+
     fun updateEvent(event: Event): Completable
 
     fun deleteEvent(event: Event): Completable

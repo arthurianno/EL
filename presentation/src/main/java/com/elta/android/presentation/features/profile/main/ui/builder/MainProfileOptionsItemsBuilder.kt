@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.main.ui.builder
 
 import android.support.annotation.StringRes
+import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.WhereBuy
@@ -43,6 +44,9 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         )
         add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
             R.drawable.ic_map_pin_bg, WhereBuy)
+        )
+        add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
+            R.drawable.ic_devices, MyDevices)
         )
     }
 

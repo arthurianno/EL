@@ -16,9 +16,13 @@ sealed class Events : Event {
     data class ChooserTagSelected(val chooserResult: ChooserResult) : Events()
     data class EventsChanged(val isCreated: Boolean) : Events()
     data class ProfileChanged(val profile: Profile) : Events()
+    object ShouldUpdateProfile : Events()
     object ReminderChanged : Events()
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()
     object ObserverInvited : Events()
     object ProfileDataChanged : Events()
+    data class PinCodeEntered(val pin: String) : Events()
+    object DeviceChanged : Events()
+    data class SyncProgress(val inProgress: Boolean) : Events()
 }

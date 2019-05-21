@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.pm
 
-import com.elta.android.presentation.analytics.Analytics
+import com.elta.android.presentation.analytics.core.Analytics
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject

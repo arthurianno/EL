@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm
 
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetGlycatedHemoglobinEventsUseCase
@@ -70,6 +71,7 @@ class HemoglobinSettingsPm @Inject constructor(
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .trackEvent(AnalyticsEventType.GLYCATED_HEMOGLOBIN_ADD)
                     .doOnComplete {
                         bus.event(Events.EventsChanged(true))
                         closeDialogCommand.consumer.accept(Unit)

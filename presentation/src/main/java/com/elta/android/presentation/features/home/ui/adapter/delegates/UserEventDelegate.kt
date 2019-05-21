@@ -22,7 +22,7 @@ class UserEventDelegate(private val bus: RxBus) : AdapterDelegate() {
             with(this as ViewHolder) {
                 eventContainerView.setOnClickListener {
                     withAdapterPosition<UserEventItem> { _, item, _ ->
-                        bus.click(Clicks.AddUserEvent(item.event))
+                        bus.click(Clicks.AddUserEvent(item.meta))
                     }
                 }
             }

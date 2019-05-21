@@ -25,6 +25,13 @@ fun Date.toEventDate(resourceProvider: ResourceProvider) =
         else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
     }
 
+fun Date.toSyncDate(resources: ResourceProvider) =
+    when {
+        isToday() -> "${resources.getString(R.string.event_date_today)} ${this.toEventTime(resources)}"
+        isYesterday() -> "${resources.getString(R.string.event_date_yesterday)} ${this.toEventTime(resources)}"
+        else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
+    }
+
 fun Date.toCalendar(): Calendar = Calendar.getInstance().apply { time = this@toCalendar }
 
 val Calendar.year

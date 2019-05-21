@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.greeting.pm
 
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -20,6 +21,7 @@ class GreetingPm @Inject constructor(
             .untilDestroy()
 
         registrationAction.observable
+            .trackEvent(AnalyticsEventType.REGISTER_OPEN)
             .subscribe { router.navigateTo(Screens.RegistrationFlow) }
             .untilDestroy()
     }

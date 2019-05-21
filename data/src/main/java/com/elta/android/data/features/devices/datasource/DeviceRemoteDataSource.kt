@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.datasource
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.devices.dto.GlucometerDto
+import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.GlucometersManager
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -20,14 +21,26 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun findDevices(): Observable<List<GlucometerDto>> =
         glucometersManager.findDevices().map(scanToDtoMapper::mapFromObjects)
 
+    override fun getDevices(): Single<List<GlucometerDto>> =
+        glucometersManager.getDevices()
+
+    override fun deleteDevice(address: String): Completable =
+        glucometersManager.deleteDevice(address)
+
     override fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         glucometersManager.getGlucometerInfo(address)
+
+    override fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto> =
+        glucometersManager.getLastGlucometerInfo(address)
 
     override fun getGlucometerEvents(address: String): Single<List<String>> =
         glucometersManager.getGlucometerEvents(address).map { it.map { it.toString() } }
 
-    override fun setPinCode(address: String, pinCode: String): Completable =
-        glucometersManager.setPinCode(address, pinCode)
+    override fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
+        glucometersManager.connectDevice(device, pinCode)
+
+    override fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
+        glucometersManager.syncWithDevice(device)
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         glucometersManager.updateFirmware(address, firmwareFile)

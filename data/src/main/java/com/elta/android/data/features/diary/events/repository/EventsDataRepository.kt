@@ -48,6 +48,15 @@ class EventsDataRepository @Inject constructor(
                     )
             }
 
+    override fun addEvents(events: List<Event>): Completable =
+        Single.fromCallable { toDtoMapper.mapFromObjects(events) }
+            .flatMapCompletable {
+                cacheSource.addEvents(it)
+                    .andThen(remoteSource.addEvents(it)
+                        .onConnectionErrorCompletes()
+                    )
+            }
+
     override fun updateEvent(event: Event): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {

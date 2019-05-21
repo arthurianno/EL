@@ -23,6 +23,8 @@ import com.elta.android.presentation.features.main.records.ui.MainRecordsFragmen
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
@@ -43,6 +45,7 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
+import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
@@ -177,6 +180,10 @@ object Screens {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
     }
 
+    object ConnectDevice : SupportAppScreen() {
+        override fun getFragment(): Fragment = ConnectDeviceFragment.newInstance()
+    }
+
     // DIARY FLOW
     object MainDiaryScreen : SupportAppScreen() {
         override fun getFragment() = MainDiaryFragment.newInstance()
@@ -201,6 +208,14 @@ object Screens {
 
     object Reminders : SupportAppScreen() {
         override fun getFragment() = RemindersFragment.newInstance()
+    }
+
+    object Devices : SupportAppScreen() {
+        override fun getFragment() = DevicesFragment.newInstance()
+    }
+
+    data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {
+        override fun getFragment() = DeviceInfoFragment.newInstance(name, address)
     }
 
     object CreateRemind : SupportAppScreen() {

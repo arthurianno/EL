@@ -1,9 +1,9 @@
 package com.elta.android.presentation.di
 
 import android.content.Context
-import com.elta.android.presentation.analytics.Analytics
-import com.elta.android.presentation.analytics.AnalyticsTracker
-import com.elta.android.presentation.analytics.FirebaseTracker
+import com.elta.android.presentation.analytics.core.Analytics
+import com.elta.android.presentation.analytics.core.AnalyticsTracker
+import com.elta.android.presentation.analytics.core.FirebaseTracker
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

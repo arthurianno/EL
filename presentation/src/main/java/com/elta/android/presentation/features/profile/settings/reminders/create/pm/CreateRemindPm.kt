@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.reminders.create.pm
 
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.domain.features.reminder.interactor.AddNewReminderUseCase
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
@@ -27,6 +28,7 @@ class CreateRemindPm @Inject constructor(
                 addNewReminderUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
+                    .trackEvent(AnalyticsEventType.REMINDER_ADD)
                     .doOnSuccess { id ->
                         ReminderWorker.startReminder(id)
                     }

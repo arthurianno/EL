@@ -164,7 +164,7 @@ class EventsOptionsChooserPm @Inject constructor(
     }
 
     private fun setPreviousSelection(configuration: ChooserConfiguration) {
-        previousSelectionState.consumer.accept(configuration.id?.let { it } ?: NONE_ID)
+        previousSelectionState.consumer.accept(configuration.id ?: NONE_ID)
     }
 
     companion object {

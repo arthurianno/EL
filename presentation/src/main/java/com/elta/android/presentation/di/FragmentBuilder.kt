@@ -7,6 +7,10 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.di.BluetoothModule
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.devices.all.di.DevicesModule
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.info.di.DeviceInfoModule
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.di.MainDiaryModule
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
@@ -52,10 +56,13 @@ import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
+import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
+import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -166,6 +173,14 @@ abstract class FragmentBuilder {
     @ContributesAndroidInjector(modules = [BluetoothModule::class])
     abstract fun bindBluetoothFragment(): BluetoothFragment
 
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindPinDialogFragment(): PinDialogFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
+    abstract fun bindConnectDeviceFragment(): ConnectDeviceFragment
+
     // DIARY FLOW
     @FragmentScope
     @ContributesAndroidInjector
@@ -203,6 +218,14 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindGlucoseRangeDialogFragment(): GlucoseRangeDialogFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [DevicesModule::class])
+    abstract fun bindDevicesFragment(): DevicesFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [DeviceInfoModule::class])
+    abstract fun bindDeviceInfoFragment(): DeviceInfoFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [RemindersModule::class])
