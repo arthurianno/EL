@@ -3,10 +3,8 @@ package com.elta.android.data.features.user.repository
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.sync.manger.LocalSyncManager
-import com.elta.android.data.common.onConnectionErrorCompletes
-import com.elta.android.data.common.onConnectionErrorResumeDefault
 import com.elta.android.data.features.common.storage.UserHolder
+import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.domain.features.user.model.Profile
@@ -36,8 +34,13 @@ class ProfileDataRepository @Inject constructor(
     }
 
     override fun getProfile(): Single<Profile> =
-        cachedSource.getUserProfile()
-            .map(toDomainMapper::mapFromObject)
+        cachedSource.hasProfile().flatMap {
+            when (it) {
+                true -> cachedSource.getUserProfile()
+                else -> remoteSource.getUserProfile()
+                    .flatMap { cachedSource.getUserProfile() }
+            }
+        }.map(toDomainMapper::mapFromObject)
 
     override fun getUserId(): Single<Long> =
         Single.just(userHolder.currentUser)

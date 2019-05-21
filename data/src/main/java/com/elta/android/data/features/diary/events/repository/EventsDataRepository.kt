@@ -52,8 +52,9 @@ class EventsDataRepository @Inject constructor(
         Single.fromCallable { toDtoMapper.mapFromObjects(events) }
             .flatMapCompletable {
                 cacheSource.addEvents(it)
-                    .andThen(remoteSource.addEvents(it)
-                        .onConnectionErrorCompletes()
+                    .andThen(
+                        remoteSource.addEvents(it)
+                            .onErrorResumeNext { syncManager.saveAsCreated(events) }
                     )
             }
 
