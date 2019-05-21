@@ -3,8 +3,10 @@ package com.elta.android.presentation.features.auth.login.pm
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
 import com.elta.android.domain.features.auth.interactor.LoginWithSocialNetworkUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
+import com.elta.android.domain.features.user.interactor.IsOnboardingPassedUseCase
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.Screens.ActivateProfile
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.updateStableParam
@@ -18,6 +20,7 @@ class LoginPm @Inject constructor(
     private val loginWithSocialNetworkUseCase: LoginWithSocialNetworkUseCase,
     private val loginUseCase: LoginUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
+    private val isOnboardingPassedUseCase: IsOnboardingPassedUseCase,
     services: ServiceFacade
 ) : BaseSocialPm(services) {
 
@@ -47,7 +50,7 @@ class LoginPm @Inject constructor(
                     .bindProgress()
                     .updateAnalyticStableParam()
                     .trackEvent(AnalyticsEventType.LOG_IN)
-                    .doOnSuccess(::handleSuccess)
+                    .flatMap(::checkEmailAndOnboarding)
                     .doOnError(::handleError)
             }
             .retry()
@@ -66,7 +69,7 @@ class LoginPm @Inject constructor(
                         AnalyticsEventType.LOG_IN,
                         AnalyticsEventParam.LOG_TYPE to params.network.name
                     )
-                    .doOnSuccess(::handleSuccess)
+                    .flatMap(::checkEmailAndOnboarding)
                     .doOnError(::handleError)
             }
             .retry()
@@ -80,17 +83,27 @@ class LoginPm @Inject constructor(
     private fun createLoginSocialParams(network: SocialNetworkType): LoginWithSocialNetworkUseCase.Params =
         LoginWithSocialNetworkUseCase.Params(network)
 
-    private fun handleSuccess(isEmailActivated: Boolean) {
-        when (isEmailActivated) {
-            true -> router.newRootFlow(Screens.OnBoardingFlow)
-            else -> router.navigateTo(Screens.ActivateProfile)
-        }
-    }
-
     private fun Single<Boolean>.updateAnalyticStableParam(): Single<Boolean> =
         this.flatMap { isEmailActivated ->
             getUserIdUseCase.execute()
                 .doOnSuccess { updateStableParam(id = it) }
                 .map { isEmailActivated }
         }
+
+    private fun checkEmailAndOnboarding(isEmailActivated: Boolean) =
+        when (isEmailActivated) {
+            true -> checkIsOnboardingPassed()
+            false -> Single.just { Unit }
+                .doOnSuccess { router.navigateTo(ActivateProfile) }
+        }
+
+    private fun checkIsOnboardingPassed(): Single<Unit> =
+        isOnboardingPassedUseCase.execute()
+            .doOnSuccess { isOnboardingPassed ->
+                when (isOnboardingPassed) {
+                    true -> router.newRootFlow(Screens.HomeFlow)
+                    false -> router.newRootFlow(Screens.OnBoardingFlow)
+                }
+            }
+            .map { Unit }
 }

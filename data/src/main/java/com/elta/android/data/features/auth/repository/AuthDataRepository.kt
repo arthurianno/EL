@@ -12,7 +12,6 @@ import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import io.reactivex.Completable
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 
 class AuthDataRepository @Inject constructor(
@@ -37,15 +36,20 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginDto::isEmailConfirmed)
-            .doOnSuccess { Timber.e("login isEmailConfirmed 1 >> ${it}") }
             .doOnSuccess { emailStorage.isEmailConfirmed = it }
-            .doOnSuccess { Timber.e("login isEmailConfirmed 2 >> ${it}") }
 
     override fun isEmailConfirmed(): Single<Boolean> =
-        source.isEmailConfirmed()
-            .doOnSuccess { Timber.e("isEmailConfirmed >> ${it.isEmailConfirmed}") }
-            .map(EmailStatusDto::isEmailConfirmed)
-            .onConnectionErrorResumeDefault { Single.just(emailStorage.isEmailConfirmed) }
+        Single.just(emailStorage.isEmailConfirmed)
+            .flatMap { isConfirmed ->
+                when (isConfirmed) {
+                    true -> Single.just(isConfirmed)
+                    false -> source.isEmailConfirmed()
+                        .map(EmailStatusDto::isEmailConfirmed)
+                        .onConnectionErrorResumeDefault { Single.just(emailStorage.isEmailConfirmed) }
+                        .doOnSuccess { emailStorage.isEmailConfirmed = it }
+                }
+            }
+
 
     override fun sendConfirmationLink(): Completable =
         source.sendConfirmationLink()

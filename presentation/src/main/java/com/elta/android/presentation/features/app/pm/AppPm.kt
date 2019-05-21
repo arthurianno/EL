@@ -16,7 +16,6 @@ import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
@@ -42,26 +41,11 @@ class AppPm @Inject constructor(
             .flatMapSingle {
                 isUserLoggedInUseCase.execute()
                     .flatMap { isUserLoggedIn ->
-                        if (isUserLoggedIn) {
-//                            Timber.e("AppPm >> ${networkStateAction.observable.blockingLast()}")
-//                            if (networkStateAction.observable.blockingLast()) {
-//
-//                            }
-                            checkEmailUseCase.execute()
-                                .doOnSuccess { isEmailConfirmed ->
-                                    if (isEmailConfirmed) {
-                                        router.newRootScreen(Screens.HomeFlow)
-                                    } else {
-                                        router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
-                                    }
-                                }
-                                .doOnError {
-                                    router.newRootScreen(Screens.HomeFlow)
-                                }
-                                .map { Unit }
-                        } else {
-                            Single.just(Unit)
-                                .doOnSuccess { router.newRootScreen(Screens.GreetingFlow) }
+                        when (isUserLoggedIn) {
+                            true -> checkEmailUseCase.execute()
+                                .flatMap(::checkEmailAndOnboarding)
+                            false -> Single.just(Unit)
+                                .doOnSuccess { router.newRootFlow(Screens.GreetingFlow) }
                         }
                     }
                     .bindProgress()
@@ -111,4 +95,23 @@ class AppPm @Inject constructor(
             .subscribe(syncProgress.consumer)
             .untilDestroy()
     }
+
+    private fun checkEmailAndOnboarding(isEmailConfirmed: Boolean) =
+        when (isEmailConfirmed) {
+            true -> checkIsOnboardingPassed()
+            false -> {
+                Single.just(Unit)
+                    .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
+            }
+        }
+
+    private fun checkIsOnboardingPassed(): Single<Unit> =
+        isOnboardingPassedUseCase.execute()
+            .doOnSuccess { isOnboardingPassed ->
+                when (isOnboardingPassed) {
+                    true -> router.newRootFlow(Screens.HomeFlow)
+                    false -> router.newRootFlow(Screens.OnBoardingFlow)
+                }
+            }
+            .map { Unit }
 }
