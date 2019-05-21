@@ -43,7 +43,7 @@ class AuthDataRepository @Inject constructor(
             .flatMap { isConfirmed ->
                 when (isConfirmed) {
                     true -> Single.just(isConfirmed)
-                    false -> source.isEmailConfirmed()
+                    else -> source.isEmailConfirmed()
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(emailStorage.isEmailConfirmed) }
                         .doOnSuccess { emailStorage.isEmailConfirmed = it }

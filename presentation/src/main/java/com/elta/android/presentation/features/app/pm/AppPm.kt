@@ -45,7 +45,7 @@ class AppPm @Inject constructor(
                         when (isUserLoggedIn) {
                             true -> checkEmailUseCase.execute()
                                 .flatMap(::checkEmailAndOnboarding)
-                            false -> Single.just(Unit)
+                            else -> Single.just(Unit)
                                 .doOnSuccess { router.newRootFlow(Screens.GreetingFlow) }
                         }
                     }
@@ -100,7 +100,7 @@ class AppPm @Inject constructor(
     private fun checkEmailAndOnboarding(isEmailConfirmed: Boolean) =
         when (isEmailConfirmed) {
             true -> checkIsOnboardingPassed()
-            false -> Single.just(Unit)
+            else -> Single.just(Unit)
                 .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
         }
 
@@ -109,7 +109,7 @@ class AppPm @Inject constructor(
             .doOnSuccess { isOnboardingPassed ->
                 when (isOnboardingPassed) {
                     true -> router.newRootFlow(Screens.HomeFlow)
-                    false -> router.newRootFlow(Screens.OnBoardingFlow)
+                    else -> router.newRootFlow(Screens.OnBoardingFlow)
                 }
             }
             .map { Unit }

@@ -93,7 +93,7 @@ class LoginPm @Inject constructor(
     private fun checkEmailAndOnboarding(isEmailActivated: Boolean) =
         when (isEmailActivated) {
             true -> checkIsOnboardingPassed()
-            false -> Single.just { Unit }
+            else -> Single.just { Unit }
                 .doOnSuccess { router.navigateTo(ActivateProfile) }
         }
 
@@ -102,7 +102,7 @@ class LoginPm @Inject constructor(
             .doOnSuccess { isOnboardingPassed ->
                 when (isOnboardingPassed) {
                     true -> router.newRootFlow(Screens.HomeFlow)
-                    false -> router.newRootFlow(Screens.OnBoardingFlow)
+                    else -> router.newRootFlow(Screens.OnBoardingFlow)
                 }
             }
             .map { Unit }
