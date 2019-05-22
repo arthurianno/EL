@@ -37,8 +37,7 @@ class FirmwarePm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val deviceAddressState = State<String>()
-    val deviceInfo = State<GlucometerInfo>()
+
     val buttonAction = Action<Unit>()
     val updateState = State<UpdateState>(UpdateState.Progress(resources))
 
@@ -49,6 +48,8 @@ class FirmwarePm @Inject constructor(
     private val startUpdateAction = Action<Unit>()
     private val downloadFirmwareAction = Action<Unit>()
 
+    private val deviceAddressState = State<String>()
+    private val deviceInfo = State<GlucometerInfo>()
     private val firmwareState = State<Firmware>()
     private val firmwareFileState = State<FirmwareFile>()
 
