@@ -9,6 +9,7 @@ import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
+import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -20,6 +21,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
@@ -37,8 +39,9 @@ import javax.inject.Inject
 class HomeFlowPm @Inject constructor(
     private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
+    private val syncWithBackendUseCase: SyncLocalChangesUseCase,
     services: ServiceFacade
-) : BaseFlowPm(services) {
+) : BaseFlowPm(services), ConnectionListener {
 
     val bottomSheetItems = State<List<ListItem>>()
     val closeBottomSheetCommand = Command<Unit>()
@@ -57,6 +60,9 @@ class HomeFlowPm @Inject constructor(
     private val syncProgressState = State(false)
     private val showRetrySyncAction = Action<Unit>()
 
+    private val syncWithBackendProgressState = State(false)
+    private val startSyncWithBackendAction = Action<Unit>()
+
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
             resources.getString(R.string.sync_connect_device_not_found),
@@ -68,6 +74,7 @@ class HomeFlowPm @Inject constructor(
         super.onCreate()
 
         bindSyncAction()
+        bindSyncWithBackendAction()
 
         loadEvents.observable
             .skipWhileInProgress()
@@ -188,6 +195,37 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
     }
 
+    private fun bindSyncWithBackendAction() {
+        syncWithBackendProgressState.observable
+            .subscribe { inProgress ->
+                bus.event(Events.BackendSyncProgress(inProgress))
+            }
+            .untilDestroy()
+
+        startSyncWithBackendAction.observable
+            .skipWhileInProgress(syncWithBackendProgressState.observable)
+            .flatMapCompletable {
+                syncWithBackendUseCase.execute()
+                    .bindProgress(syncWithBackendProgressState.consumer)
+                    .doOnComplete {
+                        bus.event(Events.EventsChanged(false))
+                        bus.event(Events.ProfileUpdated)
+                    }
+                    .doOnError(::handleError)
+            }
+            .subscribe()
+            .untilDestroy()
+
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { true },
+            networkStateCommand.observable.delay(SYNC_AFTER_CONNECTION_RESTORED_DELAY, TimeUnit.MILLISECONDS).map { it }
+        )
+            .filter { it }
+            .map { Unit }
+            .subscribe(startSyncWithBackendAction.consumer)
+            .untilDestroy()
+    }
+
     private fun handleAddEventClick(meta: Any) {
         if (meta is EventType) {
             router.startFlow(Screens.EventsCreationScreen(meta))
@@ -219,5 +257,6 @@ class HomeFlowPm @Inject constructor(
     companion object {
         private const val OPEN_EVENT_SCREEN_DELAY = 400L
         private const val META_SYNC = "meta_sync"
+        private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY = 2800L
     }
 }

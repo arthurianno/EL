@@ -1,7 +1,6 @@
 package com.elta.android.domain.features.diary.events.repository
 
 import com.elta.android.domain.features.diary.events.model.Event
-import com.elta.android.domain.features.diary.events.model.EventType
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,5 +20,7 @@ interface EventsRepository {
 
     fun updateEvent(event: Event): Completable
 
-    fun deleteEvent(eventId: String, type: EventType): Completable
+    fun deleteEvent(event: Event): Completable
+
+    fun sync(): Completable
 }
