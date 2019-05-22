@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.devices.firmware.pm
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
@@ -14,6 +15,7 @@ import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCa
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.control.bluetoothControl
@@ -55,6 +57,10 @@ class FirmwarePm @Inject constructor(
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
                     is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
                     is UpdateState.BatteryLowLevel -> router.exit()
+                    is UpdateState.UnsupportedFirmwareVersion -> {
+                        router.exit()
+                        router.navigateTo(Screens.PlayMarketScreen)
+                    }
                 }
             }
             .untilDestroy()
@@ -138,6 +144,7 @@ class FirmwarePm @Inject constructor(
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
             is GlucometerLowBatteryLevelError -> updateState.consumer.accept(UpdateState.BatteryLowLevel(resources, error.current))
+            is FirmwareNotSupportedByAppError -> updateState.consumer.accept(UpdateState.UnsupportedFirmwareVersion(resources))
             else -> super.handleError(error)
         }
     }
@@ -247,6 +254,14 @@ class FirmwarePm @Inject constructor(
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_button_close)
         ) : UpdateState()
+
+        data class UnsupportedFirmwareVersion(
+            val resources: ResourceProvider,
+            override val title: String = resources.getString(R.string.firmware_title_unsupported_version),
+            override val version: String? = resources.getString(R.string.firmware_description_unsupported_version),
+            override val hint: String? = null,
+            override val button: String? = resources.getString(R.string.firmware_button_unsupported_version)
+        ): UpdateState()
 
         data class Updated(
             val resources: ResourceProvider,
