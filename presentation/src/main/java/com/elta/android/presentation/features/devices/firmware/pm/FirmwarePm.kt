@@ -24,6 +24,7 @@ import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -50,8 +51,22 @@ class FirmwarePm @Inject constructor(
     private val firmwareState = State<Firmware>()
     private val firmwareFileState = State<FirmwareFile>()
 
+    private val delayedSetStateAction = Action<UpdateState>()
+
     override fun onCreate() {
         super.onCreate()
+
+        delayedSetStateAction.observable
+            .log("State", "before") { it.javaClass.simpleName }
+            .concatMap {
+                val delay = if (
+                    it is UpdateState.Progress || updateState.value.button != null
+                ) 0L else 2L
+                Observable.just(it).delay(delay, TimeUnit.SECONDS, Schedulers.single())
+            }
+            .log("State", "after") { it.javaClass.simpleName }
+            .subscribe(updateState.consumer)
+            .untilDestroy()
 
         buttonAction.observable
             .subscribe {
@@ -161,7 +176,7 @@ class FirmwarePm @Inject constructor(
     }
 
     private fun setState(state: UpdateState) {
-        updateState.consumer.accept(state)
+        delayedSetStateAction.consumer.accept(state)
     }
 
     private fun createGetDeviceInfoUseCaseParams(address: String): GetLastGlucometerInfoUseCase.Params =
@@ -271,7 +286,7 @@ class FirmwarePm @Inject constructor(
             override val description: String? = resources.getString(R.string.firmware_description_unsupported_version),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_button_unsupported_version)
-        ): UpdateState()
+        ) : UpdateState()
 
         data class FirmwareDownloadingError(
             val resources: ResourceProvider,
@@ -279,7 +294,7 @@ class FirmwarePm @Inject constructor(
             override val description: String? = resources.getString(R.string.firmware_downloading_error_description),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_downloading_error_button)
-        ): UpdateState()
+        ) : UpdateState()
 
         data class FirmwareUpdateError(
             val resources: ResourceProvider,
@@ -287,7 +302,7 @@ class FirmwarePm @Inject constructor(
             override val description: String? = resources.getString(R.string.firmware_update_error_description),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_update_error_button)
-        ): UpdateState()
+        ) : UpdateState()
 
         data class Updated(
             val resources: ResourceProvider,
