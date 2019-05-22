@@ -1,3 +1,6 @@
+### v0.38.0 ###
+- [ELTA-849] - [Android] PUSH уведомления
+
 ### v0.37.0 ###
 - [ELTA-855] - [Android] Share glucose event
 
