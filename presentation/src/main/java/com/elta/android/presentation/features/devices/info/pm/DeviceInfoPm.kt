@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.devices.info.ui.builder.DeviceInfoItemsBuilder
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
@@ -100,9 +101,5 @@ class DeviceInfoPm @Inject constructor(
 
     private fun handleSuccess(info: GlucometerInfo) {
         items.consumer.accept(itemsBuilder.buildItems(info))
-    }
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
     }
 }

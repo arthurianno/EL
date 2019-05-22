@@ -2,8 +2,8 @@ package com.elta.android.presentation.features.devices.info.ui
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -39,18 +39,7 @@ class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
         checkUpdateButtonView.clicks().bindTo(pm.checkUpdateAction)
         pm.nameDeviceState.bindTo(titleTextView.text())
         pm.descriptionAddressState.bindTo(descriptionTextView.text())
-
-        pm.deleteDeviceDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(DeviceInfoPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(DeviceInfoPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.deleteDeviceDialogControl.bindTo { data, dc -> createDialog(this, dc, data)}
     }
 
     companion object {

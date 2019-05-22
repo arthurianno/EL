@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -26,18 +27,7 @@ class ObserversFragment : BaseListFragment<ObserversPm>() {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
         menuButtonView.clicks().bindTo(pm.inviteObserverAction)
-
-        pm.deleteObserverDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(ObserversPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(ObserversPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.deleteObserverDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

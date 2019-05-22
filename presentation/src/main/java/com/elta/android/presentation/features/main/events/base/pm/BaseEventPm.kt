@@ -2,8 +2,7 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.EventType.ACTIVITY
-import com.elta.android.domain.features.diary.events.model.EventType.INSULIN
+import com.elta.android.domain.features.diary.events.model.EventType.*
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
@@ -15,6 +14,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
@@ -194,10 +194,6 @@ abstract class BaseEventPm constructor(
 
     private fun String.toSimpleSelectorOption() =
         SelectorOption(this)
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 
     companion object {
         private const val OPEN_SCREEN_DELAY = 300L // millis
