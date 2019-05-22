@@ -26,7 +26,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
 import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -62,8 +61,8 @@ class FirmwarePm @Inject constructor(
 
         delayedSetStateAction.observable
             .concatMap {
-                val delay = if (it is UpdateState.Progress || updateState.hasValue()) ZERO_DELAY else NEXT_STATE_DELAY
-                Observable.just(it).delay(delay, TimeUnit.MILLISECONDS, Schedulers.single())
+                val delay = if (it is UpdateState.Progress || updateState.valueOrNull.hasUserInput()) ZERO_DELAY else NEXT_STATE_DELAY
+                Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
             }
             .subscribe(updateState.consumer)
             .untilDestroy()
