@@ -12,4 +12,8 @@ data class IllegalDeleteConditionError(val condition: Condition)
     : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
     "not supported for delete operation.")
 
+data class IllegalContainsCondition(val condition: Condition)
+    : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
+    "not supported for contains operation.")
+
 object AccessDeniedError : RuntimeException("Current user == null")

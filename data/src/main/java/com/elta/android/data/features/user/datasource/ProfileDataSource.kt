@@ -9,4 +9,6 @@ interface ProfileDataSource {
     fun updateProfile(profile: ProfileDto): Completable
 
     fun getUserProfile(): Single<ProfileDto>
+
+    fun hasProfile(): Single<Boolean>
 }

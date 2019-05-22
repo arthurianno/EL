@@ -17,6 +17,7 @@ import android.widget.ImageView
 import com.elta.android.presentation.R
 import com.jakewharton.rxbinding2.view.longClicks
 import com.jakewharton.rxbinding2.view.touches
+import com.nullgr.core.ui.extensions.dpToPx
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
@@ -42,6 +43,16 @@ fun View.applyWindowInsetsForChildrenView() {
         params.topMargin = insets.systemWindowInsetTop
         insets.consumeSystemWindowInsets()
     }
+}
+
+fun View.getBitmapFromView(size: Float): Bitmap {
+    val sizePx = size.dpToPx(context).toInt()
+    measure(sizePx, sizePx)
+    layout(0, 0, measuredWidth, measuredHeight)
+    val bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    draw(canvas)
+    return bitmap
 }
 
 fun Toolbar.menuClicks(): Observable<Int> = ToolbarMenuClickObservable(this)

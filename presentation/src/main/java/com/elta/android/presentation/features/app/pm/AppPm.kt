@@ -32,6 +32,7 @@ class AppPm @Inject constructor(
     val onStopAction = Action<String>()
 
     val syncProgress = Command<Boolean>(bufferSize = 1)
+    val backendSyncProgress = Command<Boolean>(bufferSize = 1)
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -94,6 +95,13 @@ class AppPm @Inject constructor(
             .map(Events.SyncProgress::inProgress)
             .map { !it }
             .subscribe(syncProgress.consumer)
+            .untilDestroy()
+
+        bus.events<Events.BackendSyncProgress>()
+            .skip(1)
+            .map(Events.BackendSyncProgress::inProgress)
+            .map { !it }
+            .subscribe(backendSyncProgress.consumer)
             .untilDestroy()
     }
 

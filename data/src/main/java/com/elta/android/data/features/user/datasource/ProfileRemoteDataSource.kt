@@ -37,4 +37,8 @@ class ProfileRemoteDataSource @Inject constructor(
             } ?: cache.add(listOf(profileCacheDto))
         }
     }
+
+    override fun hasProfile(): Single<Boolean> {
+        throw IllegalStateException("hasProfile available only for cached data source")
+    }
 }

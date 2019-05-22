@@ -13,4 +13,6 @@ interface ProfileRepository {
     fun getUserId(): Single<Long>
 
     fun isOnboardingPassed(): Single<Boolean>
+
+    fun sync(): Completable
 }

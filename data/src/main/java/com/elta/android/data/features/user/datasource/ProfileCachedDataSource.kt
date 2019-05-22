@@ -44,4 +44,10 @@ class ProfileCachedDataSource @Inject constructor(
                     ?: throw NoSuchElementException("Current user profile is empty.")
             }
         }.map(profileFromCacheMapper::mapFromObject)
+
+    override fun hasProfile(): Single<Boolean> = Single.fromCallable {
+        userHolder.currentUser?.let {
+            profileCache.contains(CommonConditions.ById(it))
+        } ?: false
+    }
 }
