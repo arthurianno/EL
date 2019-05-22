@@ -111,14 +111,11 @@ class EventCreationPm @Inject constructor(
     }
 
     private fun createCreationEvent(params: AddNewEventUseCase.Params): AnalyticsEvent? {
-        val data = hashMapOf(AnalyticsEventParam.COMMENT to (params.note != null).toString())
+        val data = hashMapOf<String, String>()
         val name = when (params.eventType) {
             EventType.BREAD -> AnalyticsEventType.EVENT_BREAD_ADD
             EventType.WEIGHT -> AnalyticsEventType.EVENT_WEIGHT_ADD
-            EventType.MEDICAMENTS -> {
-                data[AnalyticsEventParam.COMMENT] = (params.name != null).toString()
-                AnalyticsEventType.EVENT_MEDICAMENTS_ADD
-            }
+            EventType.MEDICAMENTS -> AnalyticsEventType.EVENT_MEDICAMENTS_ADD
             EventType.ACTIVITY -> {
                 params.activity?.let { data[AnalyticsEventParam.TYPE] = it.name }
                 AnalyticsEventType.EVENT_ACTIVITY_ADD
