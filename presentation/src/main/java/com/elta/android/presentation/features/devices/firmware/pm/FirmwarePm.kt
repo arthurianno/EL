@@ -16,7 +16,9 @@ import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseC
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.control.bluetoothControl
@@ -64,6 +66,15 @@ class FirmwarePm @Inject constructor(
                 Observable.just(it).delay(delay, TimeUnit.MILLISECONDS, Schedulers.single())
             }
             .subscribe(updateState.consumer)
+            .untilDestroy()
+
+        updateState.observable
+            .filter { it is UpdateState.Updated }
+            .delay(NEXT_STATE_DELAY, TimeUnit.MILLISECONDS)
+            .subscribe {
+                bus.event(Events.FirmwareUpdated)
+                router.exit()
+            }
             .untilDestroy()
 
         buttonAction.observable
@@ -138,11 +149,6 @@ class FirmwarePm @Inject constructor(
                     }
                     .doOnComplete(::handleFirmwareUpdated)
                     .doOnError(::handleError)
-                    .andThen(
-                        Completable.fromCallable {
-                            router.exit()
-                        }.delay(NEXT_STATE_DELAY, TimeUnit.MILLISECONDS)
-                    )
             }
             .retry()
             .subscribe()
