@@ -110,8 +110,12 @@ dependencies {
     implementation commonDependencies.pulseView
     implementation commonDependencies.datePicker
 
-    implementation commonDependencies.work
-    implementation commonDependencies.rxWork
+    implementation(commonDependencies.work) {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    implementation (commonDependencies.rxWork) {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
@@ -130,6 +134,7 @@ dependencies {
 
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseInAppMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location
 
