@@ -23,7 +23,10 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -85,10 +88,10 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
 
         checkUpdatesAction.observable
-            .skipWhileInProgress()
+            .skipWhileInProgress(progressState.observable)
             .flatMapSingle {
                 getFirmwareInfoUseCase.execute()
-                    .bindProgress()
+                    .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
                         setState(UpdateState.Progress(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
@@ -100,9 +103,11 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
 
         getDeviceInfoAction.observable
+            .skipWhileInProgress(progressState.observable)
             .map(::createGetDeviceInfoUseCaseParams)
             .flatMapSingle { params ->
                 getLastGlucometerInfoUseCase.execute(params)
+                    .bindProgressExtended(progressState.consumer)
                     .doOnSuccess(::handleDeviceInfo)
                     .doOnError(::handleError)
             }
@@ -111,11 +116,11 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
 
         downloadFirmwareAction.observable
-            .skipWhileInProgress()
+            .skipWhileInProgress(progressState.observable)
             .map(::createDownloadFirmwareUseCaseParams)
             .flatMapSingle { params ->
                 downloadFirmwareUseCase.execute(params)
-                    .bindProgress()
+                    .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
                         setState(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
@@ -127,12 +132,11 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
 
         startUpdateAction.observable
-            .log("FirmwarePm", "before")
-            .log("FirmwarePm", "after")
+            .skipWhileInProgress(progressState.observable)
             .map(::createUpdateFirmwareUseCaseParams)
             .flatMapCompletable { params ->
                 updateDeviceFirmwareUseCase.execute(params)
-                    .bindProgress()
+                    .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
                         setState(UpdateState.Updating(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
@@ -217,5 +221,19 @@ class FirmwarePm @Inject constructor(
 
     private fun handleFirmwareUpdated() {
         setState(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
+    }
+
+    private inline fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
+        return this
+            .doOnSubscribe { progressConsumer.accept(true) }
+            .doOnSuccess { progressConsumer.accept(false) }
+            .doOnError { progressConsumer.accept(false) }
+    }
+
+    private inline fun Completable.bindProgressExtended(progressConsumer: Consumer<Boolean>): Completable {
+        return this
+            .doOnSubscribe { progressConsumer.accept(true) }
+            .doOnComplete { progressConsumer.accept(false) }
+            .doOnError { progressConsumer.accept(false) }
     }
 }
