@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.devices.firmware.pm
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.utils.log
@@ -15,12 +16,10 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
-import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -36,7 +35,6 @@ class FirmwarePm @Inject constructor(
     val deviceInfo = State<GlucometerInfo>()
     val buttonAction = Action<Unit>()
     val updateState = State<UpdateState>(UpdateState.Progress(resources))
-    val lowBatteryDialogControl = dialogControl<DialogData, Unit>()
 
     val btControl = bluetoothControl()
 
@@ -52,13 +50,13 @@ class FirmwarePm @Inject constructor(
         super.onCreate()
 
         buttonAction.observable
-            .filter { updateState.value is UpdateState.NotFound }
-            .subscribe(checkUpdatesAction.consumer)
-            .untilDestroy()
-
-        buttonAction.observable
-            .filter { updateState.value is UpdateState.Found }
-            .subscribe(downloadFirmwareAction.consumer)
+            .subscribe {
+                when (updateState.value) {
+                    is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
+                    is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
+                    is UpdateState.BatteryLowLevel -> router.exit()
+                }
+            }
             .untilDestroy()
 
         checkUpdatesAction.observable
@@ -139,6 +137,7 @@ class FirmwarePm @Inject constructor(
             is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is GlucometerLowBatteryLevelError -> updateState.consumer.accept(UpdateState.BatteryLowLevel(resources, error.current))
             else -> super.handleError(error)
         }
     }
@@ -238,6 +237,15 @@ class FirmwarePm @Inject constructor(
             override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = null,
             override val button: String? = null
+        ) : UpdateState()
+
+        data class BatteryLowLevel(
+            val resources: ResourceProvider,
+            val currentLevel: Int,
+            override val title: String = resources.getString(R.string.firmware_title_low_level, currentLevel),
+            override val version: String? = resources.getString(R.string.firmware_description_low_level),
+            override val hint: String? = null,
+            override val button: String? = resources.getString(R.string.firmware_button_close)
         ) : UpdateState()
 
         data class Updated(
