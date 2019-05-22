@@ -583,4 +583,8 @@
     <string name="firmware_update_error_title">Ошибка обновления ПО</string>
     <string name="firmware_update_error_description">Для повторного обновления\n нажмите кнопку "Повторить"</string>
     <string name="firmware_update_error_button">Повторить</string>
+
+    <string name="firmware_offline_error_title">Ошибка подключения</string>
+    <string name="firmware_offline_error_description">Не удалось подключиться к глюкометру</string>
+    <string name="firmware_offline_error_button">Повторить</string>
 </resources>

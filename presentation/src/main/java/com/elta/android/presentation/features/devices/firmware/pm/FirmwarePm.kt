@@ -5,6 +5,7 @@ import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.FirmwareUpdateError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
+import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.utils.log
@@ -80,6 +81,7 @@ class FirmwarePm @Inject constructor(
                     }
                     is UpdateState.FirmwareDownloadingError -> downloadFirmwareAction.consumer.accept(Unit)
                     is UpdateState.FirmwareUpdateError -> startUpdateAction.consumer.accept(Unit)
+                    is UpdateState.GlucometerOfflineError -> startUpdateAction.consumer.accept(Unit)
                 }
             }
             .untilDestroy()
@@ -166,6 +168,7 @@ class FirmwarePm @Inject constructor(
             is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
+            is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
             else -> super.handleError(error)
         }
     }
@@ -302,6 +305,14 @@ class FirmwarePm @Inject constructor(
             override val description: String? = resources.getString(R.string.firmware_update_error_description),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_update_error_button)
+        ) : UpdateState()
+
+        data class GlucometerOfflineError(
+            val resources: ResourceProvider,
+            override val title: String = resources.getString(R.string.firmware_offline_error_title),
+            override val description: String? = resources.getString(R.string.firmware_offline_error_description),
+            override val hint: String? = null,
+            override val button: String? = resources.getString(R.string.firmware_offline_error_button)
         ) : UpdateState()
 
         data class Updated(
