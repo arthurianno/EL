@@ -1,3 +1,6 @@
+### v0.37.0 ###
+- [ELTA-855] - [Android] Share glucose event
+
 ### v0.36.0 ###
 - [ELTA-934] - [Android] Синхронизация с BE
 
