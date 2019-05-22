@@ -73,7 +73,7 @@ class FirmwarePm @Inject constructor(
                 getFirmwareInfoUseCase.execute()
                     .bindProgress()
                     .doOnSubscribe {
-                        updateState.consumer.accept(UpdateState.Progress(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Progress(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
                     .doOnSuccess(::handleFirmwareInfo)
                     .doOnError(::handleError)
@@ -100,7 +100,7 @@ class FirmwarePm @Inject constructor(
                 downloadFirmwareUseCase.execute(params)
                     .bindProgress()
                     .doOnSubscribe {
-                        updateState.consumer.accept(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
                     .doOnSuccess(::handleFirmwareDownloaded)
                     .doOnError(::handleError)
@@ -117,7 +117,7 @@ class FirmwarePm @Inject constructor(
                 updateDeviceFirmwareUseCase.execute(params)
                     .bindProgress()
                     .doOnSubscribe {
-                        updateState.consumer.accept(UpdateState.Updating(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Updating(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
                     }
                     .doOnComplete(::handleFirmwareUpdated)
                     .doOnError(::handleError)
@@ -145,9 +145,9 @@ class FirmwarePm @Inject constructor(
             is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
-            is GlucometerLowBatteryLevelError -> updateState.consumer.accept(UpdateState.BatteryLowLevel(resources, error.current))
-            is FirmwareNotSupportedByAppError -> updateState.consumer.accept(UpdateState.UnsupportedFirmwareVersion(resources))
-            is FirmwareDownloadingError -> updateState.consumer.accept(UpdateState.FirmwareDownloadingError(resources))
+            is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources, error.current))
+            is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
+            is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             else -> super.handleError(error)
         }
     }
@@ -157,12 +157,16 @@ class FirmwarePm @Inject constructor(
         getDeviceInfoAction.consumer.accept(address)
     }
 
+    private fun setState(state: UpdateState) {
+        updateState.consumer.accept(state)
+    }
+
     private fun createGetDeviceInfoUseCaseParams(address: String): GetLastGlucometerInfoUseCase.Params =
         GetLastGlucometerInfoUseCase.Params(address)
 
     private fun handleDeviceInfo(info: GlucometerInfo) {
         deviceInfo.consumer.accept(info)
-        updateState.consumer.accept(UpdateState.Progress(resources, info.softwareVersion?.toString()))
+        setState(UpdateState.Progress(resources, info.softwareVersion?.toString()))
         checkUpdatesAction.consumer.accept(Unit)
     }
 
@@ -171,9 +175,9 @@ class FirmwarePm @Inject constructor(
         deviceInfo.valueOrNull?.let {
             val deviceVersionString = deviceInfo.valueOrNull?.softwareVersion?.toString() ?: "0"
             if (it.isFirmwareNewer(firmware)) {
-                updateState.consumer.accept(UpdateState.Found(resources, firmware.version, deviceVersionString))
+                setState(UpdateState.Found(resources, firmware.version, deviceVersionString))
             } else {
-                updateState.consumer.accept(UpdateState.NotFound(resources, deviceVersionString))
+                setState(UpdateState.NotFound(resources, deviceVersionString))
             }
         }
     }
@@ -193,7 +197,7 @@ class FirmwarePm @Inject constructor(
         )
 
     private fun handleFirmwareUpdated() {
-        updateState.consumer.accept(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
+        setState(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
     }
 
     sealed class UpdateState {
