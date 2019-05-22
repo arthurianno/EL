@@ -8,7 +8,6 @@ import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
-import com.elta.android.common.utils.log
 import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.interactor.isFirmwareNewer
@@ -59,14 +58,10 @@ class FirmwarePm @Inject constructor(
         super.onCreate()
 
         delayedSetStateAction.observable
-            .log("State", "before") { it.javaClass.simpleName }
             .concatMap {
-                val delay = if (
-                    it is UpdateState.Progress || updateState.value.button != null
-                ) 0L else 2L
-                Observable.just(it).delay(delay, TimeUnit.SECONDS, Schedulers.single())
+                val delay = if (it is UpdateState.Progress || updateState.hasValue()) ZERO_DELAY else NEXT_STATE_DELAY
+                Observable.just(it).delay(delay, TimeUnit.MILLISECONDS, Schedulers.single())
             }
-            .log("State", "after") { it.javaClass.simpleName }
             .subscribe(updateState.consumer)
             .untilDestroy()
 
@@ -145,7 +140,7 @@ class FirmwarePm @Inject constructor(
                     .andThen(
                         Completable.fromCallable {
                             router.exit()
-                        }.delay(5, TimeUnit.SECONDS)
+                        }.delay(NEXT_STATE_DELAY, TimeUnit.MILLISECONDS)
                     )
             }
             .retry()
@@ -223,6 +218,8 @@ class FirmwarePm @Inject constructor(
         setState(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
     }
 
+    private inline fun UpdateState?.hasUserInput(): Boolean = this?.button != null
+
     private inline fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
         return this
             .doOnSubscribe { progressConsumer.accept(true) }
@@ -235,5 +232,10 @@ class FirmwarePm @Inject constructor(
             .doOnSubscribe { progressConsumer.accept(true) }
             .doOnComplete { progressConsumer.accept(false) }
             .doOnError { progressConsumer.accept(false) }
+    }
+
+    companion object {
+        private const val ZERO_DELAY = 0L
+        private const val NEXT_STATE_DELAY = 1500L
     }
 }
