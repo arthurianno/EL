@@ -35,7 +35,7 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
         pm.updateState.bindTo {
             with(it) {
                 updateTitleView.text = title
-                updateVersionView.text = version
+                updateDescriptionView.text = description
                 updateHintView.toggleView(hint != null)
                 actionButtonView.text = button
                 actionButtonView.toggleView(button != null)

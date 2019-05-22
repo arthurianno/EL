@@ -196,7 +196,7 @@ class FirmwarePm @Inject constructor(
     sealed class UpdateState {
 
         abstract val title: String
-        abstract val version: String?
+        abstract val description: String?
         abstract val hint: String?
         abstract val button: String?
 
@@ -204,7 +204,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val currentVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_checking_updates),
-            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = null,
             override val button: String? = null
         ) : UpdateState()
@@ -213,7 +213,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val currentVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_updates_not_found),
-            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_button_check_updates)
         ) : UpdateState()
@@ -223,7 +223,7 @@ class FirmwarePm @Inject constructor(
             val newVersion: String,
             val currentVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_updates_found, newVersion),
-            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = resources.getString(R.string.firmware_updates_hint),
             override val button: String? = resources.getString(R.string.firmware_button_update)
         ) : UpdateState()
@@ -232,7 +232,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val currentVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_downloading),
-            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = null,
             override val button: String? = null
         ) : UpdateState()
@@ -241,7 +241,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val currentVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_updating),
-            override val version: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+            override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
             override val hint: String? = null,
             override val button: String? = null
         ) : UpdateState()
@@ -250,7 +250,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val currentLevel: Int,
             override val title: String = resources.getString(R.string.firmware_title_low_level, currentLevel),
-            override val version: String? = resources.getString(R.string.firmware_description_low_level),
+            override val description: String? = resources.getString(R.string.firmware_description_low_level),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_button_close)
         ) : UpdateState()
@@ -258,7 +258,7 @@ class FirmwarePm @Inject constructor(
         data class UnsupportedFirmwareVersion(
             val resources: ResourceProvider,
             override val title: String = resources.getString(R.string.firmware_title_unsupported_version),
-            override val version: String? = resources.getString(R.string.firmware_description_unsupported_version),
+            override val description: String? = resources.getString(R.string.firmware_description_unsupported_version),
             override val hint: String? = null,
             override val button: String? = resources.getString(R.string.firmware_button_unsupported_version)
         ): UpdateState()
@@ -267,7 +267,7 @@ class FirmwarePm @Inject constructor(
             val resources: ResourceProvider,
             val newVersion: String? = null,
             override val title: String = resources.getString(R.string.firmware_title_updated),
-            override val version: String? = newVersion?.let { resources.getString(R.string.firmware_version_new, it) },
+            override val description: String? = newVersion?.let { resources.getString(R.string.firmware_version_new, it) },
             override val hint: String? = null,
             override val button: String? = null
         ) : UpdateState()
