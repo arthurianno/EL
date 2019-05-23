@@ -9,6 +9,9 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.core.ui.dialog.buttons
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
@@ -71,24 +74,11 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
             }
 
         pm.likeAppDialogControl.bindLikeAppDialog()
-        pm.googlePlayDialogControl.bindDialog()
-        pm.feedbackDialogControl.bindDialog()
+        pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
-    private fun DialogControl<DialogData, MainRecordsPm.DialogResult>.bindDialog() =
-        bindTo { data, dc ->
-            MaterialDialog.Builder(requireActivity())
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.NEGATIVE) }
-                .build()
-        }
-
-    private fun DialogControl<DialogData, MainRecordsPm.DialogResult>.bindLikeAppDialog() =
+    private fun DialogControl<DialogData, DialogResult>.bindLikeAppDialog() =
         bindTo { data, dc ->
             val dialogView =
                 LayoutInflater
@@ -100,10 +90,7 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
             MaterialDialog.Builder(requireActivity())
                 .customView(dialogView, false)
                 .cancelable(false)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(MainRecordsPm.DialogResult.NEGATIVE) }
+                .buttons(dc, data)
                 .build()
         }
 

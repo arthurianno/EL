@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
@@ -222,6 +223,10 @@ object Screens {
 
     data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {
         override fun getFragment() = DeviceInfoFragment.newInstance(name, address)
+    }
+
+    data class UpdateFirmware(val address: String) : SupportAppScreen() {
+        override fun getFragment() = FirmwareFragment.newInstance(address)
     }
 
     object CreateRemind : SupportAppScreen() {

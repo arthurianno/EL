@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
@@ -126,8 +127,4 @@ abstract class BaseRemindPm constructor(
     }
 
     private fun String.toSimpleSelectorOption() = SelectorOption(this)
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 }

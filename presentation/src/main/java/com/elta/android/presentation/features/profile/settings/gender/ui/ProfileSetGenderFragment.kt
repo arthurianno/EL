@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.gender.ui
 
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -23,17 +23,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
         pm.checkFemale.bindTo(femaleButtonView)
         pm.saveChangesEnableState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)
-        pm.exitDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(ProfileSetGenderPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(ProfileSetGenderPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     override fun handleBack() {
