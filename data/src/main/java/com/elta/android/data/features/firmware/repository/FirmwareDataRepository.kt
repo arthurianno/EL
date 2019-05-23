@@ -19,6 +19,6 @@ class FirmwareDataRepository @Inject constructor(
     override fun getFirmwareInfo(): Single<Firmware> =
         source.getFirmwareInfo().map(firmwareToDomainMapper::mapFromObject)
 
-    override fun downloadFirmware(firmware: Firmware): Single<FirmwareFile> =
-        source.downloadFirmware(firmware).map(firmwareFileToDomainMapper::mapFromObject)
+    override fun getFirmware(firmware: Firmware): Single<FirmwareFile> =
+        source.getFirmware(firmware).map(firmwareFileToDomainMapper::mapFromObject)
 }

@@ -12,8 +12,8 @@ import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfo
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.interactor.isFirmwareNewer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
-import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
+import com.elta.android.domain.features.firmware.interactor.GetFirmwareUseCase
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.Events
@@ -33,7 +33,7 @@ import javax.inject.Inject
 class FirmwarePm @Inject constructor(
     private val getLastGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
-    private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
+    private val getFirmwareUseCase: GetFirmwareUseCase,
     private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
@@ -125,7 +125,7 @@ class FirmwarePm @Inject constructor(
             .skipWhileInProgress(progressState.observable)
             .map(::createDownloadFirmwareUseCaseParams)
             .flatMapSingle { params ->
-                downloadFirmwareUseCase.execute(params)
+                getFirmwareUseCase.execute(params)
                     .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
                         setState(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
@@ -206,8 +206,8 @@ class FirmwarePm @Inject constructor(
         }
     }
 
-    private fun createDownloadFirmwareUseCaseParams(i: Unit): DownloadFirmwareUseCase.Params =
-        DownloadFirmwareUseCase.Params(firmwareState.value)
+    private fun createDownloadFirmwareUseCaseParams(i: Unit): GetFirmwareUseCase.Params =
+        GetFirmwareUseCase.Params(firmwareState.value)
 
     private fun handleFirmwareDownloaded(file: FirmwareFile) {
         firmwareFileState.consumer.accept(file)

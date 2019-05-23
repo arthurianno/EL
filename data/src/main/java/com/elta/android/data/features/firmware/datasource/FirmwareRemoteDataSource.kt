@@ -18,7 +18,7 @@ class FirmwareRemoteDataSource @Inject constructor(
     override fun getFirmwareInfo(): Single<FirmwareDto> =
         api.getFirmwareInfo()
 
-    override fun downloadFirmware(firmware: Firmware): Single<FirmwareFileDto> =
+    override fun getFirmware(firmware: Firmware): Single<FirmwareFileDto> =
         api.downloadFirmware(firmware.version)
             .map { body ->
                 val file = firmwaresManager.writeToFile(firmware.version, body)
