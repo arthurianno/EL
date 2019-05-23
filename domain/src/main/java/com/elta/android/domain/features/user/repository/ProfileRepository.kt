@@ -11,4 +11,6 @@ interface ProfileRepository {
     fun getProfile(): Single<Profile>
 
     fun getUserId(): Single<Long>
+
+    fun sync(): Completable
 }

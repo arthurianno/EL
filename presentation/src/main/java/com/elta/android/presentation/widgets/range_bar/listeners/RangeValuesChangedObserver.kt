@@ -16,7 +16,6 @@ class RangeValuesChangedObserver(
         }
         val listener = Listener(view, observer)
         observer.onSubscribe(listener)
-        listener.valueListener?.onValuesChanged(view.startValue, view.endValue)
         listener.valueListener?.let {
             view.addOnValuesChangeListener(it)
         }

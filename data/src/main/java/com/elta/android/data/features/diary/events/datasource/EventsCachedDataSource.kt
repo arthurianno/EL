@@ -40,6 +40,11 @@ class EventsCachedDataSource @Inject constructor(
             }
         }
 
+    override fun getEventsById(ids: List<Long>): Observable<List<EventDto>> =
+        Observable.fromCallable {
+            cache.getAll(CommonConditions.ByIds(ids))
+        }.map(fromCacheMapper::mapFromObjects)
+
     override fun addEvents(events: List<EventDto>): Completable =
         Completable.fromCallable {
             cache.add(toCacheMapper.mapFromObjects(events))

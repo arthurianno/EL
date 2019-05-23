@@ -8,7 +8,6 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
@@ -25,8 +24,7 @@ class SocialDataRepository @Inject constructor(
     private val schedulersFacade: SchedulersFacade,
     private val tokenStorage: TokenStorage,
     private val authSocialSource: AuthSocialDataSource,
-    @Remote private val profileSource: ProfileDataSource,
-    private val userHolder: UserHolder
+    @Remote private val profileSource: ProfileDataSource
 ) : SocialRepository {
 
     override fun linkSocialNetwork(network: SocialNetworkType): Completable =
@@ -39,17 +37,16 @@ class SocialDataRepository @Inject constructor(
     override fun unLinkSocialNetwork(network: SocialNetworkType): Completable =
         authSocialSource.unLinkSocialNetwork(network.name)
             .andThen(socialFactory.getDataSource(network).logout())
+            .applyScheduler(schedulersFacade)
 
     override fun loginWithSocialNetwork(network: SocialNetworkType): Single<Boolean> =
         socialFactory.getDataSource(network).getToken().take(1)
             .switchMapSingle { token ->
                 authSocialSource.loginSocialNetwork(network.name, token)
-                    .doOnSuccess { response ->
-                        saveTokens(response.tokens)
-                    }
+                    .applyScheduler(schedulersFacade)
+                    .doOnSuccess { saveTokens(it.tokens) }
                     .flatMap { login ->
                         profileSource.getUserProfile()
-                            .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
                             .map { login }
                     }
             }

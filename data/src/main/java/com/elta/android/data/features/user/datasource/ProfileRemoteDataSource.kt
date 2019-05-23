@@ -21,8 +21,10 @@ class ProfileRemoteDataSource @Inject constructor(
     override fun updateProfile(profile: ProfileDto): Completable =
         api.updateUserSettings(profile)
 
+    @Suppress("MagicNumber")
     override fun getUserProfile(): Single<ProfileDto> =
         api.getUserSettings()
+            .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
             .doOnSuccess(::saveLocalIfNeed)
 
     private fun saveLocalIfNeed(profileDto: ProfileDto) {
@@ -34,5 +36,9 @@ class ProfileRemoteDataSource @Inject constructor(
                 }
             } ?: cache.add(listOf(profileCacheDto))
         }
+    }
+
+    override fun hasProfile(): Single<Boolean> {
+        throw IllegalStateException("hasProfile available only for cached data source")
     }
 }

@@ -195,5 +195,5 @@ class EditEventPm @Inject constructor(
     }
 
     private fun createDeleteEventUseCaseParams(event: Event) =
-        DeleteEventUseCase.Params(event.id, event.type)
+        DeleteEventUseCase.Params(event)
 }

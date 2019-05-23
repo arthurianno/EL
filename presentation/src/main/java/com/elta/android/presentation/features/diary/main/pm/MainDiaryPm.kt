@@ -1,9 +1,14 @@
 package com.elta.android.presentation.features.diary.main.pm
 
+import android.graphics.Bitmap
+import android.net.Uri
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
+import com.elta.android.domain.features.diary.events.interactor.SaveEventBitmapUseCase
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
@@ -15,12 +20,15 @@ import com.nullgr.core.date.isToday
 import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import java.io.File
 import java.util.Date
 import javax.inject.Inject
 
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
+    // todo move to glucose screen
+    private val saveEventBitmapUseCase: SaveEventBitmapUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -35,42 +43,20 @@ class MainDiaryPm @Inject constructor(
     val todayButtonVisibilityState = State<Boolean>()
     val todayClickedAction = Action<Unit>()
 
+    // todo move to glucose screen
+    val createBitmapCommand = Command<Unit>()
+    val getBitmapPathCommand = Command<File>()
+    val shareEventAction = Action<Uri>()
+    val bitmapEventAction = Action<Triple<String, String, Bitmap>>()
+
     private val loadScreenAction = Action<Date>()
     private val selectedDateState = State(Date())
 
     override fun onCreate() {
         super.onCreate()
 
-        selectDateInDialogAction.observable
-            .map { selectedDateState.value }
-            .subscribe(showDatePickerDialogCommand.consumer)
-            .untilDestroy()
-
-        dateInDialogSelectedAction.observable
-            .doOnNext(::passSelectedDate)
-            .subscribe()
-            .untilDestroy()
-
-        dateSelectedAction.observable
-            .doOnNext(::passSelectedDate)
-            .subscribe()
-            .untilDestroy()
-
-        selectedDateState.observable
-            .map { it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR) }
-            .subscribe(monthTitleState.consumer)
-            .untilDestroy()
-
-        selectedDateState.observable
-            .map { !it.isToday() }
-            .subscribe(todayButtonVisibilityState.consumer)
-            .untilDestroy()
-
-        todayClickedAction.observable
-            .map { Date() }
-            .doOnNext(::passSelectedDate)
-            .subscribe()
-            .untilDestroy()
+        observeDates()
+        observeGlucoseActions()
 
         loadScreenAction.observable
             .map(::createUseCaseParams)
@@ -105,6 +91,60 @@ class MainDiaryPm @Inject constructor(
             .untilUnbind()
     }
 
+    private fun observeDates() {
+        selectDateInDialogAction.observable
+            .map { selectedDateState.value }
+            .subscribe(showDatePickerDialogCommand.consumer)
+            .untilDestroy()
+
+        dateInDialogSelectedAction.observable
+            .doOnNext(::passSelectedDate)
+            .subscribe()
+            .untilDestroy()
+
+        dateSelectedAction.observable
+            .doOnNext(::passSelectedDate)
+            .subscribe()
+            .untilDestroy()
+
+        selectedDateState.observable
+            .map { it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR) }
+            .subscribe(monthTitleState.consumer)
+            .untilDestroy()
+
+        selectedDateState.observable
+            .map { !it.isToday() }
+            .subscribe(todayButtonVisibilityState.consumer)
+            .untilDestroy()
+
+        todayClickedAction.observable
+            .map { Date() }
+            .doOnNext(::passSelectedDate)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun observeGlucoseActions() {
+        // todo move to glucose screen
+        shareEventAction.observable
+            .map { Screens.ShareEventScreen(it, resources.getString(R.string.event_share_dialog_title)) }
+            .doOnNext(router::navigateTo)
+            .subscribe()
+            .untilDestroy()
+
+        bitmapEventAction.observable
+            .map(::createBitmapUseCaseParams)
+            .flatMapSingle {
+                saveEventBitmapUseCase.execute(it)
+                    .bindProgress()
+                    .doOnSuccess(getBitmapPathCommand.consumer)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
     private fun handleSuccess(blocks: List<EventsBlock>) {
         items.consumer.accept(
             blocks.mapIndexed { index, event -> mapper.apply { expand = index == 0 }.mapFromObject(event) }
@@ -117,11 +157,20 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun navigateToEventScreen(record: RecordItem) {
+        // todo move to glucose screen
+        if (record.eventType == EventType.GLUCOSE) {
+            createBitmapCommand.consumer.accept(Unit)
+            return
+        }
+
         router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
     }
 
     private fun createUseCaseParams(date: Date) =
         GetEventsByDateUseCase.Params(date)
+
+    private fun createBitmapUseCaseParams(data: Triple<String, String, Bitmap>) =
+        SaveEventBitmapUseCase.Params(data.first, data.second, data.third)
 
     companion object {
         const val FORMAT_MONTH_NAME_AND_YEAR = "LLL yyyy"

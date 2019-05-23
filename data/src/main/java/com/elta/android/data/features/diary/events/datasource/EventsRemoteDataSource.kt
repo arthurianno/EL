@@ -36,6 +36,10 @@ class EventsRemoteDataSource @Inject constructor(
     override fun getEventById(id: String): Single<EventDto> =
         throw UnsupportedOperationException("${this::class.java.simpleName} doesn't support getting event by id.")
 
+    override fun getEventsById(ids: List<Long>): Observable<List<EventDto>> {
+        throw UnsupportedOperationException("${this::class.java.simpleName} doesn't support getting events by id.")
+    }
+
     override fun addEvents(events: List<EventDto>): Completable =
         api.addEvents(events)
             .flatMapCompletable { Completable.complete() }

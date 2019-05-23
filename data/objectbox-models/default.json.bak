@@ -380,9 +380,49 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "13:4893127598039866661",
+      "lastPropertyId": "8:6212590879586954819",
+      "name": "GlucometerInfoCachedDto",
+      "properties": [
+        {
+          "id": "1:2148338596001665644",
+          "name": "id"
+        },
+        {
+          "id": "2:4150497300683907468",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:6053460287085527455",
+          "name": "deviceDate"
+        },
+        {
+          "id": "4:7890009120523723440",
+          "name": "syncDate"
+        },
+        {
+          "id": "5:203315695263249193",
+          "name": "temperature"
+        },
+        {
+          "id": "6:3537436629162817320",
+          "name": "batteryLevel"
+        },
+        {
+          "id": "7:4399329800404962053",
+          "name": "software"
+        },
+        {
+          "id": "8:6212590879586954819",
+          "name": "hardware"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "12:2241636644992725676",
+  "lastEntityId": "13:4893127598039866661",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

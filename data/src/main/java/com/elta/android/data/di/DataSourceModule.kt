@@ -27,6 +27,8 @@ import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
+import com.elta.android.data.features.sync.datasource.LocalSyncCachedDataSource
+import com.elta.android.data.features.sync.datasource.LocalSyncDataSource
 import com.elta.android.data.features.user.datasource.ProfileCachedDataSource
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
@@ -118,4 +120,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindFeedbackRemoteDataSource(source: FeedbackRemoteDataSource): FeedbackDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncChangesCacheDataSource(source: LocalSyncCachedDataSource): LocalSyncDataSource
 }

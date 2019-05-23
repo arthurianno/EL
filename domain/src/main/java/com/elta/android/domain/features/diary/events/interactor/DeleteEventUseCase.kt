@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.diary.events.interactor
 
-import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -14,8 +14,8 @@ class DeleteEventUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Completable {
         val p = checkNotNull(params)
-        return repo.deleteEvent(p.eventId, p.type)
+        return repo.deleteEvent(p.event)
     }
 
-    data class Params(val eventId: String, val type: EventType)
+    data class Params(val event: Event)
 }
