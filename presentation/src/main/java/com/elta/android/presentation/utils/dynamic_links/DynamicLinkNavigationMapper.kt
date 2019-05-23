@@ -22,13 +22,11 @@ object DynamicLinkNavigationMapper {
             token != null && uri.lastPathSegment.equals(VERIFY_EMAIL_PATH, true) ->
                 Screens.EmailConfirmation(token)
             // todo test inapp messaging(temporally solution)
-            screen != null && uri.lastPathSegment.equals(IN_APP_MESSAGE_PATH, true) -> {
-                if (screen == SETTINGS_SCREEN) {
-                    Screens.ProfileSettings
-                } else {
-                    Screens.HomeFlow
+            screen != null && uri.lastPathSegment.equals(IN_APP_MESSAGE_PATH, true) ->
+                when (screen) {
+                    SETTINGS_SCREEN -> Screens.ProfileSettings
+                    else -> Screens.HomeFlow
                 }
-            }
             else -> null
         }
     }
