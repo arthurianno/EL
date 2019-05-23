@@ -41,11 +41,12 @@ class ConnectDevicePm @Inject constructor(
     val connectDeviceAction = Action<Unit>()
     val connectDeviceEnabledState = State(false)
 
+    val startScanAction = Action<Unit>()
     val toAppAction = Action<Unit>()
 
     val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
 
-    val state = State(ViewState.SEARCH)
+    val state = State(ViewState.HOW_TO_CONNECT)
 
     val btControl = bluetoothControl()
 
@@ -57,7 +58,6 @@ class ConnectDevicePm @Inject constructor(
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
-    private val startScanAction = Action<Unit>()
     private val startSyncAction = Action<Unit>()
     private val syncProgressState = State(false)
 
@@ -104,7 +104,6 @@ class ConnectDevicePm @Inject constructor(
         bindClicksAndEvents()
 
         Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
             btControl.bluetoothEnabledAction.observable,
             btControl.locationPermissionsGrantedAction.observable,
             btControl.locationEnabledAction.observable
@@ -135,6 +134,9 @@ class ConnectDevicePm @Inject constructor(
         startScanAction.observable
             .flatMap {
                 findGlucometersUseCase.execute()
+                    .doOnSubscribe {
+                        state.consumer.accept(ViewState.SEARCH)
+                    }
                     .doOnNext(::handleSearchResults)
                     .doOnError(::handleError)
             }
@@ -274,6 +276,6 @@ class ConnectDevicePm @Inject constructor(
         )
 
     enum class ViewState {
-        SEARCH, FOUND, CONNECTED, SYNC_COMPLETED
+        HOW_TO_CONNECT, SEARCH, FOUND, CONNECTED, SYNC_COMPLETED
     }
 }
