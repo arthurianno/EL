@@ -1,6 +1,6 @@
 package com.elta.android.data.features.firmware.datasource
 
-import com.elta.android.common.errors.NoSuchFirmare
+import com.elta.android.common.errors.NoSuchFirmware
 import com.elta.android.data.features.firmware.dto.FirmwareDto
 import com.elta.android.data.features.firmware.dto.FirmwareFileDto
 import com.elta.android.domain.features.firmware.model.Firmware
@@ -19,6 +19,6 @@ class FirmwareLocalDataSource @Inject constructor(
         Single.fromCallable {
             firmwaresManager.getFile(firmware.version)?.let { file ->
                 firmware.toFirmwareFileDto(file)
-            } ?: throw NoSuchFirmare
-        }.validateFileHash(firmware, NoSuchFirmare)
+            } ?: throw NoSuchFirmware
+        }.validateFileHash(firmware, NoSuchFirmware)
 }

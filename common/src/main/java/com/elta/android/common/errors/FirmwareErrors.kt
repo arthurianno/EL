@@ -9,4 +9,4 @@ class FirmwareUpdateError(
     message: String
 ) : RuntimeException(message)
 
-object NoSuchFirmare : RuntimeException()
+object NoSuchFirmware : RuntimeException()

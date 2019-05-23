@@ -2,7 +2,7 @@ package com.elta.android.data.features.firmware.repository
 
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
-import com.elta.android.common.errors.NoSuchFirmare
+import com.elta.android.common.errors.NoSuchFirmware
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
 import com.elta.android.data.features.firmware.dto.FirmwareDto
@@ -27,7 +27,7 @@ class FirmwareDataRepository @Inject constructor(
         localSource.getFirmware(firmware)
             .onErrorResumeNext { error ->
                 when (error) {
-                    is NoSuchFirmare -> remoteSource.getFirmware(firmware)
+                    is NoSuchFirmware -> remoteSource.getFirmware(firmware)
                     else -> Single.error(error)
                 }
             }
