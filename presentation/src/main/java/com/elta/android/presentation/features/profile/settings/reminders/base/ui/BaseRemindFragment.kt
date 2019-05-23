@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.profile.settings.reminders.base.u
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog

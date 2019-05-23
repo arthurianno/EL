@@ -1,3 +1,5 @@
+@file:Suppress("SwallowedException")
+
 package com.elta.android.data.features.firmware.datasource
 
 import android.content.Context

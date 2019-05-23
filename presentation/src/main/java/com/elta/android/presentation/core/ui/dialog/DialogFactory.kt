@@ -40,4 +40,3 @@ fun MaterialDialog.Builder.buttons(
                 .onPositive { _, _ -> dc.sendResult(DialogResult.POSITIVE) }
         }
     }
-

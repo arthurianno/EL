@@ -78,7 +78,7 @@ class DeviceInfoPm @Inject constructor(
 
         checkUpdateAction.observable
             .skipWhileInProgress()
-            .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value))}
+            .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
             .untilDestroy()
     }
 

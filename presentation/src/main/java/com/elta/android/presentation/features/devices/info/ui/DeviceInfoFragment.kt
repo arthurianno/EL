@@ -39,7 +39,7 @@ class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
         checkUpdateButtonView.clicks().bindTo(pm.checkUpdateAction)
         pm.nameDeviceState.bindTo(titleTextView.text())
         pm.descriptionAddressState.bindTo(descriptionTextView.text())
-        pm.deleteDeviceDialogControl.bindTo { data, dc -> createDialog(this, dc, data)}
+        pm.deleteDeviceDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

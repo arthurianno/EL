@@ -38,7 +38,6 @@ class FirmwarePm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-
     val buttonAction = Action<Unit>()
     val updateState = State<UpdateState>(UpdateState.Progress(resources))
 
@@ -59,9 +58,34 @@ class FirmwarePm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
 
+        bindStateBehavior()
+        bindActions()
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
+            is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
+            is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
+            is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
+            is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
+            else -> super.handleError(error)
+        }
+    }
+
+    fun setDeviceAddress(address: String) {
+        deviceAddressState.consumer.accept(address)
+        getDeviceInfoAction.consumer.accept(address)
+    }
+
+    private fun bindStateBehavior() {
         delayedSetStateAction.observable
             .concatMap {
-                val delay = if (it is UpdateState.Progress || updateState.valueOrNull.hasUserInput()) ZERO_DELAY else NEXT_STATE_DELAY
+                val delay = if (it is UpdateState.Progress || updateState.valueOrNull.hasUserInput()) ZERO_DELAY
+                else NEXT_STATE_DELAY
                 Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
             }
             .subscribe(updateState.consumer)
@@ -92,14 +116,16 @@ class FirmwarePm @Inject constructor(
                 }
             }
             .untilDestroy()
+    }
 
+    private fun bindActions() {
         checkUpdatesAction.observable
             .skipWhileInProgress(progressState.observable)
             .flatMapSingle {
                 getFirmwareInfoUseCase.execute()
                     .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
-                        setState(UpdateState.Progress(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Progress(resources, getDeviceVersion()))
                     }
                     .doOnSuccess(::handleFirmwareInfo)
                     .doOnError(::handleError)
@@ -128,7 +154,7 @@ class FirmwarePm @Inject constructor(
                 getFirmwareUseCase.execute(params)
                     .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
-                        setState(UpdateState.Downloading(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Downloading(resources, getDeviceVersion()))
                     }
                     .doOnSuccess(::handleFirmwareDownloaded)
                     .doOnError(::handleError)
@@ -144,7 +170,7 @@ class FirmwarePm @Inject constructor(
                 updateDeviceFirmwareUseCase.execute(params)
                     .bindProgressExtended(progressState.consumer)
                     .doOnSubscribe {
-                        setState(UpdateState.Updating(resources, deviceInfo.valueOrNull?.softwareVersion?.toString()))
+                        setState(UpdateState.Updating(resources, getDeviceVersion()))
                     }
                     .doOnComplete(::handleFirmwareUpdated)
                     .doOnError(::handleError)
@@ -160,25 +186,6 @@ class FirmwarePm @Inject constructor(
         )
             .subscribe(startUpdateAction.consumer)
             .untilDestroy()
-    }
-
-    override fun handleError(error: Throwable) {
-        when (error) {
-            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
-            is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
-            is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
-            is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
-            is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
-            is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
-            else -> super.handleError(error)
-        }
-    }
-
-    fun setDeviceAddress(address: String) {
-        deviceAddressState.consumer.accept(address)
-        getDeviceInfoAction.consumer.accept(address)
     }
 
     private fun setState(state: UpdateState) {
@@ -197,7 +204,7 @@ class FirmwarePm @Inject constructor(
     private fun handleFirmwareInfo(firmware: Firmware) {
         firmwareState.consumer.accept(firmware)
         deviceInfo.valueOrNull?.let {
-            val deviceVersionString = deviceInfo.valueOrNull?.softwareVersion?.toString() ?: "0"
+            val deviceVersionString = getDeviceVersion() ?: "0"
             if (it.isFirmwareNewer(firmware)) {
                 setState(UpdateState.Found(resources, firmware.version, deviceVersionString))
             } else {
@@ -225,6 +232,8 @@ class FirmwarePm @Inject constructor(
     }
 
     private inline fun UpdateState?.hasUserInput(): Boolean = this?.button != null
+
+    private inline fun getDeviceVersion(): String? = deviceInfo.valueOrNull?.softwareVersion?.toString()
 
     private inline fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
         return this

@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.EventType.*
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
@@ -181,7 +180,7 @@ abstract class BaseEventPm constructor(
     }
 
     private fun generateChooserId() = when (eventTypeState.value) {
-        INSULIN, ACTIVITY -> formSelector.option.value.meta.toString()
+        EventType.INSULIN, EventType.ACTIVITY -> formSelector.option.value.meta.toString()
         else -> null
     }
 

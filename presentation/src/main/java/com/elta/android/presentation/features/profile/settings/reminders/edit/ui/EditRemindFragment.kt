@@ -2,10 +2,8 @@ package com.elta.android.presentation.features.profile.settings.reminders.edit.u
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
-import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.base.ui.BaseRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
 import com.elta.android.presentation.utils.bundle

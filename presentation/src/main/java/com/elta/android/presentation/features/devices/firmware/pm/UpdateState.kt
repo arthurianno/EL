@@ -16,7 +16,9 @@ sealed class UpdateState {
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_checking_updates),
-        override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+        override val description: String? = currentVersion?.let {
+            resources.getString(R.string.firmware_version_current, it)
+        },
         override val hint: String? = null,
         override val button: String? = null
     ) : UpdateState()
@@ -26,7 +28,9 @@ sealed class UpdateState {
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_updates_not_found),
-        override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+        override val description: String? = currentVersion?.let {
+            resources.getString(R.string.firmware_version_current, it)
+        },
         override val hint: String? = null,
         override val button: String? = resources.getString(R.string.firmware_button_check_updates)
     ) : UpdateState()
@@ -37,7 +41,9 @@ sealed class UpdateState {
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_updates_found, newVersion),
-        override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+        override val description: String? = currentVersion?.let {
+            resources.getString(R.string.firmware_version_current, it)
+        },
         override val hint: String? = resources.getString(R.string.firmware_updates_hint),
         override val button: String? = resources.getString(R.string.firmware_button_update)
     ) : UpdateState()
@@ -47,7 +53,9 @@ sealed class UpdateState {
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_downloading),
-        override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+        override val description: String? = currentVersion?.let {
+            resources.getString(R.string.firmware_version_current, it)
+        },
         override val hint: String? = null,
         override val button: String? = null
     ) : UpdateState()
@@ -57,7 +65,9 @@ sealed class UpdateState {
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_updating),
-        override val description: String? = currentVersion?.let { resources.getString(R.string.firmware_version_current, it) },
+        override val description: String? = currentVersion?.let {
+            resources.getString(R.string.firmware_version_current, it)
+        },
         override val hint: String? = null,
         override val button: String? = null
     ) : UpdateState()
@@ -112,7 +122,9 @@ sealed class UpdateState {
         val newVersion: String? = null,
         override val icon: Int = R.drawable.ic_sync,
         override val title: String = resources.getString(R.string.firmware_title_updated),
-        override val description: String? = newVersion?.let { resources.getString(R.string.firmware_version_new, it) },
+        override val description: String? = newVersion?.let {
+            resources.getString(R.string.firmware_version_new, it)
+        },
         override val hint: String? = null,
         override val button: String? = null
     ) : UpdateState()

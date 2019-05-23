@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.profile.settings.gender.ui
 
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
