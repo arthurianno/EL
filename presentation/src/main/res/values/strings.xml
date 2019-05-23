@@ -563,8 +563,8 @@
     <string name="firmware_title_downloading">Загрузка обновлений…</string>
     <string name="firmware_title_updating">Обновление ПО…</string>
     <string name="firmware_title_updated">Обновление ПО завершено</string>
-    <string name="firmware_title_low_level">Низкий уровень заряда\nбатареи глюкометра: %d</string>
-    <string name="firmware_description_low_level">Для обновления необходимо заменить элемент питания</string>
+    <string name="firmware_title_low_level">Низкий уровень заряда\nбатареи глюкометра</string>
+    <string name="firmware_description_low_level">Для обновления необходимо заменить\nэлемент питания</string>
     <string name="firmware_title_unsupported_version">Внимание</string>
     <string name="firmware_description_unsupported_version">Для обновления версии прошивки глюкометра,\nнеобходимо обновить приложение</string>
     <string name="firmware_button_unsupported_version">Обновить приложение</string>

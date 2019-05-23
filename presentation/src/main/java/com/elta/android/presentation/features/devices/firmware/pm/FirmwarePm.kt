@@ -167,7 +167,7 @@ class FirmwarePm @Inject constructor(
             is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
             is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
-            is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources, error.current))
+            is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
             is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))

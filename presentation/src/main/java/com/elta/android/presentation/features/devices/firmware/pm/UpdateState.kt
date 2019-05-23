@@ -64,12 +64,11 @@ sealed class UpdateState {
 
     data class BatteryLowLevel(
         val resources: ResourceProvider,
-        val currentLevel: Int,
-        override val icon: Int = R.drawable.ic_sync,
-        override val title: String = resources.getString(R.string.firmware_title_low_level, currentLevel),
+        override val icon: Int = R.drawable.ic_low_battery,
+        override val title: String = resources.getString(R.string.firmware_title_low_level),
         override val description: String? = resources.getString(R.string.firmware_description_low_level),
         override val hint: String? = null,
-        override val button: String? = resources.getString(R.string.firmware_button_close)
+        override val button: String? = null
     ) : UpdateState()
 
     data class UnsupportedFirmwareVersion(
