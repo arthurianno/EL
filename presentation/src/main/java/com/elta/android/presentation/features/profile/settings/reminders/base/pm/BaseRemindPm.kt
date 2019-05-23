@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
+import com.elta.android.presentation.jobs.ReminderWorker
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
@@ -19,6 +20,7 @@ import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
 
 abstract class BaseRemindPm constructor(
+    protected val remindersWorker: ReminderWorker,
     services: ServiceFacade
 ) : BasePm(services) {
 

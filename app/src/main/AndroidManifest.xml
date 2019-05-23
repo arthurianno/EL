@@ -63,5 +63,8 @@
             android:name="io.fabric.ApiKey"
             android:value="920aba3e4b6a09e14708096e535391e22085e85f" />
 
+        <receiver android:name=".presentation.features.profile.settings.reminders.utils.ReminderBootReceiver" />
+        <receiver android:name=".presentation.features.profile.settings.reminders.utils.ReminderNotificationReceiver" />
+
     </application>
 </manifest>

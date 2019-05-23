@@ -26,4 +26,5 @@ sealed class Events : Event {
     object DeviceChanged : Events()
     data class SyncProgress(val inProgress: Boolean) : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
+    object BootCompleted : Events()
 }

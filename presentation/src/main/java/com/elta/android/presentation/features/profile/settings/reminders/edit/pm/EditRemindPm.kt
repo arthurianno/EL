@@ -23,8 +23,9 @@ class EditRemindPm @Inject constructor(
     private val deleteReminderUseCase: DeleteReminderUseCase,
     private val getReminderByIdUseCase: GetReminderByIdUseCase,
     private val updateReminderUseCase: UpdateReminderUseCase,
+    reminderWorker: ReminderWorker,
     services: ServiceFacade
-) : BaseRemindPm(services) {
+) : BaseRemindPm(reminderWorker, services) {
 
     val deleteRemindAction = Action<Unit>()
     val deleteRemindDialogControl = dialogControl<DialogData, DialogResult>()
@@ -53,7 +54,7 @@ class EditRemindPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess { id ->
-                        ReminderWorker.startReminder(id, true)
+                        remindersWorker.cancelReminder(id)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleDeleted)
@@ -71,8 +72,8 @@ class EditRemindPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess { id ->
-                        ReminderWorker.cancelReminder(id)
-                        ReminderWorker.startReminder(id)
+                        remindersWorker.cancelReminder(id)
+                        remindersWorker.addReminder(reminderState.value)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)
