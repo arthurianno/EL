@@ -41,6 +41,7 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
         actionButtonView.clicks().bindTo(pm.buttonAction)
         pm.updateState.bindTo {
             with(it) {
+                updateIconView.setImageResource(icon)
                 updateTitleView.text = title
                 updateDescriptionView.text = description
                 updateHintView.toggleView(hint != null)
