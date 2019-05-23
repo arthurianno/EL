@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.devices.firmware.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
@@ -14,6 +15,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.toggleView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_update_firmware.*
+import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class FirmwareFragment : BaseFragment<FirmwarePm>() {
 
@@ -27,6 +29,11 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
         super.onCreate(savedInstanceState)
         val address = arguments?.getString(EXTRA_ADDRESS)
         address?.let { presentationModel.setDeviceAddress(address) }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 
     override fun onBindPresentationModel(pm: FirmwarePm) {
