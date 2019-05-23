@@ -1,6 +1,8 @@
 package com.elta.android.data.features.firmware.repository
 
+import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.common.errors.NoSuchFirmare
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
 import com.elta.android.data.features.firmware.dto.FirmwareDto
@@ -14,12 +16,20 @@ import javax.inject.Inject
 class FirmwareDataRepository @Inject constructor(
     private val firmwareToDomainMapper: Mapper<FirmwareDto, Firmware>,
     private val firmwareFileToDomainMapper: Mapper<FirmwareFileDto, FirmwareFile>,
-    @Remote private val source: FirmwareDataSource
+    @Remote private val remoteSource: FirmwareDataSource,
+    @Cache private val localSource: FirmwareDataSource
 ) : FirmwareRepository {
 
     override fun getFirmwareInfo(): Single<Firmware> =
-        source.getFirmwareInfo().map(firmwareToDomainMapper::mapFromObject)
+        remoteSource.getFirmwareInfo().map(firmwareToDomainMapper::mapFromObject)
 
     override fun getFirmware(firmware: Firmware): Single<FirmwareFile> =
-        source.getFirmware(firmware).map(firmwareFileToDomainMapper::mapFromObject)
+        localSource.getFirmware(firmware)
+            .onErrorResumeNext { error ->
+                when (error) {
+                    is NoSuchFirmare -> remoteSource.getFirmware(firmware)
+                    else -> Single.error(error)
+                }
+            }
+            .map(firmwareFileToDomainMapper::mapFromObject)
 }
