@@ -14,7 +14,7 @@ sealed class UpdateState {
     data class Progress(
         val resources: ResourceProvider,
         val currentVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_checking_updates),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
@@ -26,7 +26,7 @@ sealed class UpdateState {
     data class NotFound(
         val resources: ResourceProvider,
         val currentVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_updates_not_found),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
@@ -39,7 +39,7 @@ sealed class UpdateState {
         val resources: ResourceProvider,
         val newVersion: String,
         val currentVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_updates_found, newVersion),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
@@ -51,7 +51,7 @@ sealed class UpdateState {
     data class Downloading(
         val resources: ResourceProvider,
         val currentVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_downloading),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
@@ -63,7 +63,7 @@ sealed class UpdateState {
     data class Updating(
         val resources: ResourceProvider,
         val currentVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_updating),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
@@ -74,25 +74,25 @@ sealed class UpdateState {
 
     data class BatteryLowLevel(
         val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_low_battery,
+        override val icon: Int = R.drawable.ic_firmware_error_low_battery,
         override val title: String = resources.getString(R.string.firmware_title_low_level),
         override val description: String? = resources.getString(R.string.firmware_description_low_level),
         override val hint: String? = null,
-        override val button: String? = null
+        override val button: String? = resources.getString(R.string.firmware_button_close)
     ) : UpdateState()
 
     data class UnsupportedFirmwareVersion(
         val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_sync,
-        override val title: String = resources.getString(R.string.firmware_title_unsupported_version),
-        override val description: String? = resources.getString(R.string.firmware_description_unsupported_version),
+        override val icon: Int = R.drawable.ic_firmware_error_app_version,
+        override val title: String = resources.getString(R.string.firmware_unsupported_version_title),
+        override val description: String? = resources.getString(R.string.firmware_unsupported_version_description),
         override val hint: String? = null,
-        override val button: String? = resources.getString(R.string.firmware_button_unsupported_version)
+        override val button: String? = resources.getString(R.string.firmware_unsupported_version_button)
     ) : UpdateState()
 
     data class FirmwareDownloadingError(
         val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_error_general,
         override val title: String = resources.getString(R.string.firmware_downloading_error_title),
         override val description: String? = resources.getString(R.string.firmware_downloading_error_description),
         override val hint: String? = null,
@@ -101,7 +101,7 @@ sealed class UpdateState {
 
     data class FirmwareUpdateError(
         val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_error_general,
         override val title: String = resources.getString(R.string.firmware_update_error_title),
         override val description: String? = resources.getString(R.string.firmware_update_error_description),
         override val hint: String? = null,
@@ -110,7 +110,7 @@ sealed class UpdateState {
 
     data class GlucometerOfflineError(
         val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_error_general,
         override val title: String = resources.getString(R.string.firmware_offline_error_title),
         override val description: String? = resources.getString(R.string.firmware_offline_error_description),
         override val hint: String? = null,
@@ -120,7 +120,7 @@ sealed class UpdateState {
     data class Updated(
         val resources: ResourceProvider,
         val newVersion: String? = null,
-        override val icon: Int = R.drawable.ic_sync,
+        override val icon: Int = R.drawable.ic_firmware_logo,
         override val title: String = resources.getString(R.string.firmware_title_updated),
         override val description: String? = newVersion?.let {
             resources.getString(R.string.firmware_version_new, it)
