@@ -1,22 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <include
-        layout="@layout/layout_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/toolbarView"
+        layout="@layout/layout_toolbar" />
 
-    <com.elta.android.presentation.core.ui.state_view.StateWidget
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/stateIconView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        app:state_button="@string/registration_main_button_continue"
-        app:state_description="@string/registration_activate_description"
-        app:state_icon="@drawable/ic_activation"
-        app:state_title="@string/registration_activate_title" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/stateTitleView"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarView"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:srcCompat="@drawable/ic_send_mail" />
 
-</LinearLayout>
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/stateTitleView"
+        style="@style/Headline2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:text="@string/registration_activate_title"
+        app:layout_constraintBottom_toTopOf="@+id/stateDescriptionView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stateIconView" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/stateDescriptionView"
+        style="@style/Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:text="@string/registration_activate_description"
+        app:layout_constraintBottom_toTopOf="@+id/stateButtonView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stateTitleView" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/stateButtonView"
+        style="@style/Button.Large"
+        android:text="@string/registration_main_button_continue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

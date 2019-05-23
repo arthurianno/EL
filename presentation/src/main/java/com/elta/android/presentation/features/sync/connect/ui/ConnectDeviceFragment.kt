@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.ui
 
 import android.content.Intent
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
@@ -19,6 +20,7 @@ import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_sync_connect.*
+import kotlinx.android.synthetic.main.layout_sync_state_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_device_found.*
 import kotlinx.android.synthetic.main.layout_sync_state_sync_completed.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -47,6 +49,9 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
         pm.state.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
+                if (view.id == R.id.stateConnectView) {
+                    (stepsView.background as AnimationDrawable).start()
+                }
             }
         }
 
