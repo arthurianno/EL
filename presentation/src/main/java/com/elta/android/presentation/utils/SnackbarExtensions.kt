@@ -25,7 +25,7 @@ fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {
 
 fun Snackbar.applySnackbarHeight(): Snackbar {
     with(view) {
-        layoutParams?.height = view.resources.getDimensionPixelSize(R.dimen.large_button_height)
+        minimumHeight = view.resources.getDimensionPixelSize(R.dimen.large_button_height)
     }
     return this
 }
