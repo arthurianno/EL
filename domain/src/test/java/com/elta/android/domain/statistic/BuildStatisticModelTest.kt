@@ -186,7 +186,7 @@ class BuildStatisticModelTest {
     }
 
     private fun getExpectedBreadStatistic(): BreadStatisticModelByPeriod {
-        return BreadStatisticModelByPeriod(averageLevel = 10.0)
+        return BreadStatisticModelByPeriod(averageLevel = 20.0)
     }
 
     private fun getExpectedActivityStatistic(): ActivityStatisticModel {
