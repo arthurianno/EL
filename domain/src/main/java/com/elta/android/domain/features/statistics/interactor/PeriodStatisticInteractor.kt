@@ -149,34 +149,34 @@ fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): In
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
 
-    var bolusCount = 0
-    var basalCount = 0
-    var count = 0
+    val daysWithBolusEvents = mutableSetOf<Date>()
+    val daysWithBasalEvents = mutableSetOf<Date>()
+    val daysWithEvents = mutableSetOf<Date>()
 
     insulinEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
             if (event.isBolusInsulin()) {
                 totalBolusLevel += value
-                bolusCount++
+                daysWithBolusEvents.add(event.additionTime.withoutTime())
             }
 
             if (event.isBasalInsulin()) {
                 totalBasalLevel += value
-                basalCount++
+                daysWithBasalEvents.add(event.additionTime.withoutTime())
             }
 
             if (event.isNotMixedInsulin()) {
                 totalLevel += value
-                count++
+                daysWithEvents.add(event.additionTime.withoutTime())
             }
         }
     }
 
     return InsulinStatisticModelByPeriod(
-        averageBolusLevel = totalBolusLevel.average(bolusCount),
-        averageBasalLevel = totalBasalLevel.average(basalCount),
-        averageLevel = totalLevel.average(count)
+        averageBolusLevel = totalBolusLevel.average(daysWithBolusEvents.size),
+        averageBasalLevel = totalBasalLevel.average(daysWithBasalEvents.size),
+        averageLevel = totalLevel.average(daysWithEvents.size)
     )
 }
 
