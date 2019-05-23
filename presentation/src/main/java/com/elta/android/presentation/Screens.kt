@@ -9,6 +9,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -18,13 +20,12 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
+import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
-import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
-import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
@@ -160,7 +161,10 @@ object Screens {
     }
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
-        override fun getFragment() = EditEventFragment.newInstance(eventId, eventType)
+        override fun getFragment() = when (eventType) {
+            EventType.GLUCOSE -> GlucoseEventFragment.newInstance(eventId)
+            else -> EditEventFragment.newInstance(eventId, eventType)
+        }
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {

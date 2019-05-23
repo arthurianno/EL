@@ -77,7 +77,6 @@ class MainRecordsPm @Inject constructor(
 
         bus.clicks<Clicks.RecordClicked>()
             .map { it.item }
-            .filter { it.eventType != EventType.GLUCOSE } // TODO
             .doOnNext(::navigateToEventScreen)
             .subscribe()
             .untilUnbind()

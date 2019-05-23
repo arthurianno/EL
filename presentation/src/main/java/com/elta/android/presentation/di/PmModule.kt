@@ -24,6 +24,7 @@ import com.elta.android.presentation.features.observers.invite.pm.InviteObserver
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
+import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
@@ -175,6 +176,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EditEventPm::class)
     abstract fun bindEditEventPm(pm: EditEventPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(GlucoseEventPm::class)
+    abstract fun bindGlucoseEventPm(pm: GlucoseEventPm): PresentationModel
 
     // SYNC FLOW
     @Binds
