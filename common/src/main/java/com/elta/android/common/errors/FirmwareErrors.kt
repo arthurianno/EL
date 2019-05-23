@@ -8,3 +8,5 @@ data class FirmwareNotSupportedByAppError(
 class FirmwareUpdateError(
     message: String
 ) : RuntimeException(message)
+
+object NoSuchFirmare : RuntimeException()
