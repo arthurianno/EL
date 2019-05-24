@@ -283,7 +283,7 @@ class GlucometersManager @Inject constructor(
 
     private fun isPinError(response: String): Boolean = response == "pin.error"
     private fun isPinCommand(command: String): Boolean = command.startsWith("pin")
-    private fun isPotentialLastEvent(response: String): Boolean = response.contains("9595959595.895895")
+    private fun isPotentialLastEvent(response: String): Boolean = response.contains("rd000000000000000000")
     private fun isOk(response: String): Boolean = response.contains("ok")
 
     private fun FirmwareFile.isSupportedByApplication(): Boolean {
@@ -368,7 +368,7 @@ class GlucometersManager @Inject constructor(
             }
 
     companion object {
-        private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application
+        private const val FIRMWARE_VERSION = "1.8" // version of firmware supported by application
         private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")

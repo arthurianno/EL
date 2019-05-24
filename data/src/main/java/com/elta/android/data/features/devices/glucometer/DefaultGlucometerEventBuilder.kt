@@ -13,9 +13,9 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
 ) : GlucometerEventBuilder {
 
     override fun buildFrom(glucometerId: String, response: String): GlucometerEventDto {
-        val tokens = response.split(".")
-        val dateToken = tokens[1]
-        val temperatureAndValueToken = tokens[2]
+        val tokens = getTokens(response)
+        val dateToken = tokens.first
+        val temperatureAndValueToken = tokens.second
 
         return GlucometerEventDto(
             id = generator.generate(glucometerId, dateToken),
@@ -25,7 +25,14 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         )
     }
 
-    protected open fun extractDate(token: String): Date? = "20$token".toDate("yyyyMMddHHmm")
+    protected open fun getTokens(response: String): Pair<String, String> {
+        val cleaned = response.replace("rd", "")
+        val dateToken = cleaned.substring(0, 12)
+        val temperatureAndValueToken = cleaned.substring(12, cleaned.length)
+        return Pair(dateToken, temperatureAndValueToken)
+    }
+
+    protected open fun extractDate(token: String): Date? = "20$token".toDate("yyyyMMddHHmmss")
 
     protected open fun extractTemperature(token: String): Int? = token.substring(0, 3).toInt()
 
