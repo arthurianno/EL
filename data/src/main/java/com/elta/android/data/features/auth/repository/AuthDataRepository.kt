@@ -6,9 +6,10 @@ import com.elta.android.data.features.auth.dto.EmailStatusDto
 import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
-import com.elta.android.data.features.auth.storage.EmailStorage
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
+import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -18,7 +19,7 @@ class AuthDataRepository @Inject constructor(
     private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
     private val source: AuthDataSource,
-    private val emailStorage: EmailStorage
+    private val userInfoSource: UserInfoDataSource
 ) : AuthRepository {
 
     override fun register(email: String, password: String): Completable =
@@ -27,7 +28,7 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response, email)
             }
             .flatMapCompletable {
-                Completable.complete()
+                userInfoSource.updateUserInfo(createUserInfoDto())
             }
 
     override fun login(email: String, password: String): Single<Boolean> =
@@ -36,17 +37,26 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginDto::isEmailConfirmed)
-            .doOnSuccess { emailStorage.isEmailConfirmed = it }
+            .flatMap {
+                userInfoSource.updateUserInfo(
+                    createUserInfoDto(it)
+                ).toSingleDefault(it)
+            }
 
     override fun isEmailConfirmed(): Single<Boolean> =
-        Single.just(emailStorage.isEmailConfirmed)
+        userInfoSource.getUserInfo()
+            .map { it.isEmailConfirmed }
             .flatMap { isConfirmed ->
                 when (isConfirmed) {
                     true -> Single.just(isConfirmed)
                     else -> source.isEmailConfirmed()
                         .map(EmailStatusDto::isEmailConfirmed)
-                        .onConnectionErrorResumeDefault { Single.just(emailStorage.isEmailConfirmed) }
-                        .doOnSuccess { emailStorage.isEmailConfirmed = it }
+                        .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
+                        .flatMap {
+                            userInfoSource.updateUserInfo(
+                                createUserInfoDto(it)
+                            ).toSingleDefault(it)
+                        }
                 }
             }
 
@@ -70,10 +80,6 @@ class AuthDataRepository @Inject constructor(
         source.confirmEmail(token)
             .andThen(Completable.fromCallable { tokenStorage.refresh() })
 
-    override fun isUserLoggedIn(): Single<Boolean> =
-        Single.just(!tokenStorage.accessToken.isNullOrEmpty() &&
-            !tokenStorage.refreshToken.isNullOrEmpty())
-
     private fun saveUserCredentials(tokens: TokensDto, email: String) {
         saveTokens(tokens)
         userHolder.currentUser = email.hashCode().toLong()
@@ -83,4 +89,13 @@ class AuthDataRepository @Inject constructor(
         tokenStorage.accessToken = tokens.accessToken
         tokenStorage.refreshToken = tokens.refreshToken
     }
+
+    private fun createUserInfoDto(isEmailConfirmed: Boolean = false): UserInfoDto =
+        UserInfoDto(
+            id = userHolder.currentUser,
+            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+            isOnboardingPassed = false,
+            isFeedbackSent = false,
+            isEmailConfirmed = isEmailConfirmed
+        )
 }

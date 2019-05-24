@@ -1,9 +1,8 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
-import com.elta.android.domain.features.auth.interactor.CheckEmailUseCase
-import com.elta.android.domain.features.auth.interactor.IsUserLoggedInUseCase
-import com.elta.android.domain.features.user.interactor.IsOnboardingPassedUseCase
+import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
@@ -19,9 +18,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
-    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
-    private val checkEmailUseCase: CheckEmailUseCase,
-    private val isOnboardingPassedUseCase: IsOnboardingPassedUseCase,
+    private val getUserInfoUseCase: GetUserInfoUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -41,15 +38,15 @@ class AppPm @Inject constructor(
         coldStartAction.observable
             .skipWhileInProgress()
             .flatMapSingle {
-                isUserLoggedInUseCase.execute()
-                    .flatMap { isUserLoggedIn ->
-                        when (isUserLoggedIn) {
-                            true -> checkEmailUseCase.execute()
-                                .flatMap(::checkEmailAndOnboarding)
+                getUserInfoUseCase.execute()
+                    .flatMap { userInfo ->
+                        when (userInfo.isUserLoggedIn) {
+                            true -> checkEmailAndOnboarding(userInfo)
                             else -> Single.just(Unit)
                                 .doOnSuccess { router.newRootFlow(Screens.GreetingFlow) }
                         }
                     }
+                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
                     .bindProgress()
             }
             .retry()
@@ -105,20 +102,17 @@ class AppPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun checkEmailAndOnboarding(isEmailConfirmed: Boolean) =
-        when (isEmailConfirmed) {
-            true -> checkIsOnboardingPassed()
+    private fun checkEmailAndOnboarding(userInfo: UserInfo) =
+        when (userInfo.isEmailConfirmed) {
+            true -> Single.just(Unit)
+                .doOnSuccess { checkIsOnboardingPassed(userInfo) }
             else -> Single.just(Unit)
                 .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
         }
 
-    private fun checkIsOnboardingPassed(): Single<Unit> =
-        isOnboardingPassedUseCase.execute()
-            .doOnSuccess { isOnboardingPassed ->
-                when (isOnboardingPassed) {
-                    true -> router.newRootFlow(Screens.HomeFlow)
-                    else -> router.newRootFlow(Screens.OnBoardingFlow)
-                }
-            }
-            .map { Unit }
+    private fun checkIsOnboardingPassed(userInfo: UserInfo) =
+        when (userInfo.isOnboardingPassed) {
+            true -> router.newRootFlow(Screens.HomeFlow)
+            else -> router.newRootFlow(Screens.OnBoardingFlow)
+        }
 }

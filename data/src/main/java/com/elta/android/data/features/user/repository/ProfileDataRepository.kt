@@ -7,7 +7,7 @@ import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
-import com.elta.android.data.features.user.storage.OnboardingStorage
+import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Completable
@@ -19,7 +19,7 @@ class ProfileDataRepository @Inject constructor(
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
     @Remote private val remoteSource: ProfileDataSource,
-    private val onboardingStorage: OnboardingStorage,
+    private val userInfoDataSource: UserInfoDataSource,
     private val userHolder: UserHolder,
     private val syncManger: LocalSyncManager
 ) : ProfileRepository {
@@ -33,9 +33,7 @@ class ProfileDataRepository @Inject constructor(
                         syncManger.saveAsUpdated(profile)
                     }
             )
-            .andThen(
-                Completable.fromAction { onboardingStorage.isOnboardingPassed = true }
-            )
+            .andThen(onboardingPassed())
     }
 
     override fun getProfile(): Single<Profile> =
@@ -51,7 +49,8 @@ class ProfileDataRepository @Inject constructor(
         Single.just(userHolder.currentUser)
 
     override fun isOnboardingPassed(): Single<Boolean> =
-        Single.just(onboardingStorage.isOnboardingPassed)
+        userInfoDataSource.getUserInfo()
+            .map { it.isOnboardingPassed }
 
     override fun sync(): Completable =
         remoteSource.getUserProfile()
@@ -67,5 +66,20 @@ class ProfileDataRepository @Inject constructor(
                             else -> Completable.complete()
                         }
                     }
+            }
+
+    private fun onboardingPassed(): Completable =
+        userInfoDataSource.getUserInfo()
+            .map {
+                it.copy(
+                    id = it.id,
+                    isEmailConfirmed = it.isEmailConfirmed,
+                    isFeedbackSent = it.isFeedbackSent,
+                    isUserLoggedIn = it.isUserLoggedIn,
+                    isOnboardingPassed = true
+                )
+            }
+            .flatMapCompletable {
+                userInfoDataSource.updateUserInfo(it)
             }
 }

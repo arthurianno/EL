@@ -8,7 +8,10 @@ import com.elta.android.data.features.auth.dto.LoginDto
 import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
+import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
+import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -24,7 +27,9 @@ class SocialDataRepository @Inject constructor(
     private val schedulersFacade: SchedulersFacade,
     private val tokenStorage: TokenStorage,
     private val authSocialSource: AuthSocialDataSource,
-    @Remote private val profileSource: ProfileDataSource
+    @Remote private val profileSource: ProfileDataSource,
+    private val userHolder: UserHolder,
+    private val userInfoSource: UserInfoDataSource
 ) : SocialRepository {
 
     override fun linkSocialNetwork(network: SocialNetworkType): Completable =
@@ -51,6 +56,11 @@ class SocialDataRepository @Inject constructor(
                     }
             }
             .map(LoginDto::isEmailConfirmed)
+            .flatMapSingle {
+                userInfoSource.updateUserInfo(
+                    createUserInfoDto(it)
+                ).toSingleDefault(it)
+            }
             .single(false)
 
     override fun loginToSocialNetwork(network: SocialNetworkType): Completable =
@@ -67,4 +77,13 @@ class SocialDataRepository @Inject constructor(
         tokenStorage.accessToken = tokens.accessToken
         tokenStorage.refreshToken = tokens.refreshToken
     }
+
+    private fun createUserInfoDto(isEmailConfirmed: Boolean): UserInfoDto =
+        UserInfoDto(
+            id = userHolder.currentUser,
+            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+            isOnboardingPassed = false,
+            isFeedbackSent = false,
+            isEmailConfirmed = isEmailConfirmed
+        )
 }

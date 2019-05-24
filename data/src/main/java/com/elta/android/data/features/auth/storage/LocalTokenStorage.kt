@@ -35,6 +35,9 @@ class LocalTokenStorage(
         } else throw InvalidRefreshTokenError("Tokens can`t be null")
     }
 
+    override fun isUserLoggedIn(): Boolean =
+        !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
+
     private companion object {
         const val ACCESS_TOKEN = "access_token"
         const val REFRESH_TOKEN = "refresh_token"
