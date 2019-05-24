@@ -3,7 +3,6 @@ package com.elta.android.data.features.user.repository
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
@@ -18,7 +17,6 @@ class ProfileDataRepository @Inject constructor(
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
     @Remote private val remoteSource: ProfileDataSource,
-    private val userHolder: UserHolder,
     private val syncManger: LocalSyncManager
 ) : ProfileRepository {
 
@@ -42,8 +40,8 @@ class ProfileDataRepository @Inject constructor(
             }
         }.map(toDomainMapper::mapFromObject)
 
-    override fun getUserId(): Single<Long> =
-        Single.just(userHolder.currentUser)
+    override fun getUserId(): Single<String> =
+        getProfile().map(Profile::email)
 
     override fun sync(): Completable =
         remoteSource.getUserProfile()
