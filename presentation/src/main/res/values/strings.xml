@@ -556,7 +556,7 @@
     <string name="feedback_title">Оставить отзыв</string>
     <string name="feedback_input_name_hint">Ваше имя *</string>
     <string name="feedback_input_feedback_hint">Ваш email *</string>
-    <string name="feedback_description_text">Что вам не понравилось в приложении?</string>
+    <string name="feedback_description_text">Что вам не понравилось в приложении? *</string>
     <string name="feedback_send">Отправить</string>
 
     <!-- SYNC WITH BACKEND -->
