@@ -179,14 +179,14 @@ class BuildStatisticModelTest {
 
     private fun getExpectedInsulinStatistic(): InsulinStatisticModelByPeriod {
         return InsulinStatisticModelByPeriod(
-            averageBolusLevel = 10.0,
-            averageBasalLevel = 10.0,
-            averageLevel = 10.0
+            averageBolusLevel = 20.0,
+            averageBasalLevel = 30.0,
+            averageLevel = 50.0
         )
     }
 
     private fun getExpectedBreadStatistic(): BreadStatisticModelByPeriod {
-        return BreadStatisticModelByPeriod(averageLevel = 10.0)
+        return BreadStatisticModelByPeriod(averageLevel = 20.0)
     }
 
     private fun getExpectedActivityStatistic(): ActivityStatisticModel {

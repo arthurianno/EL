@@ -1,3 +1,5 @@
+@file:Suppress("SwallowedException")
+
 package com.elta.android.data.features.firmware.datasource
 
 import android.content.Context
@@ -24,7 +26,7 @@ class FirmwaresManager @Inject constructor(context: Context) {
 
     fun writeToFile(version: String, body: ResponseBody): File? =
         try {
-            val file = File(firmwares, "satellite_online_${version.replace(".", "")}.zip")
+            val file = File(firmwares, getFileName(version))
 
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
@@ -45,4 +47,14 @@ class FirmwaresManager @Inject constructor(context: Context) {
         } catch (e: IOException) {
             null
         }
+
+    fun getFile(version: String): File? =
+        try {
+            val file = File(firmwares, getFileName(version))
+            if (file.exists()) file else null
+        } catch (e: IOException) {
+            null
+        }
+
+    private fun getFileName(version: String): String = "satellite_online_${version.replace(".", "")}.zip"
 }

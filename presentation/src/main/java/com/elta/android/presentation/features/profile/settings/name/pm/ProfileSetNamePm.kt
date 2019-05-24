@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.name.model.PersonNameModel
 import com.nullgr.core.date.toTimestamp
 import io.reactivex.rxkotlin.Observables
@@ -154,9 +155,5 @@ class ProfileSetNamePm @Inject constructor(
             profileName.firstName != name.firstName ||
                 profileName.secondName != name.secondName
         )
-    }
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
     }
 }

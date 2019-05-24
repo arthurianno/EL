@@ -8,5 +8,5 @@ interface FirmwareRepository {
 
     fun getFirmwareInfo(): Single<Firmware>
 
-    fun downloadFirmware(firmware: Firmware): Single<FirmwareFile>
+    fun getFirmware(firmware: Firmware): Single<FirmwareFile>
 }

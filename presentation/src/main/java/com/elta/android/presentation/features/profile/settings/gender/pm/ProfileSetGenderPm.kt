@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.gender.model.GenderModel
 import com.nullgr.core.date.toTimestamp
 import io.reactivex.Observable
@@ -151,9 +152,5 @@ class ProfileSetGenderPm @Inject constructor(
     private fun handleSuccess() {
         bus.event(Events.ProfileDataChanged)
         router.exit()
-    }
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
     }
 }

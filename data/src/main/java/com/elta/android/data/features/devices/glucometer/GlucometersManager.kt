@@ -169,30 +169,34 @@ class GlucometersManager @Inject constructor(
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {
             !file.isSupportedByApplication() -> Completable.error(FirmwareNotSupportedByAppError(file.version))
-            else -> client.findConnection(address)
-                .checkPinAndSend(address)
-                .switchMap { connection ->
-                    connection.request(address, Commands.GetBatteryAndTemperature)
-                        .map { infoBuilder.buildFrom(address, listOf(it)) }
-                        .switchMap { info ->
-                            when {
-                                !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
-                                    GlucometerLowBatteryLevelError(
-                                        current = info.batteryLevel ?: 0,
-                                        required = MIN_LEVEL
-                                    )
-                                )
-                                else -> connection.request(address, Commands.ToDfuMode)
+            else ->
+                checkBluetoothClientState()
+                    .flatMapCompletable {
+                        client.findConnection(address)
+                            .checkPinAndSend(address)
+                            .switchMap { connection ->
+                                connection.request(address, Commands.GetBatteryAndTemperature)
+                                    .map { infoBuilder.buildFrom(address, listOf(it)) }
+                                    .switchMap { info ->
+                                        when {
+                                            !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
+                                                GlucometerLowBatteryLevelError(
+                                                    current = info.batteryLevel ?: 0,
+                                                    required = MIN_LEVEL
+                                                )
+                                            )
+                                            else -> connection.request(address, Commands.ToDfuMode)
+                                        }
+                                    }
                             }
-                        }
-                }
-                .take(1)
-                .switchMapCompletable { response ->
-                    when (isOk(response)) {
-                        true -> startFirmwareUpdate(context, file.path, address.toDfuAddress())
-                        else -> Completable.error(GlucometerToDfuModeError)
+                            .take(1)
+                            .switchMapCompletable { response ->
+                                when (isOk(response)) {
+                                    true -> startFirmwareUpdate(context, file.path, address.toDfuAddress())
+                                    else -> Completable.error(GlucometerToDfuModeError)
+                                }
+                            }
                     }
-                }
         }
 
     private fun RxBleConnection.simpleRequest(address: String, cmd: GlucometerCommand): Observable<String> {
@@ -300,12 +304,8 @@ class GlucometersManager @Inject constructor(
         }
 
     private fun syncInternal(address: String): Single<List<GlucometerEventDto>> =
-        Observable.just(client.state)
-            .flatMap { state ->
-                val error = state.toError()
-                if (error != null) Observable.error(error)
-                else Observable.just(state)
-            }.flatMap {
+        checkBluetoothClientState()
+            .flatMap {
                 client.findConnection(address)
                     .checkPinAndSend(address)
                     .switchMap { connection ->
@@ -358,6 +358,14 @@ class GlucometersManager @Inject constructor(
         }
         return filtered
     }
+
+    private fun checkBluetoothClientState(): Observable<RxBleClient.State> =
+        Observable.just(client.state)
+            .flatMap { state ->
+                val error = state.toError()
+                if (error != null) Observable.error(error)
+                else Observable.just(state)
+            }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.6" // version of firmware supported by application

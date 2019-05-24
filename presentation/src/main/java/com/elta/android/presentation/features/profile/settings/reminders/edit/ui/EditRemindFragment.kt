@@ -2,9 +2,8 @@ package com.elta.android.presentation.features.profile.settings.reminders.edit.u
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.features.profile.settings.reminders.base.ui.BaseRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
 import com.elta.android.presentation.utils.bundle
@@ -32,17 +31,7 @@ class EditRemindFragment : BaseRemindFragment<EditRemindPm>() {
         super.onBindPresentationModel(pm)
         menuButtonView.clicks().bindTo(pm.deleteRemindAction)
         pm.defaultScheduleState.bindTo { scheduleView.setTitle(it) }
-        pm.deleteRemindDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(BaseRemindPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(BaseRemindPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.deleteRemindDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

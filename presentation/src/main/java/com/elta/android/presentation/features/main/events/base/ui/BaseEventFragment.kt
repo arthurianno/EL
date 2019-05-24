@@ -2,10 +2,10 @@ package com.elta.android.presentation.features.main.events.base.ui
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
@@ -71,17 +71,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(formNoteView)
         pm.bindDateSelection()
-        pm.exitDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(BaseEventPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(BaseEventPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
 

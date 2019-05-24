@@ -17,6 +17,7 @@ import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareLocalDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
 import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
 import com.elta.android.data.features.observers.datasource.ObserverDataSource
@@ -106,9 +107,15 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindRemindersCacheDataSource(source: RemindersCacheDataSource): RemindersDataSource
 
+    @Remote
     @Binds
     @Singleton
-    abstract fun bindFirmwareDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+    abstract fun bindFirmwareRemoteDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindFirmwareLocalDataSource(source: FirmwareLocalDataSource): FirmwareDataSource
 
     @Binds
     @Singleton

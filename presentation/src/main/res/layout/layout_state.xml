@@ -8,15 +8,18 @@
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/stateIconView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toTopOf="@+id/stateTitleView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:src="@drawable/ic_activation" />
+        tools:src="@drawable/ic_send_mail" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/stateTitleView"
