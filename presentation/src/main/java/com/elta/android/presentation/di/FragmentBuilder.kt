@@ -9,6 +9,7 @@ import com.elta.android.presentation.features.bluetooth.di.BluetoothModule
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.devices.all.di.DevicesModule
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.di.DeviceInfoModule
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
@@ -57,11 +58,11 @@ import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
-import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
-import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
+import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
+import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
@@ -231,6 +232,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [DeviceInfoModule::class])
     abstract fun bindDeviceInfoFragment(): DeviceInfoFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFirmwareFragment(): FirmwareFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [RemindersModule::class])

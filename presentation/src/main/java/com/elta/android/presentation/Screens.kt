@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import android.content.Context
+import android.net.Uri
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -10,6 +11,7 @@ import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswo
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
@@ -50,6 +52,7 @@ import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragm
 import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
 import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
+import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
 import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -171,6 +174,10 @@ object Screens {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
     }
 
+    data class ShareEventScreen(val uri: Uri, val title: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?) = shareIntent(uri, title)
+    }
+
     // SYNC FLOW
     object SyncFlow : SupportAppScreen() {
         override fun getFragment() = SyncFlowFragment.newInstance()
@@ -220,6 +227,10 @@ object Screens {
 
     data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {
         override fun getFragment() = DeviceInfoFragment.newInstance(name, address)
+    }
+
+    data class UpdateFirmware(val address: String) : SupportAppScreen() {
+        override fun getFragment() = FirmwareFragment.newInstance(address)
     }
 
     object CreateRemind : SupportAppScreen() {

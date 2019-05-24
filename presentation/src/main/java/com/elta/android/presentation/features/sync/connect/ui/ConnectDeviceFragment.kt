@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.ui
 
 import android.content.Intent
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
@@ -20,6 +21,7 @@ import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_sync_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_device_found.*
+import kotlinx.android.synthetic.main.layout_sync_state_how_to_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_sync_completed.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
@@ -43,10 +45,14 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
         menuButtonView.clicks().bindTo(pm.skipAction)
         actionButtonView.clicks().bindTo(pm.connectDeviceAction)
         toAppButtonView.clicks().bindTo(pm.toAppAction)
+        manualStartButtonView.clicks().bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(actionButtonView::setEnabled)
         pm.state.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
+                if (view.id == R.id.stateHowToConnectView) {
+                    (stepsView.background as AnimationDrawable).start()
+                }
             }
         }
 
@@ -69,7 +75,8 @@ class ConnectDeviceFragment : BaseListFragment<ConnectDevicePm>() {
 
     private inline fun ConnectDevicePm.ViewState.getId() =
         when (this) {
-            ConnectDevicePm.ViewState.SEARCH -> R.id.stateConnectView
+            ConnectDevicePm.ViewState.HOW_TO_CONNECT -> R.id.stateHowToConnectView
+            ConnectDevicePm.ViewState.SEARCH -> R.id.stateSearchView
             ConnectDevicePm.ViewState.FOUND -> R.id.stateDeviceFoundView
             ConnectDevicePm.ViewState.CONNECTED -> R.id.stateConnectedView
             ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.stateSyncCompletedView

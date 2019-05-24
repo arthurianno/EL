@@ -14,6 +14,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
 import io.reactivex.Observable
@@ -129,8 +130,4 @@ class ProfileSettingsPm @Inject constructor(
 
     private fun createUnlinkSocialUserParams(network: SocialNetworkType) =
         UnLinkSocialNetworkUseCase.Params(network)
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 }

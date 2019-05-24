@@ -5,17 +5,26 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <include layout="@layout/layout_toolbar" />
+    <include
+        android:id="@+id/toolbarView"
+        layout="@layout/layout_toolbar" />
 
     <FrameLayout
         android:id="@+id/syncStateContainerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarView">
 
-        <include layout="@layout/layout_sync_state_connect" />
+        <include
+            layout="@layout/layout_sync_state_how_to_connect"
+            android:visibility="visible" />
+
+        <include
+            layout="@layout/layout_sync_state_search"
+            android:visibility="gone" />
 
         <include
             layout="@layout/layout_sync_state_device_found"

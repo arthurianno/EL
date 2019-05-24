@@ -13,6 +13,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.observers.all.mapper.ObserverMapper
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindEmpty
@@ -104,9 +105,5 @@ class ObserversPm @Inject constructor(
                 resources.getString(R.string.profile_observers_delete_with_success)
             )
         )
-    }
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
     }
 }

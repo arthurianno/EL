@@ -18,6 +18,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import io.reactivex.Completable
@@ -177,8 +178,4 @@ class MainRecordsPm @Inject constructor(
             .doOnNext(router::startFlow)
             .subscribe()
             .untilDestroy()
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 }

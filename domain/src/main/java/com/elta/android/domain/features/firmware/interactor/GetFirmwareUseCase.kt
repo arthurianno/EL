@@ -8,13 +8,13 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import javax.inject.Inject
 
-class DownloadFirmwareUseCase @Inject constructor(
+class GetFirmwareUseCase @Inject constructor(
     private val repo: FirmwareRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<FirmwareFile, DownloadFirmwareUseCase.Params>(schedulers) {
+) : SingleUseCase<FirmwareFile, GetFirmwareUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Single<FirmwareFile> =
-        repo.downloadFirmware(checkNotNull(params).firmware)
+        repo.getFirmware(checkNotNull(params).firmware)
 
     data class Params(val firmware: Firmware)
 }

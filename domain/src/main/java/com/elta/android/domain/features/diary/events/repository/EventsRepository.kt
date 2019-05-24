@@ -1,9 +1,11 @@
 package com.elta.android.domain.features.diary.events.repository
 
+import android.graphics.Bitmap
 import com.elta.android.domain.features.diary.events.model.Event
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import java.io.File
 import java.util.Date
 
 interface EventsRepository {
@@ -23,4 +25,6 @@ interface EventsRepository {
     fun deleteEvent(event: Event): Completable
 
     fun sync(): Completable
+
+    fun saveEventBitmap(eventHash: String, path: String, bitmap: Bitmap): Single<File>
 }

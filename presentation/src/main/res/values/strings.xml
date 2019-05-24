@@ -160,6 +160,7 @@
     <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
     <string name="event_type_activity_pattern_short">%1$s мин</string>
     <string name="event_type_glucose_pattern">%s ммоль/л</string>
+    <string name="event_type_glucose_measurement_value">ммоль/л</string>
 
     <string name="event_type_bread_no_name">Приём пищи</string>
     <string name="event_type_activity_no_name">Физическая активность</string>
@@ -287,6 +288,7 @@
     <string name="event_form_weight_format_mask">%d,%d Кг.</string>
     <string name="event_form_activity_format_mask">%d ч %d мин</string>
 
+    <string name="event_time_in_mask">%s в %s</string>
     <string name="event_time_mask">в %s</string>
     <string name="event_date_today">Сегодня</string>
     <string name="event_date_yesterday">Вчера</string>
@@ -320,6 +322,7 @@
     <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
+    <string name="event_share_dialog_title">Поделиться с помощью</string>
 
     <!-- SYNC -->
     <string name="sync_start_title">Подключение</string>
@@ -557,11 +560,43 @@
     <string name="feedback_title">Оставить отзыв</string>
     <string name="feedback_input_name_hint">Ваше имя *</string>
     <string name="feedback_input_feedback_hint">Ваш email *</string>
-    <string name="feedback_description_text">Что вам не понравилось в приложении?</string>
+    <string name="feedback_description_text">Что вам не понравилось в приложении? *</string>
     <string name="feedback_send">Отправить</string>
 
     <!-- SYNC WITH BACKEND -->
     <string name="sync_with_backend_in_progress">Идет синхронизация…</string>
     <string name="sync_with_backend_complete">Синхронизация завершена</string>
 
+    <!-- FIRMWARE -->
+    <string name="firmware_title_updates_not_found">Обновления не найдены</string>
+    <string name="firmware_title_checking_updates">Проверка обновлений…</string>
+    <string name="firmware_title_updates_found">Найдена новая версия\nПО глюкометра: %s</string>
+    <string name="firmware_title_downloading">Загрузка обновлений…</string>
+    <string name="firmware_title_updating">Обновление ПО…</string>
+    <string name="firmware_title_updated">Обновление ПО завершено</string>
+    <string name="firmware_title_low_level">Низкий уровень заряда\nбатареи глюкометра</string>
+    <string name="firmware_description_low_level">Для обновления необходимо заменить\nэлемент питания</string>
+    <string name="firmware_version_current">Текущая версия: %s</string>
+    <string name="firmware_version_new">Новая версия: %s</string>
+    <string name="firmware_button_update">Обновить</string>
+    <string name="firmware_button_check_updates">Проверить обновления прошивки</string>
+    <string name="firmware_button_close">Закрыть</string>
+    <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка прошивки, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
+    <string name="firmware_dialog_button">Закрыть</string>
+
+    <string name="firmware_unsupported_version_title">Версия приложения устарела</string>
+    <string name="firmware_unsupported_version_description">Для обновления версии прошивки\nглюкометра, необходимо обновить\nприложение</string>
+    <string name="firmware_unsupported_version_button">Обновить в Google Play</string>
+
+    <string name="firmware_downloading_error_title">Ошибка загрузки</string>
+    <string name="firmware_downloading_error_description">Во время загрузки обновления на\nустройство произошла ошибка. Чтобы\nпродолжить, необходимо повторить\nпроцесс</string>
+    <string name="firmware_downloading_error_button">Повторить</string>
+
+    <string name="firmware_update_error_title">Ошибка обновления</string>
+    <string name="firmware_update_error_description">Во время обновления прошивки\nпроизошла ошибка</string>
+    <string name="firmware_update_error_button">Повторить</string>
+
+    <string name="firmware_offline_error_title">Ошибка подключения</string>
+    <string name="firmware_offline_error_description">Во время обновления прошивки\nпроизошла ошибка подключения\nк глюкоментру</string>
+    <string name="firmware_offline_error_button">Повторить</string>
 </resources>

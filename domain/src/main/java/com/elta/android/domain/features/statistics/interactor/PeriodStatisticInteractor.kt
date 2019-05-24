@@ -11,6 +11,7 @@ import com.elta.android.domain.features.statistics.model.InsulinStatisticModelBy
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
+import com.nullgr.core.date.withoutTime
 import timber.log.Timber
 import java.util.Date
 
@@ -148,51 +149,51 @@ fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): In
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
 
-    var bolusCount = 0
-    var basalCount = 0
-    var count = 0
+    val daysWithBolusEvents = mutableSetOf<Date>()
+    val daysWithBasalEvents = mutableSetOf<Date>()
+    val daysWithEvents = mutableSetOf<Date>()
 
     insulinEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
             if (event.isBolusInsulin()) {
                 totalBolusLevel += value
-                bolusCount++
+                daysWithBolusEvents.add(event.additionTime.withoutTime())
             }
 
             if (event.isBasalInsulin()) {
                 totalBasalLevel += value
-                basalCount++
+                daysWithBasalEvents.add(event.additionTime.withoutTime())
             }
 
             if (event.isNotMixedInsulin()) {
                 totalLevel += value
-                count++
+                daysWithEvents.add(event.additionTime.withoutTime())
             }
         }
     }
 
     return InsulinStatisticModelByPeriod(
-        averageBolusLevel = totalBolusLevel.average(bolusCount),
-        averageBasalLevel = totalBasalLevel.average(basalCount),
-        averageLevel = totalLevel.average(count)
+        averageBolusLevel = totalBolusLevel.average(daysWithBolusEvents.size),
+        averageBasalLevel = totalBasalLevel.average(daysWithBasalEvents.size),
+        averageLevel = totalLevel.average(daysWithEvents.size)
     )
 }
 
 fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
-    var count = 0
+    val daysWithEvents = mutableSetOf<Date>()
 
     breadEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
             totalLevel += value
-            count++
+            daysWithEvents.add(event.additionTime.withoutTime())
         }
     }
 
     return BreadStatisticModelByPeriod(
-        averageLevel = totalLevel.average(count)
+        averageLevel = totalLevel.average(daysWithEvents.size)
     )
 }
 

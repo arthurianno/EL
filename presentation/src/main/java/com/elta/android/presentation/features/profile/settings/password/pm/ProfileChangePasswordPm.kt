@@ -7,6 +7,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.widget.InputControl
 import me.dmdev.rxpm.widget.dialogControl
@@ -108,8 +109,4 @@ class ProfileChangePasswordPm @Inject constructor(
 
     private fun getPasswordError(isPasswordValid: Boolean): String =
         if (isPasswordValid) "" else resources.getString(R.string.registration_password_pattern)
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 }
