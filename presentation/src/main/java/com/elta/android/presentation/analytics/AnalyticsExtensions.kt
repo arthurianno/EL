@@ -10,7 +10,6 @@ import com.elta.android.presentation.core.pm.BasePm
 import java.math.BigInteger
 import java.security.MessageDigest
 
-
 private const val PERIOD_PARAM_PATTERN = "%d_days"
 
 fun encodeUserId(id: String): String {
