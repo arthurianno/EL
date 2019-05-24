@@ -1,7 +1,10 @@
 package com.elta.android.presentation.features.main.events.glucose.pm
 
+import android.net.Uri
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
+import com.elta.android.domain.features.diary.events.interactor.GetShareEventUriUseCase
+import com.elta.android.domain.features.diary.events.interactor.SaveEventBitmapUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -21,17 +24,19 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
-import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormattedTemperature
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getValue
 import com.elta.android.presentation.features.main.events.glucose.model.GlucoseFormModel
+import com.elta.android.presentation.features.main.events.glucose.share.ShareImageBuilder
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
 import me.dmdev.rxpm.widget.dialogControl
@@ -40,10 +45,14 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
+    private val getShareEventUriUseCase: GetShareEventUriUseCase,
+    private val saveEventBitmapUseCase: SaveEventBitmapUseCase,
+    private val shareImageBuilder: ShareImageBuilder,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -64,7 +73,7 @@ class GlucoseEventPm @Inject constructor(
     val exitDialogAction = Action<Unit>()
     val shareAction = Action<Unit>()
 
-    val exitDialogControl = dialogControl<DialogData, BaseEventPm.DialogResult>()
+    val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
     private val selectedDateState = State<Date>()
     private val eventIdState = State<String>()
@@ -84,6 +93,7 @@ class GlucoseEventPm @Inject constructor(
         bindHandleBack()
         observeEventChanges()
         observeSaveEventAction()
+        bindShare()
         loadEvent()
     }
 
@@ -206,6 +216,26 @@ class GlucoseEventPm @Inject constructor(
     }
 
     private fun bindShare() {
+        shareAction.observable
+            .map(::createGetShareEventUriUseCaseParams)
+            .flatMapSingle {
+                getShareEventUriUseCase.execute(it)
+                    .flatMap { uri ->
+                        when (uri != Uri.EMPTY) {
+                            true -> Single.just(uri)
+                            else ->
+                                saveEventBitmapUseCase.execute(createSaveEventBitmapUseCaseParams())
+                        }
+                    }
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .map { uri ->
+                        Screens.ShareEventScreen(uri, resources.getString(R.string.event_share_dialog_title))
+                    }
+                    .doOnSuccess(router::navigateTo)
+            }
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun bindHandleBack() {
@@ -218,7 +248,7 @@ class GlucoseEventPm @Inject constructor(
             .switchMapMaybe {
                 exitDialogControl.showForResult(exitDialogData)
             }
-            .filter { it == BaseEventPm.DialogResult.POSITIVE }
+            .filter { it == DialogResult.POSITIVE }
             .doOnNext { router.exit() }
             .subscribe()
             .untilDestroy()
@@ -250,12 +280,20 @@ class GlucoseEventPm @Inject constructor(
         )
     }
 
+    private fun createGetShareEventUriUseCaseParams(i: Unit) =
+        GetShareEventUriUseCase.Params(eventState.value, glucoseLevelSettingsState.value)
+
+    private fun createSaveEventBitmapUseCaseParams() =
+        SaveEventBitmapUseCase.Params(
+            event = eventState.value,
+            glucoseLevelSettings = glucoseLevelSettingsState.value,
+            bitmap = shareImageBuilder.createBitmap(eventState.value, glucoseLevelSettingsState.value)
+        )
+
     private fun Event.isGlucoseEventChanged(
         tagId: String?,
         note: String?
-    ): Boolean {
-        return this.tagId != tagId || this.note !== note
-    }
+    ): Boolean = this.tagId != tagId || this.note !== note
 
     private fun ChooserResult.toSelectorOption() =
         SelectorOption(

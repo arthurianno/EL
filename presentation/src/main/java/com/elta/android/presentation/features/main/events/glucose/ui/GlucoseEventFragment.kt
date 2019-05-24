@@ -2,14 +2,13 @@ package com.elta.android.presentation.features.main.events.glucose.ui
 
 import android.os.Bundle
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.events.base.initializer.DEFAULT_NOTE_LENGTH
-import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.bundle
@@ -86,17 +85,7 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
         pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
         pm.noteInput.bindTo(formNoteView)
 
-        pm.exitDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(BaseEventPm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(BaseEventPm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
 
