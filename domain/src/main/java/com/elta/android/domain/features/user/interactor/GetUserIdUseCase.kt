@@ -9,8 +9,8 @@ import javax.inject.Inject
 class GetUserIdUseCase @Inject constructor(
     private val userRepo: ProfileRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<Long, Unit>(schedulers) {
+) : SingleUseCase<String, Unit>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Unit?): Single<Long> =
+    override fun buildUseCaseObservable(params: Unit?): Single<String> =
         userRepo.getUserId()
 }
