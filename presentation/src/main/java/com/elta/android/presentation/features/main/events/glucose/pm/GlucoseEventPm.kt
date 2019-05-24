@@ -205,7 +205,8 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindShare(){}
+    private fun bindShare() {
+    }
 
     private fun bindHandleBack() {
         backHandleAction.observable

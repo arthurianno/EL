@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.diary.main.pm
 
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
-import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
