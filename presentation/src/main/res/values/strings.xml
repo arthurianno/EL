@@ -323,6 +323,7 @@
     <!-- SYNC -->
     <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
+    <string name="sync_start_other_subtitle">Чтобы подключить новое устройство, вам\nнеобходимо пройти несколько шагов</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
     <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>

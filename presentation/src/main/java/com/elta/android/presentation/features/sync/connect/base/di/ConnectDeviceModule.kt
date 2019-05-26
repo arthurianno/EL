@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.bluetooth.di
+package com.elta.android.presentation.features.sync.connect.base.di
 
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceDelegatesFactory
@@ -9,8 +9,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 
-@Module(includes = [BluetoothModule.Declarations::class])
-class BluetoothModule {
+@Module(includes = [ConnectDeviceModule.Declarations::class])
+class ConnectDeviceModule {
 
     @Module
     interface Declarations {
