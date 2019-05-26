@@ -10,7 +10,7 @@ interface ProfileRepository {
 
     fun getProfile(): Single<Profile>
 
-    fun getUserId(): Single<Long>
+    fun getUserId(): Single<String>
 
     fun isOnboardingPassed(): Single<Boolean>
 
