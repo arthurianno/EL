@@ -10,10 +10,10 @@ class UserInfoToDomainMapper @Inject constructor() : Mapper<UserInfoDto, UserInf
     override fun mapFromObject(source: UserInfoDto): UserInfo =
         with(source) {
             UserInfo(
-                isUserLoggedIn = isUserLoggedIn,
-                isEmailConfirmed = isEmailConfirmed,
-                isFeedbackSent = isFeedbackSent,
-                isOnboardingPassed = isOnboardingPassed
+                isUserLoggedIn = isUserLoggedIn ?: false,
+                isEmailConfirmed = isEmailConfirmed ?: false,
+                isFeedbackSent = isFeedbackSent ?: false,
+                isOnboardingPassed = isOnboardingPassed ?: false
             )
         }
 }

@@ -8,6 +8,7 @@ import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Completable
@@ -33,7 +34,7 @@ class ProfileDataRepository @Inject constructor(
                         syncManger.saveAsUpdated(profile)
                     }
             )
-            .andThen(onboardingPassed())
+            .andThen(setOnboardingWasPassed())
     }
 
     override fun getProfile(): Single<Profile> =
@@ -68,17 +69,8 @@ class ProfileDataRepository @Inject constructor(
                     }
             }
 
-    private fun onboardingPassed(): Completable =
-        userInfoDataSource.getUserInfo()
-            .map {
-                it.copy(
-                    id = it.id,
-                    isEmailConfirmed = it.isEmailConfirmed,
-                    isFeedbackSent = it.isFeedbackSent,
-                    isUserLoggedIn = it.isUserLoggedIn,
-                    isOnboardingPassed = true
-                )
-            }
+    private fun setOnboardingWasPassed(): Completable =
+        Single.just(UserInfoDto(isOnboardingPassed = true))
             .flatMapCompletable {
                 userInfoDataSource.updateUserInfo(it)
             }

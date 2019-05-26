@@ -2,6 +2,7 @@ package com.elta.android.data.features.feedback.repository
 
 import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -20,16 +21,7 @@ class FeedbackDataRepository @Inject constructor(
             .map { it.isFeedbackSent }
 
     override fun setFeedbackWasSent(): Completable =
-        userInfoDataSource.getUserInfo()
-            .map {
-                it.copy(
-                    id = it.id,
-                    isEmailConfirmed = it.isEmailConfirmed,
-                    isFeedbackSent = true,
-                    isUserLoggedIn = it.isUserLoggedIn,
-                    isOnboardingPassed = it.isOnboardingPassed
-                )
-            }
+        Single.just(UserInfoDto(isFeedbackSent = true))
             .flatMapCompletable {
                 userInfoDataSource.updateUserInfo(it)
             }

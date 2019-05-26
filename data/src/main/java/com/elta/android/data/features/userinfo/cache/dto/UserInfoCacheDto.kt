@@ -6,8 +6,8 @@ import io.objectbox.annotation.Id
 @Entity
 data class UserInfoCacheDto(
     @Id(assignable = true) var id: Long,
-    val isUserLoggedIn: Boolean,
-    val isFeedbackSent: Boolean,
-    val isEmailConfirmed: Boolean,
-    val isOnboardingPassed: Boolean
+    val isUserLoggedIn: Boolean?,
+    val isFeedbackSent: Boolean?,
+    val isEmailConfirmed: Boolean?,
+    val isOnboardingPassed: Boolean?
 )

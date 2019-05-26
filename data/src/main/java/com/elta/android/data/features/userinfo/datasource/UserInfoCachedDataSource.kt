@@ -8,7 +8,6 @@ import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
 import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import io.reactivex.Completable
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 
 class UserInfoCachedDataSource @Inject constructor(
@@ -24,12 +23,22 @@ class UserInfoCachedDataSource @Inject constructor(
                 cache.get(CommonConditions.ById(it))
                     ?: throw NoSuchElementException("Current user is empty.")
             } ?: throw NoSuchElementException("Current user is not exist.")
-        }
-            .doOnError { Timber.e(it) }
-            .map(dtoMapper::mapFromObject)
+        }.map(dtoMapper::mapFromObject)
 
     override fun updateUserInfo(userInfo: UserInfoDto): Completable =
         Completable.fromCallable {
-            cache.add(listOf(cacheMapper.mapFromObject(userInfo)))
+            userHolder.currentUser?.let {
+                cache.get(CommonConditions.ById(it))?.let { cachedInfo ->
+                    val updatedInfo = cachedInfo.copy(
+                        id = userInfo.id ?: cachedInfo.id,
+                        isEmailConfirmed = userInfo.isEmailConfirmed ?: cachedInfo.isEmailConfirmed,
+                        isFeedbackSent = userInfo.isFeedbackSent ?: cachedInfo.isFeedbackSent,
+                        isUserLoggedIn = userInfo.isUserLoggedIn ?: cachedInfo.isUserLoggedIn,
+                        isOnboardingPassed = userInfo.isOnboardingPassed
+                            ?: cachedInfo.isOnboardingPassed
+                    )
+                    cache.update(listOf(updatedInfo))
+                } ?: cache.add(listOf(cacheMapper.mapFromObject(userInfo)))
+            }
         }
 }
