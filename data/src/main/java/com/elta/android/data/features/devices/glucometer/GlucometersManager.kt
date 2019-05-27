@@ -408,9 +408,16 @@ class GlucometersManager @Inject constructor(
             }
 
     private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
-        eventsCache.getAll(EventsConditions.ByTypeAndIds(EventTypeDto.GLUCOSE, fromGlucometer.map { it.id.hashCode().toLong() }.toLongArray()))
+        eventsCache.getAll(
+            EventsConditions.ByTypeAndIds(
+                EventTypeDto.GLUCOSE, fromGlucometer.map { it.id.hashCode().toLong() }.toLongArray()
+            )
+        )
 
-    private fun filterExistingEvents(fromGlucometer: List<GlucometerEventDto>, cached: List<EventCachedDto>): List<GlucometerEventDto> =
+    private fun filterExistingEvents(
+        fromGlucometer: List<GlucometerEventDto>,
+        cached: List<EventCachedDto>
+    ): List<GlucometerEventDto> =
         if (cached.isEmpty()) fromGlucometer
         else arrayListOf<GlucometerEventDto>().apply {
             fromGlucometer.forEach { event ->
