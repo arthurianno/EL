@@ -74,9 +74,15 @@ sealed class Dialogs : DialogData {
 
     data class DeleteDevice(
         val resources: ResourceProvider,
+        val isPrimary: Boolean,
         override val title: String = resources.getString(R.string.profile_delete_device_dialog_title),
-        override val message: String = resources.getString(R.string.profile_delete_device_dialog_body),
         override val negative: String = resources.getString(R.string.profile_delete_observer_cancel_button),
         override val positive: String = resources.getString(R.string.profile_delete_device_dialog_confirm_button)
-    ) : Dialogs()
+    ) : Dialogs() {
+        override val message: String
+            get() = resources.getString(
+                if (isPrimary) R.string.profile_delete_primary_device_dialog_body
+                else R.string.profile_delete_device_dialog_body
+            )
+    }
 }

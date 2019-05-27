@@ -131,18 +131,9 @@ class ConnectDevicePm @Inject constructor(
     }
 
     private fun bindActions() {
-        startScanAction.observable
-            .flatMap {
-                findGlucometersUseCase.execute()
-                    .doOnSubscribe {
-                        state.consumer.accept(ViewState.SEARCH)
-                    }
-                    .doOnNext(::handleSearchResults)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
+        bindStartScanAction()
+        bindStartSyncAction()
+        bindInternalConnectDeviceAction()
 
         skipAction.observable
             .subscribe(::navigateToShopsFlow)
@@ -155,6 +146,12 @@ class ConnectDevicePm @Inject constructor(
             .subscribe(openPinCodeDialogCommand.consumer)
             .untilDestroy()
 
+        toAppAction.observable
+            .subscribe { router.newRootFlow(Screens.HomeFlow) }
+            .untilDestroy()
+    }
+
+    private fun bindInternalConnectDeviceAction() =
         internalConnectDeviceAction.observable
             .skipWhileInProgress()
             .filter { glucometer != null && pinState.hasValue() }
@@ -172,10 +169,21 @@ class ConnectDevicePm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        toAppAction.observable
-            .subscribe { router.newRootFlow(Screens.HomeFlow) }
+    private fun bindStartScanAction() =
+        startScanAction.observable
+            .flatMap {
+                findGlucometersUseCase.execute()
+                    .doOnSubscribe {
+                        state.consumer.accept(ViewState.SEARCH)
+                    }
+                    .doOnNext(::handleSearchResults)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
             .untilDestroy()
 
+    private fun bindStartSyncAction() =
         startSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
@@ -189,7 +197,6 @@ class ConnectDevicePm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-    }
 
     private fun bindRetryActions() {
         showRetrySearchAction.observable
