@@ -49,10 +49,13 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
-import com.elta.android.presentation.features.sync.connect.pm.ConnectDevicePm
-import com.elta.android.presentation.features.sync.flow.pm.SyncFlowPm
+import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnBoardingConnectDevicePm
+import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePm
+import com.elta.android.presentation.features.sync.flow.onboarding.pm.FromOnBoardingSyncFlowPm
+import com.elta.android.presentation.features.sync.flow.other.pm.FromOtherSyncFlowPm
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
-import com.elta.android.presentation.features.sync.start.pm.SyncStartPm
+import com.elta.android.presentation.features.sync.start.onboarding.pm.FromOnBoardingSyncStartPm
+import com.elta.android.presentation.features.sync.start.other.pm.FromOtherSyncStartPm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -186,13 +189,23 @@ abstract class PmModule {
     // SYNC FLOW
     @Binds
     @IntoMap
-    @PmKey(SyncFlowPm::class)
-    abstract fun bindSyncFlowPm(pm: SyncFlowPm): PresentationModel
+    @PmKey(FromOnBoardingSyncFlowPm::class)
+    abstract fun bindFromOnBoardingSyncFlowPm(pm: FromOnBoardingSyncFlowPm): PresentationModel
 
     @Binds
     @IntoMap
-    @PmKey(SyncStartPm::class)
-    abstract fun bindSyncStartPm(pm: SyncStartPm): PresentationModel
+    @PmKey(FromOtherSyncFlowPm::class)
+    abstract fun bindFromOtherSyncFlowPm(pm: FromOtherSyncFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(FromOnBoardingSyncStartPm::class)
+    abstract fun bindFromOnBoardingSyncStartPm(pm: FromOnBoardingSyncStartPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(FromOtherSyncStartPm::class)
+    abstract fun bindFromOtherSyncStartPm(pm: FromOtherSyncStartPm): PresentationModel
 
     @Binds
     @IntoMap
@@ -206,8 +219,13 @@ abstract class PmModule {
 
     @Binds
     @IntoMap
-    @PmKey(ConnectDevicePm::class)
-    abstract fun bindConnectDevicePm(pm: ConnectDevicePm): PresentationModel
+    @PmKey(FromOnBoardingConnectDevicePm::class)
+    abstract fun bindFromOnBoardingConnectDevicePm(pm: FromOnBoardingConnectDevicePm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(FromOtherConnectDevicePm::class)
+    abstract fun bindFromOtherConnectDevicePm(pm: FromOtherConnectDevicePm): PresentationModel
 
     // DIARY FLOW
     @Binds

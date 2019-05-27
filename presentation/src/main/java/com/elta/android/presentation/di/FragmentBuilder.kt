@@ -61,11 +61,14 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
-import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
-import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
-import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.connect.base.di.ConnectDeviceModule
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
+import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
+import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
-import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
+import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
+import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -169,11 +172,19 @@ abstract class FragmentBuilder {
     // SYNC FLOW
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindSyncFlowFragment(): SyncFlowFragment
+    abstract fun bindFromOnBoardingSyncFlowFragment(): FromOnBoardingSyncFlowFragment
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindSyncStartFragment(): SyncStartFragment
+    abstract fun bindFromOtherSyncFlowFragment(): FromOtherSyncFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOnBoardingSyncStartFragment(): FromOnBoardingSyncStartFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOtherSyncStartFragment(): FromOtherSyncStartFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [BluetoothModule::class])
@@ -185,7 +196,11 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
-    abstract fun bindConnectDeviceFragment(): ConnectDeviceFragment
+    abstract fun bindFromOnBoardingConnectDeviceFragment(): FromOnBoardingConnectDeviceFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
+    abstract fun bindFromOtherConnectDeviceFragment(): FromOtherConnectDeviceFragment
 
     // DIARY FLOW
     @FragmentScope
