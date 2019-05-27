@@ -49,13 +49,12 @@ class DeviceDataRepository @Inject constructor(
     override fun connectDevice(device: Glucometer, pinCode: String): Completable =
         source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
 
-    // TODO: change return type to Observable<Int>, that returns number of new event,
-    // TODO: this need to prevent updates if new events = 0
-    override fun syncWithDevice(device: Glucometer?): Completable =
+    override fun syncWithDevice(device: Glucometer?): Observable<Int> =
         source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) })
             .map(eventsFromGlucometerMapper::mapFromObjects)
-            .flatMapCompletable { events ->
+            .flatMap { events ->
                 eventsRepository.addEvents(events)
+                    .andThen(Observable.just(events.size))
             }
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
