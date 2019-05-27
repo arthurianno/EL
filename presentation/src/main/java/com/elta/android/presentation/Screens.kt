@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
+import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
@@ -47,9 +48,12 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
-import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
-import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
-import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
+import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
+import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
+import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
+import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
@@ -163,7 +167,10 @@ object Screens {
     }
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
-        override fun getFragment() = EditEventFragment.newInstance(eventId, eventType)
+        override fun getFragment() = when (eventType) {
+            EventType.GLUCOSE -> GlucoseEventFragment.newInstance(eventId)
+            else -> EditEventFragment.newInstance(eventId, eventType)
+        }
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
@@ -175,20 +182,32 @@ object Screens {
     }
 
     // SYNC FLOW
-    object SyncFlow : SupportAppScreen() {
-        override fun getFragment() = SyncFlowFragment.newInstance()
+    object FromOtherSyncFlow : SupportAppScreen() {
+        override fun getFragment() = FromOtherSyncFlowFragment.newInstance()
     }
 
-    object SyncStart : SupportAppScreen() {
-        override fun getFragment() = SyncStartFragment.newInstance()
+    object FromOnBoardingSyncFlow : SupportAppScreen() {
+        override fun getFragment() = FromOnBoardingSyncFlowFragment.newInstance()
+    }
+
+    object FromOtherSyncStart : SupportAppScreen() {
+        override fun getFragment() = FromOtherSyncStartFragment.newInstance()
+    }
+
+    object FromOnBoardingSyncStart : SupportAppScreen() {
+        override fun getFragment() = FromOnBoardingSyncStartFragment.newInstance()
     }
 
     object BluetoothScreen : SupportAppScreen() {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
     }
 
-    object ConnectDevice : SupportAppScreen() {
-        override fun getFragment(): Fragment = ConnectDeviceFragment.newInstance()
+    object FromOnBoardingConnectDevice : SupportAppScreen() {
+        override fun getFragment(): Fragment = FromOnBoardingConnectDeviceFragment.newInstance()
+    }
+
+    object FromOtherConnectDevice : SupportAppScreen() {
+        override fun getFragment(): Fragment = FromOtherConnectDeviceFragment.newInstance()
     }
 
     // DIARY FLOW

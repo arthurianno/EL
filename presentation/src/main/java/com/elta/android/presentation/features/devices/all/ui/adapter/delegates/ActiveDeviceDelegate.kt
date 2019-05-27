@@ -46,6 +46,7 @@ class ActiveDeviceDelegate(
             when (payload) {
                 ActiveDeviceItem.Payload.NAME_CHANGED -> deviceNameView.text = item.name
                 ActiveDeviceItem.Payload.ADDRESS_CHANGED -> deviceAddressView.text = item.address
+                ActiveDeviceItem.Payload.IS_PRIMARY_CHANGED -> deviceIconView.setImageResource(item.icon)
             }
         }
     }

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="360dp"
     android:layout_height="360dp"
-    tools:background="@drawable/bg_gradient_red"
-    tools:parentTag="android.support.constraint.ConstraintLayout">
+    tools:background="@drawable/bg_gradient_red">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/logoView"
@@ -73,4 +72,4 @@
         app:layout_constraintTop_toBottomOf="@+id/bubbleView"
         tools:src="@drawable/ic_emj_boom" />
 
-</merge>
+</android.support.constraint.ConstraintLayout>

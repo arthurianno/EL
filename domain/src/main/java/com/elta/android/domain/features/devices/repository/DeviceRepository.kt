@@ -7,11 +7,14 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
+@Suppress("TooManyFunctions", "ComplexInterface")
 interface DeviceRepository {
 
     fun findDevices(): Observable<List<Glucometer>>
 
     fun getDevices(): Single<List<Glucometer>>
+
+    fun getDevice(address: String): Single<Glucometer>
 
     fun deleteDevice(address: String): Completable
 
@@ -23,7 +26,9 @@ interface DeviceRepository {
 
     fun connectDevice(device: Glucometer, pinCode: String): Completable
 
-    fun syncWithDevice(device: Glucometer?): Completable
+    fun syncWithDevice(device: Glucometer?): Observable<Int>
 
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
+
+    fun setPrimaryDevice(address: String): Completable
 }

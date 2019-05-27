@@ -8,11 +8,14 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
+@Suppress("TooManyFunctions", "ComplexInterface")
 interface DeviceDataSource {
 
     fun findDevices(): Observable<List<GlucometerDto>>
 
     fun getDevices(): Single<List<GlucometerDto>>
+
+    fun getDevice(address: String): Single<GlucometerDto>
 
     fun deleteDevice(address: String): Completable
 
@@ -24,7 +27,9 @@ interface DeviceDataSource {
 
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable
 
-    fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>>
+    fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>>
 
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
+
+    fun setPrimaryDevice(address: String): Completable
 }

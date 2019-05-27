@@ -30,6 +30,7 @@ import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class FirmwarePm @Inject constructor(
     private val getLastGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
@@ -119,50 +120,21 @@ class FirmwarePm @Inject constructor(
     }
 
     private fun bindActions() {
-        checkUpdatesAction.observable
-            .skipWhileInProgress(progressState.observable)
-            .flatMapSingle {
-                getFirmwareInfoUseCase.execute()
-                    .bindProgressExtended(progressState.consumer)
-                    .doOnSubscribe {
-                        setState(UpdateState.Progress(resources, getDeviceVersion()))
-                    }
-                    .doOnSuccess(::handleFirmwareInfo)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
+        bindCheckUpdateAction()
+        bindDeviceInfoAction()
+        bindDownloadFirmwareAction()
+        bindStartUpdateAction()
 
-        getDeviceInfoAction.observable
-            .skipWhileInProgress(progressState.observable)
-            .map(::createGetDeviceInfoUseCaseParams)
-            .flatMapSingle { params ->
-                getLastGlucometerInfoUseCase.execute(params)
-                    .bindProgressExtended(progressState.consumer)
-                    .doOnSuccess(::handleDeviceInfo)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
+        Observable.merge(
+            btControl.bluetoothEnabledAction.observable,
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.locationEnabledAction.observable
+        )
+            .subscribe(startUpdateAction.consumer)
             .untilDestroy()
+    }
 
-        downloadFirmwareAction.observable
-            .skipWhileInProgress(progressState.observable)
-            .map(::createDownloadFirmwareUseCaseParams)
-            .flatMapSingle { params ->
-                getFirmwareUseCase.execute(params)
-                    .bindProgressExtended(progressState.consumer)
-                    .doOnSubscribe {
-                        setState(UpdateState.Downloading(resources, getDeviceVersion()))
-                    }
-                    .doOnSuccess(::handleFirmwareDownloaded)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
+    private fun bindStartUpdateAction() =
         startUpdateAction.observable
             .skipWhileInProgress(progressState.observable)
             .map(::createUpdateFirmwareUseCaseParams)
@@ -179,14 +151,52 @@ class FirmwarePm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        Observable.merge(
-            btControl.bluetoothEnabledAction.observable,
-            btControl.locationPermissionsGrantedAction.observable,
-            btControl.locationEnabledAction.observable
-        )
-            .subscribe(startUpdateAction.consumer)
+    private fun bindDownloadFirmwareAction() =
+        downloadFirmwareAction.observable
+            .skipWhileInProgress(progressState.observable)
+            .map(::createDownloadFirmwareUseCaseParams)
+            .flatMapSingle { params ->
+                getFirmwareUseCase.execute(params)
+                    .bindProgressExtended(progressState.consumer)
+                    .doOnSubscribe {
+                        setState(UpdateState.Downloading(resources, getDeviceVersion()))
+                    }
+                    .doOnSuccess(::handleFirmwareDownloaded)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
             .untilDestroy()
-    }
+
+    private fun bindDeviceInfoAction() =
+        getDeviceInfoAction.observable
+            .skipWhileInProgress(progressState.observable)
+            .map(::createGetDeviceInfoUseCaseParams)
+            .flatMapSingle { params ->
+                getLastGlucometerInfoUseCase.execute(params)
+                    .bindProgressExtended(progressState.consumer)
+                    .doOnSuccess(::handleDeviceInfo)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+    private fun bindCheckUpdateAction() =
+        checkUpdatesAction.observable
+            .skipWhileInProgress(progressState.observable)
+            .flatMapSingle {
+                getFirmwareInfoUseCase.execute()
+                    .bindProgressExtended(progressState.consumer)
+                    .doOnSubscribe {
+                        setState(UpdateState.Progress(resources, getDeviceVersion()))
+                    }
+                    .doOnSuccess(::handleFirmwareInfo)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
 
     private fun setState(state: UpdateState) {
         delayedSetStateAction.consumer.accept(state)

@@ -23,6 +23,7 @@ import com.elta.android.presentation.features.main.events.chooser.di.EventsOptio
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
+import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
@@ -60,11 +61,14 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
-import com.elta.android.presentation.features.sync.connect.di.ConnectDeviceModule
-import com.elta.android.presentation.features.sync.connect.ui.ConnectDeviceFragment
-import com.elta.android.presentation.features.sync.flow.ui.SyncFlowFragment
+import com.elta.android.presentation.features.sync.connect.base.di.ConnectDeviceModule
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
+import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
+import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
-import com.elta.android.presentation.features.sync.start.ui.SyncStartFragment
+import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
+import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -161,14 +165,26 @@ abstract class FragmentBuilder {
     @ContributesAndroidInjector
     abstract fun bindEditEventFragment(): EditEventFragment
 
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindGlucoseEventFragment(): GlucoseEventFragment
+
     // SYNC FLOW
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindSyncFlowFragment(): SyncFlowFragment
+    abstract fun bindFromOnBoardingSyncFlowFragment(): FromOnBoardingSyncFlowFragment
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindSyncStartFragment(): SyncStartFragment
+    abstract fun bindFromOtherSyncFlowFragment(): FromOtherSyncFlowFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOnBoardingSyncStartFragment(): FromOnBoardingSyncStartFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOtherSyncStartFragment(): FromOtherSyncStartFragment
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [BluetoothModule::class])
@@ -180,7 +196,11 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
-    abstract fun bindConnectDeviceFragment(): ConnectDeviceFragment
+    abstract fun bindFromOnBoardingConnectDeviceFragment(): FromOnBoardingConnectDeviceFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ConnectDeviceModule::class])
+    abstract fun bindFromOtherConnectDeviceFragment(): FromOtherConnectDeviceFragment
 
     // DIARY FLOW
     @FragmentScope

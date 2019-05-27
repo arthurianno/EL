@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm
 
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetGlycatedHemoglobinEventsUseCase
@@ -14,6 +13,7 @@ import com.elta.android.domain.features.user.interactor.increment
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -57,12 +57,47 @@ class HemoglobinSettingsPm @Inject constructor(
 
         observeDateSelection()
         observeValueChanges()
+        observeMainAction()
+        observeDeleteHemoglobinClicks()
 
         profileState.observable
             .doOnNext { inputValueState.consumer.accept(it.getHemoglobinLevel()) }
             .subscribe()
             .untilDestroy()
 
+        loadScreeAction.observable
+            .skipWhileInProgress()
+            .flatMap { loadScreenData() }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .subscribe(loadScreeAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeDeleteHemoglobinClicks() =
+        bus.clicks<Clicks.DeleteHemoglobinEventClicked>()
+            .skipWhileInProgress()
+            .map { clickEvent -> hemoglobinEventsState.value.first { it.id == clickEvent.id } }
+            .map { createDeleteEventParams(it) }
+            .flatMap {
+                deleteEventUseCase.execute(it)
+                    .hideErrorContainer()
+                    .andThen(
+                        loadScreenData()
+                            .doOnNext { bus.event(Events.EventsChanged(false)) }
+                    )
+                    .bindProgress()
+                    .doOnError(::handleError)
+            }
+            .subscribe()
+            .untilDestroy()
+
+    private fun observeMainAction() =
         mainAction.observable
             .debounceAction()
             .skipWhileInProgress()
@@ -81,37 +116,6 @@ class HemoglobinSettingsPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-
-        loadScreeAction.observable
-            .skipWhileInProgress()
-            .flatMap { loadScreenData() }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        bus.clicks<Clicks.DeleteHemoglobinEventClicked>()
-            .skipWhileInProgress()
-            .map { clickEvent -> hemoglobinEventsState.value.first { it.id == clickEvent.id } }
-            .map { createDeleteEventParams(it) }
-            .flatMap {
-                deleteEventUseCase.execute(it)
-                    .hideErrorContainer()
-                    .andThen(
-                        loadScreenData()
-                            .doOnNext { bus.event(Events.EventsChanged(false)) }
-                    )
-                    .bindProgress()
-                    .doOnError(::handleError)
-            }
-            .subscribe()
-            .untilDestroy()
-
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
-            .subscribe(loadScreeAction.consumer)
-            .untilDestroy()
-    }
 
     private fun handleSuccess(result: Pair<Profile, List<Event>>) {
         profileState.consumer.accept(result.first)
