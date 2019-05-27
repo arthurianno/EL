@@ -27,7 +27,7 @@ interface DeviceDataSource {
 
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable
 
-    fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>>
+    fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>>
 
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
 
