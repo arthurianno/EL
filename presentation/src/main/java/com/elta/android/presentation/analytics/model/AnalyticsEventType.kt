@@ -42,7 +42,7 @@ annotation class AnalyticsEventType {
         const val ONB_WEIGHT_ADD = "onb_weight_add"
         const val PASSWORD_RECOVERY = "password_recovery"
         const val REMINDER_ADD = "reminder_add"
-        const val SHARE_GLUCOSE = "share_glucose" // todo
+        const val SHARE_GLUCOSE = "share_glucose"
         const val HOMEPAGE = "homepage"
         const val DIARY_OPEN = "diary_open"
         const val STATISTICS_OPEN = "statistics_open"
