@@ -299,6 +299,10 @@
     <string name="event_form_exit_dialog_confirm_button">Выйти</string>
     <string name="event_form_delete_dialog_confirm_button">Удалить</string>
     <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
+    <string name="event_form_glucose_share_button_title">Поделиться</string>
+    <string name="event_form_glucose_info_mask_title">Измерение выполнено при температуре в %s С°</string>
+    <string name="event_form_glucose_measure_unit">ммоль/л</string>
+    <string name="event_form_glucose_toolbar_title">Уровень глюкозы</string>
 
     <string name="google_play_rate_dialog_title">Внимание</string>
     <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
@@ -476,7 +480,8 @@
     <!--DEVICE-->
     <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
     <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
-    <string name="profile_devices_active_glucometers">Активные глюкометры</string>
+    <string name="profile_devices_primary_device">Основное устройство</string>
+    <string name="profile_devices_other_devices">Другие</string>
     <string name="profile_devices_new_device">Новое устройство</string>
 
     <string name="profile_device_info_title">СателлитOnline</string>
@@ -487,10 +492,11 @@
     <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
     <string name="profile_device_info_charge_level_field">%d/3</string>
+    <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
 
     <string name="profile_delete_device_dialog_title">Внимание</string>
-    <!--todo уточнить текст-->
     <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_primary_device_dialog_body">Вы действительно хотите удалить основной глюкометр?\nДанные будут сохранены</string>
     <string name="profile_delete_device_cancel_button">Отменить</string>
     <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
 

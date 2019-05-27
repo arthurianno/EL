@@ -1,13 +1,15 @@
 package com.elta.android.domain.features.diary.events.repository
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.io.File
 import java.util.Date
 
+@Suppress("ComplexInterface", "TooManyFunctions")
 interface EventsRepository {
 
     fun getEvents(): Observable<List<Event>>
@@ -26,5 +28,7 @@ interface EventsRepository {
 
     fun sync(): Completable
 
-    fun saveEventBitmap(eventHash: String, path: String, bitmap: Bitmap): Single<File>
+    fun getShareEventUri(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Single<Uri>
+
+    fun saveShareEventBitmap(event: Event, glucoseLevelSettings: GlucoseLevelSettings, bitmap: Bitmap): Single<Uri>
 }

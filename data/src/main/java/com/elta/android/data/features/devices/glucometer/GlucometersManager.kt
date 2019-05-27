@@ -94,12 +94,26 @@ class GlucometersManager @Inject constructor(
         Single.just(glucometersCache.getAll(CommonConditions.All))
             .map(glucometerFromCacheMapper::mapFromObjects)
 
-    fun deleteDevice(address: String): Completable =
-        Completable.fromCallable {
-            val id = address.hashCode().toLong()
-            glucometersCache.delete(CommonConditions.ById(id))
-            glucometersInfoCache.delete(CommonConditions.ById(id))
-        }
+    fun getDevice(address: String): Single<GlucometerDto> =
+        Single.just(glucometersCache.get(CommonConditions.ById(address.hashCode().toLong())))
+            .map(glucometerFromCacheMapper::mapFromObject)
+
+    fun deleteDevice(address: String): Completable {
+        val id = address.hashCode().toLong()
+        return Single.just(glucometersCache.get(CommonConditions.ById(id)))
+            .doOnSuccess {
+                glucometersCache.delete(CommonConditions.ById(id))
+                glucometersInfoCache.delete(CommonConditions.ById(id))
+            }
+            .filter { it.isPrimary }
+            .map { glucometersInfoCache.getAll(CommonConditions.All) }
+            .filter { it.isNotEmpty() }
+            .map { glucometers -> glucometers.sortedByDescending { it.syncDate }.first() }
+            .map { glucometersCache.get(CommonConditions.ById(it.id)) }
+            .map { it.copy(isPrimary = true) }
+            .map { glucometersCache.update(listOf(it)) }
+            .ignoreElement()
+    }
 
     fun getGlucometerInfo(address: String): Single<GlucometerInfoDto> =
         client.findConnection(address)
@@ -197,6 +211,24 @@ class GlucometersManager @Inject constructor(
                                 }
                             }
                     }
+        }
+
+    fun setPrimaryDevice(address: String): Completable =
+        Completable.fromCallable {
+            val glucometers = glucometersCache.getAll(CommonConditions.All)
+            var oldPrimaryGlucometer: GlucometerCachedDto? = null
+            var newPrimaryGlucometer: GlucometerCachedDto? = null
+            glucometers.forEach {
+                when {
+                    it.isPrimary -> oldPrimaryGlucometer = it.copy(isPrimary = false)
+                    it.address == address -> newPrimaryGlucometer = it.copy(isPrimary = true)
+                }
+            }
+            val glucometersToUpdate = mutableListOf<GlucometerCachedDto>().apply {
+                oldPrimaryGlucometer?.let { add(it) }
+                newPrimaryGlucometer?.let { add(it) }
+            }.toList()
+            if (glucometersToUpdate.isNotEmpty()) glucometersCache.update(glucometersToUpdate)
         }
 
     private fun RxBleConnection.simpleRequest(address: String, cmd: GlucometerCommand): Observable<String> {

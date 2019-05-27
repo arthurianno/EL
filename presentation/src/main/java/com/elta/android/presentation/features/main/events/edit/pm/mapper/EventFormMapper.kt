@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
@@ -16,6 +17,15 @@ fun Event.getPickerValues(): Pair<Int, Int>? =
         EventType.MEDICAMENTS -> null
         else -> value.toPickerValues()
     }
+
+fun Event.getValue(): Double =
+    when (value == null) {
+        true -> 0.0
+        else -> checkNotNull(value)
+    }
+
+fun Event.getFormattedTemperature(): String =
+    temperature?.let { NumberFormatter.format(it) } ?: "-"
 
 fun Event.getFormInputText(): String? =
     when (type) {
