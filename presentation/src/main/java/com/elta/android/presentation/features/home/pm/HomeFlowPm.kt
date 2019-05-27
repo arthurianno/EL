@@ -30,8 +30,8 @@ import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
-import me.dmdev.rxpm.bindProgress
 import me.dmdev.rxpm.skipWhileInProgress
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -177,10 +177,10 @@ class HomeFlowPm @Inject constructor(
         )
             .skipWhileInProgress(syncProgressState.observable)
             .map { SyncWithGlucometerUseCase.Params() }
-            .flatMapCompletable { params ->
+            .flatMap { params ->
                 syncWithGlucometerUseCase.execute(params)
                     .bindProgress(syncProgressState.consumer)
-                    .doOnComplete(::handleSyncCompleted)
+                    .doOnNext(::handleSyncCompleted)
                     .doOnError(::handleError)
             }
             .retry()
@@ -250,8 +250,8 @@ class HomeFlowPm @Inject constructor(
             meta = this
         )
 
-    private fun handleSyncCompleted() {
-        bus.event(Events.EventsChanged(true))
+    private fun handleSyncCompleted(events: Int) {
+        if (events > 0) bus.event(Events.EventsChanged(true))
     }
 
     companion object {

@@ -23,6 +23,9 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.diary.events.cache.EventsConditions
+import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -50,6 +53,7 @@ class GlucometersManager @Inject constructor(
     private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
     private val glucometerFromCacheMapper: Mapper<GlucometerCachedDto, GlucometerDto>,
     private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
+    private val eventsCache: Cache<EventCachedDto>,
     private val glucometersCache: Cache<GlucometerCachedDto>,
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
     private val eventBuilder: GlucometerEventBuilder,
@@ -172,12 +176,12 @@ class GlucometersManager @Inject constructor(
                 }
             }
 
-    fun syncWithDevice(device: GlucometerDto?): Single<List<GlucometerEventDto>> =
-        Single.just(Unit).delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
+    fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> =
+        Observable.just(Unit).delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
             .flatMap {
                 device?.let { syncInternal(it.address) }
                     ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
-                    ?: Single.error(PrimaryGlucometerNotFoundError)
+                    ?: Observable.error(PrimaryGlucometerNotFoundError)
             }
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
@@ -335,7 +339,7 @@ class GlucometersManager @Inject constructor(
             else -> null
         }
 
-    private fun syncInternal(address: String): Single<List<GlucometerEventDto>> =
+    private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()
             .flatMap {
                 client.findConnection(address)
@@ -375,8 +379,12 @@ class GlucometersManager @Inject constructor(
                     .take(1)
                     .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError(e)) }
                     .map { it.first }
+                    .map { events -> filterExistingEvents(events, getCachedEvents(events)) }
+                    .flatMap {
+                        if (it.isEmpty()) Observable.empty()
+                        else Observable.just(it)
+                    }
             }
-            .singleOrError()
 
     private fun filterConnectedDevices(
         connected: List<GlucometerCachedDto>,
@@ -398,6 +406,26 @@ class GlucometersManager @Inject constructor(
                 if (error != null) Observable.error(error)
                 else Observable.just(state)
             }
+
+    private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
+        eventsCache.getAll(
+            EventsConditions.ByTypeAndIds(
+                EventTypeDto.GLUCOSE, fromGlucometer.map { it.id.hashCode().toLong() }.toLongArray()
+            )
+        )
+
+    private fun filterExistingEvents(
+        fromGlucometer: List<GlucometerEventDto>,
+        cached: List<EventCachedDto>
+    ): List<GlucometerEventDto> =
+        if (cached.isEmpty()) fromGlucometer
+        else arrayListOf<GlucometerEventDto>().apply {
+            fromGlucometer.forEach { event ->
+                if (cached.find { it.secondaryId == event.id } == null) {
+                    add(event)
+                }
+            }
+        }
 
     companion object {
         private const val FIRMWARE_VERSION = "1.8" // version of firmware supported by application

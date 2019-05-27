@@ -15,6 +15,7 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -188,9 +189,12 @@ abstract class ConnectDevicePm constructor(
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
             .map { SyncWithGlucometerUseCase.Params(glucometer) }
-            .flatMapCompletable { params ->
+            .flatMap { params ->
                 syncWithGlucometerUseCase.execute(params)
                     .bindProgress(syncProgressState.consumer)
+                    .doOnNext { events ->
+                        if (events > 0) bus.event(Events.EventsChanged(true))
+                    }
                     .doOnComplete { state.consumer.accept(ViewState.SYNC_COMPLETED) }
                     .doOnError(::handleError)
             }
