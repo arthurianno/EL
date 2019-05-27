@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
-import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
@@ -14,7 +13,6 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
-import io.reactivex.Single
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
@@ -39,11 +37,14 @@ class AppPm @Inject constructor(
             .skipWhileInProgress()
             .flatMapSingle {
                 getUserInfoUseCase.execute()
-                    .flatMap { userInfo ->
-                        when (userInfo.isUserLoggedIn) {
-                            true -> checkEmailAndOnboarding(userInfo)
-                            else -> Single.just(Unit)
-                                .doOnSuccess { router.newRootFlow(Screens.GreetingFlow) }
+                    .doOnSuccess { user ->
+                        when {
+                            !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
+                            user.isUserLoggedIn && !user.isEmailConfirmed ->
+                                router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
+                            user.isUserLoggedIn && !user.isOnboardingPassed ->
+                                router.newRootFlow(Screens.OnBoardingFlow)
+                            else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
                     .doOnError { router.newRootFlow(Screens.GreetingFlow) }
@@ -101,18 +102,4 @@ class AppPm @Inject constructor(
             .subscribe(backendSyncProgress.consumer)
             .untilDestroy()
     }
-
-    private fun checkEmailAndOnboarding(userInfo: UserInfo) =
-        when (userInfo.isEmailConfirmed) {
-            true -> Single.just(Unit)
-                .doOnSuccess { checkIsOnboardingPassed(userInfo) }
-            else -> Single.just(Unit)
-                .doOnSuccess { router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile) }
-        }
-
-    private fun checkIsOnboardingPassed(userInfo: UserInfo) =
-        when (userInfo.isOnboardingPassed) {
-            true -> router.newRootFlow(Screens.HomeFlow)
-            else -> router.newRootFlow(Screens.OnBoardingFlow)
-        }
 }

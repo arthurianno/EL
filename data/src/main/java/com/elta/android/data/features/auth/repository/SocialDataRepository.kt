@@ -10,11 +10,11 @@ import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
-import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
-import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.user.model.SocialNetworkType
+import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
@@ -29,7 +29,7 @@ class SocialDataRepository @Inject constructor(
     private val authSocialSource: AuthSocialDataSource,
     @Remote private val profileSource: ProfileDataSource,
     private val userHolder: UserHolder,
-    private val userInfoSource: UserInfoDataSource
+    private val userInfoRepository: UserInfoRepository
 ) : SocialRepository {
 
     override fun linkSocialNetwork(network: SocialNetworkType): Completable =
@@ -57,7 +57,7 @@ class SocialDataRepository @Inject constructor(
             }
             .map(LoginDto::isEmailConfirmed)
             .flatMapSingle {
-                userInfoSource.updateUserInfo(
+                userInfoRepository.updateUserInfo(
                     createUserInfoDto(it)
                 ).toSingleDefault(it)
             }
@@ -78,9 +78,9 @@ class SocialDataRepository @Inject constructor(
         tokenStorage.refreshToken = tokens.refreshToken
     }
 
-    private fun createUserInfoDto(isEmailConfirmed: Boolean): UserInfoDto =
-        UserInfoDto(
-            id = userHolder.currentUser,
+    private fun createUserInfoDto(isEmailConfirmed: Boolean): UserInfo =
+        UserInfo(
+            id = checkNotNull(userHolder.currentUser),
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
             isOnboardingPassed = false,
             isFeedbackSent = false,

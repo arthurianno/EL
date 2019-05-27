@@ -64,8 +64,6 @@ import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileToDtoMapper
 import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
-import com.elta.android.data.features.userinfo.dto.UserInfoDto
-import com.elta.android.data.features.userinfo.mapper.UserInfoFromCacheMapper
 import com.elta.android.data.features.userinfo.mapper.UserInfoToCacheMapper
 import com.elta.android.data.features.userinfo.mapper.UserInfoToDomainMapper
 import com.elta.android.domain.features.auth.model.SocialUser
@@ -281,17 +279,12 @@ abstract class MappersModule {
     ): Mapper<FirmwareFileDto, FirmwareFile>
 
     @Binds
-    abstract fun bindUserInfoToCacheMapper(
-        mapper: UserInfoToCacheMapper
-    ): Mapper<UserInfoDto, UserInfoCacheDto>
-
-    @Binds
-    abstract fun bindUserInfoFromCacheMapper(
-        mapper: UserInfoFromCacheMapper
-    ): Mapper<UserInfoCacheDto, UserInfoDto>
-
-    @Binds
     abstract fun bindUserInfoToDomainMapper(
         mapper: UserInfoToDomainMapper
-    ): Mapper<UserInfoDto, UserInfo>
+    ): Mapper<UserInfoCacheDto, UserInfo>
+
+    @Binds
+    abstract fun bindUserInfoToCacheMapper(
+        mapper: UserInfoToCacheMapper
+    ): Mapper<UserInfo, UserInfoCacheDto>
 }

@@ -6,10 +6,9 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.dto.ProfileDto
-import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
-import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
+import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -19,7 +18,7 @@ class ProfileDataRepository @Inject constructor(
     private val toDomainMapper: Mapper<ProfileDto, Profile>,
     @Cache private val cachedSource: ProfileDataSource,
     @Remote private val remoteSource: ProfileDataSource,
-    private val userInfoDataSource: UserInfoDataSource,
+    private val userInfoRepository: UserInfoRepository,
     private val syncManger: LocalSyncManager
 ) : ProfileRepository {
 
@@ -32,7 +31,7 @@ class ProfileDataRepository @Inject constructor(
                         syncManger.saveAsUpdated(profile)
                     }
             )
-            .andThen(setOnboardingWasPassed())
+            .andThen(userInfoRepository.setOnBoardingPassed(true))
     }
 
     override fun getProfile(): Single<Profile> =
@@ -48,7 +47,7 @@ class ProfileDataRepository @Inject constructor(
         getProfile().map(Profile::email)
 
     override fun isOnboardingPassed(): Single<Boolean> =
-        userInfoDataSource.getUserInfo()
+        userInfoRepository.getUserInfo()
             .map { it.isOnboardingPassed }
 
     override fun sync(): Completable =
@@ -65,11 +64,5 @@ class ProfileDataRepository @Inject constructor(
                             else -> Completable.complete()
                         }
                     }
-            }
-
-    private fun setOnboardingWasPassed(): Completable =
-        Single.just(UserInfoDto(isOnboardingPassed = true))
-            .flatMapCompletable {
-                userInfoDataSource.updateUserInfo(it)
             }
 }

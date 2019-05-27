@@ -8,9 +8,9 @@ import com.elta.android.data.features.auth.dto.TokenOwnerDto
 import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
-import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
-import com.elta.android.data.features.userinfo.dto.UserInfoDto
 import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class AuthDataRepository @Inject constructor(
     private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
     private val source: AuthDataSource,
-    private val userInfoSource: UserInfoDataSource
+    private val userInfoRepository: UserInfoRepository
 ) : AuthRepository {
 
     override fun register(email: String, password: String): Completable =
@@ -28,7 +28,7 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response, email)
             }
             .flatMapCompletable {
-                userInfoSource.updateUserInfo(createUserInfoDto())
+                userInfoRepository.updateUserInfo(createUserInfoDto())
             }
 
     override fun login(email: String, password: String): Single<Boolean> =
@@ -38,13 +38,13 @@ class AuthDataRepository @Inject constructor(
             }
             .map(LoginDto::isEmailConfirmed)
             .flatMap {
-                userInfoSource.updateUserInfo(
+                userInfoRepository.updateUserInfo(
                     createUserInfoDto(it)
                 ).toSingleDefault(it)
             }
 
     override fun isEmailConfirmed(): Single<Boolean> =
-        userInfoSource.getUserInfo()
+        userInfoRepository.getUserInfo()
             .map { it.isEmailConfirmed }
             .flatMap { isConfirmed ->
                 when (isConfirmed) {
@@ -53,7 +53,7 @@ class AuthDataRepository @Inject constructor(
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
                         .flatMap {
-                            userInfoSource.updateUserInfo(
+                            userInfoRepository.updateUserInfo(
                                 createUserInfoDto(it)
                             ).toSingleDefault(it)
                         }
@@ -90,9 +90,9 @@ class AuthDataRepository @Inject constructor(
         tokenStorage.refreshToken = tokens.refreshToken
     }
 
-    private fun createUserInfoDto(isEmailConfirmed: Boolean = false): UserInfoDto =
-        UserInfoDto(
-            id = userHolder.currentUser,
+    private fun createUserInfoDto(isEmailConfirmed: Boolean = false): UserInfo =
+        UserInfo(
+            id = checkNotNull(userHolder.currentUser),
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
             isOnboardingPassed = false,
             isFeedbackSent = false,
