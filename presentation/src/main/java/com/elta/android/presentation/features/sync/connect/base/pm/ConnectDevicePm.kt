@@ -134,7 +134,6 @@ abstract class ConnectDevicePm constructor(
     private fun bindActions() {
         bindStartScanAction()
         bindStartSyncAction()
-        bindInternalConnectDeviceAction()
 
         skipAction.observable
             .subscribe(::navigateToShopsFlow)
@@ -166,9 +165,10 @@ abstract class ConnectDevicePm constructor(
 
         toAppAction.observable
             .subscribe(::navigateToApp)
+            .untilDestroy()
     }
 
-    private fun bindStartScanAction() =
+    private fun bindStartScanAction() {
         startScanAction.observable
             .flatMap {
                 findGlucometersUseCase.execute()
@@ -181,8 +181,9 @@ abstract class ConnectDevicePm constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
 
-    private fun bindStartSyncAction() =
+    private fun bindStartSyncAction() {
         startSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
@@ -196,6 +197,7 @@ abstract class ConnectDevicePm constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
 
     private fun bindRetryActions() {
         showRetrySearchAction.observable
