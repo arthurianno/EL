@@ -184,7 +184,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun handleSuccess() {
-        router.newRootScreen(Screens.SyncFlow)
+        router.newRootScreen(Screens.FromOnBoardingSyncFlow)
     }
 
     private fun createOnBoardingEvent(): AnalyticsEvent? {

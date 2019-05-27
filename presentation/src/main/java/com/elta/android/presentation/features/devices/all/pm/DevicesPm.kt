@@ -30,7 +30,7 @@ class DevicesPm @Inject constructor(
         bindGlucometersAction()
 
         addNewDeviceAction.observable
-            .subscribe { router.startFlow(Screens.ConnectDevice) }
+            .subscribe { router.startFlow(Screens.FromOtherSyncFlow) }
             .untilDestroy()
 
         Observable.merge(
