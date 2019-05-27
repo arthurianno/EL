@@ -3,7 +3,8 @@
     style="@style/New.Caption1.ShadeBlack2"
     android:layout_width="match_parent"
     android:layout_height="32dp"
+    android:layout_marginTop="24dp"
     android:gravity="center_vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    tools:text="@string/profile_devices_active_glucometers" />
+    tools:text="@string/profile_devices_primary_device" />

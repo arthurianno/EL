@@ -35,6 +35,7 @@ class ReminderMapper @Inject constructor(
             )
         }
 
+    @Suppress("SwallowedException")
     private fun Reminder.formatSchedule(): String {
         return try {
             val time = dateFormat.format(time)

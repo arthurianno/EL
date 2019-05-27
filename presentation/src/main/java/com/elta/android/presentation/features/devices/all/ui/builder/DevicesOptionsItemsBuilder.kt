@@ -13,17 +13,37 @@ class DevicesOptionsItemsBuilder @Inject constructor(
 ) {
     fun buildItems(glucometers: List<Glucometer>) = mutableListOf<ListItem>().apply {
         if (glucometers.isNotEmpty()) {
-            add(DevicesHeaderItem(resources.getString(R.string.profile_devices_active_glucometers)))
-            addAll(glucometers.map(::mapFromGlucometer))
+            add(DevicesHeaderItem(resources.getString(R.string.profile_devices_primary_device)))
+            val (primary, other) = divideGlucometers(glucometers)
+            add(mapFromGlucometer(primary))
+
+            if (other.isNotEmpty()) {
+                add(DevicesHeaderItem(resources.getString(R.string.profile_devices_other_devices)))
+                addAll(other.map(::mapFromGlucometer))
+            }
         }
+    }
+
+    private fun divideGlucometers(glucometers: List<Glucometer>): Pair<Glucometer, List<Glucometer>> {
+        var primary: Glucometer? = null
+        val other = mutableListOf<Glucometer>()
+        glucometers.forEach {
+            if (it.isPrimary) {
+                primary = it
+            } else {
+                other.add(it)
+            }
+        }
+        return checkNotNull(primary) to other
     }
 
     private fun mapFromGlucometer(source: Glucometer): ListItem =
         with(source) {
             ActiveDeviceItem(
-                icon = R.drawable.ic_devices,
+                icon = if (isPrimary) R.drawable.ic_devices else R.drawable.ic_devices_other,
                 name = name ?: "",
-                address = address
+                address = address,
+                isPrimary = isPrimary
             )
         }
 }

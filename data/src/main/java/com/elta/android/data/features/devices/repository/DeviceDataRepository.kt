@@ -31,6 +31,9 @@ class DeviceDataRepository @Inject constructor(
     override fun getDevices(): Single<List<Glucometer>> =
         source.getDevices().map(glucometerToDomainMapper::mapFromObjects)
 
+    override fun getDevice(address: String): Single<Glucometer> =
+        source.getDevice(address).map(glucometerToDomainMapper::mapFromObject)
+
     override fun deleteDevice(address: String): Completable =
         source.deleteDevice(address)
 
@@ -55,4 +58,7 @@ class DeviceDataRepository @Inject constructor(
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)
+
+    override fun setPrimaryDevice(address: String): Completable =
+        source.setPrimaryDevice(address)
 }

@@ -7,12 +7,13 @@ import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.PresentationModel
 
 @Suppress("UseDataClass")
-class FormSelectorControl(pm: PresentationModel) {
+class FormSelectorControl(pm: PresentationModel, val enabled: Boolean) {
     val option = pm.State(SelectorOption(null, null, null))
     val clickAction = pm.Action<Unit>()
 }
 
-fun PresentationModel.formSelectorControl(): FormSelectorControl = FormSelectorControl(this)
+fun PresentationModel.formSelectorControl(enabled: Boolean = true): FormSelectorControl =
+    FormSelectorControl(this, enabled)
 
 internal inline fun FormSelectorControl.bind(
     selectorView: FormSelectorView,
@@ -25,9 +26,10 @@ internal inline fun FormSelectorControl.bind(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(selectorView.value())
     )
-
-    compositeDisposable.add(
-        selectorView.click()
-            .subscribe(clickAction.consumer)
-    )
+    if (enabled) {
+        compositeDisposable.add(
+            selectorView.click()
+                .subscribe(clickAction.consumer)
+        )
+    }
 }

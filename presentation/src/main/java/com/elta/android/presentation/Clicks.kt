@@ -32,4 +32,5 @@ sealed class Clicks : Click {
     data class DeleteHemoglobinEventClicked(val id: String) : Clicks()
     data class ObserverItemClicked(val item: ObserverItem) : Clicks()
     data class DateInStatisticsClicked(val date: Date?) : Clicks()
+    object PrimaryDeviceItemClicked : Clicks()
 }

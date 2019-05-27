@@ -1,6 +1,5 @@
 package com.elta.android.domain.features.diary.events.interactor
 
-import android.graphics.Bitmap
 import android.net.Uri
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
@@ -10,15 +9,15 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import javax.inject.Inject
 
-class SaveEventBitmapUseCase @Inject constructor(
+class GetShareEventUriUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<Uri, SaveEventBitmapUseCase.Params>(schedulers) {
+) : SingleUseCase<Uri, GetShareEventUriUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Single<Uri> {
         val p = checkNotNull(params)
-        return eventsRepo.saveShareEventBitmap(p.event, p.glucoseLevelSettings, p.bitmap)
+        return eventsRepo.getShareEventUri(p.event, p.glucoseLevelSettings)
     }
 
-    data class Params(val event: Event, val glucoseLevelSettings: GlucoseLevelSettings, val bitmap: Bitmap)
+    data class Params(val event: Event, val glucoseLevelSettings: GlucoseLevelSettings)
 }

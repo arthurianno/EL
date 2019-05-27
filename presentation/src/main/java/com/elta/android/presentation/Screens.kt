@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
+import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
@@ -166,7 +167,10 @@ object Screens {
     }
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
-        override fun getFragment() = EditEventFragment.newInstance(eventId, eventType)
+        override fun getFragment() = when (eventType) {
+            EventType.GLUCOSE -> GlucoseEventFragment.newInstance(eventId)
+            else -> EditEventFragment.newInstance(eventId, eventType)
+        }
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
