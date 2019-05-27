@@ -39,6 +39,7 @@ class NotificationHelper @Inject constructor(
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.mipmap.ic_launcher)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title,
@@ -54,7 +55,6 @@ class NotificationHelper @Inject constructor(
             notification
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
-                .setSmallIcon(R.mipmap.ic_launcher)
                 .setLights(Color.BLUE, LIGHTS_DURATION, LIGHTS_DURATION)
         }
 
