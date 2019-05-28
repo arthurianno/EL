@@ -92,7 +92,6 @@ class AuthDataRepository @Inject constructor(
 
     private fun createUserInfoDto(isEmailConfirmed: Boolean = false): UserInfo =
         UserInfo(
-            id = checkNotNull(userHolder.currentUser),
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
             isOnBoardingPassed = false,
             isFeedbackSent = false,
