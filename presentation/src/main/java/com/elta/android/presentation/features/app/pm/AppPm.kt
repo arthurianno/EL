@@ -42,7 +42,7 @@ class AppPm @Inject constructor(
                             !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
                             user.isUserLoggedIn && !user.isEmailConfirmed ->
                                 router.newRootChain(Screens.GreetingFlow, Screens.ActivateProfile)
-                            user.isUserLoggedIn && !user.isOnboardingPassed ->
+                            user.isUserLoggedIn && !user.isOnBoardingPassed ->
                                 router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }

@@ -14,7 +14,7 @@ class UserInfoToDomainMapper @Inject constructor() : Mapper<UserInfoCacheDto, Us
                 isUserLoggedIn = isUserLoggedIn ?: false,
                 isEmailConfirmed = isEmailConfirmed ?: false,
                 isFeedbackSent = isFeedbackSent ?: false,
-                isOnboardingPassed = isOnboardingPassed ?: false
+                isOnBoardingPassed = isOnboardingPassed ?: false
             )
         }
 }

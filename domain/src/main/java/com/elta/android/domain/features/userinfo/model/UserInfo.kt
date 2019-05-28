@@ -5,5 +5,5 @@ data class UserInfo(
     val isUserLoggedIn: Boolean,
     var isFeedbackSent: Boolean,
     val isEmailConfirmed: Boolean,
-    var isOnboardingPassed: Boolean
+    var isOnBoardingPassed: Boolean
 )

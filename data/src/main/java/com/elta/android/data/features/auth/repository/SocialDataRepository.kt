@@ -82,7 +82,7 @@ class SocialDataRepository @Inject constructor(
         UserInfo(
             id = checkNotNull(userHolder.currentUser),
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
-            isOnboardingPassed = false,
+            isOnBoardingPassed = false,
             isFeedbackSent = false,
             isEmailConfirmed = isEmailConfirmed
         )
