@@ -4,6 +4,8 @@ import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -23,6 +25,7 @@ import java.util.Date
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -110,6 +113,7 @@ class OnBoardingPm @Inject constructor(
                 updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .andThen(updateUserInfoUseCase.execute(createUserInfoParams()))
                     .doOnComplete { updateStableParam(profile = params.profile) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
@@ -182,6 +186,9 @@ class OnBoardingPm @Inject constructor(
         )
         return UpdateProfileUseCase.Params(profile)
     }
+
+    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
+        UpdateUserInfoUseCase.Params(UserInfo(isOnBoardingPassed = true))
 
     private fun handleSuccess() {
         router.newRootScreen(Screens.FromOnBoardingSyncFlow)

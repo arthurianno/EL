@@ -10,7 +10,5 @@ interface UserInfoRepository {
 
     fun updateUserInfo(userInfo: UserInfo): Completable
 
-    fun setOnBoardingPassed(state: Boolean): Completable
-
     fun setFeedbackSent(state: Boolean): Completable
 }

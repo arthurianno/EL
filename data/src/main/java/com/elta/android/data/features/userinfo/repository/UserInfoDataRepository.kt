@@ -24,13 +24,6 @@ class UserInfoDataRepository @Inject constructor(
     override fun updateUserInfo(userInfo: UserInfo): Completable =
         userInfoDataSource.updateUserInfo(cacheMapper.mapFromObject(userInfo))
 
-    override fun setOnBoardingPassed(state: Boolean): Completable =
-        userInfoDataSource.updateUserInfo(
-            UserInfoCacheDto(
-                id = checkNotNull(userHolder.currentUser),
-                isOnboardingPassed = state
-            ))
-
     override fun setFeedbackSent(state: Boolean): Completable =
         userInfoDataSource.updateUserInfo(
             UserInfoCacheDto(
