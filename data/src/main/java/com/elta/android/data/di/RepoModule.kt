@@ -11,6 +11,7 @@ import com.elta.android.data.features.observers.repository.ObserverDataRepositor
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.ProfileDataRepository
+import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
@@ -22,6 +23,7 @@ import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
+import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -73,4 +75,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindFeedbackRepository(repo: FeedbackDataRepository): FeedbackRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserInfoRepository(repo: UserInfoDataRepository): UserInfoRepository
 }

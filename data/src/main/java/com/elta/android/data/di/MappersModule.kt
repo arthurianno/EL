@@ -63,6 +63,9 @@ import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileToDtoMapper
+import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
+import com.elta.android.data.features.userinfo.mapper.UserInfoToCacheMapper
+import com.elta.android.data.features.userinfo.mapper.UserInfoToDomainMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
@@ -76,6 +79,7 @@ import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import dagger.Binds
 import dagger.Module
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -273,4 +277,14 @@ abstract class MappersModule {
     abstract fun bindFirmwareFileToDomainMapper(
         mapper: FirmwareFileToDomainMapper
     ): Mapper<FirmwareFileDto, FirmwareFile>
+
+    @Binds
+    abstract fun bindUserInfoToDomainMapper(
+        mapper: UserInfoToDomainMapper
+    ): Mapper<UserInfoCacheDto, UserInfo>
+
+    @Binds
+    abstract fun bindUserInfoToCacheMapper(
+        mapper: UserInfoToCacheMapper
+    ): Mapper<UserInfo, UserInfoCacheDto>
 }
