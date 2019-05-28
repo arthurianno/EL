@@ -49,8 +49,8 @@ annotation class AnalyticsEventType {
         const val MAP_OPEN = "map_open"
         const val PROFILE_OPEN = "profile_open"
         const val NEW_EVENT_OPEN = "new_event_open"
-        const val GLUCOMETER_ADD = "glucometer_add" // todo
-        const val GLUCOMETER_SYNCH = "glucometer_synch" // todo
+        const val GLUCOMETER_ADD = "glucometer_add"
+        const val GLUCOMETER_SYNCH = "glucometer_synch"
         const val EVENT_BREAD_ADD = "event_bread_add"
         const val EVENT_INSULIN_ADD = "event_insulin_add"
         const val EVENT_ACTIVITY_ADD = "event_activity_add"

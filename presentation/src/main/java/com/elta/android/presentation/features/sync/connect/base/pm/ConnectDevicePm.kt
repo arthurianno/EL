@@ -14,6 +14,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -104,6 +105,7 @@ abstract class ConnectDevicePm constructor(
         bindActions()
         bindRetryActions()
         bindClicksAndEvents()
+        bindAnalytics()
 
         Observable.merge(
             btControl.bluetoothEnabledAction.observable,
@@ -286,6 +288,14 @@ abstract class ConnectDevicePm constructor(
             isSelected = meter.address == glucometer?.address,
             isTheLast = index == size - 1
         )
+
+    private fun bindAnalytics() {
+        state.observable
+            .filter { it == ViewState.SYNC_COMPLETED }
+            .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
+            .subscribe()
+            .untilDestroy()
+    }
 
     enum class ViewState {
         HOW_TO_CONNECT, SEARCH, FOUND, CONNECTED, SYNC_COMPLETED

@@ -130,6 +130,12 @@ abstract class BasePm(
     ): Observable<T> =
         this.doOnNext { this@BasePm.trackEvent(event(it)) }
 
+    protected inline fun <T> Observable<T>.trackEvent(
+        @AnalyticsEventType name: String,
+        vararg pairs: Pair<String, String>
+    ): Observable<T> =
+        this.doOnNext { this@BasePm.trackEvent(name, *pairs) }
+
     protected inline fun Completable.trackEvent(@AnalyticsEventType name: String): Completable =
         this.andThen(Completable.fromAction { this@BasePm.trackEvent(name) })
 
