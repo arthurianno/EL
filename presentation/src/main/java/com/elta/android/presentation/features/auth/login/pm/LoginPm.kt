@@ -94,7 +94,7 @@ class LoginPm @Inject constructor(
         getUserInfoUseCase.execute()
             .doOnSuccess { info ->
                 when {
-                    info.isEmailConfirmed?.not() ?: false -> router.navigateTo(ActivateProfile)
+                    !(info.isEmailConfirmed ?: false) -> router.navigateTo(ActivateProfile)
                     info.isOnBoardingPassed ?: false -> router.newRootFlow(Screens.HomeFlow)
                     else -> router.newRootFlow(Screens.OnBoardingFlow)
                 }
