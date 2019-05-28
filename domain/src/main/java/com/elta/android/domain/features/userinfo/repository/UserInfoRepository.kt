@@ -9,6 +9,4 @@ interface UserInfoRepository {
     fun getUserInfo(): Single<UserInfo>
 
     fun updateUserInfo(userInfo: UserInfo): Completable
-
-    fun setFeedbackSent(state: Boolean): Completable
 }

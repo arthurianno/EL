@@ -8,6 +8,4 @@ interface FeedbackRepository {
     fun sendFeedback(name: String, email: String, message: String): Completable
 
     fun isFeedbackWasSent(): Single<Boolean>
-
-    fun setFeedbackWasSent(): Completable
 }
