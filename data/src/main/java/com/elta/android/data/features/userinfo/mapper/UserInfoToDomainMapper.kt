@@ -11,10 +11,10 @@ class UserInfoToDomainMapper @Inject constructor() : Mapper<UserInfoCacheDto, Us
         with(source) {
             UserInfo(
                 id = id,
-                isUserLoggedIn = isUserLoggedIn ?: false,
-                isEmailConfirmed = isEmailConfirmed ?: false,
-                isFeedbackSent = isFeedbackSent ?: false,
-                isOnBoardingPassed = isOnboardingPassed ?: false
+                isUserLoggedIn = isUserLoggedIn,
+                isEmailConfirmed = isEmailConfirmed,
+                isFeedbackSent = isFeedbackSent,
+                isOnBoardingPassed = isOnboardingPassed
             )
         }
 }
