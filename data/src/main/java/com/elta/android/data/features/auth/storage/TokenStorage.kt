@@ -6,4 +6,6 @@ interface TokenStorage {
     var refreshToken: String?
 
     fun refresh()
+
+    fun isUserLoggedIn(): Boolean
 }

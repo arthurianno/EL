@@ -3,8 +3,9 @@ package com.elta.android.presentation.features.main.records.pm
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
-import com.elta.android.domain.features.feedback.interactor.SetFeedbackWasSentUseCase
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -28,8 +29,8 @@ import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val shouldSendFeedbackUseCase: ShouldSendFeedbackUseCase,
-    private val setFeedbackWasSentUseCase: SetFeedbackWasSentUseCase,
     private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -147,7 +148,7 @@ class MainRecordsPm @Inject constructor(
             .switchMapMaybe { googlePlayDialogControl.showForResult(googlePlayDialogData) }
             .filter { it == DialogResult.POSITIVE }
             .flatMapCompletable {
-                setFeedbackWasSentUseCase.execute()
+                updateUserInfoUseCase.execute(createUserInfoParams())
                     .andThen(Completable.fromAction {
                         router.navigateTo(Screens.PlayMarketScreen)
                     })
@@ -178,4 +179,7 @@ class MainRecordsPm @Inject constructor(
             .doOnNext(router::startFlow)
             .subscribe()
             .untilDestroy()
+
+    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
+        UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
 }

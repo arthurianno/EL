@@ -38,6 +38,7 @@ abstract class BasePm(
     val showSnackBarCommand = Command<SnackBarData>(bufferSize = 1)
 
     val retryAction = Action<Unit>()
+
     val networkStateAction = Action<Boolean>()
     val networkStateCommand = Command<Boolean>(bufferSize = 1)
 

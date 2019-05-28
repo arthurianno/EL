@@ -420,9 +420,65 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "14:2132176121149602466",
+      "lastPropertyId": "5:7347029842216060908",
+      "name": "LocalSyncCachedDto",
+      "properties": [
+        {
+          "id": "1:3528926957512000350",
+          "name": "id"
+        },
+        {
+          "id": "2:6056234610708105544",
+          "name": "secondaryId"
+        },
+        {
+          "id": "3:4072144334422161834",
+          "name": "state"
+        },
+        {
+          "id": "4:7092182216273253898",
+          "name": "className"
+        },
+        {
+          "id": "5:7347029842216060908",
+          "name": "meta"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "15:3172733917331824673",
+      "lastPropertyId": "5:1113739526237631879",
+      "name": "LocalUserCacheDto",
+      "properties": [
+        {
+          "id": "1:3684651299712072294",
+          "name": "id"
+        },
+        {
+          "id": "2:6799483249178145102",
+          "name": "isUserLoggedIn"
+        },
+        {
+          "id": "3:78969528808694988",
+          "name": "isFeedbackSent"
+        },
+        {
+          "id": "4:8809417499672134012",
+          "name": "isEmailConfirmed"
+        },
+        {
+          "id": "5:1113739526237631879",
+          "name": "isOnboardingPassed"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "13:4893127598039866661",
+  "lastEntityId": "15:3172733917331824673",
   "lastIndexId": "5:7982913992379413599",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
