@@ -56,7 +56,7 @@ class SocialDataRepository @Inject constructor(
             .map(LoginDto::isEmailConfirmed)
             .flatMapSingle {
                 userInfoRepository.updateUserInfo(
-                    createUserInfoDto(it)
+                    createUserInfoWithEmailStatus(it)
                 ).toSingleDefault(it)
             }
             .single(false)
@@ -76,11 +76,9 @@ class SocialDataRepository @Inject constructor(
         tokenStorage.refreshToken = tokens.refreshToken
     }
 
-    private fun createUserInfoDto(isEmailConfirmed: Boolean): UserInfo =
+    private fun createUserInfoWithEmailStatus(isEmailConfirmed: Boolean): UserInfo =
         UserInfo(
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
-            isOnBoardingPassed = false,
-            isFeedbackSent = false,
             isEmailConfirmed = isEmailConfirmed
         )
 }

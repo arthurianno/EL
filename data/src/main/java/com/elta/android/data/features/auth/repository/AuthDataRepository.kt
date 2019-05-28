@@ -28,7 +28,7 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response, email)
             }
             .flatMapCompletable {
-                userInfoRepository.updateUserInfo(createUserInfoDto())
+                userInfoRepository.updateUserInfo(createNewUserInfo())
             }
 
     override fun login(email: String, password: String): Single<Boolean> =
@@ -39,7 +39,7 @@ class AuthDataRepository @Inject constructor(
             .map(LoginDto::isEmailConfirmed)
             .flatMap {
                 userInfoRepository.updateUserInfo(
-                    createUserInfoDto(it)
+                    createUserInfoWithEmailStatus(it)
                 ).toSingleDefault(it)
             }
 
@@ -53,9 +53,8 @@ class AuthDataRepository @Inject constructor(
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
                         .flatMap {
-                            userInfoRepository.updateUserInfo(
-                                createUserInfoDto(it)
-                            ).toSingleDefault(it)
+                            userInfoRepository.updateUserInfo(createUserInfoWithEmailStatus(it))
+                                .toSingleDefault(it)
                         }
                 }
             }
@@ -90,11 +89,17 @@ class AuthDataRepository @Inject constructor(
         tokenStorage.refreshToken = tokens.refreshToken
     }
 
-    private fun createUserInfoDto(isEmailConfirmed: Boolean = false): UserInfo =
+    private fun createNewUserInfo(): UserInfo =
         UserInfo(
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
             isOnBoardingPassed = false,
             isFeedbackSent = false,
+            isEmailConfirmed = false
+        )
+
+    private fun createUserInfoWithEmailStatus(isEmailConfirmed: Boolean): UserInfo =
+        UserInfo(
+            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
             isEmailConfirmed = isEmailConfirmed
         )
 }
