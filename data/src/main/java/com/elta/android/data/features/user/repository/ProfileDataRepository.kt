@@ -46,10 +46,6 @@ class ProfileDataRepository @Inject constructor(
     override fun getUserId(): Single<String> =
         getProfile().map(Profile::email)
 
-    override fun isOnboardingPassed(): Single<Boolean> =
-        userInfoRepository.getUserInfo()
-            .map { it.isOnboardingPassed }
-
     override fun sync(): Completable =
         remoteSource.getUserProfile()
             .flatMapCompletable {
