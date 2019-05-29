@@ -3,10 +3,16 @@ package com.elta.android.presentation.features.home.ui
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.LayoutInflater
 import android.view.View
+import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.core.ui.dialog.buttons
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.sync.control.bindTo
@@ -22,6 +28,8 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
+import kotlinx.android.synthetic.main.layout_like_app_dialog.view.*
+import me.dmdev.rxpm.widget.DialogControl
 import javax.inject.Inject
 
 class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
@@ -79,6 +87,10 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
         pm.retryDeviceNotFoundControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+
+        pm.likeAppDialogControl.bindLikeAppDialog()
+        pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     override fun handleBack() {
@@ -96,6 +108,19 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         bottomSheetItemsView.layoutManager = LinearLayoutManager(activity)
         bottomSheetItemsView.adapter = adapter
     }
+
+    private fun DialogControl<DialogData, DialogResult>.bindLikeAppDialog() =
+        bindTo { data, dc ->
+            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.layout_like_app_dialog, null)
+            dialogView.titleView.text = data.title
+            dialogView.contentView.text = data.message
+
+            MaterialDialog.Builder(requireActivity())
+                .customView(dialogView, false)
+                .cancelable(false)
+                .buttons(dc, data)
+                .build()
+        }
 
     companion object {
         fun newInstance() = HomeFlowFragment()
