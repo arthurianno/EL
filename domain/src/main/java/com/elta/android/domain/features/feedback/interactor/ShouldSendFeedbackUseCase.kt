@@ -16,14 +16,8 @@ class ShouldSendFeedbackUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Unit?): Single<FeedbackDataModel> =
         userInfoRepo.getUserInfo().map { info -> info.isFeedbackSent ?: false }
-            .flatMap { isFeedbackWasSent ->
-                if (isFeedbackWasSent) {
-                    Single.just(noneFeedbackModel())
-                } else {
-                    eventsRepo.getEvents()
-                        .singleOrError()
-                        .onErrorReturn { emptyList() }
-                        .map { it.isFeedbackStep() }
-                }
+            .flatMap { isFeedbackSent ->
+                if (isFeedbackSent) Single.just(noneFeedbackModel())
+                else eventsRepo.countEvents().map { events -> getFeedbackModel(events.toInt()) }
             }
 }
