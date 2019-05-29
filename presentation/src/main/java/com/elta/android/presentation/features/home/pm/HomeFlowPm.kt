@@ -6,7 +6,6 @@ import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
-import com.elta.android.common.utils.log
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
@@ -139,7 +138,6 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.EventsChanged>()
-            .log("Feedback", "home")
             .filter { it.isCreated }
             .map { Unit }
             .subscribe(feedbackAction.consumer)
@@ -260,7 +258,6 @@ class HomeFlowPm @Inject constructor(
 
     private fun bindFeedbackAction() {
         feedbackAction.observable
-            .log("Feedback", "feedbackAction")
             .flatMap {
                 shouldSendFeedbackUseCase.execute(Unit)
                     .filter { it.isSendFeedback }
