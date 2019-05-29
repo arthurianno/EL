@@ -18,6 +18,8 @@ interface EventsRepository {
 
     fun getEventById(id: String): Single<Event>
 
+    fun countEvents(): Single<Long>
+
     fun addEvent(event: Event): Completable
 
     fun addEvents(events: List<Event>): Completable

@@ -46,6 +46,9 @@ class EventsDataRepository @Inject constructor(
         cacheSource.getEventById(id)
             .map(toDomainMapper::mapFromObject)
 
+    override fun countEvents(): Single<Long> =
+        cacheSource.countEvents()
+
     override fun addEvent(event: Event): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
