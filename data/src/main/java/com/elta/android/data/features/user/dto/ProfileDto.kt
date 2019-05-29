@@ -10,5 +10,6 @@ data class ProfileDto(
     @SerializedName("glucoseLevels") val glucoseLevel: GlucoseLevelDto?,
     @SerializedName("email") val email: String?,
     @SerializedName("socialNetworks") var socialNetworks: List<SocialNetworkDto>?,
+    @SerializedName("healthApps") var healthApps: List<HealthAppDto>?,
     @SerializedName("timestamp") val timeStamp: Long
 )

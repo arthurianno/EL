@@ -6,6 +6,8 @@ import com.elta.android.common.utils.log
 import com.elta.android.data.features.user.dto.DiabetTypeDto
 import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
+import com.elta.android.data.features.user.dto.HealthAppDto
+import com.elta.android.data.features.user.dto.HealthAppTypeDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
@@ -39,6 +41,10 @@ class MockedProfileApi : ProfileApi {
                     SocialNetworkDto(type = SocialNetworkTypeDto.FB, isLinked = true),
                     SocialNetworkDto(type = SocialNetworkTypeDto.VK, isLinked = false),
                     SocialNetworkDto(type = SocialNetworkTypeDto.OK, isLinked = false)
+                ),
+                healthApps = listOf(
+                    HealthAppDto(type = HealthAppTypeDto.GOOGLE_FIT, isActive = true),
+                    HealthAppDto(type = HealthAppTypeDto.APPLE_HEALTH, isActive = false)
                 ),
                 timeStamp = Date().toTimestamp()
             )

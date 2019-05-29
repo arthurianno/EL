@@ -4,12 +4,16 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.user.dto.DiabetTypeDto
 import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
+import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.Profile
 import javax.inject.Inject
 
-class ProfileToDtoMapper @Inject constructor() : Mapper<Profile, ProfileDto> {
+class ProfileToDtoMapper @Inject constructor(
+    private val healthAppsMapper: Mapper<HealthApp, HealthAppDto>
+) : Mapper<Profile, ProfileDto> {
 
     override fun mapFromObject(source: Profile): ProfileDto =
         with(source) {
@@ -31,6 +35,7 @@ class ProfileToDtoMapper @Inject constructor() : Mapper<Profile, ProfileDto> {
                 },
                 email = email,
                 socialNetworks = null,
+                healthApps = source.healthApps?.let { healthAppsMapper.mapFromObjects(it) },
                 timeStamp = timeStamp
             )
         }

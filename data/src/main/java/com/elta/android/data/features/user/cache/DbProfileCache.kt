@@ -7,6 +7,7 @@ import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto_
 import io.objectbox.kotlin.query
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +18,16 @@ class DbProfileCache @Inject constructor(
 
     override val classToken: Class<ProfileCacheDto> = ProfileCacheDto::class.java
 
+    override fun add(objects: List<ProfileCacheDto>) {
+        processToMany(objects)
+        super.add(objects)
+    }
+
+    override fun update(objects: List<ProfileCacheDto>) {
+        processToMany(objects)
+        super.update(objects)
+    }
+
     override fun contains(condition: Condition): Boolean =
         when (condition) {
             is CommonConditions.ById -> containsById(condition.id)
@@ -26,4 +37,16 @@ class DbProfileCache @Inject constructor(
     private fun containsById(id: Long): Boolean = box.query {
         equal(ProfileCacheDto_.id, id)
     }.count() > 0
+
+    private fun processToMany(objects: List<ProfileCacheDto>) {
+        objects.forEach {
+            box.attach(it)
+            if (it.tempSocialNetworks.isNotEmpty()) {
+                it.socialNetworks.addAll(it.tempSocialNetworks)
+            }
+            if (it.tempHealthApps.isNotEmpty()) {
+                it.healthApps.addAll(it.tempHealthApps)
+            }
+        }
+    }
 }

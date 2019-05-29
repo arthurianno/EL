@@ -13,6 +13,4 @@ interface Cache<T> {
     fun getAll(condition: Condition): List<T>
 
     fun contains(condition: Condition): Boolean
-
-    fun attach(entity: T)
 }

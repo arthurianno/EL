@@ -59,6 +59,9 @@ dependencies {
     implementation project(':common')
     api project(':domain')
 
+    implementation commonDependencies.googleFit
+    implementation commonDependencies.googleAuth
+
     implementation commonDependencies.appCoreRx
     implementation commonDependencies.appCoreSecurity
     implementation commonDependencies.appCoreHardware
