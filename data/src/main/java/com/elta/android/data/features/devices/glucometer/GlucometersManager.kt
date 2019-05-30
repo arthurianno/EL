@@ -214,6 +214,18 @@ class GlucometersManager @Inject constructor(
                                     else -> Completable.error(GlucometerToDfuModeError)
                                 }
                             }
+                            // we can't know when device will completely reboot after update
+                            // to get actual info so we using this this hack to update glucometer
+                            // version after update firmware.
+                            .doOnComplete {
+                                val id = address.hashCode().toLong()
+                                glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
+                                    file.version.toDoubleOrNull()?.let { version ->
+                                        val newInfo = info.copy(software = version)
+                                        glucometersInfoCache.update(listOf(newInfo))
+                                    }
+                                }
+                            }
                     }
         }
 
