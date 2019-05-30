@@ -15,6 +15,7 @@
     <string name="error_612">Not found. New account</string>
     <string name="error_613">Неверный текущий пароль</string>
     <string name="error_700">Внимание! Данный пользователь уже\nявляется вашим наблюдателем</string>
+    <string name="error_707">Невозможно отправить на свой email</string>
 
     <!-- DEFAULT ERRORS -->
     <string name="error_test_error">Internal error</string>

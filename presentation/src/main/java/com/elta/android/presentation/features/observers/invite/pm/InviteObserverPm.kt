@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.observers.invite.pm
 
+import com.elta.android.common.errors.CantSendInviteToYourselfError
 import com.elta.android.common.errors.EmailAlreadyInvitedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
@@ -47,8 +48,12 @@ class InviteObserverPm @Inject constructor(
     }
 
     override fun handleError(error: Throwable) {
-        when (error is EmailAlreadyInvitedError) {
-            true -> {
+        when (error) {
+            is EmailAlreadyInvitedError -> {
+                setErrorStateData(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                setErrorViewVisibility(true)
+            }
+            is CantSendInviteToYourselfError -> {
                 setErrorStateData(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
                 setErrorViewVisibility(true)
             }
