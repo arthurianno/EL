@@ -4,4 +4,4 @@ sealed class AdditionalFunction
 object WhereBuy : AdditionalFunction()
 object MyObservers : AdditionalFunction()
 object MyDevices : AdditionalFunction()
-object ExitFromApp: AdditionalFunction()
+object ExitFromApp : AdditionalFunction()
