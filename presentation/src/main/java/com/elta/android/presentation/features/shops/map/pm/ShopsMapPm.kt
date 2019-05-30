@@ -6,10 +6,13 @@ import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseC
 import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.isSearchInputValid
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.geo.GeoPoint
+import com.elta.android.presentation.core.geo.GeoPointIcon
 import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
@@ -293,8 +296,15 @@ class ShopsMapPm @Inject constructor(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
             id = id,
+            icon = type.toIcon(),
             meta = "$city, $address"
         )
+
+    private fun Type.toIcon(): GeoPointIcon =
+        when (this) {
+            Type.SALE -> GeoPointIcon(normal = R.drawable.ic_normal_pin_shop, selected = R.drawable.ic_active_pin_shop)
+            Type.SERVICE -> GeoPointIcon(normal = R.drawable.ic_normal_pin_services, selected = R.drawable.ic_active_pin_services)
+        }
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
