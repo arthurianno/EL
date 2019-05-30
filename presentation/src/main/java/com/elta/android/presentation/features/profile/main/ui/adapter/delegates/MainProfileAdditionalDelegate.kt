@@ -42,6 +42,7 @@ class MainProfileAdditionalDelegate(
             functionNameView.setText(item.title)
             item.description?.let { functionDescriptionNameView.setText(it) }
             functionDescriptionNameView.toggleView(item.description != null)
+            functionStateView.toggleView(item.showGoArrow)
         }
     }
 }

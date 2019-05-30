@@ -49,7 +49,12 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
             R.drawable.ic_devices, MyDevices)
         )
-        add(MainProfileAdditionalItem(title = R.string.profile_exit_from_app, icon = R.drawable.ic_exit_app, type = ExitFromApp))
+        add(MainProfileAdditionalItem(
+            title = R.string.profile_exit_from_app,
+            icon = R.drawable.ic_exit_app,
+            type = ExitFromApp,
+            showGoArrow = false)
+        )
     }
 
     private fun createGlucoseLevelText(item: Any?) =

@@ -12,7 +12,8 @@ data class MainProfileAdditionalItem(
     val description: Int? = null,
     @DrawableRes
     val icon: Int,
-    val type: AdditionalFunction
+    val type: AdditionalFunction,
+    val showGoArrow: Boolean = true
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = type
