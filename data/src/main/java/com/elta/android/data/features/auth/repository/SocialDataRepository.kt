@@ -71,6 +71,9 @@ class SocialDataRepository @Inject constructor(
         socialFactory.getDataSource(network).getSocialUser()
             .map(socialUserDtoMapper::mapFromObject)
 
+    override fun logout(network: SocialNetworkType): Completable =
+        socialFactory.getDataSource(network).logout()
+
     private fun saveTokens(tokens: TokensDto) {
         tokenStorage.accessToken = tokens.accessToken
         tokenStorage.refreshToken = tokens.refreshToken
