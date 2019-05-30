@@ -45,6 +45,9 @@ class EventsCachedDataSource @Inject constructor(
             cache.getAll(CommonConditions.ByIds(ids))
         }.map(fromCacheMapper::mapFromObjects)
 
+    override fun countEvents(): Single<Long> =
+        Single.fromCallable { cache.count(CommonConditions.All) }
+
     override fun addEvents(events: List<EventDto>): Completable =
         Completable.fromCallable {
             cache.add(toCacheMapper.mapFromObjects(events))

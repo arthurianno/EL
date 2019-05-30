@@ -17,6 +17,8 @@ interface EventsDataSource {
 
     fun getEventsById(ids: List<Long>): Observable<List<EventDto>>
 
+    fun countEvents(): Single<Long>
+
     fun addEvents(events: List<EventDto>): Completable
 
     fun updateEvents(events: List<EventDto>): Completable

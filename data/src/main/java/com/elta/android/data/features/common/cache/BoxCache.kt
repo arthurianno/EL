@@ -49,6 +49,12 @@ abstract class BoxCache<T>(
             else -> throw IllegalContainsCondition(condition)
         }
 
+    override fun count(condition: Condition): Long =
+        when (condition) {
+            is CommonConditions.All -> box.count()
+            else -> throw IllegalCountCondition(condition)
+        }
+
     override fun attach(entity: T) {
         box.attach(entity)
     }
