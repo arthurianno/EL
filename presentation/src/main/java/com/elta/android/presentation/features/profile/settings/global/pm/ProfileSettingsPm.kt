@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.profile.settings.global.pm
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
+import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Clicks
@@ -24,6 +26,7 @@ import javax.inject.Inject
 
 class ProfileSettingsPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
+    private val upadteProfileUseCase: UpdateProfileUseCase,
     private val linkSocialNetworkUseCase: LinkSocialNetworkUseCase,
     private val unlinkSocialNetworkUseCase: UnLinkSocialNetworkUseCase,
     private val itemsBuilder: ProfileSettingsItemsBuilder,
@@ -37,6 +40,7 @@ class ProfileSettingsPm @Inject constructor(
     private val getProfileSettingsAction = Action<Unit>()
     private val linkSocialUserAction = Action<Unit>()
     private val unlinkSocialUserAction = Action<Unit>()
+    private val profileState = State<Profile>()
 
     private val unlinkNetworkDialogData: DialogData by lazy { Dialogs.EventUnlinkNetwork(resources) }
 
@@ -89,6 +93,20 @@ class ProfileSettingsPm @Inject constructor(
                 else linkSocialUserAction.consumer.accept(Unit)
             }
             .untilDestroy()
+
+        bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
+            .map { it.type }
+            .map(::createSwitchHealthAppParams)
+            .flatMapSingle {
+                upadteProfileUseCase.execute(it)
+                    .andThen(getProfileUseCase.execute())
+                    .bindProgress()
+                    .handleProfileUseCase()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun observeNetworksActions() {
@@ -122,7 +140,8 @@ class ProfileSettingsPm @Inject constructor(
     }
 
     private fun Single<Profile>.handleProfileUseCase() =
-        map { itemsBuilder.buildItems(it) }
+        doOnSuccess(profileState.consumer)
+            .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
 
     private fun createLinkSocialUserParams(network: SocialNetworkType) =
@@ -130,4 +149,12 @@ class ProfileSettingsPm @Inject constructor(
 
     private fun createUnlinkSocialUserParams(network: SocialNetworkType) =
         UnLinkSocialNetworkUseCase.Params(network)
+
+    private fun createSwitchHealthAppParams(type: HealthAppType): UpdateProfileUseCase.Params =
+        UpdateProfileUseCase.Params(
+            profileState.value.copy().apply {
+                val healthApp = healthApps?.find { it.type == type }
+                healthApp?.isActive = healthApp?.isActive?.not() ?: false
+            }
+        )
 }

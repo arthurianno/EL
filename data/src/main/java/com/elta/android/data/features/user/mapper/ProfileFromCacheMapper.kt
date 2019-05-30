@@ -11,7 +11,6 @@ import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
-import timber.log.Timber
 import javax.inject.Inject
 
 class ProfileFromCacheMapper @Inject constructor(

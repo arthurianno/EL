@@ -7,7 +7,6 @@ import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto_
 import io.objectbox.kotlin.query
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
@@ -27,6 +28,7 @@ sealed class Clicks : Click {
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
     data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
+    data class ProfileSettingsHealthAppItemClicked(val type: HealthAppType) : Clicks()
     data class ReminderItemClicked(val item: ReminderItem) : Clicks()
     data class ActiveDeviceItemClicked(val item: ActiveDeviceItem) : Clicks()
     data class DeleteHemoglobinEventClicked(val id: String) : Clicks()

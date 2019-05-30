@@ -314,5 +314,4 @@ abstract class MappersModule {
     abstract fun bindHealthAppToDtoCacheMapper(
         mapper: HealthAppToDtoMapper
     ): Mapper<HealthApp, HealthAppDto>
-
 }
