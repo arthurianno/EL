@@ -30,6 +30,10 @@ class Analytics @Inject constructor(
         setStableParams(stableParams, config)
     }
 
+    fun clearStableParams() {
+        stableParams.clear()
+    }
+
     private fun setStableParams(stableParams: Map<String, String>, config: Config = defaultConfig) {
         config.usedTrackers.forEach { name -> trackers[name]?.setStableParams(stableParams) }
     }

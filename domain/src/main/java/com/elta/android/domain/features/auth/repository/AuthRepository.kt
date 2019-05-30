@@ -23,4 +23,6 @@ interface AuthRepository {
     fun checkTokenOwner(token: String): Single<Boolean>
 
     fun confirmEmail(token: String): Completable
+
+    fun logout(): Completable
 }

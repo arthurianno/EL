@@ -79,6 +79,13 @@ class AuthDataRepository @Inject constructor(
         source.confirmEmail(token)
             .andThen(Completable.fromCallable { tokenStorage.refresh() })
 
+    override fun logout(): Completable =
+        Completable.fromAction {
+            tokenStorage.accessToken = null
+            tokenStorage.refreshToken = null
+            userHolder.currentUser = null
+        }
+
     private fun saveUserCredentials(tokens: TokensDto, email: String) {
         saveTokens(tokens)
         userHolder.currentUser = email.hashCode().toLong()

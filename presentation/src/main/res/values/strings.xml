@@ -408,6 +408,7 @@
     <string name="vkontakte">Vkontakte</string>
     <string name="odnoklasniki">Odnoklasniki</string>
     <string name="profile_app_version">Версия приложения: %s</string>
+    <string name="profile_exit_from_app">Выйти из учетной записи</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
