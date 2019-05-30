@@ -7,8 +7,9 @@ import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
 import io.reactivex.Observable
+import javax.inject.Inject
 
-class LogOutUseCase(
+class LogOutUseCase @Inject constructor(
     private val authRepo: AuthRepository,
     private val socialRepo: SocialRepository,
     schedulers: SchedulersFacade
@@ -17,7 +18,7 @@ class LogOutUseCase(
     override fun buildUseCaseObservable(params: Unit?): Completable =
         authRepo.logout()
             .andThen(Observable.fromIterable(SocialNetworkType.values().asIterable())
-                    .concatMapCompletable { type ->
-                        socialRepo.logout(type)
-                    })
+                .concatMapCompletable { type ->
+                    socialRepo.logout(type)
+                })
 }
