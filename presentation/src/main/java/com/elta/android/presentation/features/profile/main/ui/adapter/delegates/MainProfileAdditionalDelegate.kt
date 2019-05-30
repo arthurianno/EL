@@ -12,6 +12,7 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
+import com.nullgr.core.ui.extensions.toggleView
 import kotlinx.android.synthetic.main.item_profile_functions.*
 
 class MainProfileAdditionalDelegate(
@@ -39,7 +40,8 @@ class MainProfileAdditionalDelegate(
         with(holder as ViewHolder) {
             functionIconView.setImageResource(item.icon)
             functionNameView.setText(item.title)
-            functionDescriptionNameView.setText(item.description)
+            item.description?.let { functionDescriptionNameView.setText(it) }
+            functionDescriptionNameView.toggleView(item.description != null)
         }
     }
 }
