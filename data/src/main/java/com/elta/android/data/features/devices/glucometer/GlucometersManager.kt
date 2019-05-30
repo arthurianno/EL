@@ -177,7 +177,11 @@ class GlucometersManager @Inject constructor(
             }
 
     fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> =
-        device?.let { Observable.just(Unit).delay(SYNC_DELAY, TimeUnit.MILLISECONDS).flatMap { syncInternal(device.address) } }
+        device?.let {
+            Observable.just(Unit)
+                .delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
+                .flatMap { syncInternal(device.address) }
+        }
             ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
             ?: Observable.error(PrimaryGlucometerNotFoundError)
 
@@ -349,23 +353,18 @@ class GlucometersManager @Inject constructor(
                 val pin = pinStorage.getPin(address)
                 if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
 
-                val startCommands = mutableListOf(
-                    Commands.SetPin(pin),
-                    Commands.SetTime(Date()),
-                    Commands.GetDate,
-                    Commands.GetBatteryAndTemperature,
-                    Commands.GetVersion
+                val startCommands = mutableListOf(Commands.SetPin(pin), Commands.SetTime(Date()),
+                    Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
                 )
 
                 Observable.range(0, EVENTS_COUNT)
                     .map { index -> Commands.ReadEvent(index) as GlucometerCommand }
                     .startWith(startCommands)
                     .concatMap { command ->
-                        Observable.just(command)
-                            .delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
+                        Observable.just(command).delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
                             .concatMapSingle {
-                                connection.writeCharacteristic(UART_RX, command.toGlucometerString().toByteArray(Charset.defaultCharset()))
-                                    .map { responses }
+                                val input = command.toGlucometerString().toByteArray(Charset.defaultCharset())
+                                connection.writeCharacteristic(UART_RX, input).map { responses }
                             }
                     }
             }
@@ -378,19 +377,13 @@ class GlucometersManager @Inject constructor(
                 }
             }
             .takeUntil { isPotentialLastEvent(it) }
-            .collectInto(SyncResponseHolder()) { holder, response ->
-                if (response.isEvent() && !isPotentialLastEvent(response)) holder.events.add(response)
-                else if (!response.isOk() && !response.isError() && !isPotentialLastEvent(response)) holder.info.add(response)
+            .collectInto(SyncResponseHolder()) { holder, r ->
+                if (r.isEvent() && !isPotentialLastEvent(r)) holder.events.add(r)
+                else if (!r.isOk() && !r.isError() && !isPotentialLastEvent(r)) holder.info.add(r)
             }
             .toObservable()
             .take(1)
-            .doOnNext { holder ->
-                val info = infoBuilder.buildFrom(address, holder.info, Date())
-                val cachedInfo = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
-                val newInfo = glucometersInfoToCacheMapper.mapFromObject(info)
-                if (cachedInfo == null) glucometersInfoCache.add(listOf(newInfo))
-                else glucometersInfoCache.update(listOf(newInfo))
-            }
+            .doOnNext { holder -> updateGlucometerInfo(address, holder.info) }
             .map(SyncResponseHolder::events)
             .map { events -> events.map { event -> eventBuilder.buildFrom(address, event) } }
             .map { events -> filterExistingEvents(events, getCachedEvents(events)) }
@@ -435,11 +428,17 @@ class GlucometersManager @Inject constructor(
         if (cached.isEmpty()) fromGlucometer
         else arrayListOf<GlucometerEventDto>().apply {
             fromGlucometer.forEach { event ->
-                if (cached.find { it.secondaryId == event.id } == null) {
-                    add(event)
-                }
+                if (cached.find { it.secondaryId == event.id } == null) add(event)
             }
         }
+
+    private fun updateGlucometerInfo(address: String, responses: List<String>) {
+        val info = infoBuilder.buildFrom(address, responses, Date())
+        val cachedInfo = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+        val newInfo = glucometersInfoToCacheMapper.mapFromObject(info)
+        if (cachedInfo == null) glucometersInfoCache.add(listOf(newInfo))
+        else glucometersInfoCache.update(listOf(newInfo))
+    }
 
     data class SyncResponseHolder(
         val info: MutableList<String> = mutableListOf(),
