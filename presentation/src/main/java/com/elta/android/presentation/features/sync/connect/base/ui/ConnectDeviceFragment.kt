@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.base.ui
 
 import android.content.Intent
-import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
@@ -49,9 +48,6 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> : BaseListFragment<T>(
         pm.state.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
-                if (view.id == R.id.stateHowToConnectView) {
-                    (stepsView.background as AnimationDrawable).start()
-                }
             }
         }
 
