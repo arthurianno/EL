@@ -73,10 +73,16 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.items.bindTo { items -> adapter.updateData(items) }
         pm.showMyLocationCommand.bindTo(::showUserLocation)
         pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
-        pm.permissionRequiredCommand.observable
+
+        pm.checkPermissionStatusCommand.bindTo {
+            val status = rxPermissions.statusFor(LOCATION_PERMISSION)
+            pm.setPermissionStatus(status)
+        }
+
+        pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
-            .bindTo(pm.permissionStatusUpdatedAction.consumer)
-        pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
+            .bindTo { status -> pm.setPermissionStatus(status) }
+
         pm.geoPoints.bindTo(::addPins)
 
         pm.selectGeoPointCommand.bindTo(::selectPin)

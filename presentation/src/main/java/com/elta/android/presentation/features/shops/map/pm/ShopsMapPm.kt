@@ -47,8 +47,9 @@ class ShopsMapPm @Inject constructor(
     val items = State<List<ListItem>>()
     val geoPoints = State<List<GeoPoint>>()
 
-    val permissionStatusUpdatedAction = Action<PermissionStatus>()
-    val permissionRequiredCommand = Command<Unit>()
+    val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
+    val requestPermissionCommand = Command<Unit>(bufferSize = 1)
+
     val showMyLocationCommand = Command<Location>()
     val showDefaultLocationCommand = Command<Location>()
     val moveToMyLocationAction = Action<Unit>()
@@ -66,10 +67,10 @@ class ShopsMapPm @Inject constructor(
     private val searchAction = Action<String>()
     private val searchResultSelectedAction = Action<SearchResultItem>()
 
+    private val permissionStatusResultAction = Action<PermissionStatus>()
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
     private val defaultLocationState = State<Location>()
-    private val permissionStatusState = State<PermissionStatus>()
     private val loadScreenAction = Action<Unit>()
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
@@ -83,18 +84,29 @@ class ShopsMapPm @Inject constructor(
         bindShopSelectionBehaviour()
         bindSearchBehaviour()
         bindClicks()
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
-            .subscribe(loadScreenAction.consumer)
+            .doOnNext(checkPermissionStatusCommand.consumer)
+            .doOnNext(loadScreenAction.consumer)
+            .subscribe()
             .untilDestroy()
     }
 
+    fun setPermissionStatus(status: PermissionStatus) {
+        permissionStatusResultAction.consumer.accept(status)
+    }
+
+    @SuppressLint("MissingPermission")
     private fun bindLocationBehaviour() {
         fetchMyLocationAction.observable
-            .filter { permissionStatusState.valueOrNull == PermissionStatus.GRANTED }
             .map { Unit }
-            .doOnNext(::fetchMyLocation)
+            .flatMap {
+                rxLocationManager.requestLocation()
+                    .doOnNext(::handleLocationResult)
+                    .doOnError(::handleError)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
@@ -120,22 +132,14 @@ class ShopsMapPm @Inject constructor(
     }
 
     private fun bindPermissionsBehaviour() {
-        loadScreenAction.observable
-            // TODO: this code emits GRANTED state for each
-            // onBindPresentationModel this end up new location request and updating ui
-            .flatMap { permissionStatusUpdatedAction.observable }
-            .subscribe(permissionStatusState.consumer)
-            .untilDestroy()
-
-        permissionStatusState.observable
-            .doOnNext {
-                when (it) {
-                    PermissionStatus.REQUIRED -> permissionRequiredCommand.consumer.accept(Unit)
+        permissionStatusResultAction.observable
+            .subscribe { status ->
+                when (status) {
+                    PermissionStatus.REQUIRED -> requestPermissionCommand.consumer.accept(Unit)
                     PermissionStatus.GRANTED -> fetchMyLocationAction.consumer.accept(Unit)
                     else -> handleLocationResult(EMPTY_LOCATION)
                 }
             }
-            .subscribe()
             .untilDestroy()
     }
 
@@ -322,14 +326,6 @@ class ShopsMapPm @Inject constructor(
     private fun handleLocationResult(location: Location) {
         if (location.isEmpty()) defaultLocationState.consumer.accept(moskowLocation)
         else myLocationState.consumer.accept(location)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun fetchMyLocation(i: Unit) {
-        rxLocationManager.requestLocation()
-            .doOnNext(::handleLocationResult)
-            .subscribe()
-            .untilDestroy()
     }
 
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
