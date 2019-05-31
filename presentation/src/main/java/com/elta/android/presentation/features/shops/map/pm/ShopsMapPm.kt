@@ -286,7 +286,7 @@ class ShopsMapPm @Inject constructor(
         }
     }
 
-    private fun SalePoint.toItem(): ListItem =
+    private inline fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,
             name = name,
@@ -295,7 +295,7 @@ class ShopsMapPm @Inject constructor(
             phone = phone
         )
 
-    private fun SalePoint.toGeoPoint(): GeoPoint =
+    private inline fun SalePoint.toGeoPoint(): GeoPoint =
         GeoPoint(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
@@ -304,7 +304,7 @@ class ShopsMapPm @Inject constructor(
             meta = "$city, $address"
         )
 
-    private fun Type.toIcon(): GeoPointIcon =
+    private inline fun Type.toIcon(): GeoPointIcon =
         when (this) {
             Type.SALE -> GeoPointIcon(
                 normal = R.drawable.ic_normal_pin_shop,
