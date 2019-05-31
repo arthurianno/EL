@@ -306,8 +306,14 @@ class ShopsMapPm @Inject constructor(
 
     private fun Type.toIcon(): GeoPointIcon =
         when (this) {
-            Type.SALE -> GeoPointIcon(normal = R.drawable.ic_normal_pin_shop, selected = R.drawable.ic_active_pin_shop)
-            Type.SERVICE -> GeoPointIcon(normal = R.drawable.ic_normal_pin_services, selected = R.drawable.ic_active_pin_services)
+            Type.SALE -> GeoPointIcon(
+                normal = R.drawable.ic_normal_pin_shop,
+                selected = R.drawable.ic_active_pin_shop
+            )
+            Type.SERVICE -> GeoPointIcon(
+                normal = R.drawable.ic_normal_pin_services,
+                selected = R.drawable.ic_active_pin_services
+            )
         }
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
