@@ -81,7 +81,6 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
 
     fun addPins(points: List<GeoPoint>) {
         points.forEach { drawPinObject(it) }
-        points.find { it.selected }?.let { setSelectedPin(it) }
     }
 
     fun selectPin(geoPoint: GeoPoint) {
