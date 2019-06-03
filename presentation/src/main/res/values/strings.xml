@@ -247,6 +247,7 @@
     <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
     <string name="main_records_daily_chart_min_title">min</string>
     <string name="main_records_daily_chart_max_title">max</string>
+    <string name="main_records_event_time_mask">в %s (UTC %s)</string>
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
