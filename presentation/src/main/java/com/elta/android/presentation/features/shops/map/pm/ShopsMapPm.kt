@@ -120,7 +120,7 @@ class ShopsMapPm @Inject constructor(
 
         moveToMyLocationAction.observable
             .checkAndRequestPermission()
-            .filter { it ==  PermissionStatus.GRANTED}
+            .filter { it == PermissionStatus.GRANTED }
             .map { Unit }
             .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()
