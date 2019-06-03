@@ -31,6 +31,7 @@ import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
 import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.location.isEmpty
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.widget.inputControl
@@ -87,9 +88,16 @@ class ShopsMapPm @Inject constructor(
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
-            .doOnNext(checkPermissionStatusCommand.consumer)
             .doOnNext(loadScreenAction.consumer)
             .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .checkAndRequestPermission()
+            .subscribe { status ->
+                if (status == PermissionStatus.GRANTED) fetchMyLocationAction.consumer.accept(Unit)
+                else handleLocationResult(EMPTY_LOCATION)
+            }
             .untilDestroy()
     }
 
@@ -111,10 +119,10 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         moveToMyLocationAction.observable
-            .map { myLocationState.valueOrNull ?: EMPTY_LOCATION }
-            .filter { !it.isEmpty() }
-            .doOnNext(showMyLocationCommand.consumer)
-            .subscribe()
+            .checkAndRequestPermission()
+            .filter { it == PermissionStatus.GRANTED }
+            .map { Unit }
+            .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()
 
         myLocationState.observable
@@ -132,15 +140,6 @@ class ShopsMapPm @Inject constructor(
     }
 
     private fun bindPermissionsBehaviour() {
-        permissionStatusResultAction.observable
-            .subscribe { status ->
-                when (status) {
-                    PermissionStatus.REQUIRED -> requestPermissionCommand.consumer.accept(Unit)
-                    PermissionStatus.GRANTED -> fetchMyLocationAction.consumer.accept(Unit)
-                    else -> handleLocationResult(EMPTY_LOCATION)
-                }
-            }
-            .untilDestroy()
     }
 
     private fun bindSalePoints() {
@@ -359,6 +358,22 @@ class ShopsMapPm @Inject constructor(
             address = "$city, $address",
             cardType = cardType
         )
+
+    private fun <T> Observable<T>.checkAndRequestPermission(): Observable<PermissionStatus> =
+        this.doOnNext { checkPermissionStatusCommand.consumer.accept(Unit) }
+            .switchMap {
+                permissionStatusResultAction.observable
+                    .take(1)
+                    .switchMap { status ->
+                        if (status == PermissionStatus.REQUIRED)
+                            permissionStatusResultAction.observable
+                                .take(1)
+                                .doOnSubscribe {
+                                    requestPermissionCommand.consumer.accept(Unit)
+                                }
+                        else Observable.just(status)
+                    }
+            }
 
     private companion object {
         const val INVALID_INDEX = -1
