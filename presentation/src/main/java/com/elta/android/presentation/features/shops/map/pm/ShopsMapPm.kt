@@ -170,10 +170,15 @@ class ShopsMapPm @Inject constructor(
 
         Observables.combineLatest(salePointsState.observable, foundedLocation.observable)
             .map {
-                it.first.forEach { point ->
-                    point.distance = it.second.distanceTo(point.coordinates)
+                val points = it.first
+                val location = it.second
+
+                if (!location.isEmpty() && location != defaultLocationState.valueOrNull) {
+                    points.forEach { point ->
+                        point.distance = location.distanceTo(point.coordinates)
+                    }
                 }
-                it.first
+                points
             }
             .map { it.sortedBy { point -> point.distance } }
             .doOnNext(::displayPoints)
