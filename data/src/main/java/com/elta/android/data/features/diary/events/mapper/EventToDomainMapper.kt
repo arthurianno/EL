@@ -10,6 +10,7 @@ import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.State
 import com.nullgr.core.date.dateFromTimestamp
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
@@ -20,6 +21,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 id = id,
                 type = EventType.valueOf(data.type.name),
                 additionTime = additionTime.getDate(),
+                additionTimeBp = ZonedDateTime.parse(additionTime),
                 additionTimeString = additionTime,
                 tagId = tagId,
                 tag = null,
