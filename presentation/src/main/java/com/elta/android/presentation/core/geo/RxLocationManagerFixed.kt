@@ -90,7 +90,10 @@ class RxLocationManagerFixed(
     }
 
     @SuppressLint("MissingPermission")
-    private fun locationObservable() = Observable.merge(rxLocationProvider.lastKnownLocation, rxLocationProvider.getUpdatedLocation(locationRequest))
+    private fun locationObservable() = Observable.merge(
+        rxLocationProvider.lastKnownLocation,
+        rxLocationProvider.getUpdatedLocation(locationRequest)
+    )
 
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 234

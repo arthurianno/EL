@@ -23,7 +23,9 @@ class LocationControl(pm: PresentationModel, private val locationManager: RxLoca
     }
 }
 
-fun PresentationModel.locationControl(locationManager: RxLocationManagerFixed): LocationControl = LocationControl(this, locationManager)
+fun PresentationModel.locationControl(
+    locationManager: RxLocationManagerFixed
+): LocationControl = LocationControl(this, locationManager)
 
 fun LocationControl.bindTo(compositeUnbind: CompositeDisposable, fragment: Fragment) {
     requestEnableLocationCommand.observable

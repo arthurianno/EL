@@ -35,21 +35,24 @@ class AppPm @Inject constructor(
 
         coldStartAction.observable
             .skipWhileInProgress()
-            .flatMapSingle {
-                getUserInfoUseCase.execute()
-                    .doOnSuccess { user ->
-                        when {
-                            !(user.isUserLoggedIn ?: false) -> router.newRootFlow(Screens.GreetingFlow)
-                            !(user.isEmailConfirmed ?: false) -> router.newRootChain(
-                                Screens.GreetingFlow, Screens.ActivateProfile
-                            )
-                            !(user.isOnBoardingPassed ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
-                            else -> router.newRootFlow(Screens.HomeFlow)
-                        }
-                    }
-                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
-                    .bindProgress()
+            .doOnNext {
+                router.newRootFlow(Screens.ShopsFlow)
             }
+//            .flatMapSingle {
+//                getUserInfoUseCase.execute()
+//                    .doOnSuccess { user ->
+//                        when {
+//                            !(user.isUserLoggedIn ?: false) -> router.newRootFlow(Screens.GreetingFlow)
+//                            !(user.isEmailConfirmed ?: false) -> router.newRootChain(
+//                                Screens.GreetingFlow, Screens.ActivateProfile
+//                            )
+//                            !(user.isOnBoardingPassed ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
+//                            else -> router.newRootFlow(Screens.HomeFlow)
+//                        }
+//                    }
+//                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
+//                    .bindProgress()
+//            }
             .retry()
             .subscribe()
             .untilDestroy()
