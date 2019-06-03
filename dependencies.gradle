@@ -48,6 +48,7 @@ def libraryVersions = [
         javaxInjectVersion         : '1',
         glassfishAnnotationVersion : '10.0-b28',
 
+        android310Version          : '1.2.0',
         appCoreVersion             : '2.0.1-beta.2',
         jodaTimeVersion            : '2.10.1',
         glideVersion               : '4.8.0',
@@ -154,6 +155,7 @@ ext.commonDependencies = [
         crashlytics           : "com.crashlytics.sdk.android:crashlytics:${libraryVersions.crashlyticsVersion}",
         materialDialogs       : "com.afollestad.material-dialogs:core:${libraryVersions.materialDialogsVersion}",
         jodaTime              : "net.danlew:android.joda:${libraryVersions.jodaTimeVersion}",
+        android310            : "com.jakewharton.threetenabp:threetenabp:${libraryVersions.android310Version}",
         picasso               : "com.squareup.picasso:picasso:${libraryVersions.picassoVersion}",
         expandableLayout      : "net.cachapa.expandablelayout:expandablelayout:${libraryVersions.expandableLayoutVersion}",
         tooltipLibrary        : "com.github.vihtarb:tooltip:${libraryVersions.tooltipVersion}",

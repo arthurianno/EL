@@ -224,6 +224,7 @@ dependencies {
     implementation commonDependencies.daggerAndroidSupport
 
     implementation commonDependencies.timber
+    implementation commonDependencies.android310
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
     implementation(commonDependencies.glide) {

@@ -62,6 +62,7 @@ dependencies {
     implementation commonDependencies.javaxInject
 
     implementation commonDependencies.timber
+    implementation commonDependencies.android310
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
