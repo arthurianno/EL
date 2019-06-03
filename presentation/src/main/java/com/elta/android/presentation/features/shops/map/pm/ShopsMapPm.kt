@@ -13,11 +13,14 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.geo.GeoPointIcon
+import com.elta.android.presentation.core.geo.LocationTurnedOffError
+import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.locationControl
 import com.elta.android.presentation.core.ui.adapter.CardType
 import com.elta.android.presentation.core.ui.adapter.getCardType
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
@@ -29,7 +32,6 @@ import com.elta.android.presentation.utils.moskowLocation
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
-import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.location.isEmpty
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
@@ -39,7 +41,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ShopsMapPm @Inject constructor(
-    private val rxLocationManager: RxLocationManager,
+    private val rxLocationManager: RxLocationManagerFixed,
     private val searchSalePointsUseCase: SearchSalePointsUseCase,
     private val getSalePointsUseCase: GetSalePointsUseCase,
     services: ServiceFacade
@@ -50,6 +52,7 @@ class ShopsMapPm @Inject constructor(
 
     val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
+    val locationControl = locationControl(rxLocationManager)
 
     val showMyLocationCommand = Command<Location>()
     val showDefaultLocationCommand = Command<Location>()
@@ -86,6 +89,10 @@ class ShopsMapPm @Inject constructor(
         bindSearchBehaviour()
         bindClicks()
 
+        locationControl.locationEnabledAction.observable
+            .subscribe(fetchMyLocationAction.consumer)
+            .untilDestroy()
+
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
             .doOnNext(loadScreenAction.consumer)
@@ -99,6 +106,11 @@ class ShopsMapPm @Inject constructor(
                 else handleLocationResult(EMPTY_LOCATION)
             }
             .untilDestroy()
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(Unit)
+        else super.handleError(error)
     }
 
     fun setPermissionStatus(status: PermissionStatus) {
@@ -120,7 +132,7 @@ class ShopsMapPm @Inject constructor(
 
         moveToMyLocationAction.observable
             .checkAndRequestPermission()
-            .filter { it ==  PermissionStatus.GRANTED}
+            .filter { it == PermissionStatus.GRANTED }
             .map { Unit }
             .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()

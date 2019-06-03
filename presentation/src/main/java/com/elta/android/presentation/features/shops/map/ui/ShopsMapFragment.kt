@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.shops.map.ui
 
 import android.Manifest
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +11,8 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
+import com.elta.android.presentation.core.pm.widgets.bindTo
+import com.elta.android.presentation.core.pm.widgets.resolveResults
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
@@ -103,6 +106,12 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
             .bindTo { searchInputView.hideKeyboard() }
+
+        pm.locationControl.bindTo(compositeUnbind, this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presentationModel.locationControl.resolveResults(requestCode, resultCode)
     }
 
     private fun showUserLocation(location: Location) {
