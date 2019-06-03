@@ -44,4 +44,11 @@ class DbSyncStorage @Inject constructor(
             userBox.put(userSyncInfo?.copy(lastTagsSync = value)
                 ?: SyncInfoDto(lastTagsSync = value))
         }
+
+    override var lastGoogleFitSync: Long?
+        get() = userSyncInfo?.lastEventsSync
+        set(value) {
+            userBox.put(userSyncInfo?.copy(lastGoogleFitSync = value)
+                ?: SyncInfoDto(lastGoogleFitSync = value))
+        }
 }

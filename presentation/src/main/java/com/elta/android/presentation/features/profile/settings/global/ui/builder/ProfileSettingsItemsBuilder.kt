@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.builder
 
 import android.support.annotation.DrawableRes
-import com.elta.android.domain.features.user.model.HealthAppType
+import com.elta.android.domain.features.user.interactor.googleFitApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.BuildConfig
@@ -77,7 +77,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
     }
 
     private fun createHealthAppItem(profile: Profile): ListItem? =
-        profile.healthApps?.find { it.type == HealthAppType.GOOGLE_FIT }?.let {
+        profile.googleFitApp()?.let {
             ProfileSettingsHealthAppItem(
                 icon = R.drawable.ic_google_fit,
                 title = resources.getString(R.string.profile_settings_google_fit),

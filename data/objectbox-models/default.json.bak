@@ -476,10 +476,35 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "17:5092861307515122171",
+      "lastPropertyId": "4:2000932439839269344",
+      "name": "HealthAppCacheDto",
+      "properties": [
+        {
+          "id": "1:3102842089124470983",
+          "name": "type"
+        },
+        {
+          "id": "2:949995477402119970",
+          "name": "id"
+        },
+        {
+          "id": "3:8741562037095094461",
+          "name": "isActive"
+        },
+        {
+          "id": "4:2000932439839269344",
+          "indexId": "6:8670197050320643670",
+          "name": "profileId"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "16:4156337543713803940",
-  "lastIndexId": "5:7982913992379413599",
+  "lastEntityId": "17:5092861307515122171",
+  "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
   "modelVersion": 4,

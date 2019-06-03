@@ -7,4 +7,6 @@ interface SyncStorage {
     var lastEventsSync: Long?
 
     var lastTagsSync: Long?
+
+    var lastGoogleFitSync: Long?
 }

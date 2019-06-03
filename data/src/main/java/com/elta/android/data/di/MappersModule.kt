@@ -34,6 +34,8 @@ import com.elta.android.data.features.firmware.dto.FirmwareDto
 import com.elta.android.data.features.firmware.dto.FirmwareFileDto
 import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
 import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
+import com.elta.android.data.features.googlefit.dto.ActivityDto
+import com.elta.android.data.features.googlefit.mapper.SessionToActivityDtoMapper
 import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.mapper.ObserverFromCacheMapper
@@ -87,6 +89,7 @@ import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.google.android.gms.fitness.data.Session
 import dagger.Binds
 import dagger.Module
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -314,4 +317,9 @@ abstract class MappersModule {
     abstract fun bindHealthAppToDtoCacheMapper(
         mapper: HealthAppToDtoMapper
     ): Mapper<HealthApp, HealthAppDto>
+
+    @Binds
+    abstract fun bindSessionsToActivityDtoMapper(
+        mapper: SessionToActivityDtoMapper
+    ): Mapper<Session, ActivityDto>
 }
