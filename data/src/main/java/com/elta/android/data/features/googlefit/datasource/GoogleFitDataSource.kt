@@ -5,6 +5,7 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.googlefit.datasource.utils.RxGoogleFitAuthActivity
 import com.elta.android.data.features.googlefit.datasource.utils.buildSessionsRequest
+import com.elta.android.data.features.googlefit.datasource.utils.filterValidOnly
 import com.elta.android.data.features.googlefit.datasource.utils.makeFitnessOptions
 import com.elta.android.data.features.googlefit.datasource.utils.readSessions
 import com.elta.android.data.features.googlefit.dto.ActivityDto
@@ -43,6 +44,7 @@ class GoogleFitDataSource @Inject constructor(
                 .readSessions(it)
         }
             .map(mapper::mapFromObjects)
+            .map { it.filterValidOnly() }
             .doOnNext { syncStorage.lastGoogleFitSync = System.currentTimeMillis() }
 
     private fun setSyncTimeIfNeed(result: Boolean) {

@@ -35,6 +35,8 @@ import com.elta.android.data.features.firmware.dto.FirmwareFileDto
 import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
 import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
 import com.elta.android.data.features.googlefit.dto.ActivityDto
+import com.elta.android.data.features.googlefit.mapper.ActivityDtoToEventMapper
+import com.elta.android.data.features.googlefit.mapper.FitnessActivityToActivityTypeMapper
 import com.elta.android.data.features.googlefit.mapper.SessionToActivityDtoMapper
 import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.observers.dto.ObserverDto
@@ -77,6 +79,7 @@ import com.elta.android.data.features.userinfo.mapper.UserInfoToDomainMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.firmware.model.Firmware
@@ -322,4 +325,14 @@ abstract class MappersModule {
     abstract fun bindSessionsToActivityDtoMapper(
         mapper: SessionToActivityDtoMapper
     ): Mapper<Session, ActivityDto>
+
+    @Binds
+    abstract fun bindActivityDtoToEventMapper(
+        mapper: ActivityDtoToEventMapper
+    ): Mapper<ActivityDto, Event>
+
+    @Binds
+    abstract fun bindFitnessActivityToActivityTypeMapper(
+        mapper: FitnessActivityToActivityTypeMapper
+    ): Mapper<String, ActivityType>
 }
