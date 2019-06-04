@@ -1,5 +1,6 @@
 package com.elta.android.domain.factory
 
+import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -28,7 +29,7 @@ object EventTestFactory {
             tag = null,
             temperature = null,
             note = "Test note",
-            modificationTime = ZonedDateTime.now(),
+            modificationTime = ZonedDateTime.now().toMillisUtc(),
             value = value,
             name = "Test name",
             kind = "Test kind",
