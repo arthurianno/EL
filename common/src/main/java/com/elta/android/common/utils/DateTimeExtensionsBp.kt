@@ -74,6 +74,8 @@ inline fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) = atStartOfDa
 
 inline fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
 
+inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * 1000
+
 /**
  * Simple class which contains number of common and wide useful date formats.
  * @author Grishko Nikita

@@ -9,7 +9,7 @@ data class Event(
     val tagId: String?,
     var tag: Tag?,
     val note: String?,
-    val modificationTime: ZonedDateTime,
+    val modificationTime: Long?,
     val value: Double?,
     val name: String?,
     val kind: String?,

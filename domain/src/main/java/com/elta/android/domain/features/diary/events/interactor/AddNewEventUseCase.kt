@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.diary.events.interactor
 
+import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -29,7 +30,7 @@ class AddNewEventUseCase @Inject constructor(
                 tagId = p.tag?.id,
                 tag = p.tag,
                 note = p.note,
-                modificationTime = date,
+                modificationTime = date.toMillisUtc(),
                 value = p.value,
                 name = p.name,
                 kind = p.kind,

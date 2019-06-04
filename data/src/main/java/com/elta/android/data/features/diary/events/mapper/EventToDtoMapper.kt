@@ -1,7 +1,7 @@
 package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.common.utils.toStringWithFormat
+import com.elta.android.common.utils.toIsoString
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
@@ -10,7 +10,6 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.domain.features.diary.events.model.Event
-import org.threeten.bp.format.DateTimeFormatter
 import javax.inject.Inject
 
 class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
@@ -20,10 +19,10 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
             EventDto(
                 id = id,
                 state = StateDto.valueOf(state.name),
-                additionTime = additionTime.toStringWithFormat(DateTimeFormatter.ISO_DATE_TIME),
+                additionTime = additionTime.toIsoString(),
                 tagId = tagId,
                 note = note,
-                modificationTime = additionTime.toInstant().toEpochMilli(),
+                modificationTime = modificationTime,
                 data = EventDataDto(
                     type = EventTypeDto.valueOf(type.name),
                     value = value,
