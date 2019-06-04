@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.reminders.base.pm
 
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -10,7 +11,7 @@ import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
-import com.elta.android.presentation.utils.toEventDate
+import com.elta.android.presentation.utils.DATE_FORMAT_WITHOUT_ZERO
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
@@ -100,7 +101,7 @@ abstract class BaseRemindPm constructor(
             .untilDestroy()
 
         selectedDateState.observable
-            .map { it.toEventDate(resources).toSimpleSelectorOption() }
+            .map { it.toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
 
