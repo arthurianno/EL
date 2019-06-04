@@ -15,7 +15,7 @@ sealed class Periods(override val start: LocalDateTime, override val end: LocalD
 
     class FourteenDays : Periods(
         start = LocalDateTime.now().minusDays(13).atStartOfDay(),
-        end =LocalDateTime.now().atEndOfDay()
+        end = LocalDateTime.now().atEndOfDay()
     )
 
     class ThirtyDays : Periods(

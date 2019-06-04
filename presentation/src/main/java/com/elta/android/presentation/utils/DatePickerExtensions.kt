@@ -11,16 +11,16 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.ZonedDateTime
 
 fun Context?.showDatePickerDialog(
-    currentDate: ZonedDateTime,
+    date: ZonedDateTime,
     minDate: ZonedDateTime? = null,
     maxDate: ZonedDateTime? = null,
     onDateSelectedFunction: (ZonedDateTime) -> Unit
 ) {
     if (this == null) return
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        onDateSelectedFunction.invoke(currentDate.with(LocalDate.of(year, month, dayOfMonth)))
+        onDateSelectedFunction.invoke(date.with(LocalDate.of(year, month, dayOfMonth)))
     }
-    DatePickerDialog(this, onDateSelectedListener, currentDate.year, currentDate.monthValue, currentDate.dayOfMonth).apply {
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.monthValue, date.dayOfMonth).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -28,7 +28,7 @@ fun Context?.showDatePickerDialog(
 }
 
 fun Context?.showDatePickerDialog(
-    currentDate: LocalDate,
+    date: LocalDate,
     minDate: LocalDate? = null,
     maxDate: LocalDate? = null,
     onDateSelectedFunction: (LocalDate) -> Unit
@@ -37,7 +37,7 @@ fun Context?.showDatePickerDialog(
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
         onDateSelectedFunction.invoke(LocalDate.of(year, month, dayOfMonth))
     }
-    DatePickerDialog(this, onDateSelectedListener, currentDate.year, currentDate.monthValue, currentDate.dayOfMonth).apply {
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.monthValue, date.dayOfMonth).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -45,14 +45,14 @@ fun Context?.showDatePickerDialog(
 }
 
 fun Context?.showTimePickerDialog(
-    currentDate: ZonedDateTime,
+    date: ZonedDateTime,
     onDateSelectedFunction: (ZonedDateTime) -> Unit
 ) {
     if (this == null) return
     val onTimeSelectedListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-        onDateSelectedFunction.invoke(currentDate.with(LocalTime.of(hourOfDay, minute)))
+        onDateSelectedFunction.invoke(date.with(LocalTime.of(hourOfDay, minute)))
     }
-    TimePickerDialog(this, onTimeSelectedListener, currentDate.hour, currentDate.minute, true).show()
+    TimePickerDialog(this, onTimeSelectedListener, date.hour, date.minute, true).show()
 }
 
 @Suppress("MagicNumber")
@@ -64,10 +64,10 @@ fun Context?.showTimePickerWithoutPastTimeDialog(
     val onTimeSelectedListener =
         TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
             // It needs to prevent choose current minute on time picker.
-            val currentDate = ZonedDateTime.now().plusMinutes(1)
+            val date = ZonedDateTime.now().plusMinutes(1)
             val pickerDate = ZonedDateTime.from(selectedDate).with(LocalTime.of(hourOfDay, minute))
 
-            if (pickerDate.isBefore(currentDate)) {
+            if (pickerDate.isBefore(date)) {
                 Toast.makeText(
                     this,
                     getString(R.string.profile_reminders_wrong_time),

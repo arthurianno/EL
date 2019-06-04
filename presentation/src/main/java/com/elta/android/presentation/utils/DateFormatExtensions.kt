@@ -12,20 +12,20 @@ import org.threeten.bp.ZonedDateTime
 
 const val DATE_FORMAT_WITHOUT_ZERO = "d LLL yyyy"
 
-inline fun ZonedDateTime.toEventTime(resources: ResourceProvider) =
-    resources.getString(R.string.event_time_mask, this.toStringWithFormat(CommonFormats.FORMAT_TIME))
+inline fun ZonedDateTime.toEventTime(r: ResourceProvider) =
+    r.getString(R.string.event_time_mask, toStringWithFormat(CommonFormats.FORMAT_TIME))
 
-inline fun ZonedDateTime.toEventDate(resourceProvider: ResourceProvider) =
+inline fun ZonedDateTime.toEventDate(r: ResourceProvider) =
     when {
-        this.toLocalDate().isToday() -> resourceProvider.getString(R.string.event_date_today)
-        this.toLocalDate().isYesterday() -> resourceProvider.getString(R.string.event_date_yesterday)
+        toLocalDate().isToday() -> r.getString(R.string.event_date_today)
+        toLocalDate().isYesterday() -> r.getString(R.string.event_date_yesterday)
         else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
     }
 
-inline fun ZonedDateTime.toSyncDate(resources: ResourceProvider) =
+inline fun ZonedDateTime.toSyncDate(r: ResourceProvider) =
     when {
-        this.toLocalDate().isToday() -> "${resources.getString(R.string.event_date_today)} ${this.toEventTime(resources)}"
-        this.toLocalDate().isYesterday() -> "${resources.getString(R.string.event_date_yesterday)} ${this.toEventTime(resources)}"
+        toLocalDate().isToday() -> "${r.getString(R.string.event_date_today)} ${toEventTime(r)}"
+        toLocalDate().isYesterday() -> "${r.getString(R.string.event_date_yesterday)} ${toEventTime(r)}"
         else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
     }
 

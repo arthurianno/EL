@@ -36,7 +36,7 @@ class ToEventsContainerTest {
 
     @Test
     fun splitByTypePerDate_correct() {
-        val firstDay = ZonedDateTime.now().with(LocalTime.of(12,0,0))
+        val firstDay = ZonedDateTime.now().with(LocalTime.of(12, 0, 0))
         val secondDay = firstDay.minusDays(2)
 
         val firstType = EventType.ACTIVITY
@@ -44,9 +44,9 @@ class ToEventsContainerTest {
 
         val events = arrayListOf(
             EventTestFactory.create(type = firstType, date = firstDay.plusMinutes(2)),
-            EventTestFactory.create(type = secondType, date = firstDay.plusMinutes( 4)),
-            EventTestFactory.create(type = firstType, date = secondDay.plusMinutes( 2)),
-            EventTestFactory.create(type = secondType, date = secondDay.plusMinutes( 4))
+            EventTestFactory.create(type = secondType, date = firstDay.plusMinutes(4)),
+            EventTestFactory.create(type = firstType, date = secondDay.plusMinutes(2)),
+            EventTestFactory.create(type = secondType, date = secondDay.plusMinutes(4))
         )
 
         val container = events.toEventsContainer()

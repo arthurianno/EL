@@ -11,11 +11,10 @@ import org.threeten.bp.temporal.TemporalAccessor
 import java.util.Locale
 
 object DateTimeFormatterCache {
-    private val cache = LruCache<String, DateTimeFormatter?>(16)
+    private const val CACHE_SIZE = 16
+    private val cache = LruCache<String, DateTimeFormatter?>(CACHE_SIZE)
 
-    operator fun get(name: String): DateTimeFormatter? {
-        return cache[name]
-    }
+    operator fun get(name: String): DateTimeFormatter? = cache[name]
 
     operator fun set(name: String, formatter: DateTimeFormatter) {
         cache.put(name, formatter)

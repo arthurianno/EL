@@ -101,28 +101,25 @@ class ReminderWorker(
         val nextDate: ZonedDateTime = if (reminderDate.isBefore(currentDate)) {
             when (reminder.scheduleType) {
                 ScheduleType.NONE -> ZonedDateTime.of(0, 0, 0, 0, 0, 0, 0, ZoneId.systemDefault())
-                ScheduleType.DAY -> {
+                ScheduleType.DAY ->
                     ZonedDateTime.from(currentDate)
                         .withHour(reminderDate.hour)
                         .withMinute(reminderDate.minute)
                         .withSecond(0)
                         .plusDays(1)
-                }
-                ScheduleType.WEEK -> {
+                ScheduleType.WEEK ->
                     ZonedDateTime.from(currentDate)
                         .withHour(reminderDate.hour)
                         .withMinute(reminderDate.minute)
                         .withSecond(0)
                         .plusDays(7)
-                }
-                ScheduleType.MONTH -> {
+                ScheduleType.MONTH ->
                     ZonedDateTime.from(currentDate)
                         .withHour(reminderDate.hour)
                         .withMinute(reminderDate.minute)
                         .withSecond(0)
                         .plusMonths(1)
-                }
-                ScheduleType.YEAR -> {
+                ScheduleType.YEAR ->
                     ZonedDateTime.from(currentDate)
                         .withMonth(reminderDate.monthValue)
                         .withDayOfMonth(reminderDate.dayOfMonth)
@@ -130,7 +127,6 @@ class ReminderWorker(
                         .withMinute(reminderDate.minute)
                         .withSecond(0)
                         .plusYears(1)
-                }
             }
         } else reminderDate
 
