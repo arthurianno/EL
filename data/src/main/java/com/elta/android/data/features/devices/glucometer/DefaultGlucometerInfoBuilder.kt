@@ -1,8 +1,10 @@
 package com.elta.android.data.features.devices.glucometer
 
-import com.elta.android.common.utils.toDate
+import com.elta.android.common.utils.toLocalDateTime
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,7 +20,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
 
         params.forEach { param ->
             when {
-                param.startsWith("time") -> date = extractDate(param)
+                param.startsWith("time") -> date = ZonedDateTime.of(extractDate(param), ZoneId.systemDefault())
                 param.startsWith("soft") -> version = extractVersion(param)
                 param.startsWith("b") -> {
                     val response = extractBatteryAndTemperature(param)
@@ -38,9 +40,9 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         )
     }
 
-    protected open fun extractDate(param: String): ZonedDateTime? {
+    protected open fun extractDate(param: String): LocalDateTime? {
         val payload = param.split(".")[1]
-        return "20$payload".toDate("yyyyMMddHHmmss")
+        return "20$payload".toLocalDateTime("yyyyMMddHHmmss")
     }
 
     protected open fun extractVersion(param: String): VersionDto {
