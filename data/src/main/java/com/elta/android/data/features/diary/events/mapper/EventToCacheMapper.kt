@@ -2,7 +2,7 @@ package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.utils.toIsoDate
-import com.elta.android.common.utils.toMillis
+import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import javax.inject.Inject
@@ -15,7 +15,7 @@ class EventToCacheMapper @Inject constructor() : Mapper<EventDto, EventCachedDto
                 id = id.hashCode().toLong(),
                 secondaryId = id,
                 type = data.type.name,
-                additionTime = additionTime.toIsoDate().toMillis(),
+                additionTime = additionTime.toIsoDate().toMillisUtc(),
                 additionTimeString = additionTime,
                 tagId = tagId,
                 note = note,
