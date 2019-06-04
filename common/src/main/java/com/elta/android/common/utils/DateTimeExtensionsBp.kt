@@ -1,11 +1,16 @@
 package com.elta.android.common.utils
 
 import android.util.LruCache
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAccessor
 import java.util.Locale
 
-internal object DateTimeFormatterCache {
+object DateTimeFormatterCache {
     private val cache = LruCache<String, DateTimeFormatter?>(16)
 
     operator fun get(name: String): DateTimeFormatter? {
@@ -27,13 +32,48 @@ internal object DateTimeFormatterCache {
     }
 }
 
-fun TemporalAccessor.toStringWithFormat(pattern: String, locale: Locale = Locale.getDefault()): String {
+inline fun TemporalAccessor.toStringWithFormat(pattern: String, locale: Locale = Locale.getDefault()): String {
     return DateTimeFormatterCache.getOrCreateFormatter(pattern, locale)
         .format(this)
 }
 
-fun TemporalAccessor.toStringWithFormat(format: DateTimeFormatter): String =
+inline fun TemporalAccessor.toStringWithFormat(format: DateTimeFormatter): String =
     format.format(this)
+
+inline fun String.toDate(pattern: String): ZonedDateTime =
+    ZonedDateTime.parse(this, DateTimeFormatterCache.getOrCreateFormatter(pattern))
+
+inline fun String.toDate(formatter: DateTimeFormatter): ZonedDateTime =
+    ZonedDateTime.parse(this, formatter)
+
+inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
+inline fun ZonedDateTime.toIsoString(): String = this.format(DateTimeFormatter.ISO_DATE_TIME)
+
+inline fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
+inline fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+
+inline fun ZonedDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
+inline fun ZonedDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+
+inline fun LocalDate.isToday(): Boolean {
+    val today = ZonedDateTime.now().toLocalDate()
+    val tomorrow = today.plusDays(1)
+    return today.rangeTo(tomorrow).contains(this)
+}
+
+inline fun LocalDate.isYesterday(): Boolean {
+    val today = ZonedDateTime.now().toLocalDate()
+    val tomorrow = today.minusDays(1)
+    return tomorrow.rangeTo(today).contains(this)
+}
+
+inline fun systemOffset(): ZoneOffset = ZoneOffset.systemDefault().rules.getOffset(LocalDateTime.now())
+
+inline fun LocalDateTime.toMillis(offset: ZoneOffset = systemOffset()) = toInstant(offset).toEpochMilli()
+
+inline fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) = atStartOfDay().toInstant(offset).toEpochMilli()
+
+inline fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
 
 /**
  * Simple class which contains number of common and wide useful date formats.
