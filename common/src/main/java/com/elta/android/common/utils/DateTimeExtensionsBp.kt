@@ -1,6 +1,7 @@
 package com.elta.android.common.utils
 
 import android.util.LruCache
+import com.elta.android.common.utils.CommonFormats.DATE_PATTERN_ISO
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
@@ -45,8 +46,10 @@ inline fun String.toDate(pattern: String): ZonedDateTime =
 inline fun String.toDate(formatter: DateTimeFormatter): ZonedDateTime =
     ZonedDateTime.parse(this, formatter)
 
-inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
-inline fun ZonedDateTime.toIsoString(): String = this.format(DateTimeFormatter.ISO_DATE_TIME)
+inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
+    this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+inline fun ZonedDateTime.toIsoString(): String = this.format(
+    DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
 
 inline fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
 inline fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
@@ -125,4 +128,6 @@ object CommonFormats {
      * Date/time format: HH:mm:ss
      */
     const val FORMAT_TIME_2 = "HH:mm:ss"
+
+    const val DATE_PATTERN_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX"
 }
