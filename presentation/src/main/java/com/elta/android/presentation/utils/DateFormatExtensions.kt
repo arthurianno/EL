@@ -10,7 +10,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
 
-const val DATE_FORMAT_WITHOUT_ZERO = "d LLL yyyy"
+const val DATE_FORMAT_WITHOUT_ZERO = "d LLLL yyyy"
 
 inline fun ZonedDateTime.toEventTime(r: ResourceProvider) =
     r.getString(R.string.event_time_mask, toStringWithFormat(CommonFormats.FORMAT_TIME))
