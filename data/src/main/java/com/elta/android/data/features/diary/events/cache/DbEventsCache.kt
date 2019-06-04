@@ -9,7 +9,6 @@ import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto_
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import io.objectbox.kotlin.query
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneOffset
 import javax.inject.Inject
 
 class DbEventsCache @Inject constructor(
@@ -27,7 +26,7 @@ class DbEventsCache @Inject constructor(
 
     private fun getAllForPeriod(start: LocalDateTime, end: LocalDateTime): List<EventCachedDto> =
         box.query {
-            between(EventCachedDto_.additionTime, start.toMillis(ZoneOffset.UTC), end.toMillis(ZoneOffset.UTC))
+            between(EventCachedDto_.additionTime, start.toMillis(), end.toMillis())
         }.find()
 
     private fun getAllByTypeAndIds(type: EventTypeDto, ids: LongArray): List<EventCachedDto> =
