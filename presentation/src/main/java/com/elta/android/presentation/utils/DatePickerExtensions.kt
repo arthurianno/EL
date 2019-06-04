@@ -18,9 +18,9 @@ fun Context?.showDatePickerDialog(
 ) {
     if (this == null) return
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        onDateSelectedFunction.invoke(date.with(LocalDate.of(year, month, dayOfMonth)))
+        onDateSelectedFunction.invoke(date.with(LocalDate.of(year, month + 1, dayOfMonth)))
     }
-    DatePickerDialog(this, onDateSelectedListener, date.year, date.monthValue, date.dayOfMonth).apply {
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -35,9 +35,9 @@ fun Context?.showDatePickerDialog(
 ) {
     if (this == null) return
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        onDateSelectedFunction.invoke(LocalDate.of(year, month, dayOfMonth))
+        onDateSelectedFunction.invoke(LocalDate.of(year, month + 1, dayOfMonth))
     }
-    DatePickerDialog(this, onDateSelectedListener, date.year, date.monthValue, date.dayOfMonth).apply {
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -64,7 +64,7 @@ fun Context?.showTimePickerWithoutPastTimeDialog(
     val onTimeSelectedListener =
         TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
             // It needs to prevent choose current minute on time picker.
-            val date = ZonedDateTime.now().plusMinutes(1)
+            val date = ZonedDateTime.now().withSecond(0)
             val pickerDate = ZonedDateTime.from(selectedDate).with(LocalTime.of(hourOfDay, minute))
 
             if (pickerDate.isBefore(date)) {
