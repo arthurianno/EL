@@ -92,7 +92,7 @@ dependencies {
     implementation commonDependencies.ok
 
     implementation commonDependencies.objectbox
-    implementation commonDependencies.android310
+    implementation commonDependencies.jsr310
 
     implementation commonDependencies.nordicScanner
     implementation commonDependencies.nordicDfu
