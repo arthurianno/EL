@@ -8,11 +8,12 @@ import com.elta.android.data.features.googlefit.datasource.utils.buildSessionsRe
 import com.elta.android.data.features.googlefit.datasource.utils.makeFitnessOptions
 import com.elta.android.data.features.googlefit.datasource.utils.readSessions
 import com.elta.android.data.features.googlefit.dto.ActivityDto
+import com.elta.android.domain.features.diary.home.model.atTimeOfDay
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.Session
+import com.nullgr.core.date.toDate
 import io.reactivex.Observable
-import java.util.Date
 import javax.inject.Inject
 
 class GoogleFitDataSource @Inject constructor(
@@ -35,18 +36,18 @@ class GoogleFitDataSource @Inject constructor(
 
     override fun getActivities(): Observable<List<ActivityDto>> =
         Observable.fromCallable {
-            buildSessionsRequest(syncStorage.lastGoogleFitSync ?: Date().time)
+            val startSyncDate = syncStorage.lastGoogleFitSync?.toDate()?.atTimeOfDay(0, 0, 0)
+            buildSessionsRequest(startSyncDate?.time ?: System.currentTimeMillis())
         }.flatMap {
             Fitness.getSessionsClient(context, checkNotNull(GoogleSignIn.getLastSignedInAccount(context)))
                 .readSessions(it)
         }
             .map(mapper::mapFromObjects)
-            .doOnNext { syncStorage.lastGoogleFitSync = Date().time }
-
+            .doOnNext { syncStorage.lastGoogleFitSync = System.currentTimeMillis() }
 
     private fun setSyncTimeIfNeed(result: Boolean) {
         if (result && syncStorage.lastGoogleFitSync == null) {
-            syncStorage.lastGoogleFitSync = Date().time
+            syncStorage.lastGoogleFitSync = System.currentTimeMillis()
         }
     }
 }

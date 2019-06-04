@@ -11,7 +11,7 @@ class SessionToActivityDtoMapper @Inject constructor() : Mapper<Session, Activit
         ActivityDto(
             id = source.identifier,
             activityType = source.activity,
-            duration = source.getActiveTime(TimeUnit.MILLISECONDS),
-            startTime = source.getStartTime(TimeUnit.MILLISECONDS)
+            duration = source.getActiveTime(TimeUnit.SECONDS),
+            additionTime = source.getEndTime(TimeUnit.MILLISECONDS)
         )
 }

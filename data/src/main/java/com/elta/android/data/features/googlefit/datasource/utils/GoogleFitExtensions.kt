@@ -3,7 +3,6 @@ package com.elta.android.data.features.googlefit.datasource.utils
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.request.SessionReadRequest
-import java.util.Date
 import java.util.concurrent.TimeUnit
 
 fun makeFitnessOptions(): FitnessOptions =
@@ -14,7 +13,7 @@ fun makeFitnessOptions(): FitnessOptions =
 
 fun buildSessionsRequest(startTime: Long): SessionReadRequest =
     SessionReadRequest.Builder()
-        .setTimeInterval(startTime, Date().time, TimeUnit.MILLISECONDS)
+        .setTimeInterval(startTime, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
         .read(DataType.TYPE_WORKOUT_EXERCISE)
         .readSessionsFromAllApps()
         .build()
