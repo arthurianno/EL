@@ -46,6 +46,9 @@ inline fun String.toDate(pattern: String): ZonedDateTime =
 inline fun String.toDate(formatter: DateTimeFormatter): ZonedDateTime =
     ZonedDateTime.parse(this, formatter)
 
+inline fun String.toLocalDateTime(pattern: String): LocalDateTime =
+    LocalDateTime.parse(this, DateTimeFormatterCache.getOrCreateFormatter(pattern))
+
 inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
     this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
 inline fun ZonedDateTime.toIsoString(): String = this.format(
@@ -57,17 +60,8 @@ inline fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
 inline fun ZonedDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
 inline fun ZonedDateTime.atEndOfDay() = this.with(LocalTime.MAX)
 
-inline fun LocalDate.isToday(): Boolean {
-    val today = ZonedDateTime.now().toLocalDate()
-    val tomorrow = today.plusDays(1)
-    return today.rangeTo(tomorrow).contains(this)
-}
-
-inline fun LocalDate.isYesterday(): Boolean {
-    val today = ZonedDateTime.now().toLocalDate()
-    val tomorrow = today.minusDays(1)
-    return tomorrow.rangeTo(today).contains(this)
-}
+inline fun LocalDate.isToday(): Boolean = LocalDate.now() == this
+inline fun LocalDate.isYesterday(): Boolean = LocalDate.now().minusDays(1) == this
 
 inline fun systemOffset(): ZoneOffset = ZoneOffset.systemDefault().rules.getOffset(LocalDateTime.now())
 
