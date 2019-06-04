@@ -20,7 +20,6 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import io.fabric.sdk.android.Fabric
 import io.reactivex.plugins.RxJavaPlugins
-import net.danlew.android.joda.JodaTimeAndroid
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import javax.inject.Inject
@@ -73,7 +72,6 @@ class App : Application(), HasActivityInjector {
 
     private fun initializeTime() {
         AndroidThreeTen.init(this)
-        JodaTimeAndroid.init(this)
     }
 
     private fun initalizeYandexMapKit() {
