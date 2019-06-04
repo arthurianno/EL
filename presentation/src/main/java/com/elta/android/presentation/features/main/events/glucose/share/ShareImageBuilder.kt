@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
@@ -12,7 +13,6 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.getBitmapFromView
-import com.nullgr.core.date.toStringWithFormat
 import kotlinx.android.synthetic.main.layout_share_glucose_event.view.*
 import javax.inject.Inject
 

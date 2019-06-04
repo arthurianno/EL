@@ -1,6 +1,7 @@
 package com.elta.android.data.features.diary.tags.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.timestamp
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
@@ -9,9 +10,7 @@ import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.dto.TagsDto
-import com.nullgr.core.date.toTimestamp
 import io.reactivex.Observable
-import java.util.Date
 import javax.inject.Inject
 
 class TagsRemoteDataSource @Inject constructor(
@@ -23,7 +22,7 @@ class TagsRemoteDataSource @Inject constructor(
 
     override fun getTags(): Observable<List<TagDto>> =
         getDataByPage(PAGE, PAGE_SIZE)
-            .doOnNext { syncStorage.lastTagsSync = Date().toTimestamp() }
+            .doOnNext { syncStorage.lastTagsSync = timestamp() }
             .map(TagsDto::tags)
             .doOnNext { tags -> updateCache(tags, cache, toCacheMapper) }
 

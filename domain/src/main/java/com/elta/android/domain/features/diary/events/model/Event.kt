@@ -2,17 +2,14 @@ package com.elta.android.domain.features.diary.events.model
 
 import com.elta.android.domain.features.diary.tags.model.Tag
 import org.threeten.bp.ZonedDateTime
-import java.util.Date
 
 data class Event(
     val id: String,
-    var additionTime: Date,
-    var additionTimeBp: ZonedDateTime ?= null,
-    val additionTimeString: String,
+    var additionTime: ZonedDateTime,
     val tagId: String?,
     var tag: Tag?,
     val note: String?,
-    val modificationTime: Date?,
+    val modificationTime: ZonedDateTime,
     val value: Double?,
     val name: String?,
     val kind: String?,

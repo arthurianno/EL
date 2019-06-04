@@ -4,7 +4,7 @@ import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 data class EventFormModel(
     var eventType: EventType? = null,
@@ -12,7 +12,7 @@ data class EventFormModel(
     var inputValue: String? = null,
     var tag: Tag? = null,
     var isDateChanged: Boolean = false,
-    var date: Date? = null,
+    var date: ZonedDateTime? = null,
     var noteValue: String? = null,
     var meta: Any? = null
 ) {

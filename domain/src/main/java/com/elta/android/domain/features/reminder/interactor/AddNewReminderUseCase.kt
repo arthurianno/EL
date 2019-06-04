@@ -6,7 +6,7 @@ import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class AddNewReminderUseCase @Inject constructor(
 
     data class Params(
         val title: String,
-        val date: Date,
+        val date: ZonedDateTime,
         val schedule: ScheduleType
     )
 }

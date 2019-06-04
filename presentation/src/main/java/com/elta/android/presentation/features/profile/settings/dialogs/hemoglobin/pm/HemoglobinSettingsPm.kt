@@ -23,7 +23,7 @@ import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.nullgr.core.adapter.items.ListItem
 import io.reactivex.rxkotlin.Observables
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class HemoglobinSettingsPm @Inject constructor(
@@ -36,8 +36,8 @@ class HemoglobinSettingsPm @Inject constructor(
 ) : BaseSettingsDialogPm(services) {
 
     val dateState = State("")
-    val dateSelectedAction = Action<Date>()
-    val dateSelectedState = State(Date())
+    val dateSelectedAction = Action<ZonedDateTime>()
+    val dateSelectedState = State(ZonedDateTime.now())
 
     val hemoglobinValueState = State<String>()
     val hemoglobinItemsState = State<List<ListItem>>()

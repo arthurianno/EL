@@ -2,10 +2,10 @@ package com.elta.android.domain.features.statistics.model.daily
 
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 data class DailyStatisticModel(
-    val date: Date,
+    val date: LocalDate,
     val glucose: GlucoseStatisticModel,
     val insulin: DailyInsulinStatisticModel,
     val bread: DailyBreadStatisticModel,

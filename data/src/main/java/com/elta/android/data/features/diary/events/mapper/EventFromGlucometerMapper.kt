@@ -16,7 +16,6 @@ class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDt
                 id = id,
                 type = EventType.GLUCOSE,
                 additionTime = checkNotNull(date),
-                additionTimeString = checkNotNull(date).toString(),
                 tagId = null,
                 tag = null,
                 note = null,

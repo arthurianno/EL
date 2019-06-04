@@ -3,6 +3,7 @@
 package com.elta.android.data.features.user.api
 
 import com.elta.android.common.utils.log
+import com.elta.android.common.utils.timestamp
 import com.elta.android.data.features.user.dto.DiabetTypeDto
 import com.elta.android.data.features.user.dto.GenderTypeDto
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
@@ -10,11 +11,9 @@ import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.dto.SocialNetworkTypeDto
-import com.nullgr.core.date.toTimestamp
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
 
 class MockedProfileApi : ProfileApi {
 
@@ -40,7 +39,7 @@ class MockedProfileApi : ProfileApi {
                     SocialNetworkDto(type = SocialNetworkTypeDto.VK, isLinked = false),
                     SocialNetworkDto(type = SocialNetworkTypeDto.OK, isLinked = false)
                 ),
-                timeStamp = Date().toTimestamp()
+                timeStamp = timestamp()
             )
         }.log("Settings", "profile") { it.toString() }
             .singleOrError()

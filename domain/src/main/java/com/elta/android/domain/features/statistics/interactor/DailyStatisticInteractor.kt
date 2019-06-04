@@ -6,10 +6,10 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 fun buildDailyStatisticModel(
-    date: Date,
+    date: LocalDate,
     eventsPerDay: Map<EventType, List<Event>>,
     settings: GlucoseLevelSettings
 ): DailyStatisticModel {

@@ -15,6 +15,7 @@ import com.elta.android.presentation.utils.showTimePickerWithoutPastTimeDialog
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_reminder_form.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import org.threeten.bp.ZonedDateTime
 import java.util.Date
 
 abstract class BaseRemindFragment<T : BaseRemindPm> : BaseFragment<T>() {
@@ -50,7 +51,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> : BaseFragment<T>() {
 
     private fun T.bindDateSelection() {
         showDatePickerDialog.bindTo { originalDate ->
-            activity.showDatePickerDialog(originalDate, minDate = Date()) {
+            activity.showDatePickerDialog(originalDate, minDate = ZonedDateTime.now()) {
                 dateTimeSelectedAction.consumer.accept(it)
             }
         }

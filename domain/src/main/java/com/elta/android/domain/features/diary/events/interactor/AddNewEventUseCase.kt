@@ -10,7 +10,7 @@ import com.elta.android.domain.features.diary.tags.model.Tag
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -26,7 +26,6 @@ class AddNewEventUseCase @Inject constructor(
             Event(
                 id = UUID.randomUUID().toString(),
                 additionTime = date,
-                additionTimeString = date.toString(),
                 tagId = p.tag?.id,
                 tag = p.tag,
                 note = p.note,
@@ -50,7 +49,7 @@ class AddNewEventUseCase @Inject constructor(
         val kind: String? = null,
         val name: String? = null,
         val duration: Long? = null,
-        val date: Date? = null,
+        val date: ZonedDateTime? = null,
         val tag: Tag? = null,
         val insulin: InsulinType? = null,
         val activity: ActivityType? = null,

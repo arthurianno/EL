@@ -1,8 +1,8 @@
 package com.elta.android.domain.features.statistics.model
 
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 
 interface StatisticPeriod {
-    val start: Date
-    val end: Date
+    val start: LocalDateTime
+    val end: LocalDateTime
 }

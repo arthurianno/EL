@@ -9,7 +9,6 @@ import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
-import com.nullgr.core.date.toTimestamp
 import javax.inject.Inject
 
 class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventDto> {
@@ -32,7 +31,7 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                 additionTime = additionTimeString,
                 tagId = tagId,
                 note = note,
-                modificationTime = modificationTime?.toTimestamp(),
+                modificationTime = modificationTime,
                 state = StateDto.valueOf(state)
             )
         }

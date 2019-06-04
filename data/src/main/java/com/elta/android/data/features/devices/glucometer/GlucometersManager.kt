@@ -39,8 +39,8 @@ import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
+import org.threeten.bp.ZonedDateTime
 import java.nio.charset.Charset
-import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -365,7 +365,7 @@ class GlucometersManager @Inject constructor(
                 val pin = pinStorage.getPin(address)
                 if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
 
-                val startCommands = mutableListOf(Commands.SetPin(pin), Commands.SetTime(Date()),
+                val startCommands = mutableListOf(Commands.SetPin(pin), Commands.SetTime(ZonedDateTime.now()),
                     Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
                 )
 
@@ -445,7 +445,7 @@ class GlucometersManager @Inject constructor(
         }
 
     private fun updateGlucometerInfo(address: String, responses: List<String>) {
-        val info = infoBuilder.buildFrom(address, responses, Date())
+        val info = infoBuilder.buildFrom(address, responses, ZonedDateTime.now())
         val cachedInfo = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
         val newInfo = glucometersInfoToCacheMapper.mapFromObject(info)
         if (cachedInfo == null) glucometersInfoCache.add(listOf(newInfo))

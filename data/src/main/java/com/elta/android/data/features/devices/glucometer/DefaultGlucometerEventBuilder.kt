@@ -1,8 +1,8 @@
 package com.elta.android.data.features.devices.glucometer
 
+import com.elta.android.common.utils.toDate
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
-import com.nullgr.core.date.toDate
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +32,7 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         return Pair(dateToken, temperatureAndValueToken)
     }
 
-    protected open fun extractDate(token: String): Date? = "20$token".toDate("yyyyMMddHHmmss")
+    protected open fun extractDate(token: String): ZonedDateTime? = "20$token".toDate("yyyyMMddHHmmss")
 
     protected open fun extractTemperature(token: String): Int? = token.substring(0, 3).toInt()
 

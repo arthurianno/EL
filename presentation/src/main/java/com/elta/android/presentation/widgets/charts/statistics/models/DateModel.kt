@@ -1,9 +1,9 @@
 package com.elta.android.presentation.widgets.charts.statistics.models
 
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 
 data class DateModel(
-    val date: Date?,
+    val date: LocalDateTime?,
     val formattedDate: String?,
     val needDrawDateTile: Boolean,
     val isStub: Boolean = false

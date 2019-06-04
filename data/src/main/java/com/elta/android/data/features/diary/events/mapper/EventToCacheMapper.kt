@@ -1,10 +1,9 @@
 package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.getDate
+import com.elta.android.common.utils.toIsoDate
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
-import com.nullgr.core.date.dateFromTimestamp
 import javax.inject.Inject
 
 class EventToCacheMapper @Inject constructor() : Mapper<EventDto, EventCachedDto> {
@@ -15,11 +14,11 @@ class EventToCacheMapper @Inject constructor() : Mapper<EventDto, EventCachedDto
                 id = id.hashCode().toLong(),
                 secondaryId = id,
                 type = data.type.name,
-                additionTime = additionTime.getDate(),
+                additionTime = additionTime.toIsoDate().toInstant().toEpochMilli(),
                 additionTimeString = additionTime,
                 tagId = tagId,
                 note = note,
-                modificationTime = modificationTime?.dateFromTimestamp(),
+                modificationTime = modificationTime,
                 value = data.value,
                 kind = data.kind,
                 name = data.name,

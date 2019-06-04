@@ -7,14 +7,14 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 
 @Suppress("ComplexInterface", "TooManyFunctions")
 interface EventsRepository {
 
     fun getEvents(): Observable<List<Event>>
 
-    fun getEvents(start: Date, end: Date): Observable<List<Event>>
+    fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<Event>>
 
     fun getEventById(id: String): Single<Event>
 

@@ -5,7 +5,7 @@ import com.elta.android.presentation.widgets.charts.statistics.StatisticsChartVi
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 class StatisticsDateChangedObserver(
     private val view: StatisticsChartView
@@ -28,7 +28,7 @@ class StatisticsDateChangedObserver(
     ) : MainThreadDisposable() {
 
         var valueListener: OnStatisticsDateChangedListener? = object : OnStatisticsDateChangedListener {
-            override fun onDateChanged(date: Date) {
+            override fun onDateChanged(date: LocalDate) {
                 if (!isDisposed)
                     observer.onNext(StatisticsSelectionResult(date))
             }

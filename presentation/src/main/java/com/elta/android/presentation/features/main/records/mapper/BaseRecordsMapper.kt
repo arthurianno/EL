@@ -61,8 +61,8 @@ open class BaseRecordsMapper(
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     protected fun Event.formatDate(): String {
         return try {
-            val time = additionTimeBp?.toStringWithFormat(CommonFormats.FORMAT_TIME) ?: ""
-            val offset = additionTimeBp?.offset?.toString() ?: ""
+            val time = additionTime?.toStringWithFormat(CommonFormats.FORMAT_TIME) ?: ""
+            val offset = additionTime?.offset?.toString() ?: ""
             resources.getString(R.string.main_records_event_time_mask, time, offset)
         } catch (e: Exception) {
             ""

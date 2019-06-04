@@ -1,6 +1,7 @@
 package com.elta.android.data.features.sale_points.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.timestamp
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
@@ -9,9 +10,7 @@ import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.data.features.sale_points.dto.SalePointsDto
-import com.nullgr.core.date.toTimestamp
 import io.reactivex.Observable
-import java.util.Date
 import javax.inject.Inject
 
 class SalePointsRemoteDataSource @Inject constructor(
@@ -23,7 +22,7 @@ class SalePointsRemoteDataSource @Inject constructor(
 
     override fun getSalePoints(): Observable<List<SalePointDto>> =
         getDataByPage(PAGE, PAGE_SIZE)
-            .doOnNext { syncStorage.lastSalePointsSync = Date().toTimestamp() }
+            .doOnNext { syncStorage.lastSalePointsSync = timestamp() }
             .map(SalePointsDto::points)
             .doOnNext { points -> updateCache(points, salePointsCache, toCacheMapper) }
 

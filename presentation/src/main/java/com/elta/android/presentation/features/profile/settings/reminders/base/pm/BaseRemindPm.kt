@@ -17,7 +17,7 @@ import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 abstract class BaseRemindPm constructor(
     services: ServiceFacade
@@ -28,10 +28,10 @@ abstract class BaseRemindPm constructor(
     val dateSelector = formSelectorControl()
     val timeSelector = formSelectorControl()
 
-    val showDatePickerDialog = Command<Date>(bufferSize = 1)
-    val showTimePickerDialog = Command<Date>(bufferSize = 1)
+    val showDatePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
     val saveReminderAction = Action<Unit>()
-    val dateTimeSelectedAction = Action<Date>()
+    val dateTimeSelectedAction = Action<ZonedDateTime>()
     val selectedScheduleAction = Action<ListItem>()
     val backHandleAction = Action<Unit>()
     val schedulesState = State<List<SpinnerItem>>()
@@ -39,7 +39,7 @@ abstract class BaseRemindPm constructor(
     val saveChangesEnableState = State(false)
 
     protected val exitDialogAction = Action<Unit>()
-    protected val selectedDateState = State(Date())
+    protected val selectedDateState = State(ZonedDateTime.now())
     protected val reminderFormHolderState = State(ReminderFormModel())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
@@ -61,16 +61,9 @@ abstract class BaseRemindPm constructor(
         router.exit()
     }
 
-    protected fun Date?.isDateChanged(other: Date): Boolean {
-        return when {
-            this == null -> false
-            else -> this != other
-        }
-    }
-
     protected fun isFormValid(reminderModel: ReminderFormModel) =
         !reminderModel.inputValue.isNullOrEmpty() &&
-            checkNotNull(reminderModel.date).after(Date())
+            checkNotNull(reminderModel.date).isAfter(ZonedDateTime.now())
 
     protected fun createScheduleItems() {
         schedulesState.consumer.accept(
