@@ -2,14 +2,10 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.home.model.atTimeOfDay
 import com.elta.android.domain.features.statistics.interactor.toEventsContainer
-import com.nullgr.core.date.minusDay
-import com.nullgr.core.date.plusAny
-import com.nullgr.core.date.withoutTime
 import org.junit.Test
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZonedDateTime
 
 class ToEventsContainerTest {
 
@@ -40,23 +36,23 @@ class ToEventsContainerTest {
 
     @Test
     fun splitByTypePerDate_correct() {
-        val firstDay = Date().atTimeOfDay(12, 0, 0)
-        val secondDay = firstDay.minusDay(2)
+        val firstDay = ZonedDateTime.now().with(LocalTime.of(12,0,0))
+        val secondDay = firstDay.minusDays(2)
 
         val firstType = EventType.ACTIVITY
         val secondType = EventType.BREAD
 
         val events = arrayListOf(
-            EventTestFactory.create(type = firstType, date = firstDay.plusAny(TimeUnit.MINUTES, 2)),
-            EventTestFactory.create(type = secondType, date = firstDay.plusAny(TimeUnit.MINUTES, 4)),
-            EventTestFactory.create(type = firstType, date = secondDay.plusAny(TimeUnit.MINUTES, 2)),
-            EventTestFactory.create(type = secondType, date = secondDay.plusAny(TimeUnit.MINUTES, 4))
+            EventTestFactory.create(type = firstType, date = firstDay.plusMinutes(2)),
+            EventTestFactory.create(type = secondType, date = firstDay.plusMinutes( 4)),
+            EventTestFactory.create(type = firstType, date = secondDay.plusMinutes( 2)),
+            EventTestFactory.create(type = secondType, date = secondDay.plusMinutes( 4))
         )
 
         val container = events.toEventsContainer()
         val byTypePerDay = container.byTypePerDay
 
-        val first = byTypePerDay[firstDay.withoutTime()]
+        val first = byTypePerDay[firstDay.toLocalDate()]
         assert(first != null)
 
         if (first != null) {
@@ -71,7 +67,7 @@ class ToEventsContainerTest {
             assert(firstBySecondType?.first()?.type == secondType)
         }
 
-        val second = byTypePerDay[secondDay.withoutTime()]
+        val second = byTypePerDay[secondDay.toLocalDate()]
         assert(second != null)
 
         if (second != null) {
