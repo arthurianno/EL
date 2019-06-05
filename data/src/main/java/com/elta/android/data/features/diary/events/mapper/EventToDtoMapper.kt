@@ -1,7 +1,7 @@
 package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.toStringIso
+import com.elta.android.common.utils.toIsoString
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
@@ -19,10 +19,10 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
             EventDto(
                 id = id,
                 state = StateDto.valueOf(state.name),
-                additionTime = additionTime.toStringIso(),
+                additionTime = additionTime.toIsoString(),
                 tagId = tagId,
                 note = note,
-                modificationTime = modificationTime?.time,
+                modificationTime = modificationTime,
                 data = EventDataDto(
                     type = EventTypeDto.valueOf(type.name),
                     value = value,

@@ -4,7 +4,6 @@ import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
-import com.elta.android.domain.features.diary.home.model.atTimeOfDay
 import com.elta.android.domain.features.statistics.interactor.buildActivityStatisticModel
 import com.elta.android.domain.features.statistics.interactor.buildBreadStatisticModelByPeriod
 import com.elta.android.domain.features.statistics.interactor.buildGlucoseStatisticModel
@@ -15,9 +14,9 @@ import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPe
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.InsulinStatisticModelByPeriod
 import com.elta.android.domain.features.user.interactor.round
-import com.nullgr.core.date.plusDay
 import org.junit.Test
-import java.util.Date
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZonedDateTime
 
 class PeriodStatisticInteractorTest {
 
@@ -55,16 +54,16 @@ class PeriodStatisticInteractorTest {
     fun buildBreadStatisticModelByPeriod_3days_2withNotZeroBreadEvents_correct() {
         val events = arrayListOf(
             // first day
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 12), value = 2.0),
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 13), value = 0.0),
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)), value = 2.0),
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)), value = 0.0),
 
             // second day
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 12).plusDay(1), value = 0.0),
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 13).plusDay(1), value = 0.0),
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(1), value = 0.0),
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(1), value = 0.0),
 
             // third day
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 12).plusDay(2), value = 4.0),
-            EventTestFactory.create(type = EventType.BREAD, date = Date().atTimeOfDay(12, 12, 13).plusDay(2), value = 6.0)
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(2), value = 4.0),
+            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(2), value = 6.0)
         )
 
         val expected = BreadStatisticModelByPeriod(averageLevel = 6.0)

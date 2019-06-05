@@ -2,7 +2,6 @@ package com.elta.android.data.features.diary.tags.cache.dto
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
-import java.util.Date
 
 @Entity
 data class TagCachedDto(
@@ -11,6 +10,6 @@ data class TagCachedDto(
     val name: String,
     val image: String,
     val isReadOnly: Boolean,
-    val modificationTime: Date?,
+    val modificationTime: Long?,
     val state: String
 )

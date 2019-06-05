@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.records.mapper
 
 import android.graphics.drawable.Drawable
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.HomeModel
@@ -10,7 +11,6 @@ import com.elta.android.presentation.features.main.records.ui.adapter.items.Reco
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.date.CommonFormats
-import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 

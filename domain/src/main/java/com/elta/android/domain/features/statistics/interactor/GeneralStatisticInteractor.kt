@@ -5,8 +5,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
-import com.nullgr.core.date.withoutTime
-import java.util.Date
+import org.threeten.bp.LocalDate
 import kotlin.math.roundToInt
 
 internal inline fun Double.average(total: Int): Double = if (total == 0) 0.0 else (this / total).round(1)
@@ -32,7 +31,7 @@ internal inline fun DailyStatisticModel.checkMin(min: DailyStatisticModel): Dail
 
 internal fun List<Event>.toEventsContainer(): EventsContainer {
     val byType = hashMapOf<EventType, List<Event>>()
-    val byTypePerDay = hashMapOf<Date, Map<EventType, List<Event>>>()
+    val byTypePerDay = hashMapOf<LocalDate, Map<EventType, List<Event>>>()
 
     for (element in this) {
         // split by type
@@ -45,7 +44,7 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
         (destinationByType as MutableList).add(element)
 
         // split by type per day
-        val day = element.additionTime.withoutTime()
+        val day = element.additionTime.toLocalDate()
         var destinationByDay1 = byTypePerDay[day]
         if (destinationByDay1 == null) {
             destinationByDay1 = hashMapOf()
@@ -65,5 +64,5 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
 
 data class EventsContainer(
     val byType: Map<EventType, List<Event>>,
-    val byTypePerDay: Map<Date, Map<EventType, List<Event>>>
+    val byTypePerDay: Map<LocalDate, Map<EventType, List<Event>>>
 )

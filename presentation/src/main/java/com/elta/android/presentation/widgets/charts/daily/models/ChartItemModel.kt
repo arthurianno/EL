@@ -1,10 +1,10 @@
 package com.elta.android.presentation.widgets.charts.daily.models
 
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 data class ChartItemModel(
     val value: Double,
-    val dateTime: Date,
+    val dateTime: ZonedDateTime,
     val formattedTime: String,
     var hourOfEvent: Int = 0,
     var minutesOfEvent: Int = 0,

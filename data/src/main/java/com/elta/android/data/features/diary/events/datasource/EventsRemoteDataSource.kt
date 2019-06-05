@@ -1,6 +1,7 @@
 package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.timestamp
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
@@ -10,11 +11,10 @@ import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
-import com.nullgr.core.date.toTimestamp
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class EventsRemoteDataSource @Inject constructor(
@@ -26,11 +26,11 @@ class EventsRemoteDataSource @Inject constructor(
 
     override fun getEvents(): Observable<List<EventDto>> =
         getDataByPage(PAGE, PAGE_SIZE)
-            .doOnNext { syncStorage.lastEventsSync = Date().toTimestamp() }
+            .doOnNext { syncStorage.lastEventsSync = timestamp() }
             .map(EventsDto::events)
             .doOnNext { events -> updateCache(events, eventsCache, toCacheMapper) }
 
-    override fun getEvents(start: Date, end: Date): Observable<List<EventDto>> =
+    override fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventDto>> =
         getEvents()
 
     override fun getEventById(id: String): Single<EventDto> =

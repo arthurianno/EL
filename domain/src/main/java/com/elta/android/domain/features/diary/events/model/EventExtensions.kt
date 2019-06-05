@@ -8,7 +8,7 @@ import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 fun EventType.getValidator(): FormValidator =
     when (this) {
@@ -27,7 +27,7 @@ fun Event.isChanged(
     kind: String? = null,
     name: String? = null,
     duration: Long? = null,
-    date: Date? = null,
+    date: ZonedDateTime? = null,
     tagId: String? = null,
     insulin: InsulinType? = null,
     activity: ActivityType? = null,

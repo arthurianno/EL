@@ -1,10 +1,10 @@
 package com.elta.android.domain.features.reminder.model
 
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 data class Reminder(
     val id: String,
     val title: String,
-    var time: Date,
+    var time: ZonedDateTime,
     val scheduleType: ScheduleType
 )

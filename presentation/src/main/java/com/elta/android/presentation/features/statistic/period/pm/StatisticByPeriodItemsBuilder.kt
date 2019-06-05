@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.statistic.period.pm
 
 import android.graphics.drawable.Drawable
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
@@ -15,9 +16,8 @@ import com.elta.android.presentation.features.statistic.period.ui.adapter.items.
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
-import java.util.Date
+import org.threeten.bp.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
     private val resources: ResourceProvider
 ) {
 
-    fun build(model: StatisticByPeriodModel, date: Date? = null): List<ListItem> {
+    fun build(model: StatisticByPeriodModel, date: LocalDate? = null): List<ListItem> {
         val items = arrayListOf<ListItem>()
 
         items.add(model.toChartItem(date))
@@ -66,7 +66,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         return items
     }
 
-    private fun DailyGlucoseModel.dailyChart(date: Date?): GlucoseDailyChartItem? {
+    private fun DailyGlucoseModel.dailyChart(date: LocalDate?): GlucoseDailyChartItem? {
         if (date == null) return null
         val dateTitle = date.toStringWithFormat(DAILY_CHART_DATE_FORMAT)
         return GlucoseDailyChartItem(ChartItemsBuilder.build(this), dateTitle)
@@ -147,7 +147,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
     private inline fun GeneralIndexItem.Type.getDescriptionByDate(
         stat: StatisticByPeriodModel,
         value: String,
-        date: Date?
+        date: LocalDate?
     ): String = when {
         this == GeneralIndexItem.Type.ACTIVITY && date != null ->
             getDescription(stat.allDays[date]?.activity?.eventsCount, value)
@@ -179,7 +179,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private fun GeneralIndexItem.Type.getValueByDate(model: StatisticByPeriodModel, date: Date?): String =
+    private fun GeneralIndexItem.Type.getValueByDate(model: StatisticByPeriodModel, date: LocalDate?): String =
         when (date == null) {
             true -> getValue(model)
             else -> getValue(model.allDays[date])
@@ -259,7 +259,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         return time.toString()
     }
 
-    private fun StatisticByPeriodModel.toChartItem(selectedDate: Date?) =
+    private fun StatisticByPeriodModel.toChartItem(selectedDate: LocalDate?) =
         GlucoseStatisticChartItem(
             datesTitle = resources.getString(
                 R.string.statistic_chart_period_dates_mask,

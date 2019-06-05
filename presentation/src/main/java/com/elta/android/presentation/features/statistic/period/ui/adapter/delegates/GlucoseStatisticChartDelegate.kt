@@ -12,7 +12,7 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
 import kotlinx.android.synthetic.main.item_glucose_statistic_chart.*
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 class GlucoseStatisticChartDelegate(val bus: RxBus) : AdapterDelegate() {
 
@@ -28,7 +28,7 @@ class GlucoseStatisticChartDelegate(val bus: RxBus) : AdapterDelegate() {
                             bus.click(Clicks.DateInStatisticsClicked(null))
                         }
 
-                        override fun onDateChanged(date: Date) {
+                        override fun onDateChanged(date: LocalDate) {
                             bus.click(Clicks.DateInStatisticsClicked(date))
                         }
                     }

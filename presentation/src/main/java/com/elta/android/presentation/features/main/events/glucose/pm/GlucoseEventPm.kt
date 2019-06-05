@@ -42,7 +42,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -76,7 +76,7 @@ class GlucoseEventPm @Inject constructor(
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
-    private val selectedDateState = State<Date>()
+    private val selectedDateState = State<ZonedDateTime>()
     private val eventIdState = State<String>()
     private val glucoseLevelSettingsState = State<GlucoseLevelSettings>()
     private val eventState = State<Event>()

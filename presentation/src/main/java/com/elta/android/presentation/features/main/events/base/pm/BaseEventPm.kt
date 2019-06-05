@@ -22,7 +22,7 @@ import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 abstract class BaseEventPm constructor(
@@ -42,9 +42,9 @@ abstract class BaseEventPm constructor(
     val mainActionVisibilityState = State(false)
     val mainAction = Action<Unit>()
 
-    val showDatePickerDialog = Command<Date>(bufferSize = 1)
-    val showTimePickerDialog = Command<Date>(bufferSize = 1)
-    val dateTimeSelectedAction = Action<Date>()
+    val showDatePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
+    val dateTimeSelectedAction = Action<ZonedDateTime>()
 
     val backHandleAction = Action<Unit>()
     val exitDialogAction = Action<Unit>()
@@ -53,7 +53,7 @@ abstract class BaseEventPm constructor(
 
     protected val formPickerValue = State<Double>()
     protected val eventTypeState = State<EventType>()
-    protected val selectedDateState = State(Date())
+    protected val selectedDateState = State(ZonedDateTime.now())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -86,13 +86,6 @@ abstract class BaseEventPm constructor(
             date = form.date,
             note = form.note
         )
-    }
-
-    protected fun Date?.isDateChanged(other: Date): Boolean {
-        return when {
-            this == null -> false
-            else -> this != other
-        }
     }
 
     protected fun handleSuccess(isCreate: Boolean) {

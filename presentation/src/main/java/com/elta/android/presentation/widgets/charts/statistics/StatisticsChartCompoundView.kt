@@ -11,7 +11,7 @@ import com.elta.android.presentation.widgets.charts.statistics.listeners.Statist
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.layout_statistics_chart_compound_view.view.*
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 @Suppress("MagicNumber")
 class StatisticsChartCompoundView @JvmOverloads constructor(
@@ -28,7 +28,7 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
         chartView.setOnStatisticsDateChangedListener(listener)
     }
 
-    fun dateChanged(): Observable<Date> = StatisticsDateChangedObserver(chartView)
+    fun dateChanged(): Observable<LocalDate> = StatisticsDateChangedObserver(chartView)
         .flatMap {
             when (it.date != null) {
                 true -> Observable.just(it.date)

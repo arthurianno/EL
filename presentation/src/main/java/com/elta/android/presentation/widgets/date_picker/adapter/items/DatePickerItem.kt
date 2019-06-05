@@ -1,10 +1,10 @@
 package com.elta.android.presentation.widgets.date_picker.adapter.items
 
 import com.nullgr.core.adapter.items.ListItem
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 data class DatePickerItem(
-    val date: Date,
+    val date: LocalDate,
     val dayOfWeek: Int,
     val dayOfMonth: Int,
     val dayOfWeekResId: Int,

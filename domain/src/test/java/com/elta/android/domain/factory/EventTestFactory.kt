@@ -1,12 +1,13 @@
 package com.elta.android.domain.factory
 
+import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.State
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.UUID
 
 object EventTestFactory {
@@ -19,17 +20,16 @@ object EventTestFactory {
         mealTag: MealTag? = null,
         insulinType: InsulinType? = null,
         tagId: String? = null,
-        date: Date = Date()
+        date: ZonedDateTime = ZonedDateTime.now()
     ): Event =
         Event(
             id = UUID.randomUUID().toString(),
             additionTime = date,
-            additionTimeString = "",
             tagId = tagId,
             tag = null,
             temperature = null,
             note = "Test note",
-            modificationTime = Date(),
+            modificationTime = ZonedDateTime.now().toMillisUtc(),
             value = value,
             name = "Test name",
             kind = "Test kind",
