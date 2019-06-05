@@ -1,6 +1,5 @@
 package com.elta.android.domain.features.sync.interactor
 
-import com.elta.android.common.utils.log
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -18,7 +17,7 @@ class SyncLocalChangesUseCase @Inject constructor(
 ) : CompletableUseCase<Unit>(schedulers) {
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
-        profileRepo.sync()
+        profileRepo.sync().applyScheduler(schedulers)
             .onErrorComplete()
             .andThen(googleFitRepo.sync().applyScheduler(schedulers))
             .onErrorComplete()

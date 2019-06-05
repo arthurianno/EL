@@ -30,7 +30,7 @@ class GoogleFitDataSource @Inject constructor(
             when (it) {
                 true -> Observable.just(true)
                 else -> RxGoogleFitAuthActivity.launchForResult(context)
-                    .map { result -> result.success }
+                    .switchMap { result -> Observable.just(result.success) }
             }
         }
             .doOnNext(::setInitialSyncTimeIfNeed)

@@ -4,13 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.elta.android.common.utils.log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.nullgr.core.intents.launch
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
 import io.reactivex.Observable
-import timber.log.Timber
 
 class RxGoogleFitAuthActivity : Activity() {
 
@@ -56,6 +54,5 @@ class RxGoogleFitAuthActivity : Activity() {
                         .map { it as AuthResult }
                         .flatMap { Observable.just(it) }
                 }
-
     }
 }
