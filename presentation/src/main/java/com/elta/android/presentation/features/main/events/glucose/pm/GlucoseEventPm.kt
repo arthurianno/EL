@@ -167,6 +167,7 @@ class GlucoseEventPm @Inject constructor(
 
     private fun bindFormTagSelection() {
         tagSelector.clickAction.observable
+            .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {

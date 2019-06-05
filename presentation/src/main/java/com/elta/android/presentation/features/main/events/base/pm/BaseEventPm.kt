@@ -117,6 +117,7 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormVariantSelection() {
         formSelector.clickAction.observable
+            .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value, generateChooserId()) }
@@ -131,6 +132,7 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormTagSelection() {
         tagSelector.clickAction.observable
+            .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
