@@ -108,6 +108,7 @@ dependencies {
     implementation commonDependencies.barcodeScanner
     implementation commonDependencies.materialEditText
     implementation commonDependencies.yandexMapKit
+    implementation commonDependencies.yandexMapKitClustering
     implementation commonDependencies.cardView
     implementation commonDependencies.pulseView
     implementation commonDependencies.datePicker

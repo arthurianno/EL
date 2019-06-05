@@ -9,6 +9,7 @@ import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.pm.widgets.bindTo
@@ -18,6 +19,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
+import com.elta.android.presentation.features.shops.map.ui.widgets.ShopClusterPinProvider
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollStateChanges
@@ -46,6 +48,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
     override val userLocationPinRes = R.drawable.ic_my_loc
+    override val clusterPinProvider by lazy(LazyThreadSafetyMode.NONE) {
+        ShopClusterPinProvider(requireActivity())
+    }
 
     private val snapHelper = PagerSnapHelper()
     private val rxPermissions by lazy { RxPermissions(this) }
@@ -86,12 +91,15 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
-            .bindTo { status -> pm.setPermissionStatus(status) }
+            .bindTo(pm::setPermissionStatus)
 
-        pm.geoPoints.bindTo(::addPins)
+        pm.geoPoints.bindTo { (points: List<GeoPoint>, selected: Int) ->
+            addPins(points)
+            selectPin(points[selected], false)
+        }
 
-        pm.selectGeoPointCommand.bindTo(::selectPin)
-        pm.selectShopItemCommand.bindTo { itemsView.smoothScrollToPosition(it) }
+        pm.selectGeoPointCommand.bindTo { selectPin(it, true) }
+        pm.selectShopItemCommand.bindTo(itemsView::smoothScrollToPosition)
 
         pinClicks().skip(1).bindTo(pm.shopItemGeoPointSelectedAction)
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)

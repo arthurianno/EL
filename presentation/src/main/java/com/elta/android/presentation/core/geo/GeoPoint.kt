@@ -1,5 +1,8 @@
 package com.elta.android.presentation.core.geo
 
+import com.a65apps.clustering.core.DefaultCluster
+import com.a65apps.clustering.core.LatLng
+
 @Suppress("MagicNumber", "UseDataClass")
 class GeoPoint(
     val latitude: Double,
@@ -9,7 +12,10 @@ class GeoPoint(
     val isUserPoint: Boolean = false,
     val icon: GeoPointIcon? = null,
     var meta: Any? = null
-) {
+) : DefaultCluster(LatLng(latitude, longitude), id) {
+
+    override fun isCluster(): Boolean = size() > CLUSTER_SIZE
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -40,6 +46,10 @@ class GeoPoint(
             "icon=$icon, " +
             "meta=$meta" +
             ")"
+    }
+
+    private companion object {
+        private const val CLUSTER_SIZE = 2
     }
 }
 

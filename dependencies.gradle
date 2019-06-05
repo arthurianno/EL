@@ -66,6 +66,7 @@ def libraryVersions = [
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
         mapKitVersion              : '3.2.0',
+        mapKitClusteringVersion    : '0.2',
         cardViewVersion            : '1.0.0',
         pulseViewVersion           : '1.0.3',
 
@@ -165,6 +166,7 @@ ext.commonDependencies = [
         barcodeScanner        : "me.dm7.barcodescanner:zxing:${libraryVersions.barcodeScannerVersion}",
         materialEditText      : "com.rengwuxian.materialedittext:library:${libraryVersions.materialEditTextVersion}",
         yandexMapKit          : "com.yandex.android:mapkit:${libraryVersions.mapKitVersion}",
+        yandexMapKitClustering: "com.github.65apps:android-clustering-for-yandex-mapkit:${libraryVersions.mapKitClusteringVersion}",
         cardView              : "com.github.captain-miao:optroundcardview:${libraryVersions.cardViewVersion}",
         pulseView             : "pl.bclogic:pulsator4droid:${libraryVersions.pulseViewVersion}",
 
