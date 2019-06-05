@@ -16,6 +16,7 @@ import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.pageScrolled
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
@@ -51,7 +52,7 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
     }
 
     override fun provideLayoutManager(context: Context?): RecyclerView.LayoutManager =
-        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
 
     override fun onBindPresentationModel(pm: OnBoardingPm) {
         super.onBindPresentationModel(pm)

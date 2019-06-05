@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.home.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
@@ -19,6 +18,7 @@ import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.widgets.BottomNavigationView
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
@@ -105,7 +105,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
     }
 
     private fun initBottomSheetItemsView() {
-        bottomSheetItemsView.layoutManager = LinearLayoutManager(activity)
+        bottomSheetItemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(activity))
         bottomSheetItemsView.adapter = adapter
     }
 

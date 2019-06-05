@@ -1,13 +1,13 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui
 
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.HapticFeedbackConstants
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.elta.android.presentation.utils.sequenceClicks
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.DynamicAdapter
@@ -31,7 +31,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        itemsView.layoutManager = LinearLayoutManager(activity)
+        itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(activity))
         itemsView.adapter = adapter
 
         arrowView.setOnClickListener {

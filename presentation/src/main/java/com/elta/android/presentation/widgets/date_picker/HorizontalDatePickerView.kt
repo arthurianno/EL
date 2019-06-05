@@ -9,6 +9,7 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDelegatesFactory
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
 import com.nullgr.core.adapter.DynamicAdapter
@@ -42,7 +43,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         val delegatesFactory = DatePickerDelegatesFactory()
         adapter = DynamicAdapter(delegatesFactory, diffCalculator)
 
-        dateItemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        dateItemsView.layoutManager = FixedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL)
         dateItemsView.adapter = adapter
         datePickerSelectorView.layoutParams.width = getSelectorWidth()
         dateItemsView.attachSnapHelperWithListener(
