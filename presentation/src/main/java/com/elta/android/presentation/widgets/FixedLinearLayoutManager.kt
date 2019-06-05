@@ -11,6 +11,7 @@ class FixedLinearLayoutManager(
     reverseLayout: Boolean = false
 ) : LinearLayoutManager(context, orientation, reverseLayout) {
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
         try {
             super.onLayoutChildren(recycler, state)
