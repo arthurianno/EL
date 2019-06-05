@@ -2,7 +2,6 @@ package com.elta.android.data.features.observers.cache.dto
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
-import java.util.Date
 
 @Entity
 data class ObserverCacheDto(
@@ -11,6 +10,6 @@ data class ObserverCacheDto(
     val email: String,
     val name: String?,
     val status: String,
-    val modificationTime: Date?,
+    val modificationTime: Long?,
     val state: String
 )

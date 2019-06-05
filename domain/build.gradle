@@ -58,7 +58,6 @@ dependencies {
     implementation project(':common')
 
     implementation commonDependencies.appCoreInteractor
-    implementation commonDependencies.appCoreDate
     implementation commonDependencies.supportCompatV7
 
     implementation commonDependencies.rxKotlin
@@ -74,8 +73,9 @@ dependencies {
     implementation commonDependencies.daggerAndroidSupport
 
     implementation commonDependencies.timber
+    implementation commonDependencies.jsr310
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
-    testImplementation commonTestDependencies.jodaTime
+    testImplementation commonTestDependencies.jsr310
 }

@@ -7,6 +7,7 @@ class GeoPoint(
     val id: Any? = null,
     var selected: Boolean = false,
     val isUserPoint: Boolean = false,
+    val icon: GeoPointIcon? = null,
     var meta: Any? = null
 ) {
     override fun equals(other: Any?): Boolean {
@@ -36,6 +37,7 @@ class GeoPoint(
             "id=$id, " +
             "selected=$selected, " +
             "isUserPoint=$isUserPoint, " +
+            "icon=$icon, " +
             "meta=$meta" +
             ")"
     }

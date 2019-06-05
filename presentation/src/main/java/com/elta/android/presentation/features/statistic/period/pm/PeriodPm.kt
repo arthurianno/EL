@@ -13,7 +13,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import io.reactivex.Observable
-import java.util.Date
+import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 class PeriodPm @Inject constructor(
@@ -81,6 +81,6 @@ class PeriodPm @Inject constructor(
             }
         )
 
-    private fun buildItems(model: StatisticByPeriodModel, date: Date? = null) =
+    private fun buildItems(model: StatisticByPeriodModel, date: LocalDate? = null) =
         periodBuilder.build(model, date)
 }

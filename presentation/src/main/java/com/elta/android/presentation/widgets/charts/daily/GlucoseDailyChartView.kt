@@ -20,15 +20,13 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.distanceBetween
-import com.elta.android.presentation.utils.hourOfDay
 import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueType
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.spToPx
-import java.util.Calendar
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 @Suppress("LongMethod", "MagicNumber")
 class GlucoseDailyChartView @JvmOverloads constructor(
@@ -41,13 +39,13 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         get() = dataModel()
         set(value) {
             _chartDataModel = value
-            currentDateCalendar.time = Date()
+            currentDateCalendar = ZonedDateTime.now()
             onDataModelChanged()
         }
 
     private var glucoseRangesOverlayView: GlucoseRangesOverlayView? = null
 
-    private val currentDateCalendar = Calendar.getInstance()
+    private var currentDateCalendar = ZonedDateTime.now()
     private lateinit var minTitle: String
     private lateinit var maxTitle: String
 
@@ -294,7 +292,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             val text = hoursTitlesMap[hour]
             val x = hoursCoordinatesMap[hour]
             timeTitlePaint.color = when {
-                hour <= currentDateCalendar.hourOfDay -> timeTextColor
+                hour <= currentDateCalendar.hour -> timeTextColor
                 else -> futureTimeTextColor
             }
             drawText(text, x, timeTitleY, timeTitlePaint)

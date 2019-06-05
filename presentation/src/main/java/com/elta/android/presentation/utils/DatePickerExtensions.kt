@@ -4,68 +4,79 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.widget.Toast
+import com.elta.android.common.utils.toMillis
 import com.elta.android.presentation.R
-import java.util.Calendar
-import java.util.Date
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZonedDateTime
 
 fun Context?.showDatePickerDialog(
-    currentDate: Date,
-    minDate: Date? = null,
-    maxDate: Date? = null,
-    onDateSelectedFunction: (Date) -> Unit
+    date: ZonedDateTime,
+    minDate: ZonedDateTime? = null,
+    maxDate: ZonedDateTime? = null,
+    onDateSelectedFunction: (ZonedDateTime) -> Unit
 ) {
     if (this == null) return
-    val c = currentDate.toCalendar()
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        c.set(year, month, dayOfMonth)
-        onDateSelectedFunction.invoke(c.time)
+        onDateSelectedFunction.invoke(date.with(LocalDate.of(year, month + 1, dayOfMonth)))
     }
-    DatePickerDialog(this, onDateSelectedListener, c.year, c.month, c.dayOfMonth).apply {
-        minDate?.let { datePicker.minDate = it.time }
-        maxDate?.let { datePicker.maxDate = it.time }
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
+        minDate?.let { datePicker.minDate = it.toMillis() }
+        maxDate?.let { datePicker.maxDate = it.toMillis() }
+        show()
+    }
+}
+
+fun Context?.showDatePickerDialog(
+    date: LocalDate,
+    minDate: LocalDate? = null,
+    maxDate: LocalDate? = null,
+    onDateSelectedFunction: (LocalDate) -> Unit
+) {
+    if (this == null) return
+    val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+        onDateSelectedFunction.invoke(LocalDate.of(year, month + 1, dayOfMonth))
+    }
+    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
+        minDate?.let { datePicker.minDate = it.toMillis() }
+        maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
     }
 }
 
 fun Context?.showTimePickerDialog(
-    currentDate: Date,
-    onDateSelectedFunction: (Date) -> Unit
+    date: ZonedDateTime,
+    onDateSelectedFunction: (ZonedDateTime) -> Unit
 ) {
     if (this == null) return
-    val c = currentDate.toCalendar()
     val onTimeSelectedListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-        c.set(c.year, c.month, c.dayOfMonth, hourOfDay, minute)
-        onDateSelectedFunction.invoke(c.time)
+        onDateSelectedFunction.invoke(date.with(LocalTime.of(hourOfDay, minute)))
     }
-    TimePickerDialog(this, onTimeSelectedListener, c.hourOfDay, c.minute, true).show()
+    TimePickerDialog(this, onTimeSelectedListener, date.hour, date.minute, true).show()
 }
 
 @Suppress("MagicNumber")
 fun Context?.showTimePickerWithoutPastTimeDialog(
-    selectedDate: Date,
-    onDateSelectedFunction: (Date) -> Unit
+    selectedDate: ZonedDateTime,
+    onDateSelectedFunction: (ZonedDateTime) -> Unit
 ) {
     if (this == null) return
-    val c = selectedDate.toCalendar()
     val onTimeSelectedListener =
         TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-            val currentCalendar = Calendar.getInstance().apply {
-                // It needs to prevent choose current minute on time picker.
-                add(Calendar.MINUTE, 1)
-            }
-            val pickedCalendar = Calendar.getInstance().apply {
-                set(c.year, c.month, c.dayOfMonth, hourOfDay, minute)
-            }
-            if (pickedCalendar.before(currentCalendar)) {
+            // It needs to prevent choose current minute on time picker.
+            val date = ZonedDateTime.now().withSecond(0)
+            val pickerDate = ZonedDateTime.from(selectedDate).with(LocalTime.of(hourOfDay, minute))
+
+            if (pickerDate.isBefore(date)) {
                 Toast.makeText(
                     this,
                     getString(R.string.profile_reminders_wrong_time),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                onDateSelectedFunction.invoke(pickedCalendar.time)
+                onDateSelectedFunction.invoke(pickerDate)
             }
         }
 
-    TimePickerDialog(this, onTimeSelectedListener, c.hourOfDay, c.minute, true).show()
+    TimePickerDialog(this, onTimeSelectedListener, selectedDate.hour, selectedDate.minute, true).show()
 }

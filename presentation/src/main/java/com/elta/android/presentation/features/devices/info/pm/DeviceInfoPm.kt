@@ -12,6 +12,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
@@ -55,6 +56,11 @@ class DeviceInfoPm @Inject constructor(
         checkUpdateAction.observable
             .skipWhileInProgress()
             .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
+            .untilDestroy()
+
+        bus.events<Events.FirmwareUpdated>()
+            .map { Unit }
+            .subscribe(getDeviceInfoAction.consumer)
             .untilDestroy()
     }
 

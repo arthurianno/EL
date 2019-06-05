@@ -14,13 +14,12 @@ import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePicke
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.RxDiffCalculator
 import com.nullgr.core.collections.replace
-import com.nullgr.core.date.withoutTime
 import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.layout_horizontal_date_picker.view.*
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 class HorizontalDatePickerView @JvmOverloads constructor(
     context: Context,
@@ -28,10 +27,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private var date: Date? = null
-        set(value) {
-            field = value?.withoutTime()
-        }
+    private var date: LocalDate? = null
 
     private var selectedPosition: Int = 0
     private var needToPerformHapticFeedBack = false
@@ -61,7 +57,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             })
     }
 
-    fun date(): Consumer<Date> = Consumer {
+    fun date(): Consumer<LocalDate> = Consumer {
         if (date != it) {
             needToPerformHapticFeedBack = false
             date = it
@@ -69,7 +65,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         }
     }
 
-    fun dateChanged(): Observable<Date> =
+    fun dateChanged(): Observable<LocalDate> =
         PageChangeListener(dateItemsView, snapHelper)
             .map {
                 val item = adapter.items[it] as DatePickerItem
@@ -100,7 +96,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         selectedPosition = position
     }
 
-    private fun scrollToDate(date: Date) {
+    private fun scrollToDate(date: LocalDate) {
         val datePosition = items.indexOfFirst { it.date == date }
         val scrollPosition = datePosition - CENTER_OFFSET
         dateItemsView.linearLayoutManager?.scrollToPositionWithOffset(scrollPosition, SCROLL_OFFSET)
@@ -113,7 +109,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private val RecyclerView.linearLayoutManager: LinearLayoutManager?
         get() = layoutManager as? LinearLayoutManager
 
-    operator fun List<DatePickerItem>.contains(date: Date) =
+    operator fun List<DatePickerItem>.contains(date: LocalDate) =
         this.any { it.date == date && it.isAvailable }
 
     companion object {

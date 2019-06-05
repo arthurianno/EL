@@ -9,8 +9,12 @@ data class MainProfileAdditionalItem(
     @StringRes
     val title: Int,
     @StringRes
-    val description: Int,
+    val description: Int? = null,
     @DrawableRes
     val icon: Int,
-    val type: AdditionalFunction
-) : ListItem
+    val type: AdditionalFunction,
+    val showGoArrow: Boolean = true
+) : ListItem {
+
+    override fun getUniqueProperty(): Any = type
+}

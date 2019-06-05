@@ -5,7 +5,6 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.dto.ObserverStatusDto
-import com.nullgr.core.date.toTimestamp
 import javax.inject.Inject
 
 class ObserverFromCacheMapper @Inject constructor() : Mapper<ObserverCacheDto, ObserverDto> {
@@ -16,7 +15,7 @@ class ObserverFromCacheMapper @Inject constructor() : Mapper<ObserverCacheDto, O
                 email = email,
                 name = name,
                 status = ObserverStatusDto.valueOf(status),
-                modificationTime = modificationTime?.toTimestamp(),
+                modificationTime = modificationTime,
                 state = StateDto.valueOf(state)
             )
         }

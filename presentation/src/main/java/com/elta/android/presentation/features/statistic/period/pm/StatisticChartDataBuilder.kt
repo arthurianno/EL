@@ -1,5 +1,7 @@
 package com.elta.android.presentation.features.statistic.period.pm
 
+import com.elta.android.common.utils.atStartOfDay
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
@@ -8,10 +10,8 @@ import com.elta.android.domain.features.statistics.model.daily.DailyStatisticMod
 import com.elta.android.presentation.utils.daysTo
 import com.elta.android.presentation.widgets.charts.statistics.models.DateModel
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
-import com.nullgr.core.date.plusDay
-import com.nullgr.core.date.toStringWithFormat
-import com.nullgr.core.date.withoutTime
-import java.util.Date
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import java.util.TreeMap
 
 private const val VALUES_COUNT = 5
@@ -22,7 +22,7 @@ private const val STEP_SIX_DAYS = 6
 private const val DATE_FORMAT = "dd.MM"
 private val stubDate = DateModel(null, null, false, true)
 
-fun StatisticByPeriodModel.toChartModel(selectedDate: Date?): StatisticsChartDataModel {
+fun StatisticByPeriodModel.toChartModel(selectedDate: LocalDate?): StatisticsChartDataModel {
     var minLevel = dayWithMinLevel?.glucose.minLevel()
     var maxLevel = dayWithMaxLevel?.glucose.maxLevel()
 
@@ -51,9 +51,9 @@ fun StatisticByPeriodModel.toChartModel(selectedDate: Date?): StatisticsChartDat
         modelsMap[stubDate] = null
     }
     var date = period.start
-    while (!date.after(period.end)) {
-        modelsMap[date.toDateModel(period)] = allDays[date].glucose()
-        date = date.plusDay(1)
+    while (!date.isAfter(period.end)) {
+        modelsMap[date.toDateModel(period)] = allDays[date.toLocalDate()].glucose()
+        date = date.plusDays(1)
     }
     return StatisticsChartDataModel(
         maxValue = maxLevel,
@@ -75,13 +75,13 @@ private fun buildValues(min: Double, max: Double): List<Double> {
     return resultList
 }
 
-private fun Date.toDateModel(period: StatisticPeriod) =
+private fun LocalDateTime.toDateModel(period: StatisticPeriod) =
     DateModel(
         date = this,
         formattedDate = this.toStringWithFormat(DATE_FORMAT),
         needDrawDateTile = when {
             period is Periods.SevenDays -> true
-            this == period.start || this == period.end.withoutTime() -> true
+            this == period.start || this == period.end.atStartOfDay() -> true
             (period.start daysTo this) % period.datesStep() == 0L -> true
             else -> false
         }

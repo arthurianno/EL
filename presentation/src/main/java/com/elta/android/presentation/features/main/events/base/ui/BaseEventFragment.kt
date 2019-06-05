@@ -20,7 +20,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_event_form.*
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
@@ -96,7 +96,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     private fun T.bindDateSelection() {
         showDatePickerDialog.bindTo { originalDate ->
-            activity.showDatePickerDialog(originalDate, maxDate = Date()) {
+            activity.showDatePickerDialog(originalDate, maxDate = ZonedDateTime.now()) {
                 dateTimeSelectedAction.consumer.accept(it)
             }
         }

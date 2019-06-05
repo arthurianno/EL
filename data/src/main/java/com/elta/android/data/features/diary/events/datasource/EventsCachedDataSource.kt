@@ -10,7 +10,7 @@ import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class EventsCachedDataSource @Inject constructor(
@@ -24,7 +24,7 @@ class EventsCachedDataSource @Inject constructor(
             cache.getAll(CommonConditions.All)
         }.map(fromCacheMapper::mapFromObjects)
 
-    override fun getEvents(start: Date, end: Date): Observable<List<EventDto>> =
+    override fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventDto>> =
         Observable.fromCallable {
             cache.getAll(EventsConditions.ByPeriod(start, end))
         }.map(fromCacheMapper::mapFromObjects)
@@ -44,6 +44,9 @@ class EventsCachedDataSource @Inject constructor(
         Observable.fromCallable {
             cache.getAll(CommonConditions.ByIds(ids))
         }.map(fromCacheMapper::mapFromObjects)
+
+    override fun countEvents(): Single<Long> =
+        Single.fromCallable { cache.count(CommonConditions.All) }
 
     override fun addEvents(events: List<EventDto>): Completable =
         Completable.fromCallable {

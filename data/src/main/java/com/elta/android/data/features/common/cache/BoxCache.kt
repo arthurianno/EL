@@ -48,4 +48,10 @@ abstract class BoxCache<T>(
             is CommonConditions.All -> box.count() > 0
             else -> throw IllegalContainsCondition(condition)
         }
+
+    override fun count(condition: Condition): Long =
+        when (condition) {
+            is CommonConditions.All -> box.count()
+            else -> throw IllegalCountCondition(condition)
+        }
 }

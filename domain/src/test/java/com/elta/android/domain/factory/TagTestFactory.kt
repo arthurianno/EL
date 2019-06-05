@@ -1,8 +1,9 @@
 package com.elta.android.domain.factory
 
+import com.elta.android.common.utils.toMillis
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.model.TagImage
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.UUID
 
 object TagTestFactory {
@@ -22,6 +23,6 @@ object TagTestFactory {
             name = "Test name",
             image = TagImage.BREAKFAST,
             isReadOnly = true,
-            modificationTime = Date()
+            modificationTime = ZonedDateTime.now().toMillis()
         )
 }

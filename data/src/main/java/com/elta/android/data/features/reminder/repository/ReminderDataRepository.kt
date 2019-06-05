@@ -9,6 +9,7 @@ import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class ReminderDataRepository @Inject constructor(
@@ -45,7 +46,7 @@ class ReminderDataRepository @Inject constructor(
         val filteredReminders = mutableListOf<ReminderDto>()
         val uselessReminders = mutableListOf<ReminderDto>()
         reminders.forEach {
-            if (it.scheduleType == ScheduleTypeDto.NONE && it.time.time < System.currentTimeMillis()) {
+            if (it.scheduleType == ScheduleTypeDto.NONE && it.time.isBefore(ZonedDateTime.now())) {
                 uselessReminders.add(it)
             } else {
                 filteredReminders.add(it)

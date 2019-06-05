@@ -1,6 +1,6 @@
 package com.elta.android.data.features.diary.events.api
 
-import com.elta.android.data.common.toStringIso
+import com.elta.android.common.utils.toIsoString
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
@@ -8,6 +8,7 @@ import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
+import org.threeten.bp.ZonedDateTime
 import java.util.Date
 
 @Suppress("MagicNumber", "ForEachOnRange", "LongParameterList")
@@ -35,7 +36,7 @@ object EventMockedFactory {
     ): EventDto =
         EventDto(
             id = id,
-            additionTime = Date().toStringIso(),
+            additionTime = ZonedDateTime.now().toIsoString(),
             tagId = tagId,
             note = note,
             modificationTime = Date().time,

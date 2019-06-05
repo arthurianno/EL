@@ -5,7 +5,6 @@ import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.domain.features.user.model.State
-import com.nullgr.core.date.dateFromTimestamp
 import javax.inject.Inject
 
 class ObserverToDomainMapper @Inject constructor() : Mapper<ObserverDto, Observer> {
@@ -16,7 +15,7 @@ class ObserverToDomainMapper @Inject constructor() : Mapper<ObserverDto, Observe
                 email = email,
                 name = name,
                 status = ObserverStatus.valueOf(status.name),
-                modificationTime = modificationTime?.dateFromTimestamp(),
+                modificationTime = modificationTime,
                 state = State.valueOf(state.name)
             )
         }

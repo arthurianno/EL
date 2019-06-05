@@ -20,7 +20,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
+import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 // TODO: CRUD logic should be improved
@@ -38,13 +38,16 @@ class EventsDataRepository @Inject constructor(
         cacheSource.getEvents()
             .map(toDomainMapper::mapFromObjects)
 
-    override fun getEvents(start: Date, end: Date): Observable<List<Event>> =
+    override fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<Event>> =
         cacheSource.getEvents(start, end)
             .map(toDomainMapper::mapFromObjects)
 
     override fun getEventById(id: String): Single<Event> =
         cacheSource.getEventById(id)
             .map(toDomainMapper::mapFromObject)
+
+    override fun countEvents(): Single<Long> =
+        cacheSource.countEvents()
 
     override fun addEvent(event: Event): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }

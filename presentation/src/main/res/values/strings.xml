@@ -247,6 +247,7 @@
     <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
     <string name="main_records_daily_chart_min_title">min</string>
     <string name="main_records_daily_chart_max_title">max</string>
+    <string name="main_records_event_time_mask">в %s (UTC %s)</string>
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
@@ -408,6 +409,7 @@
     <string name="vkontakte">Vkontakte</string>
     <string name="odnoklasniki">Odnoklasniki</string>
     <string name="profile_app_version">Версия приложения: %s</string>
+    <string name="profile_exit_from_app">Выйти из учетной записи</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>

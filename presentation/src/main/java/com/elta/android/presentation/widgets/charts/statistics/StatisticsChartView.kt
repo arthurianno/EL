@@ -30,7 +30,7 @@ import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.getDisplaySize
 import com.nullgr.core.ui.extensions.spToPx
-import java.util.Date
+import org.threeten.bp.LocalDate
 import java.util.TreeMap
 
 @Suppress("LongMethod", "MagicNumber", "NestedBlockDepth")
@@ -133,8 +133,8 @@ class StatisticsChartView @JvmOverloads constructor(
             val pointOfTouch = PointF(event.x, event.y)
             dateToSectionsMap.entries.forEach {
                 when {
-                    it.value.isSelected -> it.value.performSelection(false, it.key.date)
-                    it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date)
+                    it.value.isSelected -> it.value.performSelection(false, it.key.date?.toLocalDate())
+                    it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date?.toLocalDate())
                 }
             }
             checkMaybeAllUnselected()
@@ -379,7 +379,7 @@ class StatisticsChartView @JvmOverloads constructor(
             val sectionRect = Rect(left, 0, right, clearChartHeight.toInt())
             dateToSectionsMap[entry.key] = SectionModel(
                 sectionRect = sectionRect,
-                isSelected = !entry.key.isStub && entry.key.date == dataModel().selectedDate,
+                isSelected = !entry.key.isStub && entry.key.date?.toLocalDate() == dataModel().selectedDate,
                 isStub = entry.key.isStub
             )
         }
@@ -464,7 +464,7 @@ class StatisticsChartView @JvmOverloads constructor(
         }
     }
 
-    private fun SectionModel.performSelection(state: Boolean, date: Date?) {
+    private fun SectionModel.performSelection(state: Boolean, date: LocalDate?) {
         isSelected = state
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         if (isSelected)

@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.shops.map.ui
 
 import android.Manifest
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +11,8 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
+import com.elta.android.presentation.core.pm.widgets.bindTo
+import com.elta.android.presentation.core.pm.widgets.resolveResults
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
@@ -40,8 +43,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
-    override val selectedPinRes = R.drawable.ic_active_pin
-    override val normalPinRes = R.drawable.ic_pin_b_normal
     override val userLocationPinRes = R.drawable.ic_my_loc
 
     private val snapHelper = PagerSnapHelper()
@@ -75,10 +76,16 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.items.bindTo { items -> adapter.updateData(items) }
         pm.showMyLocationCommand.bindTo(::showUserLocation)
         pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
-        pm.permissionRequiredCommand.observable
+
+        pm.checkPermissionStatusCommand.bindTo {
+            val status = rxPermissions.statusFor(LOCATION_PERMISSION)
+            pm.setPermissionStatus(status)
+        }
+
+        pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
-            .bindTo(pm.permissionStatusUpdatedAction.consumer)
-        pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
+            .bindTo { status -> pm.setPermissionStatus(status) }
+
         pm.geoPoints.bindTo(::addPins)
 
         pm.selectGeoPointCommand.bindTo(::selectPin)
@@ -99,6 +106,12 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
             .bindTo { searchInputView.hideKeyboard() }
+
+        pm.locationControl.bindTo(compositeUnbind, this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presentationModel.locationControl.resolveResults(requestCode, resultCode)
     }
 
     private fun showUserLocation(location: Location) {

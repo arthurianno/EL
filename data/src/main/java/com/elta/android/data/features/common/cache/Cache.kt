@@ -13,4 +13,6 @@ interface Cache<T> {
     fun getAll(condition: Condition): List<T>
 
     fun contains(condition: Condition): Boolean
+
+    fun count(condition: Condition): Long
 }

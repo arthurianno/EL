@@ -16,12 +16,8 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
-import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalTime
-import org.threeten.bp.ZoneId
-import java.util.Calendar
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
@@ -54,7 +50,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
-        pm.dateSelectedState.bindTo { calendarView.selectedDate = it.toCalendarDay() }
+        pm.dateSelectedState.bindTo { calendarView.selectedDate = CalendarDay.from(it.toLocalDate()) }
         pm.dateState.bindTo(dateView.text())
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
         Observable.merge(minusView.clicks(), minusView.sequenceClicks()).bindTo {
@@ -67,24 +63,10 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         }
         calendarView.setOnDateChangedListener { _, day, selected ->
             if (selected) {
-                pm.dateSelectedAction.consumer.accept(day.date.toDate())
+                pm.dateSelectedAction.consumer.accept(ZonedDateTime.now().with(day.date))
             }
         }
         pm.hemoglobinItemsState.bindTo { items -> adapter.updateData(items) }
-    }
-
-    private fun LocalDate.toDate(): Date {
-        val instant = this.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toInstant()
-        return DateTimeUtils.toDate(instant)
-    }
-
-    private fun Date.toCalendarDay(): CalendarDay {
-        val c = Calendar.getInstance()
-        c.time = this
-        val year = c[Calendar.YEAR]
-        val month = c[Calendar.MONTH] + 1
-        val dayOfMonth = c[Calendar.DAY_OF_MONTH]
-        return CalendarDay.from(year, month, dayOfMonth)
     }
 
     companion object {

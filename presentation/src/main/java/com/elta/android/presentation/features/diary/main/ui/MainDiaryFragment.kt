@@ -10,7 +10,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_main_diary.*
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
 
@@ -27,7 +27,7 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
         selectDateButtonView.clicks().bindTo(pm.selectDateInDialogAction)
         pm.monthTitleState.bindTo(selectedMonthTitleView.text())
         pm.showDatePickerDialogCommand.bindTo { originalDate ->
-            activity.showDatePickerDialog(originalDate, maxDate = Date()) {
+            activity.showDatePickerDialog(originalDate, maxDate = LocalDate.now()) {
                 pm.dateInDialogSelectedAction.consumer.accept(it)
             }
         }

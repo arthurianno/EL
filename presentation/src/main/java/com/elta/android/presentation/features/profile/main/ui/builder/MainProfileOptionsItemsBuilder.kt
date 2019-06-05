@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.main.ui.builder
 
 import android.support.annotation.StringRes
+import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
@@ -47,6 +48,12 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         )
         add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
             R.drawable.ic_devices, MyDevices)
+        )
+        add(MainProfileAdditionalItem(
+            title = R.string.profile_exit_from_app,
+            icon = R.drawable.ic_exit_app,
+            type = ExitFromApp,
+            showGoArrow = false)
         )
     }
 
