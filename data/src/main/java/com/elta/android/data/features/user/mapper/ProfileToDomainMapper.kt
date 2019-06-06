@@ -2,17 +2,20 @@ package com.elta.android.data.features.user.mapper
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.user.dto.GlucoseLevelDto
+import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
+import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
 import javax.inject.Inject
 
 class ProfileToDomainMapper @Inject constructor(
-    private val networksMapper: Mapper<SocialNetworkDto, SocialNetwork>
+    private val networksMapper: Mapper<SocialNetworkDto, SocialNetwork>,
+    private val healthAppsMapper: Mapper<HealthAppDto, HealthApp>
 ) : Mapper<ProfileDto, Profile> {
 
     override fun mapFromObject(source: ProfileDto): Profile =
@@ -26,6 +29,7 @@ class ProfileToDomainMapper @Inject constructor(
                 glucoseLevelSettings = glucoseLevel.toSettings(),
                 email = email,
                 socialNetworks = socialNetworks?.let { networksMapper.mapFromObjects(it) },
+                healthApps = healthApps?.let { healthAppsMapper.mapFromObjects(it) },
                 timeStamp = timeStamp
             )
         }

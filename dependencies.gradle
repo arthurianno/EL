@@ -24,6 +24,8 @@ def libraryVersions = [
         customTabsVersion          : '27.1.0',
         androidAnnotationsVersion  : '21.0.3',
         multiDexVersion            : '1.0.3',
+        googleFitVersion           : '16.0.1',
+        googleAuthVersion           : '16.0.1',
 
         //Rx Libraries
         rxJavaVersion              : '2.2.5',
@@ -169,6 +171,8 @@ ext.commonDependencies = [
         location              : "com.google.android.gms:play-services-location:${libraryVersions.playServicesVersion}",
         maps                  : "com.google.android.gms:play-services-maps:${libraryVersions.playServicesVersion}",
         googleAnalytics       : "com.google.android.gms:play-services-analytics:${libraryVersions.googleAnalyticsVersion}",
+        googleFit             : "com.google.android.gms:play-services-fitness:${libraryVersions.googleFitVersion}",
+        googleAuth            : "com.google.android.gms:play-services-auth:${libraryVersions.googleAuthVersion}",
 
         firebaseCore          : "com.google.firebase:firebase-core:${libraryVersions.firebaseVersion}",
         firebaseMessaging     : "com.google.firebase:firebase-messaging:${libraryVersions.firebaseMessagingVersion}",

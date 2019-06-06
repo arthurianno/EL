@@ -2,7 +2,11 @@ package com.elta.android.presentation.features.profile.settings.global.pm
 
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
+import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
+import com.elta.android.domain.features.user.interactor.googleFitApp
+import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.Clicks
@@ -24,26 +28,33 @@ import javax.inject.Inject
 
 class ProfileSettingsPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
     private val linkSocialNetworkUseCase: LinkSocialNetworkUseCase,
     private val unlinkSocialNetworkUseCase: UnLinkSocialNetworkUseCase,
+    private val checkGoogleFitAuthUseCase: CheckGoogleFitAuthUseCase,
     private val itemsBuilder: ProfileSettingsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
     val unlinkNetworkDialogControl = dialogControl<DialogData, DialogResult>()
+    val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = Command<Unit>(bufferSize = 1)
 
     private val socialNetworkState = State<SocialNetworkType>()
     private val getProfileSettingsAction = Action<Unit>()
     private val linkSocialUserAction = Action<Unit>()
     private val unlinkSocialUserAction = Action<Unit>()
+    private val profileState = State<Profile>()
+    private val checkGoogleFitAuthAction = Action<Unit>()
 
     private val unlinkNetworkDialogData: DialogData by lazy { Dialogs.EventUnlinkNetwork(resources) }
+    private val googleFitActivatedDialogData: DialogData by lazy { Dialogs.GoogleFitActivated(resources) }
 
     override fun onCreate() {
         super.onCreate()
         observeClicks()
         observeNetworksActions()
+        observeGoogleFitAction()
 
         getProfileSettingsAction.observable
             .skipWhileInProgress()
@@ -89,6 +100,39 @@ class ProfileSettingsPm @Inject constructor(
                 else linkSocialUserAction.consumer.accept(Unit)
             }
             .untilDestroy()
+
+        bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
+            .map { it.type }
+            .map(::createSwitchHealthAppParams)
+            .flatMapSingle {
+                updateProfileUseCase.execute(it)
+                    .andThen(getProfileUseCase.execute())
+                    .bindProgress()
+                    .handleProfileUseCase()
+                    .doOnSuccess { checkGoogleFitAuthAction.consumer.accept(Unit) }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun observeGoogleFitAction() {
+        checkGoogleFitAuthAction.observable
+            .map { profileState.value }
+            .filter { it.googleFitApp()?.isActive ?: false }
+            .flatMap {
+                checkGoogleFitAuthUseCase.execute()
+                    .doOnNext(::showGoogleFitEnabledDialog)
+                    .doOnError(::handleError)
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun showGoogleFitEnabledDialog(isEnabled: Boolean) {
+        if (isEnabled)
+            googleFitActivatedDialogControl.show(googleFitActivatedDialogData)
     }
 
     private fun observeNetworksActions() {
@@ -122,7 +166,8 @@ class ProfileSettingsPm @Inject constructor(
     }
 
     private fun Single<Profile>.handleProfileUseCase() =
-        map { itemsBuilder.buildItems(it) }
+        doOnSuccess(profileState.consumer)
+            .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
 
     private fun createLinkSocialUserParams(network: SocialNetworkType) =
@@ -130,4 +175,12 @@ class ProfileSettingsPm @Inject constructor(
 
     private fun createUnlinkSocialUserParams(network: SocialNetworkType) =
         UnLinkSocialNetworkUseCase.Params(network)
+
+    private fun createSwitchHealthAppParams(type: HealthAppType): UpdateProfileUseCase.Params =
+        UpdateProfileUseCase.Params(
+            profileState.value.copy().apply {
+                val healthApp = healthApps?.find { it.type == type }
+                healthApp?.isActive = healthApp?.isActive?.not() ?: false
+            }
+        )
 }

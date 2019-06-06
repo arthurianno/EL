@@ -19,6 +19,8 @@ import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSour
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareLocalDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
+import com.elta.android.data.features.googlefit.datasource.GoogleFitDataSource
+import com.elta.android.data.features.googlefit.datasource.HealthAppDataSource
 import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
 import com.elta.android.data.features.observers.datasource.ObserverDataSource
 import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
@@ -130,4 +132,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindUserInfoDataSource(sourceInfo: UserInfoCachedDataSource): UserInfoDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindHealthAppDataSource(source: GoogleFitDataSource): HealthAppDataSource
 }

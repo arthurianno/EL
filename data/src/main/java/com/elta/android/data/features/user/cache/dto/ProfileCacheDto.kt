@@ -24,4 +24,13 @@ data class ProfileCacheDto(
 ) {
     @Backlink(to = "profile")
     lateinit var socialNetworks: ToMany<NetworkCacheDto>
+
+    @Backlink(to = "profile")
+    lateinit var healthApps: ToMany<HealthAppCacheDto>
+
+    @Transient
+    var tempSocialNetworks: List<NetworkCacheDto> = emptyList()
+
+    @Transient
+    var tempHealthApps: List<HealthAppCacheDto> = emptyList()
 }

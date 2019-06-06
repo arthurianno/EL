@@ -4,8 +4,12 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.storage.UserHolder
+import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
+import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.SocialNetworkDto
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -14,6 +18,8 @@ class ProfileCachedDataSource @Inject constructor(
     private val userHolder: UserHolder,
     private val profileFromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
     private val profileToCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
+    private val networkToCacheMapper: Mapper<SocialNetworkDto, NetworkCacheDto>,
+    private val healthAppsCacheMapper: Mapper<HealthAppDto, HealthAppCacheDto>,
     private val profileCache: Cache<ProfileCacheDto>
 ) : ProfileDataSource {
 
@@ -32,6 +38,14 @@ class ProfileCachedDataSource @Inject constructor(
                         minValue = profile.glucoseLevel?.minValue ?: cachedProfile.minValue,
                         maxValue = profile.glucoseLevel?.maxValue ?: cachedProfile.maxValue
                     )
+                    newProfile.tempSocialNetworks = profile.socialNetworks?.let { socials ->
+                        networkToCacheMapper.mapFromObjects(socials)
+                    } ?: cachedProfile.socialNetworks
+
+                    newProfile.tempHealthApps = profile.healthApps?.let { health ->
+                        healthAppsCacheMapper.mapFromObjects(health)
+                    } ?: cachedProfile.healthApps
+
                     profileCache.update(listOf(newProfile))
                 } ?: profileCache.add(listOf(profileToCacheMapper.mapFromObject(profile)))
             }

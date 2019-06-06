@@ -34,6 +34,10 @@ import com.elta.android.data.features.firmware.dto.FirmwareDto
 import com.elta.android.data.features.firmware.dto.FirmwareFileDto
 import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
 import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
+import com.elta.android.data.features.googlefit.dto.ActivityDto
+import com.elta.android.data.features.googlefit.mapper.ActivityDtoToEventMapper
+import com.elta.android.data.features.googlefit.mapper.FitnessActivityToActivityTypeMapper
+import com.elta.android.data.features.googlefit.mapper.SessionToActivityDtoMapper
 import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.mapper.ObserverFromCacheMapper
@@ -52,10 +56,16 @@ import com.elta.android.data.features.sale_points.mapper.CoordinatesToDomainMapp
 import com.elta.android.data.features.sale_points.mapper.SalePointFromCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToCacheMapper
 import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
+import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.ProfileDto
 import com.elta.android.data.features.user.dto.SocialNetworkDto
+import com.elta.android.data.features.user.mapper.HealthAppFromCacheMapper
+import com.elta.android.data.features.user.mapper.HealthAppToCacheMapper
+import com.elta.android.data.features.user.mapper.HealthAppToDomainMapper
+import com.elta.android.data.features.user.mapper.HealthAppToDtoMapper
 import com.elta.android.data.features.user.mapper.NetworkFromCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToDomainMapper
@@ -69,6 +79,7 @@ import com.elta.android.data.features.userinfo.mapper.UserInfoToDomainMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.firmware.model.Firmware
@@ -77,9 +88,11 @@ import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.google.android.gms.fitness.data.Session
 import dagger.Binds
 import dagger.Module
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -287,4 +300,39 @@ abstract class MappersModule {
     abstract fun bindUserInfoToCacheMapper(
         mapper: UserInfoToCacheMapper
     ): Mapper<UserInfo, UserInfoCacheDto>
+
+    @Binds
+    abstract fun bindHealthAppFromCacheMapper(
+        mapper: HealthAppFromCacheMapper
+    ): Mapper<HealthAppCacheDto, HealthAppDto>
+
+    @Binds
+    abstract fun bindHealthAppToCacheMapper(
+        mapper: HealthAppToCacheMapper
+    ): Mapper<HealthAppDto, HealthAppCacheDto>
+
+    @Binds
+    abstract fun bindHealthAppToDomainMapper(
+        mapper: HealthAppToDomainMapper
+    ): Mapper<HealthAppDto, HealthApp>
+
+    @Binds
+    abstract fun bindHealthAppToDtoCacheMapper(
+        mapper: HealthAppToDtoMapper
+    ): Mapper<HealthApp, HealthAppDto>
+
+    @Binds
+    abstract fun bindSessionsToActivityDtoMapper(
+        mapper: SessionToActivityDtoMapper
+    ): Mapper<Session, ActivityDto>
+
+    @Binds
+    abstract fun bindActivityDtoToEventMapper(
+        mapper: ActivityDtoToEventMapper
+    ): Mapper<ActivityDto, Event>
+
+    @Binds
+    abstract fun bindFitnessActivityToActivityTypeMapper(
+        mapper: FitnessActivityToActivityTypeMapper
+    ): Mapper<String, ActivityType>
 }

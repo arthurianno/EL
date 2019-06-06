@@ -35,11 +35,15 @@ class SocialDataRepository @Inject constructor(
             .switchMapCompletable { token ->
                 authSocialSource.linkSocialNetwork(network.name, token)
                     .applyScheduler(schedulersFacade)
-            }
+            }.andThen(
+                profileSource.getUserProfile()
+                    .ignoreElement()
+            )
 
     override fun unLinkSocialNetwork(network: SocialNetworkType): Completable =
         authSocialSource.unLinkSocialNetwork(network.name)
             .andThen(socialFactory.getDataSource(network).logout())
+            .andThen(profileSource.getUserProfile().flatMapCompletable { Completable.complete() })
             .applyScheduler(schedulersFacade)
 
     override fun loginWithSocialNetwork(network: SocialNetworkType): Single<Boolean> =
@@ -63,9 +67,7 @@ class SocialDataRepository @Inject constructor(
 
     override fun loginToSocialNetwork(network: SocialNetworkType): Completable =
         socialFactory.getDataSource(network).getToken().take(1)
-            .flatMapCompletable {
-                Completable.complete()
-            }
+            .ignoreElements()
 
     override fun getSocialUser(network: SocialNetworkType): Single<SocialUser> =
         socialFactory.getDataSource(network).getSocialUser()
