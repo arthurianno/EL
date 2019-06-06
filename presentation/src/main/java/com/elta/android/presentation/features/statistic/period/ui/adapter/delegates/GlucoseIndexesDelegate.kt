@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.DynamicAdapter
@@ -27,7 +28,7 @@ class GlucoseIndexesDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                itemsView.layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
+                itemsView.layoutManager = FixedLinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL)
                 itemsView.setRecycledViewPool(viewPool)
             }
         }

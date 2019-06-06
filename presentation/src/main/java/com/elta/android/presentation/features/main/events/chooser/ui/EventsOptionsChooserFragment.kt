@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
+import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
@@ -32,6 +33,7 @@ class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbarView.applyWindowInsetsForChildrenView()
         toolbarTitleView.setTextColor(Color.WHITE)
         homeButtonView.setColorFilter(Color.WHITE)
     }

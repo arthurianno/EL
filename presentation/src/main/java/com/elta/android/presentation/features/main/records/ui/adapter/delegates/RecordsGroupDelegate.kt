@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +7,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.GroupItem
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.DynamicAdapter
@@ -31,7 +31,7 @@ class RecordsGroupDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                itemsView.layoutManager = LinearLayoutManager(itemView.context)
+                itemsView.layoutManager = FixedLinearLayoutManager(itemView.context)
                 itemsView.setRecycledViewPool(viewPool)
                 groupStateView.setOnClickListener {
                     withAdapterPosition<RecordsGroupItem> { _, item, _ ->

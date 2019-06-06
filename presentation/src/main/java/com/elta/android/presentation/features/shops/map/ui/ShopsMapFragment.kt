@@ -21,6 +21,7 @@ import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.toPoint
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
@@ -54,7 +55,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         toolbarTitleView.text = getString(R.string.shops_map_toolbar_title)
         toolbarView.applyWindowInsetsForChildrenView()
 
-        itemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
         itemsView.adapter = adapter
         itemsView.addItemDecoration(
             MarginItemDecoration(
@@ -66,7 +67,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         )
         snapHelper.attachToRecyclerView(itemsView)
 
-        searchItemsView.layoutManager = LinearLayoutManager(context)
+        searchItemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context))
         searchItemsView.adapter = searchAdapter
     }
 
