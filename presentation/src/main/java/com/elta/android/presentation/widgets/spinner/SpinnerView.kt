@@ -93,7 +93,7 @@ class SpinnerView @JvmOverloads constructor(
     fun spinnerClicks(): Observable<ListItem> = spinnerClicks.hide()
 
     fun attachDataList(list: List<SpinnerItem>) {
-        adapter.updateData(list)
+        adapter.updateData(list, false)
     }
 
     fun setTitle(title: String) {

@@ -13,6 +13,7 @@ import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.pm.widgets.bindTo
 import com.elta.android.presentation.core.pm.widgets.resolveResults
+import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
@@ -74,7 +75,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
-        pm.items.bindTo { items -> adapter.updateData(items) }
+        pm.items.bindTo(adapter, compositeUnbind)
         pm.showMyLocationCommand.bindTo(::showUserLocation)
         pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
 
@@ -96,7 +97,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
 
         // search
-        pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
+        pm.searchItems.bindTo(searchAdapter, compositeUnbind)
         pm.searchInput.bindTo(searchInputView)
         pm.searchCloseCommand.bindTo {
             searchInputView.hideKeyboard()

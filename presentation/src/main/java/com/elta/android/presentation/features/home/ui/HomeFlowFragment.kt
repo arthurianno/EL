@@ -8,6 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.dialog.buttons
@@ -62,7 +63,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         super.onBindPresentationModel(pm)
         homeActionView.clicks().bindTo { homeActionView.isSelected.not().passTo(pm.homeAction) }
         pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
-        pm.bottomSheetItems.bindTo { items -> adapter.updateData(items) }
+        pm.bottomSheetItems.bindTo(adapter, compositeUnbind)
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
         pm.showBottomSheetCommand.bindTo { homeBottomSheetView.show() }
         Observables.combineLatest(

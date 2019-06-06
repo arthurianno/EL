@@ -10,7 +10,6 @@ import com.elta.android.presentation.features.main.records.ui.adapter.items.Reco
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.AdapterDelegatesFactory
-import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.resources.ResourceProvider
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 class MainRecordsDelegatesFactory @Inject constructor(
     private val viewPool: RecyclerView.RecycledViewPool,
-    private val calculator: DiffCalculator,
     private val bus: RxBus,
     private val resources: ResourceProvider
 ) : AdapterDelegatesFactory {
@@ -27,7 +25,7 @@ class MainRecordsDelegatesFactory @Inject constructor(
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
             RecordItem::class.java -> RecordDelegate(bus)
-            RecordsGroupItem::class.java -> RecordsGroupDelegate(this, calculator, viewPool)
+            RecordsGroupItem::class.java -> RecordsGroupDelegate(viewPool, this)
             RecordsHeaderItem::class.java -> RecordsHeaderDelegate(bus, resources)
             RecordsDailyGlucoseItem::class.java -> RecordsDailyGlucoseDelegate()
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
