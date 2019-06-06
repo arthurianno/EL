@@ -61,6 +61,6 @@ class GoogleFitDataRepository @Inject constructor(
             }
 
     private fun filterExistingEvents(fromFit: List<Event>): List<Event> =
-        if (eventsCache.count(CommonConditions.All) == 0L) fromFit
+        if (!eventsCache.contains(CommonConditions.All)) fromFit
         else fromFit.filter { !eventsCache.contains(CommonConditions.ById(it.id.hashCode().toLong())) }
 }
