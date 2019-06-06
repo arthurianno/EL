@@ -15,15 +15,13 @@ import com.elta.android.presentation.features.statistic.period.ui.adapter.items.
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
-import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
 class PeriodDelegatesFactory @Inject constructor(
     private val bus: RxBus,
-    private val viewPool: RecyclerView.RecycledViewPool,
-    private val calculator: DiffCalculator
+    private val viewPool: RecyclerView.RecycledViewPool
 ) : AdapterDelegatesFactory {
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
@@ -31,7 +29,7 @@ class PeriodDelegatesFactory @Inject constructor(
             GlucoseDailyChartItem::class.java -> GlucoseDailyChartDelegate()
             GlucoseStatisticChartItem::class.java -> GlucoseStatisticChartDelegate(bus)
             GlucoseIndexItem::class.java -> GlucoseIndexDelegate()
-            GlucoseIndexesItem::class.java -> GlucoseIndexesDelegate(this, calculator, viewPool)
+            GlucoseIndexesItem::class.java -> GlucoseIndexesDelegate(viewPool, this)
             GeneralIndexItem::class.java -> GeneralIndexDelegate()
             ProfileSettingsHeaderItem::class.java -> ProfileSettingsHeaderDelegate()
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")

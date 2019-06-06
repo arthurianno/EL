@@ -8,16 +8,14 @@ import com.elta.android.presentation.core.ui.adapter.ParentAdapterDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
-import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.ViewHolder
 import kotlinx.android.synthetic.main.item_records_group.*
 
 class GlucoseIndexesDelegate(
-    factory: AdapterDelegatesFactory,
-    calculator: DiffCalculator,
-    private val viewPool: RecyclerView.RecycledViewPool
-) : ParentAdapterDelegate(calculator, factory) {
+    private val viewPool: RecyclerView.RecycledViewPool,
+    factory: AdapterDelegatesFactory
+) : ParentAdapterDelegate(factory) {
 
     override val layoutResource: Int = R.layout.item_stat_glucose_indexes_slider
     override val itemType: Any = GlucoseIndexesItem::class
@@ -35,7 +33,7 @@ class GlucoseIndexesDelegate(
         val item = items[position] as GlucoseIndexesItem
 
         with(holder as ViewHolder) {
-            setItems(itemsView, false, item)
+            setItems(itemsView, true, item)
         }
     }
 

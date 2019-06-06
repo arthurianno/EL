@@ -10,17 +10,16 @@ import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
-import com.nullgr.core.adapter.DiffCalculator
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.ViewHolder
 import kotlinx.android.synthetic.main.item_records_group.*
 import net.cachapa.expandablelayout.ExpandableLayout
 
 class RecordsGroupDelegate(
-    factory: AdapterDelegatesFactory,
-    calculator: DiffCalculator,
-    private val viewPool: RecyclerView.RecycledViewPool
-) : ParentAdapterDelegate(calculator, factory) {
+    private val viewPool: RecyclerView.RecycledViewPool,
+    factory: AdapterDelegatesFactory
+) : ParentAdapterDelegate(factory) {
+
     override val layoutResource: Int = R.layout.item_records_group
     override val itemType: Any = RecordsGroupItem::class
 
@@ -46,7 +45,7 @@ class RecordsGroupDelegate(
             groupIconView.setImageResource(item.icon)
             groupNameView.text = item.name
             toggleState(itemsContainerView, false, groupStateView, item)
-            setItems(itemsView, false, item)
+            setItems(itemsView, true, item)
         }
     }
 
