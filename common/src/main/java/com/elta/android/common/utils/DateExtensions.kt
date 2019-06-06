@@ -2,7 +2,9 @@ package com.elta.android.common.utils
 
 import org.threeten.bp.ZonedDateTime
 
-inline fun timestamp(): Long = currentMillisUtc() / 1000
+const val MILLIS_IN_SECOND = 1000L
+
+inline fun timestamp(): Long = currentMillisUtc() / MILLIS_IN_SECOND
 
 inline fun currentMillisUtc(): Long = ZonedDateTime.now().toMillisUtc()
 

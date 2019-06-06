@@ -10,10 +10,8 @@ data class DeviceInfoItem(
     override fun getUniqueProperty(): Any = title
 
     override fun getChangePayload(other: ListItem): Any {
-        if (other is DeviceInfoItem) {
-            if (this.description != other.description) {
-                return Payload.DESCRIPTION_CHANGED
-            }
+        if (other is DeviceInfoItem && this.description != other.description) {
+            return Payload.DESCRIPTION_CHANGED
         }
         return super.getChangePayload(other)
     }

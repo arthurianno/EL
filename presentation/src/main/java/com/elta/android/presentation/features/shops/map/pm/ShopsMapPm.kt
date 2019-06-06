@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint

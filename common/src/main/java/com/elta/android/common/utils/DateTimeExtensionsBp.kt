@@ -74,7 +74,7 @@ inline fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) = atStartOfDa
 
 inline fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
 
-inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * 1000
+inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * MILLIS_IN_SECOND
 
 inline fun Long.toZonedDateTime() = ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
