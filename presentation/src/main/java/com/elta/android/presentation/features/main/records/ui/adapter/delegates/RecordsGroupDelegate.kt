@@ -5,28 +5,24 @@ import android.view.View
 import android.view.ViewGroup
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.GroupItem
+import com.elta.android.presentation.core.ui.adapter.ParentAdapterDelegate
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DiffCalculator
-import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import kotlinx.android.synthetic.main.item_records_group.*
 import net.cachapa.expandablelayout.ExpandableLayout
 
 class RecordsGroupDelegate(
-    private val factory: AdapterDelegatesFactory,
-    private val calculator: DiffCalculator,
+    factory: AdapterDelegatesFactory,
+    calculator: DiffCalculator,
     private val viewPool: RecyclerView.RecycledViewPool
-) : AdapterDelegate() {
-
+) : ParentAdapterDelegate(calculator, factory) {
     override val layoutResource: Int = R.layout.item_records_group
     override val itemType: Any = RecordsGroupItem::class
-
-    private val adapters = mutableMapOf<Any, DynamicAdapter>()
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
@@ -70,13 +66,4 @@ class RecordsGroupDelegate(
         layout.setExpanded(item.isExpanded, animate)
         indicator.isSelected = item.isExpanded
     }
-
-    private fun setItems(view: RecyclerView, useDiffUtils: Boolean, item: GroupItem) {
-        val adapter = createOrGetAdapter(item)
-        view.adapter = adapter
-        adapter.updateData(item.items, useDiffUtils)
-    }
-
-    private fun createOrGetAdapter(item: ListItem): DynamicAdapter = adapters[item.getUniqueProperty()]
-        ?: DynamicAdapter(factory, calculator).also { adapters[item.getUniqueProperty()] = it }
 }
