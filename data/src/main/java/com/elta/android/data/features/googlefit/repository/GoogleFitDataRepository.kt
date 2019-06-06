@@ -42,6 +42,7 @@ class GoogleFitDataRepository @Inject constructor(
 
     private fun checkPermissionsAndSync() =
         checkAuthorization()
+            .take(1)
             .switchMapCompletable {
                 when (it) {
                     true -> syncInternal()

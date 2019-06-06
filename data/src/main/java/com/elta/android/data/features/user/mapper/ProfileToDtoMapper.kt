@@ -35,7 +35,7 @@ class ProfileToDtoMapper @Inject constructor(
                 },
                 email = email,
                 socialNetworks = null,
-                healthApps = source.healthApps?.let { healthAppsMapper.mapFromObjects(it) },
+                healthApps = healthApps?.let { healthAppsMapper.mapFromObjects(it) },
                 timeStamp = timeStamp
             )
         }
