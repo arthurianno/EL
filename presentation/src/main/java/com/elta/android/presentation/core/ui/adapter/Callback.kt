@@ -15,7 +15,6 @@ class Callback(
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         before[oldItemPosition].areItemsTheSame(after[newItemPosition])
 
-
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         before[oldItemPosition].areContentsTheSame(after[newItemPosition])
 
@@ -25,5 +24,4 @@ class Callback(
     companion object {
         fun new(before: List<ListItem>, after: List<ListItem>) = Callback(before, after)
     }
-
 }
