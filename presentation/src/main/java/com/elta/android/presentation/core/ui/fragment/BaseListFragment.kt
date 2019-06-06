@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.DynamicAdapter
 import javax.inject.Inject
@@ -26,7 +27,7 @@ abstract class BaseListFragment<T : BaseListPm> : BaseFragment<T>() {
 
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
-        pm.items.bindTo { items -> adapter.updateData(items) }
+        pm.items.bindTo(adapter, compositeUnbind)
     }
 
     protected open fun provideLayoutManager(context: Context?): RecyclerView.LayoutManager =

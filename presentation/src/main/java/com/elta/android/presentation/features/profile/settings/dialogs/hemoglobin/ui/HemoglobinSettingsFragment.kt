@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.elta.android.presentation.utils.sequenceClicks
@@ -66,7 +67,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
                 pm.dateSelectedAction.consumer.accept(ZonedDateTime.now().with(day.date))
             }
         }
-        pm.hemoglobinItemsState.bindTo { items -> adapter.updateData(items) }
+        pm.hemoglobinItemsState.bindTo(adapter, compositeUnbind)
     }
 
     companion object {
