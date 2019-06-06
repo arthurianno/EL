@@ -11,6 +11,8 @@ import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.jobs.factory.JobInjectorFactory
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -18,7 +20,6 @@ import dagger.android.HasActivityInjector
 import dagger.android.HasBroadcastReceiverInjector
 import io.fabric.sdk.android.Fabric
 import io.reactivex.plugins.RxJavaPlugins
-import net.danlew.android.joda.JodaTimeAndroid
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,7 +40,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
         initializeCrashlytics()
         initializeInjector()
         initializeLogger()
-        initializeJodaTime()
+        initializeTime()
         initializeSocialNetworks()
         initalizeYandexMapKit()
         RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
@@ -70,8 +71,8 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
         Timber.plant(logTree)
     }
 
-    private fun initializeJodaTime() {
-        JodaTimeAndroid.init(this)
+    private fun initializeTime() {
+        AndroidThreeTen.init(this)
     }
 
     private fun initalizeYandexMapKit() {

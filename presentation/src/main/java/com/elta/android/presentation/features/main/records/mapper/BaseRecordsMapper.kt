@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.mapper
 
-import com.elta.android.common.utils.DATE_PATTERN
+import com.elta.android.common.utils.CommonFormats
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.EventsBlock
@@ -13,8 +14,6 @@ import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
-import java.text.SimpleDateFormat
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 open class BaseRecordsMapper(
@@ -59,13 +58,12 @@ open class BaseRecordsMapper(
     protected fun Event.formatDuration(resources: ResourceProvider): String =
         checkNotNull(duration).asTimeString(resources)
 
-    // TODO: rework this solution using Android310
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     protected fun Event.formatDate(): String {
         return try {
-            val date = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).parse(additionTimeString)
-            val tokens = SimpleDateFormat("HH:mm XXX", Locale.getDefault()).format(date).split(" ")
-            "в ${tokens[0]} (UTC ${tokens[1]})"
+            val time = additionTime?.toStringWithFormat(CommonFormats.FORMAT_TIME) ?: ""
+            val offset = additionTime?.offset?.toString() ?: ""
+            resources.getString(R.string.main_records_event_time_mask, time, offset)
         } catch (e: Exception) {
             ""
         }

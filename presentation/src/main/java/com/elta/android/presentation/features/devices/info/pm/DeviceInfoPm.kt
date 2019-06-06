@@ -1,23 +1,31 @@
 package com.elta.android.presentation.features.devices.info.pm
 
 import com.elta.android.domain.features.devices.interactor.DeleteGlucometerUseCase
-import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
+import com.elta.android.domain.features.devices.interactor.GetLastGlucometerAndInfoUseCase
+import com.elta.android.domain.features.devices.interactor.SetPrimaryGlucometerUseCase
+import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.devices.info.ui.builder.DeviceInfoItemsBuilder
-import com.elta.android.presentation.messages.SnackBarMessageData
+import io.reactivex.Observable
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
 class DeviceInfoPm @Inject constructor(
-    private val getGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
+    private val getLastGlucometerAndInfoUseCase: GetLastGlucometerAndInfoUseCase,
     private val deleteGlucometerUseCase: DeleteGlucometerUseCase,
+    private val setPrimaryGlucometerUseCase: SetPrimaryGlucometerUseCase,
     private val itemsBuilder: DeviceInfoItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -31,29 +39,61 @@ class DeviceInfoPm @Inject constructor(
     private val addressState = State<String>()
     private val getDeviceInfoAction = Action<Unit>()
 
-    private val deleteDeviceDialogData: DialogData by lazy { Dialogs.DeleteDevice(resources) }
+    private var glucometer: Glucometer? = null
 
     override fun onCreate() {
         super.onCreate()
 
-        getDeviceInfoAction.observable
+        observeGetDeviceAction()
+        observeDeleteDeviceAction()
+        observeSetPrimaryDeviceClicks()
+
+        addressState.observable
+            .map { resources.getString(R.string.profile_device_info_description, it) }
+            .subscribe(descriptionAddressState.consumer)
+            .untilDestroy()
+
+        checkUpdateAction.observable
             .skipWhileInProgress()
+            .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
+            .untilDestroy()
+
+        bus.events<Events.FirmwareUpdated>()
+            .map { Unit }
+            .subscribe(getDeviceInfoAction.consumer)
+            .untilDestroy()
+    }
+
+    fun setDeviceData(name: String, address: String) {
+        nameDeviceState.consumer.accept(name)
+        addressState.consumer.accept(address)
+        getDeviceInfoAction.consumer.accept(Unit)
+    }
+
+    private fun observeSetPrimaryDeviceClicks() =
+        bus.clicks<Clicks.PrimaryDeviceItemClicked>()
             .map { addressState.value }
-            .map(::createGetDeviceInfoParams)
-            .flatMapSingle { params ->
-                getGlucometerInfoUseCase.execute(params)
+            .map(::createSetPrimaryDeviceParams)
+            .flatMap {
+                setPrimaryGlucometerUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess(::handleSuccess)
+                    .andThen(loadGlucometerInfo(Unit))
+                    .doOnNext { bus.event(Events.DeviceChanged) }
                     .doOnError(::handleError)
             }
-            .retry()
             .subscribe()
             .untilDestroy()
 
+    private fun observeDeleteDeviceAction() =
         deleteDeviceAction.observable
+            .skipWhileInProgress()
             .switchMapMaybe {
-                deleteDeviceDialogControl.showForResult(deleteDeviceDialogData)
+                glucometer?.let {
+                    deleteDeviceDialogControl.showForResult(
+                        Dialogs.DeleteDevice(resources, it.isPrimary)
+                    )
+                }
             }
             .filter { it == DialogResult.POSITIVE }
             .map { addressState.value }
@@ -69,44 +109,41 @@ class DeviceInfoPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        addressState.observable
-            .map { resources.getString(R.string.profile_device_info_description, it) }
-            .subscribe(descriptionAddressState.consumer)
-            .untilDestroy()
-
-        checkUpdateAction.observable
-            .doOnNext {
-                showSnackBar(
-                    SnackBarMessageData.SimpleTextMessage("Update firmware clicked...")
-                )
-            }
+    private fun observeGetDeviceAction() =
+        getDeviceInfoAction.observable
+            .skipWhileInProgress()
+            .flatMap(::loadGlucometerInfo)
             .retry()
             .subscribe()
             .untilDestroy()
-    }
-
-    fun setDeviceData(name: String, address: String) {
-        nameDeviceState.consumer.accept(name)
-        addressState.consumer.accept(address)
-        getDeviceInfoAction.consumer.accept(Unit)
-    }
 
     private fun createDeleteDeviceParams(address: String) =
         DeleteGlucometerUseCase.Params(address)
 
     private fun createGetDeviceInfoParams(address: String) =
-        GetLastGlucometerInfoUseCase.Params(address)
+        GetLastGlucometerAndInfoUseCase.Params(address)
+
+    private fun createSetPrimaryDeviceParams(address: String) =
+        SetPrimaryGlucometerUseCase.Params(address)
 
     private fun handleDeletingSuccess() {
         bus.event(Events.DeviceChanged)
         router.exit()
     }
 
-    private fun handleSuccess(info: GlucometerInfo) {
-        items.consumer.accept(itemsBuilder.buildItems(info))
+    private fun handleSuccess(data: Pair<Glucometer, GlucometerInfo>) {
+        glucometer = data.first
+        items.consumer.accept(itemsBuilder.buildItems(data.second, data.first.isPrimary))
     }
 
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
+    private fun loadGlucometerInfo(i: Unit): Observable<Pair<Glucometer, GlucometerInfo>> =
+        Observable.just(addressState.value)
+            .map(::createGetDeviceInfoParams)
+            .flatMap {
+                getLastGlucometerAndInfoUseCase.execute(it)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnNext(::handleSuccess)
+                    .doOnError(::handleError)
+            }
 }

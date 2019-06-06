@@ -1,22 +1,24 @@
 package com.elta.android.domain.features.diary.events.interactor
 
 import android.graphics.Bitmap
+import android.net.Uri
+import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
-import java.io.File
 import javax.inject.Inject
 
 class SaveEventBitmapUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<File, SaveEventBitmapUseCase.Params>(schedulers) {
+) : SingleUseCase<Uri, SaveEventBitmapUseCase.Params>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Params?): Single<File> {
+    override fun buildUseCaseObservable(params: Params?): Single<Uri> {
         val p = checkNotNull(params)
-        return eventsRepo.saveEventBitmap(p.eventHash, p.path, p.bitmap)
+        return eventsRepo.saveShareEventBitmap(p.event, p.glucoseLevelSettings, p.bitmap)
     }
 
-    data class Params(val eventHash: String, val path: String, val bitmap: Bitmap)
+    data class Params(val event: Event, val glucoseLevelSettings: GlucoseLevelSettings, val bitmap: Bitmap)
 }

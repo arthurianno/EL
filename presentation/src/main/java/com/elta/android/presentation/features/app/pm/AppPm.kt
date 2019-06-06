@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
@@ -15,6 +16,7 @@ import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationM
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
+    private val getUserInfoUseCase: GetUserInfoUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -27,11 +29,27 @@ class AppPm @Inject constructor(
     val syncProgress = Command<Boolean>(bufferSize = 1)
     val backendSyncProgress = Command<Boolean>(bufferSize = 1)
 
+    @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
 
         coldStartAction.observable
-            .doOnNext { router.newRootScreen(Screens.HomeFlow) }
+            .skipWhileInProgress()
+            .flatMapSingle {
+                getUserInfoUseCase.execute()
+                    .doOnSuccess { user ->
+                        when {
+                            !(user.isUserLoggedIn ?: false) -> router.newRootFlow(Screens.GreetingFlow)
+                            !(user.isEmailConfirmed ?: false) -> router.newRootChain(
+                                Screens.GreetingFlow, Screens.ActivateProfile
+                            )
+                            !(user.isOnBoardingPassed ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
+                            else -> router.newRootFlow(Screens.HomeFlow)
+                        }
+                    }
+                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
+                    .bindProgress()
+            }
             .retry()
             .subscribe()
             .untilDestroy()

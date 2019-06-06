@@ -14,10 +14,10 @@
         android:id="@+id/deviceIconView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_devices"
         app:layout_constraintBottom_toBottomOf="@+id/deviceAddressView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/deviceNameView" />
+        app:layout_constraintTop_toTopOf="@+id/deviceNameView"
+        tools:src="@drawable/ic_devices" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/deviceNameView"

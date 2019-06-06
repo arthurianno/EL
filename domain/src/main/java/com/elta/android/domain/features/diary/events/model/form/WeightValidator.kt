@@ -2,7 +2,7 @@ package com.elta.android.domain.features.diary.events.model.form
 
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.DoubleRange
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 object WeightValidator : FormValidator {
 
@@ -16,7 +16,7 @@ object WeightValidator : FormValidator {
         name: String?,
         duration: Long?,
         insulin: InsulinType?,
-        date: Date?,
+        date: ZonedDateTime?,
         note: String?
     ): Boolean = validateValue(value) && date != null
 

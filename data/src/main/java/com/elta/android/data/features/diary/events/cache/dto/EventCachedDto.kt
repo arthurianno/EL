@@ -2,18 +2,17 @@ package com.elta.android.data.features.diary.events.cache.dto
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
-import java.util.Date
 
 @Entity
 data class EventCachedDto(
     @Id(assignable = true) var id: Long,
     val secondaryId: String,
     val type: String,
-    val additionTime: Date,
+    val additionTime: Long,
     val additionTimeString: String,
     val tagId: String?,
     val note: String?,
-    val modificationTime: Date?,
+    val modificationTime: Long?,
 
     // represents EventDataDto
     val temperature: Double?,

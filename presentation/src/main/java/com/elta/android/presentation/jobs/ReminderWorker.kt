@@ -2,6 +2,16 @@ package com.elta.android.presentation.jobs
 
 import android.app.AlarmManager
 import android.content.Context
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.RxWorker
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import com.elta.android.common.utils.toMillis
+import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
+import com.elta.android.domain.features.reminder.interactor.GetReminderByIdUseCase
+import com.elta.android.domain.features.reminder.interactor.UpdateReminderUseCase
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.features.profile.settings.reminders.utils.getCancelPendingIntent
@@ -14,6 +24,16 @@ import com.elta.android.presentation.utils.toCalendar
 import com.elta.android.presentation.utils.year
 import timber.log.Timber
 import java.util.Calendar
+import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.notification.NotificationSource
+import com.elta.android.presentation.jobs.factory.JobFactory
+import com.nullgr.core.rx.RxBus
+import io.reactivex.Single
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Suppress("MagicNumber")
@@ -43,56 +63,41 @@ class ReminderWorker @Inject constructor(
 
     @Suppress("LongMethod")
     private fun calculateDelay(reminder: Reminder): Reminder {
-        val reminderCalendar = reminder.time.toCalendar()
-        val currentCalendar = Calendar.getInstance()
-        currentCalendar.timeInMillis = System.currentTimeMillis()
-        val delayCalendar: Calendar
+        val reminderDate = reminder.time
+        val currentDate = ZonedDateTime.now()
 
-        if (reminderCalendar.before(currentCalendar)) {
-            delayCalendar = Calendar.getInstance()
+        val nextDate: ZonedDateTime = if (reminderDate.isBefore(currentDate)) {
             when (reminder.scheduleType) {
-                ScheduleType.NONE -> delayCalendar.timeInMillis = -1
-                ScheduleType.DAY -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
-                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
-                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
-                    delayCalendar.set(Calendar.SECOND, 0)
-                    delayCalendar.add(Calendar.DATE, 1)
-                }
-                ScheduleType.WEEK -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
-                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
-                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
-                    delayCalendar.set(Calendar.SECOND, 0)
-                    delayCalendar.add(Calendar.DATE, 7)
-                }
-                ScheduleType.MONTH -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
-                    delayCalendar.set(Calendar.MONTH, currentCalendar.month)
-                    delayCalendar.set(Calendar.DATE, currentCalendar.dayOfMonth)
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
-                    delayCalendar.set(Calendar.SECOND, 0)
-                    delayCalendar.add(Calendar.MONTH, 1)
-                }
-                ScheduleType.YEAR -> {
-                    delayCalendar.set(Calendar.YEAR, currentCalendar.year)
-                    delayCalendar.set(Calendar.MONTH, reminderCalendar.month)
-                    delayCalendar.set(Calendar.DATE, reminderCalendar.dayOfMonth)
-                    delayCalendar.set(Calendar.HOUR, reminderCalendar.hourOfDay)
-                    delayCalendar.set(Calendar.MINUTE, reminderCalendar.minute)
-                    delayCalendar.set(Calendar.SECOND, 0)
-                    delayCalendar.add(Calendar.YEAR, 1)
-                }
+                ScheduleType.NONE -> ZonedDateTime.of(0, 0, 0, 0, 0, 0, 0, ZoneId.systemDefault())
+                ScheduleType.DAY ->
+                    ZonedDateTime.from(currentDate)
+                        .withHour(reminderDate.hour)
+                        .withMinute(reminderDate.minute)
+                        .withSecond(0)
+                        .plusDays(1)
+                ScheduleType.WEEK ->
+                    ZonedDateTime.from(currentDate)
+                        .withHour(reminderDate.hour)
+                        .withMinute(reminderDate.minute)
+                        .withSecond(0)
+                        .plusDays(7)
+                ScheduleType.MONTH ->
+                    ZonedDateTime.from(currentDate)
+                        .withHour(reminderDate.hour)
+                        .withMinute(reminderDate.minute)
+                        .withSecond(0)
+                        .plusMonths(1)
+                ScheduleType.YEAR ->
+                    ZonedDateTime.from(currentDate)
+                        .withMonth(reminderDate.monthValue)
+                        .withDayOfMonth(reminderDate.dayOfMonth)
+                        .withHour(reminderDate.hour)
+                        .withMinute(reminderDate.minute)
+                        .withSecond(0)
+                        .plusYears(1)
             }
-        } else {
-            delayCalendar = reminderCalendar
-        }
+        } else reminderDate
 
-        return reminder.apply { time = delayCalendar.time }
+        return reminder.apply { time = nextDate }
     }
 }

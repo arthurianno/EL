@@ -19,10 +19,13 @@ import com.elta.android.data.features.sync.cache.LocalSyncChangesCache
 import com.elta.android.data.features.sync.cache.dto.LocalSyncCachedDto
 import com.elta.android.data.features.user.cache.DbProfileCache
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.userinfo.cache.DbUserInfoCache
+import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
 
+@Suppress("TooManyFunctions", "ComplexInterface")
 @Module(includes = [CacheModule.Declarations::class])
 class CacheModule {
 
@@ -63,5 +66,9 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindSyncChangesCache(cached: LocalSyncChangesCache): Cache<LocalSyncCachedDto>
+
+        @Binds
+        @Singleton
+        fun bindUserInfoCache(cached: DbUserInfoCache): Cache<UserInfoCacheDto>
     }
 }

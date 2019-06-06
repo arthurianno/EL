@@ -2,8 +2,8 @@ package com.elta.android.presentation.widgets.date_picker
 
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
-import org.joda.time.DateTime
-import java.util.Date
+import org.threeten.bp.LocalDate
+import org.threeten.bp.YearMonth
 
 object DatePickerDataProvider {
 
@@ -18,16 +18,16 @@ object DatePickerDataProvider {
         R.string.date_picker_day_of_week_7
     )
 
-    fun buildDatePickerDates(currentDate: Date): ArrayList<DatePickerItem> {
+    fun buildDatePickerDates(currentDate: LocalDate): ArrayList<DatePickerItem> {
         val dates = arrayListOf<DatePickerItem>()
 
-        val selectedDate = DateTime(currentDate).withTimeAtStartOfDay()
-        val todayDate = DateTime().withTimeAtStartOfDay()
+        val selectedDate = currentDate
+        val todayDate = LocalDate.now()
 
-        var tempDate = DateTime(selectedDate)
+        var tempDate = LocalDate.from(selectedDate)
 
-        val firstDayOfMonth = DateTime(selectedDate).dayOfMonth().withMinimumValue()
-        val lastDayOfMonth = DateTime(selectedDate).dayOfMonth().withMaximumValue()
+        val firstDayOfMonth = YearMonth.from(selectedDate).atDay(1)
+        val lastDayOfMonth = YearMonth.from(selectedDate).atEndOfMonth()
 
         dates.add(tempDate.toItem())
 
@@ -38,24 +38,24 @@ object DatePickerDataProvider {
             } while (tempDate.isAfter(firstDayOfMonth))
         }
 
-        var inFutureDateStart: DateTime
+        var inFutureDateStart: LocalDate
 
         if (selectedDate.isBefore(todayDate) && selectedDate.isBefore(lastDayOfMonth)) {
 
             val maxAvailableDate = if (todayDate.isBefore(lastDayOfMonth)) todayDate else lastDayOfMonth
-            tempDate = DateTime(selectedDate)
+            tempDate = LocalDate.from(selectedDate)
 
             do {
                 tempDate = tempDate.plusDays(1)
                 dates.add(tempDate.toItem())
             } while (tempDate.isBefore(maxAvailableDate))
 
-            inFutureDateStart = DateTime(maxAvailableDate)
+            inFutureDateStart = LocalDate.from(maxAvailableDate)
         } else {
-            inFutureDateStart = DateTime(selectedDate)
+            inFutureDateStart = LocalDate.from(selectedDate)
         }
 
-        var inPastDateStart = DateTime(firstDayOfMonth)
+        var inPastDateStart = LocalDate.from(firstDayOfMonth)
 
         for (i in 1..DAYS_OFFSET) {
             inPastDateStart = inPastDateStart.minusDays(1)
@@ -67,12 +67,12 @@ object DatePickerDataProvider {
         return dates
     }
 
-    private fun DateTime.toItem(isAvailable: Boolean = true): DatePickerItem =
+    private fun LocalDate.toItem(isAvailable: Boolean = true): DatePickerItem =
         DatePickerItem(
-            toDate(),
-            dayOfWeek,
+            this,
+            dayOfWeek.value,
             dayOfMonth,
-            dayOfWeekResources[dayOfWeek - 1],
+            dayOfWeekResources[dayOfWeek.value - 1],
             isAvailable
         )
 }

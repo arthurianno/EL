@@ -16,7 +16,7 @@ import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStati
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
 import org.junit.Test
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 class DailyStatisticInteractorTest {
 
@@ -63,7 +63,7 @@ class DailyStatisticInteractorTest {
 
     @Test
     fun buildDailyStatisticModel_correct() {
-        val day = Date()
+        val day = LocalDate.now()
 
         val glucoseEvents = arrayListOf(
             EventTestFactory.create(type = EventType.GLUCOSE, value = 100.0),

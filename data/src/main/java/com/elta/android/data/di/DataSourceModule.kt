@@ -17,6 +17,7 @@ import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareLocalDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
 import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
 import com.elta.android.data.features.observers.datasource.ObserverDataSource
@@ -31,6 +32,8 @@ import com.elta.android.data.features.sync.datasource.LocalSyncDataSource
 import com.elta.android.data.features.user.datasource.ProfileCachedDataSource
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
+import com.elta.android.data.features.userinfo.datasource.UserInfoCachedDataSource
+import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -106,9 +109,15 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindRemindersCacheDataSource(source: RemindersCacheDataSource): RemindersDataSource
 
+    @Remote
     @Binds
     @Singleton
-    abstract fun bindFirmwareDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+    abstract fun bindFirmwareRemoteDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+
+    @Cache
+    @Binds
+    @Singleton
+    abstract fun bindFirmwareLocalDataSource(source: FirmwareLocalDataSource): FirmwareDataSource
 
     @Binds
     @Singleton
@@ -117,4 +126,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindSyncChangesCacheDataSource(source: LocalSyncCachedDataSource): LocalSyncDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindUserInfoDataSource(sourceInfo: UserInfoCachedDataSource): UserInfoDataSource
 }

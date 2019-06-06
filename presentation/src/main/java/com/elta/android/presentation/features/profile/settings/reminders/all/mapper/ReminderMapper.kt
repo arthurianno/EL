@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.profile.settings.reminders.all.mapper
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.CommonFormats
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderHeaderItem
@@ -8,15 +10,11 @@ import com.elta.android.presentation.features.profile.settings.reminders.all.ui.
 import com.elta.android.presentation.utils.toString
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 class ReminderMapper @Inject constructor(
     private val resources: ResourceProvider
 ) : Mapper<List<Reminder>, List<ListItem>> {
-
-    private val dateFormat by lazy { SimpleDateFormat("HH:mm", Locale.getDefault()) }
 
     override fun mapFromObject(source: List<Reminder>): List<ListItem> =
         arrayListOf<ListItem>().apply {
@@ -35,9 +33,10 @@ class ReminderMapper @Inject constructor(
             )
         }
 
+    @Suppress("SwallowedException")
     private fun Reminder.formatSchedule(): String {
         return try {
-            val time = dateFormat.format(time)
+            val time = this.time.toStringWithFormat(CommonFormats.FORMAT_TIME)
             "${scheduleType.toString(resources)} в $time"
         } catch (ignored: Exception) {
             ""

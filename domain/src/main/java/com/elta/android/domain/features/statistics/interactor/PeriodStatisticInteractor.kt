@@ -11,8 +11,8 @@ import com.elta.android.domain.features.statistics.model.InsulinStatisticModelBy
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
+import org.threeten.bp.LocalDate
 import timber.log.Timber
-import java.util.Date
 
 fun buildStatisticModel(
     period: StatisticPeriod,
@@ -24,7 +24,7 @@ fun buildStatisticModel(
     val eventsByType = eventsContainer.byType
     val eventsByTypePerDay = eventsContainer.byTypePerDay
 
-    val statisticByDay = mutableMapOf<Date, DailyStatisticModel>()
+    val statisticByDay = mutableMapOf<LocalDate, DailyStatisticModel>()
 
     var dayWithMaxLevel: DailyStatisticModel? = null
     var dayWithMinLevel: DailyStatisticModel? = null
@@ -148,51 +148,51 @@ fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): In
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
 
-    var bolusCount = 0
-    var basalCount = 0
-    var count = 0
+    val daysWithBolusEvents = mutableSetOf<LocalDate>()
+    val daysWithBasalEvents = mutableSetOf<LocalDate>()
+    val daysWithEvents = mutableSetOf<LocalDate>()
 
     insulinEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
             if (event.isBolusInsulin()) {
                 totalBolusLevel += value
-                bolusCount++
+                daysWithBolusEvents.add(event.additionTime.toLocalDate())
             }
 
             if (event.isBasalInsulin()) {
                 totalBasalLevel += value
-                basalCount++
+                daysWithBasalEvents.add(event.additionTime.toLocalDate())
             }
 
             if (event.isNotMixedInsulin()) {
                 totalLevel += value
-                count++
+                daysWithEvents.add(event.additionTime.toLocalDate())
             }
         }
     }
 
     return InsulinStatisticModelByPeriod(
-        averageBolusLevel = totalBolusLevel.average(bolusCount),
-        averageBasalLevel = totalBasalLevel.average(basalCount),
-        averageLevel = totalLevel.average(count)
+        averageBolusLevel = totalBolusLevel.average(daysWithBolusEvents.size),
+        averageBasalLevel = totalBasalLevel.average(daysWithBasalEvents.size),
+        averageLevel = totalLevel.average(daysWithEvents.size)
     )
 }
 
 fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
-    var count = 0
+    val daysWithEvents = mutableSetOf<LocalDate>()
 
     breadEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
             totalLevel += value
-            count++
+            daysWithEvents.add(event.additionTime.toLocalDate())
         }
     }
 
     return BreadStatisticModelByPeriod(
-        averageLevel = totalLevel.average(count)
+        averageLevel = totalLevel.average(daysWithEvents.size)
     )
 }
 

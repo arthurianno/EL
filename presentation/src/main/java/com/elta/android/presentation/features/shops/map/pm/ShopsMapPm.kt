@@ -6,15 +6,21 @@ import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseC
 import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.isSearchInputValid
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.geo.GeoPoint
+import com.elta.android.presentation.core.geo.GeoPointIcon
+import com.elta.android.presentation.core.geo.LocationTurnedOffError
+import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.geo.emptyGeoPoint
 import com.elta.android.presentation.core.geo.isEmpty
 import com.elta.android.presentation.core.permissions.PermissionStatus
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.locationControl
 import com.elta.android.presentation.core.ui.adapter.CardType
 import com.elta.android.presentation.core.ui.adapter.getCardType
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchHeaderItem
@@ -26,8 +32,8 @@ import com.elta.android.presentation.utils.moskowLocation
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
-import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.location.isEmpty
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.widget.inputControl
@@ -35,7 +41,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ShopsMapPm @Inject constructor(
-    private val rxLocationManager: RxLocationManager,
+    private val rxLocationManager: RxLocationManagerFixed,
     private val searchSalePointsUseCase: SearchSalePointsUseCase,
     private val getSalePointsUseCase: GetSalePointsUseCase,
     services: ServiceFacade
@@ -44,8 +50,10 @@ class ShopsMapPm @Inject constructor(
     val items = State<List<ListItem>>()
     val geoPoints = State<List<GeoPoint>>()
 
-    val permissionStatusUpdatedAction = Action<PermissionStatus>()
-    val permissionRequiredCommand = Command<Unit>()
+    val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
+    val requestPermissionCommand = Command<Unit>(bufferSize = 1)
+    val locationControl = locationControl(rxLocationManager)
+
     val showMyLocationCommand = Command<Location>()
     val showDefaultLocationCommand = Command<Location>()
     val moveToMyLocationAction = Action<Unit>()
@@ -63,10 +71,10 @@ class ShopsMapPm @Inject constructor(
     private val searchAction = Action<String>()
     private val searchResultSelectedAction = Action<SearchResultItem>()
 
+    private val permissionStatusResultAction = Action<PermissionStatus>()
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
     private val defaultLocationState = State<Location>()
-    private val permissionStatusState = State<PermissionStatus>()
     private val loadScreenAction = Action<Unit>()
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
@@ -80,26 +88,53 @@ class ShopsMapPm @Inject constructor(
         bindShopSelectionBehaviour()
         bindSearchBehaviour()
         bindClicks()
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
+
+        locationControl.locationEnabledAction.observable
+            .subscribe(fetchMyLocationAction.consumer)
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
-            .subscribe(loadScreenAction.consumer)
+            .doOnNext(loadScreenAction.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .checkAndRequestPermission()
+            .subscribe { status ->
+                if (status == PermissionStatus.GRANTED) fetchMyLocationAction.consumer.accept(Unit)
+                else handleLocationResult(EMPTY_LOCATION)
+            }
             .untilDestroy()
     }
 
+    override fun handleError(error: Throwable) {
+        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(Unit)
+        else super.handleError(error)
+    }
+
+    fun setPermissionStatus(status: PermissionStatus) {
+        permissionStatusResultAction.consumer.accept(status)
+    }
+
+    @SuppressLint("MissingPermission")
     private fun bindLocationBehaviour() {
         fetchMyLocationAction.observable
-            .filter { permissionStatusState.valueOrNull == PermissionStatus.GRANTED }
             .map { Unit }
-            .doOnNext(::fetchMyLocation)
+            .flatMap {
+                rxLocationManager.requestLocation()
+                    .doOnNext(::handleLocationResult)
+                    .doOnError(::handleError)
+            }
+            .retry()
             .subscribe()
             .untilDestroy()
 
         moveToMyLocationAction.observable
-            .map { myLocationState.valueOrNull ?: EMPTY_LOCATION }
-            .filter { !it.isEmpty() }
-            .doOnNext(showMyLocationCommand.consumer)
-            .subscribe()
+            .checkAndRequestPermission()
+            .filter { it == PermissionStatus.GRANTED }
+            .map { Unit }
+            .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()
 
         myLocationState.observable
@@ -117,23 +152,6 @@ class ShopsMapPm @Inject constructor(
     }
 
     private fun bindPermissionsBehaviour() {
-        loadScreenAction.observable
-            // TODO: this code emits GRANTED state for each
-            // onBindPresentationModel this end up new location request and updating ui
-            .flatMap { permissionStatusUpdatedAction.observable }
-            .subscribe(permissionStatusState.consumer)
-            .untilDestroy()
-
-        permissionStatusState.observable
-            .doOnNext {
-                when (it) {
-                    PermissionStatus.REQUIRED -> permissionRequiredCommand.consumer.accept(Unit)
-                    PermissionStatus.GRANTED -> fetchMyLocationAction.consumer.accept(Unit)
-                    else -> handleLocationResult(EMPTY_LOCATION)
-                }
-            }
-            .subscribe()
-            .untilDestroy()
     }
 
     private fun bindSalePoints() {
@@ -152,10 +170,15 @@ class ShopsMapPm @Inject constructor(
 
         Observables.combineLatest(salePointsState.observable, foundedLocation.observable)
             .map {
-                it.first.forEach { point ->
-                    point.distance = it.second.distanceTo(point.coordinates)
+                val points = it.first
+                val location = it.second
+
+                if (!location.isEmpty() && location != defaultLocationState.valueOrNull) {
+                    points.forEach { point ->
+                        point.distance = location.distanceTo(point.coordinates)
+                    }
                 }
-                it.first
+                points
             }
             .map { it.sortedBy { point -> point.distance } }
             .doOnNext(::displayPoints)
@@ -279,7 +302,7 @@ class ShopsMapPm @Inject constructor(
         }
     }
 
-    private fun SalePoint.toItem(): ListItem =
+    private inline fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,
             name = name,
@@ -288,13 +311,26 @@ class ShopsMapPm @Inject constructor(
             phone = phone
         )
 
-    private fun SalePoint.toGeoPoint(): GeoPoint =
+    private inline fun SalePoint.toGeoPoint(): GeoPoint =
         GeoPoint(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
             id = id,
+            icon = type.toIcon(),
             meta = "$city, $address"
         )
+
+    private inline fun Type.toIcon(): GeoPointIcon =
+        when (this) {
+            Type.SALE -> GeoPointIcon(
+                normal = R.drawable.ic_normal_pin_shop,
+                selected = R.drawable.ic_active_pin_shop
+            )
+            Type.SERVICE -> GeoPointIcon(
+                normal = R.drawable.ic_normal_pin_services,
+                selected = R.drawable.ic_active_pin_services
+            )
+        }
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
@@ -312,14 +348,6 @@ class ShopsMapPm @Inject constructor(
     private fun handleLocationResult(location: Location) {
         if (location.isEmpty()) defaultLocationState.consumer.accept(moskowLocation)
         else myLocationState.consumer.accept(location)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun fetchMyLocation(i: Unit) {
-        rxLocationManager.requestLocation()
-            .doOnNext(::handleLocationResult)
-            .subscribe()
-            .untilDestroy()
     }
 
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
@@ -347,6 +375,22 @@ class ShopsMapPm @Inject constructor(
             address = "$city, $address",
             cardType = cardType
         )
+
+    private fun <T> Observable<T>.checkAndRequestPermission(): Observable<PermissionStatus> =
+        this.doOnNext { checkPermissionStatusCommand.consumer.accept(Unit) }
+            .switchMap {
+                permissionStatusResultAction.observable
+                    .take(1)
+                    .switchMap { status ->
+                        if (status == PermissionStatus.REQUIRED)
+                            permissionStatusResultAction.observable
+                                .take(1)
+                                .doOnSubscribe {
+                                    requestPermissionCommand.consumer.accept(Unit)
+                                }
+                        else Observable.just(status)
+                    }
+            }
 
     private companion object {
         const val INVALID_INDEX = -1

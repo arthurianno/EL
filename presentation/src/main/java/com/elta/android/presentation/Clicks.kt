@@ -11,8 +11,8 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
-import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
-import java.util.Date
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
+import org.threeten.bp.LocalDate
 
 sealed class Clicks : Click {
 
@@ -31,5 +31,6 @@ sealed class Clicks : Click {
     data class ActiveDeviceItemClicked(val item: ActiveDeviceItem) : Clicks()
     data class DeleteHemoglobinEventClicked(val id: String) : Clicks()
     data class ObserverItemClicked(val item: ObserverItem) : Clicks()
-    data class DateInStatisticsClicked(val date: Date?) : Clicks()
+    data class DateInStatisticsClicked(val date: LocalDate?) : Clicks()
+    object PrimaryDeviceItemClicked : Clicks()
 }

@@ -1,11 +1,12 @@
 package com.elta.android.presentation.features.statistic.period.ui.adapter.items
 
+import com.elta.android.presentation.core.ui.adapter.ParentItem
 import com.elta.android.presentation.core.ui.adapter.isChanged
 import com.nullgr.core.adapter.items.ListItem
 
 data class GlucoseIndexesItem(
-    val items: List<ListItem>
-) : ListItem {
+    override val items: List<ListItem>
+) : ParentItem {
 
     override fun getChangePayload(other: ListItem): Any {
         if (other is GlucoseIndexesItem && items.isChanged(other.items)) {

@@ -3,6 +3,7 @@ package com.elta.android.domain.features.auth.repository
 import io.reactivex.Completable
 import io.reactivex.Single
 
+@Suppress("TooManyFunctions", "ComplexInterface")
 interface AuthRepository {
 
     fun register(email: String, password: String): Completable
@@ -22,4 +23,6 @@ interface AuthRepository {
     fun checkTokenOwner(token: String): Single<Boolean>
 
     fun confirmEmail(token: String): Completable
+
+    fun logout(): Completable
 }

@@ -9,5 +9,5 @@ interface FirmwareDataSource {
 
     fun getFirmwareInfo(): Single<FirmwareDto>
 
-    fun downloadFirmware(firmware: Firmware): Single<FirmwareFileDto>
+    fun getFirmware(firmware: Firmware): Single<FirmwareFileDto>
 }

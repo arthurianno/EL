@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.profile.main.pm
 
+import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
+import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
@@ -28,6 +30,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class MainProfilePm @Inject constructor(
+    private val logOutUseCase: LogOutUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val itemsBuilder: MainProfileOptionsItemsBuilder,
@@ -85,7 +88,21 @@ class MainProfilePm @Inject constructor(
 
         bus.clicks<Clicks.ProfileAdditionalClicked>()
             .map { it.item.type }
+            .filter { it !is ExitFromApp }
             .doOnNext(::navigateAdditionalSettingsScreen)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ProfileAdditionalClicked>()
+            .map { it.item.type }
+            .filter { it is ExitFromApp }
+            .flatMapCompletable {
+                logOutUseCase.execute()
+                    .doOnComplete {
+                        analytics.clearStableParams()
+                        router.newRootFlow(Screens.GreetingFlow)
+                    }
+            }
             .subscribe()
             .untilDestroy()
 

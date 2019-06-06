@@ -1,5 +1,5 @@
 package com.elta.android.presentation.widgets.charts.statistics.listeners
 
-import java.util.Date
+import org.threeten.bp.LocalDate
 
-data class StatisticsSelectionResult(val date: Date?)
+data class StatisticsSelectionResult(val date: LocalDate?)

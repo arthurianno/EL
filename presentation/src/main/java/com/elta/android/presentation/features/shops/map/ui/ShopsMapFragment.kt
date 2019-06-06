@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.shops.map.ui
 
 import android.Manifest
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +11,9 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
+import com.elta.android.presentation.core.pm.widgets.bindTo
+import com.elta.android.presentation.core.pm.widgets.resolveResults
+import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
@@ -18,6 +22,7 @@ import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.toPoint
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
@@ -40,8 +45,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
-    override val selectedPinRes = R.drawable.ic_active_pin
-    override val normalPinRes = R.drawable.ic_pin_b_normal
     override val userLocationPinRes = R.drawable.ic_my_loc
 
     private val snapHelper = PagerSnapHelper()
@@ -53,7 +56,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         toolbarTitleView.text = getString(R.string.shops_map_toolbar_title)
         toolbarView.applyWindowInsetsForChildrenView()
 
-        itemsView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
         itemsView.adapter = adapter
         itemsView.addItemDecoration(
             MarginItemDecoration(
@@ -65,20 +68,26 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         )
         snapHelper.attachToRecyclerView(itemsView)
 
-        searchItemsView.layoutManager = LinearLayoutManager(context)
+        searchItemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context))
         searchItemsView.adapter = searchAdapter
     }
 
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
-        pm.items.bindTo { items -> adapter.updateData(items) }
+        pm.items.bindTo(adapter, compositeUnbind)
         pm.showMyLocationCommand.bindTo(::showUserLocation)
         pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
-        pm.permissionRequiredCommand.observable
+
+        pm.checkPermissionStatusCommand.bindTo {
+            val status = rxPermissions.statusFor(LOCATION_PERMISSION)
+            pm.setPermissionStatus(status)
+        }
+
+        pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
-            .bindTo(pm.permissionStatusUpdatedAction.consumer)
-        pm.permissionStatusUpdatedAction.consumer.accept(rxPermissions.statusFor(LOCATION_PERMISSION))
+            .bindTo { status -> pm.setPermissionStatus(status) }
+
         pm.geoPoints.bindTo(::addPins)
 
         pm.selectGeoPointCommand.bindTo(::selectPin)
@@ -88,7 +97,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
 
         // search
-        pm.searchItems.bindTo { items -> searchAdapter.updateData(items) }
+        pm.searchItems.bindTo(searchAdapter, compositeUnbind)
         pm.searchInput.bindTo(searchInputView)
         pm.searchCloseCommand.bindTo {
             searchInputView.hideKeyboard()
@@ -99,6 +108,12 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
             .bindTo { searchInputView.hideKeyboard() }
+
+        pm.locationControl.bindTo(compositeUnbind, this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presentationModel.locationControl.resolveResults(requestCode, resultCode)
     }
 
     private fun showUserLocation(location: Location) {

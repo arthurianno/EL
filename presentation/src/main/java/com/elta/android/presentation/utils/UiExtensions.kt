@@ -47,7 +47,8 @@ fun View.applyWindowInsetsForChildrenView() {
 
 fun View.getBitmapFromView(size: Float): Bitmap {
     val sizePx = size.dpToPx(context).toInt()
-    measure(sizePx, sizePx)
+    val measureSpec = View.MeasureSpec.makeMeasureSpec(sizePx, View.MeasureSpec.EXACTLY)
+    measure(measureSpec, measureSpec)
     layout(0, 0, measuredWidth, measuredHeight)
     val bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)

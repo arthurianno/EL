@@ -2,8 +2,6 @@ package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.EventType.ACTIVITY
-import com.elta.android.domain.features.diary.events.model.EventType.INSULIN
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
@@ -15,6 +13,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
@@ -23,7 +22,7 @@ import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 abstract class BaseEventPm constructor(
@@ -43,9 +42,9 @@ abstract class BaseEventPm constructor(
     val mainActionVisibilityState = State(false)
     val mainAction = Action<Unit>()
 
-    val showDatePickerDialog = Command<Date>(bufferSize = 1)
-    val showTimePickerDialog = Command<Date>(bufferSize = 1)
-    val dateTimeSelectedAction = Action<Date>()
+    val showDatePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
+    val dateTimeSelectedAction = Action<ZonedDateTime>()
 
     val backHandleAction = Action<Unit>()
     val exitDialogAction = Action<Unit>()
@@ -54,7 +53,7 @@ abstract class BaseEventPm constructor(
 
     protected val formPickerValue = State<Double>()
     protected val eventTypeState = State<EventType>()
-    protected val selectedDateState = State(Date())
+    protected val selectedDateState = State(ZonedDateTime.now())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -89,13 +88,6 @@ abstract class BaseEventPm constructor(
         )
     }
 
-    protected fun Date?.isDateChanged(other: Date): Boolean {
-        return when {
-            this == null -> false
-            else -> this != other
-        }
-    }
-
     protected fun handleSuccess(isCreate: Boolean) {
         bus.event(Events.EventsChanged(isCreate))
         router.exit()
@@ -125,6 +117,7 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormVariantSelection() {
         formSelector.clickAction.observable
+            .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value, generateChooserId()) }
@@ -139,6 +132,7 @@ abstract class BaseEventPm constructor(
 
     private fun bindFormTagSelection() {
         tagSelector.clickAction.observable
+            .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
@@ -181,7 +175,7 @@ abstract class BaseEventPm constructor(
     }
 
     private fun generateChooserId() = when (eventTypeState.value) {
-        INSULIN, ACTIVITY -> formSelector.option.value.meta.toString()
+        EventType.INSULIN, EventType.ACTIVITY -> formSelector.option.value.meta.toString()
         else -> null
     }
 
@@ -194,10 +188,6 @@ abstract class BaseEventPm constructor(
 
     private fun String.toSimpleSelectorOption() =
         SelectorOption(this)
-
-    enum class DialogResult {
-        NEGATIVE, POSITIVE
-    }
 
     companion object {
         private const val OPEN_SCREEN_DELAY = 300L // millis

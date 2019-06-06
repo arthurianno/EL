@@ -247,6 +247,7 @@
     <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
     <string name="main_records_daily_chart_min_title">min</string>
     <string name="main_records_daily_chart_max_title">max</string>
+    <string name="main_records_event_time_mask">в %s (UTC %s)</string>
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Тег для группировки</string>
@@ -299,6 +300,10 @@
     <string name="event_form_exit_dialog_confirm_button">Выйти</string>
     <string name="event_form_delete_dialog_confirm_button">Удалить</string>
     <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
+    <string name="event_form_glucose_share_button_title">Поделиться</string>
+    <string name="event_form_glucose_info_mask_title">Измерение выполнено при температуре в %s С°</string>
+    <string name="event_form_glucose_measure_unit">ммоль/л</string>
+    <string name="event_form_glucose_toolbar_title">Уровень глюкозы</string>
 
     <string name="google_play_rate_dialog_title">Внимание</string>
     <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
@@ -323,6 +328,7 @@
     <!-- SYNC -->
     <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
+    <string name="sync_start_other_subtitle">Чтобы подключить новое устройство, вам\nнеобходимо пройти несколько шагов</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
     <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>
@@ -403,6 +409,7 @@
     <string name="vkontakte">Vkontakte</string>
     <string name="odnoklasniki">Odnoklasniki</string>
     <string name="profile_app_version">Версия приложения: %s</string>
+    <string name="profile_exit_from_app">Выйти из учетной записи</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
@@ -476,7 +483,8 @@
     <!--DEVICE-->
     <string name="profile_devices_monitor_and_manage_your_glucometers">Контролируйте и управляйте своими глюкометрами</string>
     <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
-    <string name="profile_devices_active_glucometers">Активные глюкометры</string>
+    <string name="profile_devices_primary_device">Основное устройство</string>
+    <string name="profile_devices_other_devices">Другие</string>
     <string name="profile_devices_new_device">Новое устройство</string>
 
     <string name="profile_device_info_title">СателлитOnline</string>
@@ -487,10 +495,11 @@
     <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
     <string name="profile_device_info_charge_level_field">%d/3</string>
+    <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
 
     <string name="profile_delete_device_dialog_title">Внимание</string>
-    <!--todo уточнить текст-->
     <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_primary_device_dialog_body">Вы действительно хотите удалить основной глюкометр?\nДанные будут сохранены</string>
     <string name="profile_delete_device_cancel_button">Отменить</string>
     <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
 
@@ -556,11 +565,43 @@
     <string name="feedback_title">Оставить отзыв</string>
     <string name="feedback_input_name_hint">Ваше имя *</string>
     <string name="feedback_input_feedback_hint">Ваш email *</string>
-    <string name="feedback_description_text">Что вам не понравилось в приложении?</string>
+    <string name="feedback_description_text">Что вам не понравилось в приложении? *</string>
     <string name="feedback_send">Отправить</string>
 
     <!-- SYNC WITH BACKEND -->
     <string name="sync_with_backend_in_progress">Идет синхронизация…</string>
     <string name="sync_with_backend_complete">Синхронизация завершена</string>
 
+    <!-- FIRMWARE -->
+    <string name="firmware_title_updates_not_found">Обновления не найдены</string>
+    <string name="firmware_title_checking_updates">Проверка обновлений…</string>
+    <string name="firmware_title_updates_found">Найдена новая версия\nПО глюкометра: %s</string>
+    <string name="firmware_title_downloading">Загрузка обновлений…</string>
+    <string name="firmware_title_updating">Обновление ПО…</string>
+    <string name="firmware_title_updated">Обновление ПО завершено</string>
+    <string name="firmware_title_low_level">Низкий уровень заряда\nбатареи глюкометра</string>
+    <string name="firmware_description_low_level">Для обновления необходимо заменить\nэлемент питания</string>
+    <string name="firmware_version_current">Текущая версия: %s</string>
+    <string name="firmware_version_new">Новая версия: %s</string>
+    <string name="firmware_button_update">Обновить</string>
+    <string name="firmware_button_check_updates">Проверить обновления прошивки</string>
+    <string name="firmware_button_close">Закрыть</string>
+    <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка прошивки, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
+    <string name="firmware_dialog_button">Закрыть</string>
+
+    <string name="firmware_unsupported_version_title">Версия приложения устарела</string>
+    <string name="firmware_unsupported_version_description">Для обновления версии прошивки\nглюкометра, необходимо обновить\nприложение</string>
+    <string name="firmware_unsupported_version_button">Обновить в Google Play</string>
+
+    <string name="firmware_downloading_error_title">Ошибка загрузки</string>
+    <string name="firmware_downloading_error_description">Во время загрузки обновления на\nустройство произошла ошибка. Чтобы\nпродолжить, необходимо повторить\nпроцесс</string>
+    <string name="firmware_downloading_error_button">Повторить</string>
+
+    <string name="firmware_update_error_title">Ошибка обновления</string>
+    <string name="firmware_update_error_description">Во время обновления прошивки\nпроизошла ошибка</string>
+    <string name="firmware_update_error_button">Повторить</string>
+
+    <string name="firmware_offline_error_title">Ошибка подключения</string>
+    <string name="firmware_offline_error_description">Во время обновления прошивки\nпроизошла ошибка подключения\nк глюкоментру</string>
+    <string name="firmware_offline_error_button">Повторить</string>
 </resources>

@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.feedback.pm
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.feedback.interactor.SendFeedbackUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -12,6 +14,7 @@ import javax.inject.Inject
 
 class FeedbackPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val sendFeedbackUseCase: SendFeedbackUseCase,
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {
@@ -60,6 +63,7 @@ class FeedbackPm @Inject constructor(
             .flatMapCompletable { params ->
                 sendFeedbackUseCase.execute(params)
                     .bindProgress()
+                    .andThen(updateUserInfoUseCase.execute(createUserInfoParams()))
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -97,6 +101,9 @@ class FeedbackPm @Inject constructor(
             emailInput.text.value,
             messageInput.text.value
         )
+
+    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
+        UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
 
     private fun handleSuccess() {
         hideKeyBoardCommand.consumer.accept(Unit)

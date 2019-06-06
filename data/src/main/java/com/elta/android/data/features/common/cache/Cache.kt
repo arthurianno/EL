@@ -14,5 +14,7 @@ interface Cache<T> {
 
     fun contains(condition: Condition): Boolean
 
+    fun count(condition: Condition): Long
+
     fun attach(entity: T)
 }

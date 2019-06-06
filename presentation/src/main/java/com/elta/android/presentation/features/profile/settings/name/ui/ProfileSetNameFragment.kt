@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.name.ui
 
-import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -28,17 +28,7 @@ class ProfileSetNameFragment : BaseFragment<ProfileSetNamePm>() {
             surnameInputView.setText(person.secondName)
         }
         continueButtonView.clicks().bindTo(pm.continueAction)
-        pm.exitDialogControl.bindTo { data, dc ->
-            MaterialDialog.Builder(checkNotNull(activity))
-                .cancelable(false)
-                .title(data.title)
-                .content(data.message)
-                .negativeText(data.negative)
-                .positiveText(data.positive)
-                .onPositive { _, _ -> dc.sendResult(ProfileSetNamePm.DialogResult.POSITIVE) }
-                .onNegative { _, _ -> dc.sendResult(ProfileSetNamePm.DialogResult.NEGATIVE) }
-                .build()
-        }
+        pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
 

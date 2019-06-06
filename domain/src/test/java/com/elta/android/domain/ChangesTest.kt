@@ -1,13 +1,13 @@
 package com.elta.android.domain
 
+import com.elta.android.common.utils.atEndOfDay
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.isChanged
-import com.elta.android.domain.features.diary.home.model.atEndOfDay
 import org.junit.Test
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 class ChangesTest {
 
@@ -110,7 +110,7 @@ class ChangesTest {
                 kind = event.kind,
                 name = event.name,
                 duration = event.duration,
-                date = Date().atEndOfDay(),
+                date = ZonedDateTime.now().atEndOfDay(),
                 tagId = event.tagId,
                 insulin = event.insulinType,
                 activity = event.activityType,

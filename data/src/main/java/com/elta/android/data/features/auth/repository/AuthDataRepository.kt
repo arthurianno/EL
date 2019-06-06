@@ -1,5 +1,6 @@
 package com.elta.android.data.features.auth.repository
 
+import com.elta.android.data.common.onConnectionErrorResumeDefault
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.dto.EmailStatusDto
 import com.elta.android.data.features.auth.dto.LoginDto
@@ -8,6 +9,8 @@ import com.elta.android.data.features.auth.dto.TokensDto
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -15,7 +18,8 @@ import javax.inject.Inject
 class AuthDataRepository @Inject constructor(
     private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
-    private val source: AuthDataSource
+    private val source: AuthDataSource,
+    private val userInfoRepository: UserInfoRepository
 ) : AuthRepository {
 
     override fun register(email: String, password: String): Completable =
@@ -24,7 +28,7 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response, email)
             }
             .flatMapCompletable {
-                Completable.complete()
+                userInfoRepository.updateUserInfo(createNewUserInfo())
             }
 
     override fun login(email: String, password: String): Single<Boolean> =
@@ -33,10 +37,27 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginDto::isEmailConfirmed)
+            .flatMap {
+                userInfoRepository.updateUserInfo(
+                    createUserInfoWithEmailStatus(it)
+                ).toSingleDefault(it)
+            }
 
     override fun isEmailConfirmed(): Single<Boolean> =
-        source.isEmailConfirmed()
-            .map(EmailStatusDto::isEmailConfirmed)
+        userInfoRepository.getUserInfo()
+            .map { it.isEmailConfirmed }
+            .flatMap { isConfirmed ->
+                when (isConfirmed) {
+                    true -> Single.just(isConfirmed)
+                    else -> source.isEmailConfirmed()
+                        .map(EmailStatusDto::isEmailConfirmed)
+                        .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
+                        .flatMap {
+                            userInfoRepository.updateUserInfo(createUserInfoWithEmailStatus(it))
+                                .toSingleDefault(it)
+                        }
+                }
+            }
 
     override fun sendConfirmationLink(): Completable =
         source.sendConfirmationLink()
@@ -58,6 +79,13 @@ class AuthDataRepository @Inject constructor(
         source.confirmEmail(token)
             .andThen(Completable.fromCallable { tokenStorage.refresh() })
 
+    override fun logout(): Completable =
+        Completable.fromAction {
+            tokenStorage.accessToken = null
+            tokenStorage.refreshToken = null
+            userHolder.currentUser = null
+        }
+
     private fun saveUserCredentials(tokens: TokensDto, email: String) {
         saveTokens(tokens)
         userHolder.currentUser = email.hashCode().toLong()
@@ -67,4 +95,18 @@ class AuthDataRepository @Inject constructor(
         tokenStorage.accessToken = tokens.accessToken
         tokenStorage.refreshToken = tokens.refreshToken
     }
+
+    private fun createNewUserInfo(): UserInfo =
+        UserInfo(
+            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+            isOnBoardingPassed = false,
+            isFeedbackSent = false,
+            isEmailConfirmed = false
+        )
+
+    private fun createUserInfoWithEmailStatus(isEmailConfirmed: Boolean): UserInfo =
+        UserInfo(
+            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+            isEmailConfirmed = isEmailConfirmed
+        )
 }

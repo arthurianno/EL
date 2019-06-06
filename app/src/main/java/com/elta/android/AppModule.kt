@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.elta.android.common.di.qualifires.ComputationFacade
 import com.elta.android.common.logger.ReleaseTree
+import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.pm.ExceptionParser
 import com.elta.android.presentation.core.pm.SimpleExceptionParser
 import com.nullgr.core.adapter.DiffCalculator
@@ -13,7 +14,6 @@ import com.nullgr.core.preferences.defaultPrefs
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
-import com.nullgr.core.rx.location.RxLocationManager
 import com.nullgr.core.rx.schedulers.ComputationSchedulersFacade
 import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -71,6 +71,6 @@ class AppModule(private val enableLog: Boolean) {
 
     @Provides
     @Singleton
-    fun provideRxLocationManager(context: Context): RxLocationManager =
-        RxLocationManager(context, updatesInterval = 1100, updateCount = 1)
+    fun provideRxLocationManager(context: Context): RxLocationManagerFixed =
+        RxLocationManagerFixed(context, updatesInterval = 1100, updateCount = 1)
 }

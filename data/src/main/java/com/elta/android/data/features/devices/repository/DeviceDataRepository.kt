@@ -31,6 +31,9 @@ class DeviceDataRepository @Inject constructor(
     override fun getDevices(): Single<List<Glucometer>> =
         source.getDevices().map(glucometerToDomainMapper::mapFromObjects)
 
+    override fun getDevice(address: String): Single<Glucometer> =
+        source.getDevice(address).map(glucometerToDomainMapper::mapFromObject)
+
     override fun deleteDevice(address: String): Completable =
         source.deleteDevice(address)
 
@@ -46,13 +49,17 @@ class DeviceDataRepository @Inject constructor(
     override fun connectDevice(device: Glucometer, pinCode: String): Completable =
         source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
 
-    override fun syncWithDevice(device: Glucometer?): Completable =
+    override fun syncWithDevice(device: Glucometer?): Observable<Int> =
         source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) })
             .map(eventsFromGlucometerMapper::mapFromObjects)
-            .flatMapCompletable { events ->
+            .flatMap { events ->
                 eventsRepository.addEvents(events)
+                    .andThen(Observable.just(events.size))
             }
 
     override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
         source.updateFirmware(address, firmwareFile)
+
+    override fun setPrimaryDevice(address: String): Completable =
+        source.setPrimaryDevice(address)
 }

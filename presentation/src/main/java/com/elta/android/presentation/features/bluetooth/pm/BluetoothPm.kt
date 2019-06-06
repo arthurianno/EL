@@ -13,7 +13,7 @@ import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUs
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
-import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
+import com.elta.android.domain.features.firmware.interactor.GetFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -21,7 +21,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.sync.connect.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import me.dmdev.rxpm.widget.inputControl
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class BluetoothPm @Inject constructor(
     private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
-    private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
+    private val downloadFirmwareUseCase: GetFirmwareUseCase,
     private val setPinCodeUseCase: ConnectDeviceUseCase,
     private val getGlucometerEventsUseCase: GetGlucometerEventsUseCase,
     private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
@@ -253,8 +253,8 @@ class BluetoothPm @Inject constructor(
             pinCode = pinInputControl.text.valueOrNull ?: ""
         )
 
-    private fun createGetFirmwareUseCaseParams(i: Unit): DownloadFirmwareUseCase.Params =
-        DownloadFirmwareUseCase.Params(firmwareState.value)
+    private fun createGetFirmwareUseCaseParams(i: Unit): GetFirmwareUseCase.Params =
+        GetFirmwareUseCase.Params(firmwareState.value)
 
     private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
         UpdateDeviceFirmwareUseCase.Params(

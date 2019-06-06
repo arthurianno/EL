@@ -16,4 +16,8 @@ data class IllegalContainsCondition(val condition: Condition)
     : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
     "not supported for contains operation.")
 
+data class IllegalCountCondition(val condition: Condition)
+    : IllegalArgumentException("Passed condition ${condition::class.java.simpleName} " +
+    "not supported for count operation.")
+
 object AccessDeniedError : RuntimeException("Current user == null")

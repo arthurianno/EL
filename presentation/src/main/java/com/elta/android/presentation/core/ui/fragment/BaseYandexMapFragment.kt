@@ -25,18 +25,10 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
     protected var mapView: MapView? = null
     protected var map: Map? = null
 
-    protected abstract val selectedPinRes: Int
-    protected abstract val normalPinRes: Int
     protected abstract val userLocationPinRes: Int
 
     private val myLocationImageProvider by lazy {
         ImageProvider.fromResource(activity, userLocationPinRes)
-    }
-    private val simplePinImageProvider by lazy {
-        ImageProvider.fromResource(activity, normalPinRes)
-    }
-    private val selectedPinImageProvider by lazy {
-        ImageProvider.fromResource(activity, selectedPinRes)
     }
     private val mapObjects by lazy { map?.mapObjects?.addCollection() }
     private var userLocationMapObject: MapObject? = null
@@ -89,7 +81,6 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
 
     fun addPins(points: List<GeoPoint>) {
         points.forEach { drawPinObject(it) }
-        points.find { it.selected }?.let { setSelectedPin(it) }
     }
 
     fun selectPin(geoPoint: GeoPoint) {
@@ -111,14 +102,17 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
                 pinObjects.remove(geoPoint)
             }
         }
-        val mapObject = mapObjects?.addPlacemark(
-            geoPoint.toPoint(),
-            when (geoPoint.selected) {
-                true -> selectedPinImageProvider
-                else -> simplePinImageProvider
-            })
-        mapObject?.userData = geoPoint
-        pinObjects[geoPoint] = mapObject
+
+        geoPoint.icon?.let { icon ->
+            val imageProvider = when (geoPoint.selected) {
+                true -> ImageProvider.fromResource(activity, icon.selected)
+                else -> ImageProvider.fromResource(activity, icon.normal)
+            }
+
+            val mapObject = mapObjects?.addPlacemark(geoPoint.toPoint(), imageProvider)
+            mapObject?.userData = geoPoint
+            pinObjects[geoPoint] = mapObject
+        }
     }
 
     private fun clearAllPins() {

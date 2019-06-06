@@ -3,7 +3,6 @@ package com.elta.android.data.features.diary.tags.mapper
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
-import com.nullgr.core.date.dateFromTimestamp
 import javax.inject.Inject
 
 class TagToCacheMapper @Inject constructor() : Mapper<TagDto, TagCachedDto> {
@@ -16,7 +15,7 @@ class TagToCacheMapper @Inject constructor() : Mapper<TagDto, TagCachedDto> {
                 name = name,
                 image = image.name,
                 isReadOnly = isReadOnly,
-                modificationTime = modificationTime?.dateFromTimestamp(),
+                modificationTime = modificationTime,
                 state = state.name
             )
         }

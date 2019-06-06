@@ -8,13 +8,13 @@ import android.graphics.drawable.ColorDrawable
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.animation.LinearOutSlowInInterpolator
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.PopupWindow
 import com.elta.android.presentation.R
+import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.spinner.adapter.SpinnerDelegatesFactory
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import com.jakewharton.rxrelay2.PublishRelay
@@ -61,7 +61,7 @@ class SpinnerView @JvmOverloads constructor(
         }
 
         popupContainerView.adapter = adapter
-        popupContainerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        popupContainerView.layoutManager = FixedLinearLayoutManager(context)
 
         isArrowVisible = typedArray.getBoolean(R.styleable.SpinnerView_showArrow, true)
         spinnerArrowView.toggleView(isArrowVisible)
@@ -93,7 +93,7 @@ class SpinnerView @JvmOverloads constructor(
     fun spinnerClicks(): Observable<ListItem> = spinnerClicks.hide()
 
     fun attachDataList(list: List<SpinnerItem>) {
-        adapter.updateData(list)
+        adapter.updateData(list, false)
     }
 
     fun setTitle(title: String) {

@@ -63,7 +63,6 @@ dependencies {
     implementation commonDependencies.appCoreSecurity
     implementation commonDependencies.appCoreHardware
     implementation commonDependencies.appCoreIntents
-    implementation commonDependencies.appCoreDate
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxNetwork
@@ -92,6 +91,7 @@ dependencies {
     implementation commonDependencies.ok
 
     implementation commonDependencies.objectbox
+    implementation commonDependencies.jsr310
 
     implementation commonDependencies.nordicScanner
     implementation commonDependencies.nordicDfu

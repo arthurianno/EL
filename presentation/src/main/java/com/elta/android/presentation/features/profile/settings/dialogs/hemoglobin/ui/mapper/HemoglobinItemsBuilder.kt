@@ -1,13 +1,13 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.mapper
 
+import com.elta.android.common.utils.CommonFormats
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.items.HemoglobinHeaderItem
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.items.HemoglobinItem
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.date.CommonFormats
-import com.nullgr.core.date.toStringWithFormat
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 

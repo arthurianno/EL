@@ -1,6 +1,7 @@
 package com.elta.android.data.features.devices.mapper
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.utils.toIsoDate
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
@@ -12,8 +13,8 @@ class GlucometerInfoFromCacheMapper @Inject constructor() : Mapper<GlucometerInf
         with(source) {
             GlucometerInfoDto(
                 id = secondaryId,
-                deviceDate = deviceDate,
-                syncDate = syncDate,
+                deviceDate = deviceDate?.toIsoDate(),
+                syncDate = syncDate?.toIsoDate(),
                 temperature = temperature,
                 batteryLevel = batteryLevel,
                 version = VersionDto(

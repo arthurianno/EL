@@ -1,8 +1,8 @@
 package com.elta.android.data.features.devices.glucometer
 
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
-import com.nullgr.core.date.toStringWithFormat
-import java.util.Date
+import org.threeten.bp.ZonedDateTime
 
 object Commands {
     object Reset : GlucometerCommand {
@@ -37,7 +37,7 @@ object Commands {
         override fun toGlucometerString(): String = "find"
     }
 
-    data class SetTime(val date: Date) : GlucometerCommand {
+    data class SetTime(val date: ZonedDateTime) : GlucometerCommand {
         override fun toGlucometerString(): String = "settime.${date.toStringWithFormat("yyMMddHHmmss")}"
     }
 
