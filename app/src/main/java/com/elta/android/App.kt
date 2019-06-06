@@ -11,7 +11,6 @@ import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
-import com.elta.android.presentation.jobs.factory.JobInjectorFactory
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector

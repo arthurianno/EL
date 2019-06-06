@@ -2,38 +2,14 @@ package com.elta.android.presentation.jobs
 
 import android.app.AlarmManager
 import android.content.Context
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.RxWorker
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
 import com.elta.android.common.utils.toMillis
-import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
-import com.elta.android.domain.features.reminder.interactor.GetReminderByIdUseCase
-import com.elta.android.domain.features.reminder.interactor.UpdateReminderUseCase
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.features.profile.settings.reminders.utils.getCancelPendingIntent
 import com.elta.android.presentation.features.profile.settings.reminders.utils.toPendingIntent
-import com.elta.android.presentation.utils.dayOfMonth
-import com.elta.android.presentation.utils.hourOfDay
-import com.elta.android.presentation.utils.minute
-import com.elta.android.presentation.utils.month
-import com.elta.android.presentation.utils.toCalendar
-import com.elta.android.presentation.utils.year
-import timber.log.Timber
-import java.util.Calendar
-import com.elta.android.presentation.Events
-import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.event
-import com.elta.android.presentation.core.notification.NotificationSource
-import com.elta.android.presentation.jobs.factory.JobFactory
-import com.nullgr.core.rx.RxBus
-import io.reactivex.Single
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
-import java.util.concurrent.TimeUnit
+import timber.log.Timber
 import javax.inject.Inject
 
 @Suppress("MagicNumber")
@@ -46,7 +22,7 @@ class ReminderWorker @Inject constructor(
     fun addReminder(reminder: Reminder) {
         Timber.tag("Reminder").d("add ${reminder.title}")
         val pi = reminder.toPendingIntent(context)
-        manager.setExact(AlarmManager.RTC_WAKEUP, reminder.time.time, pi)
+        manager.setExact(AlarmManager.RTC_WAKEUP, reminder.time.toMillis(), pi)
     }
 
     fun updateReminder(reminder: Reminder) {

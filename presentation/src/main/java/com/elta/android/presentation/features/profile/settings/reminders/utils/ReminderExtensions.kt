@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
+import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
-import java.util.Date
 
 private const val ID = "com.elta.android.reminder_id"
 private const val TIME = "com.elta.android.reminder_time"
@@ -44,7 +44,7 @@ fun Reminder.getIntent(context: Context) =
 fun Intent.getReminder(): Reminder =
     Reminder(
         id = getStringExtra(ID),
-        time = getSerializableExtra(TIME) as Date,
+        time = getSerializableExtra(TIME) as ZonedDateTime,
         title = getStringExtra(TITLE),
         scheduleType = getSerializableExtra(TYPE) as ScheduleType
     )
