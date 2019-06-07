@@ -6,7 +6,6 @@ import com.elta.android.common.utils.toStringWithFormat
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
-import timber.log.Timber
 
 const val TO_PATTERN = "yyMMddHHmmss"
 const val FROM_PATTERN = "yyyyMMddHHmmss"
@@ -27,15 +26,8 @@ const val FROM_PATTERN = "yyyyMMddHHmmss"
  * Use #toStorageDateTime function
  */
 
-inline fun ZonedDateTime.toGlucometerDateTime() = toDateTimeUtc().toStringWithFormat(TO_PATTERN).also {
-    Timber.tag("TimeZone").d("toGlucometerDateTime: $it")
-}
+inline fun ZonedDateTime.toGlucometerDateTime() = toDateTimeUtc().toStringWithFormat(TO_PATTERN)
 
-inline fun String.fromGlucometerDateTime() = ZonedDateTime.of("20$this".toLocalDateTime(FROM_PATTERN), ZoneOffset.UTC).also {
-    Timber.tag("TimeZone").d("fromGlucometerDateTime: $it")
-}
+inline fun String.fromGlucometerDateTime() = ZonedDateTime.of("20$this".toLocalDateTime(FROM_PATTERN), ZoneOffset.UTC)
 
-inline fun ZonedDateTime.toStorageDateTime() =
-    this.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault()).also {
-        Timber.tag("TimeZone").d("fromGlucometerDateTimeToStorageDateTime: $it")
-    }
+inline fun ZonedDateTime.toStorageDateTime() = this.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault())
