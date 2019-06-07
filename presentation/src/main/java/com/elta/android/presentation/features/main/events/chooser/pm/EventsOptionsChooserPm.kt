@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
-import com.elta.android.common.utils.log
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
