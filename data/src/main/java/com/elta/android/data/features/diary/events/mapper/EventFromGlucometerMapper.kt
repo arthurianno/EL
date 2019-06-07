@@ -1,7 +1,6 @@
 package com.elta.android.data.features.diary.events.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.glucometer.toStorageDateTime
 import com.elta.android.domain.features.diary.events.model.Event
@@ -21,7 +20,7 @@ class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDt
                 tagId = null,
                 tag = null,
                 note = null,
-                modificationTime = checkNotNull(date).toMillisUtc(),
+                modificationTime = null,
                 value = value,
                 kind = null,
                 name = null,

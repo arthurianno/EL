@@ -1,7 +1,6 @@
 package com.elta.android.data.features.googlefit.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.common.utils.toZonedDateTime
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.googlefit.dto.ActivityDto
@@ -24,7 +23,7 @@ class ActivityDtoToEventMapper @Inject constructor(
             tagId = null,
             tag = null,
             note = null,
-            modificationTime = source.additionTime.toZonedDateTime().toMillisUtc(),
+            modificationTime = null,
             value = null,
             name = null,
             kind = null,

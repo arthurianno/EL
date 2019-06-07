@@ -134,7 +134,6 @@ class EditEventPm @Inject constructor(
                 name = form.name,
                 duration = form.duration,
                 additionTime = checkNotNull(form.date),
-                modificationTime = ZonedDateTime.now().toMillisUtc(),
                 tagId = form.tag?.id,
                 tag = form.tag,
                 activityType = form.activityType,
