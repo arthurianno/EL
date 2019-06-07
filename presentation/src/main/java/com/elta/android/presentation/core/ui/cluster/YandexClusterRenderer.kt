@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package com.elta.android.presentation.core.ui.cluster
 
 import android.animation.Animator
@@ -245,24 +247,24 @@ class YandexClusterRenderer(
     }
 
     private fun needAnimateTransition(start: LatLng, end: LatLng): Boolean =
-        !yandexRenderConfig.optimizeAnimations
-            || pointInVisibleRegion(start)
-            || pointInVisibleRegion(end)
+        !yandexRenderConfig.optimizeAnimations ||
+            pointInVisibleRegion(start) ||
+            pointInVisibleRegion(end)
 
     private fun pointInVisibleRegion(point: LatLng): Boolean {
         val minLongitude = map.visibleRegion.topLeft.longitude
         val maxLongitude = map.visibleRegion.topRight.longitude
         val minLatitude = map.visibleRegion.bottomLeft.latitude
         val maxLatitude = map.visibleRegion.topLeft.latitude
-        return point.longitude in minLongitude..maxLongitude
-            && point.latitude in minLatitude..maxLatitude
+        return point.longitude in minLongitude..maxLongitude &&
+            point.latitude in minLatitude..maxLatitude
     }
 
     private fun clustersChanged(newClusters: Set<Cluster>): Boolean {
         val currentClustersCount = clusterCount(currentClusters)
         val newClusterCount = clusterCount(newClusters)
-        return currentClustersCount != newClusterCount
-            || pinCount(currentClusters) != pinCount(newClusters)
+        return currentClustersCount != newClusterCount ||
+            pinCount(currentClusters) != pinCount(newClusters)
     }
 
     private fun pinCount(clusters: Set<Cluster>): Int =

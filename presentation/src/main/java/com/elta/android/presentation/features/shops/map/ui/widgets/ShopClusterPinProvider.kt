@@ -58,11 +58,11 @@ class ShopClusterPinProvider(private val context: Context) : ClusterPinProvider 
     }
 
     private fun createClusterProvider(type: PinProviderType): YandexPinProvider {
-        val size = clusterView.setText(type.size.toString()).toFloat()
+        clusterView.setText(type.size.toString())
         val provider = YandexPinProvider.from(
             ImageProvider.fromBitmap(
                 clusterView.getBitmapFromView(
-                    size
+                    clusterView.getPinSize()
                 )
             )
         )

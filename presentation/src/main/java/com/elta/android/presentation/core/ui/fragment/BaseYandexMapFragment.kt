@@ -7,7 +7,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import com.a65apps.clustering.core.Cluster
 import com.a65apps.clustering.core.VisibleRect
 import com.a65apps.clustering.core.algorithm.DefaultAlgorithmParameter
-import com.a65apps.clustering.core.algorithm.NonHierarchicalViewBasedAlgorithm
 import com.a65apps.clustering.yandex.extention.toLatLng
 import com.a65apps.clustering.yandex.view.ClusterPinProvider
 import com.a65apps.clustering.yandex.view.TapListener
@@ -16,6 +15,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.ui.cluster.GeoPointClusterProvider
+import com.elta.android.presentation.core.ui.cluster.ViewBasedGridAlgorithm
 import com.elta.android.presentation.core.ui.cluster.YandexClusterManager
 import com.elta.android.presentation.core.ui.cluster.YandexClusterRenderer
 import com.elta.android.presentation.utils.toPoint
@@ -134,7 +134,7 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
             )
             clusterManager = YandexClusterManager(
                 renderer,
-                NonHierarchicalViewBasedAlgorithm(GeoPointClusterProvider()),
+                ViewBasedGridAlgorithm(GeoPointClusterProvider()),
                 parameter
             )
             clusterManager?.let { m.addCameraListener(it) }
@@ -152,8 +152,8 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
 
     private fun processPinSelection(selectedPoint: GeoPoint?, isMoveToPin: Boolean = true) {
         val previousSelectedPoint = getSelectedGeoPoint()
-        if (previousSelectedPoint == selectedPoint
-            && previousSelectedPoint?.selected == selectedPoint?.selected) return
+        if (previousSelectedPoint == selectedPoint &&
+            previousSelectedPoint?.selected == selectedPoint?.selected) return
         previousSelectedPoint?.let {
             it.selected = false
             drawPinObject(it)

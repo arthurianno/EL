@@ -53,12 +53,14 @@ class ShopClusterPinView @JvmOverloads constructor(
         }
     }
 
-    fun setText(text: String): Int {
+    fun setText(text: String) {
         this.text = text
-        return getLargestSide(text)
+        computeLargestSide(text)
     }
 
-    private fun getLargestSide(text: String): Int {
+    fun getPinSize(): Float = sideSize.toFloat()
+
+    private fun computeLargestSide(text: String): Int {
         countTextPaint.getTextBounds(text, 0, text.length, bounds)
         val textWidth = bounds.right - bounds.left
         textHeight = bounds.bottom - bounds.top
@@ -96,9 +98,9 @@ class ShopClusterPinView @JvmOverloads constructor(
     }
 
     private companion object {
-        private const val BG_SECONDARY_MARGIN = 3f //dp
-        private const val TEXT_PADDING = 6f //dp
-        private const val TEXT_SIZE = 15f //sp
+        private const val BG_SECONDARY_MARGIN = 3f // dp
+        private const val TEXT_PADDING = 6f // dp
+        private const val TEXT_SIZE = 15f // sp
         private const val TYPEFACE_MEDIUM = "roboto_medium.ttf"
     }
 }
