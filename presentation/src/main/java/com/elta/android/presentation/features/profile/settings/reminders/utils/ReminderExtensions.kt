@@ -3,48 +3,50 @@ package com.elta.android.presentation.features.profile.settings.reminders.utils
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.elta.android.common.utils.toIsoDate
+import com.elta.android.common.utils.toIsoString
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
-import org.threeten.bp.ZonedDateTime
-import timber.log.Timber
+
+const val ACTION_NOTIFICATION = "com.elta.android.reminder.NOTIFICATION"
+const val ACTION_CANCEL = "com.elta.android.reminder.CANCEL"
 
 private const val ID = "com.elta.android.reminder_id"
 private const val TIME = "com.elta.android.reminder_time"
 private const val TITLE = "com.elta.android.reminder_title"
 private const val TYPE = "com.elta.android.reminder_type"
 
-fun Reminder.toPendingIntent(context: Context): PendingIntent =
+fun Reminder.getPendingIntent(context: Context): PendingIntent =
     PendingIntent.getBroadcast(
-        context,
+        context.applicationContext,
         id.hashCode(),
-        getIntent(context),
+        getIntent(context.applicationContext),
         PendingIntent.FLAG_UPDATE_CURRENT
-    ).also {
-        Timber.tag("Reminder").d(it.toString())
-    }
+    )
 
 fun getCancelPendingIntent(context: Context, id: String): PendingIntent =
     PendingIntent.getBroadcast(
         context,
         id.hashCode(),
-        Intent(context, ReminderNotificationReceiver::class.java),
+        Intent(context, ReminderNotificationReceiver::class.java).apply {
+            action = ACTION_CANCEL
+        },
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 
 fun Reminder.getIntent(context: Context) =
     Intent(context, ReminderNotificationReceiver::class.java).apply {
+        action = "$ACTION_NOTIFICATION$id"
         putExtra(ID, id)
-        putExtra(TIME, time)
+        putExtra(TIME, date.toIsoString())
         putExtra(TITLE, title)
-        putExtra(TYPE, scheduleType)
-    }.also {
-        Timber.tag("Reminder").d(it.extras.toString())
+        putExtra(TYPE, scheduleType.name)
     }
 
 fun Intent.getReminder(): Reminder =
     Reminder(
         id = getStringExtra(ID),
-        time = getSerializableExtra(TIME) as ZonedDateTime,
+        date = getStringExtra(TIME).toIsoDate(),
         title = getStringExtra(TITLE),
-        scheduleType = getSerializableExtra(TYPE) as ScheduleType
+        scheduleType = getStringExtra(TYPE).let { ScheduleType.valueOf(it) }
     )

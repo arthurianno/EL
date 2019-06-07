@@ -3,19 +3,19 @@ package com.elta.android.presentation.features.profile.settings.reminders.utils
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.elta.android.presentation.Events
-import com.elta.android.presentation.core.bus.event
-import com.nullgr.core.rx.RxBus
+import com.elta.android.presentation.jobs.RemindersManager
 import dagger.android.AndroidInjection
+import timber.log.Timber
 import javax.inject.Inject
 
-class ReminderBootReceiver : BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var bus: RxBus
+    lateinit var remindersManager: RemindersManager
 
     override fun onReceive(context: Context?, intent: Intent?) {
         AndroidInjection.inject(this, context)
-        bus.event(Events.BootCompleted)
+        Timber.tag("Reminder").d("receiver: Events.BootCompleted")
+        remindersManager.bootComplete()
     }
 }

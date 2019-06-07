@@ -14,7 +14,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
-import com.elta.android.presentation.jobs.ReminderWorker
+import com.elta.android.presentation.jobs.RemindersManager
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
@@ -25,9 +25,9 @@ class EditRemindPm @Inject constructor(
     private val deleteReminderUseCase: DeleteReminderUseCase,
     private val getReminderByIdUseCase: GetReminderByIdUseCase,
     private val updateReminderUseCase: UpdateReminderUseCase,
-    reminderWorker: ReminderWorker,
+    remindersManager: RemindersManager,
     services: ServiceFacade
-) : BaseRemindPm(reminderWorker, services) {
+) : BaseRemindPm(remindersManager, services) {
 
     val deleteRemindAction = Action<Unit>()
     val deleteRemindDialogControl = dialogControl<DialogData, DialogResult>()
@@ -56,7 +56,7 @@ class EditRemindPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess { id ->
-                        remindersWorker.cancelReminder(id)
+                        remindersManager.cancelReminder(id)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleDeleted)
@@ -74,8 +74,8 @@ class EditRemindPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnSuccess { id ->
-                        remindersWorker.cancelReminder(id)
-                        remindersWorker.addReminder(reminderState.value)
+                        remindersManager.cancelReminder(id)
+                        remindersManager.addReminder(reminderState.value)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)
@@ -170,7 +170,7 @@ class EditRemindPm @Inject constructor(
         return UpdateReminderUseCase.Params(
             reminderState.value.copy(
                 title = checkNotNull(form.inputValue),
-                time = checkNotNull(form.date),
+                date = checkNotNull(form.date),
                 scheduleType = checkNotNull(form.schedule)
             )
         )
@@ -178,7 +178,7 @@ class EditRemindPm @Inject constructor(
 
     private fun bindReminder(reminder: Reminder) {
         formInput.text.consumer.accept(reminder.title)
-        dateTimeSelectedAction.consumer.accept(reminder.time)
+        dateTimeSelectedAction.consumer.accept(reminder.date)
         defaultScheduleState.consumer.accept(reminder.scheduleType.toString(resources))
         selectedScheduleAction.consumer.accept(SpinnerItem(reminder.scheduleType))
     }

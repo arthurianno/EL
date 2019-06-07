@@ -7,7 +7,7 @@ import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
-import com.elta.android.presentation.jobs.ReminderWorker
+import com.elta.android.presentation.jobs.RemindersManager
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
@@ -16,9 +16,9 @@ import javax.inject.Inject
 
 class CreateRemindPm @Inject constructor(
     private val addNewReminderUseCase: AddNewReminderUseCase,
-    reminderWorker: ReminderWorker,
+    remindersManager: RemindersManager,
     services: ServiceFacade
-) : BaseRemindPm(reminderWorker, services) {
+) : BaseRemindPm(remindersManager, services) {
 
     private val isFormNotEmptyState = State(false)
 
@@ -33,7 +33,7 @@ class CreateRemindPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .trackEvent(AnalyticsEventType.REMINDER_ADD)
-                    .doOnSuccess { remindersWorker.addReminder(params.reminder) }
+                    .doOnSuccess { remindersManager.addReminder(params.reminder) }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
@@ -96,7 +96,7 @@ class CreateRemindPm @Inject constructor(
             Reminder(
                 id = UUID.randomUUID().toString(),
                 title = checkNotNull(form.inputValue),
-                time = checkNotNull(form.date),
+                date = checkNotNull(form.date),
                 scheduleType = checkNotNull(form.schedule)
             )
         )

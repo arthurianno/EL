@@ -5,6 +5,6 @@ import org.threeten.bp.ZonedDateTime
 data class Reminder(
     val id: String,
     val title: String,
-    var time: ZonedDateTime,
+    val date: ZonedDateTime,
     val scheduleType: ScheduleType
 )
