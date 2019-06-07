@@ -87,14 +87,14 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
     fun moveTo(
         location: Point,
         zoom: Float? = null,
-        duration: Float? = null,
-        updateSelection: Boolean = false
+        duration: Float? = null
     ) {
         val finalZoom = zoom ?: DEFAULT_ZOOM
         map?.move(
             CameraPosition(location, finalZoom, AZIMUT, TILT),
-            Animation(Animation.Type.SMOOTH, duration ?: PIN_ANIMATION_DURATION)
-        ) { if (updateSelection) moveToUpdateSelectionPin(location, finalZoom) }
+            Animation(Animation.Type.SMOOTH, duration ?: PIN_ANIMATION_DURATION),
+            null
+        )
     }
 
     fun addMyLocationPin(location: Location) {
@@ -142,7 +142,6 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
     }
 
     private fun drawPinObject(geoPoint: GeoPoint) {
-        clusterManager?.removeItem(geoPoint)
         geoPoint.icon?.let { clusterManager?.addItem(geoPoint) }
     }
 
@@ -169,30 +168,20 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
     private fun setSelectedPin(geoPoint: GeoPoint, isMoveToPin: Boolean) {
         selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
-        if (isMoveToPin) moveTo(location = geoPoint.toPoint(), updateSelection = true)
+        if (isMoveToPin) moveTo(location = geoPoint.toPoint())
     }
 
     private fun getSelectedGeoPoint() = selectedObjectRelay.value
-
-    private fun moveToUpdateSelectionPin(location: Point, finalZoom: Float) {
-        moveTo(
-            location,
-            finalZoom + PIN_SELECTION_ZOOM,
-            PIN_ANIMATION_SELECTION_DURATION
-        )
-    }
 
     private fun increaseCLusterZoom() =
         (map?.cameraPosition?.zoom ?: DEFAULT_ZOOM) + ZOOM_INCREASE_VALUE
 
     companion object {
-        private const val DEFAULT_ZOOM = 14f
-        private const val PIN_SELECTION_ZOOM = 1f
+        private const val DEFAULT_ZOOM = 15f
         private const val ZOOM_INCREASE_VALUE = 1f
         private const val AZIMUT = 0f
         private const val TILT = 0f
         private const val PIN_ANIMATION_DURATION = 3f
-        private const val PIN_ANIMATION_SELECTION_DURATION = 1f
         private const val CLUSTER_ANIMATION_DURATION = 1f
     }
 }
