@@ -14,6 +14,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
@@ -84,6 +85,7 @@ class EventsOptionsChooserPm @Inject constructor(
                 if (it.id == selectedItemIdState.value) NONE_ID
                 else it.id
             }
+            .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
             .subscribe()
             .untilDestroy()
@@ -169,5 +171,6 @@ class EventsOptionsChooserPm @Inject constructor(
 
     companion object {
         private const val NONE_ID = "none_id"
+        private const val CLICK_DELAY = 100L // millis
     }
 }
