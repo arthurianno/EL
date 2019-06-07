@@ -20,7 +20,7 @@ const val FROM_PATTERN = "yyyyMMddHHmmss"
  * Use #toGlucometerDateTime function to convert #ZonedDateTime to format acceptable by glucometer.
  *
  * Second is to create #ZonedDateTime from event response. As glucometer return events
- * with time in UTC without any information about offset add offset information manually.
+ * with time in UTC without any information about offset add offset information and extra time manually.
  * Use #fromGlucometerDateTime function.
  *
  * Third is to convert date from second step to date that will be stored in database.
@@ -36,6 +36,6 @@ inline fun String.fromGlucometerDateTime() = ZonedDateTime.of("20$this".toLocalD
 }
 
 inline fun ZonedDateTime.toStorageDateTime() =
-    this.toOffsetDateTime().toLocalDateTime().atZone(ZoneId.systemDefault()).also {
+    this.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault()).also {
         Timber.tag("TimeZone").d("fromGlucometerDateTimeToStorageDateTime: $it")
     }
