@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
+import com.elta.android.common.utils.log
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -14,6 +15,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
@@ -74,6 +76,7 @@ class EventsOptionsChooserPm @Inject constructor(
         selectedItemIdState.observable
             .skip(1)
             .doOnNext(::performSelection)
+            .log("Perform selection ")
             .map { it != NONE_ID && it != previousSelectionState.valueOrNull }
             .doOnNext(confirmButtonVisibilityCommand.consumer)
             .subscribe()
@@ -84,6 +87,7 @@ class EventsOptionsChooserPm @Inject constructor(
                 if (it.id == selectedItemIdState.value) NONE_ID
                 else it.id
             }
+            .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
             .subscribe()
             .untilDestroy()
@@ -169,5 +173,6 @@ class EventsOptionsChooserPm @Inject constructor(
 
     companion object {
         private const val NONE_ID = "none_id"
+        private const val CLICK_DELAY = 100L // millis
     }
 }
