@@ -76,7 +76,6 @@ class EventsOptionsChooserPm @Inject constructor(
         selectedItemIdState.observable
             .skip(1)
             .doOnNext(::performSelection)
-            .log("Perform selection ")
             .map { it != NONE_ID && it != previousSelectionState.valueOrNull }
             .doOnNext(confirmButtonVisibilityCommand.consumer)
             .subscribe()
