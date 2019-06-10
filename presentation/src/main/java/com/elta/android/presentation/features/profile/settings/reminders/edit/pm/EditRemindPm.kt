@@ -75,7 +75,7 @@ class EditRemindPm @Inject constructor(
                     .bindProgress()
                     .doOnSuccess { id ->
                         remindersManager.cancelReminder(id)
-                        remindersManager.addReminder(reminderState.value)
+                        remindersManager.addReminder(params.reminder)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)

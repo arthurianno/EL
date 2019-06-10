@@ -29,7 +29,7 @@ fun getCancelPendingIntent(context: Context, id: String): PendingIntent =
         context,
         id.hashCode(),
         Intent(context, ReminderCallbackReceiver::class.java).apply {
-            action = ACTION_CANCEL
+            action = "$ACTION_CANCEL$id"
         },
         PendingIntent.FLAG_UPDATE_CURRENT
     )
