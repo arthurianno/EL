@@ -17,6 +17,7 @@ import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
+import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.devices.cache.GlucometersConditions
 import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
@@ -26,6 +27,7 @@ import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -53,6 +55,8 @@ class GlucometersManager @Inject constructor(
     private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
     private val glucometerFromCacheMapper: Mapper<GlucometerCachedDto, GlucometerDto>,
     private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
+    private val userHolder: UserHolder,
+    private val profileCache: Cache<ProfileCacheDto>,
     private val eventsCache: Cache<EventCachedDto>,
     private val glucometersCache: Cache<GlucometerCachedDto>,
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
@@ -149,7 +153,15 @@ class GlucometersManager @Inject constructor(
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!isPotentialLastEvent(response)) responses.add(response)
             }
-            .map { it.map { response -> eventBuilder.buildFrom(address, response) } }
+            .map { events ->
+                userHolder.currentUser?.let { id ->
+                    profileCache.get(CommonConditions.ById(id))?.let { profile ->
+                        profile.email?.let { userId ->
+                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                        }
+                    }
+                } ?: emptyList()
+            }
 
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
         client.findConnection(device.address)
@@ -397,7 +409,15 @@ class GlucometersManager @Inject constructor(
             .take(1)
             .doOnNext { holder -> updateGlucometerInfo(address, holder.info) }
             .map(SyncResponseHolder::events)
-            .map { events -> events.map { event -> eventBuilder.buildFrom(address, event) } }
+            .map { events ->
+                userHolder.currentUser?.let { id ->
+                    profileCache.get(CommonConditions.ById(id))?.let { profile ->
+                        profile.email?.let { userId ->
+                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                        }
+                    }
+                } ?: emptyList()
+            }
             .map { events -> filterExistingEvents(events, getCachedEvents(events)) }
             .flatMap {
                 if (it.isEmpty()) Observable.empty()
