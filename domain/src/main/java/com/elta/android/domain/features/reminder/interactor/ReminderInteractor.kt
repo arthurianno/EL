@@ -40,8 +40,5 @@ inline fun getNextReminderDate(type: ScheduleType, reminderDate: ZonedDateTime, 
 inline fun getNextReminder(reminder: Reminder): Reminder? =
     getNextReminderDate(reminder.scheduleType, reminder.date, ZonedDateTime.now())?.let { reminder.copy(date = it) }
 
-inline fun Reminder.isNeedToUpdate(): Boolean =
-    date.isBefore(ZonedDateTime.now()) && scheduleType != ScheduleType.NONE
-
 inline fun Reminder.isInThePast(): Boolean = date.isBefore(ZonedDateTime.now())
 inline fun Reminder.isOneTime(): Boolean = scheduleType == ScheduleType.NONE
