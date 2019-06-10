@@ -50,6 +50,12 @@ class AuthDataRepository @Inject constructor(
                 when (isConfirmed) {
                     true -> Single.just(isConfirmed)
                     else -> source.isEmailConfirmed()
+                        .flatMap { email ->
+                            Completable
+                                .fromAction { tokenStorage.refresh() }
+                                .toSingleDefault(email)
+
+                        }
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
                         .flatMap {
