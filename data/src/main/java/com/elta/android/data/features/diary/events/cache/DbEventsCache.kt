@@ -1,12 +1,13 @@
 package com.elta.android.data.features.diary.events.cache
 
-import com.elta.android.common.utils.toMillis
 import com.elta.android.data.features.common.cache.BoxCache
 import com.elta.android.data.features.common.cache.BoxStoreFactory
+import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto_
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.extensions.toQueryMillis
 import io.objectbox.kotlin.query
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
@@ -24,9 +25,15 @@ class DbEventsCache @Inject constructor(
             else -> super.getAll(condition)
         }
 
+    override fun contains(condition: Condition): Boolean =
+        when (condition) {
+            is CommonConditions.ById -> containsById(condition.id)
+            else -> super.contains(condition)
+        }
+
     private fun getAllForPeriod(start: LocalDateTime, end: LocalDateTime): List<EventCachedDto> =
         box.query {
-            between(EventCachedDto_.additionTime, start.toMillis(), end.toMillis())
+            between(EventCachedDto_.additionTime, start.toQueryMillis(), end.toQueryMillis())
         }.find()
 
     private fun getAllByTypeAndIds(type: EventTypeDto, ids: LongArray): List<EventCachedDto> =
@@ -35,4 +42,9 @@ class DbEventsCache @Inject constructor(
             and()
             `in`(EventCachedDto_.id, ids)
         }.find()
+
+    private fun containsById(id: Long): Boolean =
+        box.query {
+            equal(EventCachedDto_.id, id)
+        }.count() > 0
 }

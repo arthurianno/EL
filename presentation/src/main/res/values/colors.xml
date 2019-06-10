@@ -169,4 +169,9 @@
 
     <color name="chart_time_text_color">@color/shade_black1</color>
     <color name="chart_future_time_text_color">@color/shade_black2</color>
+
+    <!-- CLUSTER -->
+    <color name="cluster_background_primary">#4c4580d4</color>
+    <color name="cluster_background_secondary">@color/blue</color>
+
 </resources>

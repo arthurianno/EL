@@ -35,6 +35,7 @@ class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
         pm.unlinkNetworkDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.googleFitActivatedDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.openPrivacyPolicyCommand.bindTo {
             childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
         }

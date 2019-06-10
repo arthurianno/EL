@@ -1,11 +1,13 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.builder
 
 import android.support.annotation.DrawableRes
+import com.elta.android.domain.features.user.interactor.googleFitApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
@@ -45,6 +47,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                 resources.getString(R.string.profile_notification), ProfileSettingsItem.Type.NOTIFICATION))
             add(createSettingsItem(R.drawable.ic_doc,
                 resources.getString(R.string.profile_legal_information), ProfileSettingsItem.Type.LEGAL_INFO))
+            createHealthAppItem(profile)?.let { add(it) }
             add(createSettingsItem(R.drawable.ic_app_info, resources.getString(R.string.profile_app_version,
                 BuildConfig.VERSION_NAME), ProfileSettingsItem.Type.APP_VERSION))
         }
@@ -72,6 +75,16 @@ class ProfileSettingsItemsBuilder @Inject constructor(
         }
         return socialNetworks
     }
+
+    private fun createHealthAppItem(profile: Profile): ListItem? =
+        profile.googleFitApp()?.let {
+            ProfileSettingsHealthAppItem(
+                icon = R.drawable.ic_google_fit,
+                title = resources.getString(R.string.profile_settings_google_fit),
+                isActive = it.isActive,
+                type = it.type
+            )
+        }
 
     private fun createSettingsSocialItem(
         @DrawableRes networkIcon: Int,

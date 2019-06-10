@@ -36,6 +36,7 @@ abstract class ParentAdapterDelegate(
     protected open fun createOrGetAdapter(item: ListItem): DynamicAdapter = adapters[item.getUniqueProperty()]
         ?: DynamicAdapter(factory).also { adapters[item.getUniqueProperty()] = it }
 
-    protected open fun createOrGetCompositeDisposable(item: ListItem): CompositeDisposable = disposables[item.getUniqueProperty()]
-        ?: CompositeDisposable().also { disposables[item.getUniqueProperty()] = it }
+    protected open fun createOrGetCompositeDisposable(item: ListItem): CompositeDisposable =
+        disposables[item.getUniqueProperty()]
+            ?: CompositeDisposable().also { disposables[item.getUniqueProperty()] = it }
 }

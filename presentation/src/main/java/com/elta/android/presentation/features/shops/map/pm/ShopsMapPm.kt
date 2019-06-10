@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
@@ -40,6 +41,7 @@ import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class ShopsMapPm @Inject constructor(
     private val rxLocationManager: RxLocationManagerFixed,
     private val searchSalePointsUseCase: SearchSalePointsUseCase,
@@ -48,7 +50,7 @@ class ShopsMapPm @Inject constructor(
 ) : BasePm(services) {
 
     val items = State<List<ListItem>>()
-    val geoPoints = State<List<GeoPoint>>()
+    val geoPoints = State<Pair<List<GeoPoint>, Int>>()
 
     val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
@@ -188,17 +190,18 @@ class ShopsMapPm @Inject constructor(
 
     private fun displayPoints(points: List<SalePoint>) {
         items.consumer.accept(points.map { it.toItem() })
-        geoPoints.consumer.accept(
-            points.mapIndexed { index, point ->
-                point.toGeoPoint().apply {
-                    selected = if (!selectedPointId.hasValue()) {
-                        index == 0
-                    } else {
-                        point.id == selectedPointId.value
-                    }
+        var selectedIndex = 0
+        val mappedPoints = points.mapIndexed { index, point ->
+            point.toGeoPoint().apply {
+                selected = if (!selectedPointId.hasValue()) {
+                    index == 0
+                } else {
+                    point.id == selectedPointId.value
                 }
+                if (selected) selectedIndex = index
             }
-        )
+        }
+        geoPoints.consumer.accept(mappedPoints to selectedIndex)
     }
 
     private fun bindShopSelectionBehaviour() {
@@ -334,7 +337,7 @@ class ShopsMapPm @Inject constructor(
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
-            return geoPoints.valueOrNull?.find { it.id == shopItem.id }?.also { it.selected = true }
+            return geoPoints.valueOrNull?.first?.find { it.id == shopItem.id }?.also { it.selected = true }
                 ?: emptyGeoPoint
         }
         return emptyGeoPoint

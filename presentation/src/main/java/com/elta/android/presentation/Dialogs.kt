@@ -85,4 +85,12 @@ sealed class Dialogs : DialogData {
                 else R.string.profile_delete_device_dialog_body
             )
     }
+
+    data class GoogleFitActivated(
+        val resources: ResourceProvider,
+        override val title: String = resources.getString(R.string.profile_google_fit_activated_title),
+        override val negative: String? = null,
+        override val positive: String = resources.getString(R.string.profile_google_fit_activated_positive_button),
+        override val message: String = resources.getString(R.string.profile_google_fit_activated_message)
+    ) : Dialogs()
 }

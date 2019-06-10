@@ -2,6 +2,8 @@ package com.elta.android.domain.features.user.interactor
 
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.user.model.HealthApp
+import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 
 private const val MAX_NAME_LENGTH = 50
@@ -35,3 +37,5 @@ fun isNameValid(firstName: String?, secondName: String?): Boolean {
     return firstName.isNotEmpty() && firstName.length < MAX_NAME_LENGTH ||
         secondName.isNotEmpty() && secondName.length < MAX_NAME_LENGTH
 }
+
+fun Profile.googleFitApp(): HealthApp? = healthApps?.find { it.type == HealthAppType.GOOGLE_FIT }

@@ -1,6 +1,5 @@
 package com.elta.android.data.features.devices.glucometer
 
-import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import org.threeten.bp.ZonedDateTime
 
@@ -38,7 +37,7 @@ object Commands {
     }
 
     data class SetTime(val date: ZonedDateTime) : GlucometerCommand {
-        override fun toGlucometerString(): String = "settime.${date.toStringWithFormat("yyMMddHHmmss")}"
+        override fun toGlucometerString(): String = "settime.${date.toGlucometerDateTime()}"
     }
 
     data class AddEvent(val event: Event) : GlucometerCommand {

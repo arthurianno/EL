@@ -12,5 +12,6 @@ data class Profile(
     val weight: Double? = null,
     val hba1cLevel: Double? = null,
     val socialNetworks: List<SocialNetwork>? = null,
+    val healthApps: List<HealthApp>? = null,
     val timeStamp: Long
 )

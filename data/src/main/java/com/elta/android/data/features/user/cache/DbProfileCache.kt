@@ -17,6 +17,16 @@ class DbProfileCache @Inject constructor(
 
     override val classToken: Class<ProfileCacheDto> = ProfileCacheDto::class.java
 
+    override fun add(objects: List<ProfileCacheDto>) {
+        processToMany(objects)
+        super.add(objects)
+    }
+
+    override fun update(objects: List<ProfileCacheDto>) {
+        processToMany(objects)
+        super.update(objects)
+    }
+
     override fun contains(condition: Condition): Boolean =
         when (condition) {
             is CommonConditions.ById -> containsById(condition.id)
@@ -26,4 +36,16 @@ class DbProfileCache @Inject constructor(
     private fun containsById(id: Long): Boolean = box.query {
         equal(ProfileCacheDto_.id, id)
     }.count() > 0
+
+    private fun processToMany(objects: List<ProfileCacheDto>) {
+        objects.forEach {
+            box.attach(it)
+            if (it.tempSocialNetworks.isNotEmpty()) {
+                it.socialNetworks.addAll(it.tempSocialNetworks)
+            }
+            if (it.tempHealthApps.isNotEmpty()) {
+                it.healthApps.addAll(it.tempHealthApps)
+            }
+        }
+    }
 }

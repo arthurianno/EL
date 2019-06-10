@@ -3,9 +3,21 @@ package com.elta.android.presentation.core.ui.fragment
 import android.location.Location
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.a65apps.clustering.core.Cluster
+import com.a65apps.clustering.core.VisibleRect
+import com.a65apps.clustering.core.algorithm.DefaultAlgorithmParameter
+import com.a65apps.clustering.yandex.extention.toLatLng
+import com.a65apps.clustering.yandex.view.ClusterPinProvider
+import com.a65apps.clustering.yandex.view.TapListener
+import com.a65apps.clustering.yandex.view.YandexRenderConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.core.ui.cluster.GeoPointClusterProvider
+import com.elta.android.presentation.core.ui.cluster.ViewBasedGridAlgorithm
+import com.elta.android.presentation.core.ui.cluster.YandexClusterManager
+import com.elta.android.presentation.core.ui.cluster.YandexClusterRenderer
 import com.elta.android.presentation.utils.toPoint
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.asConsumer
@@ -16,28 +28,41 @@ import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
-import com.yandex.mapkit.map.MapObjectTapListener
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
-abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListener where T : BasePm {
+abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
+
+    protected abstract val userLocationPinRes: Int
+    protected abstract val clusterPinProvider: ClusterPinProvider
 
     protected var mapView: MapView? = null
     protected var map: Map? = null
 
-    protected abstract val userLocationPinRes: Int
-
+    private var clusterManager: YandexClusterManager? = null
     private val myLocationImageProvider by lazy {
         ImageProvider.fromResource(activity, userLocationPinRes)
     }
     private val mapObjects by lazy { map?.mapObjects?.addCollection() }
     private var userLocationMapObject: MapObject? = null
-    private var pinObjects = hashMapOf<GeoPoint, MapObject?>()
     private val selectedObjectRelay = BehaviorRelay.create<GeoPoint>()
+
+    private val tapListener = object : TapListener {
+        override fun clusterTapped(cluster: Cluster, mapObject: PlacemarkMapObject) {
+            cluster as GeoPoint
+            if (cluster.size() == 1) {
+                processPinSelection(cluster)
+            } else {
+                moveTo(cluster.toPoint(), increaseCLusterZoom(), CLUSTER_ANIMATION_DURATION)
+            }
+        }
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         MapKitFactory.initialize(activity)
         super.onActivityCreated(savedInstanceState)
+        initClusterManager()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,7 +70,6 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         mapView = view.findViewById(R.id.yandexMapView)
         map = mapView?.map
         map?.isRotateGesturesEnabled = false
-        mapObjects?.addTapListener(this)
     }
 
     override fun onStart() {
@@ -60,10 +84,15 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         MapKitFactory.getInstance().onStop()
     }
 
-    fun moveTo(location: Point, zoom: Float? = null) {
+    fun moveTo(
+        location: Point,
+        zoom: Float? = null,
+        duration: Float? = null
+    ) {
+        val finalZoom = zoom ?: DEFAULT_ZOOM
         map?.move(
-            CameraPosition(location, zoom ?: DEFAULT_ZOOM, AZIMUT, TILT),
-            Animation(Animation.Type.SMOOTH, ANIMATION_DURATION),
+            CameraPosition(location, finalZoom, AZIMUT, TILT),
+            Animation(Animation.Type.SMOOTH, duration ?: PIN_ANIMATION_DURATION),
             null
         )
     }
@@ -80,50 +109,50 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
     }
 
     fun addPins(points: List<GeoPoint>) {
-        points.forEach { drawPinObject(it) }
+        clusterManager?.addItems(points.toSet())
     }
 
-    fun selectPin(geoPoint: GeoPoint) {
-        processPinSelection(geoPoint)
+    fun selectPin(geoPoint: GeoPoint, isMoveToPin: Boolean) {
+        processPinSelection(geoPoint, isMoveToPin)
     }
 
     fun pinClicks() = selectedObjectRelay.asObservable()
 
-    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
-        val selectedPoint = mapObject.userData as? GeoPoint
-        processPinSelection(selectedPoint)
-        return true
+    private fun initClusterManager() {
+        map?.let { m ->
+            val renderer = YandexClusterRenderer(
+                m,
+                clusterPinProvider,
+                YandexRenderConfig(interpolator = AccelerateDecelerateInterpolator()),
+                tapListener
+            )
+            val parameter = DefaultAlgorithmParameter(
+                VisibleRect(
+                    m.visibleRegion.topLeft.toLatLng(),
+                    m.visibleRegion.bottomRight.toLatLng()),
+                m.cameraPosition.zoom.toInt()
+            )
+            clusterManager = YandexClusterManager(
+                renderer,
+                ViewBasedGridAlgorithm(GeoPointClusterProvider()),
+                parameter
+            )
+            clusterManager?.let { m.addCameraListener(it) }
+        }
     }
 
     private fun drawPinObject(geoPoint: GeoPoint) {
-        if (geoPoint in pinObjects.keys) {
-            pinObjects[geoPoint]?.let {
-                mapObjects?.remove(it)
-                pinObjects.remove(geoPoint)
-            }
-        }
-
-        geoPoint.icon?.let { icon ->
-            val imageProvider = when (geoPoint.selected) {
-                true -> ImageProvider.fromResource(activity, icon.selected)
-                else -> ImageProvider.fromResource(activity, icon.normal)
-            }
-
-            val mapObject = mapObjects?.addPlacemark(geoPoint.toPoint(), imageProvider)
-            mapObject?.userData = geoPoint
-            pinObjects[geoPoint] = mapObject
-        }
+        geoPoint.icon?.let { clusterManager?.addItem(geoPoint) }
     }
 
     private fun clearAllPins() {
-        pinObjects.forEach { entry ->
-            entry.value?.let { mapObjects?.remove(it) }
-        }
-        pinObjects.clear()
+        clusterManager?.clearItems()
     }
 
-    private fun processPinSelection(selectedPoint: GeoPoint?) {
-        val previousSelectedPoint = selectedObjectRelay.value
+    private fun processPinSelection(selectedPoint: GeoPoint?, isMoveToPin: Boolean = true) {
+        val previousSelectedPoint = getSelectedGeoPoint()
+        if (previousSelectedPoint == selectedPoint &&
+            previousSelectedPoint?.selected == selectedPoint?.selected) return
         previousSelectedPoint?.let {
             it.selected = false
             drawPinObject(it)
@@ -131,21 +160,28 @@ abstract class BaseYandexMapFragment<T> : BaseFragment<T>(), MapObjectTapListene
         selectedPoint?.let {
             if (!it.isUserPoint) {
                 it.selected = true
-                setSelectedPin(it)
+                setSelectedPin(it, isMoveToPin)
             }
         }
     }
 
-    private fun setSelectedPin(geoPoint: GeoPoint) {
+    private fun setSelectedPin(geoPoint: GeoPoint, isMoveToPin: Boolean) {
         selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
-        moveTo(geoPoint.toPoint())
+        if (isMoveToPin) moveTo(location = geoPoint.toPoint())
     }
+
+    private fun getSelectedGeoPoint() = selectedObjectRelay.value
+
+    private fun increaseCLusterZoom() =
+        (map?.cameraPosition?.zoom ?: DEFAULT_ZOOM) + ZOOM_INCREASE_VALUE
 
     companion object {
         private const val DEFAULT_ZOOM = 15f
+        private const val ZOOM_INCREASE_VALUE = 1f
         private const val AZIMUT = 0f
         private const val TILT = 0f
-        private const val ANIMATION_DURATION = 3f
+        private const val PIN_ANIMATION_DURATION = 3f
+        private const val CLUSTER_ANIMATION_DURATION = 1f
     }
 }

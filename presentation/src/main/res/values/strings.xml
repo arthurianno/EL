@@ -410,6 +410,7 @@
     <string name="odnoklasniki">Odnoklasniki</string>
     <string name="profile_app_version">Версия приложения: %s</string>
     <string name="profile_exit_from_app">Выйти из учетной записи</string>
+    <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
@@ -453,6 +454,10 @@
     <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
     <string name="profile_unlink_network_cancel_button">Отменить</string>
     <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
+
+    <string name="profile_google_fit_activated_title">Внимание</string>
+    <string name="profile_google_fit_activated_message">Теперь ваши тренировки из Google Fit будут подгружаться в Сателлит Online</string>
+    <string name="profile_google_fit_activated_positive_button">Ок</string>
 
     <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>

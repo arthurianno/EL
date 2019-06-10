@@ -2,9 +2,11 @@ package com.elta.android.presentation.features.profile.settings.global.ui.adapte
 
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHeaderDelegate
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHealthAppDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsSeparatorDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsSocialDelegate
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
@@ -26,6 +28,7 @@ class ProfileSettingsDelegatesFactory @Inject constructor(
             ProfileSettingsItem::class.java -> ProfileSettingsDelegate(bus, resources)
             ProfileSettingsSocialItem::class.java -> ProfileSettingsSocialDelegate(bus)
             ProfileSettingsSeparatorItem::class.java -> ProfileSettingsSeparatorDelegate()
+            ProfileSettingsHealthAppItem::class.java -> ProfileSettingsHealthAppDelegate(bus)
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }

@@ -2,9 +2,11 @@ package com.elta.android.common.utils
 
 import android.util.LruCache
 import com.elta.android.common.utils.CommonFormats.DATE_PATTERN_ISO
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -51,6 +53,7 @@ inline fun String.toLocalDateTime(pattern: String): LocalDateTime =
 
 inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
     this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+
 inline fun ZonedDateTime.toIsoString(): String = this.format(
     DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
 
@@ -71,7 +74,11 @@ inline fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) = atStartOfDa
 
 inline fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
 
-inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * 1000
+inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * MILLIS_IN_SECOND
+
+inline fun Long.toZonedDateTime() = ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+
+inline fun ZonedDateTime.toDateTimeUtc() = toOffsetDateTime().atZoneSameInstant(ZoneOffset.UTC)
 
 /**
  * Simple class which contains number of common and wide useful date formats.

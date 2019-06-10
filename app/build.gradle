@@ -182,6 +182,8 @@ dependencies {
     implementation commonDependencies.appCore
     implementation commonDependencies.appCoreSecurity
 
+    implementation commonDependencies.googleFit
+    implementation commonDependencies.googleAuth
     implementation commonDependencies.supportAnnotations
     implementation commonDependencies.supportV4
     implementation commonDependencies.supportV13
