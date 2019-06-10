@@ -7,7 +7,6 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.nullgr.core.rx.RxBus
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
 
 class BootReceiver : BroadcastReceiver() {
@@ -17,7 +16,6 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         AndroidInjection.inject(this, context)
-        Timber.d("receiver: Events.BootCompleted")
         bus.event(Events.BootCompleted)
     }
 }
