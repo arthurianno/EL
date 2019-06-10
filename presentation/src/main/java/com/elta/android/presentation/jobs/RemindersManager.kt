@@ -38,13 +38,16 @@ class RemindersManager @Inject constructor(
 
     init {
         bus.events<Events.BootCompleted>()
-            .subscribe { scheduleReminders() }
+            .doOnNext { scheduleReminders() }
+            .retry()
+            .subscribe()
 
         bus.events<Events.ReminderSpent>()
             .log("Reminder", "Events.ReminderSpent")
             .map(Events.ReminderSpent::reminder)
             .doOnNext(::showReminderNotification)
             .doOnNext(::updateReminder)
+            .retry()
             .subscribe()
     }
 
