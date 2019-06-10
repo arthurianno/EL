@@ -8,7 +8,7 @@ import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCas
 import com.elta.android.domain.features.reminder.interactor.GetRemindersUseCase
 import com.elta.android.domain.features.reminder.interactor.UpdateReminderUseCase
 import com.elta.android.domain.features.reminder.interactor.getNextReminder
-import com.elta.android.domain.features.reminder.interactor.isInPast
+import com.elta.android.domain.features.reminder.interactor.isInThePast
 import com.elta.android.domain.features.reminder.interactor.isOneTime
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.Events
@@ -73,7 +73,7 @@ class RemindersManager @Inject constructor(
     fun scheduleReminders() {
         val reminders = getRemindersUseCase.execute().blockingFirst()
         reminders.forEach { reminder ->
-            if (!reminder.isInPast()) addReminder(reminder)
+            if (!reminder.isInThePast()) addReminder(reminder)
             else if (!reminder.isOneTime()) updateReminder(reminder)
             else deleteReminderInternal(reminder)
         }
