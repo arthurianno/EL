@@ -11,12 +11,14 @@ import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.features.registration.main.pm.BaseSocialPm
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
 class LoginPm @Inject constructor(
+    private val remindersManager: RemindersManager,
     private val loginWithSocialNetworkUseCase: LoginWithSocialNetworkUseCase,
     private val loginUseCase: LoginUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
@@ -95,7 +97,10 @@ class LoginPm @Inject constructor(
             .doOnSuccess { info ->
                 when {
                     !(info.isEmailConfirmed ?: false) -> router.navigateTo(ActivateProfile)
-                    info.isOnBoardingPassed ?: false -> router.newRootFlow(Screens.HomeFlow)
+                    info.isOnBoardingPassed ?: false -> {
+                        remindersManager.scheduleReminders()
+                        router.newRootFlow(Screens.HomeFlow)
+                    }
                     else -> router.newRootFlow(Screens.OnBoardingFlow)
                 }
             }

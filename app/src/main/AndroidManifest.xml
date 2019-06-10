@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".App"
@@ -62,6 +63,13 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="920aba3e4b6a09e14708096e535391e22085e85f" />
+
+        <receiver android:name=".presentation.features.profile.settings.reminders.utils.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".presentation.features.profile.settings.reminders.utils.ReminderCallbackReceiver" />
 
     </application>
 </manifest>

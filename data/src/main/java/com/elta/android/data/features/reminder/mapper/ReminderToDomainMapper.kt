@@ -12,7 +12,7 @@ class ReminderToDomainMapper @Inject constructor() : Mapper<ReminderDto, Reminde
         with(source) {
             Reminder(
                 id = id,
-                time = time,
+                date = time,
                 title = title,
                 scheduleType = ScheduleType.valueOf(scheduleType.name)
             )

@@ -19,7 +19,7 @@ import com.elta.android.presentation.di.FragmentBuilder
 import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
-import com.elta.android.presentation.jobs.WorkersModule
+import com.elta.android.presentation.di.ReceiverBuilder
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -48,8 +48,8 @@ import javax.inject.Singleton
     PmModule::class,
     ActivityBuilder::class,
     FragmentBuilder::class,
-    WorkersModule::class,
     NotificationModule::class,
+    ReceiverBuilder::class,
     // navigation
     NavigationModule::class,
     // analytics

@@ -2,20 +2,23 @@ package com.elta.android.presentation.features.profile.settings.reminders.create
 
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.reminder.interactor.AddNewReminderUseCase
+import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
-import com.elta.android.presentation.jobs.ReminderWorker
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
+import java.util.UUID
 import javax.inject.Inject
 
 class CreateRemindPm @Inject constructor(
     private val addNewReminderUseCase: AddNewReminderUseCase,
+    remindersManager: RemindersManager,
     services: ServiceFacade
-) : BaseRemindPm(services) {
+) : BaseRemindPm(remindersManager, services) {
 
     private val isFormNotEmptyState = State(false)
 
@@ -25,14 +28,12 @@ class CreateRemindPm @Inject constructor(
         saveReminderAction.observable
             .skipWhileInProgress()
             .map(::createAddReminderParams)
-            .flatMapSingle {
-                addNewReminderUseCase.execute(it)
+            .flatMapSingle { params ->
+                addNewReminderUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
                     .trackEvent(AnalyticsEventType.REMINDER_ADD)
-                    .doOnSuccess { id ->
-                        ReminderWorker.startReminder(id)
-                    }
+                    .doOnSuccess { remindersManager.addReminder(params.reminder) }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
@@ -92,9 +93,12 @@ class CreateRemindPm @Inject constructor(
     private fun createAddReminderParams(i: Unit): AddNewReminderUseCase.Params {
         val form = reminderFormHolderState.value
         return AddNewReminderUseCase.Params(
-            title = checkNotNull(form.inputValue),
-            date = checkNotNull(form.date),
-            schedule = checkNotNull(form.schedule)
+            Reminder(
+                id = UUID.randomUUID().toString(),
+                title = checkNotNull(form.inputValue),
+                date = checkNotNull(form.date),
+                scheduleType = checkNotNull(form.schedule)
+            )
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.core.bus.Event
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
@@ -27,4 +28,6 @@ sealed class Events : Event {
     object FirmwareUpdated : Events()
     data class SyncProgress(val inProgress: Boolean) : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
+    object BootCompleted : Events()
+    data class ReminderSpent(val reminder: Reminder) : Events()
 }

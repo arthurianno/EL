@@ -8,5 +8,5 @@ fun Reminder.isChanged(
     schedule: ScheduleType? = null
 ): Boolean =
     this.title != title ||
-        this.time != date ||
+        this.date != date ||
         this.scheduleType != schedule

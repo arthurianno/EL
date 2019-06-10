@@ -7,9 +7,9 @@ import dagger.Module
 import javax.inject.Singleton
 
 @Module
-interface NotificationModule {
+abstract class NotificationModule {
 
     @Binds
     @Singleton
-    fun provideNotificationModule(source: NotificationHelper): NotificationSource
+    abstract fun provideNotificationModule(source: NotificationHelper): NotificationSource
 }
