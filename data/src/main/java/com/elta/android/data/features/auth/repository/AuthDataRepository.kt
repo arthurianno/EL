@@ -38,9 +38,14 @@ class AuthDataRepository @Inject constructor(
             }
             .map(LoginDto::isEmailConfirmed)
             .flatMap {
-                userInfoRepository.updateUserInfo(
-                    createUserInfoWithEmailStatus(it)
-                ).toSingleDefault(it)
+                val userInfo = UserInfo(
+                    isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+                    isEmailConfirmed = it,
+                    isOnBoardingPassed = it
+                )
+                userInfoRepository
+                    .updateUserInfo(userInfo)
+                    .toSingleDefault(it)
             }
 
     override fun isEmailConfirmed(): Single<Boolean> =
@@ -58,7 +63,12 @@ class AuthDataRepository @Inject constructor(
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
                         .flatMap {
-                            userInfoRepository.updateUserInfo(createUserInfoWithEmailStatus(it))
+                            val userInfo = UserInfo(
+                                isUserLoggedIn = tokenStorage.isUserLoggedIn(),
+                                isEmailConfirmed = it
+                            )
+                            userInfoRepository
+                                .updateUserInfo(userInfo)
                                 .toSingleDefault(it)
                         }
                 }
@@ -107,11 +117,5 @@ class AuthDataRepository @Inject constructor(
             isOnBoardingPassed = false,
             isFeedbackSent = false,
             isEmailConfirmed = false
-        )
-
-    private fun createUserInfoWithEmailStatus(isEmailConfirmed: Boolean): UserInfo =
-        UserInfo(
-            isUserLoggedIn = tokenStorage.isUserLoggedIn(),
-            isEmailConfirmed = isEmailConfirmed
         )
 }
