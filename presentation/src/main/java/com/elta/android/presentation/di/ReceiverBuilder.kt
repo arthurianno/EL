@@ -2,7 +2,7 @@ package com.elta.android.presentation.di
 
 import com.elta.android.common.di.scope.ReceiverScope
 import com.elta.android.presentation.features.profile.settings.reminders.utils.BootReceiver
-import com.elta.android.presentation.features.profile.settings.reminders.utils.ReminderNotificationReceiver
+import com.elta.android.presentation.features.profile.settings.reminders.utils.ReminderCallbackReceiver
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -15,5 +15,5 @@ abstract class ReceiverBuilder {
 
     @ReceiverScope
     @ContributesAndroidInjector
-    abstract fun bindReminderNotificationReceiver(): ReminderNotificationReceiver
+    abstract fun bindReminderNotificationReceiver(): ReminderCallbackReceiver
 }
