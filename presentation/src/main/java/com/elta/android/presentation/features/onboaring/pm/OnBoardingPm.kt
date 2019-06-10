@@ -88,21 +88,19 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun addItems() {
-        items.consumer.accept(
-            listOf(
-                OnBoardingGenderItem(
-                    resources.getString(R.string.on_boarding_header_user_sex)
-                ),
-                OnBoardingWeightItem(
-                    resources.getString(R.string.on_boarding_header_user_weight),
-                    INITIAL_WEIGHT
-                ),
-                OnBoardingDiabetesItem(
-                    resources.getString(R.string.on_boarding_header_user_diabetes_type),
-                    Diabetes.values().toList()
-                )
-            )
+        val genderItem = OnBoardingGenderItem(
+            resources.getString(R.string.on_boarding_header_user_sex)
         )
+        val weightItem = OnBoardingWeightItem(
+            resources.getString(R.string.on_boarding_header_user_weight),
+            INITIAL_WEIGHT
+        )
+        val diabetesItem = OnBoardingDiabetesItem(
+            resources.getString(R.string.on_boarding_header_user_diabetes_type),
+            Diabetes.values().toList()
+        )
+        savePageData(weightItem)
+        items.consumer.accept(listOf(genderItem, weightItem, diabetesItem))
     }
 
     private fun bindUpdateProfileBehaviour() {
@@ -158,9 +156,13 @@ class OnBoardingPm @Inject constructor(
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
         val item = event.item
+        savePageData(item)
+        updateNextButtonState(item)
+    }
+
+    private fun savePageData(item: OnBoardingItem) {
         val data = item.data
         params[item::class.java] = data
-        updateNextButtonState(item)
     }
 
     private fun updateNextButtonState(currentItem: OnBoardingItem) {
