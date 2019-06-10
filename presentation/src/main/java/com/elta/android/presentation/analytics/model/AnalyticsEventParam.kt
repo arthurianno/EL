@@ -1,3 +1,5 @@
+@file:Suppress("UtilityClassWithPublicConstructor")
+
 package com.elta.android.presentation.analytics.model
 
 import android.support.annotation.StringDef

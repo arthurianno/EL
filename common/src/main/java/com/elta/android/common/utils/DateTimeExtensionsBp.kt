@@ -78,6 +78,8 @@ inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).to
 
 inline fun Long.toZonedDateTime() = ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
+inline fun ZonedDateTime.toDateTimeUtc() = toOffsetDateTime().atZoneSameInstant(ZoneOffset.UTC)
+
 /**
  * Simple class which contains number of common and wide useful date formats.
  * @author Grishko Nikita
