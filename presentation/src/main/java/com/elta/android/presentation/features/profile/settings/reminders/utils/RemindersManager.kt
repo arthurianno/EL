@@ -12,8 +12,10 @@ import com.elta.android.domain.features.reminder.interactor.isInThePast
 import com.elta.android.domain.features.reminder.interactor.isOneTime
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.notification.NotificationSource
+import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,6 +28,7 @@ class RemindersManager @Inject constructor(
     private val deleteReminderUseCase: DeleteReminderUseCase,
     private val getRemindersUseCase: GetRemindersUseCase,
     private val notificationManager: NotificationSource,
+    private val resources: ResourceProvider,
     private val context: Context,
     private val bus: RxBus
 ) {
@@ -91,7 +94,7 @@ class RemindersManager @Inject constructor(
 
     private fun showReminderNotification(reminder: Reminder) {
         notificationManager.sendNotification(
-            title = reminder.title,
+            title = resources.getString(R.string.profile_reminders_notification_title),
             text = reminder.title,
             id = reminder.id
         )
