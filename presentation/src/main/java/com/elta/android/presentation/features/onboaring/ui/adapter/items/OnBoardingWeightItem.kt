@@ -6,7 +6,7 @@ data class OnBoardingWeightItem(
 ) : OnBoardingItem {
 
     override val data: Any?
-        get() = weight
+        get() = weight ?: initialValue
 
     var weight: Double? = null
 }

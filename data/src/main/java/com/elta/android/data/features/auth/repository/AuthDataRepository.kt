@@ -54,7 +54,6 @@ class AuthDataRepository @Inject constructor(
                             Completable
                                 .fromAction { tokenStorage.refresh() }
                                 .toSingleDefault(email)
-
                         }
                         .map(EmailStatusDto::isEmailConfirmed)
                         .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
