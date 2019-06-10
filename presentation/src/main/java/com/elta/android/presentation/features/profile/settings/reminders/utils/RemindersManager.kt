@@ -73,21 +73,9 @@ class RemindersManager @Inject constructor(
     fun scheduleReminders() {
         val reminders = getRemindersUseCase.execute().blockingFirst()
         reminders.forEach { reminder ->
-            if (reminder.isOneTime() && reminder.isInPast()) {
-                deleteReminderInternal(reminder)
-            }
-
-            if (reminder.isOneTime() && !reminder.isInPast()) {
-                addReminder(reminder)
-            }
-
-            if (!reminder.isOneTime() && reminder.isInPast()) {
-                updateReminder(reminder)
-            }
-
-            if (!reminder.isOneTime() && !reminder.isInPast()) {
-                addReminder(reminder)
-            }
+            if (!reminder.isInPast()) addReminder(reminder)
+            else if (!reminder.isOneTime()) updateReminder(reminder)
+            else deleteReminderInternal(reminder)
         }
     }
 
