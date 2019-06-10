@@ -10,6 +10,16 @@ import org.threeten.bp.temporal.ChronoField
 class ReminderInteractorTest {
 
     @Test
+    fun getNextReminderDate_AnyScheduleType_reminderInFuture_reminderDate() {
+        ScheduleType.values().forEach { type ->
+            val reminderDate = ZonedDateTime.of(2019, 6, 6, 15, 23, 0, 0, ZoneId.systemDefault())
+            val now = ZonedDateTime.of(2019, 6, 6, 15, 10, 0, 0, ZoneId.systemDefault())
+            val nextDate = getNextReminderDate(type = type, reminderDate = reminderDate, now = now)
+            assert(nextDate == reminderDate)
+        }
+    }
+
+    @Test
     fun getNextReminderDate_ScheduleTypeNONE_null() {
         val type = ScheduleType.NONE
         val reminderDate = ZonedDateTime.of(2019, 6, 6, 15, 23, 0, 0, ZoneId.systemDefault())
