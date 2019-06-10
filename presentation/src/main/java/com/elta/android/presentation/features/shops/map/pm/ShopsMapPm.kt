@@ -248,12 +248,10 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         searchAction.observable
-            .skipWhileInProgress(progressState.observable)
             .map(::createSearchParams)
-            .flatMap { params ->
+            .switchMap { params ->
                 searchSalePointsUseCase.execute(params)
                     .hideErrorContainer()
-                    .bindProgress(progressState.consumer)
                     .doOnNext(::handleSearchSuccess)
                     .doOnError(::handleError)
             }
