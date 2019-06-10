@@ -29,5 +29,5 @@ sealed class Events : Event {
     data class SyncProgress(val inProgress: Boolean) : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
-    data class ReminderSpent(val reminder: Reminder): Events()
+    data class ReminderSpent(val reminder: Reminder) : Events()
 }
