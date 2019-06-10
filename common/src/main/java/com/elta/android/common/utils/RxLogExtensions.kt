@@ -1,3 +1,5 @@
+@file:Suppress("MethodOverloading")
+
 package com.elta.android.common.utils
 
 import io.reactivex.Completable
