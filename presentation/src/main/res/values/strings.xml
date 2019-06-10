@@ -406,8 +406,8 @@
     <string name="profile_notification">Напоминания</string>
     <string name="profile_legal_information">Юридическая информация</string>
     <string name="facebook">Facebook</string>
-    <string name="vkontakte">Vkontakte</string>
-    <string name="odnoklasniki">Odnoklasniki</string>
+    <string name="vkontakte">VK</string>
+    <string name="odnoklasniki">OK</string>
     <string name="profile_app_version">Версия приложения: %s</string>
     <string name="profile_exit_from_app">Выйти из учетной записи</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
@@ -430,7 +430,7 @@
     <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
     <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
     <string name="profile_settings_hemoglobin_date_mask">- %s</string>
-    <string name="profile_settings_hemoglobin_header">Последние замеры</string>
+    <string name="profile_settings_hemoglobin_header">Последние измерения</string>
 
     <string name="profile_settings_change_name_title">Имя и Фамилия</string>
     <string name="profile_settings_change_name_description">Изменение персональных данных</string>
@@ -494,10 +494,10 @@
 
     <string name="profile_device_info_title">СателлитOnline</string>
     <string name="profile_device_info_description">Адрес устройства: %s</string>
-    <string name="profile_device_info_check_update_button">Проверить обновления прошивки</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления ПО глюкометра</string>
     <string name="profile_device_info_delete">Удалить устройство</string>
     <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
-    <string name="profile_device_info_firmware_version_title_field">Версия прошивки:</string>
+    <string name="profile_device_info_firmware_version_title_field">Версия ПО глюкометра:</string>
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
     <string name="profile_device_info_charge_level_field">%d/3</string>
     <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
@@ -562,7 +562,7 @@
 
     <string name="statistic_glucose_index_average_unit">ммоль/л</string>
     <string name="statistic_glucose_index_total_unit">за&#160;период</string>
-    <string name="statistic_glucose_index_level_unit">(%s\%% от замеров)</string>
+    <string name="statistic_glucose_index_level_unit">(%s\%% от измерений)</string>
     <string name="statistic_chart_period_dates_mask">%s - %s</string>
     <string name="statistic_daily_glucose_title">Мои показатели</string>
 
@@ -589,13 +589,13 @@
     <string name="firmware_version_current">Текущая версия: %s</string>
     <string name="firmware_version_new">Новая версия: %s</string>
     <string name="firmware_button_update">Обновить</string>
-    <string name="firmware_button_check_updates">Проверить обновления прошивки</string>
+    <string name="firmware_button_check_updates">Проверить обновления ПО глюкометра</string>
     <string name="firmware_button_close">Закрыть</string>
-    <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка прошивки, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
+    <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка ПО глюкометра, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
     <string name="firmware_dialog_button">Закрыть</string>
 
     <string name="firmware_unsupported_version_title">Версия приложения устарела</string>
-    <string name="firmware_unsupported_version_description">Для обновления версии прошивки\nглюкометра, необходимо обновить\nприложение</string>
+    <string name="firmware_unsupported_version_description">Для обновления версии ПО глюкометра\nглюкометра, необходимо обновить\nприложение</string>
     <string name="firmware_unsupported_version_button">Обновить в Google Play</string>
 
     <string name="firmware_downloading_error_title">Ошибка загрузки</string>
@@ -603,10 +603,10 @@
     <string name="firmware_downloading_error_button">Повторить</string>
 
     <string name="firmware_update_error_title">Ошибка обновления</string>
-    <string name="firmware_update_error_description">Во время обновления прошивки\nпроизошла ошибка</string>
+    <string name="firmware_update_error_description">Во время обновления ПО глюкометра\nпроизошла ошибка</string>
     <string name="firmware_update_error_button">Повторить</string>
 
     <string name="firmware_offline_error_title">Ошибка подключения</string>
-    <string name="firmware_offline_error_description">Во время обновления прошивки\nпроизошла ошибка подключения\nк глюкоментру</string>
+    <string name="firmware_offline_error_description">Во время обновления ПО глюкометра\nпроизошла ошибка подключения\nк глюкоментру</string>
     <string name="firmware_offline_error_button">Повторить</string>
 </resources>
