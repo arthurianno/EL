@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
@@ -67,8 +68,12 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         notificationStartAction.observable
-            .map { NotificationNavigationMapper.notificationDataToScreen(it) }
-            .doOnNext { screen -> screen?.let { router.newRootFlow(it) } }
+            .flatMapSingle { uri ->
+                getUserInfoUseCase.execute()
+                    .map { Pair(uri, it) }
+                    .doOnSuccess(::handleNotification)
+                    .doOnError(::handleError)
+            }
             .retry()
             .subscribe()
             .untilDestroy()
@@ -101,5 +106,18 @@ class AppPm @Inject constructor(
             .map { !it }
             .subscribe(backendSyncProgress.consumer)
             .untilDestroy()
+    }
+
+    private fun handleNotification(pair: Pair<Uri, UserInfo>) {
+        if (pair.second.isUserLoggedIn == true)
+            NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
+                router.newRootScreen(it)
+            }
+        else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error is NoSuchElementException) router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        else super.handleError(error)
     }
 }
