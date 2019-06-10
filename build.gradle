@@ -52,6 +52,7 @@ detekt {
         filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
         baseline = "$project.projectDir/detekt-config/baseline.xml"
         parallel = true
+        version = "1.0.0.RC8"
     }
 }
 

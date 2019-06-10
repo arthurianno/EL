@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE", "TooManyFunctions")
+@file:Suppress("NOTHING_TO_INLINE", "TooManyFunctions", "MethodOverloading", "LabeledExpression")
 
 package com.elta.android.presentation.core.pm
 

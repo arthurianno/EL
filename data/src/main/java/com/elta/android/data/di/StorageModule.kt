@@ -9,13 +9,13 @@ import dagger.Module
 import javax.inject.Singleton
 
 @Module
-abstract class StorageModule {
+interface StorageModule {
 
     @Binds
     @Singleton
-    abstract fun bindSyncStorage(storage: DbSyncStorage): SyncStorage
+    fun bindSyncStorage(storage: DbSyncStorage): SyncStorage
 
     @Binds
     @Singleton
-    abstract fun bindUserHolder(holder: LocalUserHolder): UserHolder
+    fun bindUserHolder(holder: LocalUserHolder): UserHolder
 }

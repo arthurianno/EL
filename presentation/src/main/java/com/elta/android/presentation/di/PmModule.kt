@@ -9,6 +9,9 @@ import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
+import com.elta.android.presentation.features.devices.all.pm.DevicesPm
+import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
+import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
 import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.features.feedback.pm.FeedbackPm
@@ -17,15 +20,12 @@ import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
+import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
-import com.elta.android.presentation.features.devices.all.pm.DevicesPm
-import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
-import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
-import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm.DiabetesSettingDialogPm
@@ -61,7 +61,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import me.dmdev.rxpm.PresentationModel
 
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "UnnecessaryAbstractClass")
 @Module
 abstract class PmModule {
 

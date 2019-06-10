@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.main.events.edit.pm
 
 import com.elta.android.common.utils.isDateChanged
-import com.elta.android.common.utils.toMillisUtc
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
@@ -21,7 +20,6 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSele
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
-import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class EditEventPm @Inject constructor(
@@ -134,7 +132,6 @@ class EditEventPm @Inject constructor(
                 name = form.name,
                 duration = form.duration,
                 additionTime = checkNotNull(form.date),
-                modificationTime = ZonedDateTime.now().toMillisUtc(),
                 tagId = form.tag?.id,
                 tag = form.tag,
                 activityType = form.activityType,
