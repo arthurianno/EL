@@ -11,8 +11,11 @@ import com.elta.android.domain.features.reminder.interactor.getNextReminder
 import com.elta.android.domain.features.reminder.interactor.isInPast
 import com.elta.android.domain.features.reminder.interactor.isOneTime
 import com.elta.android.domain.features.reminder.model.Reminder
+import com.elta.android.presentation.Events
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.features.profile.settings.reminders.utils.getCancelPendingIntent
 import com.elta.android.presentation.features.profile.settings.reminders.utils.getPendingIntent
+import com.nullgr.core.rx.RxBus
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,10 +25,16 @@ class RemindersManager @Inject constructor(
     private val updateReminderUseCase: UpdateReminderUseCase,
     private val deleteReminderUseCase: DeleteReminderUseCase,
     private val getRemindersUseCase: GetRemindersUseCase,
-    private val context: Context
+    private val context: Context,
+    private val bus: RxBus
 ) {
 
     private val manager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    init {
+        bus.events<Events.BootCompleted>()
+            .subscribe { bootComplete() }
+    }
 
     fun addReminder(reminder: Reminder) {
         Timber.tag("Reminder").d("add: $reminder")

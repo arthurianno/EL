@@ -11,6 +11,7 @@ import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.jobs.RemindersManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
@@ -33,6 +34,9 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     @Inject
     lateinit var logTree: Timber.Tree
+
+    @Inject
+    lateinit var remindersManager: RemindersManager
 
     override fun onCreate() {
         super.onCreate()
