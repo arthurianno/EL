@@ -23,13 +23,16 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
+import com.elta.android.presentation.jobs.RemindersManager
 import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 
 class MainProfilePm @Inject constructor(
+    private val remindersManager: RemindersManager,
     private val logOutUseCase: LogOutUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
@@ -98,6 +101,7 @@ class MainProfilePm @Inject constructor(
             .filter { it is ExitFromApp }
             .flatMapCompletable {
                 logOutUseCase.execute()
+                    .startWith(Completable.fromCallable { remindersManager.cancelAll() })
                     .doOnComplete {
                         analytics.clearStableParams()
                         router.newRootFlow(Screens.GreetingFlow)
