@@ -11,7 +11,7 @@ import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
-import com.elta.android.presentation.jobs.RemindersManager
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.utils.DATE_FORMAT_WITHOUT_ZERO
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption

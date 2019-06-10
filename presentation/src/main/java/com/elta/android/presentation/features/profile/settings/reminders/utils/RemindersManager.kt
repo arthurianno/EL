@@ -1,4 +1,4 @@
-package com.elta.android.presentation.jobs
+package com.elta.android.presentation.features.profile.settings.reminders.utils
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -15,8 +15,6 @@ import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.notification.NotificationSource
-import com.elta.android.presentation.features.profile.settings.reminders.utils.getCancelPendingIntent
-import com.elta.android.presentation.features.profile.settings.reminders.utils.getPendingIntent
 import com.nullgr.core.rx.RxBus
 import timber.log.Timber
 import javax.inject.Inject

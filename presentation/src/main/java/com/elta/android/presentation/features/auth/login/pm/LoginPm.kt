@@ -11,8 +11,8 @@ import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.features.registration.main.pm.BaseSocialPm
-import com.elta.android.presentation.jobs.RemindersManager
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject

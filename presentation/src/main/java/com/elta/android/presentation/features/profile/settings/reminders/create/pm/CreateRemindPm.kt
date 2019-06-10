@@ -7,7 +7,7 @@ import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
-import com.elta.android.presentation.jobs.RemindersManager
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables

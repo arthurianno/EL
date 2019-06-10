@@ -23,7 +23,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
-import com.elta.android.presentation.jobs.RemindersManager
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Completable
