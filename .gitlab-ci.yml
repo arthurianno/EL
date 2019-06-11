@@ -20,6 +20,8 @@ complexCheck:
   - ./gradlew detektCheck ktlint testDebugUnitTest
   only:
   - merge_requests
+  - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
+  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
   
 # For tag v0.0.0-beta
 beta:
