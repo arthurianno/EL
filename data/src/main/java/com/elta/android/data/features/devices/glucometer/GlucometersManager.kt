@@ -418,7 +418,9 @@ class GlucometersManager @Inject constructor(
             .take(1)
             // Glucometers memory organized like stack, so the most recent event will be on the top
             // or in holder if there are no new events
-            .doOnNext { holder -> updateGlucometerInfo(address, holder.info, holder.events.firstOrNull() ?: holder.lastSyncedEvent) }
+            .doOnNext { holder ->
+                updateGlucometerInfo(address, holder.info, holder.events.firstOrNull() ?: holder.lastSyncedEvent)
+            }
             .map(SyncResponseHolder::events)
             .map { events ->
                 userHolder.currentUser?.let { id ->
