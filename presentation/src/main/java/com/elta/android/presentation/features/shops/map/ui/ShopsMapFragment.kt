@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.map.ui.widgets.ShopClusterPinProvider
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.pageScrolled
+import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
@@ -81,8 +82,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
         pm.items.bindTo(adapter, compositeUnbind)
-        pm.showMyLocationCommand.bindTo(::showUserLocation)
-        pm.showDefaultLocationCommand.bindTo { moveTo(it.toPoint()) }
+        pm.addMyLocationPinCommand.bindTo(::showUserLocation)
+        pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
+        pm.navigateToLocationCommand.bindTo { moveTo(it.toPoint()) }
 
         pm.checkPermissionStatusCommand.bindTo {
             val status = rxPermissions.statusFor(LOCATION_PERMISSION)
@@ -99,7 +101,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         }
 
         pm.selectGeoPointCommand.bindTo { selectPin(it, true) }
-        pm.selectShopItemCommand.bindTo(itemsView::smoothScrollToPosition)
+        pm.selectShopItemCommand.bindTo(itemsView::scrollSmooth)
 
         pinClicks().skip(1).bindTo(pm.shopItemGeoPointSelectedAction)
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
@@ -125,7 +127,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     }
 
     private fun showUserLocation(location: Location) {
-        moveTo(location.toPoint())
         addMyLocationPin(location)
     }
 

@@ -1,8 +1,10 @@
 @file:Suppress("TooManyFunctions")
+
 package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
 import android.location.Location
+import com.elta.android.common.utils.takeFirst
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.isSearchInputValid
@@ -30,13 +32,13 @@ import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopIte
 import com.elta.android.presentation.utils.distanceTo
 import com.elta.android.presentation.utils.formatDistance
 import com.elta.android.presentation.utils.moskowLocation
+import com.elta.android.presentation.utils.toPoint
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.rx.bindProgress
 import com.nullgr.core.rx.location.EMPTY_LOCATION
 import com.nullgr.core.rx.location.isEmpty
+import com.yandex.mapkit.geometry.Point
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
-import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -56,8 +58,8 @@ class ShopsMapPm @Inject constructor(
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
     val locationControl = locationControl(rxLocationManager)
 
-    val showMyLocationCommand = Command<Location>()
-    val showDefaultLocationCommand = Command<Location>()
+    val addMyLocationPinCommand = Command<Location>()
+    val navigateToLocationCommand = Command<Location>()
     val moveToMyLocationAction = Action<Unit>()
 
     val shopListItemSelectedAction = Action<Int>()
@@ -69,6 +71,7 @@ class ShopsMapPm @Inject constructor(
     val searchInput = inputControl()
     val searchClearAction = Action<Unit>()
     val searchCloseCommand = Command<Unit>()
+    val showDefaultScreenStateCommand = Command<List<Point>>()
 
     private val searchAction = Action<String>()
     private val searchResultSelectedAction = Action<SearchResultItem>()
@@ -81,10 +84,11 @@ class ShopsMapPm @Inject constructor(
     private val salePointsState = State<List<SalePoint>>()
     private val foundedLocation = State<Location>()
     private val selectedPointId = State<Any>()
+    private val coldStartState = State(true)
+    private val manualNavigateToUserLocation = State(false)
 
     override fun onCreate() {
         super.onCreate()
-        bindPermissionsBehaviour()
         bindLocationBehaviour()
         bindSalePoints()
         bindShopSelectionBehaviour()
@@ -93,6 +97,11 @@ class ShopsMapPm @Inject constructor(
 
         locationControl.locationEnabledAction.observable
             .subscribe(fetchMyLocationAction.consumer)
+            .untilDestroy()
+
+        locationControl.locationNotAllowedAction.observable
+            .map { moskowLocation }
+            .subscribe(defaultLocationState.consumer)
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
@@ -136,24 +145,25 @@ class ShopsMapPm @Inject constructor(
             .checkAndRequestPermission()
             .filter { it == PermissionStatus.GRANTED }
             .map { Unit }
+            .doOnNext { manualNavigateToUserLocation.consumer.accept(true) }
             .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()
 
         myLocationState.observable
             .filter { !it.isEmpty() }
-            .doOnNext(showMyLocationCommand.consumer)
             .doOnNext(foundedLocation.consumer)
+            .doOnNext(addMyLocationPinCommand.consumer)
+            .filter { manualNavigateToUserLocation.value }
+            .doOnNext(navigateToLocationCommand.consumer)
+            .doOnNext { manualNavigateToUserLocation.consumer.accept(false) }
             .subscribe()
             .untilDestroy()
 
         defaultLocationState.observable
-            .doOnNext(showDefaultLocationCommand.consumer)
+            .doOnNext(navigateToLocationCommand.consumer)
             .doOnNext(foundedLocation.consumer)
             .subscribe()
             .untilDestroy()
-    }
-
-    private fun bindPermissionsBehaviour() {
     }
 
     private fun bindSalePoints() {
@@ -184,6 +194,10 @@ class ShopsMapPm @Inject constructor(
             }
             .map { it.sortedBy { point -> point.distance } }
             .doOnNext(::displayPoints)
+            .filter { coldStartState.value && foundedLocation.value != defaultLocationState.valueOrNull }
+            .map { buildColdStartPoints() }
+            .doOnNext(showDefaultScreenStateCommand.consumer)
+            .doOnNext { coldStartState.consumer.accept(false) }
             .subscribe()
             .untilDestroy()
     }
@@ -393,8 +407,15 @@ class ShopsMapPm @Inject constructor(
                     }
             }
 
+    private fun buildColdStartPoints(): List<Point> =
+        arrayListOf<Point>().apply {
+            add(foundedLocation.value.toPoint())
+            addAll(geoPoints.value.first.takeFirst(NEAREST_TEN_POINTS).map { it.toPoint() })
+        }
+
     private companion object {
         const val INVALID_INDEX = -1
         const val INPUT_DELAY = 300L
+        const val NEAREST_TEN_POINTS = 10
     }
 }

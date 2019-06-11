@@ -14,6 +14,8 @@ class LocationControl(pm: PresentationModel, private val locationManager: RxLoca
 
     val locationEnabledAction = pm.Action<Unit>()
 
+    val locationNotAllowedAction = pm.Action<Unit>()
+
     fun enableLocation(fragment: Fragment) {
         locationManager.enableLocation(fragment)
     }
@@ -37,7 +39,10 @@ fun LocationControl.bindTo(compositeUnbind: CompositeDisposable, fragment: Fragm
 }
 
 fun LocationControl.resolveResults(requestCode: Int, resultCode: Int) {
-    if (requestCode == LocationControl.REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
-        locationEnabledAction.consumer.accept(Unit)
+    if (requestCode == LocationControl.REQUEST_CODE_ENABLE_LOCATION) {
+        when (resultCode) {
+            Activity.RESULT_OK -> locationEnabledAction.consumer.accept(Unit)
+            else -> locationNotAllowedAction.consumer.accept(Unit)
+        }
     }
 }
