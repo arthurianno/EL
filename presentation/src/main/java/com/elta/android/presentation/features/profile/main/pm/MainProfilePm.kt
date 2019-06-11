@@ -71,6 +71,7 @@ class MainProfilePm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.ProfileDataChanged>().map { Unit },
             bus.events<Events.EventsChanged>().map { Unit }
         )
             .subscribe(getProfileSettingsAction.consumer)
