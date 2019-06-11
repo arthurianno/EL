@@ -7,12 +7,13 @@ class IdTest {
 
     @Test
     fun generate_ids_the_same() {
-        val mac = "AC:DA:48:01:02:05"
-        val date = "1812151936"
-        val expected = "BEE03470-8899-3805-9CA4-41CBF6A1ECA5".toLowerCase()
+        val userId = "example@mail.com"
+        val mac = "ea:dd:2d:df:45:54"
+        val date = "190527162626"
+        val expected = "F0EE4B70-889D-385F-A40A-8B87F029BFC0".toLowerCase()
 
         val generator = DefaultGlucometerEventIdGenerator()
-        val id = generator.generate(mac, date)
+        val id = generator.generate(userId, mac, date)
 
         assert(id == expected)
     }

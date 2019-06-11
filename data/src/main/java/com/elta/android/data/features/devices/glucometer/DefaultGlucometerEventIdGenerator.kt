@@ -7,6 +7,7 @@ import javax.inject.Singleton
 @Singleton
 class DefaultGlucometerEventIdGenerator @Inject constructor() : GlucometerEventIdGenerator {
 
-    override fun generate(glucometerId: String, dateToken: String): String =
-        UUID.nameUUIDFromBytes("${glucometerId.toLowerCase()}$dateToken".toByteArray()).toString()
+    override fun generate(userId: String, glucometerId: String, dateToken: String): String =
+        UUID.nameUUIDFromBytes("${userId.toLowerCase()}${glucometerId.toLowerCase()}$dateToken".toByteArray())
+            .toString()
 }
