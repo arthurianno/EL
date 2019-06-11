@@ -20,7 +20,8 @@ class GlucometerInfoFromCacheMapper @Inject constructor() : Mapper<GlucometerInf
                 version = VersionDto(
                     software = software,
                     hardware = hardware
-                )
+                ),
+                lastSyncedEvent = lastSyncedEvent
             )
         }
 }
