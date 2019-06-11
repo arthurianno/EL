@@ -31,7 +31,8 @@ class UserInfoCachedDataSource @Inject constructor(
                         isFeedbackSent = userInfo.isFeedbackSent ?: cachedInfo.isFeedbackSent,
                         isUserLoggedIn = userInfo.isUserLoggedIn ?: cachedInfo.isUserLoggedIn,
                         isOnboardingPassed = userInfo.isOnboardingPassed
-                            ?: cachedInfo.isOnboardingPassed
+                            ?: cachedInfo.isOnboardingPassed,
+                        isFirstHomeEntrance = userInfo.isFirstHomeEntrance ?: cachedInfo.isFirstHomeEntrance
                     )
                     cache.update(listOf(updatedInfo))
                 } ?: cache.add(listOf(userInfo))

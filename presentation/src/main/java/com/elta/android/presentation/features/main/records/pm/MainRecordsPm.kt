@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.main.records.pm
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -21,6 +23,7 @@ import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -38,6 +41,11 @@ class MainRecordsPm @Inject constructor(
                 getHomeModelUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .flatMapSingle { homeModel ->
+                        updateUserInfoUseCase
+                            .execute(createUserInfoParams())
+                            .toSingleDefault(homeModel)
+                    }
                     .doOnNext(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -80,16 +88,16 @@ class MainRecordsPm @Inject constructor(
 
     private fun HomeModel.launchState() {
         when {
+            hasEvents -> mainScreenState.visibilityState.consumer.accept(false)
             isFirstEntrance -> {
                 mainScreenState.dataState.consumer.accept(States.MainRecordsScreenFirstLaunchState(resources))
                 mainScreenState.visibilityState.consumer.accept(true)
             }
-            !hasEvents -> {
+            else -> {
                 mainScreenState.dataState.consumer.accept(States.MainRecordsScreenNewDayState(resources,
                     dayPeriod.greetingTitle()))
                 mainScreenState.visibilityState.consumer.accept(true)
             }
-            else -> mainScreenState.visibilityState.consumer.accept(false)
         }
     }
 
@@ -99,4 +107,7 @@ class MainRecordsPm @Inject constructor(
             DayPeriod.AFTERNOON -> R.string.main_records_new_day_title_afternoon
             DayPeriod.EVENING -> R.string.main_records_new_day_title_evening
         }
+
+    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
+        UpdateUserInfoUseCase.Params(UserInfo(isFirstHomeEntrance = false))
 }
