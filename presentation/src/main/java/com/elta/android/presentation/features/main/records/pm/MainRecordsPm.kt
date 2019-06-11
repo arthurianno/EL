@@ -19,6 +19,7 @@ import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -41,11 +42,7 @@ class MainRecordsPm @Inject constructor(
                 getHomeModelUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .flatMapSingle { homeModel ->
-                        updateUserInfoUseCase
-                            .execute(createUserInfoParams())
-                            .toSingleDefault(homeModel)
-                    }
+                    .handleFirstEntrance()
                     .doOnNext(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -75,6 +72,17 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilUnbind()
     }
+
+    private fun Observable<HomeModel>.handleFirstEntrance(): Observable<HomeModel> =
+        this.flatMapSingle { homeModel ->
+            if (homeModel.isFirstEntrance) {
+                updateUserInfoUseCase
+                    .execute(createUserInfoParams())
+                    .toSingleDefault(homeModel)
+            } else {
+                Single.just(homeModel)
+            }
+        }
 
     private fun navigateToEventScreen(record: RecordItem) {
         router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
