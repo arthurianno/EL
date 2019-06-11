@@ -36,6 +36,7 @@ fun startFirmwareUpdate(context: Context, path: String, deviceAddress: String): 
     val starter = DfuServiceInitiator(deviceAddress)
     starter.setDeviceName("SatelliteOnline")
     starter.setZip(path)
+    starter.setForceDfu(true)
     starter.start(context, EltaDfuService::class.java)
 
     emitter.setDisposable(Disposables.fromAction {
