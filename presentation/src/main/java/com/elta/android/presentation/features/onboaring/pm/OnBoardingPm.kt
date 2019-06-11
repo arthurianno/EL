@@ -41,6 +41,7 @@ class OnBoardingPm @Inject constructor(
 
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
     private val updateProfileSettingsAction = Action<Unit>()
+    private val updateUserInfoAction = Action<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -85,6 +86,7 @@ class OnBoardingPm @Inject constructor(
 
         bindBusEvents()
         bindUpdateProfileBehaviour()
+        bindLifecycle()
     }
 
     private fun addItems() {
@@ -104,6 +106,19 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun bindUpdateProfileBehaviour() {
+        updateUserInfoAction.observable
+            .skipWhileInProgress()
+            .map(::createEmailUserInfoParams)
+            .flatMapCompletable { params ->
+                updateUserInfoUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
         updateProfileSettingsAction.observable
             .skipWhileInProgress()
             .map(::createUseCaseParams)
@@ -111,7 +126,7 @@ class OnBoardingPm @Inject constructor(
                 updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .andThen(updateUserInfoUseCase.execute(createUserInfoParams()))
+                    .andThen(updateUserInfoUseCase.execute(createOnBoardingUserInfoParams()))
                     .doOnComplete { updateStableParam(profile = params.profile) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
@@ -124,6 +139,13 @@ class OnBoardingPm @Inject constructor(
     private fun bindBusEvents() {
         bus.events<Events.OnBoardingPageSelected>()
             .subscribe(::onBoardingPageSelected)
+            .untilDestroy()
+    }
+
+    private fun bindLifecycle() {
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .subscribe(updateUserInfoAction.consumer)
             .untilDestroy()
     }
 
@@ -189,8 +211,11 @@ class OnBoardingPm @Inject constructor(
         return UpdateProfileUseCase.Params(profile)
     }
 
-    private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
+    private fun createOnBoardingUserInfoParams(): UpdateUserInfoUseCase.Params =
         UpdateUserInfoUseCase.Params(UserInfo(isOnBoardingPassed = true))
+
+    private fun createEmailUserInfoParams(i: Unit): UpdateUserInfoUseCase.Params =
+        UpdateUserInfoUseCase.Params(UserInfo(isEmailConfirmed = true))
 
     private fun handleSuccess() {
         router.newRootScreen(Screens.FromOnBoardingSyncFlow)
