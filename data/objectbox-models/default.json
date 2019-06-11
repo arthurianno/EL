@@ -459,7 +459,7 @@
     },
     {
       "id": "16:4156337543713803940",
-      "lastPropertyId": "5:389016516142161600",
+      "lastPropertyId": "6:3983104656624443690",
       "name": "UserInfoCacheDto",
       "properties": [
         {
@@ -481,6 +481,10 @@
         {
           "id": "5:389016516142161600",
           "name": "isOnboardingPassed"
+        },
+        {
+          "id": "6:3983104656624443690",
+          "name": "isFirstHomeEntrance"
         }
       ],
       "relations": []

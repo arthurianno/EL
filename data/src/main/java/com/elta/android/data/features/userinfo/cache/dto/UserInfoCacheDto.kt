@@ -9,5 +9,6 @@ data class UserInfoCacheDto(
     val isUserLoggedIn: Boolean? = null,
     val isFeedbackSent: Boolean? = null,
     val isEmailConfirmed: Boolean? = null,
-    val isOnboardingPassed: Boolean? = null
+    val isOnboardingPassed: Boolean? = null,
+    var isFirstHomeEntrance: Boolean? = null
 )
