@@ -5,5 +5,10 @@ import org.threeten.bp.ZonedDateTime
 
 interface GlucometerInfoBuilder {
 
-    fun buildFrom(id: String, params: List<String>, syncDate: ZonedDateTime? = null): GlucometerInfoDto
+    fun buildFrom(
+        id: String,
+        params: List<String>,
+        syncDate: ZonedDateTime? = null,
+        lastSyncedEvent: String? = null
+    ): GlucometerInfoDto
 }

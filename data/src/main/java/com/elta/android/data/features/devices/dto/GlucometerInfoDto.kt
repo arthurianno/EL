@@ -8,5 +8,6 @@ data class GlucometerInfoDto(
     val syncDate: ZonedDateTime? = null,
     val temperature: Int? = null,
     val batteryLevel: Int? = null,
-    val version: VersionDto? = null
+    val version: VersionDto? = null,
+    val lastSyncedEvent: String? = null
 )

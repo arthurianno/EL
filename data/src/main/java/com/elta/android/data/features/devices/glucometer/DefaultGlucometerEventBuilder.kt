@@ -11,13 +11,13 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
     private val generator: GlucometerEventIdGenerator
 ) : GlucometerEventBuilder {
 
-    override fun buildFrom(glucometerId: String, response: String): GlucometerEventDto {
+    override fun buildFrom(userId: String, glucometerId: String, response: String): GlucometerEventDto {
         val tokens = getTokens(response)
         val dateToken = tokens.first
         val temperatureAndValueToken = tokens.second
 
         return GlucometerEventDto(
-            id = generator.generate(glucometerId, dateToken),
+            id = generator.generate(userId, glucometerId, dateToken),
             date = extractDate(dateToken),
             temperature = extractTemperature(temperatureAndValueToken),
             value = extractValue(temperatureAndValueToken)

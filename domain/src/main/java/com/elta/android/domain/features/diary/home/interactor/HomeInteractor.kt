@@ -11,10 +11,16 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import java.util.Date
 import kotlin.math.abs
 
-fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelSettings): HomeModel {
+fun buildHomeModel(
+    events: List<Event>,
+    tags: List<Tag>,
+    settings: GlucoseLevelSettings,
+    userInfo: UserInfo
+): HomeModel {
 
     val sortedEvents = events.sortAndFilter()
 
@@ -36,7 +42,7 @@ fun buildHomeModel(events: List<Event>, tags: List<Tag>, settings: GlucoseLevelS
     }
 
     return HomeModel(
-        isFirstEntrance = false,
+        isFirstEntrance = userInfo.isFirstHomeEntrance ?: true,
         dayPeriod = getDayPeriod(Date().time),
         lastBreadEvent = lastBreadEvent,
         lastInsulinEvent = lastInsulinEvent,

@@ -18,7 +18,8 @@ class GlucometerInfoToCacheMapper @Inject constructor() : Mapper<GlucometerInfoD
                 temperature = temperature,
                 batteryLevel = batteryLevel,
                 software = version?.software,
-                hardware = version?.hardware
+                hardware = version?.hardware,
+                lastSyncedEvent = lastSyncedEvent
             )
         }
 }

@@ -87,9 +87,13 @@ class LoginPm @Inject constructor(
 
     private fun Single<Boolean>.updateAnalyticStableParam(): Single<Boolean> =
         this.flatMap { isEmailActivated ->
-            getUserIdUseCase.execute()
-                .doOnSuccess { updateStableParam(id = it) }
-                .map { isEmailActivated }
+            if (isEmailActivated) {
+                getUserIdUseCase.execute()
+                    .doOnSuccess { updateStableParam(id = it) }
+                    .map { isEmailActivated }
+            } else {
+                Single.just(isEmailActivated)
+            }
         }
 
     private fun checkEmailAndOnBoarding(i: Boolean) =
@@ -97,7 +101,7 @@ class LoginPm @Inject constructor(
             .doOnSuccess { info ->
                 when {
                     !(info.isEmailConfirmed ?: false) -> router.navigateTo(ActivateProfile)
-                    info.isOnBoardingPassed ?: false -> {
+                    info.isOnBoardingPassed ?: false || info.isEmailConfirmed ?: false -> {
                         remindersManager.scheduleReminders()
                         router.newRootFlow(Screens.HomeFlow)
                     }
