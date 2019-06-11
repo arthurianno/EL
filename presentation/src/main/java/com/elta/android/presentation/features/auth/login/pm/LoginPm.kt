@@ -87,9 +87,13 @@ class LoginPm @Inject constructor(
 
     private fun Single<Boolean>.updateAnalyticStableParam(): Single<Boolean> =
         this.flatMap { isEmailActivated ->
-            getUserIdUseCase.execute()
-                .doOnSuccess { updateStableParam(id = it) }
-                .map { isEmailActivated }
+            if (isEmailActivated) {
+                getUserIdUseCase.execute()
+                    .doOnSuccess { updateStableParam(id = it) }
+                    .map { isEmailActivated }
+            } else {
+                Single.just(isEmailActivated)
+            }
         }
 
     private fun checkEmailAndOnBoarding(i: Boolean) =
