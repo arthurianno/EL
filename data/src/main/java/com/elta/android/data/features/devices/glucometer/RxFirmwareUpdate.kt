@@ -10,7 +10,11 @@ import no.nordicsemi.android.dfu.DfuServiceInitiator
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper
 import timber.log.Timber
 
-fun startFirmwareUpdate(context: Context, path: String, deviceAddress: String): Completable = Completable.create { emitter ->
+fun startFirmwareUpdate(
+    context: Context,
+    path: String,
+    deviceAddress: String
+): Completable = Completable.create { emitter ->
 
     val listener = object : DfuProgressLogger() {
         override fun onDfuCompleted(address: String) {
@@ -44,6 +48,7 @@ fun startFirmwareUpdate(context: Context, path: String, deviceAddress: String): 
     })
 }
 
+@Suppress("MaxLineLength")
 abstract class DfuProgressLogger : DfuProgressListener {
 
     override fun onProgressChanged(address: String, percent: Int, speed: Float, avgSpeed: Float, currentPart: Int, partsTotal: Int) {
