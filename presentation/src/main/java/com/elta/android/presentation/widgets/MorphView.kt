@@ -135,8 +135,9 @@ class MorphView @JvmOverloads constructor(
             duration = 8000
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
-                oval1.angle = it.animatedValue as Float
-                oval2.angle = it.animatedValue as Float
+                val value = it.animatedValue as Float
+                oval1.angle = value
+                oval2.angle = value
             }
         }
 
@@ -152,8 +153,9 @@ class MorphView @JvmOverloads constructor(
             duration = 5000
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
-                oval1.radius.x = it.animatedValue as Float
-                oval2.radius.x = it.animatedValue as Float
+                val value = it.animatedValue as Float
+                oval1.radius.x = value
+                oval2.radius.x = value
             }
         }
 
@@ -161,8 +163,9 @@ class MorphView @JvmOverloads constructor(
             duration = 4000
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
-                oval1.radius.y = it.animatedValue as Float
-                oval2.radius.y = it.animatedValue as Float
+                val value = it.animatedValue as Float
+                oval1.radius.y = value
+                oval2.radius.y = value
             }
         }
 
@@ -182,6 +185,7 @@ class MorphView @JvmOverloads constructor(
             }
         }
 
+        animators.map { it.cancel() }
         animators.clear()
 
         animators.add(smallAngleAnimator)
@@ -248,7 +252,7 @@ class MorphView @JvmOverloads constructor(
         ovals.map { it.path.reset() }
 
         val start = 0f
-        val end = 2 * PI.toFloat()
+        val end = END
 
         var i = start
         while (i <= end) {
@@ -258,7 +262,7 @@ class MorphView @JvmOverloads constructor(
 
             ovals.forEach {
                 val path = it.path
-                val anglePi = it.rotateOffset * it.angle * PI.toFloat()
+                val anglePi = it.rotateOffsetPiFloat * it.angle
 
                 val sinAnglePi = sin(anglePi)
                 val cosAnglePi = cos(anglePi)
@@ -283,6 +287,11 @@ class MorphView @JvmOverloads constructor(
         }
         ovals.map { it.path.close() }
     }
+
+    companion object {
+        val PI_FLOAT = PI.toFloat()
+        val END = 2 * PI_FLOAT
+    }
 }
 
 class Oval(
@@ -290,7 +299,8 @@ class Oval(
     val rotateOffset: Float = 1f,
     var center: PointF = PointF(),
     var radius: PointF = PointF(),
-    var angle: Float = 0f
+    var angle: Float = 0f,
+    val rotateOffsetPiFloat: Float = rotateOffset * MorphView.PI_FLOAT
 ) {
 
     fun setCenter(cx: Float, cy: Float) {
