@@ -5,6 +5,7 @@ import com.elta.android.common.errors.CantSendInviteToYourselfError
 import com.elta.android.common.errors.EmailAlreadyConfirmedError
 import com.elta.android.common.errors.EmailAlreadyInvitedError
 import com.elta.android.common.errors.EmailAlreadyRegisteredError
+import com.elta.android.common.errors.EmailLinkInvalid
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.ServerError
@@ -34,6 +35,7 @@ class ErrorInterceptor @Inject constructor(
                     ERROR_CODE_603 -> throw EmailAlreadyRegisteredError(message)
                     ERROR_CODE_605 -> throw InvalidRefreshTokenError(message)
                     ERROR_CODE_606 -> throw EmailAlreadyConfirmedError(message)
+                    ERROR_CODE_607 -> throw EmailLinkInvalid(message)
                     ERROR_CODE_700 -> throw EmailAlreadyInvitedError(message)
                     ERROR_CODE_707 -> throw CantSendInviteToYourselfError(message)
                     else -> throw ServerError(message)
@@ -50,6 +52,7 @@ class ErrorInterceptor @Inject constructor(
         const val ERROR_CODE_603 = 603
         const val ERROR_CODE_605 = 605
         const val ERROR_CODE_606 = 606
+        const val ERROR_CODE_607 = 607
         const val ERROR_CODE_700 = 700
         const val ERROR_CODE_707 = 707
 
