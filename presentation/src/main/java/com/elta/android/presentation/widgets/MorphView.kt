@@ -11,7 +11,6 @@ import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
-import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -53,7 +52,6 @@ class MorphView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        Timber.tag("Animation").d("onAttachedToWindow")
         if (autoPlay || wasAnimatingWhenDetached) {
             playAnimation()
             autoPlay = false
@@ -67,7 +65,6 @@ class MorphView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        Timber.tag("Animation").d("onDetachedFromWindow")
         if (isAnimating()) {
             cancelAnimation()
             wasAnimatingWhenDetached = true
@@ -90,8 +87,6 @@ class MorphView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        Timber.tag("Animation").d("onMeasure")
 
         val cx = measuredWidth / 2f
         val cy = measuredHeight / 2f
@@ -240,7 +235,6 @@ class MorphView @JvmOverloads constructor(
     private fun isAnimating(): Boolean = animators.lastOrNull()?.isRunning ?: false
 
     private fun createOvalPath(vararg ovals: Oval) {
-        Timber.tag("Animation").d("createOvalPath")
         ovals.map { it.path.reset() }
 
         val start = 0f
