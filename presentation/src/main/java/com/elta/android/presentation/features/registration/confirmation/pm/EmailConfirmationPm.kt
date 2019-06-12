@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.registration.confirmation.pm
 
+import com.elta.android.common.errors.EmailLinkInvalid
 import com.elta.android.domain.features.auth.interactor.CheckTokenOwnerUseCase
 import com.elta.android.domain.features.auth.interactor.ConfirmEmailUseCase
 import com.elta.android.presentation.Screens
@@ -63,6 +64,13 @@ class EmailConfirmationPm @Inject constructor(
 
     fun setToken(token: String) {
         this.token.consumer.accept(token)
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error is EmailLinkInvalid)
+            router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        else
+            super.handleError(error)
     }
 
     private fun handleSuccess(isOwner: Boolean) {
