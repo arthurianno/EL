@@ -1,5 +1,6 @@
 package com.elta.android.presentation.widgets
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -8,8 +9,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.Region
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -40,8 +43,54 @@ class MorphView @JvmOverloads constructor(
 
     private val clip: Region = Region()
 
+    private var isInitialized = false
+    private var wasAnimatingWhenDetached = false
+    private var wasAnimatingWhenNotShown = false
+    private var autoPlay = true
+
+    private val animators = arrayListOf<Animator>()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        Timber.tag("Animation").d("onAttachedToWindow")
+        if (autoPlay || wasAnimatingWhenDetached) {
+            playAnimation()
+            autoPlay = false
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // This is needed to mimic newer platform behavior.
+            // https://stackoverflow.com/a/53625860/715633
+            onVisibilityChanged(this, visibility)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Timber.tag("Animation").d("onDetachedFromWindow")
+        if (isAnimating()) {
+            cancelAnimation()
+            wasAnimatingWhenDetached = true
+        }
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        if (isShown) {
+            if (wasAnimatingWhenNotShown) {
+                resumeAnimation()
+                wasAnimatingWhenNotShown = false
+            }
+        } else {
+            if (isAnimating()) {
+                pauseAnimation()
+                wasAnimatingWhenNotShown = true
+            }
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
+        Timber.tag("Animation").d("onMeasure")
 
         clip.set(0, 0, measuredWidth, measuredHeight)
 
@@ -133,15 +182,21 @@ class MorphView @JvmOverloads constructor(
             }
         }
 
-        smallAngleAnimator.start()
-        xRanimator.start()
-        yRanimator.start()
+        animators.clear()
 
-        largeAngleAnimator.start()
-        xRlargeAnimator.start()
-        yRlargeAnimator.start()
+        animators.add(smallAngleAnimator)
+        animators.add(xRanimator)
+        animators.add(yRanimator)
 
-        timer.start()
+        animators.add(largeAngleAnimator)
+        animators.add(xRlargeAnimator)
+        animators.add(yRlargeAnimator)
+
+        animators.add(timer)
+
+        isInitialized = true
+
+        playAnimation()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -150,7 +205,46 @@ class MorphView @JvmOverloads constructor(
         canvas.drawPath(oval1.path, smallOvalPaint)
     }
 
+    fun playAnimation() {
+        if (!isInitialized) return
+
+        if (isShown) {
+            animators.map { it.start() }
+        } else {
+            wasAnimatingWhenNotShown = true
+        }
+    }
+
+    fun resumeAnimation() {
+        if (!isInitialized) return
+
+        if (isShown) {
+            animators.map { it.resume() }
+        } else {
+            wasAnimatingWhenNotShown = true
+        }
+    }
+
+    fun cancelAnimation() {
+        if (!isInitialized) return
+
+        wasAnimatingWhenNotShown = false
+        animators.map { it.cancel() }
+    }
+
+    fun pauseAnimation() {
+        if (!isInitialized) return
+
+        autoPlay = false
+        wasAnimatingWhenDetached = false
+        wasAnimatingWhenNotShown = false
+        animators.map { it.pause() }
+    }
+
+    private fun isAnimating(): Boolean = animators.lastOrNull()?.isRunning ?: false
+
     private fun createOvalPath(vararg ovals: Oval) {
+        Timber.tag("Animation").d("createOvalPath")
         ovals.map { it.path.reset() }
 
         val start = 0f
