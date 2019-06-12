@@ -46,9 +46,23 @@ class MorphView @JvmOverloads constructor(
 
     private val animators = arrayListOf<Animator>()
 
-    private val frameDuration = 1000 / 60f
+    private val time = 1000L
+    private val frames = 60
+    private val frameDuration = time / frames.toFloat()
 
-    private val deltaPerFrame = (1 / 24).toFloat()
+    private val smallAngleValues = Values()
+    private val largeAngleValues = Values()
+
+    private val xRValues = Values()
+    private val yRValues = Values()
+
+    private val xRLargeValues = Values()
+    private val yRLargeValues = Values()
+
+    init {
+        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values, false)
+        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values, true)
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -116,72 +130,41 @@ class MorphView @JvmOverloads constructor(
 
         createOvalPath(oval1, oval2, oval3)
 
+        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values, true)
+        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values, true)
+
+        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values, true)
+        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values, true)
+
         // 60fps
-        val timer = ValueAnimator.ofInt(0, 60).apply {
-            duration = 1000
+        val timer = ValueAnimator.ofInt(0, frames).apply {
+            duration = time
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
-                oval1.angle = oval1.angle + deltaPerFrame
-                oval2.angle = oval2.angle + deltaPerFrame
+
+                val value = smallAngleValues.next()
+                oval1.angle = value
+                oval2.angle = value
+                oval3.angle = largeAngleValues.next()
+
+                val oval_1_2_X = xRValues.next()
+                oval1.radius.x = oval_1_2_X
+                oval2.radius.x = oval_1_2_X
+
+                val oval_1_2_Y = yRValues.next()
+                oval1.radius.y = oval_1_2_Y
+                oval2.radius.y = oval_1_2_Y
+
+                oval3.radius.x = xRLargeValues.next()
+                oval3.radius.y = yRLargeValues.next()
 
                 createOvalPath(oval1, oval2, oval3)
                 invalidate()
             }
         }
 
-        val largeAngleAnimator = ValueAnimator.ofFloat(0.65f, 0.8f, 0.65f).apply {
-            duration = 8000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                oval3.angle = it.animatedValue as Float
-            }
-        }
-
-        val xRanimator = ValueAnimator.ofFloat(smallOvalSize.xMin, smallOvalSize.xMax, smallOvalSize.xMin).apply {
-            duration = 5000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                val value = it.animatedValue as Float
-                oval1.radius.x = value
-                oval2.radius.x = value
-            }
-        }
-
-        val yRanimator = ValueAnimator.ofFloat(smallOvalSize.yMin, smallOvalSize.yMax, smallOvalSize.yMin).apply {
-            duration = 4000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                val value = it.animatedValue as Float
-                oval1.radius.y = value
-                oval2.radius.y = value
-            }
-        }
-
-        val xRlargeAnimator = ValueAnimator.ofFloat(largeOvalSize.xMin, largeOvalSize.xMax, largeOvalSize.xMin).apply {
-            duration = 5000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                oval3.radius.x = it.animatedValue as Float
-            }
-        }
-
-        val yRlargeAnimator = ValueAnimator.ofFloat(largeOvalSize.yMin, largeOvalSize.yMax, largeOvalSize.yMin).apply {
-            duration = 4000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                oval3.radius.y = it.animatedValue as Float
-            }
-        }
-
         animators.map { it.cancel() }
         animators.clear()
-
-        animators.add(xRanimator)
-        animators.add(yRanimator)
-
-        animators.add(largeAngleAnimator)
-        animators.add(xRlargeAnimator)
-        animators.add(yRlargeAnimator)
 
         animators.add(timer)
 
@@ -235,7 +218,7 @@ class MorphView @JvmOverloads constructor(
     private fun isAnimating(): Boolean = animators.lastOrNull()?.isRunning ?: false
 
     private fun createOvalPath(vararg ovals: Oval) {
-        ovals.map { it.path.reset() }
+        ovals.forEach { it.path.reset() }
 
         val start = 0f
         val end = END
@@ -271,7 +254,27 @@ class MorphView @JvmOverloads constructor(
 
             i += 0.01f
         }
-        ovals.map { it.path.close() }
+        ovals.forEach { it.path.close() }
+    }
+
+    private fun initializeValues(min: Float, max: Float, duration: Float, frameDuration: Float, values: MutableList<Float>, mirror: Boolean) {
+        values.clear()
+
+        val delta = max - min
+        val valuePerFrame = delta * frameDuration / duration
+        var total: Float = min
+
+        var time: Float = 0f
+
+        while (time <= duration) {
+            total += valuePerFrame
+            time += frameDuration
+            values.add(total)
+        }
+
+        if (mirror) {
+            values.addAll(values.reversed())
+        }
     }
 
     companion object {
@@ -302,3 +305,12 @@ class OvalSize(
     var yMin: Float = 0f,
     var yMax: Float = 0f
 )
+
+class Values {
+
+    private var index: Int = 0
+
+    val values = mutableListOf<Float>()
+
+    fun next(): Float = values[index++ % values.size]
+}
