@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
-import android.graphics.Region
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -41,14 +40,16 @@ class MorphView @JvmOverloads constructor(
     private val smallOvalSize = OvalSize()
     private val largeOvalSize = OvalSize()
 
-    private val clip: Region = Region()
-
     private var isInitialized = false
     private var wasAnimatingWhenDetached = false
     private var wasAnimatingWhenNotShown = false
     private var autoPlay = true
 
     private val animators = arrayListOf<Animator>()
+
+    private val frameDuration = 1000 / 60f
+
+    private val deltaPerFrame = (1 / 24).toFloat()
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -92,8 +93,6 @@ class MorphView @JvmOverloads constructor(
 
         Timber.tag("Animation").d("onMeasure")
 
-        clip.set(0, 0, measuredWidth, measuredHeight)
-
         val cx = measuredWidth / 2f
         val cy = measuredHeight / 2f
 
@@ -122,22 +121,16 @@ class MorphView @JvmOverloads constructor(
 
         createOvalPath(oval1, oval2, oval3)
 
+        // 60fps
         val timer = ValueAnimator.ofInt(0, 60).apply {
             duration = 1000
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
+                oval1.angle = oval1.angle + deltaPerFrame
+                oval2.angle = oval2.angle + deltaPerFrame
+
                 createOvalPath(oval1, oval2, oval3)
                 invalidate()
-            }
-        }
-
-        val smallAngleAnimator = ValueAnimator.ofFloat(0.0f, 2.0f).apply {
-            duration = 8000
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                val value = it.animatedValue as Float
-                oval1.angle = value
-                oval2.angle = value
             }
         }
 
@@ -188,7 +181,6 @@ class MorphView @JvmOverloads constructor(
         animators.map { it.cancel() }
         animators.clear()
 
-        animators.add(smallAngleAnimator)
         animators.add(xRanimator)
         animators.add(yRanimator)
 
