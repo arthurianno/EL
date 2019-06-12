@@ -18,13 +18,16 @@ import com.elta.android.presentation.core.ui.cluster.GeoPointClusterProvider
 import com.elta.android.presentation.core.ui.cluster.ViewBasedGridAlgorithm
 import com.elta.android.presentation.core.ui.cluster.YandexClusterManager
 import com.elta.android.presentation.core.ui.cluster.YandexClusterRenderer
+import com.elta.android.presentation.utils.distanceTo
 import com.elta.android.presentation.utils.toPoint
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.asConsumer
 import com.nullgr.core.rx.asObservable
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.BoundingBoxHelper
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
@@ -118,6 +121,20 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
 
     fun pinClicks() = selectedObjectRelay.asObservable()
 
+    fun moveToPointsInBounds(points: List<Point>) {
+        map?.let { nonNullMap ->
+            val boundingBox = BoundingBoxHelper.getBounds(Polyline(points))
+            var cameraPosition = nonNullMap.cameraPosition(boundingBox)
+            cameraPosition = CameraPosition(
+                cameraPosition.target,
+                cameraPosition.zoom - ZOOM_DIFF,
+                cameraPosition.azimuth,
+                cameraPosition.tilt
+            )
+            nonNullMap.move(cameraPosition, Animation(Animation.Type.SMOOTH, CLUSTER_ANIMATION_DURATION), null)
+        }
+    }
+
     private fun initClusterManager() {
         map?.let { m ->
             val renderer = YandexClusterRenderer(
@@ -160,15 +177,20 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
         selectedPoint?.let {
             if (!it.isUserPoint) {
                 it.selected = true
-                setSelectedPin(it, isMoveToPin)
+                setSelectedPin(it, isMoveToPin, checkAnimationNeeded(it))
             }
         }
     }
 
-    private fun setSelectedPin(geoPoint: GeoPoint, isMoveToPin: Boolean) {
+    private fun checkAnimationNeeded(point: GeoPoint) =
+        map?.let { nonNullMap ->
+            point.distanceTo(nonNullMap.cameraPosition.target) < POINT_ANIMATION_THRESHOLD
+        } ?: false
+
+    private fun setSelectedPin(geoPoint: GeoPoint, isMoveToPin: Boolean, withAnimation: Boolean) {
         selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
-        if (isMoveToPin) moveTo(location = geoPoint.toPoint())
+        if (isMoveToPin) moveTo(location = geoPoint.toPoint(), duration = if (withAnimation) null else 0f)
     }
 
     private fun getSelectedGeoPoint() = selectedObjectRelay.value
@@ -181,7 +203,9 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
         private const val ZOOM_INCREASE_VALUE = 1f
         private const val AZIMUT = 0f
         private const val TILT = 0f
-        private const val PIN_ANIMATION_DURATION = 3f
+        private const val PIN_ANIMATION_DURATION = 1f
         private const val CLUSTER_ANIMATION_DURATION = 1f
+        private const val POINT_ANIMATION_THRESHOLD = 100000f // meters
+        private const val ZOOM_DIFF = 0.3f
     }
 }

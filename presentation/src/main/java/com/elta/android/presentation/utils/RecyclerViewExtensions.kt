@@ -63,3 +63,20 @@ fun checkMainThread(observer: Observer<*>): Boolean {
 
 fun RecyclerView.firstVisiblePosition() =
     (this.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition() ?: 0
+
+fun RecyclerView.scrollSmooth(position: Int) {
+    when (Math.abs(firstVisiblePosition() - position) > SMOOTH_SCROLL_THRESHOLD) {
+        true -> {
+            val diff = when {
+                firstVisiblePosition() < position -> BEFORE_SMOOTH_DIFF
+                else -> -BEFORE_SMOOTH_DIFF
+            }
+            scrollToPosition(position + diff)
+            smoothScrollToPosition(position)
+        }
+        else -> smoothScrollToPosition(position)
+    }
+}
+
+private const val SMOOTH_SCROLL_THRESHOLD = 20
+private const val BEFORE_SMOOTH_DIFF = 10
