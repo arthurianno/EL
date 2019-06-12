@@ -14,6 +14,7 @@ import com.elta.android.presentation.features.main.records.ui.status_bar.MainScr
 import com.elta.android.presentation.widgets.decoration.MainScreenMarginItemDecoration
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.RxBus
+import com.nullgr.core.ui.extensions.toggleVisibilityState
 import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_main_records.*
 import javax.inject.Inject
@@ -45,6 +46,12 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
     override fun onBindPresentationModel(pm: MainRecordsPm) {
         super.onBindPresentationModel(pm)
         pm.mainScreenState.bind(mainScreenStateView, compositeUnbind)
+        pm.mainScreenState
+            .visibilityState
+            .observable.map { !it }
+            .bindTo {
+                itemsView?.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            }
 
         bus.events<Events.HomeBottomSheetStateChanged>().map { it.opened }
             .bindTo(bottomSheetState)
