@@ -225,18 +225,18 @@ class MorphView @JvmOverloads constructor(
 
     private fun initializeValues() {
 
-        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values)
-        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values)
+        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.list)
+        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.list)
 
-        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values)
-        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values)
+        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.list)
+        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.list)
 
-        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values)
-        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values)
+        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.list)
+        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.list)
 
-        val max0 = max(smallAngleValues.values.size, largeAngleValues.values.size)
-        val max1 = max(xRValues.values.size, yRValues.values.size)
-        val max2 = max(xRLargeValues.values.size, yRLargeValues.values.size)
+        val max0 = max(smallAngleValues.list.size, largeAngleValues.list.size)
+        val max1 = max(xRValues.list.size, yRValues.list.size)
+        val max2 = max(xRLargeValues.list.size, yRLargeValues.list.size)
 
         val max = maxOf(max0, max1, max2)
 
@@ -319,7 +319,13 @@ class MorphView @JvmOverloads constructor(
         return holder
     }
 
-    private fun initializeValues(min: Float, max: Float, duration: Float, frameDuration: Float, values: MutableList<Float>) {
+    private fun initializeValues(
+        min: Float,
+        max: Float,
+        duration: Float,
+        frameDuration: Float,
+        values: MutableList<Float>
+    ) {
         values.clear()
 
         val delta = max - min
@@ -335,111 +341,112 @@ class MorphView @JvmOverloads constructor(
         }
     }
 
+    class Oval(
+        var path: Path = Path(),
+        val rotateOffset: Float = 1f,
+        var center: PointF = PointF(),
+        var radius: PointF = PointF(),
+        var angle: Float = 0f,
+        val rotateOffsetPiFloat: Float = rotateOffset * MorphView.PI_FLOAT
+    ) {
+
+        fun setCenter(cx: Float, cy: Float) {
+            center.x = cx
+            center.y = cy
+        }
+    }
+
+    @Suppress("UseDataClass")
+    class OvalSize(
+        var xMin: Float = 0f,
+        var xMax: Float = 0f,
+        var yMin: Float = 0f,
+        var yMax: Float = 0f
+    )
+
+    class Values(val mirror: Boolean) {
+
+        private var endlessIterator: Iterator<Float>? = null
+        private var forwardBackwardIterator: Iterator<Float>? = null
+
+        val list = mutableListOf<Float>()
+
+        fun next(): Float {
+
+            if (mirror && forwardBackwardIterator == null) {
+                forwardBackwardIterator = list.forwardBackwardIterator()
+            }
+
+            if (!mirror && endlessIterator == null) {
+                endlessIterator = list.endlessIterator()
+            }
+
+            return if (mirror) forwardBackwardIterator?.next() ?: 0f else endlessIterator?.next()
+                ?: 0f
+        }
+    }
+
+    class PathHolder(
+        val p1: Path = Path(),
+        val p2: Path = Path(),
+        val p3: Path = Path()
+    ) {
+        inline fun getPath(index: Int): Path = if (index == 0) p1 else if (index == 1) p2 else p3
+    }
+
+    class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+
+        private val size = list.size
+        private var current = -1
+        private var isForward = true
+        private var iteration = 0
+
+        override fun hasNext(): Boolean = if (count == -1) true else iteration < count
+
+        override fun next(): T {
+            if (isForward) {
+                current += 1
+                if (current == size - 1) {
+                    isForward = false
+                }
+            } else {
+                current -= 1
+                if (current == 0) {
+                    isForward = true
+                    iteration += 1
+                }
+            }
+
+            return list[current]
+        }
+    }
+
+    class EndlessIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+
+        private val size = list.size
+        private var current = 0
+        private var iteration = 0
+
+        override fun hasNext(): Boolean = if (count == -1) true else iteration < count
+
+        override fun next(): T {
+            val item = list[current++]
+            if (current == size) {
+                current = 0
+                iteration++
+            }
+            return item
+        }
+    }
+
     companion object {
         val PI_FLOAT = PI.toFloat()
         val END = 2 * PI_FLOAT
     }
 }
 
-class Oval(
-    var path: Path = Path(),
-    val rotateOffset: Float = 1f,
-    var center: PointF = PointF(),
-    var radius: PointF = PointF(),
-    var angle: Float = 0f,
-    val rotateOffsetPiFloat: Float = rotateOffset * MorphView.PI_FLOAT
-) {
-
-    fun setCenter(cx: Float, cy: Float) {
-        center.x = cx
-        center.y = cy
-    }
-}
-
-@Suppress("UseDataClass")
-class OvalSize(
-    var xMin: Float = 0f,
-    var xMax: Float = 0f,
-    var yMin: Float = 0f,
-    var yMax: Float = 0f
-)
-
-class Values(val mirror: Boolean) {
-
-    private var endlessIterator: Iterator<Float>? = null
-    private var forwardBackwardIterator: Iterator<Float>? = null
-
-    val values = mutableListOf<Float>()
-
-    fun next(): Float {
-
-        if (mirror && forwardBackwardIterator == null) {
-            forwardBackwardIterator = values.forwardBackwardIterator()
-        }
-
-        if (!mirror && endlessIterator == null) {
-            endlessIterator = values.endlessIterator()
-        }
-
-        return if (mirror) forwardBackwardIterator?.next() ?: 0f else endlessIterator?.next() ?: 0f
-    }
-}
-
-class PathHolder(
-    val p1: Path = Path(),
-    val p2: Path = Path(),
-    val p3: Path = Path()
-) {
-    inline fun getPath(index: Int): Path = if (index == 0) p1 else if (index == 1) p2 else p3
-}
-
 fun <T> List<T>.forwardBackwardIterator(count: Int = -1): Iterator<T> =
-    ForwardBackwardIterator(this, count)
-
-class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
-
-    private val size = list.size
-    private var current = -1
-    private var isForward = true
-    private var iteration = 0
-
-    override fun hasNext(): Boolean = if (count == -1) true else iteration < count
-
-    override fun next(): T {
-        if (isForward) {
-            current += 1
-            if (current == size - 1) {
-                isForward = false
-            }
-        } else {
-            current -= 1
-            if (current == 0) {
-                isForward = true
-                iteration += 1
-            }
-        }
-
-        return list[current]
-    }
-}
+    MorphView.ForwardBackwardIterator(this, count)
 
 fun <T> List<T>.endlessIterator(count: Int = -1): Iterator<T> =
-    EndlessIterator(this, count)
-
-class EndlessIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
-
-    private val size = list.size
-    private var current = 0
-    private var iteration = 0
-
-    override fun hasNext(): Boolean = if (count == -1) true else iteration < count
-
-    override fun next(): T {
-        val item = list[current++]
-        if (current == size) {
-            current = 0
-            iteration++
-        }
-        return item
-    }
-}
+    MorphView.EndlessIterator(this, count)
