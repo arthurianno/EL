@@ -1,7 +1,5 @@
 package com.elta.android.presentation.widgets
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -9,14 +7,17 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
 import android.os.Build
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.View
+import com.elta.android.common.utils.log
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
@@ -53,17 +54,6 @@ class MorphView @JvmOverloads constructor(
     private val smallOvalSize = OvalSize()
     private val largeOvalSize = OvalSize()
 
-    private var isInitialized = false
-    private var wasAnimatingWhenDetached = false
-    private var wasAnimatingWhenNotShown = false
-    private var autoPlay = true
-
-    private val animators = arrayListOf<Animator>()
-
-    private val time = 1000L
-    private val frames = 60
-    private val frameDuration = time / frames.toFloat()
-
     private val smallAngleValues = Values()
     private val largeAngleValues = Values()
 
@@ -77,8 +67,33 @@ class MorphView @JvmOverloads constructor(
     private val holders = mutableListOf<PathHolder>()
     private var holdersIterator: Iterator<PathHolder>? = null
 
+    private val time = 1000L
+    private val frames = 60
+    private val frameDuration = time / frames.toFloat()
+    private val frameDelay = 16L
+
+    private var isInitialized = false
+    private var wasAnimatingWhenDetached = false
+    private var wasAnimatingWhenNotShown = false
+    private var autoPlay = true
+
     private val initializeValuesAction = PublishRelay.create<Unit>()
     private val compositeDisposable = CompositeDisposable()
+
+    private var isAnimating = false
+    private val animationHandler = Handler()
+    private val animation = object : Runnable {
+        override fun run() {
+            holdersIterator?.let {
+                val holder = it.next()
+                oval1.path = holder.p1
+                oval2.path = holder.p2
+                oval3.path = holder.p3
+                invalidate()
+                animationHandler.postDelayed(this, frameDelay)
+            }
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -93,6 +108,7 @@ class MorphView @JvmOverloads constructor(
         }
 
         initializeValuesAction
+            .log("Animation", "init action")
             .switchMapCompletable {
                 Completable.fromCallable { initializeValues() }
                     .subscribeOn(Schedulers.computation())
@@ -106,12 +122,10 @@ class MorphView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         compositeDisposable.clear()
-
-        if (isAnimating()) {
+        if (isAnimating) {
             cancelAnimation()
             wasAnimatingWhenDetached = true
         }
-
         super.onDetachedFromWindow()
     }
 
@@ -122,7 +136,7 @@ class MorphView @JvmOverloads constructor(
                 wasAnimatingWhenNotShown = false
             }
         } else {
-            if (isAnimating()) {
+            if (isAnimating) {
                 pauseAnimation()
                 wasAnimatingWhenNotShown = true
             }
@@ -131,8 +145,60 @@ class MorphView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        Timber.tag("Animation").d("measure: w=$measuredWidth, h=$measuredHeight")
+        measureOvals()
+    }
 
-        isInitialized = false
+    override fun onDraw(canvas: Canvas) {
+        canvas.drawPath(oval3.path, largeOvalPaint)
+        canvas.drawPath(oval2.path, smallOvalPaint)
+        canvas.drawPath(oval1.path, smallOvalPaint)
+    }
+
+    fun playAnimation() {
+        if (!isInitialized) return
+
+        if (isShown) {
+            isAnimating = true
+            animationHandler.removeCallbacks(animation)
+            animationHandler.post(animation)
+        } else {
+            wasAnimatingWhenNotShown = true
+        }
+    }
+
+    fun resumeAnimation() {
+        if (!isInitialized) return
+
+        if (isShown) {
+            isAnimating = true
+            animationHandler.removeCallbacks(animation)
+            animationHandler.post(animation)
+        } else {
+            wasAnimatingWhenNotShown = true
+        }
+    }
+
+    fun cancelAnimation() {
+        if (!isInitialized) return
+
+        wasAnimatingWhenNotShown = false
+        isAnimating = false
+        animationHandler.removeCallbacks(animation)
+    }
+
+    fun pauseAnimation() {
+        if (!isInitialized) return
+
+        autoPlay = false
+        wasAnimatingWhenDetached = false
+        wasAnimatingWhenNotShown = false
+        isAnimating = false
+        animationHandler.removeCallbacks(animation)
+    }
+
+    private fun measureOvals() {
+        Timber.tag("Animation").d("measure ovals")
 
         val cx = measuredWidth / 2f
         val cy = measuredHeight / 2f
@@ -161,70 +227,7 @@ class MorphView @JvmOverloads constructor(
         oval3.radius.y = largeOvalSize.yMin
 
         initializeValuesAction.accept(Unit)
-
-        // 60fps
-        val timer = ValueAnimator.ofInt(0, frames).apply {
-            duration = time
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener {
-                holdersIterator?.let {
-                    val holder = it.next()
-                    oval1.path = holder.p1
-                    oval2.path = holder.p2
-                    oval3.path = holder.p3
-                    invalidate()
-                }
-            }
-        }
-
-        animators.map { it.cancel() }
-        animators.clear()
-
-        animators.add(timer)
     }
-
-    override fun onDraw(canvas: Canvas) {
-        canvas.drawPath(oval3.path, largeOvalPaint)
-        canvas.drawPath(oval1.path, smallOvalPaint)
-    }
-
-    fun playAnimation() {
-        if (!isInitialized) return
-
-        if (isShown) {
-            animators.map { it.start() }
-        } else {
-            wasAnimatingWhenNotShown = true
-        }
-    }
-
-    fun resumeAnimation() {
-        if (!isInitialized) return
-
-        if (isShown) {
-            animators.map { it.resume() }
-        } else {
-            wasAnimatingWhenNotShown = true
-        }
-    }
-
-    fun cancelAnimation() {
-        if (!isInitialized) return
-
-        wasAnimatingWhenNotShown = false
-        animators.map { it.cancel() }
-    }
-
-    fun pauseAnimation() {
-        if (!isInitialized) return
-
-        autoPlay = false
-        wasAnimatingWhenDetached = false
-        wasAnimatingWhenNotShown = false
-        animators.map { it.pause() }
-    }
-
-    private fun isAnimating(): Boolean = animators.lastOrNull()?.isRunning ?: false
 
     private fun initializeValues() {
 
@@ -279,8 +282,6 @@ class MorphView @JvmOverloads constructor(
             }
         }
 
-        println(added)
-
         holdersIterator = holders.forwardBackwardIterator()
 
         isInitialized = true
@@ -323,11 +324,8 @@ class MorphView @JvmOverloads constructor(
                 }
             }
 
-            i += 0.01f
+            i += 0.05f
         }
-
-        holder.p1.addPath(holder.p2)
-
         return holder
     }
 
