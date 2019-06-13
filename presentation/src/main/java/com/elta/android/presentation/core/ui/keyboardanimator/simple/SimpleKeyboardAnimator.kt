@@ -1,3 +1,5 @@
+@file:Suppress("LabeledExpression")
+
 package com.elta.android.presentation.core.ui.keyboardanimator.simple
 
 import android.annotation.TargetApi
