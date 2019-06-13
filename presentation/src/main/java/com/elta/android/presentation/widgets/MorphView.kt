@@ -52,14 +52,14 @@ class MorphView @JvmOverloads constructor(
     private val smallOvalSize = OvalSize()
     private val largeOvalSize = OvalSize()
 
-    private val smallAngleValues = Values()
-    private val largeAngleValues = Values()
+    private val smallAngleValues = Values(mirror = false)
+    private val largeAngleValues = Values(mirror = true)
 
-    private val xRValues = Values()
-    private val yRValues = Values()
+    private val xRValues = Values(mirror = true)
+    private val yRValues = Values(mirror = true)
 
-    private val xRLargeValues = Values()
-    private val yRLargeValues = Values()
+    private val xRLargeValues = Values(mirror = true)
+    private val yRLargeValues = Values(mirror = true)
 
     private val keys = mutableSetOf<String>()
     private val holders = mutableListOf<PathHolder>()
@@ -225,14 +225,14 @@ class MorphView @JvmOverloads constructor(
 
     private fun initializeValues() {
 
-        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values, false)
-        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values, true)
+        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values)
+        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values)
 
-        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values, true)
-        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values, true)
+        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values)
+        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values)
 
-        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values, true)
-        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values, true)
+        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values)
+        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values)
 
         val max0 = max(smallAngleValues.values.size, largeAngleValues.values.size)
         val max1 = max(xRValues.values.size, yRValues.values.size)
@@ -252,8 +252,8 @@ class MorphView @JvmOverloads constructor(
             val yRLargeValue = yRLargeValues.next()
 
             val key = "$smallAngleValue-$largeAngleValue-$xRValue-$yRValue-$xRLargeValue-$yRLargeValue"
-            keys.add(key).also {
-                if (it) {
+            keys.add(key).also { added ->
+                if (added) {
                     oval1.angle = smallAngleValue
                     oval2.angle = smallAngleValue
                     oval3.angle = largeAngleValue
@@ -319,7 +319,7 @@ class MorphView @JvmOverloads constructor(
         return holder
     }
 
-    private fun initializeValues(min: Float, max: Float, duration: Float, frameDuration: Float, values: MutableList<Float>, mirror: Boolean) {
+    private fun initializeValues(min: Float, max: Float, duration: Float, frameDuration: Float, values: MutableList<Float>) {
         values.clear()
 
         val delta = max - min
@@ -332,10 +332,6 @@ class MorphView @JvmOverloads constructor(
             total += valuePerFrame
             time += frameDuration
             values.add(total)
-        }
-
-        if (mirror) {
-            values.addAll(values.reversed())
         }
     }
 
@@ -368,14 +364,25 @@ class OvalSize(
     var yMax: Float = 0f
 )
 
-class Values {
+class Values(val mirror: Boolean) {
 
-    private var index: Int = 0
+    private var endlessIterator: Iterator<Float>? = null
+    private var forwardBackwardIterator: Iterator<Float>? = null
 
     val values = mutableListOf<Float>()
 
+    fun next(): Float {
 
-    fun next(): Float = values[index++ % values.size]
+        if (mirror && forwardBackwardIterator == null) {
+            forwardBackwardIterator = values.forwardBackwardIterator()
+        }
+
+        if (!mirror && endlessIterator == null) {
+            endlessIterator = values.endlessIterator()
+        }
+
+        return if (mirror) forwardBackwardIterator?.next() ?: 0f else endlessIterator?.next() ?: 0f
+    }
 }
 
 class PathHolder(
@@ -413,5 +420,26 @@ class ForwardBackwardIterator<T>(private val list: List<T>, private val count: I
         }
 
         return list[current]
+    }
+}
+
+fun <T> List<T>.endlessIterator(count: Int = -1): Iterator<T> =
+    EndlessIterator(this, count)
+
+class EndlessIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+
+    private val size = list.size
+    private var current = 0
+    private var iteration = 0
+
+    override fun hasNext(): Boolean = if (count == -1) true else iteration < count
+
+    override fun next(): T {
+        val item = list[current++]
+        if (current == size) {
+            current = 0
+            iteration++
+        }
+        return item
     }
 }
