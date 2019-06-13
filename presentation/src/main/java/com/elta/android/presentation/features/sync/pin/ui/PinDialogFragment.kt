@@ -1,8 +1,11 @@
 package com.elta.android.presentation.features.sync.pin.ui
 
+import android.app.Dialog
 import android.os.Bundle
+import android.view.WindowManager
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
+import com.elta.android.presentation.core.ui.keyboardanimator.simple.SimpleKeyboardAnimator
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
@@ -13,6 +16,13 @@ class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
 
     override val screenLayout: Int = R.layout.fragment_enter_pin_dialog
     override val classToken: Class<PinDialogPm> = PinDialogPm::class.java
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return super.onCreateDialog(savedInstanceState).apply {
+            window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            window?.let { SimpleKeyboardAnimator(it).start() }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
