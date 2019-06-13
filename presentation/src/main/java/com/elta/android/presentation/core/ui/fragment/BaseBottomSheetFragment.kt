@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
+import com.elta.android.presentation.utils.hideKeyboardFun
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -21,6 +22,11 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        view?.hideKeyboardFun()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

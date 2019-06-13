@@ -19,6 +19,7 @@ import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.utils.applyInsetsToContentView
+import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.makeSnackBar
 import com.elta.android.presentation.utils.visibility
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
@@ -72,6 +73,11 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
     override fun onResume() {
         super.onResume()
         backgroundColor?.let { activity?.window?.setBackgroundDrawableResource(it) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        view?.hideKeyboardFun()
     }
 
     override fun onStart() {
