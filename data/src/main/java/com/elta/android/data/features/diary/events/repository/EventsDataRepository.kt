@@ -99,27 +99,38 @@ class EventsDataRepository @Inject constructor(
                     }
             }
             .flatMap { toSync ->
-                remoteSource.deleteEvents(
-                    toSync.filter { it.state == StateDto.DELETED }
-                        .map { SimpleEventDto(it.secondaryId, EventTypeDto.valueOf(checkNotNull(it.meta))) }
-                )
-                    .andThen(syncManager.setAllSynced<Event>(StateDto.DELETED))
-                    .andThen(Observable.just(toSync))
+                val toDelete = toSync.filter { it.state == StateDto.DELETED }
+                    .map { SimpleEventDto(it.secondaryId, EventTypeDto.valueOf(checkNotNull(it.meta))) }
+
+                when (toDelete.isEmpty()) {
+                    true -> Observable.just(toSync)
+                    else -> remoteSource.deleteEvents(toDelete)
+                        .andThen(syncManager.setAllSynced<Event>(StateDto.DELETED))
+                        .andThen(Observable.just(toSync))
+                }
             }
             .flatMap { toSync ->
                 val toCreate = toSync.filter { it.state == StateDto.CREATED }
                     .map { it.secondaryId.hashCode().toLong() }
-                cacheSource.getEventsById(toCreate)
-                    .flatMapCompletable { remoteSource.addEvents(it) }
-                    .andThen(syncManager.setAllSynced<Event>(StateDto.CREATED))
-                    .andThen(Observable.just(toSync))
+
+                when (toCreate.isEmpty()) {
+                    true -> Observable.just(toSync)
+                    else -> cacheSource.getEventsById(toCreate)
+                        .flatMapCompletable { remoteSource.addEvents(it) }
+                        .andThen(syncManager.setAllSynced<Event>(StateDto.CREATED))
+                        .andThen(Observable.just(toSync))
+                }
             }
             .flatMapCompletable { toSync ->
-                val toCreate = toSync.filter { it.state == StateDto.UPDATED }
+                val toUpdate = toSync.filter { it.state == StateDto.UPDATED }
                     .map { it.secondaryId.hashCode().toLong() }
-                cacheSource.getEventsById(toCreate)
-                    .flatMapCompletable { remoteSource.updateEvents(it) }
-                    .andThen(syncManager.setAllSynced<Event>(StateDto.UPDATED))
+
+                when (toUpdate.isEmpty()) {
+                    true -> Completable.complete()
+                    else -> cacheSource.getEventsById(toUpdate)
+                        .flatMapCompletable { remoteSource.updateEvents(it) }
+                        .andThen(syncManager.setAllSynced<Event>(StateDto.UPDATED))
+                }
             }
 
     override fun getShareEventUri(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Single<Uri> =
