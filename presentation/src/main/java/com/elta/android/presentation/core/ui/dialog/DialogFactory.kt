@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.support.v4.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
+import com.elta.android.presentation.R
 import me.dmdev.rxpm.widget.DialogControl
 
 fun createDialog(
@@ -23,6 +24,7 @@ fun createDialog(
         .content(data.message)
         .buttons(dc, data)
         .build()
+        .apply { this?.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_rounded) }
 
 fun MaterialDialog.Builder.buttons(
     dc: DialogControl<DialogData, DialogResult>,
@@ -33,10 +35,12 @@ fun MaterialDialog.Builder.buttons(
             builder
                 .negativeText(text)
                 .onNegative { _, _ -> dc.sendResult(DialogResult.NEGATIVE) }
+                .negativeColorRes(R.color.color_dialog_button)
         }
         data.positive?.let { text ->
             builder
                 .positiveText(text)
                 .onPositive { _, _ -> dc.sendResult(DialogResult.POSITIVE) }
+                .positiveColorRes(R.color.color_dialog_button)
         }
     }
