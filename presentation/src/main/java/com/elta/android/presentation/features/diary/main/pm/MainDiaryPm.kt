@@ -45,7 +45,7 @@ class MainDiaryPm @Inject constructor(
 
         loadScreenAction.observable
             .map(::createUseCaseParams)
-            .flatMap {
+            .switchMap {
                 getEventsByDateUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
@@ -58,7 +58,6 @@ class MainDiaryPm @Inject constructor(
             .untilDestroy()
 
         Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
             selectedDateState.observable.map { Unit },
             bus.events<Events.EventsChanged>().map { Unit }
         )
