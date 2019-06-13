@@ -11,8 +11,15 @@ import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 
 @Suppress("LongMethod", "MagicNumber")
@@ -35,6 +42,13 @@ class MorphView @JvmOverloads constructor(
     private val oval1 = Oval(rotateOffset = 0f)
     private val oval2 = Oval(rotateOffset = 0.5f)
     private val oval3 = Oval(rotateOffset = 1f)
+    private val ovals = arrayListOf<Oval>().apply {
+        add(oval1)
+        add(oval2)
+        add(oval3)
+    }
+
+    private val ovalsRange = 0 until ovals.size
 
     private val smallOvalSize = OvalSize()
     private val largeOvalSize = OvalSize()
@@ -59,10 +73,12 @@ class MorphView @JvmOverloads constructor(
     private val xRLargeValues = Values()
     private val yRLargeValues = Values()
 
-    init {
-        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values, false)
-        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values, true)
-    }
+    private val keys = mutableSetOf<String>()
+    private val holders = mutableListOf<PathHolder>()
+    private var holdersIterator: Iterator<PathHolder>? = null
+
+    private val initializeValuesAction = PublishRelay.create<Unit>()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -75,14 +91,28 @@ class MorphView @JvmOverloads constructor(
             // https://stackoverflow.com/a/53625860/715633
             onVisibilityChanged(this, visibility)
         }
+
+        initializeValuesAction
+            .switchMapCompletable {
+                Completable.fromCallable { initializeValues() }
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete { playAnimation() }
+            }
+            .retry()
+            .subscribe()
+            .addTo(compositeDisposable)
     }
 
     override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
+        compositeDisposable.clear()
+
         if (isAnimating()) {
             cancelAnimation()
             wasAnimatingWhenDetached = true
         }
+
+        super.onDetachedFromWindow()
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
@@ -101,6 +131,8 @@ class MorphView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
+        isInitialized = false
 
         val cx = measuredWidth / 2f
         val cy = measuredHeight / 2f
@@ -128,38 +160,20 @@ class MorphView @JvmOverloads constructor(
         oval3.radius.x = largeOvalSize.xMin
         oval3.radius.y = largeOvalSize.yMin
 
-        createOvalPath(oval1, oval2, oval3)
-
-        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values, true)
-        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values, true)
-
-        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values, true)
-        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values, true)
+        initializeValuesAction.accept(Unit)
 
         // 60fps
         val timer = ValueAnimator.ofInt(0, frames).apply {
             duration = time
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
-
-                val value = smallAngleValues.next()
-                oval1.angle = value
-                oval2.angle = value
-                oval3.angle = largeAngleValues.next()
-
-                val oval_1_2_X = xRValues.next()
-                oval1.radius.x = oval_1_2_X
-                oval2.radius.x = oval_1_2_X
-
-                val oval_1_2_Y = yRValues.next()
-                oval1.radius.y = oval_1_2_Y
-                oval2.radius.y = oval_1_2_Y
-
-                oval3.radius.x = xRLargeValues.next()
-                oval3.radius.y = yRLargeValues.next()
-
-                createOvalPath(oval1, oval2, oval3)
-                invalidate()
+                holdersIterator?.let {
+                    val holder = it.next()
+                    oval1.path = holder.p1
+                    oval2.path = holder.p2
+                    oval3.path = holder.p3
+                    invalidate()
+                }
             }
         }
 
@@ -167,14 +181,9 @@ class MorphView @JvmOverloads constructor(
         animators.clear()
 
         animators.add(timer)
-
-        isInitialized = true
-
-        playAnimation()
     }
 
     override fun onDraw(canvas: Canvas) {
-        oval1.path.addPath(oval2.path)
         canvas.drawPath(oval3.path, largeOvalPaint)
         canvas.drawPath(oval1.path, smallOvalPaint)
     }
@@ -217,11 +226,71 @@ class MorphView @JvmOverloads constructor(
 
     private fun isAnimating(): Boolean = animators.lastOrNull()?.isRunning ?: false
 
-    private fun createOvalPath(vararg ovals: Oval) {
-        ovals.forEach { it.path.reset() }
+    private fun initializeValues() {
 
+        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.values, false)
+        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.values, true)
+
+        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.values, true)
+        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.values, true)
+
+        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.values, true)
+        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.values, true)
+
+        val max0 = max(smallAngleValues.values.size, largeAngleValues.values.size)
+        val max1 = max(xRValues.values.size, yRValues.values.size)
+        val max2 = max(xRLargeValues.values.size, yRLargeValues.values.size)
+
+        val max = maxOf(max0, max1, max2)
+
+        var added = 0
+
+        (0 until max).forEach {
+
+            val smallAngleValue = smallAngleValues.next()
+            val largeAngleValue = largeAngleValues.next()
+
+            val xRValue = xRValues.next()
+            val yRValue = yRValues.next()
+
+            val xRLargeValue = xRLargeValues.next()
+            val yRLargeValue = yRLargeValues.next()
+
+            val key = "$smallAngleValue-$largeAngleValue-$xRValue-$yRValue-$xRLargeValue-$yRLargeValue"
+            keys.add(key).also {
+                if (it) {
+                    added++
+
+                    oval1.angle = smallAngleValue
+                    oval2.angle = smallAngleValue
+                    oval3.angle = largeAngleValue
+
+                    oval1.radius.x = xRValue
+                    oval2.radius.x = xRValue
+
+                    oval1.radius.y = yRValue
+                    oval2.radius.y = yRValue
+
+                    oval3.radius.x = xRLargeValue
+                    oval3.radius.y = yRLargeValue
+
+                    holders.add(getOvalPaths(ovals))
+                }
+            }
+        }
+
+        println(added)
+
+        holdersIterator = holders.forwardBackwardIterator()
+
+        isInitialized = true
+    }
+
+    private fun getOvalPaths(ovals: List<Oval>): PathHolder {
         val start = 0f
         val end = END
+
+        val holder = PathHolder()
 
         var i = start
         while (i <= end) {
@@ -229,18 +298,20 @@ class MorphView @JvmOverloads constructor(
             val sinI = sin(i)
             val cosI = cos(i)
 
-            ovals.forEach {
-                val path = it.path
-                val anglePi = it.rotateOffsetPiFloat * it.angle
+            for (index in ovalsRange) {
+                val oval = ovals[index]
+
+                val path = holder.getPath(index)
+                val anglePi = oval.rotateOffsetPiFloat * oval.angle
 
                 val sinAnglePi = sin(anglePi)
                 val cosAnglePi = cos(anglePi)
 
-                val xR = it.radius.x
-                val yR = it.radius.y
+                val xR = oval.radius.x
+                val yR = oval.radius.y
 
-                val cx = it.center.x
-                val cy = it.center.y
+                val cx = oval.center.x
+                val cy = oval.center.y
 
                 val xPos = cx - xR * sinI * sinAnglePi + yR * cosI * cosAnglePi
                 val yPos = cy + yR * cosI * sinAnglePi + xR * sinI * cosAnglePi
@@ -254,7 +325,10 @@ class MorphView @JvmOverloads constructor(
 
             i += 0.01f
         }
-        ovals.forEach { it.path.close() }
+
+        holder.p1.addPath(holder.p2)
+
+        return holder
     }
 
     private fun initializeValues(min: Float, max: Float, duration: Float, frameDuration: Float, values: MutableList<Float>, mirror: Boolean) {
@@ -284,7 +358,7 @@ class MorphView @JvmOverloads constructor(
 }
 
 class Oval(
-    val path: Path = Path(),
+    var path: Path = Path(),
     val rotateOffset: Float = 1f,
     var center: PointF = PointF(),
     var radius: PointF = PointF(),
@@ -312,5 +386,44 @@ class Values {
 
     val values = mutableListOf<Float>()
 
+
     fun next(): Float = values[index++ % values.size]
+}
+
+class PathHolder(
+    val p1: Path = Path(),
+    val p2: Path = Path(),
+    val p3: Path = Path()
+) {
+    inline fun getPath(index: Int): Path = if (index == 0) p1 else if (index == 1) p2 else p3
+}
+
+fun <T> List<T>.forwardBackwardIterator(count: Int = -1): Iterator<T> =
+    ForwardBackwardIterator(this, count)
+
+class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+
+    private val size = list.size
+    private var current = -1
+    private var isForward = true
+    private var iteration = 0
+
+    override fun hasNext(): Boolean = if (count == -1) true else iteration < count
+
+    override fun next(): T {
+        if (isForward) {
+            current += 1
+            if (current == size - 1) {
+                isForward = false
+            }
+        } else {
+            current -= 1
+            if (current == 0) {
+                isForward = true
+                iteration += 1
+            }
+        }
+
+        return list[current]
+    }
 }
