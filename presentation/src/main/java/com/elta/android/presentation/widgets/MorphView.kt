@@ -10,14 +10,12 @@ import android.os.Build
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.View
-import com.elta.android.common.utils.log
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
@@ -108,7 +106,6 @@ class MorphView @JvmOverloads constructor(
         }
 
         initializeValuesAction
-            .log("Animation", "init action")
             .switchMapCompletable {
                 Completable.fromCallable { initializeValues() }
                     .subscribeOn(Schedulers.computation())
@@ -145,7 +142,6 @@ class MorphView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        Timber.tag("Animation").d("measure: w=$measuredWidth, h=$measuredHeight")
         measureOvals()
     }
 
@@ -198,8 +194,6 @@ class MorphView @JvmOverloads constructor(
     }
 
     private fun measureOvals() {
-        Timber.tag("Animation").d("measure ovals")
-
         val cx = measuredWidth / 2f
         val cy = measuredHeight / 2f
 
@@ -246,8 +240,6 @@ class MorphView @JvmOverloads constructor(
 
         val max = maxOf(max0, max1, max2)
 
-        var added = 0
-
         (0 until max).forEach {
 
             val smallAngleValue = smallAngleValues.next()
@@ -262,8 +254,6 @@ class MorphView @JvmOverloads constructor(
             val key = "$smallAngleValue-$largeAngleValue-$xRValue-$yRValue-$xRLargeValue-$yRLargeValue"
             keys.add(key).also {
                 if (it) {
-                    added++
-
                     oval1.angle = smallAngleValue
                     oval2.angle = smallAngleValue
                     oval3.angle = largeAngleValue
