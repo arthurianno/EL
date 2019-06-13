@@ -373,7 +373,7 @@ public class BottomSheetBehavior<V extends View> extends Behavior<V> {
                           When clicked, it scrolls 1-2 pixels
                           and considers that it is necessary to close the dialog
                          */
-                        if (dy > -5) return;
+                        if (dy > -15) return;
 
                         consumed[1] = dy;
                         ViewCompat.offsetTopAndBottom(child, -dy);
