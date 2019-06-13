@@ -8,6 +8,7 @@ import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
+import io.reactivex.Completable
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -18,8 +19,17 @@ class TagsDataRepository @Inject constructor(
 ) : TagsRepository {
 
     override fun getTags(): Observable<List<Tag>> =
+        cacheSource.getTags()
+            .flatMap {
+                when (it.isEmpty()) {
+                    true -> sync().andThen(cacheSource.getTags())
+                    else -> Observable.just(it)
+                }
+            }
+            .map(toDomainMapper::mapFromObjects)
+
+    override fun sync(): Completable =
         remoteSource.getTags()
             .onConnectionErrorReturnsEmpty()
-            .flatMap { cacheSource.getTags() }
-            .map(toDomainMapper::mapFromObjects)
+            .ignoreElements()
 }
