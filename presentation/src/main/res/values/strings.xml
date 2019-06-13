@@ -228,7 +228,7 @@
 
     <!-- MAIN RECORDS -->
     <string name="main_records_firs_launch_title">Добро пожаловать</string>
-    <string name="main_records_firs_launch_subtitle">Чтобы добавить новую запись в дневник,\nвоспользуйтесь кнопкой "плюс" и выберите\nнужный показатель\n\nДля добавления записи об уровне глюкозы\nпроведите измерение с помощью\nглюкометра</string>
+    <string name="main_records_firs_launch_subtitle">Чтобы добавить новую запись в дневник,\nвоспользуйтесь кнопкой \"плюс\" и выберите\nнужный показатель\n\nДля добавления записи об уровне глюкозы\nпроведите измерение с помощью\nглюкометра</string>
 
     <string name="main_records_new_day_title_morning">Доброе утро</string>
     <string name="main_records_new_day_title_afternoon">Добрый день</string>
