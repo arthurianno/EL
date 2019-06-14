@@ -174,4 +174,6 @@
     <color name="cluster_background_primary">#4c4580d4</color>
     <color name="cluster_background_secondary">@color/blue</color>
 
+    <color name="color_dialog_button">@color/g_green_b</color>
+
 </resources>

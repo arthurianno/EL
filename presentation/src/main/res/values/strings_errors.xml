@@ -10,7 +10,7 @@
     <string name="error_607">Invalid token</string>
     <string name="error_608">Invalid token</string>
     <string name="error_609">User already linked to social network</string>
-    <string name="error_610">Social network account is already linked</string>
+    <string name="error_610">Социальная сеть уже привязана к другому аккаунту</string>
     <string name="error_611">User had not been linked to this social network</string>
     <string name="error_612">Not found. New account</string>
     <string name="error_613">Неверный текущий пароль</string>

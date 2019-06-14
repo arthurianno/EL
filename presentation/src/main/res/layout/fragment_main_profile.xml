@@ -8,7 +8,8 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayoutView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarView"
@@ -17,6 +18,7 @@
             app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:scrimAnimationDuration="200"
+            app:statusBarScrim="@android:color/transparent"
             app:titleEnabled="false">
 
             <LinearLayout

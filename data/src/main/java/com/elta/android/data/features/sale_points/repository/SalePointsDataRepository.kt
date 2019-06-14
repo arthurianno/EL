@@ -9,6 +9,7 @@ import com.elta.android.data.features.sale_points.dto.SalePointDto
 import com.elta.android.domain.features.sale_points.model.CoordinatesBounds
 import com.elta.android.domain.features.sale_points.model.SalePoint
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
+import io.reactivex.Completable
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -19,12 +20,14 @@ class SalePointsDataRepository @Inject constructor(
 ) : SalePointsRepository {
 
     override fun getSalePoints(): Observable<List<SalePoint>> =
-        remoteSource.getSalePoints()
-            .onConnectionErrorReturnsEmpty()
+        cacheSource.getSalePoints()
             .flatMap {
-                cacheSource.getSalePoints()
-                    .map { toDomainMapper.mapFromObjects(it) }
+                when (it.isEmpty()) {
+                    true -> sync().andThen(cacheSource.getSalePoints())
+                    else -> Observable.just(it)
+                }
             }
+            .map { toDomainMapper.mapFromObjects(it) }
 
     override fun getSalePoints(bounds: CoordinatesBounds): Observable<List<SalePoint>> =
         cacheSource.getSalePoints(
@@ -37,4 +40,9 @@ class SalePointsDataRepository @Inject constructor(
     override fun searchSalePoints(query: String): Observable<List<SalePoint>> =
         cacheSource.searchSalePoints(query)
             .map { toDomainMapper.mapFromObjects(it) }
+
+    override fun sync(): Completable =
+        remoteSource.getSalePoints()
+            .onConnectionErrorReturnsEmpty()
+            .ignoreElements()
 }

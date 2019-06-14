@@ -2,6 +2,7 @@ package com.elta.android.domain.features.sale_points.repository
 
 import com.elta.android.domain.features.sale_points.model.CoordinatesBounds
 import com.elta.android.domain.features.sale_points.model.SalePoint
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 interface SalePointsRepository {
@@ -11,4 +12,6 @@ interface SalePointsRepository {
     fun getSalePoints(bounds: CoordinatesBounds): Observable<List<SalePoint>>
 
     fun searchSalePoints(query: String): Observable<List<SalePoint>>
+
+    fun sync(): Completable
 }
