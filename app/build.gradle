@@ -252,13 +252,6 @@ dependencies {
 
     implementation commonDependencies.nordicScanner
 
-    implementation (commonDependencies.work){
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-    implementation (commonDependencies.rxWork) {
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }

@@ -113,13 +113,6 @@ dependencies {
     implementation commonDependencies.pulseView
     implementation commonDependencies.datePicker
 
-    implementation(commonDependencies.work) {
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-    implementation (commonDependencies.rxWork) {
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-
     // Dagger2
     kapt commonDependencies.daggerCompiler
     kapt commonDependencies.daggerAndroidProcessor

@@ -197,9 +197,6 @@ ext.commonDependencies = [
         nordicScanner         : "no.nordicsemi.android.support.v18:scanner:${libraryVersions.nordicScannerVersion}",
         nordicDfu             : "no.nordicsemi.android:dfu:${libraryVersions.nordicDfuVersion}",
         rxBluetooth           : "com.polidea.rxandroidble2:rxandroidble:${libraryVersions.rxBluetoothVersion}",
-
-        work                  : "android.arch.work:work-runtime:${libraryVersions.workVersion}",
-        rxWork                : "android.arch.work:work-rxjava2:${libraryVersions.workVersion}"
 ]
 
 ext.commonTestDependencies = [
