@@ -8,15 +8,13 @@ import requests
 def get_git_branches():
     out = check_output(["git", "branch"]).decode("utf8")
     branches = out.split("\n")
-    print(branches)
     return branches
 
 
 def find_current_branch(branches):
     current = next(branch for branch in branches if branch.startswith("*"))
     output = current.strip("*").strip()
-    print("find_current_branch")
-    print(output)
+    # print("current branch: " + output)
     return output
 
 
@@ -29,8 +27,7 @@ def find_parent_branch(branches, current):
         parent_prefix_lower = parent_prefix.lower()
         parent = next(branch for branch in branches if (parent_prefix_lower in branch.lower())).strip()
 
-    print("find_parent_branch")
-    print(parent)
+    # print("parent branch: " + parent)
     return parent
 
 
@@ -48,14 +45,20 @@ def create_merge_request(token, project_id, title, current, destination):
         "remove_source_branch": "true"
     }
     response = requests.post(url=url, headers=headers, data=json.dumps(data))
-    print(response.content)
-    return response.json()
+
+    mr = response.json()
+
+    if response.status_code == 201:
+        print("created: " + mr['web_url'])
+    else:
+        print("error: " + mr['message'][0])
+
+    return mr
 
 
 def get_title_from_branch(branch):
     title = branch.replace('-', ' ').lower()
     formatted = title[0].capitalize() + title[1:]
-    print(formatted)
     return formatted
 
 
@@ -73,6 +76,8 @@ if __name__ == '__main__':
     current_branch = find_current_branch(all_branches)
     parent_branch = find_parent_branch(all_branches, current_branch)
     title = get_title_from_branch(current_branch)
+
+    print("request: " + current_branch + " -> " + parent_branch)
 
     create_merge_request(
         token=token,
