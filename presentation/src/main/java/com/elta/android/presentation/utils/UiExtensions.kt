@@ -1,5 +1,6 @@
 package com.elta.android.presentation.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -7,7 +8,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.VectorDrawable
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.OnApplyWindowInsetsListener
 import android.support.v4.view.ViewCompat
+import android.support.v4.view.WindowInsetsCompat
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -42,6 +45,43 @@ fun View.applyWindowInsetsForChildrenView() {
         val params = v.layoutParams as ViewGroup.MarginLayoutParams
         params.topMargin = insets.systemWindowInsetTop
         insets.consumeSystemWindowInsets()
+    }
+}
+
+inline fun Activity.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
+    ViewCompat.setOnApplyWindowInsetsListener(window.decorView, listener)
+}
+
+inline fun Activity.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
+    ViewCompat.setOnApplyWindowInsetsListener(window.decorView, listener)
+}
+
+object WindowBottomInsetsForViewListenerFactory {
+    fun instance(view: View, callback: (Int) -> Unit) =
+        OnApplyBottomWindowInsetsListener(view, callback)
+}
+
+class OnApplyBottomWindowInsetsListener(
+    private val view: View,
+    private val callback: (Int) -> Unit
+) : OnApplyWindowInsetsListener {
+
+    override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+        val offset = getBottomOffset(insets)
+        applyBottomOffsetToView(view, offset)
+        callback(offset)
+        return insets.consumeSystemWindowInsets()
+    }
+
+    private fun getBottomOffset(insets: WindowInsetsCompat): Int =
+        when {
+            insets.systemWindowInsetBottom < insets.stableInsetBottom -> insets.systemWindowInsetBottom
+            else -> insets.systemWindowInsetBottom - insets.stableInsetBottom
+        }
+
+    private fun applyBottomOffsetToView(view: View, offset: Int) {
+        val params = view.layoutParams as ViewGroup.MarginLayoutParams
+        params.bottomMargin = offset
     }
 }
 

@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.glucose.ui
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -10,13 +11,17 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.events.base.initializer.DEFAULT_NOTE_LENGTH
 import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
+import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
+import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.hideKeyboardFun
+import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.applyLengthFilter
+import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_glucose_event.*
 import java.util.concurrent.TimeUnit
 
@@ -29,6 +34,14 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     private var maxTranslation: Int = 0
     private val viewsState = ViewsState()
+    private var isTouchingScroll = false
+    private var isTouchingAppBar = false
+    private val insetsListener by lazy(LazyThreadSafetyMode.NONE) {
+        instance(formSaveButtonView) { offset ->
+            if (!isTouchingScroll || !isTouchingAppBar)
+                appBarLayoutView?.setExpanded(offset == 0, true)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +61,16 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
             formSaveButtonView.visibility = buttonVisibility
         }
         formNoteView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        requireActivity().applyWindowBottomInsetsListener(insetsListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        requireActivity().removeWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onPause() {
@@ -95,6 +118,18 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
     }
 
     private fun observeAppBarChanges() {
+        scrollableView.setOnTouchListener { _, me ->
+            isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
+            isTouchingAppBar = isTouchingScroll
+            false
+        }
+
+        glucoseEventFormContainerView.setOnTouchListener { _, me ->
+            isTouchingAppBar = me.action == MotionEvent.ACTION_MOVE
+            isTouchingScroll = isTouchingAppBar
+            false
+        }
+
         appBarLayoutView.collapseProgress().bindTo {
             val alpha = 1 - Math.abs(it / 100f)
             glucoseEventValueTextView.alpha = alpha
@@ -105,6 +140,7 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
             toolbarTitleView.translationY = translation
             toolbarSubTitleView.alpha = 1 - alpha
             toolbarSubTitleView.translationY = translation
+            if (isTouchingScroll || isTouchingAppBar) view?.hideKeyboard()
         }
     }
 

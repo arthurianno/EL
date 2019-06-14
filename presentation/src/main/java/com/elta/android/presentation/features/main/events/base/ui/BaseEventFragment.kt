@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.base.ui
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
@@ -12,13 +13,17 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBar
 import com.elta.android.presentation.features.main.events.base.initializer.FormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
+import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.hideKeyboardFun
+import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
@@ -32,6 +37,14 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     private lateinit var initializer: FormInitializer
     private var maxTranslation: Int = 0
     private val viewsState = ViewsState()
+    private var isTouchingScroll = false
+    private var isTouchingAppBar = false
+    private val insetsListener by lazy(LazyThreadSafetyMode.NONE) {
+        instance(formSaveButtonView) { offset ->
+            if (!isTouchingScroll || !isTouchingAppBar)
+                appBarLayoutView?.setExpanded(offset == 0, true)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +88,16 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
 
+    override fun onStart() {
+        super.onStart()
+        requireActivity().applyWindowBottomInsetsListener(insetsListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        requireActivity().removeWindowBottomInsetsListener(insetsListener)
+    }
+
     override fun onPause() {
         super.onPause()
         with(viewsState) {
@@ -111,6 +134,18 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     private fun observeAppBarChanges() {
         formPickerView.valueChangesFormatted().bindTo(toolbarSubTitleView.text())
 
+        scrollableView.setOnTouchListener { _, me ->
+            isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
+            isTouchingAppBar = isTouchingScroll
+            false
+        }
+
+        eventFormContainerView.setOnTouchListener { _, me ->
+            isTouchingAppBar = me.action == MotionEvent.ACTION_MOVE
+            isTouchingScroll = isTouchingAppBar
+            false
+        }
+
         appBarLayoutView.collapseProgress().bindTo {
             val alpha = 1 - Math.abs(it / 100f)
             formPickerView.alpha = alpha
@@ -120,6 +155,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
             toolbarTitleView.translationY = translation
             toolbarSubTitleView.alpha = 1 - alpha
             toolbarSubTitleView.translationY = translation
+            if (isTouchingScroll || isTouchingAppBar) view?.hideKeyboard()
         }
     }
 
