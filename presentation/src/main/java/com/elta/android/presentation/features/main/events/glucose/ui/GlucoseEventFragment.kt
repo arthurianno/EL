@@ -11,10 +11,12 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.events.base.initializer.DEFAULT_NOTE_LENGTH
 import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
+import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
 import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.jakewharton.rxbinding2.view.clicks
@@ -32,16 +34,11 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
     override val backgroundColor: Int? = null
 
+    private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
     private var maxTranslation: Int = 0
     private val viewsState = ViewsState()
     private var isTouchingScroll = false
     private var isTouchingAppBar = false
-    private val insetsListener by lazy(LazyThreadSafetyMode.NONE) {
-        instance(formSaveButtonView) { offset ->
-            if (!isTouchingScroll || !isTouchingAppBar)
-                appBarLayoutView?.setExpanded(offset == 0, true)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +47,13 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        insetsListener = instance(formSaveButtonView) { offset ->
+            if (!isTouchingScroll || !isTouchingAppBar) {
+                val isOffsetZero = offset == 0
+                appBarLayoutView?.setExpanded(isOffsetZero, true)
+                if (isOffsetZero) requireActivity().findAndClearFocus()
+            }
+        }
         maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
         with(viewsState) {
             glucoseEventValueTextView.alpha = valueViewAlpha
@@ -65,12 +69,12 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     override fun onStart() {
         super.onStart()
-        requireActivity().applyWindowBottomInsetsListener(insetsListener)
+        view?.applyWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onStop() {
         super.onStop()
-        requireActivity().removeWindowBottomInsetsListener(insetsListener)
+        view?.removeWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onPause() {
@@ -140,7 +144,10 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
             toolbarTitleView.translationY = translation
             toolbarSubTitleView.alpha = 1 - alpha
             toolbarSubTitleView.translationY = translation
-            if (isTouchingScroll || isTouchingAppBar) view?.hideKeyboard()
+            if (isTouchingScroll || isTouchingAppBar) {
+                view?.hideKeyboard()
+                requireActivity().findAndClearFocus()
+            }
         }
     }
 

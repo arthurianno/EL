@@ -13,9 +13,11 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBar
 import com.elta.android.presentation.features.main.events.base.initializer.FormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
 import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
+import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.elta.android.presentation.utils.showDatePickerDialog
@@ -34,17 +36,12 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
     override val backgroundColor: Int? = null
 
+    private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
     private lateinit var initializer: FormInitializer
     private var maxTranslation: Int = 0
     private val viewsState = ViewsState()
     private var isTouchingScroll = false
     private var isTouchingAppBar = false
-    private val insetsListener by lazy(LazyThreadSafetyMode.NONE) {
-        instance(formSaveButtonView) { offset ->
-            if (!isTouchingScroll || !isTouchingAppBar)
-                appBarLayoutView?.setExpanded(offset == 0, true)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +52,13 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        insetsListener = instance(formSaveButtonView) { offset ->
+            if (!isTouchingScroll || !isTouchingAppBar) {
+                val isOffsetZero = offset == 0
+                appBarLayoutView?.setExpanded(isOffsetZero, true)
+                if (isOffsetZero) requireActivity().findAndClearFocus()
+            }
+        }
         maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
         with(viewsState) {
             formPickerView.alpha = formPickerViewAlpha
@@ -90,12 +94,12 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override fun onStart() {
         super.onStart()
-        requireActivity().applyWindowBottomInsetsListener(insetsListener)
+        view?.applyWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onStop() {
         super.onStop()
-        requireActivity().removeWindowBottomInsetsListener(insetsListener)
+        view?.removeWindowBottomInsetsListener(insetsListener)
     }
 
     override fun onPause() {
@@ -155,7 +159,10 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
             toolbarTitleView.translationY = translation
             toolbarSubTitleView.alpha = 1 - alpha
             toolbarSubTitleView.translationY = translation
-            if (isTouchingScroll || isTouchingAppBar) view?.hideKeyboard()
+            if (isTouchingScroll || isTouchingAppBar) {
+                view?.hideKeyboard()
+                requireActivity().findAndClearFocus()
+            }
         }
     }
 

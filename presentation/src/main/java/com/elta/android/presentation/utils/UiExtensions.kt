@@ -48,12 +48,14 @@ fun View.applyWindowInsetsForChildrenView() {
     }
 }
 
-inline fun Activity.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
-    ViewCompat.setOnApplyWindowInsetsListener(window.decorView, listener)
+inline fun Activity.findAndClearFocus() = currentFocus?.clearFocus()
+
+inline fun View.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
+    ViewCompat.setOnApplyWindowInsetsListener(this, listener)
 }
 
-inline fun Activity.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
-    ViewCompat.setOnApplyWindowInsetsListener(window.decorView, listener)
+inline fun View.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
+    ViewCompat.setOnApplyWindowInsetsListener(this, listener)
 }
 
 object WindowBottomInsetsForViewListenerFactory {
