@@ -155,11 +155,15 @@ class HomeFlowPm @Inject constructor(
         when (error) {
             is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.FromOtherSyncFlow)
             is GlucometerSyncError ->
-                when(error.cause) {
-                    is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-                    is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-                    is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
-                    is GlucometerOfflineError -> showRetrySyncAction.consumer.accept(Unit)
+                when (error.cause) {
+                    is BluetoothNotEnabledError ->
+                        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+                    is LocationPermissionNotGrantedError ->
+                        btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+                    is LocationNotEnabledError ->
+                        btControl.requestEnableLocationCommand.consumer.accept(Unit)
+                    is GlucometerOfflineError ->
+                        showRetrySyncAction.consumer.accept(Unit)
                     else -> super.handleError(error)
                 }
             else -> super.handleError(error)
