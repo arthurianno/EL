@@ -10,6 +10,7 @@ import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.ServerError
 import com.elta.android.common.errors.ServiceUnavailableError
+import com.elta.android.common.errors.UnauthorizedError
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -28,6 +29,7 @@ class ErrorInterceptor @Inject constructor(
         val responseCode = response.code()
         when {
             responseCode == ERROR_CODE_400 || responseCode == ERROR_CODE_500 -> throw ServiceUnavailableError()
+            responseCode == ERROR_CODE_403 -> throw UnauthorizedError()
             responseCode >= ERROR_CODE_600 -> {
                 val message = getStringByCode(context, responseCode)
                 when (responseCode) {
@@ -47,6 +49,7 @@ class ErrorInterceptor @Inject constructor(
 
     companion object {
         const val ERROR_CODE_400 = 400
+        const val ERROR_CODE_403 = 403
         const val ERROR_CODE_500 = 500
         const val ERROR_CODE_600 = 600
         const val ERROR_CODE_603 = 603

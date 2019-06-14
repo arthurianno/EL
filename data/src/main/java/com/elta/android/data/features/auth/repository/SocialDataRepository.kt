@@ -1,6 +1,7 @@
 package com.elta.android.data.features.auth.repository
 
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.social.datasource.SocialDataSourceFactory
@@ -38,12 +39,13 @@ class SocialDataRepository @Inject constructor(
             }.andThen(
                 profileSource.getUserProfile()
                     .ignoreElement()
+                    .onErrorComplete { it is UnauthorizedError }
             )
 
     override fun unLinkSocialNetwork(network: SocialNetworkType): Completable =
         authSocialSource.unLinkSocialNetwork(network.name)
             .andThen(socialFactory.getDataSource(network).logout())
-            .andThen(profileSource.getUserProfile().flatMapCompletable { Completable.complete() })
+            .andThen(profileSource.getUserProfile().ignoreElement())
             .applyScheduler(schedulersFacade)
 
     override fun loginWithSocialNetwork(network: SocialNetworkType): Single<Boolean> =
