@@ -215,7 +215,6 @@ dependencies {
 
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
-    implementation commonDependencies.barcodeScanner
     implementation commonDependencies.rxBluetooth
 
     // Dagger2
@@ -229,10 +228,6 @@ dependencies {
     implementation commonDependencies.jsr310
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
-    implementation(commonDependencies.glide) {
-        exclude group: "com.android.support"
-    }
-    kapt commonDependencies.glideProcessor
 
     implementation commonDependencies.retrofit
     implementation commonDependencies.retrofitConverter
@@ -246,7 +241,6 @@ dependencies {
 
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
-    implementation commonDependencies.exoPlayer
     implementation commonDependencies.location
     implementation commonDependencies.datePicker
 

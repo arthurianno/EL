@@ -105,7 +105,6 @@ dependencies {
 
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
-    implementation commonDependencies.barcodeScanner
     implementation commonDependencies.materialEditText
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.yandexMapKitClustering
@@ -124,10 +123,6 @@ dependencies {
     implementation commonDependencies.jsr310
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
-    implementation(commonDependencies.glide) {
-        exclude group: "com.android.support"
-    }
-    kapt commonDependencies.glideProcessor
 
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
