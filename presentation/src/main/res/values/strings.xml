@@ -280,13 +280,13 @@
 
     <string name="event_form_measure_unit_bread">ХЕ</string>
     <string name="event_form_measure_unit_insulin">Ед.</string>
-    <string name="event_form_measure_unit_weight">Кг.</string>
+    <string name="event_form_measure_unit_weight">кг</string>
     <string name="event_form_measure_unit_hours">ч</string>
     <string name="event_form_measure_unit_minutes">мин</string>
 
     <string name="event_form_bread_format_mask">%d,%d XE</string>
     <string name="event_form_insulin_format_mask">%d,%d Ед.</string>
-    <string name="event_form_weight_format_mask">%d,%d Кг.</string>
+    <string name="event_form_weight_format_mask">%d,%d кг</string>
     <string name="event_form_activity_format_mask">%d ч %d мин</string>
 
     <string name="event_time_in_mask">%s в %s</string>
