@@ -1,10 +1,10 @@
 package com.elta.android.presentation.features.main.events.base.initializer
 
+import android.text.InputFilter
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
-import com.nullgr.core.ui.extensions.applyLengthFilter
 import kotlinx.android.synthetic.main.fragment_event_form.view.*
 
 abstract class FormInitializer {
@@ -21,7 +21,7 @@ abstract class FormInitializer {
     }
 
     open fun View.initNoteView() {
-        formNoteView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
+        formNoteView.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_NOTE_LENGTH))
     }
 
     abstract fun View.initHeaderView()
