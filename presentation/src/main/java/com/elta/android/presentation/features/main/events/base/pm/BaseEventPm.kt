@@ -6,6 +6,7 @@ import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -17,6 +18,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
+import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
@@ -56,6 +58,9 @@ abstract class BaseEventPm constructor(
     protected val selectedDateState = State(ZonedDateTime.now())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
+    private val dateInFutureSnackBarData by lazy {
+        SnackBarMessageData.SimpleTextMessage(resources.getString(R.string.event_form_date_in_future))
+    }
 
     abstract fun handleBack(i: Unit)
 
@@ -170,6 +175,7 @@ abstract class BaseEventPm constructor(
             .untilDestroy()
 
         dateTimeSelectedAction.observable
+            .filter(::validateSelectedDate)
             .subscribe(selectedDateState.consumer)
             .untilDestroy()
     }
@@ -188,6 +194,11 @@ abstract class BaseEventPm constructor(
 
     private fun String.toSimpleSelectorOption() =
         SelectorOption(this)
+
+    private fun validateSelectedDate(date: ZonedDateTime) =
+        !date.isAfter(ZonedDateTime.now()).also {
+            if (it) showSnackBar(dateInFutureSnackBarData)
+        }
 
     companion object {
         private const val OPEN_SCREEN_DELAY = 300L // millis
