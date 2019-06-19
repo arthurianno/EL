@@ -38,10 +38,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
+                        android:paddingEnd="16dp"
                         android:layout_marginTop="72dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Иванов Алексей" />
+                        tools:text="Иванов Алексей"
+                        tools:ignore="RtlSymmetry" />
 
                     <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/subTitleView"
@@ -88,13 +92,15 @@
 
                     <LinearLayout
                         android:id="@+id/toolbarProfileContainerView"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="?attr/actionBarSize"
                         android:alpha="0"
                         android:gravity="center_vertical"
                         android:orientation="vertical"
+                        app:layout_constraintVertical_weight="1"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/homeButtonView"
+                        app:layout_constraintEnd_toStartOf="@id/toolbarProfileSettingsButtonView"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <android.support.v7.widget.AppCompatTextView
@@ -103,7 +109,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
+                            android:ellipsize="end"
                             android:includeFontPadding="false"
+                            android:maxLines="1"
                             tools:text="Иванов алексей" />
 
                         <android.support.v7.widget.AppCompatTextView
