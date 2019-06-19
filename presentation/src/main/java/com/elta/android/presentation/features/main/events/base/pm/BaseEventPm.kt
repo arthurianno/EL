@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
+import com.elta.android.common.utils.atEndOfDay
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.getValidator
@@ -196,7 +197,7 @@ abstract class BaseEventPm constructor(
         SelectorOption(this)
 
     private fun validateSelectedDate(date: ZonedDateTime) =
-        !date.isAfter(ZonedDateTime.now()).also {
+        !date.isAfter(ZonedDateTime.now().atEndOfDay()).also {
             if (it) showSnackBar(dateInFutureSnackBarData)
         }
 
