@@ -34,8 +34,8 @@ fun buildProfile(original: Profile, events: List<Event>): Profile {
 
 fun isNameValid(firstName: String?, secondName: String?): Boolean {
     if (firstName == null || secondName == null) return false
-    return firstName.isNotEmpty() && firstName.length < MAX_NAME_LENGTH ||
-        secondName.isNotEmpty() && secondName.length < MAX_NAME_LENGTH
+    return firstName.isNotEmpty() && firstName.length <= MAX_NAME_LENGTH ||
+        secondName.isNotEmpty() && secondName.length <= MAX_NAME_LENGTH
 }
 
 fun Profile.googleFitApp(): HealthApp? = healthApps?.find { it.type == HealthAppType.GOOGLE_FIT }
