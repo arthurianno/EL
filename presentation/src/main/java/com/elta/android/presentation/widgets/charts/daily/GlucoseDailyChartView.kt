@@ -211,9 +211,18 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun Canvas.drawPointTitle(pointF: PointF, text: String, backgroundColor: Int) {
-        val bgX = pointF.x + chartItemRadius * 3
-        val bgY = pointF.y - chartPointTitleBackgroundHeight / 2
-        chartPointTitleBackgroundRect.set(bgX, bgY, bgX + chartPointTitleBackgroundWidth, bgY + chartPointTitleBackgroundHeight)
+        var bgStartX = pointF.x + chartItemRadius * 3
+        val bgStartY = pointF.y - chartPointTitleBackgroundHeight / 2
+
+        var bgEndX = bgStartX + chartPointTitleBackgroundWidth
+        val bgEndY = bgStartY + chartPointTitleBackgroundHeight
+
+        if (bgEndX > fullViewWidth) {
+            bgEndX = pointF.x - chartItemRadius * 3
+            bgStartX = bgEndX - chartPointTitleBackgroundWidth
+        }
+
+        chartPointTitleBackgroundRect.set(bgStartX, bgStartY, bgEndX, bgEndY)
         chartPointBackgroundPaint.color = backgroundColor
         drawRoundRect(chartPointTitleBackgroundRect, chartPointTitleBackgroundCorners, chartPointTitleBackgroundCorners, chartPointBackgroundPaint)
 
