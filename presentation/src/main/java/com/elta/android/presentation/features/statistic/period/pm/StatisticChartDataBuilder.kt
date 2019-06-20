@@ -47,9 +47,7 @@ fun StatisticByPeriodModel.toChartModel(selectedDate: LocalDate?): StatisticsCha
 
     val values = buildValues(minLevel, maxLevel)
     val modelsMap = TreeMap<DateModel, GlucoseStatisticModel?>()
-    if (period is Periods.SevenDays) {
-        modelsMap[stubDate] = null
-    }
+    modelsMap[stubDate] = null
     var date = period.start
     while (!date.isAfter(period.end)) {
         modelsMap[date.toDateModel(period)] = allDays[date.toLocalDate()].glucose()
