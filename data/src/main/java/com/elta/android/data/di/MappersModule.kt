@@ -35,7 +35,6 @@ import com.elta.android.data.features.firmware.dto.FirmwareFileDto
 import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
 import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
 import com.elta.android.data.features.googlefit.dto.ActivityDto
-import com.elta.android.data.features.googlefit.mapper.ActivityDtoToEventMapper
 import com.elta.android.data.features.googlefit.mapper.FitnessActivityToActivityTypeMapper
 import com.elta.android.data.features.googlefit.mapper.SessionToActivityDtoMapper
 import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
@@ -325,11 +324,6 @@ abstract class MappersModule {
     abstract fun bindSessionsToActivityDtoMapper(
         mapper: SessionToActivityDtoMapper
     ): Mapper<Session, ActivityDto>
-
-    @Binds
-    abstract fun bindActivityDtoToEventMapper(
-        mapper: ActivityDtoToEventMapper
-    ): Mapper<ActivityDto, Event>
 
     @Binds
     abstract fun bindFitnessActivityToActivityTypeMapper(

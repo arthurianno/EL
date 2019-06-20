@@ -1,8 +1,7 @@
-package com.elta.android.data.features.googlefit.mapper
+package com.elta.android.data.features.googlefit.builder
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.utils.toZonedDateTime
-import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.googlefit.dto.ActivityDto
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
@@ -11,14 +10,15 @@ import com.elta.android.domain.features.diary.events.model.State
 import java.util.UUID
 import javax.inject.Inject
 
-class ActivityDtoToEventMapper @Inject constructor(
-    private val activityTypeMapper: Mapper<String, ActivityType>,
-    private val userHolder: UserHolder
-) : Mapper<ActivityDto, Event> {
+class EventsBuilder @Inject constructor(
+    private val activityTypeMapper: Mapper<String, ActivityType>
+) {
+    fun buildEvents(activities: List<ActivityDto>, profileEmail: String): List<Event> =
+        activities.map { mapFromObject(it, profileEmail) }
 
-    override fun mapFromObject(source: ActivityDto): Event =
+    private fun mapFromObject(source: ActivityDto, email: String): Event =
         Event(
-            id = UUID.nameUUIDFromBytes("${source.id}${userHolder.currentUser}".toByteArray()).toString(),
+            id = UUID.nameUUIDFromBytes("${source.id}$email".toByteArray()).toString(),
             additionTime = source.additionTime.toZonedDateTime(),
             tagId = null,
             tag = null,
