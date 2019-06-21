@@ -116,12 +116,10 @@ String getVersionSufix(def version) {
     return sufix
 }
 
-static String readCurrentBranch() {
-    def branch = ""
-    def proc = "git rev-parse --abbrev-ref HEAD".execute()
-    proc.in.eachLine { line -> branch = line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
+String readCurrentBranch() {
+    def command = "git name-rev --name-only HEAD"
+    def proc = command.execute([], rootDir)
+    def branch = proc.text.trim()
     println "Current branch readed: $branch"
     return branch
 }
