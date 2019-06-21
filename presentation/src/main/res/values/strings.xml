@@ -473,7 +473,7 @@
     <string name="profile_reminders_delete">Удалить</string>
     <string name="profile_reminders_save_changes">Сохранить изменение</string>
     <string name="profile_reminders_message_deleted">Напоминание удалено</string>
-    <string name="profile_reminders_wrong_time">Вы выбрали время в прошлом. Пожалуйста, выбирите время в будущем.</string>
+    <string name="profile_reminders_wrong_time">Вы выбрали время в прошлом. Пожалуйста, выберите время в будущем.</string>
 
     <string name="profile_reminders_schedule_not_repeat">Не повторять</string>
     <string name="profile_reminders_schedule_day">Ежедневно</string>
