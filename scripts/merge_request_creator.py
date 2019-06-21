@@ -31,6 +31,18 @@ def find_parent_branch(branches, current):
     return parent
 
 
+def get_project_path():
+    out = check_output(["git", "remote", "get-url", "origin"]).decode("utf8")
+    # git@192.168.1.1:project/key.git
+    key = out.split(':')[1].replace('.git', '').strip()
+    return key
+
+
+def encode(string):
+    encoded = string.replace('/', '%2F')
+    return encoded
+
+
 def create_merge_request(token, project_id, title, current, destination):
     headers = {
         'Private-Token': token,
@@ -65,12 +77,11 @@ def get_title_from_branch(branch):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-t", "--token", dest="TOKEN")
-    parser.add_argument("-p", "--project", dest="PROJECT")
 
     args = parser.parse_args()
 
     token = args.TOKEN
-    project_id = args.PROJECT
+    project_path = get_project_path()
 
     all_branches = get_git_branches()
     current_branch = find_current_branch(all_branches)
@@ -81,7 +92,7 @@ if __name__ == '__main__':
 
     create_merge_request(
         token=token,
-        project_id=project_id,
+        project_id=encode(project_path),
         title=title,
         current=current_branch,
         destination=parent_branch
