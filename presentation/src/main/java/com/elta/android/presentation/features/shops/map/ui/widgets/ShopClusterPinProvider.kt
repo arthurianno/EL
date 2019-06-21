@@ -10,7 +10,6 @@ import com.elta.android.presentation.features.shops.map.ui.widgets.PinProviderTy
 import com.elta.android.presentation.features.shops.map.ui.widgets.PinProviderType.SinglePinProvider
 import com.elta.android.presentation.features.shops.map.ui.widgets.PinProviderType.SinglePinProvider.NormalPinProvider
 import com.elta.android.presentation.features.shops.map.ui.widgets.PinProviderType.SinglePinProvider.SelectedPinProvider
-import com.elta.android.presentation.utils.getBitmapFromView
 import com.yandex.runtime.image.ImageProvider
 
 class ShopClusterPinProvider(private val context: Context) : ClusterPinProvider {
@@ -60,11 +59,7 @@ class ShopClusterPinProvider(private val context: Context) : ClusterPinProvider 
     private fun createClusterProvider(type: PinProviderType): YandexPinProvider {
         clusterView.setText(type.size.toString())
         val provider = YandexPinProvider.from(
-            ImageProvider.fromBitmap(
-                clusterView.getBitmapFromView(
-                    clusterView.getPinSize()
-                )
-            )
+            ImageProvider.fromBitmap(clusterView.getBitmap())
         )
         providers[type] = provider
         return provider
