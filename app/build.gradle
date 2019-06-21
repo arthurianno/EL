@@ -82,7 +82,7 @@ android {
 
         all {
             ext.betaDistributionReleaseNotesFilePath =
-                    file('../CHANGELOG.md').absolutePath
+                    file('../BUILD_NOTES.md').absolutePath
             ext.betaDistributionGroupAliases = "QA-Nullgr"
         }
 
