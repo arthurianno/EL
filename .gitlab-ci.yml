@@ -17,7 +17,7 @@ stages:
 complexCheck:
   stage: check
   script:
-  - ./gradlew detektCheck ktlint testDebugUnitTest
+  - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
   only:
   - merge_requests
   - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
@@ -30,7 +30,7 @@ beta:
     - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
   when: on_success
   script:
-    - ./gradlew clean build crashlyticsUploadDistributionDebug
+    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
 
 # For tag v0.0.0-rc
 rc:
@@ -39,7 +39,7 @@ rc:
   - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
   when: on_success
   script:
-  - ./gradlew clean build crashlyticsUploadDistributionRelease
+  - ./gradlew clean build crashlyticsUploadDistributionRelease -x lint
   artifacts:
     expire_in: 1 week
     paths:
