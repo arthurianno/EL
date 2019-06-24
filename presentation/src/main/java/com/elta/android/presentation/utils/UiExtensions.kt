@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.OnApplyWindowInsetsListener
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.WindowInsetsCompat
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -48,6 +49,10 @@ fun View.applyWindowInsetsForChildrenView() {
     }
 }
 
+fun NestedScrollView.scrollToBottom() {
+    post { scrollTo(0, bottom) }
+}
+
 inline fun Activity.findAndClearFocus() = currentFocus?.clearFocus()
 
 inline fun View.applyWindowBottomInsetsListener(listener: OnApplyWindowInsetsListener) {
@@ -59,18 +64,18 @@ inline fun View.removeWindowBottomInsetsListener(listener: OnApplyWindowInsetsLi
 }
 
 object WindowBottomInsetsForViewListenerFactory {
-    fun instance(view: View, callback: (Int) -> Unit) =
-        OnApplyBottomWindowInsetsListener(view, callback)
+    fun instance(vararg views: View, callback: (Int) -> Unit) =
+        OnApplyBottomWindowInsetsListener(views.toList(), callback)
 }
 
 class OnApplyBottomWindowInsetsListener(
-    private val view: View,
+    private val views: List<View>,
     private val callback: (Int) -> Unit
 ) : OnApplyWindowInsetsListener {
 
     override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
         val offset = getBottomOffset(insets)
-        applyBottomOffsetToView(view, offset)
+        views.forEach { applyBottomOffsetToView(it, offset) }
         callback(offset)
         return insets.consumeSystemWindowInsets()
     }

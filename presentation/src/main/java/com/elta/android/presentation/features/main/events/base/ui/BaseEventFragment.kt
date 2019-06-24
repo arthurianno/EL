@@ -20,11 +20,13 @@ import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
 import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
+import com.elta.android.presentation.utils.scrollToBottom
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import org.threeten.bp.ZonedDateTime
@@ -52,11 +54,12 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        insetsListener = instance(formSaveButtonView) { offset ->
+        insetsListener = instance(formSaveButtonView, formContainerView) { offset ->
             if (!isTouchingScroll || !isTouchingAppBar) {
                 val isOffsetZero = offset == 0
                 appBarLayoutView?.setExpanded(isOffsetZero, true)
                 if (isOffsetZero) requireActivity().findAndClearFocus()
+                if (!isOffsetZero) scrollableView.scrollToBottom()
             }
         }
         maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
@@ -90,6 +93,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
+        formNoteView.textChanges().bindTo { scrollableView.scrollToBottom() }
     }
 
     override fun onStart() {
