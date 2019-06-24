@@ -33,9 +33,12 @@ def find_parent_branch(branches, current):
 
 def get_project_path():
     out = check_output(["git", "remote", "get-url", "origin"]).decode("utf8")
-    # git@192.168.1.1:project/key.git
-    key = out.split(':')[1].replace('.git', '').strip()
-    return key
+    if 'http://' in out:
+        return out.replace('http://', '').split('/', 1)[1].strip()
+    elif 'https://' in out:
+        return out.replace('https://', '').split('/', 1)[1].strip()
+    else:
+        return out.split(':')[1].replace('.git', '').strip()
 
 
 def encode(string):
