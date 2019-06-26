@@ -9,6 +9,7 @@ import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.user.model.Support
 import com.elta.android.domain.features.user.model.WhereBuy
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -151,6 +152,7 @@ class MainProfilePm @Inject constructor(
             }
             MyObservers -> router.startFlow(Screens.Observers)
             MyDevices -> router.startFlow(Screens.Devices)
+            Support -> router.startFlow(Screens.Support)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 

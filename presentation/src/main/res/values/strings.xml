@@ -531,6 +531,17 @@
     <string name="profile_delete_observer_cancel_button">Отменить</string>
     <string name="profile_delete_observer_dialog_confirm_button">Удалить</string>
 
+    <!-- SUPPORT FLOW -->
+    <string name="profile_support_title">Нужна помощь?</string>
+    <string name="profile_support_subtitle">Служба заботы о пользователях?</string>
+    <string name="profile_support_actions_header">Доступные действия</string>
+    <string name="profile_support_phone_number">8 800 250 17 50</string>
+    <string name="profile_support_phone_number_description">Позвонить</string>
+    <string name="profile_support_email">service@eltaltd.ru</string>
+    <string name="profile_support_email_description">Написать</string>
+    <string name="profile_support_service_centers">Куда обратиться</string>
+    <string name="profile_support_service_centers_description">Карта сервисных центров</string>
+
     <!-- STATISTICS -->
     <string name="statistic_title">Статистика</string>
     <string name="statistic_period_seven_days">7 дней</string>

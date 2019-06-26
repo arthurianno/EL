@@ -5,6 +5,7 @@ import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.user.model.Support
 import com.elta.android.domain.features.user.model.WhereBuy
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
@@ -48,6 +49,9 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         )
         add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
             R.drawable.ic_devices, MyDevices)
+        )
+        add(MainProfileAdditionalItem(R.string.profile_support_title, R.string.profile_support_subtitle,
+            R.drawable.ic_support, Support)
         )
         add(MainProfileAdditionalItem(
             title = R.string.profile_exit_from_app,

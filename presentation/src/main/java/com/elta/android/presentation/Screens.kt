@@ -38,6 +38,7 @@ import com.elta.android.presentation.features.profile.settings.password.ui.Profi
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
+import com.elta.android.presentation.features.profile.support.ui.SupportFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -271,6 +272,10 @@ object Screens {
 
     object SetGender : SupportAppScreen() {
         override fun getFragment() = ProfileSetGenderFragment.newInstance()
+    }
+
+    object Support : SupportAppScreen() {
+        override fun getFragment() = SupportFragment.newInstance()
     }
 
     // STATISTICS FLOW
