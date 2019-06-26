@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
@@ -118,7 +119,11 @@ object Screens {
     }
 
     object ShopsMap : SupportAppScreen() {
-        override fun getFragment() = ShopsMapFragment.newInstance()
+        override fun getFragment() = ShopsMapFragment.newInstance(Type.SALE)
+    }
+
+    object ServiceCentersMap : SupportAppScreen() {
+        override fun getFragment() = ShopsMapFragment.newInstance(Type.SERVICE)
     }
 
     class CallScreen(private val phoneNumber: String) : SupportAppScreen() {

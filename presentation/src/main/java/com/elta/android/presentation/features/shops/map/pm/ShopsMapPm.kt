@@ -76,6 +76,7 @@ class ShopsMapPm @Inject constructor(
     private val searchAction = Action<String>()
     private val searchResultSelectedAction = Action<SearchResultItem>()
 
+    private val shopsTypeState = State<Type>()
     private val permissionStatusResultAction = Action<PermissionStatus>()
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
@@ -104,7 +105,8 @@ class ShopsMapPm @Inject constructor(
             .subscribe(defaultLocationState.consumer)
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }
+        Observables.combineLatest(lifecycleObservable, shopsTypeState.observable)
+            .filter { it.first == Lifecycle.CREATED }
             .map { Unit }
             .doOnNext(loadScreenAction.consumer)
             .subscribe()
@@ -122,6 +124,10 @@ class ShopsMapPm @Inject constructor(
     override fun handleError(error: Throwable) {
         if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(Unit)
         else super.handleError(error)
+    }
+
+    fun setShopsType(type: Type) {
+        shopsTypeState.consumer.accept(type)
     }
 
     fun setPermissionStatus(status: PermissionStatus) {
@@ -169,6 +175,7 @@ class ShopsMapPm @Inject constructor(
     private fun bindSalePoints() {
         loadScreenAction.observable
             .skipWhileInProgress()
+            .map(::createGetSalePointsParams)
             .flatMap { params ->
                 getSalePointsUseCase.execute(params)
                     .hideErrorContainer()
@@ -368,7 +375,10 @@ class ShopsMapPm @Inject constructor(
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
 
     private fun createSearchParams(query: String): SearchSalePointsUseCase.Params =
-        SearchSalePointsUseCase.Params(query)
+        SearchSalePointsUseCase.Params(query, shopsTypeState.value)
+
+    private fun createGetSalePointsParams(i: Unit) =
+        GetSalePointsUseCase.Params(shopsTypeState.value)
 
     private fun handleSearchSuccess(points: List<SalePoint>) {
         if (points.isEmpty()) {

@@ -27,7 +27,8 @@ class DbSalePointsCache @Inject constructor(
                 northEastLatitude = condition.northEastLatitude,
                 northEastLongitude = condition.northEastLongitude
             )
-            is SalePointsConditions.Query -> getAllByQuery(condition.query)
+            is SalePointsConditions.Type -> getAllByType(condition.type)
+            is SalePointsConditions.Query -> getAllByQuery(condition.query, condition.type)
             else -> super.getAll(condition)
         }
 
@@ -53,7 +54,11 @@ class DbSalePointsCache @Inject constructor(
         return query.find()
     }
 
-    private fun getAllByQuery(query: String): List<SalePointCacheDto> {
+    private fun getAllByType(type: String) = box.query {
+        equal(SalePointCacheDto_.type, type)
+    }.find()
+
+    private fun getAllByQuery(query: String, type: String?): List<SalePointCacheDto> {
         return if (query.isEmpty()) {
             emptyList()
         } else {
@@ -66,6 +71,7 @@ class DbSalePointsCache @Inject constructor(
                     builder.and()
                 }
             }
+            type?.let { builder.and().equal(SalePointCacheDto_.type, it) }
             builder.build().find()
         }
     }
