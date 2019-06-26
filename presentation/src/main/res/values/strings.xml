@@ -420,7 +420,7 @@
 
     <string name="profile_settings_dialog_glucose_title">Целевой диапазон</string>
     <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
-    <string name="profile_settings_dialog_glucose_description">Задайте целевой диапазон положительных значений ваших измерений</string>
+    <string name="profile_settings_dialog_glucose_description">Задайте свой целевой диапазон измерений глюкозы</string>
     <string name="profile_settings_dialog_glucose_action_button">Установить</string>
     <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nЦелевой диапазон будет использоваться на графике главного экрана.</string>
 
