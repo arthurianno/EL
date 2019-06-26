@@ -431,7 +431,7 @@
     <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
     <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
     <string name="profile_settings_hemoglobin_date_mask">- %s</string>
-    <string name="profile_settings_hemoglobin_header">Последние измерения</string>
+    <string name="profile_settings_hemoglobin_header">Последние анализы</string>
 
     <string name="profile_settings_change_name_title">Имя и Фамилия</string>
     <string name="profile_settings_change_name_description">Изменение персональных данных</string>
