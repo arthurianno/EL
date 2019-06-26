@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.profile.main.ui.adapter.items.Main
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
+import com.elta.android.presentation.features.profile.support.model.SupportAction
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
@@ -35,4 +36,5 @@ sealed class Clicks : Click {
     data class ObserverItemClicked(val item: ObserverItem) : Clicks()
     data class DateInStatisticsClicked(val date: LocalDate?) : Clicks()
     object PrimaryDeviceItemClicked : Clicks()
+    data class SupportActionClicked(val action: SupportAction) : Clicks()
 }
