@@ -267,8 +267,8 @@
     <string name="events_creation_save_button">Сохранить запись</string>
     <string name="events_creation_hint_bread">Название блюда или продукта</string>
     <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
-    <string name="events_helper_text_bread">Доступный диапазон ввода: от 0,1 до 99,9</string>
-    <string name="events_helper_text_insulin">Доступный диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_weight">На сколько изменился ваш вес</string>
     <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
 
@@ -387,7 +387,7 @@
     <string name="profile_map_of_stores">Карта магазинов и торговых точек</string>
     <string name="profile_hba1c">HbA1C</string>
     <string name="profile_hba1c_value">%s %%</string>
-    <string name="profile_range">Диапазон</string>
+    <string name="profile_range">Целевой диапазон</string>
     <string name="profile_glucose_level">Уровень глюкозы</string>
     <string name="profile_weight">Вес</string>
     <string name="profile_weight_value">%s кг</string>
@@ -418,11 +418,11 @@
     <string name="profile_settings_dialog_diabetes_description">Если вам нужно изменить тип диабета, выберите нужный тип из списка</string>
     <string name="profile_settings_dialog_diabetes_action_button">Выбрать</string>
 
-    <string name="profile_settings_dialog_glucose_title">Диапазон</string>
+    <string name="profile_settings_dialog_glucose_title">Целевой диапазон</string>
     <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
-    <string name="profile_settings_dialog_glucose_description">Задайте диапазон положительных значений ваших измерений</string>
+    <string name="profile_settings_dialog_glucose_description">Задайте целевой диапазон положительных значений ваших измерений</string>
     <string name="profile_settings_dialog_glucose_action_button">Установить</string>
-    <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nДиапазон будет использоваться на графике главного экрана.</string>
+    <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nЦелевой диапазон будет использоваться на графике главного экрана.</string>
 
     <string name="profile_settings_dialog_hba1c_title">HbA1C</string>
     <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
@@ -540,9 +540,9 @@
 
     <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
     <string name="statistic_glucose_index_description_total">Количество измерений</string>
-    <string name="statistic_glucose_index_description_high">Измерения выше диапазона</string>
-    <string name="statistic_glucose_index_description_normal">Измерения в диапазоне</string>
-    <string name="statistic_glucose_index_description_low">Измерения ниже диапазона</string>
+    <string name="statistic_glucose_index_description_high">Измерения выше целевого диапазона</string>
+    <string name="statistic_glucose_index_description_normal">Измерения в целевом диапазоне</string>
+    <string name="statistic_glucose_index_description_low">Измерения ниже целевого диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
     <string name="statistic_general_index_title_insulin">Количество инсулина</string>
