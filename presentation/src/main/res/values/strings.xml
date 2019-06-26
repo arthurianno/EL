@@ -384,7 +384,7 @@
     <string name="profile_my_watchers">Мои наблюдатели</string>
     <string name="profile_management_and_settings">Управление и настройки</string>
     <string name="profile_where_purchase_products">Где приобрести продукцию</string>
-    <string name="profile_map_of_stores">Карта магазинов и торговых точек</string>
+    <string name="profile_map_of_stores">Карта точек продаж</string>
     <string name="profile_hba1c">HbA1C</string>
     <string name="profile_hba1c_value">%s %%</string>
     <string name="profile_range">Целевой диапазон</string>
