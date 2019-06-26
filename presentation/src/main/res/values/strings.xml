@@ -551,7 +551,7 @@
     <string name="statistic_general_index_title_activity">Физическая активность</string>
 
     <string name="statistic_general_index_description_by_period_bread">Среднесуточное количество хлебных единиц\nза период: %s</string>
-    <string name="statistic_general_index_description_value_by_period_bread">%s&#160;ХЕ&#160;.</string>
+    <string name="statistic_general_index_description_value_by_period_bread">%s&#160;ХЕ.</string>
 
     <string name="statistic_general_index_description_by_period_insulin">Общее среднесуточное количество инсулина\n(кроме смешанного) за период: %s</string>
     <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного\nинсулина (ультракороткий + короткий): %s</string>
