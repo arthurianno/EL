@@ -9,6 +9,7 @@
     <string name="error_server_not_responding_title">Сервер не доступен</string>
     <string name="error_server_not_responding_subtitle">Приносим свои извинения за принесенные неудобства</string>
     <string name="error_server_not_responding_retry_button">Повторить</string>
+    <string name="error_server_not_responding_snackbar_message">Сервер временно не доступен</string>
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>

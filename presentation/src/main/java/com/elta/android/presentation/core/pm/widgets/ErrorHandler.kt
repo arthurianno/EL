@@ -13,7 +13,7 @@ import io.reactivex.exceptions.CompositeException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
-@Suppress("EmptyWhenBlock", "LongMethod")
+@Suppress("EmptyWhenBlock", "LongMethod", "NestedBlockDepth")
 class ErrorHandler(private val pm: BasePm) {
 
     fun handleError(error: Throwable) {
@@ -45,7 +45,11 @@ class ErrorHandler(private val pm: BasePm) {
                 } else {
                     if (error !is NetworkConnectionError) {
                         pm.setErrorViewVisibility(false)
-                        pm.showSnackBar(SnackBarMessageData.SimpleTextMessage(error.message ?: ""))
+                        val messageData = if (error.isServerUnavailableError())
+                            SnackBarMessageData.ServerUnavailableMessage(pm.resources)
+                        else
+                            SnackBarMessageData.SimpleTextMessage(error.message ?: "")
+                        pm.showSnackBar(messageData)
                     }
                 }
         }
