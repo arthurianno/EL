@@ -33,7 +33,8 @@ class AppActivity : BaseActivity<AppPm>() {
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
         pm.networkStateCommand.bindTo(connectionStatusView.changeState())
-        pm.syncProgress.bindTo(syncStatusView.changeState())
+        pm.syncStatusVisibility.bindTo(syncStatusView.visibleChanges())
+        pm.syncStatusState.bindTo(syncStatusView.statusChanges())
         pm.backendSyncProgress.bindTo(backendSyncStatusView.changeState())
     }
 

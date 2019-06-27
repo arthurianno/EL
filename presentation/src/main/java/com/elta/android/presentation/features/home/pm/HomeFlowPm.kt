@@ -196,12 +196,6 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun bindSyncAction() {
-        syncProgressState.observable
-            .subscribe { inProgress ->
-                bus.event(Events.SyncProgress(inProgress))
-            }
-            .untilDestroy()
-
         Observable.merge(
             startSyncAction.observable,
             btControl.bluetoothEnabledAction.observable,
@@ -213,6 +207,9 @@ class HomeFlowPm @Inject constructor(
             .flatMap { params ->
                 syncWithGlucometerUseCase.execute(params)
                     .bindProgress(syncProgressState.consumer)
+                    .doOnSubscribe { bus.event(Events.Sync.Started) }
+                    .doOnError { bus.event(Events.Sync.Error) }
+                    .doOnComplete { bus.event(Events.Sync.Success) }
                     .doOnNext(::handleSyncCompleted)
                     .doOnError(::handleError)
             }
