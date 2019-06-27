@@ -26,8 +26,14 @@ sealed class Events : Event {
     data class PinCodeEntered(val pin: String) : Events()
     object DeviceChanged : Events()
     object FirmwareUpdated : Events()
-    data class SyncProgress(val inProgress: Boolean) : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
     data class ReminderSpent(val reminder: Reminder) : Events()
+
+    sealed class Sync : Events() {
+        object Unknown : Sync()
+        object Started : Sync()
+        object Error : Sync()
+        object Success : Sync()
+    }
 }

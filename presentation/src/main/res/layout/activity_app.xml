@@ -24,14 +24,10 @@
             app:state2_color="@color/color_background_connected"
             app:state2_text="@string/title_connection_found" />
 
-        <com.elta.android.presentation.widgets.TwoStateStatusView
+        <com.elta.android.presentation.widgets.status.StatusView
             android:id="@+id/syncStatusView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:state1_color="@color/color_background_sync_started"
-            app:state1_text="@string/sync_in_progress"
-            app:state2_color="@color/color_background_sync_finished"
-            app:state2_text="@string/sync_completed" />
+            android:layout_height="wrap_content" />
 
         <com.elta.android.presentation.widgets.TwoStateStatusView
             android:id="@+id/backendSyncStatusView"
