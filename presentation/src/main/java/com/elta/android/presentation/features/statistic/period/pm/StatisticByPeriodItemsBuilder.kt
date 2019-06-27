@@ -237,15 +237,14 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         val time = StringBuilder().apply {
             if (days > ZERO) {
                 append(resources.getString(R.string.activity_duration_day, days.toInt()))
-                append(" ")
             }
             if (hours > ZERO) {
+                if (isNotEmpty()) append("\u00A0") // non breaking space
                 append(resources.getString(R.string.activity_duration_hour, hours.toInt()))
-                append(" ")
             }
             if (minutes > ZERO) {
+                if (isNotEmpty()) append("\u00A0") // non breaking space
                 append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
-                append(" ")
             }
             if (seconds > ZERO && isEmpty()) {
                 append(resources.getString(R.string.activity_duration_sec, seconds.toInt()))

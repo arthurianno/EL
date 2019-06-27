@@ -51,6 +51,15 @@ class ProfileSettingsDelegate(
         }
     }
 
+    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+        val item = items[position] as ProfileSettingsItem
+        with(holder as ViewHolder) {
+            when (payload) {
+                ProfileSettingsItem.Payload.TITLE_CHANGED -> settingsTitleView.text = item.title
+            }
+        }
+    }
+
     private fun ViewHolder.toggleFocus(isFocus: Boolean) {
         settingsTitleView.setTextColor(resources.getColor(if (isFocus) R.color.black_blue else R.color.shade_black2))
         nextIconView.visibility = if (isFocus) View.VISIBLE else View.INVISIBLE
