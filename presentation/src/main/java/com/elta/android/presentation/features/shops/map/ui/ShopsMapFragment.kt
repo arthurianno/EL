@@ -30,6 +30,7 @@ import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.hideKeyboard
@@ -66,7 +67,6 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         homeButtonView.setImageResource(R.drawable.ic_dialog_close)
-        toolbarTitleView.text = getString(R.string.shops_map_toolbar_title)
         toolbarView.applyWindowInsetsForChildrenView()
 
         itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
@@ -88,6 +88,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
+        pm.titleState.bindTo(toolbarTitleView.text())
         pm.items.bindTo(adapter, compositeUnbind)
         pm.addMyLocationPinCommand.bindTo(::showUserLocation)
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)

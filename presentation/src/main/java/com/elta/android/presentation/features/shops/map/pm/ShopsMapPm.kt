@@ -53,6 +53,7 @@ class ShopsMapPm @Inject constructor(
 
     val items = State<List<ListItem>>()
     val geoPoints = State<Pair<List<GeoPoint>, Int>>()
+    val titleState = State<String>()
 
     val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
@@ -103,6 +104,11 @@ class ShopsMapPm @Inject constructor(
         locationControl.locationNotAllowedAction.observable
             .map { moskowLocation }
             .subscribe(defaultLocationState.consumer)
+            .untilDestroy()
+
+        shopsTypeState.observable
+            .map { it.toScreenTitle() }
+            .subscribe(titleState.consumer)
             .untilDestroy()
 
         Observables.combineLatest(lifecycleObservable, shopsTypeState.observable)
@@ -421,6 +427,12 @@ class ShopsMapPm @Inject constructor(
         arrayListOf<Point>().apply {
             add(foundedLocation.value.toPoint())
             addAll(geoPoints.value.first.takeFirst(NEAREST_TEN_POINTS).map { it.toPoint() })
+        }
+
+    private fun Type.toScreenTitle(): String =
+        when (this) {
+            Type.SALE -> resources.getString(R.string.shops_map_toolbar_title)
+            Type.SERVICE -> resources.getString(R.string.shops_map_toolbar_title_services)
         }
 
     private companion object {
