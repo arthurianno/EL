@@ -10,7 +10,18 @@ data class ProfileSettingsItem(
     val type: Type
 ) : ListItem {
 
-    override fun getUniqueProperty() = title
+    override fun getUniqueProperty() = type
+
+    override fun getChangePayload(other: ListItem): Any {
+        if (other is ProfileSettingsItem && title != other.title) {
+            return Payload.TITLE_CHANGED
+        }
+        return super.getChangePayload(other)
+    }
+
+    enum class Payload {
+        TITLE_CHANGED
+    }
 
     enum class Type {
         NAME,
