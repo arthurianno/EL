@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.requestStatus
@@ -21,6 +22,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.map.ui.widgets.ShopClusterPinProvider
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
+import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
@@ -28,6 +30,7 @@ import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.hideKeyboard
@@ -56,10 +59,14 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     private val snapHelper = PagerSnapHelper()
     private val rxPermissions by lazy { RxPermissions(this) }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (arguments?.get(EXTRA_TYPE) as? Type)?.let { presentationModel.setShopsType(it) }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         homeButtonView.setImageResource(R.drawable.ic_dialog_close)
-        toolbarTitleView.text = getString(R.string.shops_map_toolbar_title)
         toolbarView.applyWindowInsetsForChildrenView()
 
         itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
@@ -81,6 +88,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
+        pm.titleState.bindTo(toolbarTitleView.text())
         pm.items.bindTo(adapter, compositeUnbind)
         pm.addMyLocationPinCommand.bindTo(::showUserLocation)
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
@@ -131,7 +139,11 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     }
 
     companion object {
-        fun newInstance() = ShopsMapFragment()
+        fun newInstance(type: Type) = ShopsMapFragment().apply {
+            arguments = bundle(EXTRA_TYPE to type)
+        }
+
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
+        private const val EXTRA_TYPE = "extra_shops_type"
     }
 }

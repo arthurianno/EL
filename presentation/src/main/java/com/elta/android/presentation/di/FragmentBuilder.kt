@@ -48,6 +48,8 @@ import com.elta.android.presentation.features.profile.settings.reminders.all.di.
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
+import com.elta.android.presentation.features.profile.support.di.SupportModule
+import com.elta.android.presentation.features.profile.support.ui.SupportFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -279,6 +281,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindProfileSetGenderFragment(): ProfileSetGenderFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [SupportModule::class])
+    abstract fun bindSupportFragment(): SupportFragment
 
     // STATISTICS FLOW
     @FragmentScope

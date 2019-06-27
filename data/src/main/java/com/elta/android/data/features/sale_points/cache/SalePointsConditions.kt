@@ -4,7 +4,9 @@ import com.elta.android.data.features.common.cache.Condition
 
 sealed class SalePointsConditions : Condition {
 
-    data class Query(val query: String) : SalePointsConditions()
+    data class Query(val query: String, val type: String?) : SalePointsConditions()
+
+    data class Type(val type: String) : SalePointsConditions()
 
     data class Bounds(
         val southWestLatitude: Double,

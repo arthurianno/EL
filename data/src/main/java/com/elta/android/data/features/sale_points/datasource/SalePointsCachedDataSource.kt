@@ -14,9 +14,13 @@ class SalePointsCachedDataSource @Inject constructor(
     private val cache: Cache<SalePointCacheDto>
 ) : SalePointsDataSource {
 
-    override fun getSalePoints(): Observable<List<SalePointDto>> =
+    override fun getSalePoints(type: String?): Observable<List<SalePointDto>> =
         Observable.fromCallable {
-            cache.getAll(CommonConditions.All)
+            val condition = when (type == null) {
+                true -> CommonConditions.All
+                else -> SalePointsConditions.Type(type)
+            }
+            cache.getAll(condition)
         }.map(fromCacheMapper::mapFromObjects)
 
     override fun getSalePoints(
@@ -36,8 +40,8 @@ class SalePointsCachedDataSource @Inject constructor(
             )
         }.map(fromCacheMapper::mapFromObjects)
 
-    override fun searchSalePoints(query: String): Observable<List<SalePointDto>> =
+    override fun searchSalePoints(query: String, type: String?): Observable<List<SalePointDto>> =
         Observable.fromCallable {
-            cache.getAll(SalePointsConditions.Query(query))
+            cache.getAll(SalePointsConditions.Query(query, type))
         }.map(fromCacheMapper::mapFromObjects)
 }

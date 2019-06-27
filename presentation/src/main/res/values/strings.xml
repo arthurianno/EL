@@ -130,6 +130,7 @@
     <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
     <string name="shops_start_find_action_button">Найти магазин на карте</string>
     <string name="shops_map_toolbar_title">Приобрести глюкометр</string>
+    <string name="shops_map_toolbar_title_services">Сервисные центры</string>
     <string name="shops_map_route">Как доехать</string>
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
@@ -530,6 +531,17 @@
     <string name="profile_delete_observer_dialog_body">Вы уверены, что хотите удалить наблюдателя?</string>
     <string name="profile_delete_observer_cancel_button">Отменить</string>
     <string name="profile_delete_observer_dialog_confirm_button">Удалить</string>
+
+    <!-- SUPPORT FLOW -->
+    <string name="profile_support_title">Нужна помощь?</string>
+    <string name="profile_support_subtitle">Служба заботы о пользователях?</string>
+    <string name="profile_support_actions_header">Доступные действия</string>
+    <string name="profile_support_phone_number">8 800 250 17 50</string>
+    <string name="profile_support_phone_number_description">Позвонить</string>
+    <string name="profile_support_email">service@eltaltd.ru</string>
+    <string name="profile_support_email_description">Написать</string>
+    <string name="profile_support_service_centers">Куда обратиться</string>
+    <string name="profile_support_service_centers_description">Карта сервисных центров</string>
 
     <!-- STATISTICS -->
     <string name="statistic_title">Статистика</string>

@@ -53,6 +53,7 @@ class ShopsMapPm @Inject constructor(
 
     val items = State<List<ListItem>>()
     val geoPoints = State<Pair<List<GeoPoint>, Int>>()
+    val titleState = State<String>()
 
     val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
@@ -76,6 +77,7 @@ class ShopsMapPm @Inject constructor(
     private val searchAction = Action<String>()
     private val searchResultSelectedAction = Action<SearchResultItem>()
 
+    private val shopsTypeState = State<Type>()
     private val permissionStatusResultAction = Action<PermissionStatus>()
     private val fetchMyLocationAction = Action<Unit>()
     private val myLocationState = State<Location>()
@@ -104,7 +106,13 @@ class ShopsMapPm @Inject constructor(
             .subscribe(defaultLocationState.consumer)
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }
+        shopsTypeState.observable
+            .map { it.toScreenTitle() }
+            .subscribe(titleState.consumer)
+            .untilDestroy()
+
+        Observables.combineLatest(lifecycleObservable, shopsTypeState.observable)
+            .filter { it.first == Lifecycle.CREATED }
             .map { Unit }
             .doOnNext(loadScreenAction.consumer)
             .subscribe()
@@ -122,6 +130,10 @@ class ShopsMapPm @Inject constructor(
     override fun handleError(error: Throwable) {
         if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(Unit)
         else super.handleError(error)
+    }
+
+    fun setShopsType(type: Type) {
+        shopsTypeState.consumer.accept(type)
     }
 
     fun setPermissionStatus(status: PermissionStatus) {
@@ -169,6 +181,7 @@ class ShopsMapPm @Inject constructor(
     private fun bindSalePoints() {
         loadScreenAction.observable
             .skipWhileInProgress()
+            .map(::createGetSalePointsParams)
             .flatMap { params ->
                 getSalePointsUseCase.execute(params)
                     .hideErrorContainer()
@@ -368,7 +381,10 @@ class ShopsMapPm @Inject constructor(
     private fun Int.isInRange(): Boolean = this in 0 until items.value.size
 
     private fun createSearchParams(query: String): SearchSalePointsUseCase.Params =
-        SearchSalePointsUseCase.Params(query)
+        SearchSalePointsUseCase.Params(query, shopsTypeState.value)
+
+    private fun createGetSalePointsParams(i: Unit) =
+        GetSalePointsUseCase.Params(shopsTypeState.value)
 
     private fun handleSearchSuccess(points: List<SalePoint>) {
         if (points.isEmpty()) {
@@ -411,6 +427,12 @@ class ShopsMapPm @Inject constructor(
         arrayListOf<Point>().apply {
             add(foundedLocation.value.toPoint())
             addAll(geoPoints.value.first.takeFirst(NEAREST_TEN_POINTS).map { it.toPoint() })
+        }
+
+    private fun Type.toScreenTitle(): String =
+        when (this) {
+            Type.SALE -> resources.getString(R.string.shops_map_toolbar_title)
+            Type.SERVICE -> resources.getString(R.string.shops_map_toolbar_title_services)
         }
 
     private companion object {

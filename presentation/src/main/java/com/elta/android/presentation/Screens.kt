@@ -1,9 +1,11 @@
 package com.elta.android.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
@@ -37,6 +39,7 @@ import com.elta.android.presentation.features.profile.settings.password.ui.Profi
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
 import com.elta.android.presentation.features.profile.settings.reminders.create.ui.CreateRemindFragment
 import com.elta.android.presentation.features.profile.settings.reminders.edit.ui.EditRemindFragment
+import com.elta.android.presentation.features.profile.support.ui.SupportFragment
 import com.elta.android.presentation.features.registration.activation.ui.ActivationFragment
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
@@ -57,6 +60,7 @@ import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncS
 import com.elta.android.presentation.utils.navigationIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
+import com.nullgr.core.intents.emailIntent
 import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
@@ -118,7 +122,11 @@ object Screens {
     }
 
     object ShopsMap : SupportAppScreen() {
-        override fun getFragment() = ShopsMapFragment.newInstance()
+        override fun getFragment() = ShopsMapFragment.newInstance(Type.SALE)
+    }
+
+    object ServiceCentersMap : SupportAppScreen() {
+        override fun getFragment() = ShopsMapFragment.newInstance(Type.SERVICE)
     }
 
     class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
@@ -266,6 +274,15 @@ object Screens {
 
     object SetGender : SupportAppScreen() {
         override fun getFragment() = ProfileSetGenderFragment.newInstance()
+    }
+
+    object Support : SupportAppScreen() {
+        override fun getFragment() = SupportFragment.newInstance()
+    }
+
+    data class EmailScreen(val email: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?): Intent =
+            emailIntent(email)
     }
 
     // STATISTICS FLOW

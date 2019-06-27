@@ -20,7 +20,7 @@ class SalePointsRemoteDataSource @Inject constructor(
     private val api: SalePointsApi
 ) : SalePointsDataSource {
 
-    override fun getSalePoints(): Observable<List<SalePointDto>> =
+    override fun getSalePoints(type: String?): Observable<List<SalePointDto>> =
         getDataByPage(PAGE, PAGE_SIZE)
             .doOnNext { syncStorage.lastSalePointsSync = timestamp() }
             .map(SalePointsDto::points)
@@ -31,9 +31,9 @@ class SalePointsRemoteDataSource @Inject constructor(
         southWestLongitude: Double,
         northEastLatitude: Double,
         northEastLongitude: Double
-    ): Observable<List<SalePointDto>> = getSalePoints()
+    ): Observable<List<SalePointDto>> = getSalePoints(null)
 
-    override fun searchSalePoints(query: String): Observable<List<SalePointDto>> = getSalePoints()
+    override fun searchSalePoints(query: String, type: String?): Observable<List<SalePointDto>> = getSalePoints(null)
 
     private fun getDataByPage(page: Int, size: Int): Observable<SalePointsDto> =
         api.getSalePoints(syncStorage.lastSalePointsSync, page, size)

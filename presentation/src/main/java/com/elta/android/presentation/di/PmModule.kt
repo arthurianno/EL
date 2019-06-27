@@ -38,6 +38,7 @@ import com.elta.android.presentation.features.profile.settings.password.pm.Profi
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
 import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
+import com.elta.android.presentation.features.profile.support.pm.SupportPm
 import com.elta.android.presentation.features.registration.activation.pm.ActivationPm
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
@@ -323,6 +324,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(ProfileSetGenderPm::class)
     abstract fun bindProfileSetGenderPm(pm: ProfileSetGenderPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(SupportPm::class)
+    abstract fun bindSupportPm(pm: SupportPm): PresentationModel
 
     // STATISTICS FLOW
     @Binds
