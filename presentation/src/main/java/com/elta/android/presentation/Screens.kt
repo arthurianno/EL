@@ -1,6 +1,7 @@
 package com.elta.android.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.support.v4.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -59,6 +60,7 @@ import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncS
 import com.elta.android.presentation.utils.navigationIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
+import com.nullgr.core.intents.emailIntent
 import com.nullgr.core.intents.webIntent
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
@@ -276,6 +278,11 @@ object Screens {
 
     object Support : SupportAppScreen() {
         override fun getFragment() = SupportFragment.newInstance()
+    }
+
+    data class EmailScreen(val email: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context?): Intent =
+            emailIntent(email)
     }
 
     // STATISTICS FLOW
