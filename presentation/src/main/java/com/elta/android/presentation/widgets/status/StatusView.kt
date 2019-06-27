@@ -49,23 +49,28 @@ class StatusView @JvmOverloads constructor(
         prevStatus = status
     }
 
-    fun setVisible(visible: Boolean) {
-        if (visible) show()
-        else hide()
+    fun setVisible(visibility: Visibility) {
+        if (visibility.value) show()
+        else hide(visibility.delay)
     }
 
     fun statusChanges(): Consumer<Status> = Consumer { setStatus(it) }
 
-    fun visibleChanges(): Consumer<Boolean> = Consumer { setVisible(it) }
+    fun visibleChanges(): Consumer<Visibility> = Consumer { setVisible(it) }
 
     private inline fun show() {
         removeCallbacks(hideViewCallback)
         statusExpandableLayout.expand(true)
     }
 
-    private inline fun hide() {
-        removeCallbacks(hideViewCallback)
-        postDelayed(hideViewCallback, HIDE_VIEW_DELAY)
+    private inline fun hide(delay: Boolean) {
+        if (delay) {
+            removeCallbacks(hideViewCallback)
+            postDelayed(hideViewCallback, HIDE_VIEW_DELAY)
+        } else {
+            removeCallbacks(hideViewCallback)
+            hideViewCallback.run()
+        }
     }
 
     private inline fun getAnimator(prev: Status, new: Status): ObjectAnimator =

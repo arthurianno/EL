@@ -16,6 +16,7 @@ import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
 import com.elta.android.presentation.widgets.status.Status
+import com.elta.android.presentation.widgets.status.Visibility
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 
@@ -31,7 +32,7 @@ class AppPm @Inject constructor(
     val onStopAction = Action<String>()
 
     val syncStatusState = State<Status>()
-    val syncStatusVisibility = State(false)
+    val syncStatusVisibility = State<Visibility>(Visibility.Hide)
 
     val backendSyncProgress = Command<Boolean>(bufferSize = 1)
 
@@ -101,15 +102,15 @@ class AppPm @Inject constructor(
         bus.events<Events.Sync>()
             .doOnNext {
                 when (it) {
-                    is Events.Sync.Unknown -> syncStatusVisibility.consumer.accept(false)
-                    is Events.Sync.Error -> syncStatusVisibility.consumer.accept(false)
+                    is Events.Sync.Unknown -> syncStatusVisibility.consumer.accept(Visibility.Hide)
+                    is Events.Sync.Error -> syncStatusVisibility.consumer.accept(Visibility.Hide)
                     is Events.Sync.Started -> {
                         syncStatusState.consumer.accept(SyncStatus.Started(resources))
-                        syncStatusVisibility.consumer.accept(true)
+                        syncStatusVisibility.consumer.accept(Visibility.Show)
                     }
                     is Events.Sync.Success -> {
                         syncStatusState.consumer.accept(SyncStatus.Success(resources))
-                        syncStatusVisibility.consumer.accept(false)
+                        syncStatusVisibility.consumer.accept(Visibility.HideWithDelay)
                     }
                 }
             }
