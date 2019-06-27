@@ -4,6 +4,7 @@ import android.net.Uri
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
@@ -14,6 +15,9 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
+import com.elta.android.presentation.widgets.status.Status
+import com.elta.android.presentation.widgets.status.Visibility
+import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
@@ -27,7 +31,9 @@ class AppPm @Inject constructor(
     val coldStartDeepLinkAction = Action<Uri>()
     val onStopAction = Action<String>()
 
-    val syncProgress = Command<Boolean>(bufferSize = 1)
+    val syncStatusState = State<Status>()
+    val syncStatusVisibility = State<Visibility>(Visibility.Hide)
+
     val backendSyncProgress = Command<Boolean>(bufferSize = 1)
 
     @Suppress("LongMethod")
@@ -93,11 +99,22 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.events<Events.SyncProgress>()
-            .skip(1)
-            .map(Events.SyncProgress::inProgress)
-            .map { !it }
-            .subscribe(syncProgress.consumer)
+        bus.events<Events.Sync>()
+            .doOnNext {
+                when (it) {
+                    is Events.Sync.Unknown -> syncStatusVisibility.consumer.accept(Visibility.Hide)
+                    is Events.Sync.Error -> syncStatusVisibility.consumer.accept(Visibility.Hide)
+                    is Events.Sync.Started -> {
+                        syncStatusState.consumer.accept(SyncStatus.Started(resources))
+                        syncStatusVisibility.consumer.accept(Visibility.Show)
+                    }
+                    is Events.Sync.Success -> {
+                        syncStatusState.consumer.accept(SyncStatus.Success(resources))
+                        syncStatusVisibility.consumer.accept(Visibility.HideWithDelay)
+                    }
+                }
+            }
+            .subscribe()
             .untilDestroy()
 
         bus.events<Events.BackendSyncProgress>()
@@ -119,5 +136,19 @@ class AppPm @Inject constructor(
     override fun handleError(error: Throwable) {
         if (error is NoSuchElementException) router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
         else super.handleError(error)
+    }
+
+    private sealed class SyncStatus : Status {
+        data class Started(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.sync_in_progress),
+            override val color: Int = resources.getColor(R.color.color_background_sync_started)
+        ) : SyncStatus()
+
+        data class Success(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.sync_completed),
+            override val color: Int = resources.getColor(R.color.color_background_sync_finished)
+        ) : SyncStatus()
     }
 }
