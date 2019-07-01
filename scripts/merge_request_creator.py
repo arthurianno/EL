@@ -34,9 +34,9 @@ def find_parent_branch(branches, current):
 def get_project_path():
     out = check_output(["git", "remote", "get-url", "origin"]).decode("utf8")
     if 'http://' in out:
-        return out.replace('http://', '').split('/', 1)[1].strip()
+        return out.replace('http://', '').split('/', 1)[1].replace('.git', '').strip()
     elif 'https://' in out:
-        return out.replace('https://', '').split('/', 1)[1].strip()
+        return out.replace('https://', '').split('/', 1)[1].replace('.git', '').strip()
     else:
         return out.split(':')[1].replace('.git', '').strip()
 
