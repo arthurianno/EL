@@ -30,7 +30,8 @@ import android.support.annotation.StringDef
     AnalyticsEventType.EVENT_MEDICAMENTS_ADD,
     AnalyticsEventType.GLYCATED_HEMOGLOBIN_ADD,
     AnalyticsEventType.PERIOD_TAB,
-    AnalyticsEventType.APP_EXIT
+    AnalyticsEventType.APP_EXIT,
+    AnalyticsEventType.GLUCOMETERS_OPEN
 )
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 annotation class AnalyticsEventType {
@@ -61,5 +62,6 @@ annotation class AnalyticsEventType {
         const val GLYCATED_HEMOGLOBIN_ADD = "glycated_hemoglobin_add"
         const val PERIOD_TAB = "period_tab"
         const val APP_EXIT = "app_exit"
+        const val GLUCOMETERS_OPEN = "glucometers_open"
     }
 }

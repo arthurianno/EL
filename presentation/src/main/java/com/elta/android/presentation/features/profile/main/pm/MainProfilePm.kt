@@ -151,7 +151,10 @@ class MainProfilePm @Inject constructor(
                 router.startFlow(Screens.ShopsMap)
             }
             MyObservers -> router.startFlow(Screens.Observers)
-            MyDevices -> router.startFlow(Screens.Devices)
+            MyDevices -> {
+                trackEvent(AnalyticsEventType.GLUCOMETERS_OPEN)
+                router.startFlow(Screens.Devices)
+            }
             Support -> router.startFlow(Screens.Support)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
