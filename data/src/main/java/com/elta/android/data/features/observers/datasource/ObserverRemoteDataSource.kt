@@ -12,6 +12,7 @@ import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
 import com.elta.android.data.features.user.dto.SimpleObserverDto
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 class ObserverRemoteDataSource @Inject constructor(
@@ -24,6 +25,9 @@ class ObserverRemoteDataSource @Inject constructor(
         getObserverInvitesByPage(PAGE, PAGE_SIZE)
             .map(ObserversQueryResultDto::items)
             .doOnNext { events -> updateCache(events, cache, mapper) }
+
+    override fun getObserver(id: String): Single<ObserverDto> =
+        Single.error(IllegalStateException("getObserver method dose not support by remote data source"))
 
     override fun sendObserverInvite(email: String): Completable =
         api.sendObserverInvite(ObserverInviteEmailRequest(email))
