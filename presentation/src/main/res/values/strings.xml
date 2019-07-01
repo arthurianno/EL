@@ -528,6 +528,12 @@
     <string name="profile_observer_invite_new_email_hint">Email наблюдателя</string>
     <string name="profile_observer_invite_with_success">Приглашение отправлено</string>
 
+    <string name="profile_observer_edit_title">Наблюдатель</string>
+    <string name="profile_observer_edit_subtitle">Вы можете назвать наблюдателя или удалить его из списка</string>
+    <string name="profile_observer_edit_name_hint">Имя наблюдателя</string>
+    <string name="profile_observer_edit_save_button">Сохранить</string>
+    <string name="profile_observer_edit_delete_button">Удалить</string>
+
     <string name="profile_delete_observer_dialog_title">Внимание</string>
     <string name="profile_delete_observer_dialog_body">Вы уверены, что хотите удалить наблюдателя?</string>
     <string name="profile_delete_observer_cancel_button">Отменить</string>

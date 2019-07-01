@@ -47,7 +47,7 @@ class ObserverMapper @Inject constructor(
                 title = if (name.isNullOrEmpty()) resources.getString(R.string.profile_observers_user_name_placeholder)
                 else checkNotNull(name),
                 description = email,
-                action = R.drawable.ic_delete,
+                action = R.drawable.ic_arrow_left,
                 status = status
             )
         }

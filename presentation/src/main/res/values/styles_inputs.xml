@@ -24,6 +24,10 @@
         <item name="android:inputType">text</item>
     </style>
 
+    <style name="InputStyle.Text.CapSentences" parent="InputStyle">
+        <item name="android:inputType">textCapSentences</item>
+    </style>
+
     <style name="InputStyle.Digits" parent="InputStyle">
         <item name="android:inputType">numberDecimal</item>
     </style>
