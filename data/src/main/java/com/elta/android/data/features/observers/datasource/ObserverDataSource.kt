@@ -14,5 +14,7 @@ interface ObserverDataSource {
 
     fun sendObserverInvite(email: String): Completable
 
+    fun updateObserverName(id: String, name: String): Completable
+
     fun deleteObserverInvite(observables: List<SimpleObserverDto>): Completable
 }

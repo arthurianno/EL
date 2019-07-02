@@ -5,6 +5,7 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.dto.ObserverInviteEmailRequest
 import com.elta.android.data.features.observers.dto.ObserverStatusDto
+import com.elta.android.data.features.observers.dto.ObserverUpdateNameRequest
 import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -59,6 +60,9 @@ class MockedObserverApi : ObserverApi {
                 state = StateDto.CREATED
             )
         )
+
+    override fun updateObserverName(id: String, name: ObserverUpdateNameRequest): Completable =
+        Completable.complete()
 
     override fun deleteObserverInvite(id: String): Completable =
         Completable.complete()

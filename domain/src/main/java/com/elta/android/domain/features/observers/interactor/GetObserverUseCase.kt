@@ -7,10 +7,10 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import javax.inject.Inject
 
-class GetOberverUseCase @Inject constructor(
+class GetObserverUseCase @Inject constructor(
     private val repository: ObserverRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<Observer, GetOberverUseCase.Params>(schedulers) {
+) : SingleUseCase<Observer, GetObserverUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Single<Observer> =
         repository.getObserver(checkNotNull(params).id)

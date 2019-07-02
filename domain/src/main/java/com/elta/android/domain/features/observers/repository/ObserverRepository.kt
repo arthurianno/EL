@@ -11,6 +11,8 @@ interface ObserverRepository {
 
     fun getObserver(id: String): Single<Observer>
 
+    fun updateObserverName(id: String, name: String): Completable
+
     fun sendObserverInvite(email: String): Completable
 
     fun deleteObserverInvite(id: String): Completable

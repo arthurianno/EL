@@ -26,6 +26,14 @@ class ObserverCachedDataSource @Inject constructor(
             cache.get(CommonConditions.ById(id.hashCode().toLong()))
         }.map(fromCacheMapper::mapFromObject)
 
+    override fun updateObserverName(id: String, name: String): Completable =
+        Completable.fromCallable {
+            val observer = cache.get(CommonConditions.ById(id.hashCode().toLong()))
+            observer?.let {
+                cache.update(arrayListOf(it.copy(name = name)))
+            }
+        }
+
     override fun sendObserverInvite(email: String): Completable =
         Completable.error(Throwable("Unsupported cache method"))
 

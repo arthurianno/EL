@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.observers.edit.pm
 
 import com.elta.android.domain.features.observers.interactor.DeleteObserverUseCase
-import com.elta.android.domain.features.observers.interactor.GetOberverUseCase
+import com.elta.android.domain.features.observers.interactor.GetObserverUseCase
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 class EditObserverPm @Inject constructor(
     private val deleteObserverUseCase: DeleteObserverUseCase,
-    private val getObserverUseCase: GetOberverUseCase,
+    private val getObserverUseCase: GetObserverUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -117,7 +117,7 @@ class EditObserverPm @Inject constructor(
 
     private fun createDeleteObserverParams(id: String) = DeleteObserverUseCase.Params(id)
 
-    private fun createGetObserverParams(id: String) = GetOberverUseCase.Params(id)
+    private fun createGetObserverParams(id: String) = GetObserverUseCase.Params(id)
 
     companion object {
         private const val AFTER_DELETE_DELAY = 1000L
