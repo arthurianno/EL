@@ -580,6 +580,12 @@
     <string name="statistic_chart_period_dates_mask">%s - %s</string>
     <string name="statistic_daily_glucose_title">Мои показатели</string>
 
+    <string name="statistic_report_title">Выгрузка отчета</string>
+    <string name="statistic_report_sub_title">Диапазон данных 14 дней</string>
+    <string name="statistic_report_description">Выберите дату начала диапазона для\nгенерации данных в отчете</string>
+    <string name="statistic_report_action_button">Подтвердить и выгрузить</string>
+    <string name="statistic_menu_button">Выгрузить отчет</string>
+
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>
     <string name="feedback_input_name_hint">Ваше имя *</string>

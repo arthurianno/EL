@@ -6,4 +6,10 @@ import javax.inject.Inject
 
 class ReportPeriodChooserPm @Inject constructor(
     services: ServiceFacade
-) : BasePm(services)
+) : BasePm(services) {
+
+    val actionButtonEnabledCommand = State(false)
+    val mainAction = Action<Unit>()
+    val closeDialogCommand = Command<Unit>(bufferSize = 1)
+
+}

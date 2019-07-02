@@ -1,6 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_top_round_rect"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="bottom"
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="22dp"
+        android:paddingBottom="10dp">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/dialogTitleView"
+            style="@style/New.Headline4.BlackBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:includeFontPadding="false"
+            android:text="@string/statistic_report_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/dialogSubTitleView"
+            style="@style/New.Caption1.ShadeBlack2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:includeFontPadding="false"
+            android:text="@string/statistic_report_sub_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitleView" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/dialogCloseButtonView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dialog_close" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/dialogDescriptionTitleView"
+                style="@style/New.Body1.BlackBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/statistic_report_description" />
+
+            <FrameLayout
+                android:id="@+id/dialogContentContainerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="14dp">
+
+                        <android.support.v7.widget.AppCompatImageView
+                            android:id="@+id/calendarIconView"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="16dp"
+                            app:srcCompat="@drawable/ic_calendar" />
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/dateView"
+                            style="@style/New.Title2.BlackBlue"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            tools:text="12 June" />
+
+                    </LinearLayout>
+
+                    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:mcv_dateTextAppearance="@style/New.Caption2.Calendar"
+                        app:mcv_firstDayOfWeek="monday"
+                        app:mcv_headerTextAppearance="@style/New.Body1.BlackBlue"
+                        app:mcv_leftArrowMask="@drawable/ic_calendar_arrow_left"
+                        app:mcv_rightArrowMask="@drawable/ic_calendar_arrow_right"
+                        app:mcv_selectionColor="@color/black_blue"
+                        app:mcv_selectionMode="single"
+                        app:mcv_showOtherDates="out_of_range"
+                        app:mcv_titleAnimationOrientation="horizontal"
+                        app:mcv_weekDayTextAppearance="@style/New.Caption1.ShadeBlack2" />
+
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/progressView"
+                    style="@style/AppProgressBar.Accent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/dialogActionButtonView"
+        style="@style/Button.Large"
+        android:text="@string/statistic_report_action_button" />
+
+</LinearLayout>
