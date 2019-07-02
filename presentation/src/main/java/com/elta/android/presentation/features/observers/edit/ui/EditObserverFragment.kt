@@ -10,8 +10,8 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.observers.edit.pm.EditObserverPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.ui.extensions.applyLengthFilter
 import kotlinx.android.synthetic.main.fragment_edit_observer.*
-import kotlinx.android.synthetic.main.fregment_invite_observer.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class EditObserverFragment : BaseFragment<EditObserverPm>() {
@@ -30,6 +30,7 @@ class EditObserverFragment : BaseFragment<EditObserverPm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         menuButtonView.text = getString(R.string.profile_observer_edit_delete_button)
+        nameInputView.applyLengthFilter(MAX_NAME_LENGTH)
     }
 
     override fun onBindPresentationModel(pm: EditObserverPm) {
@@ -37,13 +38,14 @@ class EditObserverFragment : BaseFragment<EditObserverPm>() {
         bindProgressDialog(pm)
         menuButtonView.clicks().bindTo(pm.deleteObserverAction)
         saveButtonView.clicks().bindTo(pm.saveObserverAction)
-        pm.saveButtonEnabledState.bindTo { continueButtonView.isEnabled = it }
+        pm.saveButtonEnabledState.bindTo { saveButtonView.isEnabled = it }
         pm.observerNameInput.bindTo(nameInputView)
         pm.deleteObserverDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {
         private const val EXTRA_ID = "extra_observer_id"
+        private const val MAX_NAME_LENGTH = 100
 
         fun newInstance(id: String): EditObserverFragment {
             return EditObserverFragment().apply {

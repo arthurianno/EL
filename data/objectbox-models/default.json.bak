@@ -387,7 +387,7 @@
     },
     {
       "id": "13:4893127598039866661",
-      "lastPropertyId": "9:6237374916312762544",
+      "lastPropertyId": "10:6655224264396305099",
       "name": "GlucometerInfoCachedDto",
       "properties": [
         {
@@ -423,8 +423,8 @@
           "name": "hardware"
         },
         {
-          "id": "9:6237374916312762544",
-          "name": "lastEvent"
+          "id": "10:6655224264396305099",
+          "name": "lastSyncedEvent"
         }
       ],
       "relations": []
@@ -459,7 +459,7 @@
     },
     {
       "id": "16:4156337543713803940",
-      "lastPropertyId": "5:389016516142161600",
+      "lastPropertyId": "6:3983104656624443690",
       "name": "UserInfoCacheDto",
       "properties": [
         {
@@ -481,6 +481,10 @@
         {
           "id": "5:389016516142161600",
           "name": "isOnboardingPassed"
+        },
+        {
+          "id": "6:3983104656624443690",
+          "name": "isFirstHomeEntrance"
         }
       ],
       "relations": []
@@ -553,7 +557,8 @@
     6799483249178145102,
     78969528808694988,
     8809417499672134012,
-    1113739526237631879
+    1113739526237631879,
+    6237374916312762544
   ],
   "retiredRelationUids": [
     5224261980992438077,

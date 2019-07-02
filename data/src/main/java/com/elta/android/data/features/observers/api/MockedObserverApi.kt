@@ -23,6 +23,7 @@ class MockedObserverApi : ObserverApi {
             id = "vcxz-bvxc-nbcc-mnbv",
             email = "maksim@gmail.com",
             name = "Maksim Drum",
+            customName = "Some Name",
             status = ObserverStatusDto.PENDING,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -31,6 +32,7 @@ class MockedObserverApi : ObserverApi {
             id = "fdas-gfsd-trwe-gfsd",
             email = "vitaliy@gmail.com",
             name = "Vitaliy Vocal",
+            customName = "Some Name",
             status = ObserverStatusDto.CONFIRMED,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -39,6 +41,7 @@ class MockedObserverApi : ObserverApi {
             id = "trwe-hgfd-jhgf-nbvc",
             email = "dmitriy@gmail.com",
             name = "Dmitriy Bass",
+            customName = "Some Name",
             status = ObserverStatusDto.EXPIRED,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -55,6 +58,7 @@ class MockedObserverApi : ObserverApi {
                 id = "vcxz-bvxc-nbcc-mnbv",
                 email = "maksim@gmail.com",
                 name = "Maksim Drum",
+                customName = "Some Name",
                 status = ObserverStatusDto.PENDING,
                 modificationTime = Date().time,
                 state = StateDto.CREATED

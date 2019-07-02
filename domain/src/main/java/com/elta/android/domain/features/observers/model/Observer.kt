@@ -6,6 +6,7 @@ data class Observer(
     val id: String,
     val email: String,
     val name: String?,
+    val customName: String?,
     val status: ObserverStatus,
     val modificationTime: Long?,
     val state: State

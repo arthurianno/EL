@@ -25,7 +25,7 @@ interface ObserverApi {
     @PUT("api/share/v1/observers/invites")
     fun sendObserverInvite(@Body email: ObserverInviteEmailRequest): Single<ObserverDto>
 
-    @PUT("/v1/observers/{id}")
+    @PUT("api/share/v1/observers/{id}")
     fun updateObserverName(@Path("id") id: String, @Body name: ObserverUpdateNameRequest): Completable
 
     @DELETE("api/share/v1/observers/invites/{id}")

@@ -2,6 +2,8 @@ package com.elta.android.presentation.features.observers.edit.pm
 
 import com.elta.android.domain.features.observers.interactor.DeleteObserverUseCase
 import com.elta.android.domain.features.observers.interactor.GetObserverUseCase
+import com.elta.android.domain.features.observers.interactor.UpdateObserverNameUseCase
+import com.elta.android.domain.features.observers.interactor.userName
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -21,6 +23,7 @@ import javax.inject.Inject
 class EditObserverPm @Inject constructor(
     private val deleteObserverUseCase: DeleteObserverUseCase,
     private val getObserverUseCase: GetObserverUseCase,
+    private val updateObserverNameUseCase: UpdateObserverNameUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -66,14 +69,25 @@ class EditObserverPm @Inject constructor(
     private fun bindObserverState() {
         observerState.observable
             .filter { it.name != null }
-            .map { checkNotNull(it.name) }
+            .map { checkNotNull(it.userName) }
             .doOnNext(observerNameInput.text.consumer)
             .subscribe()
             .untilDestroy()
 
         observerNameInput.textChanges.observable
-            .map { !it.isNotEmpty() && it != observerState.value.name }
+            .map { it.isNotEmpty() && it != observerState.value.name }
             .doOnNext(saveButtonEnabledState.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        saveObserverAction.observable
+            .map(::createUpdateObserverNameParams)
+            .flatMapCompletable {
+                updateObserverNameUseCase.execute(it)
+                    .bindProgress()
+                    .doOnComplete(::handleNameChangedSuccess)
+                    .doOnError(::handleError)
+            }
             .subscribe()
             .untilDestroy()
     }
@@ -118,6 +132,14 @@ class EditObserverPm @Inject constructor(
     private fun createDeleteObserverParams(id: String) = DeleteObserverUseCase.Params(id)
 
     private fun createGetObserverParams(id: String) = GetObserverUseCase.Params(id)
+
+    private fun createUpdateObserverNameParams(i: Unit) =
+        UpdateObserverNameUseCase.Params(selectedObserverIdState.value, observerNameInput.text.value)
+
+    private fun handleNameChangedSuccess() {
+        bus.event(Events.ObserversUpdated)
+        router.exit()
+    }
 
     companion object {
         private const val AFTER_DELETE_DELAY = 1000L

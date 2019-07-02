@@ -46,7 +46,8 @@ class ObserverDelegate(
         val item = items[position] as ObserverItem
         with(holder as ViewHolder) {
             when (payload) {
-                ObserverItem.Payload.STATUS_CHANGED -> fillItem(item)
+                ObserverItem.Payload.STATUS_CHANGED, ObserverItem.Payload.TITLE_CHANGED ->
+                    fillItem(item)
             }
         }
     }
