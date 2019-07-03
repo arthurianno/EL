@@ -63,6 +63,7 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
+import com.elta.android.presentation.features.statistic.report.ui.ReportPeriodChooserFragment
 import com.elta.android.presentation.features.sync.connect.base.di.ConnectDeviceModule
 import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
 import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
@@ -294,6 +295,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [PeriodModule::class])
     abstract fun bindPeriodFragment(): PeriodFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindReportPeriodChooserFragment(): ReportPeriodChooserFragment
 
     // FEEDBACK FLOW
     @FragmentScope

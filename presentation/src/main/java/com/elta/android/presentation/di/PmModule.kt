@@ -50,6 +50,7 @@ import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
 import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
+import com.elta.android.presentation.features.statistic.report.pm.ReportPeriodChooserPm
 import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnBoardingConnectDevicePm
 import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePm
 import com.elta.android.presentation.features.sync.flow.onboarding.pm.FromOnBoardingSyncFlowPm
@@ -340,6 +341,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(PeriodPm::class)
     abstract fun bindPeriodPm(pm: PeriodPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(ReportPeriodChooserPm::class)
+    abstract fun bindReportPeriodChooserPm(pm: ReportPeriodChooserPm): PresentationModel
 
     // FEEDBACK FLOW
     @Binds
