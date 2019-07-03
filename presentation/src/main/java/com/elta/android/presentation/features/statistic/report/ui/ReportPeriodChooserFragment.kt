@@ -4,7 +4,6 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.text.style.ForegroundColorSpan
 import android.view.View
@@ -16,7 +15,6 @@ import com.elta.android.presentation.widgets.simple_date_picker.RangeDecorator
 import com.elta.android.presentation.widgets.simple_date_picker.RangeSpanDecorator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
-import com.jakewharton.rxrelay2.PublishRelay
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import kotlinx.android.synthetic.main.fragment_statistic_report_period_chooser.*
 import org.threeten.bp.LocalDate
@@ -26,8 +24,6 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
 
     override val screenLayout: Int = R.layout.fragment_statistic_report_period_chooser
     override val classToken: Class<ReportPeriodChooserPm> = ReportPeriodChooserPm::class.java
-
-    private val daySelectionRelay = PublishRelay.create<LocalDate>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,7 +82,7 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
         calendarView.addDecorators(decorators)
 
         calendarView.setOnDateChangedListener { _, day, _ ->
-            daySelectionRelay.accept(day.date)
+            presentationModel.selectDateAction.consumer.accept(day.date)
         }
         calendarView.setOnRangeSelectedListener { _, dates ->
             decorators.forEach {
@@ -104,11 +100,10 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
         pm.selectedRangeState.bindTo {
             calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
         }
-        daySelectionRelay.bindTo(pm.selectDateAction)
         pm.titleState.bindTo(dateView.text())
     }
 
-    private inline fun Fragment.drawable(drawable: Int, inset: Int): Drawable =
+    private inline fun drawable(drawable: Int, inset: Int): Drawable =
         InsetDrawable(ContextCompat.getDrawable(checkNotNull(context), drawable), 0, inset, 0, inset)
 
     private inline fun drawable(drawable: Drawable, inset: Int): Drawable =
@@ -129,11 +124,6 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
 
     companion object {
         private const val DAYS_TO_ADD = 6L
-        fun newInstance(): ReportPeriodChooserFragment {
-            return ReportPeriodChooserFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
-        }
+        fun newInstance() = ReportPeriodChooserFragment()
     }
 }

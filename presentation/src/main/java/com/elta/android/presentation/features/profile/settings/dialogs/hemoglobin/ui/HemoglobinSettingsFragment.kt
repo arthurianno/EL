@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.profile.settings.dialogs.hemoglob
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -79,7 +78,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         pm.hemoglobinItemsState.bindTo(adapter, compositeUnbind)
     }
 
-    private inline fun Fragment.drawable(drawable: Int, inset: Int): Drawable =
+    private inline fun drawable(drawable: Int, inset: Int): Drawable =
         InsetDrawable(ContextCompat.getDrawable(checkNotNull(context), drawable), 0, inset, 0, inset)
 
     companion object {
