@@ -115,7 +115,7 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
         InsetDrawable(drawable, 0, inset, 0, inset)
 
     private inline fun CalendarDay.isStartOfWeek() = date.dayOfWeek == calendarView.firstDayOfWeek
-    private inline fun CalendarDay.isEndOfWeek() = date.dayOfWeek == calendarView.firstDayOfWeek.plus(6)
+    private inline fun CalendarDay.isEndOfWeek() = date.dayOfWeek == calendarView.firstDayOfWeek.plus(DAYS_TO_ADD)
     private inline fun CalendarDay.isStartOfMonth() = date == date.with(TemporalAdjusters.firstDayOfMonth())
     private inline fun CalendarDay.isEndOfMonth() = date == date.with(TemporalAdjusters.lastDayOfMonth())
 
@@ -128,6 +128,7 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
     private inline fun CalendarDay.isBoundary(dates: List<CalendarDay>) = dates.first() == this || dates.last() == this
 
     companion object {
+        private const val DAYS_TO_ADD = 6L
         fun newInstance(): ReportPeriodChooserFragment {
             return ReportPeriodChooserFragment().apply {
                 arguments = Bundle().apply {
