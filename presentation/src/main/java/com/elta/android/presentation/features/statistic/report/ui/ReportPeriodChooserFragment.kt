@@ -15,10 +15,10 @@ import com.elta.android.presentation.widgets.simple_date_picker.BackgroundDecora
 import com.elta.android.presentation.widgets.simple_date_picker.RangeDecorator
 import com.elta.android.presentation.widgets.simple_date_picker.RangeSpanDecorator
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxrelay2.PublishRelay
 import com.prolificinteractive.materialcalendarview.CalendarDay
-import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
+import kotlinx.android.synthetic.main.fragment_statistic_report_period_chooser.*
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.TemporalAdjusters
 
@@ -106,6 +106,7 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
             calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
         }
         daySelectionRelay.bindTo(pm.selectDateAction)
+        pm.titleState.bindTo(dateView.text())
     }
 
     private inline fun Fragment.drawable(drawable: Int, inset: Int): Drawable =

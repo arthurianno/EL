@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.statistic.report.pm
 
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import org.threeten.bp.LocalDate
@@ -14,6 +15,7 @@ class ReportPeriodChooserPm @Inject constructor(
     val closeDialogCommand = Command<Unit>(bufferSize = 1)
     val selectDateAction = Action<LocalDate>()
     val selectedRangeState = State(getRange())
+    val titleState = State<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -22,10 +24,22 @@ class ReportPeriodChooserPm @Inject constructor(
             .map(::getRange)
             .subscribe(selectedRangeState.consumer)
             .untilDestroy()
+
+        selectedRangeState.observable
+            .map(::formatRange)
+            .subscribe(titleState.consumer)
+            .untilDestroy()
     }
+
+    private fun formatRange(range: Range): String =
+        "${range.start.toStringWithFormat(FORMAT)} - ${range.end.toStringWithFormat(FORMAT)}"
 
     // TODO: to domain
     private fun getRange(now: LocalDate = LocalDate.now()): Range = Range(start = now.minusDays(13), end = now)
+
+    private companion object {
+        const val FORMAT = "dd LLLL"
+    }
 
     data class Range(val start: LocalDate, val end: LocalDate)
 }
