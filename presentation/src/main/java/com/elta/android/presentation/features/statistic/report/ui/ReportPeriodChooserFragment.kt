@@ -11,6 +11,7 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
 import com.elta.android.presentation.features.statistic.report.pm.ReportPeriodChooserPm
+import com.elta.android.presentation.widgets.simple_date_picker.BackgroundDecorator
 import com.elta.android.presentation.widgets.simple_date_picker.RangeDecorator
 import com.elta.android.presentation.widgets.simple_date_picker.RangeSpanDecorator
 import com.jakewharton.rxbinding2.view.clicks
@@ -82,6 +83,7 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
         )
 
 
+        calendarView.addDecorator(BackgroundDecorator(drawable(R.drawable.selector_calendar_date, inset)))
         calendarView.addDecorators(decorators)
 
         calendarView.setOnDateChangedListener { _, day, _ ->
