@@ -20,6 +20,7 @@ data class ObserverItem(
     override fun getChangePayload(other: ListItem): Any {
         if (other is ObserverItem) {
             return mutableSetOf<Payload>().apply {
+                if (title != other.title) add(Payload.TITLE_CHANGED)
                 if (status != other.status) add(Payload.STATUS_CHANGED)
             }
         }
@@ -27,6 +28,6 @@ data class ObserverItem(
     }
 
     enum class Payload {
-        STATUS_CHANGED
+        STATUS_CHANGED, TITLE_CHANGED
     }
 }

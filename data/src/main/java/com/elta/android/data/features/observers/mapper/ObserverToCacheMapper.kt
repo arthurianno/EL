@@ -13,6 +13,7 @@ class ObserverToCacheMapper @Inject constructor() : Mapper<ObserverDto, Observer
                 secondaryId = id,
                 email = email,
                 name = name,
+                customName = customName,
                 status = status.name,
                 modificationTime = modificationTime,
                 state = state.name

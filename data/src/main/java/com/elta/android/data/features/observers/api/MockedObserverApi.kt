@@ -5,6 +5,7 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.dto.ObserverInviteEmailRequest
 import com.elta.android.data.features.observers.dto.ObserverStatusDto
+import com.elta.android.data.features.observers.dto.ObserverUpdateNameRequest
 import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -22,6 +23,7 @@ class MockedObserverApi : ObserverApi {
             id = "vcxz-bvxc-nbcc-mnbv",
             email = "maksim@gmail.com",
             name = "Maksim Drum",
+            customName = "Some Name",
             status = ObserverStatusDto.PENDING,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -30,6 +32,7 @@ class MockedObserverApi : ObserverApi {
             id = "fdas-gfsd-trwe-gfsd",
             email = "vitaliy@gmail.com",
             name = "Vitaliy Vocal",
+            customName = "Some Name",
             status = ObserverStatusDto.CONFIRMED,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -38,6 +41,7 @@ class MockedObserverApi : ObserverApi {
             id = "trwe-hgfd-jhgf-nbvc",
             email = "dmitriy@gmail.com",
             name = "Dmitriy Bass",
+            customName = "Some Name",
             status = ObserverStatusDto.EXPIRED,
             modificationTime = Date().time,
             state = StateDto.CREATED
@@ -54,11 +58,15 @@ class MockedObserverApi : ObserverApi {
                 id = "vcxz-bvxc-nbcc-mnbv",
                 email = "maksim@gmail.com",
                 name = "Maksim Drum",
+                customName = "Some Name",
                 status = ObserverStatusDto.PENDING,
                 modificationTime = Date().time,
                 state = StateDto.CREATED
             )
         )
+
+    override fun updateObserverName(id: String, name: ObserverUpdateNameRequest): Completable =
+        Completable.complete()
 
     override fun deleteObserverInvite(id: String): Completable =
         Completable.complete()

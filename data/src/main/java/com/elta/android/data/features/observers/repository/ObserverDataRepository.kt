@@ -27,6 +27,14 @@ class ObserverDataRepository @Inject constructor(
             .flatMap { cacheSource.getObserverInvites() }
             .map(toDomainMapper::mapFromObjects)
 
+    override fun getObserver(id: String): Single<Observer> =
+        cacheSource.getObserver(id)
+            .map(toDomainMapper::mapFromObject)
+
+    override fun updateObserverName(id: String, name: String): Completable =
+        remoteSource.updateObserverName(id, name)
+            .andThen(cacheSource.updateObserverName(id, name))
+
     override fun sendObserverInvite(email: String): Completable =
         remoteSource.sendObserverInvite(email)
 

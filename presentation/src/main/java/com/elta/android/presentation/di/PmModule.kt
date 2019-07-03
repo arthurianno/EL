@@ -24,6 +24,7 @@ import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEven
 import com.elta.android.presentation.features.main.flow.pm.MainFlowPm
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
+import com.elta.android.presentation.features.observers.edit.pm.EditObserverPm
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.features.profile.flow.pm.ProfileFlowPm
@@ -259,6 +260,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(InviteObserverPm::class)
     abstract fun bindInviteObserverPm(pm: InviteObserverPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(EditObserverPm::class)
+    abstract fun bindEditObserverPm(pm: EditObserverPm): PresentationModel
 
     @Binds
     @IntoMap

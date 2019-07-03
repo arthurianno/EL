@@ -9,6 +9,7 @@ data class ObserverCacheDto(
     val secondaryId: String,
     val email: String,
     val name: String?,
+    val customName: String?,
     val status: String,
     val modificationTime: Long?,
     val state: String

@@ -22,6 +22,7 @@ sealed class Events : Event {
     object ReminderDeleted : Events()
     object ProfileUpdated : Events()
     object ObserverInvited : Events()
+    object ObserversUpdated : Events()
     object ProfileDataChanged : Events()
     data class PinCodeEntered(val pin: String) : Events()
     object DeviceChanged : Events()

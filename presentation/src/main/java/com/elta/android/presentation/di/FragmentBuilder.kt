@@ -29,6 +29,7 @@ import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.di.ObserversModule
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
@@ -269,6 +270,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindInviteObserverFragment(): InviteObserverFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEditObserverFragment(): EditObserverFragment
 
     @FragmentScope
     @ContributesAndroidInjector

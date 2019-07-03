@@ -28,6 +28,7 @@ import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEven
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
+import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
@@ -234,6 +235,10 @@ object Screens {
 
     object Observers : SupportAppScreen() {
         override fun getFragment() = ObserversFragment.newInstance()
+    }
+
+    data class EditObserver(val id: String) : SupportAppScreen() {
+        override fun getFragment() = EditObserverFragment.newInstance(id)
     }
 
     object InviteObserver : SupportAppScreen() {

@@ -2,6 +2,7 @@ package com.elta.android.data.features.observers.api
 
 import com.elta.android.data.features.observers.dto.ObserverDto
 import com.elta.android.data.features.observers.dto.ObserverInviteEmailRequest
+import com.elta.android.data.features.observers.dto.ObserverUpdateNameRequest
 import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -23,6 +24,9 @@ interface ObserverApi {
 
     @PUT("api/share/v1/observers/invites")
     fun sendObserverInvite(@Body email: ObserverInviteEmailRequest): Single<ObserverDto>
+
+    @PUT("api/share/v1/observers/{id}")
+    fun updateObserverName(@Path("id") id: String, @Body name: ObserverUpdateNameRequest): Completable
 
     @DELETE("api/share/v1/observers/invites/{id}")
     fun deleteObserverInvite(@Path("id") id: String): Completable

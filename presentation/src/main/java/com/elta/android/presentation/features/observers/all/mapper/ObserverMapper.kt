@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.observers.all.mapper
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.domain.features.observers.interactor.userName
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.presentation.R
@@ -42,15 +43,19 @@ class ObserverMapper @Inject constructor(
         with(source) {
             ObserverItem(
                 id = id,
-                type = if (status == ObserverStatus.CONFIRMED) R.drawable.ic_viewer_enabled
-                else R.drawable.ic_viewer_disabled,
-                title = if (name.isNullOrEmpty()) resources.getString(R.string.profile_observers_user_name_placeholder)
-                else checkNotNull(name),
+                type = status.toIcon(),
+                title = userName ?: resources.getString(R.string.profile_observers_user_name_placeholder),
                 description = email,
-                action = R.drawable.ic_delete,
+                action = R.drawable.ic_arrow_left,
                 status = status
             )
         }
+
+    private fun ObserverStatus.toIcon() =
+        if (this == ObserverStatus.CONFIRMED)
+            R.drawable.ic_viewer_enabled
+        else
+            R.drawable.ic_viewer_disabled
 
     private object ConfirmedPredicate : Predicate<Observer> {
         override fun test(t: Observer?) = t?.status == ObserverStatus.CONFIRMED

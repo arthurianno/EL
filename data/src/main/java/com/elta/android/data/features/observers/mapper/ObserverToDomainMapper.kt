@@ -14,6 +14,7 @@ class ObserverToDomainMapper @Inject constructor() : Mapper<ObserverDto, Observe
                 id = id,
                 email = email,
                 name = name,
+                customName = customName,
                 status = ObserverStatus.valueOf(status.name),
                 modificationTime = modificationTime,
                 state = State.valueOf(state.name)
