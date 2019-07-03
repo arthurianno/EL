@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="end">
+        <shape android:shape="rectangle">
+            <size android:width="@dimen/calendar_day_radius" />
+            <solid android:color="@color/shade_blue3_20" />
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/calendar_day_radius" />
+            <solid android:color="@color/shade_blue3" />
+        </shape>
+    </item>
+</layer-list>
