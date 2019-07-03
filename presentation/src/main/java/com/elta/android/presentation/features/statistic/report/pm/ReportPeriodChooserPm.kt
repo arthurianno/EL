@@ -38,7 +38,7 @@ class ReportPeriodChooserPm @Inject constructor(
     private fun getRange(now: LocalDate = LocalDate.now()): Range = Range(start = now.minusDays(13), end = now)
 
     private companion object {
-        const val FORMAT = "dd LLLL"
+        const val FORMAT = "d LLLL"
     }
 
     data class Range(val start: LocalDate, val end: LocalDate)
