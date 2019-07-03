@@ -1,6 +1,10 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui
 
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.view.HapticFeedbackConstants
 import android.view.View
 import com.elta.android.presentation.R
@@ -9,6 +13,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.B
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
 import com.elta.android.presentation.utils.sequenceClicks
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
+import com.elta.android.presentation.widgets.simple_date_picker.BackgroundDecorator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.DynamicAdapter
@@ -43,6 +48,9 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             setMaximumDate(LocalDate.now())
             commit()
         }
+
+        val inset = view.resources.getDimensionPixelSize(R.dimen.calendar_day_padding)
+        calendarView.addDecorator(BackgroundDecorator(drawable(R.drawable.selector_calendar_date, inset)))
     }
 
     override fun onBindPresentationModel(pm: HemoglobinSettingsPm) {
@@ -66,9 +74,13 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             if (selected) {
                 pm.dateSelectedAction.consumer.accept(ZonedDateTime.now().with(day.date))
             }
+            calendarView.invalidateDecorators()
         }
         pm.hemoglobinItemsState.bindTo(adapter, compositeUnbind)
     }
+
+    private inline fun Fragment.drawable(drawable: Int, inset: Int): Drawable =
+        InsetDrawable(ContextCompat.getDrawable(checkNotNull(context), drawable), 0, inset, 0, inset)
 
     companion object {
         fun newInstance(): HemoglobinSettingsFragment = HemoglobinSettingsFragment()
