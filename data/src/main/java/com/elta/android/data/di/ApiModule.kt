@@ -15,6 +15,8 @@ import com.elta.android.data.features.firmware.api.FirmwareApi
 import com.elta.android.data.features.firmware.api.MockedFirmwareApi
 import com.elta.android.data.features.observers.api.MockedObserverApi
 import com.elta.android.data.features.observers.api.ObserverApi
+import com.elta.android.data.features.reports.api.MockedReportsApi
+import com.elta.android.data.features.reports.api.ReportsApi
 import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.user.api.MockedProfileApi
@@ -120,6 +122,17 @@ class ApiModule {
             else -> retrofit.create<FeedbackApi>(FeedbackApi::class.java)
         }
 
+    @Provides
+    @Singleton
+    fun provideReportsApi(
+        context: Context,
+        retrofit: Retrofit
+    ): ReportsApi =
+        when (ApiConfig.USE_MOCKED_REPORTS_API) {
+            true -> MockedReportsApi(context)
+            else -> retrofit.create<ReportsApi>(ReportsApi::class.java)
+        }
+
     object ApiConfig {
         const val USE_MOCKED_SALE_POINTS_API = false
         const val USE_MOCKED_EVENTS_API = false
@@ -128,5 +141,6 @@ class ApiModule {
         const val USE_MOCKED_OBSERVER_API = false
         const val USE_MOCKED_FIRMWARE_API = false
         const val USE_MOCKED_FEEDBACK_API = false
+        const val USE_MOCKED_REPORTS_API = false
     }
 }
