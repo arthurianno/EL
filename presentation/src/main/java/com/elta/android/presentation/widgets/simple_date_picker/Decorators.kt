@@ -10,7 +10,7 @@ class BackgroundDecorator(private val drawable: Drawable?) : DayViewDecorator {
     override fun shouldDecorate(day: CalendarDay): Boolean = true
 
     override fun decorate(view: DayViewFacade) {
-        drawable?.let { view.setBackgroundDrawable(it) }
+        drawable?.let { view.setSelectionDrawable(it) }
     }
 }
 

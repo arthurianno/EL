@@ -1,4 +1,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/bg_calendar_date_black" android:state_pressed="true" />
+    <item android:drawable="@drawable/bg_calendar_date_black" android:state_checked="true" />
     <item android:drawable="@android:color/transparent" />
 </selector>
