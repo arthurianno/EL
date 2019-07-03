@@ -90,6 +90,8 @@ class HomeFlowPm @Inject constructor(
         )
     }
 
+    private var isAutoSync = true
+
     override fun onCreate() {
         super.onCreate()
 
@@ -126,10 +128,11 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
-            .subscribe(loadEvents.consumer)
+            .doOnNext(startSyncAction.consumer)
+            .doOnNext(loadEvents.consumer)
+            .subscribe()
             .untilDestroy()
 
         bus.events<Events.HomeModelChanged>()
@@ -153,7 +156,10 @@ class HomeFlowPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.FromOtherSyncFlow)
+            is PrimaryGlucometerNotFoundError -> {
+                if (!isAutoSync) router.startFlow(Screens.FromOtherSyncFlow)
+                else startSyncWithBackendAction.consumer.accept(Unit)
+            }
             is GlucometerSyncError ->
                 when (error.cause) {
                     is BluetoothNotEnabledError ->
@@ -164,7 +170,7 @@ class HomeFlowPm @Inject constructor(
                         btControl.requestEnableLocationCommand.consumer.accept(Unit)
                     is GlucometerOfflineError ->
                         showRetrySyncAction.consumer.accept(Unit)
-                    else -> super.handleError(error)
+                    else -> if (isAutoSync) startSyncWithBackendAction.consumer.accept(Unit)
                 }
             else -> super.handleError(error)
         }
@@ -209,7 +215,10 @@ class HomeFlowPm @Inject constructor(
                     .bindProgress(syncProgressState.consumer)
                     .doOnSubscribe { bus.event(Events.Sync.Started) }
                     .doOnError { bus.event(Events.Sync.Error) }
-                    .doOnComplete { bus.event(Events.Sync.Success) }
+                    .doOnComplete {
+                        bus.event(Events.Sync.Success)
+                        if (isAutoSync) startSyncWithBackendAction.consumer.accept(Unit)
+                    }
                     .doOnNext(::handleSyncCompleted)
                     .doOnError(::handleError)
             }
@@ -246,12 +255,11 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        Observable.merge(
-            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { true },
-            networkStateCommand.observable.delay(SYNC_AFTER_CONNECTION_RESTORED_DELAY, TimeUnit.MILLISECONDS).map { it }
-        )
+        networkStateCommand.observable
+            .delay(SYNC_AFTER_CONNECTION_RESTORED_DELAY, TimeUnit.MILLISECONDS)
             .filter { it }
             .map { Unit }
+            .skipWhileInProgress(syncProgressState.observable)
             .subscribe(startSyncWithBackendAction.consumer)
             .untilDestroy()
     }
@@ -316,6 +324,7 @@ class HomeFlowPm @Inject constructor(
         if (meta is EventType) {
             router.startFlow(Screens.EventsCreationScreen(meta))
         } else if (meta == META_SYNC) {
+            isAutoSync = false
             startSyncAction.consumer.accept(Unit)
         }
     }

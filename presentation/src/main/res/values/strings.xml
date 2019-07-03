@@ -594,7 +594,7 @@
     <string name="feedback_send">Отправить</string>
 
     <!-- SYNC WITH BACKEND -->
-    <string name="sync_with_backend_in_progress">Идет синхронизация…</string>
+    <string name="sync_with_backend_in_progress">Идет процесс синхронизации с сервером…</string>
     <string name="sync_with_backend_complete">Синхронизация завершена</string>
 
     <!-- FIRMWARE -->
