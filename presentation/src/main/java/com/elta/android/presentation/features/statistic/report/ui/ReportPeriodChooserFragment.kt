@@ -82,7 +82,6 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
             RangeSpanDecorator(ForegroundColorSpan(white), firstOrLastInRange)
         )
 
-
         calendarView.addDecorator(BackgroundDecorator(drawable(R.drawable.selector_calendar_date, inset)))
         calendarView.addDecorators(decorators)
 
