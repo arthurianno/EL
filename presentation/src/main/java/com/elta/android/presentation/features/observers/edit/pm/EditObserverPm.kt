@@ -39,10 +39,6 @@ class EditObserverPm @Inject constructor(
 
     private val deleteObserverDialogData: DialogData by lazy { Dialogs.EventDeleteObserver(resources) }
 
-    fun setObserverId(id: String) {
-        selectedObserverIdState.consumer.accept(id)
-    }
-
     override fun onCreate() {
         super.onCreate()
         bindDeleteBehaviour()
@@ -64,6 +60,10 @@ class EditObserverPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
+
+    fun setObserverId(id: String) {
+        selectedObserverIdState.consumer.accept(id)
     }
 
     private fun bindObserverState() {
