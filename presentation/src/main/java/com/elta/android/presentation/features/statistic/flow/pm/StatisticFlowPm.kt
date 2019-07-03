@@ -17,6 +17,8 @@ class StatisticFlowPm @Inject constructor(
 
     val periodSelectedAction = Action<Int>()
     val selectedPeriodIdState = State(R.id.periodSevenDaysView)
+    val menuAction = Action<Unit>()
+    val showReportPeriodChooser = Command<Unit>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -31,6 +33,10 @@ class StatisticFlowPm @Inject constructor(
             .doOnNext { router.navigateToTab(Screens.PeriodScreen(it.second)) }
             .map { it.first }
             .subscribe(selectedPeriodIdState.consumer)
+            .untilDestroy()
+
+        menuAction.observable
+            .subscribe(showReportPeriodChooser.consumer)
             .untilDestroy()
     }
 

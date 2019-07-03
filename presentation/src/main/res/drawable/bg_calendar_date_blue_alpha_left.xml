@@ -1,0 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners
+        android:bottomLeftRadius="@dimen/calendar_day_radius"
+        android:topLeftRadius="@dimen/calendar_day_radius" />
+    <solid android:color="@color/shade_blue3_20" />
+</shape>
