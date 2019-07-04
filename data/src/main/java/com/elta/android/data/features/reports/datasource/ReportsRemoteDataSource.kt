@@ -5,7 +5,7 @@ import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.data.features.reports.api.ReportsApi
 import com.elta.android.data.features.reports.dto.TokenDto
 import io.reactivex.Single
-import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 class ReportsRemoteDataSource @Inject constructor(
@@ -13,7 +13,7 @@ class ReportsRemoteDataSource @Inject constructor(
     private val fileManager: ReportFileManager
 ) : ReportsDataSource {
 
-    override fun getReportToken(startDate: ZonedDateTime, endDate: ZonedDateTime): Single<TokenDto> =
+    override fun getReportToken(startDate: LocalDate, endDate: LocalDate): Single<TokenDto> =
         reportsApi.getReportToken(
             startDate = startDate.toStringWithFormat(DATE_PATTERN),
             endDate = endDate.toStringWithFormat(DATE_PATTERN)
