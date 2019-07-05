@@ -108,9 +108,10 @@
     <!-- SYNC STATUS VIEW COLORS -->
     <color name="color_background_sync_started">@color/shade_blue3</color>
     <color name="color_background_sync_finished">@color/shade_g_green_a</color>
+    <color name="color_background_sync_error">@color/g_orange_b</color>
 
     <!-- BACKEND SYNC STATUS VIEW COLORS -->
-    <color name="color_background_backend_sync_started">@color/g_orange_b</color>
+    <color name="color_background_backend_sync_started">@color/shade_blue3</color>
     <color name="color_background_backend_sync_finished">@color/shade_g_green_a</color>
 
     <!-- ERROR VIEW COLORS -->
