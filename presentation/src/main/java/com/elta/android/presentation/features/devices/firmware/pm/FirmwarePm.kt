@@ -21,7 +21,7 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.elta.android.presentation.features.sync.control.bluetoothControl2
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -42,7 +42,7 @@ class FirmwarePm @Inject constructor(
     val buttonAction = Action<Unit>()
     val updateState = State<UpdateState>(UpdateState.Progress(resources))
 
-    val btControl = bluetoothControl()
+    val btControl = bluetoothControl2()
 
     private val getDeviceInfoAction = Action<String>()
     private val checkUpdatesAction = Action<Unit>()
@@ -65,9 +65,6 @@ class FirmwarePm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
             is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
             is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
@@ -124,29 +121,13 @@ class FirmwarePm @Inject constructor(
         bindDeviceInfoAction()
         bindDownloadFirmwareAction()
         bindStartUpdateAction()
-
-        Observable.merge(
-            btControl.bluetoothEnabledAction.observable,
-            btControl.locationPermissionsGrantedAction.observable,
-            btControl.locationEnabledAction.observable
-        )
-            .subscribe(startUpdateAction.consumer)
-            .untilDestroy()
     }
 
     private fun bindStartUpdateAction() =
         startUpdateAction.observable
             .skipWhileInProgress(progressState.observable)
             .map(::createUpdateFirmwareUseCaseParams)
-            .flatMapCompletable { params ->
-                updateDeviceFirmwareUseCase.execute(params)
-                    .bindProgressExtended(progressState.consumer)
-                    .doOnSubscribe {
-                        setState(UpdateState.Updating(resources, getDeviceVersion()))
-                    }
-                    .doOnComplete(::handleFirmwareUpdated)
-                    .doOnError(::handleError)
-            }
+            .flatMapCompletable(::updateFirmware)
             .retry()
             .subscribe()
             .untilDestroy()
@@ -258,6 +239,44 @@ class FirmwarePm @Inject constructor(
             .doOnComplete { progressConsumer.accept(false) }
             .doOnError { progressConsumer.accept(false) }
     }
+
+    private fun updateFirmware(params: UpdateDeviceFirmwareUseCase.Params): Completable =
+        updateDeviceFirmwareUseCase.execute(params)
+            .bindProgressExtended(progressState.consumer)
+            .doOnSubscribe {
+                setState(UpdateState.Updating(resources, getDeviceVersion()))
+            }
+            .doOnComplete(::handleFirmwareUpdated)
+            .onErrorResumeNext { error ->
+                when (error) {
+                    is BluetoothNotEnabledError ->
+                        btControl.requestEnableBluetooth()
+                            .flatMapCompletable {
+                                if (it) updateFirmware(params)
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
+                            }
+                    is LocationPermissionNotGrantedError ->
+                        btControl.requestLocationPermissions()
+                            .flatMapCompletable {
+                                if (it) updateFirmware(params)
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
+                            }
+                    is LocationNotEnabledError ->
+                        btControl.requestEnableLocation()
+                            .flatMapCompletable {
+                                if (it) updateFirmware(params)
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
+                            }
+                    else -> Completable.error(error)
+                }
+            }
+            .doOnError(::handleError)
 
     companion object {
         private const val ZERO_DELAY = 0L
