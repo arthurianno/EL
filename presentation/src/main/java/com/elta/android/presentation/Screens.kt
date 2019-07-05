@@ -59,6 +59,7 @@ import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFl
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
 import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
 import com.elta.android.presentation.utils.navigationIntent
+import com.elta.android.presentation.utils.pdfActionIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
 import com.nullgr.core.intents.emailIntent
@@ -297,6 +298,11 @@ object Screens {
             val superKey = super.getScreenKey()
             return "$superKey-${period.name}"
         }
+    }
+
+    data class ViewPdfScreen(val uri: Uri) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context): Intent =
+            pdfActionIntent(uri, context)
     }
 
     // FEEDBACK

@@ -26,6 +26,8 @@ import com.elta.android.data.features.observers.datasource.ObserverDataSource
 import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
 import com.elta.android.data.features.reminder.datasource.RemindersCacheDataSource
 import com.elta.android.data.features.reminder.datasource.RemindersDataSource
+import com.elta.android.data.features.reports.datasource.ReportsDataSource
+import com.elta.android.data.features.reports.datasource.ReportsRemoteDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsCachedDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsDataSource
 import com.elta.android.data.features.sale_points.datasource.SalePointsRemoteDataSource
@@ -136,4 +138,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindHealthAppDataSource(source: GoogleFitDataSource): HealthAppDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindReportsDataSources(source: ReportsRemoteDataSource): ReportsDataSource
 }

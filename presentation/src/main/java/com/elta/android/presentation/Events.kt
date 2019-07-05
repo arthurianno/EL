@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import android.net.Uri
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.user.model.Profile
@@ -30,6 +31,7 @@ sealed class Events : Event {
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
     data class ReminderSpent(val reminder: Reminder) : Events()
+    data class ReportLoadedEvent(val uri: Uri) : Events()
 
     sealed class Sync : Events() {
         object Unknown : Sync()

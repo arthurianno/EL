@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.utils.hideKeyboardFun
+import com.elta.android.presentation.utils.visibility
+import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import dagger.android.support.AndroidSupportInjection
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() {
@@ -18,6 +21,7 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
 
     protected abstract val screenLayout: Int
     protected abstract val classToken: Class<T>
+    open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -33,4 +37,10 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
         inflater.inflate(screenLayout, container, false)
 
     override fun providePresentationModel(): T = factory.createViewModel(classToken)
+
+    protected fun bindProgressDialog(pm: T) {
+        pm.progressState.observable
+            .throttleLast(BaseFragment.DEBOUNCE, TimeUnit.MILLISECONDS)
+            .bindTo(progressDialog.visibility(childFragmentManager))
+    }
 }

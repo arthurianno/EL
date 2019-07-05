@@ -62,4 +62,7 @@
 
     <dimen name="settings_top_margin">16dp</dimen>
     <dimen name="settings_bottom_margin">8dp</dimen>
+
+    <dimen name="calendar_day_padding">2dp</dimen>
+    <dimen name="calendar_day_radius">10dp</dimen>
 </resources>
