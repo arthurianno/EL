@@ -253,19 +253,25 @@ class FirmwarePm @Inject constructor(
                         btControl.requestEnableBluetooth()
                             .flatMapCompletable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable { setState(UpdateState.GlucometerOfflineError(resources)) }
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
                             }
                     is LocationPermissionNotGrantedError ->
                         btControl.requestLocationPermissions()
                             .flatMapCompletable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable { setState(UpdateState.GlucometerOfflineError(resources)) }
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
                             }
                     is LocationNotEnabledError ->
                         btControl.requestEnableLocation()
                             .flatMapCompletable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable { setState(UpdateState.GlucometerOfflineError(resources)) }
+                                else Completable.fromCallable {
+                                    setState(UpdateState.GlucometerOfflineError(resources))
+                                }
                             }
                     else -> Completable.error(error)
                 }
