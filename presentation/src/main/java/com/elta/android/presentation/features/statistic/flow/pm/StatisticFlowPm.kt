@@ -1,14 +1,19 @@
 package com.elta.android.presentation.features.statistic.flow.pm
 
+import android.net.Uri
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.getPeriodParam
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.messages.SnackBarMessageData
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class StatisticFlowPm @Inject constructor(
@@ -38,10 +43,24 @@ class StatisticFlowPm @Inject constructor(
         menuAction.observable
             .subscribe(showReportPeriodChooser.consumer)
             .untilDestroy()
+
+        bus.events<Events.ReportLoadedEvent>()
+            .delay(CHOOSER_DELAY, TimeUnit.MILLISECONDS)
+            .map { it.uri }
+            .doOnNext(::handleFileUri)
+            .subscribe()
+            .untilDestroy()
     }
 
     override fun navigateToLaunchScreen() {
         router.navigateToTab(Screens.PeriodScreen(Period.SEVEN))
+    }
+
+    private fun handleFileUri(uri: Uri) {
+        if (uri != Uri.EMPTY)
+            router.navigateTo(Screens.ViewPdfScreen(uri))
+        else
+            showSnackBar(SnackBarMessageData.SimpleTextMessage(resources.getString(R.string.error_file_not_saved)))
     }
 
     private fun handlePeriodTabClick(id: Int): Period =
@@ -52,4 +71,8 @@ class StatisticFlowPm @Inject constructor(
             R.id.periodNinetyDaysView -> Period.NINETY
             else -> throw IllegalArgumentException("$id is not supported.")
         }
+
+    companion object {
+        private const val CHOOSER_DELAY = 400L
+    }
 }

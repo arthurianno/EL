@@ -23,4 +23,6 @@
 
     <string name="error_general_title">Ошибка</string>
     <string name="error_general_button">Повторить</string>
+
+    <string name="error_file_not_saved">Произошла ошибка при сохранении файла</string>
 </resources>
