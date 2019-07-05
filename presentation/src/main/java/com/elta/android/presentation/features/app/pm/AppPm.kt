@@ -18,6 +18,8 @@ import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationM
 import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
 import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Observable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AppPm @Inject constructor(
@@ -34,8 +36,6 @@ class AppPm @Inject constructor(
     val syncStatusState = State<Status>()
     val syncStatusVisibility = State<Visibility>(Visibility.Hide)
 
-    val backendSyncProgress = Command<Boolean>(bufferSize = 1)
-
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
@@ -46,11 +46,13 @@ class AppPm @Inject constructor(
                 getUserInfoUseCase.execute()
                     .doOnSuccess { user ->
                         when {
-                            !(user.isUserLoggedIn ?: false) -> router.newRootFlow(Screens.GreetingFlow)
+                            !(user.isUserLoggedIn
+                                ?: false) -> router.newRootFlow(Screens.GreetingFlow)
                             !(user.isEmailConfirmed ?: false) -> router.newRootChain(
                                 Screens.GreetingFlow, Screens.ActivateProfile
                             )
-                            !(user.isOnBoardingPassed ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
+                            !(user.isOnBoardingPassed
+                                ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
@@ -100,29 +102,51 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.Sync>()
+            .concatMap { event ->
+                val delay = when {
+                    !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY // first start add delay to make smoooth
+                    event is Events.Sync.Glucometer.Error -> 0L
+                    event is Events.Sync.Glucometer.Started -> 0L
+                    else -> STATUS_DELAY
+                }
+                Observable.just(event).delay(delay, TimeUnit.MILLISECONDS)
+            }
             .doOnNext {
                 when (it) {
-                    is Events.Sync.Unknown -> syncStatusVisibility.consumer.accept(Visibility.Hide)
-                    is Events.Sync.Error -> syncStatusVisibility.consumer.accept(Visibility.Hide)
-                    is Events.Sync.Started -> {
-                        syncStatusState.consumer.accept(SyncStatus.Started(resources))
-                        syncStatusVisibility.consumer.accept(Visibility.Show)
+                    is Events.Sync.Glucometer.Error -> setStatusVisibility(Visibility.Hide)
+                    is Events.Sync.Glucometer.ErrorWithMessage -> {
+                        setStatus(SyncStatus.Glucometer.Error(resources))
+                        setStatusVisibility(Visibility.Show)
                     }
-                    is Events.Sync.Success -> {
-                        syncStatusState.consumer.accept(SyncStatus.Success(resources))
-                        syncStatusVisibility.consumer.accept(Visibility.HideWithDelay)
+                    is Events.Sync.Glucometer.Started -> {
+                        setStatus(SyncStatus.Glucometer.Started(resources))
+                        setStatusVisibility(Visibility.Show)
+                    }
+                    is Events.Sync.Glucometer.Success -> {
+                        setStatus(SyncStatus.Glucometer.Success(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
+                    }
+                    is Events.Sync.Server.Error -> {
+                        setStatus(SyncStatus.Server.Success(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
+                    }
+                    is Events.Sync.Server.Started -> {
+                        setStatus(SyncStatus.Server.Started(resources))
+                        setStatusVisibility(Visibility.Show)
+                    }
+                    is Events.Sync.Server.Success -> {
+                        setStatus(SyncStatus.Server.Success(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
                     }
                 }
             }
             .subscribe()
             .untilDestroy()
+    }
 
-        bus.events<Events.BackendSyncProgress>()
-            .skip(1)
-            .map(Events.BackendSyncProgress::inProgress)
-            .map { !it }
-            .subscribe(backendSyncProgress.consumer)
-            .untilDestroy()
+    override fun handleError(error: Throwable) {
+        if (error is NoSuchElementException) router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        else super.handleError(error)
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
@@ -133,22 +157,52 @@ class AppPm @Inject constructor(
         else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
     }
 
-    override fun handleError(error: Throwable) {
-        if (error is NoSuchElementException) router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
-        else super.handleError(error)
+    private fun setStatus(status: SyncStatus) {
+        syncStatusState.consumer.accept(status)
+    }
+
+    private fun setStatusVisibility(visibility: Visibility) {
+        syncStatusVisibility.consumer.accept(visibility)
     }
 
     private sealed class SyncStatus : Status {
-        data class Started(
-            val resources: ResourceProvider,
-            override val text: String = resources.getString(R.string.sync_in_progress),
-            override val color: Int = resources.getColor(R.color.color_background_sync_started)
-        ) : SyncStatus()
+        sealed class Glucometer : SyncStatus() {
+            data class Started(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_glucometer_in_progress),
+                override val color: Int = resources.getColor(R.color.color_background_sync_started)
+            ) : SyncStatus()
 
-        data class Success(
-            val resources: ResourceProvider,
-            override val text: String = resources.getString(R.string.sync_completed),
-            override val color: Int = resources.getColor(R.color.color_background_sync_finished)
-        ) : SyncStatus()
+            data class Success(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_glucometer_completed),
+                override val color: Int = resources.getColor(R.color.color_background_sync_finished)
+            ) : SyncStatus()
+
+            data class Error(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_glucometer_error),
+                override val color: Int = resources.getColor(R.color.color_background_sync_error)
+            ) : SyncStatus()
+        }
+
+        sealed class Server : SyncStatus() {
+            data class Started(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_backend_in_progress),
+                override val color: Int = resources.getColor(R.color.color_background_backend_sync_started)
+            ) : SyncStatus()
+
+            data class Success(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_backend_complete),
+                override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
+            ) : SyncStatus()
+        }
+    }
+
+    private companion object {
+        const val EMPTY_STATUS_DELAY = 400L // millis
+        const val STATUS_DELAY = 2000L // millis
     }
 }

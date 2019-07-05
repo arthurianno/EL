@@ -334,8 +334,9 @@
     <string name="sync_start_other_subtitle">Чтобы подключить новое устройство, вам\nнеобходимо пройти несколько шагов</string>
     <string name="sync_start_menu_button_text">Пропустить этот этап</string>
     <string name="sync_start_action_button">Начать</string>
-    <string name="sync_in_progress">Идет процесс синхронизации с глюкометром…</string>
-    <string name="sync_completed">Синхронизация с глюкометром завершена</string>
+    <string name="sync_with_glucometer_in_progress">Идет процесс синхронизации с глюкометром…</string>
+    <string name="sync_with_glucometer_completed">Синхронизация с глюкометром завершена</string>
+    <string name="sync_with_glucometer_error">Синхронизация с глюкометром не выполнена</string>
 
     <string name="sync_state_title_how_to_connect">Как подключить?</string>
     <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из\nглюкометра держатель с батарейкой.\nГлюкометр отобразит ПИН-код,\nнеобходимый для подключения устройства</string>
@@ -595,7 +596,7 @@
 
     <!-- SYNC WITH BACKEND -->
     <string name="sync_with_backend_in_progress">Идет процесс синхронизации с сервером…</string>
-    <string name="sync_with_backend_complete">Синхронизация завершена</string>
+    <string name="sync_with_backend_complete">Синхронизация с сервером завершена</string>
 
     <!-- FIRMWARE -->
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>

@@ -32,9 +32,17 @@ sealed class Events : Event {
     data class ReminderSpent(val reminder: Reminder) : Events()
 
     sealed class Sync : Events() {
-        object Unknown : Sync()
-        object Started : Sync()
-        object Error : Sync()
-        object Success : Sync()
+        sealed class Glucometer : Sync() {
+            object Started : Glucometer()
+            object ErrorWithMessage : Glucometer()
+            object Error : Glucometer()
+            object Success : Glucometer()
+        }
+
+        sealed class Server : Sync() {
+            object Started : Server()
+            object Error : Server()
+            object Success : Server()
+        }
     }
 }

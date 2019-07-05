@@ -28,16 +28,6 @@
             android:id="@+id/syncStatusView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <com.elta.android.presentation.widgets.TwoStateStatusView
-            android:id="@+id/backendSyncStatusView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:state1_color="@color/color_background_backend_sync_started"
-            app:state1_text="@string/sync_with_backend_in_progress"
-            app:state2_color="@color/color_background_backend_sync_finished"
-            app:state2_text="@string/sync_with_backend_complete" />
-
     </FrameLayout>
 
 </LinearLayout>
