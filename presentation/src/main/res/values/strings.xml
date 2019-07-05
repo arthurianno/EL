@@ -585,6 +585,8 @@
     <string name="statistic_report_description">Выберите дату начала диапазона для\nгенерации данных в отчете</string>
     <string name="statistic_report_action_button">Подтвердить и выгрузить</string>
     <string name="statistic_menu_button">Выгрузить отчет</string>
+    <string name="statistic_share_pdf_dialog_title">Поделиться с помощью</string>
+    <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
 
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>

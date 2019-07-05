@@ -93,9 +93,9 @@ class ReportPeriodChooserFragment : BaseBottomSheetFragment<ReportPeriodChooserP
     }
 
     override fun onBindPresentationModel(pm: ReportPeriodChooserPm) {
+        bindProgressDialog(pm)
         dialogCloseButtonView.clicks().bindTo { dialog.dismiss() }
         dialogActionButtonView.clicks().bindTo(pm.mainAction)
-        pm.actionButtonEnabledCommand.bindTo(dialogActionButtonView::setEnabled)
         pm.closeDialogCommand.bindTo { dialog.dismiss() }
         pm.selectedRangeState.bindTo {
             calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
