@@ -541,8 +541,8 @@
     <string name="profile_delete_observer_dialog_confirm_button">Удалить</string>
 
     <!-- SUPPORT FLOW -->
-    <string name="profile_support_title">Нужна помощь?</string>
-    <string name="profile_support_subtitle">Служба заботы о пользователях?</string>
+    <string name="profile_support_title">Поддержка</string>
+    <string name="profile_support_subtitle">Служба заботы о пользователях</string>
     <string name="profile_support_actions_header">Доступные действия</string>
     <string name="profile_support_phone_number">8 800 250 17 50</string>
     <string name="profile_support_phone_number_description">Позвонить</string>
