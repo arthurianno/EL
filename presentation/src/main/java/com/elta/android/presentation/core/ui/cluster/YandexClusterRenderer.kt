@@ -270,10 +270,10 @@ class YandexClusterRenderer(
             pinCount(currentClusters) != pinCount(newClusters)
     }
 
-    private fun pinCount(clusters: Set<Cluster>): Int =
-        clusters
-            .map { it.size() }
-            .sum()
+    private fun pinCount(clusters: Set<Cluster>): Int {
+        val copy = mutableSetOf<Cluster>().apply { addAll(clusters) }
+        return copy.asSequence().map { it.size() }.sum()
+    }
 
     private fun clusterCount(clusters: Set<Cluster>): Int {
         val copy = mutableSetOf<Cluster>().apply { addAll(clusters) }
