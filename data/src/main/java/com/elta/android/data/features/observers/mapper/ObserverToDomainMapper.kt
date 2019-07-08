@@ -13,7 +13,8 @@ class ObserverToDomainMapper @Inject constructor() : Mapper<ObserverDto, Observe
             Observer(
                 id = id,
                 email = email,
-                name = name,
+                // for some reason server returns empty name instead of null, so we make null explicitly
+                name = if (name.isNullOrEmpty()) null else name,
                 customName = customName,
                 status = ObserverStatus.valueOf(status.name),
                 modificationTime = modificationTime,
