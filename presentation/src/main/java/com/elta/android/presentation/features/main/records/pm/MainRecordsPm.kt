@@ -18,8 +18,9 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -42,7 +43,6 @@ class MainRecordsPm @Inject constructor(
                 getHomeModelUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .handleFirstEntrance()
                     .doOnNext(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -61,6 +61,16 @@ class MainRecordsPm @Inject constructor(
             .doOnNext { loadScreenAction.consumer.accept(Unit) }
             .subscribe()
             .untilDestroy()
+
+        Observables.combineLatest(
+            lifecycleObservable.filter { it == Lifecycle.UNBINDED },
+            bus.events<Events.HomeModelChanged>().filter { it.model.isFirstEntrance }
+        ).flatMapCompletable {
+            if (it.second.model.isFirstEntrance) updateUserInfoUseCase.execute(createUserInfoParams())
+            else Completable.complete()
+        }
+            .subscribe()
+            .untilDestroy()
     }
 
     override fun onBind() {
@@ -72,17 +82,6 @@ class MainRecordsPm @Inject constructor(
             .subscribe()
             .untilUnbind()
     }
-
-    private fun Observable<HomeModel>.handleFirstEntrance(): Observable<HomeModel> =
-        this.flatMapSingle { homeModel ->
-            if (homeModel.isFirstEntrance) {
-                updateUserInfoUseCase
-                    .execute(createUserInfoParams())
-                    .toSingleDefault(homeModel)
-            } else {
-                Single.just(homeModel)
-            }
-        }
 
     private fun navigateToEventScreen(record: RecordItem) {
         router.startFlow(Screens.EditEventScreen(record.id as String, record.eventType))
