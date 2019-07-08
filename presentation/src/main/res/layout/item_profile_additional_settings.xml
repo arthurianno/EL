@@ -18,7 +18,7 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/settingsNameView"
-        style="@style/New.Body2"
+        style="@style/New.Body2.BlackBlue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
