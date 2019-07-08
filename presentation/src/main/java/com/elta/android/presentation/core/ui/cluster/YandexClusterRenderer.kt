@@ -280,7 +280,6 @@ class YandexClusterRenderer(
         return copy.asSequence().filter { it.isCluster() }.count()
     }
 
-
     private fun updateCurrent(newClusters: Set<Cluster>) {
         currentClusters.clear()
         currentClusters.addAll(newClusters)
