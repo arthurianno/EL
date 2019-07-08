@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.profile.support.ui.builder
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.support.model.SupportAction
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportActionItem
+import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
@@ -11,6 +12,11 @@ class SupportItemsBuilder @Inject constructor(
     private val resourceProvider: ResourceProvider
 ) {
     fun buildItems(): List<ListItem> = arrayListOf<ListItem>().apply {
+        add(
+            SupportHeaderItem(
+                text = resourceProvider.getString(R.string.profile_support_actions_header)
+            )
+        )
         add(
             SupportActionItem(
                 icon = R.drawable.ic_support_call,
