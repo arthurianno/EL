@@ -61,10 +61,13 @@ class YandexClusterRenderer(
     }
 
     private fun animateUpdate(newClusters: Set<Cluster>, updateSelection: Boolean) {
-        val diffs = calcDiffs(newClusters)
-        scope.launch(Dispatchers.Main) {
-            animateDiffs(diffs, updateSelection)
-            updateCurrent(newClusters)
+        try {
+            val diffs = calcDiffs(newClusters)
+            scope.launch(Dispatchers.Main) {
+                animateDiffs(diffs, updateSelection)
+                updateCurrent(newClusters)
+            }
+        } catch (e: ConcurrentModificationException) {
         }
     }
 
@@ -272,11 +275,11 @@ class YandexClusterRenderer(
             .map { it.size() }
             .sum()
 
-    private fun clusterCount(clusters: Set<Cluster>): Int =
-        clusters
-            .toMutableSet()
-            .filter { it.isCluster() }
-            .count()
+    private fun clusterCount(clusters: Set<Cluster>): Int {
+        val copy = mutableSetOf<Cluster>().apply { addAll(clusters) }
+        return copy.asSequence().filter { it.isCluster() }.count()
+    }
+
 
     private fun updateCurrent(newClusters: Set<Cluster>) {
         currentClusters.clear()
