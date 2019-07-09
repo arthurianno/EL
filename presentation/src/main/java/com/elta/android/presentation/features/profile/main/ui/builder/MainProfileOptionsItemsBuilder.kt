@@ -44,11 +44,11 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
         add(MainProfileAdditionalItem(R.string.profile_my_watchers, R.string.profile_management_and_settings,
             R.drawable.ic_observers_bg, MyObservers)
         )
-        add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
-            R.drawable.ic_map_pin_bg, WhereBuy)
-        )
         add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
             R.drawable.ic_devices, MyDevices)
+        )
+        add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
+            R.drawable.ic_map_pin_bg, WhereBuy)
         )
         add(MainProfileAdditionalItem(R.string.profile_support_title, R.string.profile_support_subtitle,
             R.drawable.ic_support, Support)
