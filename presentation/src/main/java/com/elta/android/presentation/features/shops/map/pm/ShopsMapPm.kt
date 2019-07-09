@@ -38,7 +38,9 @@ import com.nullgr.core.rx.location.EMPTY_LOCATION
 import com.nullgr.core.rx.location.isEmpty
 import com.yandex.mapkit.geometry.Point
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.schedulers.Schedulers
 import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -88,6 +90,8 @@ class ShopsMapPm @Inject constructor(
     private val selectedPointId = State<Any>()
     private val coldStartState = State(true)
     private val manualNavigateToUserLocation = State(false)
+
+    private val backgroundScheduler: Scheduler = Schedulers.computation()
 
     override fun onCreate() {
         super.onCreate()
@@ -194,6 +198,7 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         Observables.combineLatest(salePointsState.observable, foundedLocation.observable)
+            .observeOn(backgroundScheduler)
             .map {
                 val points = it.first
                 val location = it.second
