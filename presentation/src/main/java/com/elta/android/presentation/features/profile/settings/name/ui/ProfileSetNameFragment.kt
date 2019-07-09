@@ -23,10 +23,6 @@ class ProfileSetNameFragment : BaseFragment<ProfileSetNamePm>() {
         pm.firstNameInput.bindTo(nameInputView)
         pm.secondNameInput.bindTo(surnameInputView)
         pm.saveChangesEnableState.bindTo { continueButtonView.isEnabled = it }
-        pm.fullNameSate.bindTo { person ->
-            nameInputView.setText(person.firstName)
-            surnameInputView.setText(person.secondName)
-        }
         continueButtonView.clicks().bindTo(pm.continueAction)
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }

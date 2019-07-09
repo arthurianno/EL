@@ -27,7 +27,6 @@ class ProfileSetNamePm @Inject constructor(
 
     val continueAction = Action<Unit>()
     val backHandleAction = Action<Unit>()
-    val fullNameSate = State(PersonNameModel())
     val saveChangesEnableState = State(false)
     val firstNameInput = inputControl(hideErrorOnUserInput = false)
     val secondNameInput = inputControl(hideErrorOnUserInput = false)
@@ -38,6 +37,7 @@ class ProfileSetNamePm @Inject constructor(
     private val isNameNotEmptyState = State(false)
     private val isNameChangedState = State(false)
     private val changedFullNameSate = State(PersonNameModel())
+    private val originalFullNameState = State(PersonNameModel())
     private val profileState = State<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
@@ -64,11 +64,9 @@ class ProfileSetNamePm @Inject constructor(
             firstNameInput.text.observable,
             secondNameInput.text.observable
         ) { firstName, secondName ->
-            changedFullNameSate.value.apply {
-                this.firstName = firstName
-                this.secondName = secondName
-            }
+            PersonNameModel(firstName, secondName)
         }
+            .doOnNext(changedFullNameSate.consumer)
             .doOnNext(::checkIsEmpty)
             .doOnNext(::checkIsChanged)
             .map { isNameValid(it.firstName, it.secondName) && isNameChangedState.value }
@@ -128,12 +126,14 @@ class ProfileSetNamePm @Inject constructor(
     )
 
     private fun handleProfile(profile: Profile) {
-        fullNameSate.consumer.accept(
+        originalFullNameState.consumer.accept(
             PersonNameModel(
-                firstName = profile.firstName ?: "",
-                secondName = profile.secondName ?: ""
+                firstName = profile.firstName,
+                secondName = profile.secondName
             )
         )
+        firstNameInput.text.consumer.accept(profile.firstName ?: "")
+        secondNameInput.text.consumer.accept(profile.secondName ?: "")
     }
 
     private fun handleSuccess() {
@@ -150,7 +150,7 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun checkIsChanged(name: PersonNameModel) {
-        val profileName = fullNameSate.value
+        val profileName = originalFullNameState.value
         isNameChangedState.consumer.accept(
             profileName.firstName != name.firstName ||
                 profileName.secondName != name.secondName
