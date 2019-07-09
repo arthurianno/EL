@@ -453,6 +453,7 @@
     <string name="profile_settings_change_password_description">Придумайте новый пароль для входа в приложение</string>
     <string name="profile_settings_change_password_old_hint">Старый пароль</string>
     <string name="profile_settings_change_password_new_hint">Новый пароль</string>
+    <string name="profile_settings_change_password_changed">Пароль изменен</string>
 
     <string name="profile_unlink_network_dialog_title">Внимание</string>
     <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
