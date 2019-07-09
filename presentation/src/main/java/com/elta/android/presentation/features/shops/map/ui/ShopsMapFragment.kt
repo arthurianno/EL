@@ -89,7 +89,9 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         super.onBindPresentationModel(pm)
         myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
         pm.titleState.bindTo(toolbarTitleView.text())
-        pm.items.bindTo(adapter, compositeUnbind)
+        // due to large data set diff utils works with issues or
+        // requires a lot of resources for calculation, so disable it.
+        pm.items.bindTo { adapter.updateData(it, false) }
         pm.addMyLocationPinCommand.bindTo(::showUserLocation)
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
         pm.navigateToLocationCommand.bindTo { moveTo(it.toPoint()) }
