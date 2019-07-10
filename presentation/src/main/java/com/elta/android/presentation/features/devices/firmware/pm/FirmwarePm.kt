@@ -103,7 +103,7 @@ class FirmwarePm @Inject constructor(
                 when (updateState.value) {
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
                     is UpdateState.Found -> {
-                        if (firmwareState.valueOrNull?.isCompatibleWithApplication == true){
+                        if (firmwareState.valueOrNull?.isCompatibleWithApplication == true) {
                             downloadFirmwareAction.consumer.accept(Unit)
                         } else {
                             setState(UpdateState.UnsupportedFirmwareVersion(resources))
