@@ -13,6 +13,7 @@ import com.elta.android.presentation.States
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
@@ -52,14 +53,11 @@ class MainRecordsPm @Inject constructor(
 
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
-            bus.events<Events.ProfileUpdated>().map { Unit }
+            bus.events<Events.ProfileUpdated>().map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
         )
             .subscribe(loadScreenAction.consumer)
-            .untilDestroy()
-
-        bus.events<Events.EventsChanged>()
-            .doOnNext { loadScreenAction.consumer.accept(Unit) }
-            .subscribe()
             .untilDestroy()
 
         Observables.combineLatest(

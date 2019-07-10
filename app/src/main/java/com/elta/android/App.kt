@@ -10,9 +10,11 @@ import com.crashlytics.android.core.CrashlyticsCore
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
+import com.elta.android.presentation.core.date.DateChangeReceiver
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nullgr.core.rx.RxBus
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -38,6 +40,11 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
     @Inject
     lateinit var remindersManager: RemindersManager
 
+    @Inject
+    lateinit var bus: RxBus
+
+    lateinit var dateReceiver: DateChangeReceiver
+
     override fun onCreate() {
         super.onCreate()
         initializeCrashlytics()
@@ -46,6 +53,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
         initializeTime()
         initializeSocialNetworks()
         initalizeYandexMapKit()
+        initializeDateReceiver()
         RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
     }
 
@@ -90,5 +98,10 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     private fun initializeSocialNetworks() {
         SocialNetworks.initialize(this)
+    }
+
+    private fun initializeDateReceiver() {
+        dateReceiver = DateChangeReceiver(bus)
+        dateReceiver.register(this)
     }
 }

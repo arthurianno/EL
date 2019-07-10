@@ -84,11 +84,13 @@ class MorphView @JvmOverloads constructor(
         override fun run() {
             holdersIterator?.let {
                 val holder = it.next()
-                oval1.path = holder.p1
-                oval2.path = holder.p2
-                oval3.path = holder.p3
-                invalidate()
-                animationHandler.postDelayed(this, frameDelay)
+                holder?.let { h ->
+                    oval1.path = h.p1
+                    oval2.path = h.p2
+                    oval3.path = h.p3
+                    invalidate()
+                    animationHandler.postDelayed(this, frameDelay)
+                }
             }
         }
     }
