@@ -55,8 +55,8 @@ class SocialDataRepository @Inject constructor(
                     .applyScheduler(schedulersFacade)
                     .doOnSuccess { saveTokens(it.tokens) }
                     .flatMap { login ->
-                        profileSource.getUserProfile()
-                            .map { login }
+                        if (login.isEmailConfirmed) profileSource.getUserProfile().map { login }
+                        else Single.just(login)
                     }
             }
             .map(LoginDto::isEmailConfirmed)
