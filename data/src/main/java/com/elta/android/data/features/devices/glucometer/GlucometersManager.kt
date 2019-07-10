@@ -34,6 +34,7 @@ import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
+import com.polidea.rxandroidble2.exceptions.BleException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -440,7 +441,10 @@ class GlucometersManager @Inject constructor(
                 if (it.isEmpty()) Observable.empty()
                 else Observable.just(it)
             }
-            .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError(e)) }
+            .onErrorResumeNext { e: Throwable ->
+                if (e is BleException) Observable.error(GlucometerSyncError(GlucometerOfflineError))
+                else Observable.error(GlucometerSyncError(e))
+            }
 
     private fun filterConnectedDevices(
         connected: List<GlucometerCachedDto>,
