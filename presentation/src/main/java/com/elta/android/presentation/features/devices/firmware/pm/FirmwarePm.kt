@@ -102,7 +102,13 @@ class FirmwarePm @Inject constructor(
             .subscribe {
                 when (updateState.value) {
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
-                    is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
+                    is UpdateState.Found -> {
+                        if (firmwareState.valueOrNull?.isCompatibleWithApplication == true){
+                            downloadFirmwareAction.consumer.accept(Unit)
+                        } else {
+                            setState(UpdateState.UnsupportedFirmwareVersion(resources))
+                        }
+                    }
                     is UpdateState.BatteryLowLevel -> router.exit()
                     is UpdateState.UnsupportedFirmwareVersion -> {
                         router.exit()

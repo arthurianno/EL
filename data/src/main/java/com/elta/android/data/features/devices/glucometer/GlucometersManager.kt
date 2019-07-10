@@ -28,6 +28,7 @@ import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -84,6 +85,10 @@ class GlucometersManager @Inject constructor(
     private val infoCommands = listOf(
         Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
     )
+
+    fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
+
+    fun isSupportedByApplication(firmwareFile: FirmwareFile): Boolean = isSupported(firmwareFile.compatible)
 
     fun findDevices(): Observable<List<ScanResult>> =
         Observable.just(client.state)
@@ -199,7 +204,7 @@ class GlucometersManager @Inject constructor(
 
     fun updateFirmware(address: String, file: FirmwareFile): Completable =
         when {
-            !file.isSupportedByApplication() -> Completable.error(FirmwareNotSupportedByAppError(file.version))
+            !isSupportedByApplication(file) -> Completable.error(FirmwareNotSupportedByAppError(file.version))
             else ->
                 checkBluetoothClientState()
                     .flatMapCompletable {
@@ -348,8 +353,7 @@ class GlucometersManager @Inject constructor(
     private inline fun String.isOk(): Boolean = endsWith("ok")
     private inline fun String.isError(): Boolean = contains("error")
     private inline fun String.isEvent(): Boolean = startsWith("rd")
-
-    private fun FirmwareFile.isSupportedByApplication(): Boolean {
+    private inline fun isSupported(compatible: String): Boolean {
         val appVersionCode = FIRMWARE_VERSION.replace(".", "").toInt()
         val compatibleVersionCode = compatible.replace(".", "").toInt()
         return appVersionCode >= compatibleVersionCode
