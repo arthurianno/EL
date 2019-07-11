@@ -58,9 +58,14 @@
             android:name="io.fabric.ApiKey"
             android:value="920aba3e4b6a09e14708096e535391e22085e85f" />
 
-        <receiver android:name=".presentation.features.profile.settings.reminders.utils.BootReceiver">
+        <receiver
+            android:name=".presentation.features.profile.settings.reminders.utils.BootReceiver"
+            android:directBootAware="true"
+            android:exported="false"
+            tools:ignore="UnusedAttribute">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver android:name=".presentation.features.profile.settings.reminders.utils.ReminderCallbackReceiver" />
