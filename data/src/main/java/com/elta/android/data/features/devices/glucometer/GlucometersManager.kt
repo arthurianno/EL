@@ -500,7 +500,7 @@ class GlucometersManager @Inject constructor(
     )
 
     companion object {
-        private const val FIRMWARE_VERSION = "1.9" // version of firmware supported by application
+        private const val FIRMWARE_VERSION = "1.8" // version of firmware supported by application
         private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
