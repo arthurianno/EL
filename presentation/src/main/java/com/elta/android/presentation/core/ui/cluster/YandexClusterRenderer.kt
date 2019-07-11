@@ -25,6 +25,7 @@ import com.yandex.mapkit.map.PlacemarkMapObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Suppress("NestedBlockDepth", "EmptyCatchBlock", "TooGenericExceptionCaught")
 class YandexClusterRenderer(
     private val map: Map,
     private val imageProvider: ClusterPinProvider,
