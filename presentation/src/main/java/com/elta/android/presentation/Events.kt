@@ -30,6 +30,7 @@ sealed class Events : Event {
     object FirmwareUpdated : Events()
     data class BackendSyncProgress(val inProgress: Boolean) : Events()
     object BootCompleted : Events()
+    object PackageReplaced : Events()
     data class ReminderSpent(val reminder: Reminder) : Events()
     data class ReportLoadedEvent(val uri: Uri) : Events()
 

@@ -18,6 +18,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.notification.NotificationSource
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
+import io.reactivex.Observable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,7 +38,10 @@ class RemindersManager @Inject constructor(
     private val manager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     init {
-        bus.events<Events.BootCompleted>()
+        Observable.merge(
+            bus.events<Events.BootCompleted>().map { Unit },
+            bus.events<Events.PackageReplaced>().map { Unit }
+        )
             .doOnNext { scheduleReminders() }
             .retry()
             .subscribe()

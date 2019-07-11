@@ -27,5 +27,8 @@ class BootReceiver : BroadcastReceiver() {
         if (action == bootAction) {
             bus.event(Events.BootCompleted)
         }
+        if (action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+            bus.event(Events.PackageReplaced)
+        }
     }
 }
