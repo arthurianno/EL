@@ -168,14 +168,18 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
 
     private fun processPinSelection(selectedPoint: GeoPoint?, isMoveToPin: Boolean = true) {
         val previousSelectedPoint = getSelectedGeoPoint()
-        if (previousSelectedPoint == selectedPoint &&
-            previousSelectedPoint?.selected == selectedPoint?.selected) return
+        if (previousSelectedPoint?.id == selectedPoint?.id &&
+            previousSelectedPoint?.selected == selectedPoint?.selected
+        ) return
+
         previousSelectedPoint?.let {
+            clusterManager?.removeItem(it)
             it.selected = false
             drawPinObject(it)
         }
         selectedPoint?.let {
             if (!it.isUserPoint) {
+                clusterManager?.removeItem(it)
                 it.selected = true
                 setSelectedPin(it, isMoveToPin, checkAnimationNeeded(it))
             }
