@@ -16,15 +16,16 @@ import com.a65apps.clustering.yandex.view.ClusterPinProvider
 import com.a65apps.clustering.yandex.view.TapListener
 import com.a65apps.clustering.yandex.view.YandexRenderConfig
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.ConflictResolvingMode
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@Suppress("NestedBlockDepth", "EmptyCatchBlock", "TooGenericExceptionCaught")
 class YandexClusterRenderer(
     private val map: Map,
     private val imageProvider: ClusterPinProvider,
@@ -33,7 +34,9 @@ class YandexClusterRenderer(
     name: String = DEFAULT_MAP_OBJECT_NAME
 ) : ClusterRenderer<YandexRenderConfig> {
 
-    private val layer: MapObjectCollection = map.addMapObjectLayer(name)
+    private val layer: MapObjectCollection = map.addMapObjectLayer(name).apply {
+        setConflictResolvingMode(ConflictResolvingMode.IGNORE)
+    }
     private val currentClusters = mutableSetOf<Cluster>()
     private val mapObjects = mutableMapOf<Cluster, PlacemarkMapObject>()
     private var clusterAnimator = AnimatorSet()
@@ -52,7 +55,7 @@ class YandexClusterRenderer(
     } else {
         null
     }
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Map)
 
     override suspend fun updateClusters(newClusters: Set<Cluster>, updateSelection: Boolean) {
         if (updateSelection || clustersChanged(newClusters)) {
@@ -73,13 +76,16 @@ class YandexClusterRenderer(
 
     private fun animateDiffs(diffs: ClustersDiff, updateSelection: Boolean) {
         val transitions = diffs.transitions()
-        clusterAnimator.cancel()
+        clusterAnimator.end()
+        clusterAnimator.removeAllListeners()
         clusterAnimator = AnimatorSet()
+        val animators = mutableListOf<Animator>()
         for ((cluster, markers) in transitions) {
             clusterAnimation(cluster, markers, diffs.collapsing())?.let {
-                clusterAnimator.play(it)
+                animators.add(it)
             }
         }
+        clusterAnimator.playTogether(animators)
         clusterAnimator.duration = yandexRenderConfig.duration
         clusterAnimator.interpolator = yandexRenderConfig.interpolator
         clusterAnimator.addListener(object : AnimatorListenerAdapter() {
@@ -104,12 +110,16 @@ class YandexClusterRenderer(
     private fun checkPins(clusters: Set<Cluster>, updateSelection: Boolean) {
         val iterator = mapObjects.iterator()
         while (iterator.hasNext()) {
-            val mapObject = iterator.next()
-            if (updateSelection || !clusters.contains(mapObject.key)) {
-                if (mapObject.value.isValid) {
-                    layer.remove(mapObject.value)
+            val mapEntry = iterator.next()
+            if (updateSelection || !clusters.contains(mapEntry.key)) {
+                val mapObject = mapEntry.value
+                if (mapObject.isValid) {
+                    try {
+                        mapObject.parent.remove(mapObject)
+                        iterator.remove()
+                    } catch (ignored: Exception) {
+                    }
                 }
-                iterator.remove()
             }
         }
         for (marker in clusters) {
@@ -264,21 +274,22 @@ class YandexClusterRenderer(
     }
 
     private fun clustersChanged(newClusters: Set<Cluster>): Boolean {
-        val currentClustersCount = clusterCount(currentClusters)
-        val newClusterCount = clusterCount(newClusters)
-        return currentClustersCount != newClusterCount ||
-            pinCount(currentClusters) != pinCount(newClusters)
+        val old = mutableSetOf<Cluster>().apply { addAll(currentClusters) }
+        val new = mutableSetOf<Cluster>().apply { addAll(newClusters) }
+
+        val oldClustersCount = clusterCount(old)
+        val newClustersCount = clusterCount(new)
+
+        val oldPinsCount = pinCount(old)
+        val newPinsCount = pinCount(new)
+
+        return oldClustersCount != newClustersCount ||
+            oldPinsCount != newPinsCount ||
+            old != new
     }
 
-    private fun pinCount(clusters: Set<Cluster>): Int {
-        val copy = mutableSetOf<Cluster>().apply { addAll(clusters) }
-        return copy.asSequence().map { it.size() }.sum()
-    }
-
-    private fun clusterCount(clusters: Set<Cluster>): Int {
-        val copy = mutableSetOf<Cluster>().apply { addAll(clusters) }
-        return copy.asSequence().filter { it.isCluster() }.count()
-    }
+    private fun pinCount(clusters: Set<Cluster>): Int = clusters.asSequence().map { it.size() }.sum()
+    private fun clusterCount(clusters: Set<Cluster>): Int = clusters.asSequence().filter { it.isCluster() }.count()
 
     private fun updateCurrent(newClusters: Set<Cluster>) {
         currentClusters.clear()

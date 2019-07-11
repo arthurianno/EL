@@ -12,6 +12,7 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
+import com.nullgr.core.ui.extensions.toggleView
 import kotlinx.android.synthetic.main.item_shop.*
 
 class ShopDelegate(
@@ -46,6 +47,7 @@ class ShopDelegate(
         with(holder as ViewHolder) {
             shopNameView.text = item.name
             shopAddressView.text = item.address
+            shopDistanceView.toggleView(!item.distance.isNullOrEmpty())
             shopDistanceView.text = item.distance
         }
     }
@@ -54,7 +56,10 @@ class ShopDelegate(
         val item = items[position] as ShopItem
         with(holder as ViewHolder) {
             when (payload) {
-                ShopItem.Payload.DISTANCE_CHANGED -> shopDistanceView.text = item.distance
+                ShopItem.Payload.DISTANCE_CHANGED -> {
+                    shopDistanceView.toggleView(!item.distance.isNullOrEmpty())
+                    shopDistanceView.text = item.distance
+                }
             }
         }
     }
