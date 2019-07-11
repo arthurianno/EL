@@ -42,6 +42,8 @@ class RangeBarView @JvmOverloads constructor(
             setValues(value.start, value.endInclusive)
         }
 
+    var minRange: Double = Double.NaN
+
     private var values = Values(DEFAULT_START_VALUE, DEFAULT_END_VALUE)
     private val listeners = arrayListOf<OnRageBarValuesChangeListener>()
     private var resultFraction = FRACTION_DIGITS_COUNT
@@ -77,6 +79,7 @@ class RangeBarView @JvmOverloads constructor(
     private var dragIndicatorsPadding = 0f
     private var dragIndicatorsTopY = 0f
     private var dragTouchBounds = 0f
+    private var minSpaceBetweenValues = 0f
 
     private var trianglesPadding = 0f
     private var trianglesHeight = 0f
@@ -149,12 +152,13 @@ class RangeBarView @JvmOverloads constructor(
 
             MotionEvent.ACTION_MOVE ->
                 if (movementState != MovementState.IDLE) {
-                    val touchX = event.x
-                    if (movementState == MovementState.DRAG_LEFT_EDGE && canDragLeftEdge(touchX)) {
+                    if (movementState == MovementState.DRAG_LEFT_EDGE) {
+                        val touchX = event.x.validateTouchXForLeftEdge()
                         startProgress = (touchX - backgroundRect.left) / backgroundRect.width()
                         onUpdateAndInvalidate()
                     }
-                    if (movementState == MovementState.DRAG_RIGHT_EDGE && canDragRightEdge(touchX)) {
+                    if (movementState == MovementState.DRAG_RIGHT_EDGE) {
+                        val touchX = event.x.validateTouchXForRightEdge()
                         endProgress = (touchX - backgroundRect.left) / backgroundRect.width()
                         onUpdateAndInvalidate()
                     }
@@ -261,6 +265,7 @@ class RangeBarView @JvmOverloads constructor(
                 DEFAULT_END_VALUE.toFloat()
             )
             valuesRange = startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize()
+            minRange = a.getFloat(R.styleable.RangeBarView_rbv_min_range, Float.NaN).toDouble()
             a.recycle()
         } else {
             initDefault()
@@ -328,6 +333,13 @@ class RangeBarView @JvmOverloads constructor(
 
         initDragIndicatorsSizes()
         dragTouchBounds = TOUCH_BOUNDS_DP.dpToPx(context)
+        minSpaceBetweenValues = when (minRange.isNaN() || minRange == 0.0) {
+            true -> dragTouchBounds * 2
+            else -> {
+                val minProgress = minRange / (valuesRange.endInclusive - valuesRange.start)
+                (backgroundRect.width() * minProgress).toFloat()
+            }
+        }
     }
 
     private fun initDragIndicatorsSizes() {
@@ -390,11 +402,17 @@ class RangeBarView @JvmOverloads constructor(
         x in rangeBarRect.right - dragTouchBounds..rangeBarRect.right + dragTouchBounds &&
             y > rangeBarTopY && y < rangeBarTopY + rangeBarHeight
 
-    private fun canDragLeftEdge(x: Float) =
-        x > backgroundRect.left && x < rangeBarRect.right - dragTouchBounds * 2
+    private fun Float.validateTouchXForLeftEdge(): Float =
+        when {
+            this < rangeBarRect.left -> Math.max(backgroundRect.left, this)
+            else -> Math.min(rangeBarRect.right - minSpaceBetweenValues, this)
+        }
 
-    private fun canDragRightEdge(x: Float) =
-        x < backgroundRect.right && x > rangeBarRect.left + dragTouchBounds * 2
+    private fun Float.validateTouchXForRightEdge(): Float =
+        when {
+            this > rangeBarRect.right -> Math.min(backgroundRect.right, this)
+            else -> Math.max(rangeBarRect.left + minSpaceBetweenValues, this)
+        }
 
     private fun disableParentTouch() {
         parent.requestDisallowInterceptTouchEvent(true)
@@ -413,7 +431,7 @@ class RangeBarView @JvmOverloads constructor(
         private const val DEFAULT_END_VALUE = 100.0
         private const val TRIANGLE_PADDING_DP = 3f
         private const val TEXT_PADDING_DP = 5f
-        private const val DEFAULT_TEXT_SIZE = 15f
+        private const val DEFAULT_TEXT_SIZE = 13f
         private const val TYPEFACE = "roboto_medium.ttf"
         private const val STUB_TEXT = "#"
     }

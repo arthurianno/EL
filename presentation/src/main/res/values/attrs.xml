@@ -38,6 +38,7 @@
         <attr name="rbv_range_start" format="float" />
         <attr name="rbv_range_end" format="float" />
         <attr name="rbv_fraction_digits_count" format="integer" />
+        <attr name="rbv_min_range" format="float" />
     </declare-styleable>
 
     <declare-styleable name="SpinnerView">

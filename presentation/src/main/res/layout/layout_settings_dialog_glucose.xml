@@ -15,7 +15,8 @@
         android:layout_marginEnd="12dp"
         app:rbv_fraction_digits_count="1"
         app:rbv_range_end="20.0"
-        app:rbv_range_start="1.0" />
+        app:rbv_range_start="1.0"
+        app:rbv_min_range="2.0"/>
 
     <LinearLayout
         android:layout_width="match_parent"
