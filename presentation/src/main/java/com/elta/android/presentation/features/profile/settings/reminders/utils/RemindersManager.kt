@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.profile.settings.reminders.utils
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.content.Context
+import android.os.Build
 import com.elta.android.common.utils.toMillis
 import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
 import com.elta.android.domain.features.reminder.interactor.GetRemindersUseCase
@@ -51,7 +52,10 @@ class RemindersManager @Inject constructor(
 
     fun addReminder(reminder: Reminder) {
         val pi = reminder.getPendingIntent(context)
-        manager.setExact(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
+        else
+            manager.setExact(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
     }
 
     fun updateReminder(reminder: Reminder) {
