@@ -9,6 +9,7 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.diary.main.DiaryEventsMapper
@@ -59,7 +60,8 @@ class MainDiaryPm @Inject constructor(
 
         Observable.merge(
             selectedDateState.observable.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit }
+            bus.events<Events.EventsChanged>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
         )
             .map { selectedDateState.value }
             .subscribe(loadScreenAction.consumer)

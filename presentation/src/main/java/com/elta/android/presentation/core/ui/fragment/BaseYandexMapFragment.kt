@@ -47,7 +47,7 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
     private val myLocationImageProvider by lazy {
         ImageProvider.fromResource(activity, userLocationPinRes)
     }
-    private val mapObjects by lazy { map?.mapObjects?.addCollection() }
+    private val mapObjects by lazy { map?.addMapObjectLayer("USER_LOCATION") }
     private var userLocationMapObject: MapObject? = null
     private val selectedObjectRelay = BehaviorRelay.create<GeoPoint>()
 
@@ -92,7 +92,7 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
         zoom: Float? = null,
         duration: Float? = null
     ) {
-        val finalZoom = zoom ?: DEFAULT_ZOOM
+        val finalZoom = zoom ?: map?.maxZoom ?: DEFAULT_ZOOM
         map?.move(
             CameraPosition(location, finalZoom, AZIMUT, TILT),
             Animation(Animation.Type.SMOOTH, duration ?: PIN_ANIMATION_DURATION),
@@ -199,7 +199,7 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
         (map?.cameraPosition?.zoom ?: DEFAULT_ZOOM) + ZOOM_INCREASE_VALUE
 
     companion object {
-        private const val DEFAULT_ZOOM = 15f
+        private const val DEFAULT_ZOOM = 17f
         private const val ZOOM_INCREASE_VALUE = 1f
         private const val AZIMUT = 0f
         private const val TILT = 0f

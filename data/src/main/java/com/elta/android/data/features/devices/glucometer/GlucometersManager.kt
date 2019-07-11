@@ -34,6 +34,7 @@ import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
+import com.polidea.rxandroidble2.exceptions.BleException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -440,7 +441,10 @@ class GlucometersManager @Inject constructor(
                 if (it.isEmpty()) Observable.empty()
                 else Observable.just(it)
             }
-            .onErrorResumeNext { e: Throwable -> Observable.error(GlucometerSyncError(e)) }
+            .onErrorResumeNext { e: Throwable ->
+                if (e is BleException) Observable.error(GlucometerSyncError(GlucometerOfflineError))
+                else Observable.error(GlucometerSyncError(e))
+            }
 
     private fun filterConnectedDevices(
         connected: List<GlucometerCachedDto>,
@@ -496,7 +500,7 @@ class GlucometersManager @Inject constructor(
     )
 
     companion object {
-        private const val FIRMWARE_VERSION = "1.9" // version of firmware supported by application
+        private const val FIRMWARE_VERSION = "1.8" // version of firmware supported by application
         private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")

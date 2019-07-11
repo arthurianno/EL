@@ -11,7 +11,6 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateSource
 import com.yandex.mapkit.map.Map
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,7 +28,7 @@ class YandexClusterManager(
     CameraListener {
 
     private var lastZoom: Int = 0
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Map)
 
     override fun onCameraPositionChanged(
         map: Map,

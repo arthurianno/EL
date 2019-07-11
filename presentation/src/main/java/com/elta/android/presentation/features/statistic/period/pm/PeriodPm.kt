@@ -9,6 +9,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
@@ -45,7 +46,8 @@ class PeriodPm @Inject constructor(
 
         Observable.merge(
             bus.events<Events.EventsChanged>().map { Unit },
-            bus.events<Events.ProfileUpdated>().map { Unit }
+            bus.events<Events.ProfileUpdated>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
         )
             .filter { periodState.hasValue() }
             .map { periodState.value }
