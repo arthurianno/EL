@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.profile.settings.reminders.utils
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.content.Context
+import android.os.Build
 import com.elta.android.common.utils.toMillis
 import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
 import com.elta.android.domain.features.reminder.interactor.GetRemindersUseCase
@@ -14,9 +15,11 @@ import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.notification.NotificationSource
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
+import io.reactivex.Observable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,7 +39,11 @@ class RemindersManager @Inject constructor(
     private val manager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     init {
-        bus.events<Events.BootCompleted>()
+        Observable.merge(
+            bus.events<Events.BootCompleted>().map { Unit },
+            bus.events<Events.PackageReplaced>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
+        )
             .doOnNext { scheduleReminders() }
             .retry()
             .subscribe()
@@ -51,7 +58,10 @@ class RemindersManager @Inject constructor(
 
     fun addReminder(reminder: Reminder) {
         val pi = reminder.getPendingIntent(context)
-        manager.setExact(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
+        else
+            manager.setExact(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
     }
 
     fun updateReminder(reminder: Reminder) {
