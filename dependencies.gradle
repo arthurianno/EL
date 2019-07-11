@@ -65,7 +65,7 @@ def libraryVersions = [
         barcodeScannerVersion      : '1.9.8',
         datePickerVersion          : '2.0.0',
         materialEditTextVersion    : '2.1.4',
-        mapKitVersion              : '3.2.0',
+        mapKitVersion              : '3.3.1',
         mapKitClusteringVersion    : '0.2',
         cardViewVersion            : '1.0.0',
         pulseViewVersion           : '1.0.3',
