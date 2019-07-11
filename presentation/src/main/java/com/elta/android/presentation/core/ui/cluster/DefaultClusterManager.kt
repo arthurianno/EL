@@ -5,7 +5,6 @@ import com.a65apps.clustering.core.algorithm.Algorithm
 import com.a65apps.clustering.core.algorithm.DefaultAlgorithmParameter
 import com.a65apps.clustering.core.view.RenderConfig
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -21,7 +20,7 @@ open class DefaultClusterManager<in C : RenderConfig>(
         renderer.onAdd()
     }
 
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Map)
     private val algorithmLock = ReentrantReadWriteLock()
 
     suspend fun calculateClusters(algorithmParameter: DefaultAlgorithmParameter) {
