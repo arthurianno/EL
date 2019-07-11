@@ -15,6 +15,7 @@ import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.notification.NotificationSource
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
@@ -40,7 +41,8 @@ class RemindersManager @Inject constructor(
     init {
         Observable.merge(
             bus.events<Events.BootCompleted>().map { Unit },
-            bus.events<Events.PackageReplaced>().map { Unit }
+            bus.events<Events.PackageReplaced>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
         )
             .doOnNext { scheduleReminders() }
             .retry()
