@@ -14,6 +14,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.geo.ExtendedLocation
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.geo.GeoPointIcon
 import com.elta.android.presentation.core.geo.LocationTurnedOffError
@@ -62,7 +63,7 @@ class ShopsMapPm @Inject constructor(
     val locationControl = locationControl(rxLocationManager)
 
     val addMyLocationPinCommand = Command<Location>()
-    val navigateToLocationCommand = Command<Location>()
+    val navigateToLocationCommand = Command<ExtendedLocation>()
     val moveToMyLocationAction = Action<Unit>()
 
     val shopListItemSelectedAction = Action<Int>()
@@ -170,13 +171,13 @@ class ShopsMapPm @Inject constructor(
             .doOnNext(foundedLocation.consumer)
             .doOnNext(addMyLocationPinCommand.consumer)
             .filter { manualNavigateToUserLocation.value }
-            .doOnNext(navigateToLocationCommand.consumer)
+            .doOnNext { navigateToLocationCommand.consumer.accept(ExtendedLocation(it)) }
             .doOnNext { manualNavigateToUserLocation.consumer.accept(false) }
             .subscribe()
             .untilDestroy()
 
         defaultLocationState.observable
-            .doOnNext(navigateToLocationCommand.consumer)
+            .doOnNext { navigateToLocationCommand.consumer.accept(ExtendedLocation(it, DEFAULT_LOCATION_ZOOM)) }
             .doOnNext(foundedLocation.consumer)
             .subscribe()
             .untilDestroy()
@@ -444,5 +445,6 @@ class ShopsMapPm @Inject constructor(
         const val INVALID_INDEX = -1
         const val INPUT_DELAY = 300L
         const val NEAREST_TEN_POINTS = 10
+        const val DEFAULT_LOCATION_ZOOM = 10f
     }
 }
