@@ -71,5 +71,15 @@
         </receiver>
         <receiver android:name=".presentation.features.profile.settings.reminders.utils.ReminderCallbackReceiver" />
 
+        <receiver
+            android:name=".presentation.core.date.DateChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>
