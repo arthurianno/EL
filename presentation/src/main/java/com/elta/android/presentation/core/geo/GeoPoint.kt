@@ -25,6 +25,11 @@ class GeoPoint(
         if (latitude != other.latitude) return false
         if (longitude != other.longitude) return false
         if (id != other.id) return false
+        if (selected != other.selected) return false
+        if (isUserPoint != other.isUserPoint) return false
+        if (icon != other.icon) return false
+        if (meta != other.meta) return false
+        if (!super.equals(other)) return false
 
         return true
     }
@@ -33,6 +38,11 @@ class GeoPoint(
         var result = latitude.hashCode()
         result = 31 * result + longitude.hashCode()
         result = 31 * result + (id?.hashCode() ?: 0)
+        result = 31 * result + if (selected) 1 else 0
+        result = 31 * result + if (isUserPoint) 1 else 0
+        result = 31 * result + (icon?.hashCode() ?: 0)
+        result = 31 * result + (meta?.hashCode() ?: 0)
+        result = 31 * result + super.hashCode()
         return result
     }
 
