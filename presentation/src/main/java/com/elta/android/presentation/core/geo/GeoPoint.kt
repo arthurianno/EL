@@ -14,7 +14,7 @@ class GeoPoint(
     var meta: Any? = null
 ) : DefaultCluster(LatLng(latitude, longitude), id) {
 
-    override fun isCluster(): Boolean = size() > CLUSTER_SIZE
+    override fun isCluster(): Boolean = size() > 1
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,7 +25,6 @@ class GeoPoint(
         if (latitude != other.latitude) return false
         if (longitude != other.longitude) return false
         if (id != other.id) return false
-        if (selected != other.selected) return false
         if (isUserPoint != other.isUserPoint) return false
         if (icon != other.icon) return false
         if (meta != other.meta) return false
@@ -38,7 +37,6 @@ class GeoPoint(
         var result = latitude.hashCode()
         result = 31 * result + longitude.hashCode()
         result = 31 * result + (id?.hashCode() ?: 0)
-        result = 31 * result + if (selected) 1 else 0
         result = 31 * result + if (isUserPoint) 1 else 0
         result = 31 * result + (icon?.hashCode() ?: 0)
         result = 31 * result + (meta?.hashCode() ?: 0)
@@ -56,10 +54,6 @@ class GeoPoint(
             "icon=$icon, " +
             "meta=$meta" +
             ")"
-    }
-
-    private companion object {
-        private const val CLUSTER_SIZE = 2
     }
 }
 
