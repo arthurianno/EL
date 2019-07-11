@@ -94,7 +94,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         pm.items.bindTo { adapter.updateData(it, false) }
         pm.addMyLocationPinCommand.bindTo(::showUserLocation)
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
-        pm.navigateToLocationCommand.bindTo { moveTo(it.toPoint()) }
+        pm.navigateToLocationCommand.bindTo { moveTo(it.location.toPoint(), zoom = it.zoom) }
 
         pm.checkPermissionStatusCommand.bindTo {
             val status = rxPermissions.statusFor(LOCATION_PERMISSION)
