@@ -25,6 +25,7 @@ import com.elta.android.presentation.widgets.charts.daily.models.ChartItemModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueType
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
+import com.nullgr.core.ui.extensions.getDisplaySize
 import com.nullgr.core.ui.extensions.spToPx
 import org.threeten.bp.ZonedDateTime
 
@@ -120,6 +121,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private val hoursCoordinatesMap = SparseArray<Float>()
     private val hoursTitlesMap = SparseArray<String>()
     private val chartPoints = hashMapOf<ChartItemModel, PointF>()
+    private var scrollOffset = 0f
 
     init {
         initDefault()
@@ -136,8 +138,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     fun getScrollPosition(): Float {
         val lastEventEntry = chartPoints.entries.maxBy { it.value.x }
         if (lastEventEntry != null) {
-            val scrollToHour = lastEventEntry.key.hourOfEvent - 2
-            return if (scrollToHour >= 1) hoursCoordinatesMap[scrollToHour] else 0f
+            return lastEventEntry.value.x - scrollOffset
         }
         return 0f
     }
@@ -435,6 +436,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             onDataModelChanged()
         }
         timeTitleY = chartOffset * 2 + clearChartHeight + titlePadding + (titleHeight * 0.75).toInt()
+        scrollOffset = getDisplaySize(context).first * 0.8f
     }
 
     private fun onDataModelChanged() {
