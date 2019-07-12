@@ -37,7 +37,7 @@ class NotificationHelper @Inject constructor(
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(false)
+            .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_reminder)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
