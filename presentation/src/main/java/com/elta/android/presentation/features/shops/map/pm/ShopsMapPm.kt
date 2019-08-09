@@ -57,6 +57,7 @@ class ShopsMapPm @Inject constructor(
     val items = State<List<ListItem>>()
     val geoPoints = State<Pair<List<GeoPoint>, Int>>()
     val titleState = State<String>()
+    val searchHintState = State<String>()
 
     val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
     val requestPermissionCommand = Command<Unit>(bufferSize = 1)
@@ -112,8 +113,9 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         shopsTypeState.observable
-            .map { it.toScreenTitle() }
-            .subscribe(titleState.consumer)
+            .doOnNext { titleState.consumer.accept(it.toScreenTitle()) }
+            .doOnNext { searchHintState.consumer.accept(it.toSearchHint()) }
+            .subscribe()
             .untilDestroy()
 
         Observables.combineLatest(lifecycleObservable, shopsTypeState.observable)
@@ -439,6 +441,12 @@ class ShopsMapPm @Inject constructor(
         when (this) {
             Type.SALE -> resources.getString(R.string.shops_map_toolbar_title)
             Type.SERVICE -> resources.getString(R.string.shops_map_toolbar_title_services)
+        }
+
+    private fun Type.toSearchHint(): String =
+        when (this) {
+            Type.SALE -> resources.getString(R.string.shops_search_hint)
+            Type.SERVICE -> resources.getString(R.string.shops_search_hint_services)
         }
 
     private companion object {
