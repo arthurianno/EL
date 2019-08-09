@@ -29,6 +29,7 @@ class ProfileSetGenderPm @Inject constructor(
     val continueAction = Action<Unit>()
     val backHandleAction = Action<Unit>()
     val saveChangesEnableState = State(false)
+    val checkNotSpecifiedVisibility = State<Boolean>()
     val checkNotSpecified = checkControl()
     val checkMale = checkControl()
     val checkFemale = checkControl()
@@ -123,6 +124,7 @@ class ProfileSetGenderPm @Inject constructor(
             Gender.FEMALE -> checkFemale.checked.consumer.accept(true)
             else -> checkNotSpecified.checked.consumer.accept(true)
         }
+        checkNotSpecifiedVisibility.consumer.accept(profile.gender == null)
         profileGenderState.consumer.accept(
             profile.gender?.let { GenderModel.valueOf(it.name) } ?: GenderModel.NOT_SPECIFIED
         )
