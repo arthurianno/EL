@@ -400,7 +400,7 @@
     <string name="profile_name_placeholder">Профиль</string>
     <string name="profile_personal_information">Персональные данные</string>
     <string name="profile_security">Безопасность</string>
-    <string name="profile_linked_social_networks">Привязаные соц.сети</string>
+    <string name="profile_linked_social_networks">Привязанные соцсети</string>
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
     <string name="profile_gender_placeholder">Пол не указан</string>
