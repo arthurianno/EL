@@ -117,6 +117,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         itemsView.pageScrolled().bindTo(pm.shopListItemSelectedAction)
 
         // search
+        pm.searchHintState.bindTo(searchInputView::setHint)
         pm.searchItems.bindTo(searchAdapter, compositeUnbind)
         pm.searchInput.bindTo(searchInputView)
         pm.searchCloseCommand.bindTo {
