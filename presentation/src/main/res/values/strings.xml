@@ -154,7 +154,7 @@
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Запись с глюкометра</string>
-    <string name="event_type_hba1c">HbA1C</string>
+    <string name="event_type_hba1c">HbA1c</string>
     <string name="event_type_sync">Синхронизация с устройством</string>
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
@@ -389,7 +389,7 @@
     <string name="profile_management_and_settings">Управление и настройки</string>
     <string name="profile_where_purchase_products">Где приобрести продукцию</string>
     <string name="profile_map_of_stores">Карта точек продаж</string>
-    <string name="profile_hba1c">HbA1C</string>
+    <string name="profile_hba1c">HbA1c</string>
     <string name="profile_hba1c_value">%s %%</string>
     <string name="profile_range">Целевой диапазон</string>
     <string name="profile_glucose_level">Уровень глюкозы</string>
@@ -428,9 +428,9 @@
     <string name="profile_settings_dialog_glucose_action_button">Установить</string>
     <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nЦелевой диапазон будет использоваться на графике главного экрана.</string>
 
-    <string name="profile_settings_dialog_hba1c_title">HbA1C</string>
+    <string name="profile_settings_dialog_hba1c_title">HbA1c</string>
     <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
-    <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1C</string>
+    <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1c</string>
     <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
     <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
     <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
