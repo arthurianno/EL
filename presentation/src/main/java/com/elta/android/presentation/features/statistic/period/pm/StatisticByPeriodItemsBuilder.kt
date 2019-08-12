@@ -148,13 +148,37 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         stat: StatisticByPeriodModel,
         value: String,
         date: LocalDate?
-    ): String = when {
-        this == GeneralIndexItem.Type.ACTIVITY && date != null ->
-            getDescription(stat.allDays[date]?.activity?.eventsCount, value)
-        else -> getDescription(stat.activity.eventsCount, value)
+    ): String {
+        return if (date != null) getDescriptionByDay(stat.allDays[date]?.activity?.eventsCount, value)
+        else getDescriptionByPeriod(stat.activity.eventsCount, value)
     }
 
-    private inline fun GeneralIndexItem.Type.getDescription(eventsCount: Int?, value: String): String =
+    private inline fun GeneralIndexItem.Type.getDescriptionByDay(eventsCount: Int?, value: String): String =
+        when (this) {
+            GeneralIndexItem.Type.BREAD -> resources.getString(
+                R.string.statistic_general_index_description_by_day_bread,
+                value
+            )
+            GeneralIndexItem.Type.TOTAL -> resources.getString(
+                R.string.statistic_general_index_description_by_day_insulin,
+                value
+            )
+            GeneralIndexItem.Type.BOLUS -> resources.getString(
+                R.string.statistic_general_index_description_by_day_bolus_insulin,
+                value
+            )
+            GeneralIndexItem.Type.BASAL -> resources.getString(
+                R.string.statistic_general_index_description_by_day_basal_insulin,
+                value
+            )
+            GeneralIndexItem.Type.ACTIVITY -> resources.getString(
+                R.string.statistic_general_index_description_by_day_activity,
+                eventsCount.toString(),
+                value
+            )
+        }
+
+    private inline fun GeneralIndexItem.Type.getDescriptionByPeriod(eventsCount: Int?, value: String): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_by_period_bread,
