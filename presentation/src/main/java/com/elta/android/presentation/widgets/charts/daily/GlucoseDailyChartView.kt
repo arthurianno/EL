@@ -180,34 +180,39 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     private fun Canvas.drawPoints() {
         chartPoints.entries.forEach {
-            chartItemPaint.color = when {
-                it.key.isSelected -> selectedItemInnerColor
-                it.key.valueType == ChartItemValueType.LOW -> lowRangeItemColor
-                it.key.valueType == ChartItemValueType.NORMAL -> normalRangeItemColor
-                it.key.valueType == ChartItemValueType.HIGH -> highRangeItemColor
-                else -> 0
+            if (!it.key.isSelected) {
+                chartItemPaint.color = when {
+                    it.key.valueType == ChartItemValueType.LOW -> lowRangeItemColor
+                    it.key.valueType == ChartItemValueType.NORMAL -> normalRangeItemColor
+                    it.key.valueType == ChartItemValueType.HIGH -> highRangeItemColor
+                    else -> 0
+                }
+                drawCircle(it.value.x, it.value.y, chartItemRadius, chartItemPaint)
+
+                if (it.key.isMaxValue && !it.key.isSelected) {
+                    drawPointTitle(it.value, maxTitle, highRangeItemColor)
+                }
+
+                if (it.key.isMinValue && !it.key.isSelected) {
+                    drawPointTitle(it.value, minTitle, lowRangeItemColor)
+                }
             }
+        }
+
+        chartPoints.entries.find { it.key.isSelected }?.let {
+            chartItemPaint.color = selectedItemInnerColor
             drawCircle(it.value.x, it.value.y, chartItemRadius, chartItemPaint)
 
-            if (it.key.isSelected) {
-                val selectionColor = when (it.key.valueType) {
-                    ChartItemValueType.LOW -> lowRangeSelectedItemColor
-                    ChartItemValueType.NORMAL -> normalRangeSelectedItemColor
-                    ChartItemValueType.HIGH -> highRangeSelectedItemColor
-                }
-                selectedItemPaint.color = selectionColor
-                drawCircle(it.value.x, it.value.y, selectedChartItemRadius, selectedItemPaint)
-                drawPointTitle(it.value, it.key.value.format(), selectionColor)
-                drawSelected(it.value, selectionColor, it.key.formattedTime)
+            val selectionColor = when (it.key.valueType) {
+                ChartItemValueType.LOW -> lowRangeSelectedItemColor
+                ChartItemValueType.NORMAL -> normalRangeSelectedItemColor
+                ChartItemValueType.HIGH -> highRangeSelectedItemColor
             }
 
-            if (it.key.isMaxValue && !it.key.isSelected) {
-                drawPointTitle(it.value, maxTitle, highRangeItemColor)
-            }
-
-            if (it.key.isMinValue && !it.key.isSelected) {
-                drawPointTitle(it.value, minTitle, lowRangeItemColor)
-            }
+            selectedItemPaint.color = selectionColor
+            drawCircle(it.value.x, it.value.y, selectedChartItemRadius, selectedItemPaint)
+            drawPointTitle(it.value, it.key.value.format(), selectionColor)
+            drawSelected(it.value, selectionColor, it.key.formattedTime)
         }
     }
 
