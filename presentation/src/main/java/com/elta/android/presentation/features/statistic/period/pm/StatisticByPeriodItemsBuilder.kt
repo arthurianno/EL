@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package com.elta.android.presentation.features.statistic.period.pm
 
 import android.graphics.drawable.Drawable

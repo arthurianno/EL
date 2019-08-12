@@ -33,7 +33,7 @@ class ReminderMapper @Inject constructor(
             )
         }
 
-    @Suppress("SwallowedException")
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     private fun Reminder.formatSchedule(): String {
         return try {
             val time = this.date.toStringWithFormat(CommonFormats.FORMAT_TIME)
