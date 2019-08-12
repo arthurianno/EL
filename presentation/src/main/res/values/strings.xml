@@ -130,13 +130,13 @@
     <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
     <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
     <string name="shops_start_find_action_button">Найти магазин на карте</string>
-    <string name="shops_map_toolbar_title">Приобрести глюкометр</string>
+    <string name="shops_map_toolbar_title">Приобрести продукцию</string>
     <string name="shops_map_toolbar_title_services">Сервисные центры</string>
     <string name="shops_map_route">Как доехать</string>
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
     <string name="shops_map_distance_m_pattern">%d м</string>
-    <string name="shops_search_hint">Найти магазин</string>
+    <string name="shops_search_hint">Найти точку продаж</string>
     <string name="shops_search_header">Результат поиска</string>
 
     <!-- HOME FLOW -->
