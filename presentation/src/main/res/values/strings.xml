@@ -6,10 +6,10 @@
     <string name="space"> </string>
 
     <!-- ERROR VIEW ERRORS -->
-    <string name="error_server_not_responding_title">Сервер не доступен</string>
+    <string name="error_server_not_responding_title">Сервер недоступен</string>
     <string name="error_server_not_responding_subtitle">Приносим свои извинения за принесенные неудобства</string>
     <string name="error_server_not_responding_retry_button">Повторить</string>
-    <string name="error_server_not_responding_snackbar_message">Сервер временно не доступен</string>
+    <string name="error_server_not_responding_snackbar_message">Сервер временно недоступен</string>
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
@@ -130,13 +130,13 @@
     <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
     <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
     <string name="shops_start_find_action_button">Найти магазин на карте</string>
-    <string name="shops_map_toolbar_title">Приобрести глюкометр</string>
+    <string name="shops_map_toolbar_title">Приобрести продукцию</string>
     <string name="shops_map_toolbar_title_services">Получить заботу</string>
     <string name="shops_map_route">Как доехать</string>
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
     <string name="shops_map_distance_m_pattern">%d м</string>
-    <string name="shops_search_hint">Найти магазин</string>
+    <string name="shops_search_hint">Найти точку продаж</string>
     <string name="shops_search_hint_services">Найти сервисный центр</string>
     <string name="shops_search_header">Результат поиска</string>
 
@@ -353,7 +353,7 @@
     <string name="sync_state_pin_dialog_button">Подключить</string>
 
     <string name="sync_state_title_device_found">Устройство найдено</string>
-    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете прододжить\nпроцесс подключения</string>
+    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете продолжить\nпроцесс подключения</string>
     <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
 
     <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
@@ -401,7 +401,7 @@
     <string name="profile_name_placeholder">Профиль</string>
     <string name="profile_personal_information">Персональные данные</string>
     <string name="profile_security">Безопасность</string>
-    <string name="profile_linked_social_networks">Привязаные соц.сети</string>
+    <string name="profile_linked_social_networks">Привязанные соцсети</string>
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
     <string name="profile_gender_placeholder">Пол не указан</string>
