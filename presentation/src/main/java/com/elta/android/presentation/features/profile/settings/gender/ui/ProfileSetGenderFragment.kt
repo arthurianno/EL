@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.profile.settings.gender.pm.ProfileSetGenderPm
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
 import kotlinx.android.synthetic.main.fragment_profile_set_gender.*
 
 class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
@@ -18,6 +19,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+        pm.checkNotSpecifiedVisibility.bindTo(notSpecifiedButtonView.visibility())
         pm.checkNotSpecified.bindTo(notSpecifiedButtonView)
         pm.checkMale.bindTo(maleButtonView)
         pm.checkFemale.bindTo(femaleButtonView)
