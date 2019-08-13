@@ -92,7 +92,8 @@ class HomeFlowPm @Inject constructor(
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
             resources.getString(R.string.sync_connect_device_not_found),
-            resources.getString(R.string.sync_connect_button_retry)
+            resources.getString(R.string.sync_connect_button_retry),
+            SNACK_BAR_DURATION
         )
     }
 
@@ -413,5 +414,6 @@ class HomeFlowPm @Inject constructor(
         private const val OPEN_EVENT_SCREEN_DELAY = 400L
         private const val META_SYNC = "meta_sync"
         private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY = 2800L
+        private const val SNACK_BAR_DURATION = 5000
     }
 }

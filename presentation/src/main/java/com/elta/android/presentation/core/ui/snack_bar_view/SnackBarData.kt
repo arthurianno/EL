@@ -7,4 +7,6 @@ interface SnackBarData {
     val message: String
 
     val button: String?
+
+    val duration: Int?
 }
