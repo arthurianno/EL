@@ -527,7 +527,7 @@
     <string name="profile_observer_invite_new_title">Новый наблюдатель</string>
     <string name="profile_observer_invite_new_description">Чтобы пригласить наблюдателя,\nвведите его email</string>
     <string name="profile_observer_invite_new_send_invite">Отправить</string>
-    <string name="profile_observer_invite_new_invite_description">После отправки запроса на email, пользователь должен принять ваше приглашение. После этого он будет отображаться в списке доступных наблюдателей</string>
+    <string name="profile_observer_invite_new_invite_description">После отправки запроса на email пользователь должен принять ваше приглашение. После этого он будет отображаться в списке доступных наблюдателей</string>
     <string name="profile_observer_invite_new_email_hint">Email наблюдателя</string>
     <string name="profile_observer_invite_with_success">Приглашение отправлено</string>
 
