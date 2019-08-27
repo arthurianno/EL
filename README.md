@@ -96,3 +96,30 @@ git config alias.mr '!sh mr.sh'
 
 _TOKEN_ - create at [GitLab](http://172.16.100.20/profile/personal_access_tokens)  
 _PROJECT_ - path to project. For example: _nullgravity%2FTele2%2Ftele2-self-service-android_
+
+Build app in different environments
+-------------
+Project contains 2 predefined config file: [test](./configuration-build-test.properties) and [stage](./configuration-build-stage.properties).   
+If you need to build app in other environment you need to create your own config file and set environment variable.  
+
+List of supported configs:
+- ```environment``` - represents name of environment
+- ```server.url``` - represents base url to be used to make requests
+- ```deep.link.host``` - represents host to be used to handle deep links
+- ```app.id.suffix``` - represents suffix of application id. Can be used to create different application id for different environments.
+- ```app.name.suffix``` - represents suffix of application name. Can be used to create different application name for different environments.
+- ```log.enabled``` - represents boolean flag to enable or disable logs in application.
+
+NOTE: currently ```app.id.suffix``` unused to keep integration with social networks in working state at iOS and Android.  
+
+How to set environment variable:  
+Name of variable builds in next way: ```"{applicationId}.config.file".toUpperCase().replace(".", "_")```  
+```applicationId``` you can get at [base config](./configuration.properties).  
+Set variable, in Terminal type: ```export VARIABLE_NAME=path/to/file```  
+To set variable for GitLab CI add ```variables``` section to job:  
+```
+beta:
+  stage: beta
+  variables:
+    VARIABLE_NAME: 'path/to/file'
+```

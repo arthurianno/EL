@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="elta-test.nullgr.com"
+                    android:host="@string/app_deep_link_host"
                     android:scheme="https" />
             </intent-filter>
         </activity>

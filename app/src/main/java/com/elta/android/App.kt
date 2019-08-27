@@ -63,7 +63,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
             .builder()
             .context(this)
             .appModule(AppModule(BuildConfig.IS_LOG_ENABLED))
-            .apiConstantsModule(ApiConstantsModule(BuildConfig.DEBUG))
+            .apiConstantsModule(ApiConstantsModule(BuildConfig.SERVER_URL))
             .interceptorModule(InterceptorModule(App::class.java.simpleName, HttpLoggingInterceptor.Level.BODY))
             .analyticsModule(AnalyticsModule(this))
             .build()

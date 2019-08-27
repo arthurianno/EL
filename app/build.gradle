@@ -15,6 +15,14 @@ def KEY_PASSWORD = 'key.password'
 def GLOBAL_CONFIGURATION_PROPERTIES = "../configuration.properties"
 def GLOBAL_CONFIGURATION_APPLICATION_ID = "application.id"
 
+def DEFAULT_BUILD_CONFIG_FILE = '../configuration-build-test.properties'
+def CONFIG_ENVIRONMENT = 'environment'
+def CONFIG_SERVER_URL = 'server.url'
+def CONFIG_DEEP_LINK_HOST = 'deep.link.host'
+def CONFIG_APP_ID_SUFFIX = 'app.id.suffix'
+def CONFIG_APP_NAME_SUFFIX = 'app.name.suffix'
+def CONFIG_LOG_ENABLED = 'log.enabled'
+
 buildscript {
     repositories {
         jcenter()
@@ -28,13 +36,27 @@ android {
         globalConfigProperties.load(it)
     }
 
+    def appId = globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
+
+    def configFilePropertyName = "${appId}.config.file".toUpperCase().replace(".", "_")
+    def buildConfigProperties = new Properties()
+    def buildConfigFile = System.getenv(configFilePropertyName)
+    if (buildConfigFile == null) {
+        println("There is not environment variable ${configFilePropertyName}, default value will be used.")
+        buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+    }
+    println("Build config will be loaded from: ${buildConfigFile}.")
+    file(buildConfigFile).withInputStream {
+        buildConfigProperties.load(it)
+    }
+
     def androidConfigurationVersion = rootProject.ext.androidVersions
 
     compileSdkVersion androidConfigurationVersion.androidCompileSdkVersion
     buildToolsVersion androidConfigurationVersion.androidBuildToolsVersion
 
     defaultConfig {
-        applicationId globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
+        applicationId appId
         minSdkVersion androidConfigurationVersion.androidMinSdkVersion
         targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
 
@@ -84,13 +106,26 @@ android {
             ext.betaDistributionReleaseNotesFilePath =
                     file('../BUILD_NOTES.md').absolutePath
             ext.betaDistributionGroupAliases = "QA-Nullgr"
+
+            def appIdSuffix = buildConfigProperties[CONFIG_APP_ID_SUFFIX]
+            if (appIdSuffix != null) {
+                applicationIdSuffix ".${appIdSuffix}"
+            }
+
+            def appNameSuffix = buildConfigProperties[CONFIG_APP_NAME_SUFFIX]
+            if (appNameSuffix != null) {
+                versionNameSuffix "-${appNameSuffix}"
+            }
+
+            buildConfigField "String", "ENVIRONMENT", "\"${buildConfigProperties[CONFIG_ENVIRONMENT]}\""
+            buildConfigField "String", "SERVER_URL", "\"${buildConfigProperties[CONFIG_SERVER_URL]}\""
+            buildConfigField "boolean", "IS_LOG_ENABLED", buildConfigProperties[CONFIG_LOG_ENABLED]
+
+            resValue "string", "app_deep_link_host", buildConfigProperties[CONFIG_DEEP_LINK_HOST]
         }
 
         debug {
             signingConfig signingConfigs.debug
-            buildConfigField "boolean", "IS_LOG_ENABLED", "true"
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
         }
 
         release {
@@ -98,7 +133,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             proguardFiles fileTree('proguard').asList().toArray()
-            buildConfigField "boolean", "IS_LOG_ENABLED", "false"
         }
     }
 
