@@ -25,7 +25,7 @@ complexCheck:
   - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
   - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
   variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "./configuration-build-test.properties"
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-test.properties"
   
 # For tag v0.0.0-beta
 beta:
@@ -36,7 +36,7 @@ beta:
   script:
     - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
   variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "./configuration-build-test.properties"
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-test.properties"
 
 # For tag v0.0.0-uat
 uat:
@@ -50,7 +50,7 @@ uat:
     paths:
       - app/build/outputs/
   variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "./configuration-build-stage.properties"
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
 
 # For tag v0.0.0-rc
 rc:
