@@ -6,6 +6,7 @@ cache:
   - .gradle/
 
 before_script:
+- export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
 - chmod +x ./gradlew
 
