@@ -100,7 +100,7 @@ _PROJECT_ - path to project. For example: _nullgravity%2FTele2%2Ftele2-self-serv
 Build app in different environments
 -------------
 Project contains 2 predefined config file: [test](./configuration-build-test.properties) and [stage](./configuration-build-stage.properties).   
-If you need to build app in other environment you need to create your own config file and set environment variable.  
+If you need to build app in other environment you need to create your own config file and set path to build file.  
 
 List of supported configs:
 - ```environment``` - represents name of environment
@@ -112,14 +112,21 @@ List of supported configs:
 
 NOTE: currently ```app.id.suffix``` unused to keep integration with social networks in working state at iOS and Android.  
 
-How to set environment variable:  
-Name of variable builds in next way: ```"{applicationId}.config.file".toUpperCase().replace(".", "_")```  
-```applicationId``` you can get at [base config](./configuration.properties).  
-Set variable, in Terminal type: ```export VARIABLE_NAME=path/to/file```  
-To set variable for GitLab CI add ```variables``` section to job:  
+For local builds you can change config file at [local properties](./local.properties) by adding ```build.file``` property.  
+For CI builds you can change config file by setting environment variable and specify ```CI``` variable to determinate that build running at ci server.
+
+How to setup GitLab CI:
+- set ```CI``` variable:
+```
+before_script:
+- export CI=GitLab
+``` 
+- set variable for config file:
 ```
 beta:
   stage: beta
   variables:
     VARIABLE_NAME: 'path/to/file'
 ```
+Name of variable builds in next way: ```"{applicationId}.config.file".toUpperCase().replace(".", "_")```  
+```applicationId``` you can get at [base config](./configuration.properties).  

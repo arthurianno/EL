@@ -15,6 +15,9 @@ def KEY_PASSWORD = 'key.password'
 def GLOBAL_CONFIGURATION_PROPERTIES = "../configuration.properties"
 def GLOBAL_CONFIGURATION_APPLICATION_ID = "application.id"
 
+def CI = 'CI'
+def LOCAL_PROPERTIES = '../local.properties'
+def LOCAL_BUILD_FILE = 'build.file'
 def DEFAULT_BUILD_CONFIG_FILE = '../configuration-build-test.properties'
 def CONFIG_ENVIRONMENT = 'environment'
 def CONFIG_SERVER_URL = 'server.url'
@@ -38,14 +41,35 @@ android {
 
     def appId = globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
 
-    def configFilePropertyName = "${appId}.config.file".toUpperCase().replace(".", "_")
-    def buildConfigProperties = new Properties()
-    def buildConfigFile = System.getenv(configFilePropertyName)
-    if (buildConfigFile == null) {
-        println("There is not environment variable ${configFilePropertyName}, default value will be used.")
-        buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+    def buildConfigFile
+
+    def ci = System.getenv(CI)
+    if (ci != null) {
+        println("Build runned on ${ci} CI server.")
+        def configFilePropertyName = "${appId}.config.file".toUpperCase().replace(".", "_")
+        buildConfigFile = System.getenv(configFilePropertyName)
+
+        if (buildConfigFile == null) {
+            println("There is not environment variable ${configFilePropertyName}, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
+    } else {
+        println("Build runned on local machine.")
+        def localProperties = new Properties()
+        file(LOCAL_PROPERTIES).withInputStream {
+            localProperties.load(it)
+        }
+        buildConfigFile = localProperties[LOCAL_BUILD_FILE]
+
+        if (buildConfigFile == null) {
+            println("There is property ${LOCAL_BUILD_FILE} at ${LOCAL_PROPERTIES}, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
     }
+
     println("Build config will be loaded from: ${buildConfigFile}.")
+
+    def buildConfigProperties = new Properties()
     file(buildConfigFile).withInputStream {
         buildConfigProperties.load(it)
     }
