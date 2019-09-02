@@ -49,7 +49,7 @@ uat:
     - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
   artifacts:
     paths:
-      - app/build/outputs/
+      - app/build/outputs/apk/debug/app-universal-debug.apk
   variables:
     COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
 
