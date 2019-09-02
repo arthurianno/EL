@@ -6,12 +6,14 @@ cache:
   - .gradle/
 
 before_script:
+- export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
 - chmod +x ./gradlew
 
 stages:
 - check
 - beta
+- uat
 - rc
 
 complexCheck:
@@ -22,6 +24,9 @@ complexCheck:
   - merge_requests
   - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
   - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
+  - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
+  variables:
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-test.properties"
   
 # For tag v0.0.0-beta
 beta:
@@ -31,6 +36,22 @@ beta:
   when: on_success
   script:
     - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
+  variables:
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-test.properties"
+
+# For tag v0.0.0-uat
+uat:
+  stage: uat
+  only:
+    - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
+  when: on_success
+  script:
+    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
+  artifacts:
+    paths:
+      - app/build/outputs/
+  variables:
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
 
 # For tag v0.0.0-rc
 rc:

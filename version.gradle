@@ -160,9 +160,13 @@ String buildVersionSufix(def branch, def build, def localBuild) {
             sufix = "beta.${build}"
         } else if (branchName.contains('rc')) {
             sufix = "rc${localBuild}.${build}"
-        } else if (branchName.concat('hotfix')) {
+        } else if (branchName.contains('hotfix')) {
             sufix = "rc${localBuild}.${build}"
-        } else {
+        }
+        else if (branchName.contains('uat')) {
+            sufix = "uat${localBuild}.${build}"
+        }
+        else {
             sufix = "alpha.${build}"
         }
     } else {

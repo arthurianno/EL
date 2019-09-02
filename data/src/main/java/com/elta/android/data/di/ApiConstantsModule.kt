@@ -6,17 +6,9 @@ import dagger.Provides
 
 @Module
 @Suppress("FunctionOnlyReturningConstant")
-class ApiConstantsModule(private val isDebugMode: Boolean) {
+class ApiConstantsModule(private val serverUrl: String) {
 
     @Provides
     @ServerUrl
-    fun provideServerUrl() = when (isDebugMode) {
-        true -> SERVER_URL_TEST
-        else -> SERVER_URL_PROD
-    }
-
-    private companion object {
-        const val SERVER_URL_PROD = "https://elta-test.nullgr.com"
-        const val SERVER_URL_TEST = "https://elta-test.nullgr.com"
-    }
+    fun provideServerUrl() = serverUrl
 }
