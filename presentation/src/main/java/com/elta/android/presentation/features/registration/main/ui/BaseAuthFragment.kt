@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
@@ -44,10 +43,6 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
         pm.emailInput.error.observable
             .distinctUntilChanged()
             .bindTo(emailInputView.error())
-        pm.emailInput.error.observable
-            .map(String::isNotEmpty)
-            .distinctUntilChanged()
-            .bindTo(emailErrorIconView.fadeVisibility())
 
         pm.passwordInput.bindTo(passwordInputView)
         pm.passwordInput.error.observable
