@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_feedback.*
@@ -34,11 +33,6 @@ class FeedbackFragment : BaseFragment<FeedbackPm>() {
         pm.emailInput.error.observable
             .distinctUntilChanged()
             .bindTo(emailInputView.error())
-        pm.emailInput.error.observable
-            .map(String::isNotEmpty)
-            .distinctUntilChanged()
-            .bindTo(emailErrorIconView.fadeVisibility())
-
         pm.nameInput bindTo nameInputView
         pm.messageInput bindTo messageInputView
         pm.sendFeedbackEnabledState bindTo { sendFeedbackButtonView.isEnabled = it }

@@ -56,27 +56,13 @@
                     android:layout_marginBottom="24dp"
                     tools:text="@string/registration_main_subtitle" />
 
-                <FrameLayout
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/emailInputView"
+                    style="@style/InputStyle.Email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
-
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:id="@+id/emailInputView"
-                        style="@style/InputStyle.Email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/registration_main_email_hint" />
-
-                    <android.support.v7.widget.AppCompatImageView
-                        android:id="@+id/emailErrorIconView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top|end"
-                        android:layout_marginTop="4dp"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_warning" />
-                </FrameLayout>
+                    android:layout_marginBottom="8dp"
+                    android:hint="@string/registration_main_email_hint" />
 
                 <FrameLayout
                     android:layout_width="match_parent"

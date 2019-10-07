@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.fadeVisibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_password_recovery.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -30,10 +29,6 @@ class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
         pm.emailInput.error.observable
             .distinctUntilChanged()
             .bindTo(emailInputView.error())
-        pm.emailInput.error.observable
-            .map(String::isNotEmpty)
-            .distinctUntilChanged()
-            .bindTo(emailErrorIconView.fadeVisibility())
         pm.continueEnabledState.bindTo { sendLinkButtonView.isEnabled = it }
         sendLinkButtonView.clicks().bindTo(pm.continueAction)
         bindProgressDialog(pm)

@@ -72,7 +72,7 @@
     <string name="registration_activate_title">Активируйте ваш профиль</string>
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
     <string name="registration_send_again">Отправить письмо повторно</string>
-    <string name="registration_error_input_email">Некорректный email</string>
+    <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="registration_email_confirmation_title">Аккаунт верифицирован</string>

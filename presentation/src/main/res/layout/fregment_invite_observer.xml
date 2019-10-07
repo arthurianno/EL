@@ -52,18 +52,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/emailErrorIconView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="20dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/emailInputView"
-                app:layout_constraintTop_toTopOf="@+id/emailInputView"
-                app:srcCompat="@drawable/ic_warning"
-                tools:visibility="visible" />
-
             <com.elta.android.presentation.widgets.SimpleErrorView
                 android:id="@+id/errorStateView"
                 android:layout_width="match_parent"

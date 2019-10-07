@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.elta.android.presentation.utils.error
-import com.elta.android.presentation.utils.fadeVisibility
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fregment_invite_observer.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -32,11 +31,6 @@ class InviteObserverFragment : BaseFragment<InviteObserverPm>() {
         pm.emailInput.error.observable
             .distinctUntilChanged()
             .bindTo(emailInputView.error())
-        pm.emailInput.error.observable
-            .map(String::isNotEmpty)
-            .distinctUntilChanged()
-            .bindTo(emailErrorIconView.fadeVisibility())
-
         pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)
     }
