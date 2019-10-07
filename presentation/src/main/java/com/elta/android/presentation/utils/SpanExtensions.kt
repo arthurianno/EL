@@ -1,7 +1,9 @@
 package com.elta.android.presentation.utils
 
 import android.text.Html
+import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
@@ -26,7 +28,10 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
             }
         }
 
-        text = spannable.withSpan {
+        val ss = SpannableString(text)
+        TextUtils.copySpansFrom(spannable, 0, ss.length, null, ss, 0)
+
+        text = ss.withSpan {
             setSpan(span, startIndex, startIndex + spanText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
