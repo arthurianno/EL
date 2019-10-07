@@ -24,7 +24,7 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
 
         val span = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                it.onNext(Unit)
+                if (!it.isDisposed) it.onNext(Unit)
             }
         }
 
