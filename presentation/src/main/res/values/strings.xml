@@ -22,8 +22,9 @@
     <string name="registration_main_subtitle">Пожалуйста, введите email и пароль для вашего будущего аккаунта</string>
     <string name="registration_main_email_hint">Ваш email</string>
     <string name="registration_main_password_hint">Пароль</string>
-    <string name="registration_main_description_privacy_policy">Я согласен с условиями Политики конфиденциальности</string>
-    <string name="registration_main_privacy_policy_clickable_mask">Политики конфиденциальности</string>
+    <string name="registration_main_description_privacy_policy">Я ознакомлен и согласен с условиями\nлицензионного договора и политики\nобработки персональных данных, а также\nдаю согласие на обработку персональных\nданных</string>
+    <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики\nобработки персональных данных</string>
+    <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных\nданных</string>
     <string name="registration_main_button_continue">Продолжить</string>
     <!--TODO for tests. Should be replaced with real text -->
     <string name="registration_privacy_policy_text">

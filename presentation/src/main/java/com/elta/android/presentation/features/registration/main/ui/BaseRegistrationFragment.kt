@@ -20,21 +20,28 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override val authTitleText: Int = R.string.registration_main_title_new_user
     override val authSubtitleText: Int = R.string.registration_main_subtitle
 
-    protected lateinit var spanClicks: Observable<Unit>
+    protected lateinit var privacyPolicyClicks: Observable<Unit>
+    protected lateinit var personalDataClicks: Observable<Unit>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         privacyPolicyView.show()
         authTitleIconView.hide()
-        spanClicks = policyDescriptionTextView
+        privacyPolicyClicks = policyDescriptionTextView
             .clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
+        personalDataClicks = policyDescriptionTextView
+            .clickableSpan(getString(R.string.registration_main_personal_data_clickable_mask))
     }
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        spanClicks.bindTo(pm.privacyPolicyClickAction)
+        privacyPolicyClicks.bindTo(pm.privacyPolicyClickAction)
+        personalDataClicks.bindTo(pm.personalDataClickAction)
         pm.openPrivacyPolicyCommand.bindTo {
             childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
+        }
+        pm.openPersonalDataCommand.bindTo {
+
         }
 
         policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
