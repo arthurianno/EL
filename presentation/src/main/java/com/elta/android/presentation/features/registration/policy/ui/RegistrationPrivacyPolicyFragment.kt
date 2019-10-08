@@ -1,11 +1,16 @@
 package com.elta.android.presentation.features.registration.policy.ui
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_registration_privacy_policy.*
 import kotlinx.android.synthetic.main.layout_bottom_sheet_toolbar.*
 
@@ -28,6 +33,16 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
             toolbarView.z = when (privacyContentScrollView.scrollY) {
                 0 -> ZERO_Z_INDEX
                 else -> DEFAULT_Z_INDEX
+            }
+        }
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                progressView.show()
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                progressView.hide()
             }
         }
 

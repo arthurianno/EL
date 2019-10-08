@@ -5,7 +5,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="2000dp"/>
+        android:layout_height="2000dp" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/privacyContentScrollView"
@@ -20,6 +20,15 @@
             android:layout_height="wrap_content" />
 
     </android.support.v4.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/progressView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar style="@style/AppProgressBar.Accent" />
+
+    </FrameLayout>
 
     <include layout="@layout/layout_bottom_sheet_toolbar" />
 
