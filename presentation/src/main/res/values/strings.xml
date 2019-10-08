@@ -22,52 +22,12 @@
     <string name="registration_main_subtitle">Пожалуйста, введите email и пароль для вашего будущего аккаунта</string>
     <string name="registration_main_email_hint">Ваш email</string>
     <string name="registration_main_password_hint">Пароль</string>
-    <string name="registration_main_description_privacy_policy">Я согласен с условиями Политики конфиденциальности</string>
-    <string name="registration_main_privacy_policy_clickable_mask">Политики конфиденциальности</string>
+    <string name="registration_main_description_privacy_policy">Я ознакомлен и согласен с условиями\nлицензионного договора и политики\nобработки персональных данных, а также\nдаю согласие на обработку персональных\nданных</string>
+    <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики\nобработки персональных данных</string>
+    <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных\nданных</string>
     <string name="registration_main_button_continue">Продолжить</string>
-    <!--TODO for tests. Should be replaced with real text -->
-    <string name="registration_privacy_policy_text">
-        <![CDATA[
-         <b>Lorem ipsum dolor sit amet</b>
-         <br/>
-         <br/>
-         For a better experience while using our Service, we may require you to provide us with certain personally identifiable information, including but not limited to your name, phone number, and postal address. The information that we collect will be used to contact or identify you.
-         <br/>
-         <br/>
-         <b>Log Data</b>
-         <br/>
-         <br/>
-         We want to inform you that whenever you visit our Service, we collect information that your browser sends to us that is called Log Data. This Log Data may include information such as your computer\'s Internet Protocol (“IP”) address, browser version, pages of our Service that you visit, the time and date of your visit, the time spent on those pages, and other statistics.
-         <br/>
-         <br/>
-         <b>Cookies</b>
-         <br/>
-         <br/>
-         Cookies are files with small amount of data that is commonly used an anonymous unique identifier. These are sent to your browser from the website that you visit and are stored on your computer\'s hard drive.
-         <br/>
-         Our website uses these “cookies” to collection information and to improve our Service. You have the option to either accept or refuse these cookies, and know when a cookie is being sent to your computer. If you choose to refuse our cookies, you may not be able to use some portions of our Service.
-         <br/>
-         <br/>
-         <b>Lorem ipsum dolor sit amet</b>
-         <br/>
-         <br/>
-         For a better experience while using our Service, we may require you to provide us with certain personally identifiable information, including but not limited to your name, phone number, and postal address. The information that we collect will be used to contact or identify you.
-         <br/>
-         <br/>
-         <b>Log Data</b>
-         <br/>
-         <br/>
-         We want to inform you that whenever you visit our Service, we collect information that your browser sends to us that is called Log Data. This Log Data may include information such as your computer\'s Internet Protocol (“IP”) address, browser version, pages of our Service that you visit, the time and date of your visit, the time spent on those pages, and other statistics.
-         <br/>
-         <br/>
-         <b>Cookies</b>
-         <br/>
-         <br/>
-         Cookies are files with small amount of data that is commonly used an anonymous unique identifier. These are sent to your browser from the website that you visit and are stored on your computer\'s hard drive.
-         <br/>
-         Our website uses these “cookies” to collection information and to improve our Service. You have the option to either accept or refuse these cookies, and know when a cookie is being sent to your computer. If you choose to refuse our cookies, you may not be able to use some portions of our Service.
-        ]]>
-    </string>
+    <string name="registration_privacy_policy">https://stage.vdiabete.com/privacy_policy.html</string>
+    <string name="registration_personal_data">https://stage.vdiabete.com/personal_data.html</string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
     <string name="registration_activate_title">Активируйте ваш профиль</string>
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>

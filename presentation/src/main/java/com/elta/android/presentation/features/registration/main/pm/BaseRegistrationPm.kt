@@ -7,7 +7,9 @@ abstract class BaseRegistrationPm(services: ServiceFacade) : BaseAuthPm(services
 
     val privacyPolicyAcceptAction = Action<Boolean>()
     val privacyPolicyClickAction = Action<Unit>()
+    val personalDataClickAction = Action<Unit>()
     val openPrivacyPolicyCommand = Command<Unit>()
+    val openPersonalDataCommand = Command<Unit>()
 
     protected val privacyPolicyAcceptedState = State<Boolean>()
 
@@ -17,6 +19,10 @@ abstract class BaseRegistrationPm(services: ServiceFacade) : BaseAuthPm(services
         privacyPolicyClickAction.observable
             .trackEvent(AnalyticsEventType.TERMS_OF_USE)
             .subscribe(openPrivacyPolicyCommand.consumer)
+            .untilDestroy()
+
+        personalDataClickAction.observable
+            .subscribe(openPersonalDataCommand.consumer)
             .untilDestroy()
 
         privacyPolicyAcceptAction.observable

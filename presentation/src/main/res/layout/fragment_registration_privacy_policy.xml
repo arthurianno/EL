@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2000dp" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/privacyContentScrollView"
@@ -11,13 +14,22 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:background="@color/color_window_background">
 
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/privacyPolicyTextView"
-            style="@style/Body1"
+        <WebView
+            android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="14dp" />
+            android:layout_height="wrap_content" />
+
     </android.support.v4.widget.NestedScrollView>
 
+    <FrameLayout
+        android:id="@+id/progressView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar style="@style/AppProgressBar.Accent" />
+
+    </FrameLayout>
+
     <include layout="@layout/layout_bottom_sheet_toolbar" />
+
 </FrameLayout>

@@ -10,7 +10,6 @@ import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
-import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 
 abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragment<PM>() {
@@ -20,21 +19,28 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override val authTitleText: Int = R.string.registration_main_title_new_user
     override val authSubtitleText: Int = R.string.registration_main_subtitle
 
-    protected lateinit var spanClicks: Observable<Unit>
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         privacyPolicyView.show()
         authTitleIconView.hide()
-        spanClicks = policyDescriptionTextView
-            .clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
     }
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        spanClicks.bindTo(pm.privacyPolicyClickAction)
+        policyDescriptionTextView.text = getString(R.string.registration_main_description_privacy_policy)
+        policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
+            .bindTo(pm.privacyPolicyClickAction)
+        policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_personal_data_clickable_mask))
+            .bindTo(pm.personalDataClickAction)
         pm.openPrivacyPolicyCommand.bindTo {
-            childFragmentManager.showDialog(RegistrationPrivacyPolicyFragment.newInstance())
+            childFragmentManager.showDialog(
+                RegistrationPrivacyPolicyFragment.newInstance(getString(R.string.registration_privacy_policy))
+            )
+        }
+        pm.openPersonalDataCommand.bindTo {
+            childFragmentManager.showDialog(
+                RegistrationPrivacyPolicyFragment.newInstance(getString(R.string.registration_personal_data))
+            )
         }
 
         policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
