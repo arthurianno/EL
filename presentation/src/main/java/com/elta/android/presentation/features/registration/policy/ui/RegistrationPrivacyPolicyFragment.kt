@@ -28,7 +28,6 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarTitleView.text = getString(R.string.registration_privacy_policy_toolbar_title)
         privacyContentScrollView.viewTreeObserver.addOnScrollChangedListener {
             toolbarView.z = when (privacyContentScrollView.scrollY) {
                 0 -> ZERO_Z_INDEX
