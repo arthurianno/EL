@@ -414,6 +414,6 @@ class HomeFlowPm @Inject constructor(
         private const val OPEN_EVENT_SCREEN_DELAY = 400L
         private const val META_SYNC = "meta_sync"
         private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY = 2800L
-        private const val SNACK_BAR_DURATION = 5000
+        private const val SNACK_BAR_DURATION = 2000
     }
 }
