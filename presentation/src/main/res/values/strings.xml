@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ELTA</string>
+    <string name="app_name">Сателлит Online</string>
     <string name="input_font_name">roboto_regular.ttf</string>
     <string name="title_connection_lost">Нет подключения</string>
     <string name="title_connection_found">Соединение восстановлено</string>
