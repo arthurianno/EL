@@ -6,10 +6,10 @@ allprojects {
 }
 
 ext.androidVersions = [
-        androidBuildToolsVersion: '28.0.3',
-        androidMinSdkVersion    : 22,
-        androidTargetSdkVersion : 28,
-        androidCompileSdkVersion: 28
+        androidBuildToolsVersion: '29.0.3',
+        androidMinSdkVersion    : 24,
+        androidTargetSdkVersion : 29,
+        androidCompileSdkVersion: 30
 ]
 
 def libraryVersions = [
