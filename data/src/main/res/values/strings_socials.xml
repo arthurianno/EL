@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="facebook_app_id">388218928620956</string>
-    <string name="fb_login_protocol_scheme">fb388218928620956</string>
-    <string name="OK_APP_ID">1278497536</string>
-    <string name="OK_APP_KEY">CBAEFFDNEBABABABA</string>
-    <string name="OK_REDIRECT_URL">okauth://ok1278497536</string>
-    <integer name="com_vk_sdk_AppId">6819846</integer>
+    <string name="facebook_app_id">813551812571141</string>
+    <string name="fb_login_protocol_scheme">fb813551812571141</string>
+    <string name="OK_APP_ID">512000768827</string>
+    <string name="OK_APP_KEY">CMDMLQJGDIHBABABA</string>
+    <string name="OK_REDIRECT_URL">okauth://ok512000768827</string>
+    <integer name="com_vk_sdk_AppId">7780370</integer>
 </resources>

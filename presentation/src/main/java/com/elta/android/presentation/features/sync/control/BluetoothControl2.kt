@@ -68,7 +68,7 @@ fun BluetoothControl2.bindTo(compositeUnbind: CompositeDisposable, permissions: 
     locationPermissionsRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.request(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            permissions.request(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
         .subscribe(locationPermissionsRequestResultRelay)
         .addTo(compositeUnbind)

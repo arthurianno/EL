@@ -50,7 +50,7 @@ fun BluetoothControl.bindTo(compositeUnbind: CompositeDisposable, permissions: R
     requestLocationPermissionsCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.request(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            permissions.request(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 .filter { it }
                 .map { Unit }
         }

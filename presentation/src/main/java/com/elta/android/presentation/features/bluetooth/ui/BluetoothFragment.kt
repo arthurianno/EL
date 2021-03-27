@@ -81,7 +81,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         pm.requestLocationPermissionsCommand.observable
             .log("Command", "request permissions")
             .switchMap {
-                rxPermissions.request(Manifest.permission.ACCESS_COARSE_LOCATION)
+                rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
                     .filter { it }
                     .map { Unit }
             }
