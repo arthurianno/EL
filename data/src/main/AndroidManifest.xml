@@ -28,7 +28,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="ok1278497536"
+                    android:host="ok512000768827"
                     android:scheme="okauth" />
             </intent-filter>
         </activity>

@@ -5,5 +5,5 @@
     <string name="OK_APP_ID">512000768827</string>
     <string name="OK_APP_KEY">CMDMLQJGDIHBABABA</string>
     <string name="OK_REDIRECT_URL">okauth://ok512000768827</string>
-    <integer name="com_vk_sdk_AppId">7780370</integer>
+    <integer name="com_vk_sdk_AppId">7811203</integer>
 </resources>
