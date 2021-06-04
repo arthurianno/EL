@@ -56,16 +56,21 @@ dependencies {
 
     ktlint commonDependencies.ktlint
 
+    implementation project(':core-rx')
+    implementation project(':core-security')
+    implementation project(':core-hardware')
+    implementation project(':core-intents')
+    implementation project(':core-preferences')
     implementation project(':common')
     api project(':domain')
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
 
-    implementation commonDependencies.appCoreRx
-    implementation commonDependencies.appCoreSecurity
-    implementation commonDependencies.appCoreHardware
-    implementation commonDependencies.appCoreIntents
+//    implementation commonDependencies.appCoreRx
+//    implementation commonDependencies.appCoreSecurity
+//    implementation commonDependencies.appCoreHardware
+//    implementation commonDependencies.appCoreIntents
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxNetwork

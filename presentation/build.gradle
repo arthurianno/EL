@@ -68,12 +68,25 @@ dependencies {
 
     ktlint commonDependencies.ktlint
 
+    implementation project(':core-all')
+    implementation project(':core-resources')
+    implementation project(':core-rx')
+    implementation project(':core-ui')
+    implementation project(':core-adapter')
+    implementation project(':core-adapter-ktx')
+    implementation project(':core-hardware')
+    implementation project(':core-rx-location')
+    implementation project(':core-collections')
+    implementation project(':core-intents')
+    implementation project(':core-interactor')
+    implementation project(':core-font')
+    implementation project(':core-date')
     implementation project(':common')
     api project(':domain')
 
     implementation commonDependencies.libs
-    implementation commonDependencies.appCore
-    implementation commonDependencies.appCoreAdapterKtx
+//    implementation commonDependencies.appCore
+//    implementation commonDependencies.appCoreAdapterKtx
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
@@ -96,6 +109,7 @@ dependencies {
     implementation commonDependencies.rxBinding
     implementation commonDependencies.rxNetwork
     implementation commonDependencies.rxPermissions
+    implementation commonDependencies.rxLocation
 
     implementation commonDependencies.javaxAnnotation
     implementation commonDependencies.javaxInject

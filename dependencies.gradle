@@ -99,6 +99,8 @@ def libraryVersions = [
         vkVersion                  : '1.6.9',
         okVersion                  : '2.1.6',
 
+        jodaTimeVersion            : '2.9.9.2',
+
         objectboxVersion           : ext.objectboxVersion
 ]
 
@@ -143,14 +145,16 @@ ext.commonDependencies = [
         okHttp                : "com.squareup.okhttp3:okhttp:${libraryVersions.okHttpVersion}",
         okHttpLogger          : "com.squareup.okhttp3:logging-interceptor:${libraryVersions.okHttpVersion}",
 
-        appCore               : "com.nullgr.core:core-all:${libraryVersions.appCoreVersion}",
-        appCoreInteractor     : "com.nullgr.core:core-interactor:${libraryVersions.appCoreVersion}",
-        appCoreRx             : "com.nullgr.core:core-rx:${libraryVersions.appCoreVersion}",
-        appCoreIntents        : "com.nullgr.core:core-intents:${libraryVersions.appCoreVersion}",
-        appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
-        appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
-        appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
-        kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libraryVersions.kotlin_version}",
+//        appCore               : "com.nullgr.core:core-all:${libraryVersions.appCoreVersion}",
+//        appCoreInteractor     : "com.nullgr.core:core-interactor:${libraryVersions.appCoreVersion}",
+//        appCoreRx             : "com.nullgr.core:core-rx:${libraryVersions.appCoreVersion}",
+//        appCoreIntents        : "com.nullgr.core:core-intents:${libraryVersions.appCoreVersion}",
+//        appCoreAdapterKtx     : "com.nullgr.core:core-adapter-ktx:${libraryVersions.appCoreVersion}",
+//        appCoreSecurity       : "com.nullgr.core:core-security:${libraryVersions.appCoreVersion}",
+//        appCoreHardware       : "com.nullgr.core:core-hardware:${libraryVersions.appCoreVersion}",
+
+        jodaTime             : "net.danlew:android.joda:${libraryVersions.jodaTimeVersion}",
+        kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
         gson                  : "com.google.code.gson:gson:${libraryVersions.gsonVersion}",
         glide                 : "com.github.bumptech.glide:glide:${libraryVersions.glideVersion}",
         glideProcessor        : "com.github.bumptech.glide:compiler:${libraryVersions.glideVersion}",
@@ -201,7 +205,7 @@ ext.commonDependencies = [
 
 ext.commonTestDependencies = [
         junit          : "junit:junit:${libraryVersions.jUnitVersion}",
-        kotlinJUnit    : "org.jetbrains.kotlin:kotlin-test-junit:${libraryVersions.kotlin_version}",
+        kotlinJUnit    : "org.jetbrains.kotlin:kotlin-test-junit:${kotlin_version}",
         assertj        : "org.assertj:assertj-core:${libraryVersions.assertJVersion}",
         mockito        : "com.nhaarman.mockitokotlin2:mockito-kotlin:${libraryVersions.mockitoKotlinVersion}",
         robolectric    : "org.robolectric:robolectric:${libraryVersions.robolectricVersion}",
@@ -214,6 +218,7 @@ ext.commonTestDependencies = [
         androidRunner  : "com.android.support.test:runner:${libraryVersions.runnerVersion}",
         androidRules   : "com.android.support.test:rules:${libraryVersions.runnerVersion}",
         workMagerTest  : "android.arch.work:work-testing:${libraryVersions.workVersion}",
-        jsr310         : "org.threeten:threetenbp:${libraryVersions.java310Version}"
+        jsr310         : "org.threeten:threetenbp:${libraryVersions.java310Version}",
+        supportRecyclerView  : "com.android.support:recyclerview-v7:${libraryVersions.supportLibraryVersion}",
 ]
 
