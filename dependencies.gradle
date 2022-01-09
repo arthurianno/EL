@@ -46,7 +46,7 @@ def libraryVersions = [
 
         //DI
         daggerVersion              : '2.22.1',
-        javaxAnnotationVersion     : '1.0',
+        javaxAnnotationVersion     : '1.3.2',
         javaxInjectVersion         : '1',
         glassfishAnnotationVersion : '10.0-b28',
 
@@ -134,7 +134,7 @@ ext.commonDependencies = [
         daggerAndroidProcessor: "com.google.dagger:dagger-android-processor:${libraryVersions.daggerVersion}",
         daggerAndroidSupport  : "com.google.dagger:dagger-android-support:${libraryVersions.daggerVersion}",
 
-        javaxAnnotation       : "javax.annotation:jsr250-api:${libraryVersions.javaxAnnotationVersion}",
+        javaxAnnotation       : "javax.annotation:javax.annotation-api:${libraryVersions.javaxAnnotationVersion}",
         javaxInject           : "javax.inject:javax.inject:${libraryVersions.javaxInjectVersion}",
         glassfish             : "org.glassfish:javax.annotation:${libraryVersions.glassfishAnnotationVersion}",
 
