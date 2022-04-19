@@ -48,6 +48,10 @@ android {
 
 kapt {
     correctErrorTypes = true
+        javacOptions {
+            option("-source", "8")
+            option("-target", "8")
+        }
 }
 
 configurations {
