@@ -54,7 +54,9 @@ dependencies {
 
     ktlint commonDependencies.ktlint
 
-    implementation commonDependencies.appCoreInteractor
+    implementation project(':core-interactor')
+
+//    implementation commonDependencies.appCoreInteractor
 
     implementation commonDependencies.rxKotlin
 

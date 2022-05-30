@@ -26,8 +26,8 @@
     <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики\nобработки персональных данных</string>
     <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных\nданных</string>
     <string name="registration_main_button_continue">Продолжить</string>
-    <string name="registration_privacy_policy">https://stage.vdiabete.com/privacy_policy.html</string>
-    <string name="registration_personal_data">https://stage.vdiabete.com/personal_data.html</string>
+    <string name="registration_privacy_policy">https://stage2.vdiabete.com/privacy_policy.html</string>
+    <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
     <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
     <string name="registration_activate_title">Активируйте ваш профиль</string>
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>

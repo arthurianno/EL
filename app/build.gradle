@@ -196,6 +196,10 @@ android {
 
 kapt {
     correctErrorTypes = true
+    javacOptions {
+        option("-source", "8")
+        option("-target", "8")
+    }
 }
 
 configurations {
@@ -232,13 +236,21 @@ dependencies {
 
     ktlint commonDependencies.ktlint
 
+    implementation project(':core-all')
+    implementation project(':core-security')
+    implementation project(':core-rx')
+    implementation project(':core-resources')
+    implementation project(':core-adapter')
+    implementation project(':core-hardware')
+    implementation project(':core-preferences')
+    implementation project(':core-interactor')
     implementation project(':common')
     api project(':presentation')
     api project(':data')
 
     implementation commonDependencies.libs
-    implementation commonDependencies.appCore
-    implementation commonDependencies.appCoreSecurity
+//    implementation commonDependencies.appCore
+//    implementation commonDependencies.appCoreSecurity
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
