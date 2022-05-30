@@ -20,7 +20,7 @@ complexCheck:
   stage: check
   script:
   # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
-  - ./gradlew ktlint testDebugUnitTest -x lint
+  - ./gradlew testDebugUnitTest -x lint
   only:
   - merge_requests
   - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
