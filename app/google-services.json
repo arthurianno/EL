@@ -1,70 +1,36 @@
 {
   "project_info": {
-    "project_number": "374002783004",
-    "firebase_url": "https://elta-59442.firebaseio.com",
-    "project_id": "elta-59442",
-    "storage_bucket": "elta-59442.appspot.com"
+    "project_number": "102343746205",
+    "project_id": "elta-31f0d",
+    "storage_bucket": "elta-31f0d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:374002783004:android:ff71dbdcd416b562",
+        "mobilesdk_app_id": "1:102343746205:android:479ccf08a56b23da87ea74",
         "android_client_info": {
           "package_name": "com.elta.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "374002783004-l1621gu7cgd2e897r63tmvdd9gluv7m7.apps.googleusercontent.com",
+          "client_id": "102343746205-ngq58jmm8vjfunqtv9956ej081md0561.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAqf0rhen149543fbLjvvV6l4H9ms293K8"
+          "current_key": "AIzaSyBLQ06p-ERE9P4FjGynFN_YzOvOmpCU7c0"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:374002783004:android:45bf58727b63ef48",
-        "android_client_info": {
-          "package_name": "com.elta.android.debug"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "374002783004-l1621gu7cgd2e897r63tmvdd9gluv7m7.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAqf0rhen149543fbLjvvV6l4H9ms293K8"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "102343746205-ngq58jmm8vjfunqtv9956ej081md0561.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
