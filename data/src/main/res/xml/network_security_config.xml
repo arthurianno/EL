@@ -2,8 +2,10 @@
 <network-security-config>
     <domain-config>
         <domain includeSubdomains="true">stage2.vdiabete.com</domain>
+    </domain-config>
+    <debug-overrides>
         <trust-anchors>
             <certificates src="@raw/vdiabete_com"/>
         </trust-anchors>
-    </domain-config>
+    </debug-overrides>
 </network-security-config>
