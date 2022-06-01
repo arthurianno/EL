@@ -23,14 +23,14 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
-import me.dmdev.rxpm.base.PmSupportActivity
+import me.dmdev.rxpm.base.PmActivity
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
 @SuppressLint("MissingSuperCall")
-abstract class BaseActivity<T : BasePm> : PmSupportActivity<T>(),
+abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
     HasSupportFragmentInjector,
     BackHandler,
     RouterProvider {

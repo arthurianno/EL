@@ -18,15 +18,18 @@ class RxResolveResultActivity : AppCompatActivity() {
 
         fun newInstance(context: Context, argument: Parcelable): Intent {
             return Intent(context, RxResolveResultActivity::class.java)
-                    .apply {
-                        putExtra(EXTRA_KEY, argument)
-                        addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                    }
+                .apply {
+                    putExtra(EXTRA_KEY, argument)
+                    addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                }
         }
     }
 
     private val delegate: BaseResolveResultActivityDelegate by lazy {
-        BaseResolveResultActivityDelegate.newInstance(intent.extras[EXTRA_KEY], this)
+        BaseResolveResultActivityDelegate.newInstance(
+            intent.extras?.get(EXTRA_KEY) ?: Bundle(),
+            this
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

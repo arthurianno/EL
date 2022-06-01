@@ -1,12 +1,13 @@
 package com.elta.android.presentation.core.pm
 
 import android.support.annotation.CallSuper
+import me.dmdev.rxpm.action
 
 abstract class BaseFlowPm(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val launchScreenAction = Action<Unit>()
+    val launchScreenAction = action<Unit>()
 
     @CallSuper
     override fun onCreate() {

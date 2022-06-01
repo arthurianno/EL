@@ -113,6 +113,8 @@ dependencies {
     implementation commonDependencies.rxBluetooth
     implementation commonDependencies.rxReplaying
 
+    implementation 'org.greenrobot:essentials:3.1.0'
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }

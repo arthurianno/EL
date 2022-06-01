@@ -7,7 +7,7 @@ import com.elta.android.data.features.common.cache.Condition
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto_
 import io.objectbox.kotlin.query
-import io.objectbox.query.QueryBuilder
+import io.objectbox.query.QueryBuilder.StringOrder.CASE_INSENSITIVE
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,7 +55,7 @@ class DbSalePointsCache @Inject constructor(
     }
 
     private fun getAllByType(type: String) = box.query {
-        equal(SalePointCacheDto_.type, type)
+        equal(SalePointCacheDto_.type, type, CASE_INSENSITIVE)
     }.find()
 
     private fun getAllByQuery(query: String, type: String?): List<SalePointCacheDto> {
@@ -66,12 +66,19 @@ class DbSalePointsCache @Inject constructor(
             val tokens = query.toLowerCase().trim().replace(regex, SPACE).split(SPACE)
             val builder = box.query()
             tokens.forEachIndexed { index, token ->
-                builder.contains(SalePointCacheDto_.fullAddress, token, QueryBuilder.StringOrder.CASE_INSENSITIVE)
+                builder.contains(
+                    SalePointCacheDto_.fullAddress,
+                    token,
+                    CASE_INSENSITIVE
+                )
                 if (tokens.size > 1 && index != tokens.size - 1) {
                     builder.and()
                 }
             }
-            type?.let { builder.and().equal(SalePointCacheDto_.type, it) }
+            type?.let {
+                builder.and()
+                    .equal(SalePointCacheDto_.type, it, CASE_INSENSITIVE)
+            }
             builder.build().find()
         }
     }

@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
+apply plugin: "io.objectbox"
+apply plugin: 'com.google.gms.google-services'
+
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
 def CREDENTIALS_RELEASE = '../keystore/credentials-release.properties'
@@ -25,12 +27,6 @@ def CONFIG_DEEP_LINK_HOST = 'deep.link.host'
 def CONFIG_APP_ID_SUFFIX = 'app.id.suffix'
 def CONFIG_APP_NAME_SUFFIX = 'app.name.suffix'
 def CONFIG_LOG_ENABLED = 'log.enabled'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
 
 android {
 
@@ -319,5 +315,3 @@ dependencies {
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
-
-apply plugin: 'com.google.gms.google-services'
