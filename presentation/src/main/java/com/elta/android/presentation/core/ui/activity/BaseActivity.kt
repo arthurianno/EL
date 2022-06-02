@@ -3,8 +3,8 @@ package com.elta.android.presentation.core.ui.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.AppNavigator
 import com.elta.android.presentation.core.navigation.BackHandler
@@ -17,6 +17,9 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.utils.makeSnackBar
+import com.github.terrakok.cicerone.Navigator
+import com.github.terrakok.cicerone.NavigatorHolder
+import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import dagger.android.AndroidInjection
@@ -24,8 +27,6 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import me.dmdev.rxpm.base.PmActivity
-import ru.terrakok.cicerone.Navigator
-import ru.terrakok.cicerone.NavigatorHolder
 import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
@@ -51,7 +52,7 @@ abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
 
     protected abstract val classToken: Class<T>
 
-    protected open val navigator: Navigator = AppNavigator(this)
+    protected open val navigator: Navigator = AppNavigator(this,  R.id.containerView)
 
     protected val currentFragment: BaseFragment<*>?
         get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>

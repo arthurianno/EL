@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
@@ -27,11 +28,13 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
+import me.dmdev.rxpm.base.PmFragment
 import me.dmdev.rxpm.base.PmSupportFragment
+import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
+abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
 
     @Inject
     lateinit var factory: PmFactory
@@ -90,7 +93,7 @@ abstract class BaseFragment<T : BasePm> : PmSupportFragment<T>(), BackHandler {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.bindTo { activity?.onBackPressed() }
+        homeButtonView?.clicks()?.bindTo() { activity?.onBackPressed() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 

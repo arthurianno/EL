@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.navigation.commands
 
-import ru.terrakok.cicerone.android.support.SupportAppScreen
-import ru.terrakok.cicerone.commands.Command
+import com.github.terrakok.cicerone.Command
+import com.github.terrakok.cicerone.Screen
 
-class AttachTab(val screen: SupportAppScreen) : Command
+class AttachTab(val screen: Screen) : Command

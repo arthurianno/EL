@@ -1,16 +1,14 @@
 package com.elta.android.presentation.core.navigation
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.commands.AddTabs
 import com.elta.android.presentation.core.navigation.commands.AttachTab
 import com.nullgr.core.collections.isNotNullOrEmpty
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
-import ru.terrakok.cicerone.android.support.SupportAppScreen
-import ru.terrakok.cicerone.commands.Command
 
 open class ExtendedNavigator(
     activity: FragmentActivity?,

@@ -9,6 +9,8 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import kotlinx.android.synthetic.main.activity_app.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 
 class AppActivity : BaseActivity<AppPm>() {
 

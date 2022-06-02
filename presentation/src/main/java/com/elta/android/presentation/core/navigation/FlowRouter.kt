@@ -2,16 +2,16 @@ package com.elta.android.presentation.core.navigation
 
 import com.elta.android.presentation.core.navigation.commands.AddTabs
 import com.elta.android.presentation.core.navigation.commands.AttachTab
-import ru.terrakok.cicerone.Router
-import ru.terrakok.cicerone.android.support.SupportAppScreen
+import com.github.terrakok.cicerone.Router
+import com.github.terrakok.cicerone.Screen
 
 class FlowRouter(private val parentRouter: Router?) : UiThreadRouter() {
 
-    fun startFlow(screen: SupportAppScreen) {
+    fun startFlow(screen: Screen) {
         runCommand { navigateTo(screen) }
     }
 
-    fun newRootFlow(screen: SupportAppScreen) {
+    fun newRootFlow(screen: Screen) {
         runCommand { newRootScreen(screen) }
     }
 
@@ -19,11 +19,11 @@ class FlowRouter(private val parentRouter: Router?) : UiThreadRouter() {
         runCommand { exit() }
     }
 
-    fun newTabs(screens: Array<SupportAppScreen>) {
+    fun newTabs(screens: Array<Screen>) {
         executeCommands(AddTabs(screens))
     }
 
-    fun navigateToTab(screen: SupportAppScreen) {
+    fun navigateToTab(screen: Screen) {
         executeCommands(AttachTab(screen))
     }
 
@@ -31,6 +31,6 @@ class FlowRouter(private val parentRouter: Router?) : UiThreadRouter() {
         if (parentRouter != null)
             parentRouter.command()
         else
-            this.command()
+            command()
     }
 }

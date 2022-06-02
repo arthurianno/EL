@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.support.multidex.MultiDex
+import androidx.multidex.MultiDex
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.elta.android.data.di.ApiConstantsModule
@@ -56,7 +56,8 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     override fun activityInjector(): AndroidInjector<Activity> = dispatchingActivityInjector
 
-    override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> = dispatchingReceiverInjector
+    override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> =
+        dispatchingReceiverInjector
 
     private fun initializeInjector() {
         DaggerAppComponent
@@ -64,7 +65,12 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
             .context(this)
             .appModule(AppModule(BuildConfig.IS_LOG_ENABLED))
             .apiConstantsModule(ApiConstantsModule(BuildConfig.SERVER_URL))
-            .interceptorModule(InterceptorModule(App::class.java.simpleName, HttpLoggingInterceptor.Level.BODY))
+            .interceptorModule(
+                InterceptorModule(
+                    App::class.java.simpleName,
+                    HttpLoggingInterceptor.Level.BODY
+                )
+            )
             .analyticsModule(AnalyticsModule(this))
             .build()
             .inject(this)
