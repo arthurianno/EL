@@ -1,8 +1,8 @@
 package com.nullgr.core.ui.widgets
 
 import android.content.Context
-import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatButton
 import com.nullgr.core.ui.widgets.extensions.initTypeface
 
 /**
@@ -24,7 +24,11 @@ class Button : AppCompatButton {
         }
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         if (!isInEditMode) {
             initTypeface(this, context, attrs)
         }

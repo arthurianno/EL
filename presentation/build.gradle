@@ -88,6 +88,8 @@ dependencies {
     implementation project(':common')
     api project(':domain')
 
+    implementation commonDependencies.coroutines
+
     implementation commonDependencies.libs
 //    implementation commonDependencies.appCore
 //    implementation commonDependencies.appCoreAdapterKtx

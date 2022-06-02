@@ -23,14 +23,14 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/deviceNameView"
                 style="@style/New.Body2.BlackBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/deviceAddressView"
                 style="@style/New.Caption1.ShadeBlack2"
                 android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
 
         </LinearLayout>
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/deviceChooserView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

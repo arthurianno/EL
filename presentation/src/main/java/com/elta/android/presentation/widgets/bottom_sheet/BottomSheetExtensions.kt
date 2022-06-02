@@ -1,7 +1,7 @@
 package com.elta.android.presentation.widgets.bottom_sheet
 
-import android.support.design.widget.BottomSheetBehavior
 import android.view.View
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 inline fun <T : View> BottomSheetBehavior<T>.expand() {
     this.state = BottomSheetBehavior.STATE_EXPANDED

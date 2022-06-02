@@ -1,9 +1,9 @@
 package com.elta.android.presentation.utils
 
 import android.os.Looper
-import android.support.annotation.CheckResult
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.CheckResult
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
@@ -27,7 +27,8 @@ private class RecyclerViewScrollStateChangeObservable(
             return
         }
         val listener = Listener(
-            view, observer)
+            view, observer
+        )
         observer.onSubscribe(listener)
         view.addOnScrollListener(listener.scrollListener)
     }
@@ -54,8 +55,11 @@ private class RecyclerViewScrollStateChangeObservable(
 fun checkMainThread(observer: Observer<*>): Boolean {
     if (Looper.myLooper() != Looper.getMainLooper()) {
         observer.onSubscribe(Disposables.empty())
-        observer.onError(IllegalStateException(
-            "Expected to be called on the main thread but was " + Thread.currentThread().name))
+        observer.onError(
+            IllegalStateException(
+                "Expected to be called on the main thread but was " + Thread.currentThread().name
+            )
+        )
         return false
     }
     return true

@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.ui.adapter
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import com.nullgr.core.adapter.items.ListItem
 
 class Callback(

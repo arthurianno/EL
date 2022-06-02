@@ -6,11 +6,10 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.support.annotation.NonNull
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.firstVisiblePosition
 import com.elta.android.presentation.widgets.indicators.listeners.SimpleAdapterDataObserver
@@ -62,7 +61,8 @@ class IndicatorsView : View {
         val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
-        var desiredWidth = indicatorWidth * numOfIndicators + paddingBetweenIndicators * (numOfIndicators - 1)
+        var desiredWidth =
+            indicatorWidth * numOfIndicators + paddingBetweenIndicators * (numOfIndicators - 1)
         var desiredHeight = indicatorHeight
 
         desiredWidth += paddingLeft + paddingRight
@@ -164,9 +164,9 @@ class IndicatorsView : View {
 
         onScrollListener = object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(@NonNull recyclerView: RecyclerView, dx: Int, dy: Int) {}
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
 
-            override fun onScrollStateChanged(@NonNull recyclerView: RecyclerView, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     val position = recyclerView.firstVisiblePosition()
                     if (position in 0 until numOfIndicators) {
@@ -222,13 +222,20 @@ class IndicatorsView : View {
 
             // Get number of indicators
             numOfIndicators = a.getInteger(
-                R.styleable.IndicatorsView_numberOfIndicators, numOfIndicators)
+                R.styleable.IndicatorsView_numberOfIndicators, numOfIndicators
+            )
 
             // Get selected indicator
-            selectedIndicator = a.getInteger(R.styleable.IndicatorsView_selectedIndicator, selectedIndicator)
+            selectedIndicator =
+                a.getInteger(R.styleable.IndicatorsView_selectedIndicator, selectedIndicator)
 
             // Indicator mode
-            mode = Mode.values()[a.getInteger(R.styleable.IndicatorsView_indicatorMode, DEFAULT_MODE_INDEX)]
+            mode = Mode.values()[
+                a.getInteger(
+                    R.styleable.IndicatorsView_indicatorMode,
+                    DEFAULT_MODE_INDEX
+                )
+            ]
 
             a.recycle()
         }

@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.profile.settings.reminders.utils.R
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.state
 import java.util.UUID
 import javax.inject.Inject
 
@@ -20,7 +21,7 @@ class CreateRemindPm @Inject constructor(
     services: ServiceFacade
 ) : BaseRemindPm(remindersManager, services) {
 
-    private val isFormNotEmptyState = State(false)
+    private val isFormNotEmptyState = state(false)
 
     override fun onCreate() {
         super.onCreate()

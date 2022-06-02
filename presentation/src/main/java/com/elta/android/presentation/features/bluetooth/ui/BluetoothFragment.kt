@@ -27,6 +27,8 @@ import com.nullgr.core.intents.launchForResult
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_bluetooth.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 import timber.log.Timber
 
 class BluetoothFragment : BaseListFragment<BluetoothPm>() {
@@ -74,7 +76,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
     private fun observeCommands(pm: BluetoothPm) {
         pm.requestEnableBluetoothCommand.observable
             .log("Command", "enable bluetooth")
-            .bindTo {
+            .subscribe {
                 Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                     .launchForResult(checkNotNull(activity), REQUEST_CODE_ENABLE_BLUETOOTH)
             }
@@ -88,7 +90,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
             .bindTo(pm.locationPermissionsGrantedAction)
         pm.requestEnableLocationCommand.observable
             .log("Command", "enable location")
-            .bindTo {
+            .subscribe {
                 val result = SettingsClient(checkNotNull(context))
                     .checkLocationSettings(
                         LocationSettingsRequest.Builder()

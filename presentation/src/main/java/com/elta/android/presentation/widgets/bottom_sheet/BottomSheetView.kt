@@ -4,15 +4,15 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.CoordinatorLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.animation.AnimatorEvent
 import com.elta.android.presentation.widgets.animation.AnimatorEventObservable
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -54,7 +54,8 @@ class BottomSheetView @JvmOverloads constructor(
 
         attrs?.let {
             val array = context.obtainStyledAttributes(attrs, R.styleable.BottomSheetView, 0, 0)
-            bottomSheetLayout = array.getResourceId(R.styleable.BottomSheetView_bottom_sheet_layout, 0)
+            bottomSheetLayout =
+                array.getResourceId(R.styleable.BottomSheetView_bottom_sheet_layout, 0)
             array.recycle()
         }
 

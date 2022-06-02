@@ -11,6 +11,8 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseRegistrationPm
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -20,11 +22,11 @@ class RegistrationSocialPm @Inject constructor(
     services: ServiceFacade
 ) : BaseRegistrationPm(services) {
 
-    val authTitleState = State(resources.getString(R.string.registration_social_title_no_name))
+    val authTitleState = state(resources.getString(R.string.registration_social_title_no_name))
 
-    private val getSocialUserAction = Action<SocialNetworkType>()
-    private val socialNetworkState = State<SocialNetworkType>()
-    private val showErrorAndContinueAction = Action<String>()
+    private val getSocialUserAction = action<SocialNetworkType>()
+    private val socialNetworkState = state<SocialNetworkType>()
+    private val showErrorAndContinueAction = action<String>()
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -108,7 +110,12 @@ class RegistrationSocialPm @Inject constructor(
     }
 
     private fun handleSocialUserSuccess(user: SocialUser) {
-        authTitleState.consumer.accept(resources.getString(R.string.registration_social_title, user.name))
+        authTitleState.consumer.accept(
+            resources.getString(
+                R.string.registration_social_title,
+                user.name
+            )
+        )
     }
 
     companion object {

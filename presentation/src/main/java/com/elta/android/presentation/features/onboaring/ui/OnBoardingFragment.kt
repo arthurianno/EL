@@ -2,12 +2,12 @@ package com.elta.android.presentation.features.onboaring.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PagerSnapHelper
-import android.support.v7.widget.RecyclerView
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
@@ -23,6 +23,7 @@ import com.nullgr.core.ui.extensions.hide
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 @Suppress("LabeledExpression")
 class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
@@ -57,8 +58,8 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
     override fun onBindPresentationModel(pm: OnBoardingPm) {
         super.onBindPresentationModel(pm)
         pm.currentPageState.bindTo { page -> itemsView?.smoothScrollToPosition(page) }
-        pm.titleState.observable.skip(1).bindTo { onBoardingHeaderTextView.animateText(it) }
-        pm.titleState.observable.take(1).bindTo(onBoardingHeaderTextView.text())
+        pm.titleState.observable.skip(1).subscribe { onBoardingHeaderTextView.animateText(it) }
+        pm.titleState.observable.take(1).subscribe(onBoardingHeaderTextView.text())
         pm.previousPageVisibilityState.bindTo(previewPageButtonView.fadeVisibility())
         pm.nextPageVisibilityState.bindTo(nextPageButtonView.fadeVisibility())
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)

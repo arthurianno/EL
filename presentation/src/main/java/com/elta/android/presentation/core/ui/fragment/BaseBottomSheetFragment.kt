@@ -23,9 +23,9 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
     protected abstract val classToken: Class<T>
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
 
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
+    override fun onAttach(context: Context) {
         super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
 
     override fun onPause() {
@@ -33,7 +33,11 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
         view?.hideKeyboardFun()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
         inflater.inflate(screenLayout, container, false)
 
     override fun providePresentationModel(): T = factory.createViewModel(classToken)
@@ -41,6 +45,6 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
             .throttleLast(BaseFragment.DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(progressDialog.visibility(childFragmentManager))
+            .subscribe(progressDialog.visibility(childFragmentManager))
     }
 }

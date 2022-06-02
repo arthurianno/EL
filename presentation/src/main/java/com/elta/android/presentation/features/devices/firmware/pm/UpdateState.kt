@@ -40,7 +40,10 @@ sealed class UpdateState {
         val newVersion: String,
         val currentVersion: String? = null,
         override val icon: Int = R.drawable.ic_firmware_logo,
-        override val title: String = resources.getString(R.string.firmware_title_updates_found, newVersion),
+        override val title: String = resources.getString(
+            R.string.firmware_title_updates_found,
+            newVersion
+        ),
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
         },

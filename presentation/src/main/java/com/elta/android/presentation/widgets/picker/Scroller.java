@@ -43,7 +43,7 @@ import android.view.animation.Interpolator;
  *    ...
  * }</pre>
  */
-public class Scroller  {
+public class Scroller {
     private final Interpolator mInterpolator;
 
     private int mMode;
@@ -169,7 +169,7 @@ public class Scroller  {
      * is {@link ViewConfiguration#getScrollFriction}.
      *
      * @param friction A scalar dimension-less value representing the coefficient of
-     *         friction.
+     *                 friction.
      */
     public final void setFriction(float friction) {
         mDeceleration = computeDeceleration(friction);
@@ -184,7 +184,6 @@ public class Scroller  {
     }
 
     /**
-     *
      * Returns whether the scroller has finished scrolling.
      *
      * @return True if the scroller has finished scrolling, false otherwise.
@@ -285,7 +284,7 @@ public class Scroller  {
             return false;
         }
 
-        int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+        int timePassed = (int) (AnimationUtils.currentAnimationTimeMillis() - mStartTime);
 
         if (timePassed < mDuration) {
             switch (mMode) {
@@ -326,8 +325,7 @@ public class Scroller  {
 
                     break;
             }
-        }
-        else {
+        } else {
             mCurrX = mFinalX;
             mCurrY = mFinalY;
             mFinished = true;
@@ -341,13 +339,13 @@ public class Scroller  {
      * duration.
      *
      * @param startX Starting horizontal scroll offset in pixels. Positive
-     *        numbers will scroll the content to the left.
+     *               numbers will scroll the content to the left.
      * @param startY Starting vertical scroll offset in pixels. Positive numbers
-     *        will scroll the content up.
-     * @param dx Horizontal distance to travel. Positive numbers will scroll the
-     *        content to the left.
-     * @param dy Vertical distance to travel. Positive numbers will scroll the
-     *        content up.
+     *               will scroll the content up.
+     * @param dx     Horizontal distance to travel. Positive numbers will scroll the
+     *               content to the left.
+     * @param dy     Vertical distance to travel. Positive numbers will scroll the
+     *               content up.
      */
     public void startScroll(int startX, int startY, int dx, int dy) {
         startScroll(startX, startY, dx, dy, DEFAULT_DURATION);
@@ -357,14 +355,14 @@ public class Scroller  {
      * Start scrolling by providing a starting point, the distance to travel,
      * and the duration of the scroll.
      *
-     * @param startX Starting horizontal scroll offset in pixels. Positive
-     *        numbers will scroll the content to the left.
-     * @param startY Starting vertical scroll offset in pixels. Positive numbers
-     *        will scroll the content up.
-     * @param dx Horizontal distance to travel. Positive numbers will scroll the
-     *        content to the left.
-     * @param dy Vertical distance to travel. Positive numbers will scroll the
-     *        content up.
+     * @param startX   Starting horizontal scroll offset in pixels. Positive
+     *                 numbers will scroll the content to the left.
+     * @param startY   Starting vertical scroll offset in pixels. Positive numbers
+     *                 will scroll the content up.
+     * @param dx       Horizontal distance to travel. Positive numbers will scroll the
+     *                 content to the left.
+     * @param dy       Vertical distance to travel. Positive numbers will scroll the
+     *                 content up.
      * @param duration Duration of the scroll in milliseconds.
      */
     public void startScroll(int startX, int startY, int dx, int dy, int duration) {
@@ -385,20 +383,20 @@ public class Scroller  {
      * Start scrolling based on a fling gesture. The distance travelled will
      * depend on the initial velocity of the fling.
      *
-     * @param startX Starting point of the scroll (X)
-     * @param startY Starting point of the scroll (Y)
+     * @param startX    Starting point of the scroll (X)
+     * @param startY    Starting point of the scroll (Y)
      * @param velocityX Initial velocity of the fling (X) measured in pixels per
-     *        second.
+     *                  second.
      * @param velocityY Initial velocity of the fling (Y) measured in pixels per
-     *        second
-     * @param minX Minimum X value. The scroller will not scroll past this
-     *        point.
-     * @param maxX Maximum X value. The scroller will not scroll past this
-     *        point.
-     * @param minY Minimum Y value. The scroller will not scroll past this
-     *        point.
-     * @param maxY Maximum Y value. The scroller will not scroll past this
-     *        point.
+     *                  second
+     * @param minX      Minimum X value. The scroller will not scroll past this
+     *                  point.
+     * @param maxX      Maximum X value. The scroller will not scroll past this
+     *                  point.
+     * @param minY      Minimum Y value. The scroller will not scroll past this
+     *                  point.
+     * @param maxY      Maximum Y value. The scroller will not scroll past this
+     *                  point.
      */
     public void fling(int startX, int startY, int velocityX, int velocityY,
                       int minX, int maxX, int minY, int maxY) {
@@ -505,7 +503,7 @@ public class Scroller  {
      * @return The elapsed time in milliseconds.
      */
     public int timePassed() {
-        return (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+        return (int) (AnimationUtils.currentAnimationTimeMillis() - mStartTime);
     }
 
     /**
@@ -543,7 +541,9 @@ public class Scroller  {
     }
 
     static class ViscousFluidInterpolator implements Interpolator {
-        /** Controls the viscous fluid effect (how much of it). */
+        /**
+         * Controls the viscous fluid effect (how much of it).
+         */
         private static final float VISCOUS_FLUID_SCALE = 8.0f;
 
         private static final float VISCOUS_FLUID_NORMALIZE;
@@ -560,10 +560,10 @@ public class Scroller  {
         private static float viscousFluid(float x) {
             x *= VISCOUS_FLUID_SCALE;
             if (x < 1.0f) {
-                x -= (1.0f - (float)Math.exp(-x));
+                x -= (1.0f - (float) Math.exp(-x));
             } else {
                 float start = 0.36787944117f;   // 1/e == exp(-1)
-                x = 1.0f - (float)Math.exp(1.0f - x);
+                x = 1.0f - (float) Math.exp(1.0f - x);
                 x = start + x * (1.0f - start);
             }
             return x;

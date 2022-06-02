@@ -18,7 +18,8 @@ class AppActivity : BaseActivity<AppPm>() {
     override val classToken: Class<AppPm> = AppPm::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         DynamicLinkProcessor.from(intent)

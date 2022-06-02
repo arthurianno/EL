@@ -11,21 +11,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingTop="16dp"
         android:paddingBottom="14dp">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/calendarIconView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
             app:srcCompat="@drawable/ic_calendar" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dateView"
             style="@style/New.Title2.BlackBlue"
             android:layout_width="0dp"
@@ -33,7 +33,7 @@
             android:layout_weight="1"
             tools:text="12 June" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/arrowView"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -71,21 +71,21 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/shade_black3" />
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_hemoglobin_picker"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/minusView"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -97,7 +97,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_minus" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/hemoglobinValueView"
             style="@style/New.Headline2.ShadeGreen2"
             android:layout_width="wrap_content"
@@ -111,7 +111,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="5,2" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/hemoglobinPercentView"
             style="@style/New.Headline5.ShadeGreen2"
             android:layout_width="wrap_content"
@@ -123,7 +123,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/hemoglobinValueView" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/plusView"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -144,13 +144,13 @@
         android:layout_marginEnd="16dp"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
             app:srcCompat="@drawable/ic_info" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -159,10 +159,10 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
-        android:scrollbars="none"/>
+        android:scrollbars="none" />
 </LinearLayout>

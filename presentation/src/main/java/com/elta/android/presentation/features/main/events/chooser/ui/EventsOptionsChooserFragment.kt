@@ -16,6 +16,7 @@ import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_events_options_chooser.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() {
 

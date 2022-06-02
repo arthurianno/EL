@@ -2,11 +2,12 @@ package com.elta.android.presentation.widgets.selector
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.checkMainThread
 import com.elta.android.presentation.widgets.selector.model.SelectorOption

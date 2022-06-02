@@ -14,6 +14,8 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
@@ -23,9 +25,9 @@ class PeriodPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    private val loadScreenAction = Action<Period>()
-    private val periodState = State<Period>()
-    private val statisticsByPeriodState = State<StatisticByPeriodModel>()
+    private val loadScreenAction = action<Period>()
+    private val periodState = state<Period>()
+    private val statisticsByPeriodState = state<StatisticByPeriodModel>()
 
     override fun onCreate() {
         super.onCreate()

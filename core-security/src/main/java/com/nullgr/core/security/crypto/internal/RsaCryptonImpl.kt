@@ -2,7 +2,7 @@ package com.nullgr.core.security.crypto.internal
 
 import android.content.Context
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import com.nullgr.core.security.crypto.CryptoKeysFactory
 import com.nullgr.core.security.crypto.fromBase64
 import com.nullgr.core.security.crypto.toBase64
@@ -98,7 +98,10 @@ object RsaCryptonImpl {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     @Throws(GeneralSecurityException::class, InvalidKeyException::class)
     fun encrypt(context: Context, originalText: String, keyAlias: String): String {
-        return encrypt(originalText.toByteArray(), CryptoKeysFactory.findOrCreateRSAKeyPair(context, keyAlias));
+        return encrypt(
+            originalText.toByteArray(),
+            CryptoKeysFactory.findOrCreateRSAKeyPair(context, keyAlias)
+        )
     }
 
     /**
@@ -176,7 +179,10 @@ object RsaCryptonImpl {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     @Throws(GeneralSecurityException::class)
     fun decryptAsString(context: Context, encryptedText: String, keyAlias: String): String {
-        return decryptAsString(encryptedText, CryptoKeysFactory.findOrCreateRSAKeyPair(context, keyAlias))
+        return decryptAsString(
+            encryptedText,
+            CryptoKeysFactory.findOrCreateRSAKeyPair(context, keyAlias)
+        )
     }
 
     /**
@@ -202,7 +208,12 @@ object RsaCryptonImpl {
         cipher.init(
             Cipher.ENCRYPT_MODE,
             publicKey,
-            OAEPParameterSpec(OAEP_PARAM_MD_NAME, OAEP_PARAM_MGF_NAME, MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+            OAEPParameterSpec(
+                OAEP_PARAM_MD_NAME,
+                OAEP_PARAM_MGF_NAME,
+                MGF1ParameterSpec.SHA1,
+                PSource.PSpecified.DEFAULT
+            )
         )
         val cipherBytes = cipher.doFinal(original)
         return cipherBytes.toBase64()
@@ -213,7 +224,12 @@ object RsaCryptonImpl {
         cipher.init(
             Cipher.DECRYPT_MODE,
             keyPair.private,
-            OAEPParameterSpec(OAEP_PARAM_MD_NAME, OAEP_PARAM_MGF_NAME, MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+            OAEPParameterSpec(
+                OAEP_PARAM_MD_NAME,
+                OAEP_PARAM_MGF_NAME,
+                MGF1ParameterSpec.SHA1,
+                PSource.PSpecified.DEFAULT
+            )
         )
         return cipher.doFinal(encryptedText.fromBase64())
     }

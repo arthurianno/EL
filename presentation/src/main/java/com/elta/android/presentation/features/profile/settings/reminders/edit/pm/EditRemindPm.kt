@@ -18,6 +18,8 @@ import com.elta.android.presentation.features.profile.settings.reminders.utils.R
 import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
@@ -29,14 +31,14 @@ class EditRemindPm @Inject constructor(
     services: ServiceFacade
 ) : BaseRemindPm(remindersManager, services) {
 
-    val deleteRemindAction = Action<Unit>()
+    val deleteRemindAction = action<Unit>()
     val deleteRemindDialogControl = dialogControl<DialogData, DialogResult>()
-    val defaultScheduleState = State<String>()
+    val defaultScheduleState = state<String>()
 
-    private val reminderIdState = State<String>()
-    private val reminderState = State<Reminder>()
-    private val getReminderById = Action<Unit>()
-    private val isFormChangedState = State(false)
+    private val reminderIdState = state<String>()
+    private val reminderState = state<Reminder>()
+    private val getReminderById = action<Unit>()
+    private val isFormChangedState = state(false)
 
     private val deleteRemindDialogData: DialogData by lazy { Dialogs.EventDeleteReminder(resources) }
 

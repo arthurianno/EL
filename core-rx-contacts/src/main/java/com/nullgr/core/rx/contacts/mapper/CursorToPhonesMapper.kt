@@ -19,22 +19,29 @@ internal object CursorToPhonesMapper : CursorMapper<List<ContactPhone>> {
                 if (cursor.moveToFirst()) {
                     do {
                         val id = cursor.getInt(
-                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID))
+                            cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)
+                        )
                         if (!(phonesResult has id)) {
                             val displayName = cursor.getString(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                            )
                             val isStarred = cursor.getInt(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.STARRED)) != 0
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.STARRED)
+                            ) != 0
                             val phone = cursor.getString(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            )
                             val normalizedPhone = cursor.getString(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER))
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)
+                            )
 
-                            val contactPhone = ContactPhone(id.toLong(),
-                                    displayName,
-                                    isStarred,
-                                    phone,
-                                    normalizedPhone)
+                            val contactPhone = ContactPhone(
+                                id.toLong(),
+                                displayName,
+                                isStarred,
+                                phone,
+                                normalizedPhone
+                            )
 
                             phonesResult.add(contactPhone)
                         }

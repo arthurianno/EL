@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.statistic.period.ui.adapter.delegates
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.ParentAdapterDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
@@ -23,13 +23,18 @@ class GlucoseIndexesDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                itemsView.layoutManager = FixedLinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL)
+                itemsView.layoutManager =
+                    FixedLinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL)
                 itemsView.setRecycledViewPool(viewPool)
             }
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as GlucoseIndexesItem
 
         with(holder as ViewHolder) {
@@ -37,7 +42,12 @@ class GlucoseIndexesDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as GlucoseIndexesItem
         with(holder as ViewHolder) {
             when (payload) {

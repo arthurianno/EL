@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.support.annotation.RequiresPermission
+import androidx.annotation.RequiresPermission
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
@@ -27,9 +27,11 @@ import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
  * @property updateCount - integer number of updates or **null** if need to update all time
  * @constructor creates new instance of [RxLocationManager]
  */
-class RxLocationManager(private var context: Context,
-                        private val updatesInterval: Long = 180000,
-                        private val updateCount: Int? = null) {
+class RxLocationManager(
+    private var context: Context,
+    private val updatesInterval: Long = 180000,
+    private val updateCount: Int? = null
+) {
 
     private val rxLocationProvider: ReactiveLocationProvider by lazy {
         ReactiveLocationProvider(context)
@@ -88,5 +90,8 @@ class RxLocationManager(private var context: Context,
     }
 
     @SuppressLint("MissingPermission")
-    private fun locationObservable() = Observable.merge(rxLocationProvider.lastKnownLocation, rxLocationProvider.getUpdatedLocation(locationRequest))
+    private fun locationObservable() = Observable.merge(
+        rxLocationProvider.lastKnownLocation,
+        rxLocationProvider.getUpdatedLocation(locationRequest)
+    )
 }

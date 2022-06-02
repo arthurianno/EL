@@ -90,7 +90,10 @@ object AesCbcCryptonImpl {
         return decryptAesCbcWithSecretKeyInternal(encryptedText, secretKey)
     }
 
-    private fun encryptAesCbcWithSecretKeyInternal(original: ByteArray, secretKey: SecretKey): String {
+    private fun encryptAesCbcWithSecretKeyInternal(
+        original: ByteArray,
+        secretKey: SecretKey
+    ): String {
         val cipher = Cipher.getInstance(AES_CBC_PKCS7_CIPHER_ALGORITHM)
         val iv = CryptoKeysFactory.generateIv(cipher.blockSize)
         val ivParams = IvParameterSpec(iv)
@@ -99,7 +102,10 @@ object AesCbcCryptonImpl {
         return "${iv.toBase64()}$DELIMITER${cipherBytes.toBase64()}"
     }
 
-    private fun decryptAesCbcWithSecretKeyInternal(encryptedText: String, secretKey: SecretKey): ByteArray {
+    private fun decryptAesCbcWithSecretKeyInternal(
+        encryptedText: String,
+        secretKey: SecretKey
+    ): ByteArray {
         val fields = encryptedText.split(DELIMITER)
         if (fields.size != 2) {
             throw IllegalArgumentException("Invalid encrypted text.")

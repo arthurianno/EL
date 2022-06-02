@@ -7,11 +7,13 @@ import androidx.fragment.app.FragmentTransaction
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.commands.AddTabs
 import com.elta.android.presentation.core.navigation.commands.AttachTab
+import com.elta.android.presentation.core.navigation.support.SupportAppNavigator
+import com.elta.android.presentation.core.navigation.support.SupportAppScreen
+import com.github.terrakok.cicerone.Command
 import com.nullgr.core.collections.isNotNullOrEmpty
-import ru.terrakok.cicerone.android.support.SupportAppNavigator
 
 open class ExtendedNavigator(
-    activity: FragmentActivity?,
+    activity: FragmentActivity,
     private val fragmentManager: FragmentManager,
     private val containerId: Int
 ) : SupportAppNavigator(activity, fragmentManager, containerId) {
@@ -30,11 +32,13 @@ open class ExtendedNavigator(
         }
     }
 
-    override fun applyCommand(command: Command) {
-        when (checkCondition(command)) {
-            is AttachTab -> attachTabFragment((command as AttachTab).screen)
-            is AddTabs -> replaceTabFragments((command as AddTabs).screens)
-            else -> super.applyCommand(command)
+    override fun applyCommands(commands: Array<out Command>) {
+        commands.forEach { command ->
+            when (checkCondition(command)) {
+                is AttachTab -> attachTabFragment((command as AttachTab).screen)
+                is AddTabs -> replaceTabFragments((command as AddTabs).screens)
+                else -> super.applyCommand(command)
+            }
         }
     }
 
@@ -56,11 +60,13 @@ open class ExtendedNavigator(
     }
 
     private fun addTabFragment(screen: SupportAppScreen) {
-        tabsHolder[screen.screenKey] = fragmentManager.initializeSingleTab(
-            screen.fragment,
-            containerId,
-            screen.screenKey
-        )
+        screen.getFragment()?.let {
+            tabsHolder[screen.screenKey] = fragmentManager.initializeSingleTab(
+                it,
+                containerId,
+                screen.screenKey
+            )
+        }
     }
 
     private fun FragmentManager.initializeSingleTab(
@@ -91,10 +97,10 @@ open class ExtendedNavigator(
     private fun checkCondition(command: Command): Command {
         when (command) {
             is AttachTab ->
-                if (command.screen.fragment == null) throwInvalidConditionException(command)
+                if (command.screen.getFragment() == null) throwInvalidConditionException(command)
             is AddTabs ->
                 command.screens.forEach {
-                    if (it.fragment == null) throwInvalidConditionException(command)
+                    if (it.getFragment() == null) throwInvalidConditionException(command)
                 }
         }
         return command

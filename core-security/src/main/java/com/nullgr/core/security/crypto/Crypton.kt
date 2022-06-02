@@ -4,7 +4,6 @@ import com.nullgr.core.security.crypto.internal.AesCbcCryptonImpl
 import com.nullgr.core.security.crypto.internal.PbeCryptonImpl
 import com.nullgr.core.security.crypto.internal.RsaCryptonImpl
 
-
 /**
  * Simple class to encrypt/decrypt user data with few common algorithms.
  *

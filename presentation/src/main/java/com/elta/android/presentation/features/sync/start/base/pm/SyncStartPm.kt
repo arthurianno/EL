@@ -3,13 +3,14 @@ package com.elta.android.presentation.features.sync.start.base.pm
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
 
 abstract class SyncStartPm constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val mainAction = Action<Unit>()
-    val skipAction = Action<Unit>()
+    val mainAction = action<Unit>()
+    val skipAction = action<Unit>()
 
     abstract fun navigateToConnectDeviceScreen(i: Unit)
 

@@ -12,6 +12,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.observers.all.mapper.ObserverMapper
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class ObserversPm @Inject constructor(
@@ -20,8 +21,8 @@ class ObserversPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val inviteObserverAction = Action<Unit>()
-    private val getObserversAction = Action<Unit>()
+    val inviteObserverAction = action<Unit>()
+    private val getObserversAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +61,10 @@ class ObserversPm @Inject constructor(
     }
 
     private fun handleSuccess(observers: List<Observer>) {
-        items.consumer.accept(if (observers.isEmpty()) emptyList() else mapper.mapFromObject(observers))
+        items.consumer.accept(
+            if (observers.isEmpty()) emptyList() else mapper.mapFromObject(
+                observers
+            )
+        )
     }
 }

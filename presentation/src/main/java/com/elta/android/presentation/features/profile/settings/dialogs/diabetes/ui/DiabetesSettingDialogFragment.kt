@@ -13,6 +13,7 @@ import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_diabetes.*
+import me.dmdev.rxpm.bindTo
 
 class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSettingDialogPm>() {
 
@@ -47,7 +48,8 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
             }
         }
         diabetesViews.forEach { view ->
-            view.clicks().bindTo { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
+            view.clicks()
+                .subscribe { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
         }
         pm.progressState.bindTo {
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)

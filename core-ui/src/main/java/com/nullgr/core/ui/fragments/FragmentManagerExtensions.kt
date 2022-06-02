@@ -1,51 +1,55 @@
 package com.nullgr.core.ui.fragments
 
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 /**
  * @author il_mov.
  */
-fun FragmentManager.addScreen(fragment: Fragment,
-                              containerId: Int,
-                              tag: String = fragment.javaClass.name,
-                              addToBackStack: Boolean = true,
-                              enterAnimation: Int = 0,
-                              exitAnimation: Int = 0) {
+fun FragmentManager.addScreen(
+    fragment: Fragment,
+    containerId: Int,
+    tag: String = fragment.javaClass.name,
+    addToBackStack: Boolean = true,
+    enterAnimation: Int = 0,
+    exitAnimation: Int = 0
+) {
     beginTransaction()
-            .also {
-                if (enterAnimation != 0 || exitAnimation != 0) {
-                    it.setCustomAnimations(enterAnimation, 0, 0, exitAnimation)
-                }
+        .also {
+            if (enterAnimation != 0 || exitAnimation != 0) {
+                it.setCustomAnimations(enterAnimation, 0, 0, exitAnimation)
             }
-            .add(containerId, fragment, tag)
-            .also { if (addToBackStack) it.addToBackStack(tag) }
-            .commitAllowingStateLoss()
+        }
+        .add(containerId, fragment, tag)
+        .also { if (addToBackStack) it.addToBackStack(tag) }
+        .commitAllowingStateLoss()
 }
 
-fun FragmentManager.replaceScreen(fragment: Fragment,
-                                  containerId: Int,
-                                  tag: String = fragment.javaClass.name,
-                                  addToBackStack: Boolean = true,
-                                  enterAnimation: Int = 0,
-                                  exitAnimation: Int = 0) {
+fun FragmentManager.replaceScreen(
+    fragment: Fragment,
+    containerId: Int,
+    tag: String = fragment.javaClass.name,
+    addToBackStack: Boolean = true,
+    enterAnimation: Int = 0,
+    exitAnimation: Int = 0
+) {
     beginTransaction()
-            .also {
-                if (enterAnimation != 0 || exitAnimation != 0) {
-                    it.setCustomAnimations(enterAnimation, 0, 0, exitAnimation)
-                }
+        .also {
+            if (enterAnimation != 0 || exitAnimation != 0) {
+                it.setCustomAnimations(enterAnimation, 0, 0, exitAnimation)
             }
-            .replace(containerId, fragment, tag)
-            .also { if (addToBackStack) it.addToBackStack(tag) }
-            .commitAllowingStateLoss()
+        }
+        .replace(containerId, fragment, tag)
+        .also { if (addToBackStack) it.addToBackStack(tag) }
+        .commitAllowingStateLoss()
 }
 
 fun FragmentManager.removeScreen(fragment: Fragment, exitAnimation: Int = 0) {
     beginTransaction()
-            .also { if (exitAnimation != 0) it.setCustomAnimations(0, exitAnimation) }
-            .remove(fragment)
-            .commitAllowingStateLoss()
+        .also { if (exitAnimation != 0) it.setCustomAnimations(0, exitAnimation) }
+        .remove(fragment)
+        .commitAllowingStateLoss()
 }
 
 fun FragmentManager.findCurrentScreen(containerId: Int): Fragment? {
@@ -94,8 +98,10 @@ inline fun <reified T> FragmentManager.findScreen(): T? {
     return findFragmentByTag(T::class.java.name) as? T
 }
 
-fun FragmentManager.showDialog(dialog: DialogFragment,
-                               tag: String = dialog.javaClass.name) {
+fun FragmentManager.showDialog(
+    dialog: DialogFragment,
+    tag: String = dialog.javaClass.name
+) {
     executePendingTransactions()
     findScreen<DialogFragment>()?.dismissAllowingStateLoss()
     dialog.show(this, tag)

@@ -1,7 +1,7 @@
 package com.elta.android.presentation.utils
 
-import android.support.annotation.StyleRes
 import android.view.View
+import androidx.annotation.StyleRes
 import com.elta.android.presentation.R
 import com.tooltip.Tooltip
 

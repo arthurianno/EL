@@ -12,13 +12,15 @@ import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_main_diary.*
+import me.dmdev.rxpm.bindTo
 import org.threeten.bp.LocalDate
 
 class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
 
     override val screenLayout: Int = R.layout.fragment_main_diary
     override val classToken: Class<MainDiaryPm> = MainDiaryPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        TransparentStatusBarConfigProvider
 
     override val backgroundColor = R.color.pale_gray
 
@@ -35,7 +37,12 @@ class MainDiaryFragment : BaseListFragment<MainDiaryPm>() {
         }
         pm.todayButtonVisibilityState.bindTo(todayButtonView.visibility())
         todayButtonView.clicks().bindTo(pm.todayClickedAction)
-        pm.items.bindTo { itemsView?.toggleVisibilityState(it.isNotEmpty(), defaultFalseState = View.INVISIBLE) }
+        pm.items.bindTo {
+            itemsView?.toggleVisibilityState(
+                it.isNotEmpty(),
+                defaultFalseState = View.INVISIBLE
+            )
+        }
     }
 
     companion object {

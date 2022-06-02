@@ -12,6 +12,8 @@ import com.elta.android.presentation.utils.hideKeyboardFun
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_feedback.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class FeedbackFragment : BaseFragment<FeedbackPm>() {
 
@@ -32,7 +34,7 @@ class FeedbackFragment : BaseFragment<FeedbackPm>() {
         pm.emailInput bindTo emailInputView
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .bindTo(emailInputView.error())
+            .subscribe(emailInputView.error())
         pm.nameInput bindTo nameInputView
         pm.messageInput bindTo messageInputView
         pm.sendFeedbackEnabledState bindTo { sendFeedbackButtonView.isEnabled = it }

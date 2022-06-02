@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class ObserversFragment : BaseListFragment<ObserversPm>() {
 

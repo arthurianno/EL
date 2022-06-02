@@ -12,6 +12,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import kotlinx.android.synthetic.main.fragment_email_confirmation.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
 

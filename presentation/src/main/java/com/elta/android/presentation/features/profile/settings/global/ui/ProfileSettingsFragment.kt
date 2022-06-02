@@ -12,6 +12,8 @@ import com.elta.android.presentation.features.registration.policy.ui.Registratio
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
 

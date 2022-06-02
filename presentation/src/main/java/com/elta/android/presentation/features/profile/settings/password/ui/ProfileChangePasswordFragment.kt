@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.password.ui
 
-import android.support.v7.widget.AppCompatEditText
-import android.support.v7.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatImageView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -13,7 +13,10 @@ import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_profile_change_password.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.InputControl
+import me.dmdev.rxpm.widget.bindTo
 
 class ProfileChangePasswordFragment : BaseFragment<ProfileChangePasswordPm>() {
 
@@ -40,16 +43,15 @@ class ProfileChangePasswordFragment : BaseFragment<ProfileChangePasswordPm>() {
     }
 
     override fun handleBack() {
-        view?.hideKeyboardFun()
-        passTo(presentationModel.backHandleAction)
+        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     private infix fun AppCompatImageView.bindToggleTo(view: AppCompatEditText) =
-        clicks() bindTo { toggleSecureIcon(view.toggleSecure()) }
+        clicks().subscribe { toggleSecureIcon(view.toggleSecure()) }
 
     private infix fun InputControl.bindInputTo(view: AppCompatEditText) {
         bindTo(view)
-        error.observable.distinctUntilChanged() bindTo view.error()
+        error.observable.distinctUntilChanged().subscribe { view.error() }
     }
 
     companion object {

@@ -18,7 +18,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/titleTextView"
                 style="@style/New.Headline3"
                 android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/descriptionTextView"
                 style="@style/New.Title2.ShadeBlack0"
                 android:layout_width="0dp"
@@ -53,7 +53,7 @@
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/saveButtonView"
         style="@style/Button.Large"
         android:enabled="false"

@@ -24,11 +24,11 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iconView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_pin_grey" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/nameView"
                 style="@style/Title3"
                 android:layout_width="0dp"
@@ -55,7 +55,7 @@
                 app:layout_constraintVertical_chainStyle="packed"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/addressView"
                 style="@style/Caption2"
                 android:layout_width="0dp"
@@ -70,7 +70,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/nameView"
                 tools:text="@tools:sample/lorem" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
 </com.github.captain_miao.optroundcardview.OptRoundCardView>

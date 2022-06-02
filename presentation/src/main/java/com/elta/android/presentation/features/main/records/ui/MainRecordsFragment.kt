@@ -26,7 +26,8 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
 
     override val screenLayout: Int = R.layout.fragment_main_records
     override val classToken: Class<MainRecordsPm> = MainRecordsPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = MainScreenTransparentStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        MainScreenTransparentStatusBarConfigProvider
     override val backgroundColor: Int = R.color.pale_gray
 
     private val secondaryProvider: StatusBarConfigProvider = MainScreenLightStatusBarConfigProvider
@@ -49,18 +50,18 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
         pm.mainScreenState
             .visibilityState
             .observable.map { !it }
-            .bindTo {
+            .subscribe {
                 itemsView?.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             }
 
         bus.events<Events.HomeBottomSheetStateChanged>().map { it.opened }
-            .bindTo(bottomSheetState)
+            .subscribe(bottomSheetState)
 
         bus.events<Events.RecordsAttachedStateChanged>().map { it.attached }
-            .bindTo(headerState)
+            .subscribe(headerState)
 
         Observables.combineLatest(bottomSheetState, headerState)
-            .bindTo {
+            .subscribe {
                 val bottomSheetVisible = it.first
                 val headerVisible = it.second
                 if (bottomSheetVisible) {

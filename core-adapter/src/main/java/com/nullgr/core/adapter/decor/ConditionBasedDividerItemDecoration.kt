@@ -4,10 +4,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.items.ListItem
 
@@ -23,7 +23,8 @@ import com.nullgr.core.adapter.items.ListItem
  *
  * @author Grishko Nikita
  */
-class ConditionBasedDividerItemDecoration(context: Context, @DrawableRes resId: Int? = null) : RecyclerView.ItemDecoration() {
+class ConditionBasedDividerItemDecoration(context: Context, @DrawableRes resId: Int? = null) :
+    RecyclerView.ItemDecoration() {
 
     companion object {
         private val ATTRS = intArrayOf(android.R.attr.listDivider)
@@ -60,8 +61,12 @@ class ConditionBasedDividerItemDecoration(context: Context, @DrawableRes resId: 
         }
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                state: RecyclerView.State) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
         if (divider == null) {
             outRect.set(0, 0, 0, 0)
             return

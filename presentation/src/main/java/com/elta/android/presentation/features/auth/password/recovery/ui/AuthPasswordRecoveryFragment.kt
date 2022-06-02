@@ -11,6 +11,8 @@ import com.elta.android.presentation.utils.error
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_password_recovery.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
 
@@ -28,7 +30,7 @@ class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
         pm.emailInput.bindTo(emailInputView)
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .bindTo(emailInputView.error())
+            .subscribe(emailInputView.error())
         pm.continueEnabledState.bindTo { sendLinkButtonView.isEnabled = it }
         sendLinkButtonView.clicks().bindTo(pm.continueAction)
         bindProgressDialog(pm)

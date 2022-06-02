@@ -1,7 +1,7 @@
 package com.elta.android.presentation.widgets.picker.model
 
 import android.content.res.Resources
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 
 open class FormMeasurementConfig(
     val firstPickerMaxValue: Int,

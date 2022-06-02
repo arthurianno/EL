@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.navigation.AppNavigator
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
@@ -26,12 +25,15 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.base.PmActivity
+import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
 @SuppressLint("MissingSuperCall")
-abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
+abstract class BaseActivity<T : BasePm> :
+    PmActivity<T>(),
     HasSupportFragmentInjector,
     BackHandler,
     RouterProvider {
@@ -52,7 +54,7 @@ abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
 
     protected abstract val classToken: Class<T>
 
-    protected open val navigator: Navigator = AppNavigator(this,  R.id.containerView)
+    protected open val navigator: Navigator = AppNavigator(this, R.id.containerView)
 
     protected val currentFragment: BaseFragment<*>?
         get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
@@ -61,6 +63,7 @@ abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
     private var emptyStateView: StateView? = null
     private var progressView: View? = null
     private var homeButtonView: View? = null
+    protected val compositeUnbind = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -95,7 +98,7 @@ abstract class BaseActivity<T : BasePm> : PmActivity<T>(),
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.bindTo { onBackPressed() }
+        homeButtonView?.clicks()?.subscribe { onBackPressed() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 

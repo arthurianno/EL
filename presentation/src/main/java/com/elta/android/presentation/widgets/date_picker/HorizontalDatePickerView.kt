@@ -1,13 +1,13 @@
 package com.elta.android.presentation.widgets.date_picker
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSnapHelper
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDelegatesFactory
@@ -43,7 +43,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         val delegatesFactory = DatePickerDelegatesFactory()
         adapter = DynamicAdapter(delegatesFactory, diffCalculator)
 
-        dateItemsView.layoutManager = FixedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL)
+        dateItemsView.layoutManager =
+            FixedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL)
         dateItemsView.adapter = adapter
         datePickerSelectorView.layoutParams.width = getSelectorWidth()
         dateItemsView.attachSnapHelperWithListener(
@@ -55,7 +56,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
                         performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                     onPickerItemScrolled(position)
                 }
-            })
+            }
+        )
     }
 
     fun date(): Consumer<LocalDate> = Consumer {

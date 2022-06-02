@@ -1,7 +1,7 @@
 package com.elta.android.presentation.utils
 
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType

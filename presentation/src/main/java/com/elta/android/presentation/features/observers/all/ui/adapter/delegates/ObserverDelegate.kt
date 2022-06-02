@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.observers.all.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
@@ -34,7 +34,11 @@ class ObserverDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as ObserverItem
         with(holder as ViewHolder) {
             fillItem(item)
@@ -42,7 +46,12 @@ class ObserverDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as ObserverItem
         with(holder as ViewHolder) {
             when (payload) {

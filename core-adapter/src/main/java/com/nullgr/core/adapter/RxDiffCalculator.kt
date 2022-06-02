@@ -1,7 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -18,7 +18,8 @@ import java.lang.ref.WeakReference
  * @author vchernyshov
  */
 class RxDiffCalculator(
-        private val schedulersFacade: SchedulersFacade = ComputationToMainSchedulersFacade()) : DiffCalculator {
+    private val schedulersFacade: SchedulersFacade = ComputationToMainSchedulersFacade()
+) : DiffCalculator {
 
     private val calculateDiffFunction = CalculateDiffFunction()
 
@@ -32,11 +33,21 @@ class RxDiffCalculator(
      * @param after New list of items.
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
-    override fun calculateDiff(adapter: DynamicAdapter, before: List<ListItem>, after: List<ListItem>, detectMoves: Boolean) {
-        Observable.zip(Observable.just(before), Observable.just(after), Observable.just(detectMoves), calculateDiffFunction)
-                .subscribeOn(schedulersFacade.subscribeOn)
-                .observeOn(schedulersFacade.observeOn)
-                .subscribe(DiffResultConsumer(adapter))
+    override fun calculateDiff(
+        adapter: DynamicAdapter,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    ) {
+        Observable.zip(
+            Observable.just(before),
+            Observable.just(after),
+            Observable.just(detectMoves),
+            calculateDiffFunction
+        )
+            .subscribeOn(schedulersFacade.subscribeOn)
+            .observeOn(schedulersFacade.observeOn)
+            .subscribe(DiffResultConsumer(adapter))
     }
 
     /**
@@ -49,19 +60,34 @@ class RxDiffCalculator(
      * @param after New list of items.
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
-    override fun calculateDiff(updateCallback: ListUpdateCallback, before: List<ListItem>, after: List<ListItem>, detectMoves: Boolean) {
-        Observable.zip(Observable.just(before), Observable.just(after), Observable.just(detectMoves), calculateDiffFunction)
-                .subscribeOn(schedulersFacade.subscribeOn)
-                .observeOn(schedulersFacade.observeOn)
-                .subscribe(DiffResultConsumer2(updateCallback))
+    override fun calculateDiff(
+        updateCallback: ListUpdateCallback,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    ) {
+        Observable.zip(
+            Observable.just(before),
+            Observable.just(after),
+            Observable.just(detectMoves),
+            calculateDiffFunction
+        )
+            .subscribeOn(schedulersFacade.subscribeOn)
+            .observeOn(schedulersFacade.observeOn)
+            .subscribe(DiffResultConsumer2(updateCallback))
     }
 
     /**
      * Implementation of [Function3] that calculates DiffResult.
      */
-    private class CalculateDiffFunction : Function3<List<ListItem>, List<ListItem>, Boolean, Pair<List<ListItem>, DiffUtil.DiffResult>> {
+    private class CalculateDiffFunction :
+        Function3<List<ListItem>, List<ListItem>, Boolean, Pair<List<ListItem>, DiffUtil.DiffResult>> {
         @Throws(Exception::class)
-        override fun apply(before: List<ListItem>, after: List<ListItem>, detectMoves: Boolean): Pair<List<ListItem>, DiffUtil.DiffResult> {
+        override fun apply(
+            before: List<ListItem>,
+            after: List<ListItem>,
+            detectMoves: Boolean
+        ): Pair<List<ListItem>, DiffUtil.DiffResult> {
             val diffResult = DiffUtil.calculateDiff(Callback(before, after), detectMoves)
             return Pair(after, diffResult)
         }
@@ -71,7 +97,8 @@ class RxDiffCalculator(
      * Implementation of [Consumer] that sets new list of items to adapter and dispatches DiffResults.
      * Instance stores adapter by [WeakReference].
      */
-    private class DiffResultConsumer(adapter: DynamicAdapter) : Consumer<Pair<List<ListItem>, DiffUtil.DiffResult>> {
+    private class DiffResultConsumer(adapter: DynamicAdapter) :
+        Consumer<Pair<List<ListItem>, DiffUtil.DiffResult>> {
 
         val reference: WeakReference<DynamicAdapter> = WeakReference(adapter)
 
@@ -88,7 +115,8 @@ class RxDiffCalculator(
      * Implementation of [Consumer] that dispatches DiffResults to [ListUpdateCallback].
      * Instance stores adapter by [WeakReference].
      */
-    private class DiffResultConsumer2(updateCallback: ListUpdateCallback) : Consumer<Pair<List<ListItem>, DiffUtil.DiffResult>> {
+    private class DiffResultConsumer2(updateCallback: ListUpdateCallback) :
+        Consumer<Pair<List<ListItem>, DiffUtil.DiffResult>> {
 
         val reference: WeakReference<ListUpdateCallback> = WeakReference(updateCallback)
 

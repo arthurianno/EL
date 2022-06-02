@@ -19,6 +19,8 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.devices.info.ui.builder.DeviceInfoItemsBuilder
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
@@ -31,13 +33,13 @@ class DeviceInfoPm @Inject constructor(
 ) : BaseListPm(services) {
 
     val deleteDeviceDialogControl = dialogControl<DialogData, DialogResult>()
-    val deleteDeviceAction = Action<Unit>()
-    val checkUpdateAction = Action<Unit>()
-    val nameDeviceState = State<String>()
-    val descriptionAddressState = State<String>()
+    val deleteDeviceAction = action<Unit>()
+    val checkUpdateAction = action<Unit>()
+    val nameDeviceState = state<String>()
+    val descriptionAddressState = state<String>()
 
-    private val addressState = State<String>()
-    private val getDeviceInfoAction = Action<Unit>()
+    private val addressState = state<String>()
+    private val getDeviceInfoAction = action<Unit>()
 
     private var glucometer: Glucometer? = null
 

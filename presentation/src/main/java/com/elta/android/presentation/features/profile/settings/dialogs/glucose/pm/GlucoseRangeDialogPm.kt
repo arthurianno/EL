@@ -7,6 +7,8 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class GlucoseRangeDialogPm @Inject constructor(
@@ -14,10 +16,10 @@ class GlucoseRangeDialogPm @Inject constructor(
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
-    val glucoseRangeChangedAction = Action<Pair<Double, Double>>()
-    val glucoseRangeState = State(DEFAULT_GLUCOSE_START to DEFAULT_GLUCOSE_END)
-    private val profileState = State<Profile>()
-    private val loadScreeAction = Action<Unit>()
+    val glucoseRangeChangedAction = action<Pair<Double, Double>>()
+    val glucoseRangeState = state(DEFAULT_GLUCOSE_START to DEFAULT_GLUCOSE_END)
+    private val profileState = state<Profile>()
+    private val loadScreeAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()

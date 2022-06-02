@@ -11,6 +11,8 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
@@ -20,8 +22,8 @@ class InviteObserverPm @Inject constructor(
 ) : BasePm(services) {
 
     val emailInput = inputControl(hideErrorOnUserInput = false)
-    val continueEnabledState = State(false)
-    val continueAction = Action<Unit>()
+    val continueEnabledState = state(false)
+    val continueAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -50,11 +52,21 @@ class InviteObserverPm @Inject constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is EmailAlreadyInvitedError -> {
-                setErrorStateData(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                setErrorStateData(
+                    States.SimpleError(
+                        icon = R.drawable.ic_warning,
+                        description = error.message
+                    )
+                )
                 setErrorViewVisibility(true)
             }
             is CantSendInviteToYourselfError -> {
-                setErrorStateData(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                setErrorStateData(
+                    States.SimpleError(
+                        icon = R.drawable.ic_warning,
+                        description = error.message
+                    )
+                )
                 setErrorViewVisibility(true)
             }
             else -> super.handleError(error)

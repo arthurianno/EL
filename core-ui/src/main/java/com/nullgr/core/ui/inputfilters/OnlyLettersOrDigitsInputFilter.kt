@@ -10,7 +10,14 @@ import android.widget.EditText
  * @author Grishko Nikita
  */
 class OnlyLettersOrDigitsInputFilter : InputFilter {
-    override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence? {
+    override fun filter(
+        source: CharSequence?,
+        start: Int,
+        end: Int,
+        dest: Spanned?,
+        dstart: Int,
+        dend: Int
+    ): CharSequence? {
         if (source != null && end != 0 && !Character.isLetterOrDigit(source[end - 1])) {
             return source.subSequence(start, end - 1)
         }

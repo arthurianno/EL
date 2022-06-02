@@ -1,12 +1,12 @@
 package com.elta.android.presentation.widgets
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.state_view.StateData
 import com.elta.android.presentation.core.ui.state_view.StateView

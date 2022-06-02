@@ -22,7 +22,10 @@ class ChooserOptionsItemsBuilder @Inject constructor(
 
     private val activitiesComparator = ActivitiesComparator(resourceProvider)
 
-    fun buildItems(configuration: ChooserConfiguration, options: List<ChooserOptionModel>): MutableList<ListItem> {
+    fun buildItems(
+        configuration: ChooserConfiguration,
+        options: List<ChooserOptionModel>
+    ): MutableList<ListItem> {
         return arrayListOf<ListItem>().apply {
             add(ChooserHeaderItem(configuration.toHeaderTitle()))
             if (configuration.eventType == EventType.ACTIVITY) {

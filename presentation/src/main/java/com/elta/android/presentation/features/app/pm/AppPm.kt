@@ -17,8 +17,11 @@ import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMa
 import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
 import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
+import com.github.terrakok.cicerone.Screen
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -27,14 +30,14 @@ class AppPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
-    val coldStartAction = Action<Unit>()
-    val notificationStartAction = Action<Uri>()
-    val deepLinkAction = Action<Uri>()
-    val coldStartDeepLinkAction = Action<Uri>()
-    val onStopAction = Action<String>()
+    val coldStartAction = action<Unit>()
+    val notificationStartAction = action<Uri>()
+    val deepLinkAction = action<Uri>()
+    val coldStartDeepLinkAction = action<Uri>()
+    val onStopAction = action<String>()
 
-    val syncStatusState = State<Status>()
-    val syncStatusVisibility = State<Visibility>(Visibility.Hide)
+    val syncStatusState = state<Status>()
+    val syncStatusVisibility = state<Visibility>(Visibility.Hide)
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -46,13 +49,17 @@ class AppPm @Inject constructor(
                 getUserInfoUseCase.execute()
                     .doOnSuccess { user ->
                         when {
-                            !(user.isUserLoggedIn
-                                ?: false) -> router.newRootFlow(Screens.GreetingFlow)
+                            !(
+                                user.isUserLoggedIn
+                                    ?: false
+                                ) -> router.newRootFlow(Screens.GreetingFlow)
                             !(user.isEmailConfirmed ?: false) -> router.newRootChain(
                                 Screens.GreetingFlow, Screens.ActivateProfile
                             )
-                            !(user.isOnBoardingPassed
-                                ?: false) -> router.newRootFlow(Screens.OnBoardingFlow)
+                            !(
+                                user.isOnBoardingPassed
+                                    ?: false
+                                ) -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
@@ -65,13 +72,13 @@ class AppPm @Inject constructor(
 
         deepLinkAction.observable
             .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
-            .doOnNext { router.navigateTo(it) }
+            .doOnNext { router.navigateTo(it as Screen) }
             .subscribe()
             .untilDestroy()
 
         coldStartDeepLinkAction.observable
             .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
-            .doOnNext { router.newRootChain(Screens.GreetingFlow, it) }
+            .doOnNext { router.newRootChain(Screens.GreetingFlow, it as Screen) }
             .subscribe()
             .untilDestroy()
 
@@ -145,7 +152,10 @@ class AppPm @Inject constructor(
     }
 
     override fun handleError(error: Throwable) {
-        if (error is NoSuchElementException) router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        if (error is NoSuchElementException) router.newRootChain(
+            Screens.GreetingFlow,
+            Screens.AuthFlow
+        )
         else super.handleError(error)
     }
 

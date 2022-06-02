@@ -13,6 +13,8 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_device_info.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/groupIconView"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -29,7 +29,7 @@
                 android:layout_marginBottom="12dp"
                 tools:src="@drawable/ic_event_medicaments" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/groupNameView"
                 style="@style/New.Headline5.BlackBlue"
                 android:layout_width="0dp"
@@ -42,7 +42,7 @@
                 android:lines="1"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/groupStateView"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
@@ -59,7 +59,7 @@
             android:descendantFocusability="blocksDescendants"
             app:el_expanded="false">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/itemsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,4 +69,4 @@
 
     </LinearLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

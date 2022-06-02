@@ -3,7 +3,7 @@ package com.elta.android.data.features.common.storage
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject

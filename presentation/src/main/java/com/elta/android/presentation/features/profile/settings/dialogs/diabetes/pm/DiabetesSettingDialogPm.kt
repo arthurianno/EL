@@ -8,6 +8,8 @@ import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class DiabetesSettingDialogPm @Inject constructor(
@@ -15,12 +17,12 @@ class DiabetesSettingDialogPm @Inject constructor(
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
-    val diabetesTypeSelectedAction = Action<Diabetes>()
-    val diabetesState = State(Diabetes.values())
-    val selectedDiabetesState = State<Diabetes>()
+    val diabetesTypeSelectedAction = action<Diabetes>()
+    val diabetesState = state(Diabetes.values())
+    val selectedDiabetesState = state<Diabetes>()
 
-    private val profileState = State<Profile>()
-    private val loadScreeAction = Action<Unit>()
+    private val profileState = state<Profile>()
+    private val loadScreeAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()

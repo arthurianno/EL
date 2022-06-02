@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.devices.info.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
@@ -31,7 +31,11 @@ class DevicePrimaryInfoDelegate(
             }
         }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as DevicePrimaryInfoItem
 
         with(holder as ViewHolder) {
@@ -40,7 +44,12 @@ class DevicePrimaryInfoDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as DevicePrimaryInfoItem
         with(holder as ViewHolder) {
             when (payload) {

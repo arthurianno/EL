@@ -10,6 +10,8 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_reminder_form.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class EditRemindFragment : BaseRemindFragment<EditRemindPm>() {
 

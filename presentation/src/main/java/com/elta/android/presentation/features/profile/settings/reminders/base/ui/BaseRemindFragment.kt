@@ -15,6 +15,9 @@ import com.elta.android.presentation.utils.showTimePickerWithoutPastTimeDialog
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_reminder_form.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 import org.threeten.bp.ZonedDateTime
 
 abstract class BaseRemindFragment<T : BaseRemindPm> : BaseFragment<T>() {
@@ -44,8 +47,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> : BaseFragment<T>() {
     }
 
     override fun handleBack() {
-        view?.hideKeyboardFun()
-        passTo(presentationModel.backHandleAction)
+        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     private fun T.bindDateSelection() {

@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.onboaring.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -44,7 +44,11 @@ class OnBoardingGenderDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as OnBoardingGenderItem
 
         with(holder as ViewHolder) {

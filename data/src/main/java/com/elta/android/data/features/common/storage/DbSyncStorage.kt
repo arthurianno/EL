@@ -27,28 +27,36 @@ class DbSyncStorage @Inject constructor(
     override var lastSalePointsSync: Long?
         get() = appSyncInfo?.lastSalePointsSync
         set(value) {
-            appBox.put(appSyncInfo?.copy(lastSalePointsSync = value)
-                ?: SyncInfoDto(lastSalePointsSync = value))
+            appBox.put(
+                appSyncInfo?.copy(lastSalePointsSync = value)
+                    ?: SyncInfoDto(lastSalePointsSync = value)
+            )
         }
 
     override var lastEventsSync: Long?
         get() = userSyncInfo?.lastEventsSync
         set(value) {
-            userBox.put(userSyncInfo?.copy(lastEventsSync = value)
-                ?: SyncInfoDto(lastEventsSync = value))
+            userBox.put(
+                userSyncInfo?.copy(lastEventsSync = value)
+                    ?: SyncInfoDto(lastEventsSync = value)
+            )
         }
 
     override var lastTagsSync: Long?
         get() = userSyncInfo?.lastTagsSync
         set(value) {
-            userBox.put(userSyncInfo?.copy(lastTagsSync = value)
-                ?: SyncInfoDto(lastTagsSync = value))
+            userBox.put(
+                userSyncInfo?.copy(lastTagsSync = value)
+                    ?: SyncInfoDto(lastTagsSync = value)
+            )
         }
 
     override var lastGoogleFitSync: Long?
         get() = userSyncInfo?.lastGoogleFitSync
         set(value) {
-            userBox.put(userSyncInfo?.copy(lastGoogleFitSync = value)
-                ?: SyncInfoDto(lastGoogleFitSync = value))
+            userBox.put(
+                userSyncInfo?.copy(lastGoogleFitSync = value)
+                    ?: SyncInfoDto(lastGoogleFitSync = value)
+            )
         }
 }

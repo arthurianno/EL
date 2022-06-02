@@ -10,6 +10,9 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.State
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.InputControl
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
@@ -23,13 +26,13 @@ class ProfileChangePasswordPm @Inject constructor(
     val oldPasswordInput = inputControl(hideErrorOnUserInput = false)
     val newPasswordInput = inputControl(hideErrorOnUserInput = false)
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
-    val changePasswordEnabledState = State(false)
-    val continueAction = Action<Unit>()
-    val backHandleAction = Action<Unit>()
+    val changePasswordEnabledState = state(false)
+    val continueAction = action<Unit>()
+    val backHandleAction = action<Unit>()
 
-    private val isOldPasswordValidState = State(false)
-    private val isNewPasswordValidState = State(false)
-    private val exitDialogAction = Action<Unit>()
+    private val isOldPasswordValidState = state(false)
+    private val isNewPasswordValidState = state(false)
+    private val exitDialogAction = action<Unit>()
     private val exitDialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
     override fun onCreate() {

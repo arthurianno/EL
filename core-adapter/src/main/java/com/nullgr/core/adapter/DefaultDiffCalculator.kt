@@ -1,7 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import com.nullgr.core.adapter.items.ListItem
 
 /**
@@ -12,14 +12,24 @@ import com.nullgr.core.adapter.items.ListItem
  */
 class DefaultDiffCalculator : DiffCalculator {
 
-    override fun calculateDiff(adapter: DynamicAdapter, before: List<ListItem>, after: List<ListItem>, detectMoves: Boolean) {
+    override fun calculateDiff(
+        adapter: DynamicAdapter,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    ) {
         val callback = Callback(before, after)
         val diffResult = DiffUtil.calculateDiff(callback, detectMoves)
         adapter.setData(after)
         diffResult.dispatchUpdatesTo(adapter)
     }
 
-    override fun calculateDiff(updateCallback: ListUpdateCallback, before: List<ListItem>, after: List<ListItem>, detectMoves: Boolean) {
+    override fun calculateDiff(
+        updateCallback: ListUpdateCallback,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    ) {
         val callback = Callback(before, after)
         val diffResult = DiffUtil.calculateDiff(callback, detectMoves)
         diffResult.dispatchUpdatesTo(updateCallback)

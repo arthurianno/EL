@@ -1,7 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.items.ListItem
 
 interface AdapterDelegatesManager {
@@ -14,7 +14,12 @@ interface AdapterDelegatesManager {
 
     fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder)
 
-    fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder, payloads: List<Any>)
+    fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        vh: RecyclerView.ViewHolder,
+        payloads: List<Any>
+    )
 
     fun onViewRecycled(vh: RecyclerView.ViewHolder)
 

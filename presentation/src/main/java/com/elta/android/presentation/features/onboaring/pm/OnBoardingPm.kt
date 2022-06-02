@@ -21,6 +21,8 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.date.toTimestamp
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import java.util.Date
 import javax.inject.Inject
 
@@ -30,18 +32,18 @@ class OnBoardingPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val pageChangedAction = Action<Int>()
-    val currentPageState = State(0)
-    val skipPageAction = Action<Unit>()
-    val nextPageAction = Action<Unit>()
-    val previousPageAction = Action<Unit>()
-    val nextPageVisibilityState = State(false)
-    val previousPageVisibilityState = State(false)
-    val titleState = State(resources.getString(R.string.on_boarding_header_user_sex))
+    val pageChangedAction = action<Int>()
+    val currentPageState = state(0)
+    val skipPageAction = action<Unit>()
+    val nextPageAction = action<Unit>()
+    val previousPageAction = action<Unit>()
+    val nextPageVisibilityState = state(false)
+    val previousPageVisibilityState = state(false)
+    val titleState = state(resources.getString(R.string.on_boarding_header_user_sex))
 
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
-    private val updateProfileSettingsAction = Action<Unit>()
-    private val updateUserInfoAction = Action<Unit>()
+    private val updateProfileSettingsAction = action<Unit>()
+    private val updateUserInfoAction = action<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {

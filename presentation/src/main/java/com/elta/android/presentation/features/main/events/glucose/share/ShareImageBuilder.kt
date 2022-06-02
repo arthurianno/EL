@@ -3,8 +3,8 @@ package com.elta.android.presentation.features.main.events.glucose.share
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel

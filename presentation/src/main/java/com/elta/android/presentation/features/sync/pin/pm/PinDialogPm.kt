@@ -6,6 +6,9 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
@@ -13,11 +16,11 @@ class PinDialogPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val actionButtonEnabledState = State(false)
-    val mainAction = Action<Unit>()
-    val closeDialogCommand = Command<Unit>(bufferSize = 1)
+    val actionButtonEnabledState = state(false)
+    val mainAction = action<Unit>()
+    val closeDialogCommand = command<Unit>(bufferSize = 1)
     val pinInputControl = inputControl()
-    val deviceNameState = State("")
+    val deviceNameState = state("")
 
     override fun onCreate() {
         super.onCreate()
@@ -37,6 +40,11 @@ class PinDialogPm @Inject constructor(
     }
 
     fun setDeviceName(name: String) {
-        deviceNameState.consumer.accept(resources.getString(R.string.sync_state_pin_dialog_device_pattern, name))
+        deviceNameState.consumer.accept(
+            resources.getString(
+                R.string.sync_state_pin_dialog_device_pattern,
+                name
+            )
+        )
     }
 }

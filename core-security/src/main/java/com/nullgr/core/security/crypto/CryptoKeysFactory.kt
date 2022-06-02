@@ -5,7 +5,7 @@ import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import java.math.BigInteger
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidParameterException
@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
 import java.security.SecureRandom
 import java.security.spec.InvalidKeySpecException
-import java.util.*
+import java.util.Calendar
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
@@ -84,10 +84,12 @@ object CryptoKeysFactory {
      * @return RSA [KeyPair]
      */
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    @Throws(IllegalArgumentException::class,
+    @Throws(
+        IllegalArgumentException::class,
         InvalidAlgorithmParameterException::class,
         NoSuchProviderException::class,
-        NoSuchAlgorithmException::class)
+        NoSuchAlgorithmException::class
+    )
     fun createRSAKeyPair(ctx: Context, keyAlias: String): KeyPair {
         val notBefore = Calendar.getInstance()
         val notAfter = Calendar.getInstance()
@@ -95,7 +97,15 @@ object CryptoKeysFactory {
 
         val spec = KeyPairGeneratorSpec.Builder(ctx)
             .setAlias(keyAlias)
-            .setSubject(X500Principal(String.format(X500_PRINCIPAL_NAME_MASK, keyAlias, ctx.packageName)))
+            .setSubject(
+                X500Principal(
+                    String.format(
+                        X500_PRINCIPAL_NAME_MASK,
+                        keyAlias,
+                        ctx.packageName
+                    )
+                )
+            )
             .setSerialNumber(BigInteger.ONE)
             .setStartDate(notBefore.time)
             .setEndDate(notAfter.time)
@@ -115,9 +125,13 @@ object CryptoKeysFactory {
      */
     @RequiresApi(Build.VERSION_CODES.M)
     fun createRSAKeyPairUserAuthRequired(keyAlias: String): KeyPair {
-        val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
+        val keyPairGenerator =
+            KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
         keyPairGenerator.initialize(
-            KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            KeyGenParameterSpec.Builder(
+                keyAlias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
                 .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
                 .setUserAuthenticationRequired(true)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
@@ -136,9 +150,13 @@ object CryptoKeysFactory {
      */
     @RequiresApi(Build.VERSION_CODES.M)
     fun createAESKeyInAndroidKeystore(keyAlias: String): SecretKey {
-        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+        val keyGenerator =
+            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
         keyGenerator.init(
-            KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            KeyGenParameterSpec.Builder(
+                keyAlias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
                 .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
                 .setRandomizedEncryptionRequired(false)

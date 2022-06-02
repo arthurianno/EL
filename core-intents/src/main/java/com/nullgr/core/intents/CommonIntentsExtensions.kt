@@ -11,12 +11,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.MediaStore
-import android.support.annotation.ColorInt
-import android.support.annotation.RequiresPermission
-import android.support.customtabs.CustomTabsIntent
 import android.telephony.PhoneNumberUtils
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresPermission
+import androidx.browser.customtabs.CustomTabsIntent
 import com.nullgr.core.intents.rxresult.RxActivityResult
 import com.nullgr.core.intents.rxresult.RxResolveResultActivity
 import com.nullgr.core.rx.RxBus
@@ -31,7 +31,7 @@ fun callIntent(number: String): Intent {
     return Intent(Intent.ACTION_DIAL)
         .setData(
             Uri.parse(
-                if (number.toLowerCase().startsWith("tel:")) number
+                if (number.lowercase().startsWith("tel:")) number
                 else String.format("tel:%s", PhoneNumberUtils.stripSeparators(number))
             )
         )

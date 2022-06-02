@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.GroupItem
 import com.elta.android.presentation.core.ui.adapter.ParentAdapterDelegate
@@ -38,7 +38,11 @@ class RecordsGroupDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as RecordsGroupItem
 
         with(holder as ViewHolder) {
@@ -49,7 +53,12 @@ class RecordsGroupDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as RecordsGroupItem
         with(holder as ViewHolder) {
             when (payload) {
@@ -61,7 +70,12 @@ class RecordsGroupDelegate(
         }
     }
 
-    private fun toggleState(layout: ExpandableLayout, animate: Boolean, indicator: View, item: GroupItem) {
+    private fun toggleState(
+        layout: ExpandableLayout,
+        animate: Boolean,
+        indicator: View,
+        item: GroupItem
+    ) {
         layout.setExpanded(item.isExpanded, animate)
         indicator.isSelected = item.isExpanded
     }

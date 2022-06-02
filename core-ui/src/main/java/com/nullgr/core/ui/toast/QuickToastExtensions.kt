@@ -44,4 +44,4 @@ fun String?.showLongToast(context: Context?) {
 }
 
 private fun makeTextToast(context: Context, message: String, length: Int): Toast =
-        Toast.makeText(context, message, length)
+    Toast.makeText(context, message, length)

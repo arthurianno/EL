@@ -4,17 +4,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
-import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.Action
 import timber.log.Timber
 
 class DynamicLinkProcessor private constructor(
     private val initialIntent: Intent?,
     private val ignoreColdStart: Boolean,
     private val savedState: Bundle? = null,
-    private val coldStartAction: PresentationModel.Action<Unit>?,
-    private val notificationStartAction: PresentationModel.Action<Uri>?,
-    private val deepLinkOpenAction: PresentationModel.Action<Uri>?,
-    private val coldStartByDeepLinkAction: PresentationModel.Action<Uri>?
+    private val coldStartAction: Action<Unit>?,
+    private val notificationStartAction: Action<Uri>?,
+    private val deepLinkOpenAction: Action<Uri>?,
+    private val coldStartByDeepLinkAction: Action<Uri>?
 ) {
 
     @Suppress("LongMethod")
@@ -62,10 +62,10 @@ class DynamicLinkProcessor private constructor(
     class Builder(private val initialIntent: Intent?) {
         private var ignoreColdStart: Boolean = true
         private var savedState: Bundle? = null
-        private var coldStartAction: PresentationModel.Action<Unit>? = null
-        private var notificationStartAction: PresentationModel.Action<Uri>? = null
-        private var deepLinkOpenAction: PresentationModel.Action<Uri>? = null
-        private var coldStartByDeepLinkAction: PresentationModel.Action<Uri>? = null
+        private var coldStartAction: Action<Unit>? = null
+        private var notificationStartAction: Action<Uri>? = null
+        private var deepLinkOpenAction: Action<Uri>? = null
+        private var coldStartByDeepLinkAction: Action<Uri>? = null
 
         fun ignoreColdStart(ignore: Boolean): Builder {
             this.ignoreColdStart = ignore
@@ -77,22 +77,22 @@ class DynamicLinkProcessor private constructor(
             return this
         }
 
-        fun coldStartPassTo(action: PresentationModel.Action<Unit>): Builder {
+        fun coldStartPassTo(action: Action<Unit>): Builder {
             this.coldStartAction = action
             return this
         }
 
-        fun notificationStartPassTo(action: PresentationModel.Action<Uri>): Builder {
+        fun notificationStartPassTo(action: Action<Uri>): Builder {
             this.notificationStartAction = action
             return this
         }
 
-        fun deepLinkStartPassTo(action: PresentationModel.Action<Uri>): Builder {
+        fun deepLinkStartPassTo(action: Action<Uri>): Builder {
             this.deepLinkOpenAction = action
             return this
         }
 
-        fun coldStartByDeepLinkPassTo(action: PresentationModel.Action<Uri>): Builder {
+        fun coldStartByDeepLinkPassTo(action: Action<Uri>): Builder {
             this.coldStartByDeepLinkAction = action
             return this
         }

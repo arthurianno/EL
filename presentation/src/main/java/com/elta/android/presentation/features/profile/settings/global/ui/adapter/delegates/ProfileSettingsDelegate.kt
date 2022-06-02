@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
@@ -35,7 +35,11 @@ class ProfileSettingsDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as ProfileSettingsItem
         with(holder as ViewHolder) {
             settingsIconView.setImageResource(item.icon)
@@ -51,7 +55,12 @@ class ProfileSettingsDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as ProfileSettingsItem
         with(holder as ViewHolder) {
             when (payload) {

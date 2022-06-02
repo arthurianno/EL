@@ -15,6 +15,8 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
@@ -28,14 +30,14 @@ class EditObserverPm @Inject constructor(
 ) : BasePm(services) {
 
     val observerNameInput = inputControl()
-    val saveButtonEnabledState = State(false)
+    val saveButtonEnabledState = state(false)
     val deleteObserverDialogControl = dialogControl<DialogData, DialogResult>()
-    val deleteObserverAction = Action<Unit>()
-    val saveObserverAction = Action<Unit>()
+    val deleteObserverAction = action<Unit>()
+    val saveObserverAction = action<Unit>()
 
-    private val observerDeletedSuccessAction = Action<Unit>()
-    private val selectedObserverIdState = State<String>()
-    private val observerState = State<Observer>()
+    private val observerDeletedSuccessAction = action<Unit>()
+    private val selectedObserverIdState = state<String>()
+    private val observerState = state<Observer>()
 
     private val deleteObserverDialogData: DialogData by lazy { Dialogs.EventDeleteObserver(resources) }
 
@@ -134,7 +136,10 @@ class EditObserverPm @Inject constructor(
     private fun createGetObserverParams(id: String) = GetObserverUseCase.Params(id)
 
     private fun createUpdateObserverNameParams(i: Unit) =
-        UpdateObserverNameUseCase.Params(selectedObserverIdState.value, observerNameInput.text.value)
+        UpdateObserverNameUseCase.Params(
+            selectedObserverIdState.value,
+            observerNameInput.text.value
+        )
 
     private fun handleNameChangedSuccess() {
         bus.event(Events.ObserversUpdated)

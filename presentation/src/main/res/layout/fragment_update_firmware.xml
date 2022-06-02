@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/updateIconView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbarView"
         app:srcCompat="@drawable/ic_firmware_logo" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/updateTitleView"
         style="@style/New.Headline4.BlackBlue"
         android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/updateIconView" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/updateDescriptionView"
         style="@style/New.Caption1.ShadeBlack2"
         android:layout_width="wrap_content"
@@ -66,13 +66,13 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
             app:srcCompat="@drawable/ic_info" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/actionButtonView"
         style="@style/Button.Large"
         android:text="@string/firmware_button_update"

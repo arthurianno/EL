@@ -3,10 +3,11 @@ package com.elta.android.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.domain.features.user.model.SocialNetworkType
+import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
@@ -64,7 +65,6 @@ import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
 import com.nullgr.core.intents.emailIntent
 import com.nullgr.core.intents.webIntent
-import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
 
@@ -132,7 +132,7 @@ object Screens {
     }
 
     class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?) =
+        override fun getActivityIntent(context: Context) =
             callIntent(phoneNumber)
     }
 
@@ -141,7 +141,7 @@ object Screens {
         private val lng: Double,
         private val address: String
     ) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?) =
+        override fun getActivityIntent(context: Context) =
             navigationIntent(lat, lng, address)
     }
 
@@ -188,7 +188,7 @@ object Screens {
     }
 
     data class ShareEventScreen(val uri: Uri, val title: String) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?) = shareIntent(uri, title)
+        override fun getActivityIntent(context: Context) = shareIntent(uri, title)
     }
 
     // SYNC FLOW
@@ -287,17 +287,17 @@ object Screens {
     }
 
     data class EmailScreen(val email: String) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?): Intent =
+        override fun getActivityIntent(context: Context): Intent =
             emailIntent(email)
     }
 
     // STATISTICS FLOW
     data class PeriodScreen(val period: Period) : SupportAppScreen() {
         override fun getFragment() = PeriodFragment.newInstance(period)
-        override fun getScreenKey(): String {
-            val superKey = super.getScreenKey()
-            return "$superKey-${period.name}"
-        }
+//        override fun getScreenKey(): String {
+//            val superKey = super.getScreenKey()
+//            return "$superKey-${period.name}"
+//        }
     }
 
     data class ViewPdfScreen(val uri: Uri) : SupportAppScreen() {
@@ -311,7 +311,7 @@ object Screens {
     }
 
     object PlayMarketScreen : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?) =
+        override fun getActivityIntent(context: Context) =
             webIntent("market://details?id=com.elta.android")
     }
 }

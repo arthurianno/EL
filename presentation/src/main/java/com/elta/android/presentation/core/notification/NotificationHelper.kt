@@ -8,7 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.net.Uri
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.app.ui.AppActivity
 import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_AUTHORITY
@@ -44,8 +44,10 @@ class NotificationHelper @Inject constructor(
             .setCategory(NotificationCompat.CATEGORY_ALARM)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, title,
-                NotificationManager.IMPORTANCE_HIGH).apply {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID, title,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
                 enableLights(true)
                 lightColor = Color.BLUE
                 enableVibration(true)

@@ -5,7 +5,8 @@ import com.elta.android.presentation.features.sync.start.onboarding.pm.FromOnBoa
 
 class FromOnBoardingSyncStartFragment : SyncStartFragment<FromOnBoardingSyncStartPm>() {
 
-    override val classToken: Class<FromOnBoardingSyncStartPm> = FromOnBoardingSyncStartPm::class.java
+    override val classToken: Class<FromOnBoardingSyncStartPm> =
+        FromOnBoardingSyncStartPm::class.java
 
     companion object {
         fun newInstance() = FromOnBoardingSyncStartFragment()

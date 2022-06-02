@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class DevicesFragment : BaseListFragment<DevicesPm>() {
     override val screenLayout = R.layout.fragment_devices

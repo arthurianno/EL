@@ -1,17 +1,18 @@
 package com.elta.android.presentation.features.greeting.pm
 
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class GreetingPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val menuAction = Action<Unit>()
-    val registrationAction = Action<Unit>()
+    val menuAction = action<Unit>()
+    val registrationAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()

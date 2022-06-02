@@ -15,10 +15,12 @@ internal object SelectionArgsBuilder {
         if (selectionArgs.size == 1) {
             return buildWhere(selectionArgs[0])
         }
-        return selectionArgs.joinToString(separator = ",",
-                prefix = " IN (",
-                postfix = ")",
-                transform = { "'$it'" })
+        return selectionArgs.joinToString(
+            separator = ",",
+            prefix = " IN (",
+            postfix = ")",
+            transform = { "'$it'" }
+        )
     }
 
     fun buildLike(selectionArg: String): String {

@@ -11,7 +11,7 @@
         android:layout_height="0.7dp"
         android:background="@color/shade_black3" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/periodDatesTitleView"
         style="@style/New.Caption1.BlackBlue"
         android:layout_width="wrap_content"
@@ -28,6 +28,6 @@
     <com.elta.android.presentation.widgets.charts.statistics.StatisticsChartCompoundView
         android:id="@+id/statisticsChartView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -13,12 +13,12 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.charts.statistics.listeners.OnStatisticsDateChangedListener
@@ -122,8 +122,10 @@ class StatisticsChartView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         onBeforeMeasure()
-        val newWidthMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewWidth.toInt(), MeasureSpec.EXACTLY)
-        val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
+        val newWidthMeasureSpec =
+            MeasureSpec.makeMeasureSpec(fullViewWidth.toInt(), MeasureSpec.EXACTLY)
+        val newHeightMeasureSpec =
+            MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
         super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
     }
 
@@ -133,8 +135,14 @@ class StatisticsChartView @JvmOverloads constructor(
             val pointOfTouch = PointF(event.x, event.y)
             dateToSectionsMap.entries.forEach {
                 when {
-                    it.value.isSelected -> it.value.performSelection(false, it.key.date?.toLocalDate())
-                    it.value.isClicked(pointOfTouch) -> it.value.performSelection(true, it.key.date?.toLocalDate())
+                    it.value.isSelected -> it.value.performSelection(
+                        false,
+                        it.key.date?.toLocalDate()
+                    )
+                    it.value.isClicked(pointOfTouch) -> it.value.performSelection(
+                        true,
+                        it.key.date?.toLocalDate()
+                    )
                 }
             }
             checkMaybeAllUnselected()
@@ -206,8 +214,14 @@ class StatisticsChartView @JvmOverloads constructor(
             drawRect(sectionModel.sectionRect, sectionPaint)
 
             if (index < dateToSectionsMap.size - 1) {
-                sectionLinePath.moveTo(sectionModel.sectionRect.right.toFloat(), sectionModel.sectionRect.top.toFloat())
-                sectionLinePath.lineTo(sectionModel.sectionRect.right.toFloat(), sectionModel.sectionRect.bottom.toFloat())
+                sectionLinePath.moveTo(
+                    sectionModel.sectionRect.right.toFloat(),
+                    sectionModel.sectionRect.top.toFloat()
+                )
+                sectionLinePath.lineTo(
+                    sectionModel.sectionRect.right.toFloat(),
+                    sectionModel.sectionRect.bottom.toFloat()
+                )
                 drawPath(sectionLinePath, sectionLinePaint)
                 sectionLinePath.reset()
             }
@@ -218,9 +232,13 @@ class StatisticsChartView @JvmOverloads constructor(
     }
 
     private fun Canvas.drawSelected() {
-        dateToSectionsMap.entries.find { !it.key.formattedDate.isNullOrEmpty() && it.value.isSelected }?.let {
-            drawSelectedSectionAttributes(checkNotNull(it.key.formattedDate), it.value.sectionRect)
-        }
+        dateToSectionsMap.entries.find { !it.key.formattedDate.isNullOrEmpty() && it.value.isSelected }
+            ?.let {
+                drawSelectedSectionAttributes(
+                    checkNotNull(it.key.formattedDate),
+                    it.value.sectionRect
+                )
+            }
     }
 
     private fun Canvas.drawDateTitle(date: String, sectionRect: Rect) {
@@ -244,7 +262,12 @@ class StatisticsChartView @JvmOverloads constructor(
             bgBottom
         )
 
-        drawRoundRect(selectedItemTimeBgRect, selectedItemBackgroundCorner, selectedItemBackgroundCorner, selectedItemShapePaint)
+        drawRoundRect(
+            selectedItemTimeBgRect,
+            selectedItemBackgroundCorner,
+            selectedItemBackgroundCorner,
+            selectedItemShapePaint
+        )
         drawText(date, x.toFloat(), dateTitleY, selectedDateTitlePaint)
 
         selectedItemTriangleTop.moveTo(x - selectedItemTriangleWidth / 2, 0f)
@@ -255,10 +278,22 @@ class StatisticsChartView @JvmOverloads constructor(
         drawPath(selectedItemTriangleTop, selectedItemShapePaint)
         selectedItemTriangleTop.reset()
 
-        selectedItemTriangleBottom.moveTo(x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
-        selectedItemTriangleBottom.lineTo(x + selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
-        selectedItemTriangleBottom.lineTo(x.toFloat(), selectedItemTimeBgRect.top - selectedItemTriangleHeight)
-        selectedItemTriangleBottom.lineTo(x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
+        selectedItemTriangleBottom.moveTo(
+            x - selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
+        selectedItemTriangleBottom.lineTo(
+            x + selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
+        selectedItemTriangleBottom.lineTo(
+            x.toFloat(),
+            selectedItemTimeBgRect.top - selectedItemTriangleHeight
+        )
+        selectedItemTriangleBottom.lineTo(
+            x - selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
         selectedItemTriangleBottom.close()
         drawPath(selectedItemTriangleBottom, selectedItemShapePaint)
         selectedItemTriangleBottom.reset()
@@ -367,7 +402,8 @@ class StatisticsChartView @JvmOverloads constructor(
 
     private fun processSections() {
         dateToSectionsMap.clear()
-        val availableScreenWidth = getDisplaySize(context).first - CHART_VALUES_WIDTH.dpToPx(context)
+        val availableScreenWidth =
+            getDisplaySize(context).first - CHART_VALUES_WIDTH.dpToPx(context)
         singleSectionWidth = when {
             dataModel().period is Periods.SevenDays -> availableScreenWidth / 8
             else -> availableScreenWidth / 14
@@ -408,7 +444,8 @@ class StatisticsChartView @JvmOverloads constructor(
 
                 if (model.eventsLowCount > 0) {
                     val minLow = model.minLowLevel ?: 0.0
-                    val lowBottom = originTop + availableChartHeight * (1 - (minLow - min) / fullRange)
+                    val lowBottom =
+                        originTop + availableChartHeight * (1 - (minLow - min) / fullRange)
                     val maxLow = model.maxLowLevel ?: 0.0
                     var lowTop = originTop + availableChartHeight * (1 - (maxLow - min) / fullRange)
 
@@ -420,9 +457,11 @@ class StatisticsChartView @JvmOverloads constructor(
 
                 if (model.eventsNormalCount > 0) {
                     val minNormal = model.minNormalLevel ?: 0.0
-                    val normalBottom = originTop + availableChartHeight * (1 - (minNormal - min) / fullRange)
+                    val normalBottom =
+                        originTop + availableChartHeight * (1 - (minNormal - min) / fullRange)
                     val maxNormal = model.maxNormalLevel ?: 0.0
-                    var normalTop = originTop + availableChartHeight * (1 - (maxNormal - min) / fullRange)
+                    var normalTop =
+                        originTop + availableChartHeight * (1 - (maxNormal - min) / fullRange)
 
                     if (normalBottom - normalTop < glucoseMinBlockHeight) {
                         normalTop = normalBottom - glucoseMinBlockHeight
@@ -432,9 +471,11 @@ class StatisticsChartView @JvmOverloads constructor(
 
                 if (model.eventsHighCount > 0) {
                     val minHigh = model.minHighLevel ?: 0.0
-                    val highBottom = originTop + availableChartHeight * (1 - (minHigh - min) / fullRange)
+                    val highBottom =
+                        originTop + availableChartHeight * (1 - (minHigh - min) / fullRange)
                     val maxHigh = model.maxHighLevel ?: 0.0
-                    var highTop = originTop + availableChartHeight * (1 - (maxHigh - min) / fullRange)
+                    var highTop =
+                        originTop + availableChartHeight * (1 - (maxHigh - min) / fullRange)
 
                     if (highBottom - highTop < glucoseMinBlockHeight) {
                         highTop = highBottom - glucoseMinBlockHeight
@@ -444,7 +485,8 @@ class StatisticsChartView @JvmOverloads constructor(
 
                 if (model.averageLevel > 0) {
                     val pointX = originSectionRect.left + originSectionRect.width() / 2
-                    val pointY = originTop + availableChartHeight * (1 - (model.averageLevel - min) / fullRange)
+                    val pointY =
+                        originTop + availableChartHeight * (1 - (model.averageLevel - min) / fullRange)
                     pointsOfAverage.add(PointF(pointX.toFloat(), pointY.toFloat()))
                 }
 

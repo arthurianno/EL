@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.pm
 
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import me.dmdev.rxpm.action
 
 abstract class BaseFlowPm(

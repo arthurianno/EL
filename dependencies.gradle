@@ -100,7 +100,9 @@ def libraryVersions = [
 
         jodaTimeVersion            : '2.9.9.2',
 
-        objectboxVersion           : ext.objectboxVersion
+        objectboxVersion           : ext.objectboxVersion,
+
+        coroutinesVersion          : '1.3.9'
 ]
 
 ext.commonDependencies = [
@@ -200,6 +202,9 @@ ext.commonDependencies = [
         nordicScanner         : "no.nordicsemi.android.support.v18:scanner:${libraryVersions.nordicScannerVersion}",
         nordicDfu             : "no.nordicsemi.android:dfu:${libraryVersions.nordicDfuVersion}",
         rxBluetooth           : "com.polidea.rxandroidble2:rxandroidble:${libraryVersions.rxBluetoothVersion}",
+
+        // new dependencies
+        coroutines            : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${libraryVersions.coroutinesVersion}"
 ]
 
 ext.commonTestDependencies = [

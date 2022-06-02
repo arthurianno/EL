@@ -9,6 +9,8 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
@@ -19,14 +21,14 @@ class FeedbackPm @Inject constructor(
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {
 
-    val sendFeedbackEnabledState = State(false)
+    val sendFeedbackEnabledState = state(false)
     val nameInput = inputControl()
     val emailInput = inputControl(hideErrorOnUserInput = false)
     val messageInput = inputControl()
-    val continueAction = Action<Unit>()
+    val continueAction = action<Unit>()
 
-    private val getProfileAction = Action<Unit>()
-    private val isEmailValidState = State(false)
+    private val getProfileAction = action<Unit>()
+    private val isEmailValidState = state(false)
 
     override fun onCreate() {
         super.onCreate()

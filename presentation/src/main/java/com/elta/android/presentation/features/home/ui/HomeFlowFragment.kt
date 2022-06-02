@@ -30,7 +30,10 @@ import io.reactivex.rxkotlin.Observables
 import kotlinx.android.synthetic.main.fragment_home_flow.*
 import kotlinx.android.synthetic.main.layout_home_bottom_sheet.*
 import kotlinx.android.synthetic.main.layout_like_app_dialog.view.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.DialogControl
+import me.dmdev.rxpm.widget.bindTo
 import javax.inject.Inject
 
 class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
@@ -48,7 +51,8 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)?.passTo(presentationModel.menuItemRestoredAction)
+        savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)
+            ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
     }
 
@@ -61,9 +65,9 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
         super.onBindPresentationModel(pm)
-        homeActionView.clicks().bindTo { homeActionView.isSelected.not().passTo(pm.homeAction) }
+        homeActionView.clicks().subscribe { homeActionView.isSelected.not().passTo(pm.homeAction) }
         pm.selectedItemIdState.bindTo(homeBottomNavigationView.selection())
-        pm.bottomSheetItems.bindTo(adapter, compositeUnbind)
+        pm.bottomSheetItems.observable.bindTo(adapter, compositeUnbind)
         pm.closeBottomSheetCommand.bindTo { homeBottomSheetView.hide() }
         pm.showBottomSheetCommand.bindTo { homeBottomSheetView.show() }
         Observables.combineLatest(
@@ -72,7 +76,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
         )
             .map { it.first && it.second }
             .distinctUntilChanged()
-            .bindTo {
+            .subscribe {
                 if (it) {
                     homePulseView.show()
                     homePulseView.start()
@@ -81,12 +85,18 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
                     homePulseView.hide()
                 }
             }
-        homeBottomSheetView.visibilityChanges().bindTo { visible ->
+        homeBottomSheetView.visibilityChanges().subscribe { visible ->
             homeActionView.isSelected = visible
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
-        pm.retryDeviceNotFoundControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.retryDeviceNotFoundControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                checkNotNull(view),
+                data,
+                sc
+            )
+        }
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
 
         pm.likeAppDialogControl.bindLikeAppDialog()
@@ -112,7 +122,8 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm>() {
 
     private fun DialogControl<DialogData, DialogResult>.bindLikeAppDialog() =
         bindTo { data, dc ->
-            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.layout_like_app_dialog, null)
+            val dialogView =
+                LayoutInflater.from(requireContext()).inflate(R.layout.layout_like_app_dialog, null)
             dialogView.titleView.text = data.title
             dialogView.contentView.text = data.message
 

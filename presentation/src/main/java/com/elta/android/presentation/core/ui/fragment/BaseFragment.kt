@@ -2,8 +2,6 @@ package com.elta.android.presentation.core.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,12 +22,13 @@ import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.makeSnackBar
 import com.elta.android.presentation.utils.visibility
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.base.PmFragment
-import me.dmdev.rxpm.base.PmSupportFragment
 import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -40,6 +39,8 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
     lateinit var factory: PmFactory
 
     protected abstract val screenLayout: Int
+
+    protected val compositeUnbind = CompositeDisposable()
 
     protected abstract val classToken: Class<T>
 
@@ -57,13 +58,17 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
     private var progressView: View? = null
     private var homeButtonView: View? = null
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 
     @CallSuper
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
         inflater.inflate(screenLayout, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -93,7 +98,7 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.bindTo() { activity?.onBackPressed() }
+        homeButtonView?.clicks()?.subscribe { requireActivity().onBackPressed() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
     }
 
@@ -121,7 +126,7 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
             .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(progressDialog.visibility(childFragmentManager))
+            .subscribe(progressDialog.visibility(childFragmentManager))
     }
 
     private fun showSnackbar(data: SnackBarData) {

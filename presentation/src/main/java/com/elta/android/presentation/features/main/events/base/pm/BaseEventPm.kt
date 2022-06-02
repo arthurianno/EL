@@ -23,6 +23,9 @@ import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
@@ -32,8 +35,8 @@ abstract class BaseEventPm constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val formPickerValueChangedAction = Action<Double>()
-    val updateFormPickerValueCommand = Command<Pair<Int, Int>>()
+    val formPickerValueChangedAction = action<Double>()
+    val updateFormPickerValueCommand = command<Pair<Int, Int>>()
 
     val formInput = inputControl()
     val formSelector = formSelectorControl()
@@ -41,22 +44,22 @@ abstract class BaseEventPm constructor(
     val dateSelector = formSelectorControl()
     val timeSelector = formSelectorControl()
     val noteInput = inputControl()
-    val mainActionTitleState = State<String>()
-    val mainActionVisibilityState = State(false)
-    val mainAction = Action<Unit>()
+    val mainActionTitleState = state<String>()
+    val mainActionVisibilityState = state(false)
+    val mainAction = action<Unit>()
 
-    val showDatePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
-    val showTimePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
-    val dateTimeSelectedAction = Action<ZonedDateTime>()
+    val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val dateTimeSelectedAction = action<ZonedDateTime>()
 
-    val backHandleAction = Action<Unit>()
-    val exitDialogAction = Action<Unit>()
+    val backHandleAction = action<Unit>()
+    val exitDialogAction = action<Unit>()
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
-    protected val formPickerValue = State<Double>()
-    protected val eventTypeState = State<EventType>()
-    protected val selectedDateState = State(ZonedDateTime.now())
+    protected val formPickerValue = state<Double>()
+    protected val eventTypeState = state<EventType>()
+    protected val selectedDateState = state(ZonedDateTime.now())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
     private val dateInFutureSnackBarData by lazy {
@@ -126,7 +129,13 @@ abstract class BaseEventPm constructor(
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
-            .map { ChooserConfiguration(ChooserType.VARIANTS, eventTypeState.value, generateChooserId()) }
+            .map {
+                ChooserConfiguration(
+                    ChooserType.VARIANTS,
+                    eventTypeState.value,
+                    generateChooserId()
+                )
+            }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
 
@@ -142,8 +151,10 @@ abstract class BaseEventPm constructor(
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(ChooserType.GROUP_TAGS, eventTypeState.value,
-                    (tagSelector.option.value.meta as? Tag)?.id)
+                ChooserConfiguration(
+                    ChooserType.GROUP_TAGS, eventTypeState.value,
+                    (tagSelector.option.value.meta as? Tag)?.id
+                )
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()

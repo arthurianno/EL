@@ -11,6 +11,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.hide
 import kotlinx.android.synthetic.main.fragment_sync_start.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 abstract class SyncStartFragment<T : SyncStartPm> : BaseFragment<T>() {
 

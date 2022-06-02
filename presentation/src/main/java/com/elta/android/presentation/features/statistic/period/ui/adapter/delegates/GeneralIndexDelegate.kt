@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.statistic.period.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
 import com.nullgr.core.adapter.items.ListItem
@@ -19,7 +19,11 @@ class GeneralIndexDelegate : AdapterDelegate() {
     override val layoutResource: Int = R.layout.item_stat_general_index
     override val itemType: Any = GeneralIndexItem::class
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as GeneralIndexItem
 
         with(holder as ViewHolder) {
@@ -30,13 +34,21 @@ class GeneralIndexDelegate : AdapterDelegate() {
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as GeneralIndexItem
         with(holder as ViewHolder) {
             when (payload) {
                 GeneralIndexItem.Payload.ICON_CHANGED -> generalIndexIconView.setImageResource(item.icon)
                 GeneralIndexItem.Payload.TITLE_CHANGED -> recordTitleView.text = item.title
-                GeneralIndexItem.Payload.DESCRIPTION_CHANGED -> setDescription(generalIndexDescriptionView, item)
+                GeneralIndexItem.Payload.DESCRIPTION_CHANGED -> setDescription(
+                    generalIndexDescriptionView,
+                    item
+                )
                 GeneralIndexItem.Payload.POSITION_CHANGED -> bottomDividerView.toggleView(item.isTheLast)
             }
         }

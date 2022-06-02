@@ -1,17 +1,17 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainProfileContainerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayoutView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.CollapsingToolbarLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,13 +26,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/profileInfoView"
                     android:layout_width="match_parent"
                     android:layout_height="260dp"
                     android:background="@color/white">
 
-                    <android.support.v7.widget.AppCompatTextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/titleTextView"
                         style="@style/New.Headline3"
                         android:layout_width="0dp"
@@ -48,7 +48,7 @@
                         tools:ignore="RtlSymmetry"
                         tools:text="Иванов Алексей" />
 
-                    <android.support.v7.widget.AppCompatTextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/subTitleView"
                         style="@style/Caption1"
                         android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View
                     android:id="@+id/dividerView"
@@ -68,18 +68,18 @@
                     android:background="?android:attr/listDivider" />
             </LinearLayout>
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 style="@style/FakeToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin">
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/toolbarView"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize">
 
-                    <android.support.v7.widget.AppCompatTextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/toolbarProfileSettingsButtonView"
                         style="@style/ToolbarTextButton"
                         android:layout_width="wrap_content"
@@ -105,7 +105,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_weight="1">
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/toolbarTitleView"
                             style="@style/New.Title1"
                             android:layout_width="wrap_content"
@@ -116,7 +116,7 @@
                             android:maxLines="1"
                             tools:text="Иванов алексей" />
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/toolbarSubTitleView"
                             style="@style/New.Caption2.ShadeBlack1"
                             android:layout_width="wrap_content"
@@ -125,12 +125,12 @@
                             android:includeFontPadding="false"
                             android:text="@string/profile_my_indicators" />
                     </LinearLayout>
-                </android.support.constraint.ConstraintLayout>
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -138,4 +138,4 @@
         android:paddingBottom="16dp"
         app:behavior_overlapTop="126dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

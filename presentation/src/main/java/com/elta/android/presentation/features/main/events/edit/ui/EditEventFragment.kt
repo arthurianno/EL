@@ -10,6 +10,7 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.show
 import kotlinx.android.synthetic.main.fragment_event_form.*
+import me.dmdev.rxpm.bindTo
 
 class EditEventFragment : BaseEventFragment<EditEventPm>() {
 

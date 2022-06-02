@@ -41,20 +41,20 @@
         android:layout_height="wrap_content"
         android:text="Update firmware" />
 
-    <android.support.v7.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/commandInputView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter pin here" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/logView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scrollbars="vertical" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"

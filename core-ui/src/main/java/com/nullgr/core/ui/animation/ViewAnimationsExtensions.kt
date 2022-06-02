@@ -34,7 +34,8 @@ infix fun <T : View> T.revealTo(other: T) {
             val width = this@revealTo.measuredWidth
             val height = this@revealTo.measuredHeight
             val maxRadius = Math.max(width, height).toFloat()
-            val reveal = ViewAnimationUtils.createCircularReveal(other, width / 2, height / 2, 0f, maxRadius)
+            val reveal =
+                ViewAnimationUtils.createCircularReveal(other, width / 2, height / 2, 0f, maxRadius)
             other.show()
             this@revealTo.disappear()
             reveal.start()

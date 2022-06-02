@@ -10,7 +10,8 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
-class SupportDelegatesFactory @Inject constructor(private val bus: RxBus) : AdapterDelegatesFactory {
+class SupportDelegatesFactory @Inject constructor(private val bus: RxBus) :
+    AdapterDelegatesFactory {
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {
