@@ -16,7 +16,7 @@ class FragmentOutlast<T : Outlasting?>(
         return (
             fragment.requireActivity().isFinishing ||
                 !wasInstanceStateSaved && // See http://stackoverflow.com/questions/34649126/fragment-back-stack-and-isremoving
-                    (fragment.isRemoving || isAnyParentOfFragmentRemoving)
+                (fragment.isRemoving || isAnyParentOfFragmentRemoving)
             )
     }
 

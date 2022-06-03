@@ -55,7 +55,7 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
     }
 
     override fun onBindPresentationModel(pm: RegistrationPrivacyPolicyPm) {
-        homeButtonView.clicks().subscribe { dialog.dismiss() }
+        homeButtonView.clicks().subscribe { dialog?.dismiss() }
     }
 
     companion object {

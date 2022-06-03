@@ -1,7 +1,7 @@
 package com.elta.android.presentation.widgets.spinner.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
 import com.elta.android.presentation.utils.toString
@@ -34,7 +34,11 @@ class SpinnerDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as SpinnerItem
         with(holder as ViewHolder) {
             spinnerTitleView.text = item.type.toString(resources)

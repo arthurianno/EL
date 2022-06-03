@@ -23,6 +23,9 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
     protected abstract val classToken: Class<T>
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
 
+    override val presentationModel: T
+        get() = providePresentationModel()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         AndroidSupportInjection.inject(this)

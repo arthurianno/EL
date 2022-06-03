@@ -34,10 +34,10 @@ class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
     }
 
     override fun onBindPresentationModel(pm: PinDialogPm) {
-        dialogCloseButtonView.clicks().subscribe { dialog.dismiss() }
+        dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
         dialogActionButtonView.clicks().bindTo(pm.mainAction)
         pm.actionButtonEnabledState.bindTo(dialogActionButtonView::setEnabled)
-        pm.closeDialogCommand.bindTo { dialog.dismiss() }
+        pm.closeDialogCommand.bindTo { dialog?.dismiss() }
         pm.pinInputControl.bindTo(pinCodeInputView)
         pm.deviceNameState.bindTo(deviceNameView.text())
     }
