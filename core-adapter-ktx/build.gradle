@@ -58,7 +58,7 @@ dependencies {
     implementation project(':core-rx')
     implementation project(':core-adapter')
 
-    compileOnly commonDependencies.supportRecyclerView
+    compileOnly commonDependencies.androidxRecyclerView
     compileOnly commonDependencies.kotlin
 
     implementation commonDependencies.rxKotlin
@@ -96,5 +96,3 @@ dependencies {
         exclude module: 'design'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

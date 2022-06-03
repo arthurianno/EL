@@ -66,9 +66,6 @@ dependencies {
     implementation project(':core-rx')
     implementation project(':common')
 
-//    implementation commonDependencies.appCoreInteractor
-    implementation commonDependencies.supportCompatV7
-
     implementation commonDependencies.rxKotlin
 
     implementation commonDependencies.javaxAnnotation

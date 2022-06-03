@@ -58,9 +58,8 @@ dependencies {
     implementation project(':core-common')
     implementation project(':core-font')
 
-    compileOnly commonDependencies.supportV4
-    compileOnly commonDependencies.supportCompatV7
-    compileOnly commonDependencies.supportRecyclerView
+    compileOnly commonDependencies.androidxAppCompact
+    compileOnly commonDependencies.androidxRecyclerView
     compileOnly commonDependencies.kotlin
 
     testImplementation commonTestDependencies.kotlinJUnit
@@ -94,5 +93,3 @@ dependencies {
         exclude module: 'design'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

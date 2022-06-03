@@ -54,13 +54,11 @@ androidExtensions {
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
 
-    compileOnly commonDependencies.supportCompatV7
-    compileOnly commonDependencies.supportCustomTabs
+    compileOnly commonDependencies.androidxAppCompact
+    compileOnly commonDependencies.androidxBrowser
     compileOnly commonDependencies.supportAnnotations
     compileOnly commonDependencies.kotlin
 
     implementation project(':core-rx')
     implementation commonDependencies.rxKotlin
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

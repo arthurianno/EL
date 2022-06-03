@@ -56,7 +56,7 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    compileOnly commonDependencies.supportCompatV7
+    compileOnly commonDependencies.androidxCore
     compileOnly commonDependencies.kotlin
 
     testImplementation commonTestDependencies.kotlinJUnit
@@ -90,5 +90,3 @@ dependencies {
         exclude module: 'design'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

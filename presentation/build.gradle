@@ -91,22 +91,12 @@ dependencies {
     implementation commonDependencies.coroutines
 
     implementation commonDependencies.libs
-//    implementation commonDependencies.appCore
-//    implementation commonDependencies.appCoreAdapterKtx
+
+    implementation commonDependencies.materialDesign
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
     implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
 
     implementation commonDependencies.rxKotlin

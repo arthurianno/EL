@@ -1,10 +1,10 @@
 package com.nullgr.core.font
 
+import android.app.ActionBar
 import android.content.Context
 import android.graphics.Typeface
 import android.util.Log
 import android.widget.Toolbar
-import androidx.appcompat.app.ActionBar
 
 /**
  * Provide [Typeface] object, created from ***assets*** by using full path to font in assets.

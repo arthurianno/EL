@@ -18,14 +18,14 @@ abstract class PmBottomSheetFragment<PM : PresentationModel> :
 
 //    override val presentationModel get() = delegate.presentationModel
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
+    //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
 //        delegate.onCreate(savedInstanceState)
 //    }
 //
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-//        BottomSheetDialog(checkNotNull(context), theme)
-//
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        BottomSheetDialog(requireContext(), theme)
+
 //    override fun onStart() {
 //        super.onStart()
 //        delegate.onStart()

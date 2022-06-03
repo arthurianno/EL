@@ -68,10 +68,12 @@ class RxLocationManager(
                             Observable.just(EMPTY_LOCATION)
                         else
                             Observable.fromCallable {
-                                val intent = RxResolveResultActivity.newInstance(
-                                    context,
-                                    it.status.resolution.intentSender
-                                ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+                                val intent = it.status.resolution?.intentSender?.let { it1 ->
+                                    RxResolveResultActivity.newInstance(
+                                        context,
+                                        it1
+                                    ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+                                }
                                 context.startActivity(intent)
                             }.flatMap {
                                 SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)

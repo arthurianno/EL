@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "io.objectbox"
 apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.firebase.crashlytics'
 
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
@@ -248,19 +249,13 @@ dependencies {
 //    implementation commonDependencies.appCore
 //    implementation commonDependencies.appCoreSecurity
 
+    implementation commonDependencies.materialDesign
+
+    implementation commonDependencies.androidxMultidex
+
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
     implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.cardView
@@ -301,18 +296,17 @@ dependencies {
     implementation commonDependencies.okHttp
     implementation commonDependencies.okHttpLogger
     implementation commonDependencies.gson
-    implementation(commonDependencies.crashlytics) {
-        transitive = true
-    }
 
     implementation commonDependencies.firebaseCore
     implementation commonDependencies.firebaseMessaging
+//    implementation commonDependencies.firebaseCrashlytics
+//    implementation commonDependencies.firebaseAnalytics
     implementation commonDependencies.location
     implementation commonDependencies.datePicker
 
     implementation commonDependencies.nordicScanner
 
-    implementation commonDependencies.guavaConfictLost
+    implementation commonDependencies.guavaConflictLost
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

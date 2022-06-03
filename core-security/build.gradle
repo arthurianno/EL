@@ -58,7 +58,7 @@ dependencies {
     implementation project(':core-rx')
     implementation project(':core-preferences')
 
-    compileOnly commonDependencies.supportCompatV7
+    compileOnly commonDependencies.androidxCore
     compileOnly commonDependencies.kotlin
 
     implementation commonDependencies.rxKotlin
@@ -96,5 +96,3 @@ dependencies {
         exclude module: 'design'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

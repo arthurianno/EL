@@ -769,11 +769,11 @@ package com.elta.android.presentation.core.ui.bottom_sheet
 //        private const val HIDE_FRICTION = 0.1f
 //        fun <V : View?> from(view: V): BottomSheetBehavior<V> {
 //            val params: ViewGroup.LayoutParams = view!!.layoutParams
-//            return if (params !is android.support.design.widget.CoordinatorLayout.LayoutParams) {
+//            return if (params !is androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
 //                throw IllegalArgumentException("The view is not a child of CoordinatorLayout")
 //            } else {
 //                val behavior: Behavior =
-//                    (params as android.support.design.widget.CoordinatorLayout.LayoutParams).getBehavior()
+//                    (params as androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams).getBehavior()
 //                if (behavior !is BottomSheetBehavior<*>) {
 //                    throw IllegalArgumentException("The view is not associated with BottomSheetBehavior")
 //                } else {
