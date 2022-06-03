@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.navigation.AppNavigator
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
@@ -18,7 +19,6 @@ import com.elta.android.presentation.core.ui.state_view.StateView
 import com.elta.android.presentation.utils.makeSnackBar
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
-import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import dagger.android.AndroidInjection
@@ -54,7 +54,7 @@ abstract class BaseActivity<T : BasePm> :
 
     protected abstract val classToken: Class<T>
 
-    protected open val navigator: Navigator = AppNavigator(this, R.id.containerView)
+    protected open val navigator: Navigator = AppNavigator(this)
 
     protected val currentFragment: BaseFragment<*>?
         get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>

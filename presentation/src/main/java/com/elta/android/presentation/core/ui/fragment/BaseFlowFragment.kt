@@ -12,7 +12,6 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
-import me.dmdev.rxpm.Action
 import me.dmdev.rxpm.passTo
 import javax.inject.Inject
 
@@ -42,10 +41,8 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (childFragmentManager.fragments.isEmpty()) {
-            (presentationModel as? BaseFlowPm)?.launchScreenAction?.let { action ->
-                (action as? Action<BaseFlowFragment<T>>)?.let {
-                    passTo(it)
-                }
+            (presentationModel as? BaseFlowPm)?.launchScreenAction?.let {
+                Unit.passTo(it)
             }
         }
     }

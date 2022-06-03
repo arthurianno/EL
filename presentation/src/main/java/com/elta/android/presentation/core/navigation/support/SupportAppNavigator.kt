@@ -13,7 +13,6 @@ import com.github.terrakok.cicerone.Command
 import com.github.terrakok.cicerone.Forward
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.Replace
-import java.util.LinkedList
 
 /**
  * Navigator implementation for launch fragments and activities.<br></br>
@@ -28,14 +27,7 @@ open class SupportAppNavigator(
     private val activity: Activity
     private val fragmentManager: FragmentManager
     private val containerId: Int
-    private var localStackCopy: LinkedList<String>? = null
-
-    constructor(activity: FragmentActivity, containerId: Int) : this(
-        activity,
-        activity.supportFragmentManager,
-        containerId
-    ) {
-    }
+    private val localStackCopy = mutableListOf<String>()
 
     override fun applyCommands(commands: Array<out Command>) {
         fragmentManager.executePendingTransactions()
@@ -48,10 +40,10 @@ open class SupportAppNavigator(
     }
 
     private fun copyStackToLocal() {
-        localStackCopy = LinkedList()
-        val stackSize: Int = fragmentManager.getBackStackEntryCount()
+        localStackCopy.clear()
+        val stackSize: Int = fragmentManager.backStackEntryCount
         for (i in 0 until stackSize) {
-            localStackCopy!!.add(fragmentManager.getBackStackEntryAt(i).getName().orEmpty())
+            localStackCopy.add(fragmentManager.getBackStackEntryAt(i).name.orEmpty())
         }
     }
 
@@ -106,13 +98,13 @@ open class SupportAppNavigator(
                 .addToBackStack(screen.screenKey)
                 .commit()
         }
-        localStackCopy!!.add(screen.screenKey)
+        localStackCopy.add(screen.screenKey)
     }
 
     protected fun fragmentBack() {
-        if (localStackCopy!!.size > 0) {
+        if (localStackCopy.isNotEmpty()) {
             fragmentManager.popBackStack()
-            localStackCopy!!.removeLast()
+            localStackCopy.removeLast()
         } else {
             activityBack()
         }
@@ -139,9 +131,9 @@ open class SupportAppNavigator(
     protected fun fragmentReplace(command: Replace) {
         val screen = command.screen as SupportAppScreen
         val fragment: Fragment? = createFragment(screen)
-        if (localStackCopy!!.size > 0) {
+        if (localStackCopy.isNotEmpty()) {
             fragmentManager.popBackStack()
-            localStackCopy!!.removeLast()
+            localStackCopy.removeLast()
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
             setupFragmentTransaction(
                 command,
@@ -155,7 +147,7 @@ open class SupportAppNavigator(
                     .addToBackStack(screen.screenKey)
                     .commit()
             }
-            localStackCopy!!.add(screen.screenKey)
+            localStackCopy.add(screen.screenKey)
         } else {
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
             setupFragmentTransaction(
@@ -180,11 +172,11 @@ open class SupportAppNavigator(
             backToRoot()
         } else {
             val key: String = command.screen?.screenKey.orEmpty()
-            val index = localStackCopy!!.indexOf(key)
-            val size = localStackCopy!!.size
+            val index = localStackCopy.indexOf(key)
+            val size = localStackCopy.size
             if (index != -1) {
                 for (i in 1 until size - index) {
-                    localStackCopy!!.removeLast()
+                    localStackCopy.removeLast()
                 }
                 fragmentManager.popBackStack(key, 0)
             } else {
@@ -195,7 +187,7 @@ open class SupportAppNavigator(
 
     private fun backToRoot() {
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        localStackCopy!!.clear()
+        localStackCopy.clear()
     }
 
     /**
