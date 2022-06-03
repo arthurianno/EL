@@ -2,14 +2,15 @@ package com.elta.android.presentation.core.ui.fragment
 
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v7.app.AppCompatDialogFragment
+import androidx.appcompat.app.AppCompatDialogFragment
 import com.elta.android.presentation.core.ui.bottom_sheet.BottomSheetDialog
 import io.reactivex.disposables.CompositeDisposable
-import me.dmdev.rxpm.AndroidPmView
+import me.dmdev.rxpm.PmView
 import me.dmdev.rxpm.PresentationModel
-import me.dmdev.rxpm.delegate.PmSupportFragmentDelegate
 
-abstract class PmBottomSheetFragment<PM : PresentationModel> : AppCompatDialogFragment(), AndroidPmView<PM> {
+abstract class PmBottomSheetFragment<PM : PresentationModel> :
+    AppCompatDialogFragment(),
+    PmView<PM> {
 
     private val delegate by lazy(LazyThreadSafetyMode.NONE) { PmSupportFragmentDelegate(this) }
 
