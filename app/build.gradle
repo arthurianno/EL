@@ -312,6 +312,8 @@ dependencies {
 
     implementation commonDependencies.nordicScanner
 
+    implementation commonDependencies.guavaConfictLost
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
