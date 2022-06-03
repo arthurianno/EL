@@ -96,7 +96,6 @@ dependencies {
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-    implementation commonDependencies.supportAnnotations
     implementation commonDependencies.materialDialogs
 
     implementation commonDependencies.rxKotlin

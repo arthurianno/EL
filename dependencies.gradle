@@ -116,7 +116,6 @@ def libraryVersions = [
 
 ext.commonDependencies = [
         libs                  : fileTree(dir: 'libs', include: ['*.jar']),
-        supportAnnotations    : "com.android.support:support-annotations:${libraryVersions.supportLibraryVersion}",
 
         rxKotlin              : "io.reactivex.rxjava2:rxkotlin:${libraryVersions.rxKotlinVersion}",
         rxAndroid             : "io.reactivex.rxjava2:rxandroid:${libraryVersions.rxAndroidVersion}",

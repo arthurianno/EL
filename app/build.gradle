@@ -246,8 +246,6 @@ dependencies {
     api project(':data')
 
     implementation commonDependencies.libs
-//    implementation commonDependencies.appCore
-//    implementation commonDependencies.appCoreSecurity
 
     implementation commonDependencies.materialDesign
 
@@ -255,7 +253,6 @@ dependencies {
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-    implementation commonDependencies.supportAnnotations
     implementation commonDependencies.materialDialogs
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.cardView

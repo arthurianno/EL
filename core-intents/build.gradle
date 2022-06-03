@@ -56,7 +56,6 @@ dependencies {
 
     compileOnly commonDependencies.androidxAppCompact
     compileOnly commonDependencies.androidxBrowser
-    compileOnly commonDependencies.supportAnnotations
     compileOnly commonDependencies.kotlin
 
     implementation project(':core-rx')

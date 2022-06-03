@@ -55,7 +55,6 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    compileOnly commonDependencies.supportAnnotations
     compileOnly commonDependencies.androidxCore
     compileOnly commonDependencies.kotlin
 
