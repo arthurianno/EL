@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "io.objectbox"
 apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.crashlytics'
 
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
@@ -294,10 +294,10 @@ dependencies {
     implementation commonDependencies.okHttpLogger
     implementation commonDependencies.gson
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
-//    implementation commonDependencies.firebaseCrashlytics
-//    implementation commonDependencies.firebaseAnalytics
+    implementation commonDependencies.firebaseCrashlytics
+    implementation commonDependencies.firebaseAnalytics
     implementation commonDependencies.location
     implementation commonDependencies.datePicker
 

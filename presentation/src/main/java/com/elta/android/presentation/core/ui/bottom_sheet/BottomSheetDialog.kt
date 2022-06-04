@@ -212,7 +212,7 @@ class BottomSheetDialog : AppCompatDialog {
                 override fun performAccessibilityAction(
                     host: View,
                     action: Int,
-                    args: Bundle
+                    args: Bundle?
                 ): Boolean {
                     if (action == AccessibilityNodeInfoCompat.ACTION_DISMISS && cancelable) {
                         cancel()

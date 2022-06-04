@@ -59,6 +59,8 @@ dependencies {
 
     compileOnly commonDependencies.kotlin
 
+    implementation commonDependencies.androidxCoreKtx
+
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
     implementation commonDependencies.rxRelay
