@@ -11,6 +11,8 @@ import com.elta.android.presentation.utils.error
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fregment_invite_observer.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class InviteObserverFragment : BaseFragment<InviteObserverPm>() {
 
@@ -30,7 +32,7 @@ class InviteObserverFragment : BaseFragment<InviteObserverPm>() {
         pm.emailInput.bindTo(emailInputView)
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .bindTo(emailInputView.error())
+            .subscribe(emailInputView.error())
         pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)
     }

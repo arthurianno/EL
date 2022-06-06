@@ -6,7 +6,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
-import android.support.annotation.RequiresPermission
+import androidx.annotation.RequiresPermission
 import com.nullgr.core.rx.contacts.domain.BaseContact
 import com.nullgr.core.rx.contacts.domain.ContactEmail
 import com.nullgr.core.rx.contacts.domain.ContactPhone
@@ -15,7 +15,6 @@ import com.nullgr.core.rx.contacts.engine.ContactsLoadEngine
 import com.nullgr.core.rx.contacts.engine.query.ContactsQueryBuilder
 import com.nullgr.core.rx.contacts.engine.query.QueryProperty
 import io.reactivex.Observable
-
 
 /**
  * This class provides rx api to work with phone contacts.
@@ -85,9 +84,9 @@ class RxContactsProvider private constructor(private val contactsLoadEngine: Con
     @RequiresPermission(Manifest.permission.READ_CONTACTS)
     fun <T : BaseContact> fetchAll(clazz: Class<T>): Observable<List<T>> {
         return contactsLoadEngine
-                .withIncludeAdditionalData(true, true)
-                .withQueryConfiguration(clazz)
-                .fetchAll()
+            .withIncludeAdditionalData(true, true)
+            .withQueryConfiguration(clazz)
+            .fetchAll()
     }
 
     /**
@@ -99,9 +98,9 @@ class RxContactsProvider private constructor(private val contactsLoadEngine: Con
     @RequiresPermission(Manifest.permission.READ_CONTACTS)
     fun <T : BaseContact> fetchSingle(clazz: Class<T>): Observable<T> {
         return contactsLoadEngine
-                .withIncludeAdditionalData(true, true)
-                .withQueryConfiguration(clazz)
-                .fetchSingle()
+            .withIncludeAdditionalData(true, true)
+            .withQueryConfiguration(clazz)
+            .fetchSingle()
     }
 
     /**
@@ -120,9 +119,9 @@ class RxContactsProvider private constructor(private val contactsLoadEngine: Con
     @RequiresPermission(Manifest.permission.READ_CONTACTS)
     fun <T : BaseContact> fromUri(clazz: Class<T>, uri: Uri): Observable<List<T>> {
         return contactsLoadEngine
-                .withIncludeAdditionalData(true, true)
-                .withUriConfiguration(clazz, uri)
-                .fetchAll()
+            .withIncludeAdditionalData(true, true)
+            .withUriConfiguration(clazz, uri)
+            .fetchAll()
     }
 
     /**

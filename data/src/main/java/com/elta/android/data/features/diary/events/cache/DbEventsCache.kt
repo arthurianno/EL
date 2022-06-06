@@ -9,6 +9,7 @@ import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto_
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.extensions.toQueryMillis
 import io.objectbox.kotlin.query
+import io.objectbox.query.QueryBuilder.StringOrder.CASE_INSENSITIVE
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
@@ -38,7 +39,7 @@ class DbEventsCache @Inject constructor(
 
     private fun getAllByTypeAndIds(type: EventTypeDto, ids: LongArray): List<EventCachedDto> =
         box.query {
-            equal(EventCachedDto_.type, type.name)
+            equal(EventCachedDto_.type, type.name, CASE_INSENSITIVE)
             and()
             `in`(EventCachedDto_.id, ids)
         }.find()

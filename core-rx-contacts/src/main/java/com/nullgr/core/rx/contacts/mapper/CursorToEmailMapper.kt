@@ -19,19 +19,25 @@ internal object CursorToEmailMapper : CursorMapper<List<ContactEmail>> {
                 if (cursor.moveToFirst()) {
                     do {
                         val id = cursor.getInt(
-                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email._ID))
+                            cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email._ID)
+                        )
                         if (!(emailResult has id)) {
                             val displayName = cursor.getString(
-                                    cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME))
+                                cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME)
+                            )
                             val isStarred = cursor.getInt(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.STARRED)) != 0
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.STARRED)
+                            ) != 0
                             val email = cursor.getString(
-                                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA1))
+                                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA1)
+                            )
 
-                            val contactEmail = ContactEmail(id.toLong(),
-                                    displayName,
-                                    isStarred,
-                                    email)
+                            val contactEmail = ContactEmail(
+                                id.toLong(),
+                                displayName,
+                                isStarred,
+                                email
+                            )
 
                             emailResult.add(contactEmail)
                         }

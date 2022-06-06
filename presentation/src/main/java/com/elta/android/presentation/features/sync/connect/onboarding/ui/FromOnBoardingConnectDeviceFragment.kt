@@ -5,7 +5,8 @@ import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnB
 
 class FromOnBoardingConnectDeviceFragment : ConnectDeviceFragment<FromOnBoardingConnectDevicePm>() {
 
-    override val classToken: Class<FromOnBoardingConnectDevicePm> = FromOnBoardingConnectDevicePm::class.java
+    override val classToken: Class<FromOnBoardingConnectDevicePm> =
+        FromOnBoardingConnectDevicePm::class.java
 
     companion object {
         fun newInstance() = FromOnBoardingConnectDeviceFragment()

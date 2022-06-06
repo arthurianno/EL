@@ -1,6 +1,6 @@
 package com.elta.android.presentation.widgets.indicators.listeners
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class SimpleAdapterDataObserver : RecyclerView.AdapterDataObserver() {
 

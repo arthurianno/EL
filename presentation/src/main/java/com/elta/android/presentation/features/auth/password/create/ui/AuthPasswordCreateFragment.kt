@@ -14,6 +14,8 @@ import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_password_create.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
 
@@ -35,13 +37,12 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
 
     override fun onBindPresentationModel(pm: AuthPasswordCreatePm) {
         super.onBindPresentationModel(pm)
-        passwordVisibilityButtonView.clicks().bindTo {
-            passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
-        }
+        passwordVisibilityButtonView.clicks()
+            .subscribe { passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure()) }
         pm.passwordInput.bindTo(passwordInputView)
         pm.passwordInput.error.observable
             .distinctUntilChanged()
-            .bindTo(passwordInputView.error())
+            .subscribe(passwordInputView.error())
         pm.continueEnabledState.bindTo { saveButtonView.isEnabled = it }
         saveButtonView.clicks().bindTo(pm.continueAction)
         bindProgressDialog(pm)

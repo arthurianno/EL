@@ -12,7 +12,8 @@ class ReactiveNetworkFacade @Inject constructor(
     private val networkChecker: NetworkChecker
 ) {
 
-    fun observeNetworkConnectivity(): Observable<Connectivity> = ReactiveNetwork.observeNetworkConnectivity(context)
+    fun observeNetworkConnectivity(): Observable<Connectivity> =
+        ReactiveNetwork.observeNetworkConnectivity(context)
 
     fun isConnectedOverWifi(): Boolean = networkChecker.isConnectedOverWifi()
 }

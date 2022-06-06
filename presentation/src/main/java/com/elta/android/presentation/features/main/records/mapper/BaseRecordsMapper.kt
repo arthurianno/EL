@@ -43,14 +43,26 @@ open class BaseRecordsMapper(
 
     protected fun Event.formatValue(): String? =
         when (type) {
-            EventType.INSULIN -> resources.getString(R.string.event_type_insulin_pattern, value.format()
-                ?: "")
-            EventType.BREAD -> resources.getString(R.string.event_type_bread_pattern, value.format()
-                ?: "")
-            EventType.WEIGHT -> resources.getString(R.string.event_type_weight_pattern, value.format()
-                ?: "")
-            EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_pattern, value.format()
-                ?: "")
+            EventType.INSULIN -> resources.getString(
+                R.string.event_type_insulin_pattern,
+                value.format()
+                    ?: ""
+            )
+            EventType.BREAD -> resources.getString(
+                R.string.event_type_bread_pattern,
+                value.format()
+                    ?: ""
+            )
+            EventType.WEIGHT -> resources.getString(
+                R.string.event_type_weight_pattern,
+                value.format()
+                    ?: ""
+            )
+            EventType.GLUCOSE -> resources.getString(
+                R.string.event_type_glucose_pattern,
+                value.format()
+                    ?: ""
+            )
             EventType.ACTIVITY -> this.formatDuration(resources)
             else -> null
         }
@@ -86,8 +98,10 @@ open class BaseRecordsMapper(
 
         val days = TimeUnit.SECONDS.toDays(this)
         val hours = TimeUnit.SECONDS.toHours(this) - days * HOURS_IN_DAY
-        val minutes = TimeUnit.SECONDS.toMinutes(this) - TimeUnit.SECONDS.toHours(this) * MINUTES_IN_HOUR
-        val seconds = TimeUnit.SECONDS.toSeconds(this) - TimeUnit.SECONDS.toMinutes(this) * SECONDS_IN_MINUTE
+        val minutes =
+            TimeUnit.SECONDS.toMinutes(this) - TimeUnit.SECONDS.toHours(this) * MINUTES_IN_HOUR
+        val seconds =
+            TimeUnit.SECONDS.toSeconds(this) - TimeUnit.SECONDS.toMinutes(this) * SECONDS_IN_MINUTE
 
         val time = StringBuilder().apply {
             if (days > ZERO) {

@@ -21,7 +21,8 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.layout_statistics_chart_compound_view, this, true)
+        LayoutInflater.from(context)
+            .inflate(R.layout.layout_statistics_chart_compound_view, this, true)
     }
 
     fun setOnStatisticsDateChangedListener(listener: OnStatisticsDateChangedListener) {

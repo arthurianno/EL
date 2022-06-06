@@ -3,14 +3,15 @@ package com.elta.android.presentation.features.shops.start.pm
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class ShopsStartPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val findShopAction = Action<Unit>()
-    val skipAction = Action<Unit>()
+    val findShopAction = action<Unit>()
+    val skipAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()

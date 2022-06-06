@@ -10,13 +10,13 @@
     android:gravity="bottom"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="22dp"
         android:paddingBottom="10dp">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dialogTitleView"
             style="@style/New.Headline4.BlackBlue"
             android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dialogSubTitleView"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dialogTitleView" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/dialogCloseButtonView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,9 +47,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_dialog_close" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/dialogDescriptionTitleView"
                 style="@style/New.Body1.BlackBlue"
                 android:layout_width="wrap_content"
@@ -91,14 +91,14 @@
                         android:paddingTop="16dp"
                         android:paddingBottom="14dp">
 
-                        <android.support.v7.widget.AppCompatImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/calendarIconView"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginEnd="16dp"
                             app:srcCompat="@drawable/ic_calendar" />
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dateView"
                             style="@style/New.Title2.BlackBlue"
                             android:layout_width="0dp"
@@ -116,13 +116,13 @@
                         app:mcv_firstDayOfWeek="monday"
                         app:mcv_headerTextAppearance="@style/New.Body1.BlackBlue"
                         app:mcv_leftArrowMask="@drawable/ic_calendar_arrow_left"
+                        app:mcv_monthLabels="@array/month_names"
                         app:mcv_rightArrowMask="@drawable/ic_calendar_arrow_right"
                         app:mcv_selectionColor="@android:color/transparent"
                         app:mcv_selectionMode="range"
-                        app:mcv_monthLabels="@array/month_names"
-                        app:mcv_weekDayLabels="@array/day_names"
                         app:mcv_showOtherDates="out_of_range"
                         app:mcv_titleAnimationOrientation="horizontal"
+                        app:mcv_weekDayLabels="@array/day_names"
                         app:mcv_weekDayTextAppearance="@style/New.Caption1.ShadeBlack2" />
 
                 </LinearLayout>
@@ -132,16 +132,16 @@
                     style="@style/AppProgressBar.Accent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
 
             </FrameLayout>
 
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialogActionButtonView"
         style="@style/Button.Large"
         android:text="@string/statistic_report_action_button" />

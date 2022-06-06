@@ -21,8 +21,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     buildTypes {
@@ -55,8 +55,7 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    compileOnly commonDependencies.supportAnnotations
-    compileOnly commonDependencies.supportV4
+    compileOnly commonDependencies.androidxCore
     compileOnly commonDependencies.kotlin
 
     testImplementation commonTestDependencies.kotlinJUnit
@@ -90,5 +89,3 @@ dependencies {
         exclude module: 'design'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

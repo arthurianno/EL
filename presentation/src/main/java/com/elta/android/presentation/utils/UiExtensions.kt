@@ -7,17 +7,17 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.VectorDrawable
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.OnApplyWindowInsetsListener
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.WindowInsetsCompat
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.view.OnApplyWindowInsetsListener
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.NestedScrollView
 import com.elta.android.presentation.R
 import com.jakewharton.rxbinding2.view.longClicks
 import com.jakewharton.rxbinding2.view.touches
@@ -30,10 +30,12 @@ import java.util.concurrent.TimeUnit
 const val SEQUENCE_CLICKS_PERIOD = 150L
 
 fun ImageView.toggleSecureIcon(isSecure: Boolean) {
-    setImageResource(when (isSecure) {
-        true -> R.drawable.ic_show_password
-        else -> R.drawable.ic_password_hide
-    })
+    setImageResource(
+        when (isSecure) {
+            true -> R.drawable.ic_show_password
+            else -> R.drawable.ic_password_hide
+        }
+    )
 }
 
 fun View.applyInsetsToContentView(fitsSystemWindows: Boolean) {
@@ -152,8 +154,7 @@ class ToolbarMenuClickObservable(private val toolbar: Toolbar) : Observable<Int>
 }
 
 fun Context.decodeBitmap(drawableId: Int): Bitmap {
-    val drawable = ContextCompat.getDrawable(this, drawableId)
-    return when (drawable) {
+    return when (val drawable = ContextCompat.getDrawable(this, drawableId)) {
         is BitmapDrawable -> BitmapFactory.decodeResource(resources, drawableId)
         is VectorDrawable -> drawable.toBitmap()
         else -> throw IllegalArgumentException("unsupported drawable type")

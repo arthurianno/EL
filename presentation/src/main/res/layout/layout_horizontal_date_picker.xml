@@ -11,7 +11,7 @@
         android:layout_gravity="center"
         android:background="@drawable/shape_date_picker_selector" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dateItemsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

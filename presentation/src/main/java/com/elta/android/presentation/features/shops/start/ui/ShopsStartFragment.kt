@@ -11,6 +11,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.hide
 import kotlinx.android.synthetic.main.fragment_shops_start.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class ShopsStartFragment : BaseFragment<ShopsStartPm>() {
 

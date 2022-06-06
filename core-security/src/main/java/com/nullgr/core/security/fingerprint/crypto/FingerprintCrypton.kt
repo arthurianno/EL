@@ -3,7 +3,7 @@ package com.nullgr.core.security.fingerprint.crypto
 import android.annotation.TargetApi
 import android.os.Build
 import android.security.keystore.KeyPermanentlyInvalidatedException
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import com.nullgr.core.security.crypto.CryptoKeysFactory
 import com.nullgr.core.security.crypto.Crypton
 import com.nullgr.core.security.crypto.fromBase64
@@ -74,9 +74,16 @@ object FingerprintCrypton {
         val privateKey = CryptoKeysFactory.findOrCreateRSAKeyPairUserAuthRequired(alias).private
         val cipher = Cipher.getInstance(RsaCryptonImpl.RSA_CIPHER_ALGORITHM)
         try {
-            cipher.init(Cipher.DECRYPT_MODE,
+            cipher.init(
+                Cipher.DECRYPT_MODE,
                 privateKey,
-                OAEPParameterSpec(RsaCryptonImpl.OAEP_PARAM_MD_NAME, RsaCryptonImpl.OAEP_PARAM_MGF_NAME, MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT))
+                OAEPParameterSpec(
+                    RsaCryptonImpl.OAEP_PARAM_MD_NAME,
+                    RsaCryptonImpl.OAEP_PARAM_MGF_NAME,
+                    MGF1ParameterSpec.SHA1,
+                    PSource.PSpecified.DEFAULT
+                )
+            )
         } catch (e: KeyPermanentlyInvalidatedException) {
             CryptoKeysFactory.deleteKeyFromKeyStore(alias)
             throw KeyPermanentlyInvalidatedException()
@@ -84,7 +91,10 @@ object FingerprintCrypton {
         return FingerprintManagerCompat.CryptoObject(cipher)
     }
 
-    fun prepareCryptoObjectSafe(alias: String, errorHandlingFunction: (exception: Exception) -> Unit): FingerprintManagerCompat.CryptoObject? {
+    fun prepareCryptoObjectSafe(
+        alias: String,
+        errorHandlingFunction: (exception: Exception) -> Unit
+    ): FingerprintManagerCompat.CryptoObject? {
         return try {
             prepareCryptoObject(alias)
         } catch (exception: Exception) {

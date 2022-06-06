@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PagerSnapHelper
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.geo.GeoPoint
@@ -37,6 +37,8 @@ import com.nullgr.core.ui.extensions.hideKeyboard
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_shops_map.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 import javax.inject.Inject
 
 @Suppress("MagicNumber")
@@ -48,7 +50,8 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
     @Inject
     lateinit var searchAdapter: DynamicAdapter
 
-    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
     override val userLocationPinRes = R.drawable.ic_my_loc
@@ -69,7 +72,8 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
         homeButtonView.setImageResource(R.drawable.ic_dialog_close)
         toolbarView.applyWindowInsetsForChildrenView()
 
-        itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
+        itemsView.layoutManager =
+            FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
         itemsView.adapter = adapter
         itemsView.addItemDecoration(
             MarginItemDecoration(
@@ -103,7 +107,7 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
-            .bindTo(pm::setPermissionStatus)
+            .subscribe(pm::setPermissionStatus)
 
         pm.geoPoints.bindTo { (points: List<GeoPoint>, selected: Int) ->
             addPins(points)
@@ -118,17 +122,18 @@ class ShopsMapFragment : BaseYandexMapFragment<ShopsMapPm>() {
 
         // search
         pm.searchHintState.bindTo(searchInputView::setHint)
-        pm.searchItems.bindTo(searchAdapter, compositeUnbind)
+        pm.searchItems.observable.bindTo(searchAdapter, compositeUnbind)
         pm.searchInput.bindTo(searchInputView)
         pm.searchCloseCommand.bindTo {
             searchInputView.hideKeyboard()
             activity?.window?.decorView?.clearFocus()
         }
         searchClearView.clicks().bindTo(pm.searchClearAction)
-        searchInputView.textChanges().map { it.isNotEmpty() }.bindTo { searchIconView.isSelected = it }
+        searchInputView.textChanges().map { it.isNotEmpty() }
+            .subscribe { searchIconView.isSelected = it }
         searchItemsView.scrollStateChanges()
             .filter { it != RecyclerView.SCROLL_STATE_IDLE }
-            .bindTo { searchInputView.hideKeyboard() }
+            .subscribe { searchInputView.hideKeyboard() }
 
         pm.locationControl.bindTo(compositeUnbind, this)
     }

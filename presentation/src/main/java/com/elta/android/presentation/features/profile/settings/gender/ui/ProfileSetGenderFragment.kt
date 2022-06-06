@@ -9,6 +9,9 @@ import com.elta.android.presentation.features.profile.settings.gender.pm.Profile
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import kotlinx.android.synthetic.main.fragment_profile_set_gender.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 
 class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
 
@@ -29,7 +32,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
     }
 
     override fun handleBack() {
-        passTo(presentationModel.backHandleAction)
+        Unit.passTo(presentationModel.backHandleAction)
     }
 
     companion object {

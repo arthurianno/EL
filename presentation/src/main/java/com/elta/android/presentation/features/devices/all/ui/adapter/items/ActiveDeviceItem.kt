@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.devices.all.ui.adapter.items
 
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.nullgr.core.adapter.items.ListItem
 
 data class ActiveDeviceItem(

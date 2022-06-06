@@ -1,20 +1,22 @@
 package com.elta.android.presentation.core.pm.widgets
 
 import android.app.Activity
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 
 class LocationControl(pm: PresentationModel, private val locationManager: RxLocationManagerFixed) {
 
-    val requestEnableLocationCommand = pm.Command<Unit>(bufferSize = 1)
+    val requestEnableLocationCommand = pm.command<Unit>(bufferSize = 1)
 
-    val locationEnabledAction = pm.Action<Unit>()
+    val locationEnabledAction = pm.action<Unit>()
 
-    val locationNotAllowedAction = pm.Action<Unit>()
+    val locationNotAllowedAction = pm.action<Unit>()
 
     fun enableLocation(fragment: Fragment) {
         locationManager.enableLocation(fragment)

@@ -7,6 +7,7 @@ import com.elta.android.common.utils.toIsoDate
 import com.elta.android.common.utils.toIsoString
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.reminder.model.ScheduleType
+import org.threeten.bp.ZonedDateTime
 
 const val ACTION_SPENT = "com.elta.android.reminder.SPENT"
 const val ACTION_CANCEL = "com.elta.android.reminder.CANCEL"
@@ -45,8 +46,8 @@ fun Reminder.getIntent(context: Context) =
 
 fun Intent.getReminder(): Reminder =
     Reminder(
-        id = getStringExtra(ID),
-        date = getStringExtra(TIME).toIsoDate(),
-        title = getStringExtra(TITLE),
-        scheduleType = getStringExtra(TYPE).let { ScheduleType.valueOf(it) }
+        id = getStringExtra(ID).orEmpty(),
+        date = getStringExtra(TIME)?.toIsoDate() ?: ZonedDateTime.now(),
+        title = getStringExtra(TITLE).orEmpty(),
+        scheduleType = getStringExtra(TYPE).let { ScheduleType.valueOf(it.orEmpty()) }
     )

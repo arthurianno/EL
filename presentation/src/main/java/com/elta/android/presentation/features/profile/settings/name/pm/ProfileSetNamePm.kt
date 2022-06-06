@@ -14,6 +14,8 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.name.model.PersonNameModel
 import com.nullgr.core.date.toTimestamp
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import java.util.Date
@@ -25,20 +27,20 @@ class ProfileSetNamePm @Inject constructor(
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {
 
-    val continueAction = Action<Unit>()
-    val backHandleAction = Action<Unit>()
-    val saveChangesEnableState = State(false)
+    val continueAction = action<Unit>()
+    val backHandleAction = action<Unit>()
+    val saveChangesEnableState = state(false)
     val firstNameInput = inputControl(hideErrorOnUserInput = false)
     val secondNameInput = inputControl(hideErrorOnUserInput = false)
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
-    private val exitDialogAction = Action<Unit>()
-    private val getProfileAction = Action<Unit>()
-    private val isNameNotEmptyState = State(false)
-    private val isNameChangedState = State(false)
-    private val changedFullNameSate = State(PersonNameModel())
-    private val originalFullNameState = State(PersonNameModel())
-    private val profileState = State<Profile>()
+    private val exitDialogAction = action<Unit>()
+    private val getProfileAction = action<Unit>()
+    private val isNameNotEmptyState = state(false)
+    private val isNameChangedState = state(false)
+    private val changedFullNameSate = state(PersonNameModel())
+    private val originalFullNameState = state(PersonNameModel())
+    private val profileState = state<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 

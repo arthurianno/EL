@@ -2,17 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="24dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="24dp">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/pale_gray" />
 
-    <android.support.v7.widget.AppCompatTextView
-        style="@style/New.Caption1.ShadeBlack2"
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/headerTitleView"
+        style="@style/New.Caption1.ShadeBlack2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

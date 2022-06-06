@@ -2,8 +2,8 @@ package com.elta.android.presentation.core.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.ui.adapter.bindTo
@@ -27,7 +27,7 @@ abstract class BaseListFragment<T : BaseListPm> : BaseFragment<T>() {
 
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
-        pm.items.bindTo(adapter, compositeUnbind)
+        pm.items.observable.bindTo(adapter, compositeUnbind)
     }
 
     protected open fun provideLayoutManager(context: Context?): RecyclerView.LayoutManager =

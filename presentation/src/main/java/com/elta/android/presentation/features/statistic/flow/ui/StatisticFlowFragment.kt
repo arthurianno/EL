@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.statistic.flow.ui
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -15,12 +15,14 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.fragment_statistic_flow.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class StatisticFlowFragment : BaseFlowFragment<StatisticFlowPm>() {
 
     override val screenLayout: Int = R.layout.fragment_statistic_flow
     override val classToken: Class<StatisticFlowPm> = StatisticFlowPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        TransparentStatusBarConfigProvider
     override val backgroundColor: Int = R.color.pale_gray
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -11,6 +11,8 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import kotlinx.android.synthetic.main.fragment_enter_pin_dialog.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
 
@@ -32,10 +34,10 @@ class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
     }
 
     override fun onBindPresentationModel(pm: PinDialogPm) {
-        dialogCloseButtonView.clicks().bindTo { dialog.dismiss() }
+        dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
         dialogActionButtonView.clicks().bindTo(pm.mainAction)
         pm.actionButtonEnabledState.bindTo(dialogActionButtonView::setEnabled)
-        pm.closeDialogCommand.bindTo { dialog.dismiss() }
+        pm.closeDialogCommand.bindTo { dialog?.dismiss() }
         pm.pinInputControl.bindTo(pinCodeInputView)
         pm.deviceNameState.bindTo(deviceNameView.text())
     }

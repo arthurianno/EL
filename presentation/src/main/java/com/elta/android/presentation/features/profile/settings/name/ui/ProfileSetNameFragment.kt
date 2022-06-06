@@ -9,6 +9,9 @@ import com.elta.android.presentation.features.profile.settings.name.pm.ProfileSe
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_profile_set_name.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 
 class ProfileSetNameFragment : BaseFragment<ProfileSetNamePm>() {
 
@@ -29,8 +32,7 @@ class ProfileSetNameFragment : BaseFragment<ProfileSetNamePm>() {
     }
 
     override fun handleBack() {
-        view?.hideKeyboardFun()
-        passTo(presentationModel.backHandleAction)
+        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     companion object {

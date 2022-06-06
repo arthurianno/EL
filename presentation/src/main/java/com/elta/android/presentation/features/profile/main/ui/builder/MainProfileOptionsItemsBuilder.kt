@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.main.ui.builder
 
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
@@ -35,29 +35,45 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
                 ?: resources.getString(R.string.profile_diabetes_empty_value)
             val weight = createIndicatorText(weight, R.string.profile_weight_value)
             val hemoglobin = createIndicatorText(hba1cLevel, R.string.profile_hba1c_value)
-            return MainProfileIndicatorItem(glucoseLevelMin, glucoseLevelMax, diabetesType,
-                weight, hemoglobin)
+            return MainProfileIndicatorItem(
+                glucoseLevelMin, glucoseLevelMax, diabetesType,
+                weight, hemoglobin
+            )
         }
     }
 
     private fun createMainProfileAdditionalItems() = mutableListOf<ListItem>().apply {
-        add(MainProfileAdditionalItem(R.string.profile_my_watchers, R.string.profile_management_and_settings,
-            R.drawable.ic_observers_bg, MyObservers)
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_my_watchers, R.string.profile_management_and_settings,
+                R.drawable.ic_observers_bg, MyObservers
+            )
         )
-        add(MainProfileAdditionalItem(R.string.profile_my_devices, R.string.profile_manage_glucometer,
-            R.drawable.ic_devices, MyDevices)
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_my_devices, R.string.profile_manage_glucometer,
+                R.drawable.ic_devices, MyDevices
+            )
         )
-        add(MainProfileAdditionalItem(R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
-            R.drawable.ic_map_pin_bg, WhereBuy)
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_where_purchase_products, R.string.profile_map_of_stores,
+                R.drawable.ic_map_pin_bg, WhereBuy
+            )
         )
-        add(MainProfileAdditionalItem(R.string.profile_support_title, R.string.profile_support_subtitle,
-            R.drawable.ic_support, Support)
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_support_title, R.string.profile_support_subtitle,
+                R.drawable.ic_support, Support
+            )
         )
-        add(MainProfileAdditionalItem(
-            title = R.string.profile_exit_from_app,
-            icon = R.drawable.ic_exit_app,
-            type = ExitFromApp,
-            showGoArrow = false)
+        add(
+            MainProfileAdditionalItem(
+                title = R.string.profile_exit_from_app,
+                icon = R.drawable.ic_exit_app,
+                type = ExitFromApp,
+                showGoArrow = false
+            )
         )
     }
 

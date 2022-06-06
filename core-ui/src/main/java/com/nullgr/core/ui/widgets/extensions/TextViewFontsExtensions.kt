@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.TextView
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.R
-import java.lang.Exception
 
 /**
  * Provide ability to use custom typeface for [TextView] children

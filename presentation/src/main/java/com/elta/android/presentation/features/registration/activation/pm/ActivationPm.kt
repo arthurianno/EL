@@ -7,6 +7,7 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class ActivationPm @Inject constructor(
@@ -15,8 +16,8 @@ class ActivationPm @Inject constructor(
     private val checkEmailUseCase: CheckEmailUseCase
 ) : BasePm(services) {
 
-    val sendAgainAction = Action<Unit>()
-    val continueAction = Action<Unit>()
+    val sendAgainAction = action<Unit>()
+    val continueAction = action<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {

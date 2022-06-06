@@ -25,9 +25,12 @@ class FromOtherConnectDevicePm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        state.observable
+        mstate.observable
             .filter { it == ViewState.CONNECTED }
-            .trackEvent(AnalyticsEventType.GLUCOMETER_ADD, AnalyticsEventParam.SOURCE to SOURCE_PROFILE)
+            .trackEvent(
+                AnalyticsEventType.GLUCOMETER_ADD,
+                AnalyticsEventParam.SOURCE to SOURCE_PROFILE
+            )
             .subscribe()
             .untilDestroy()
     }

@@ -8,5 +8,4 @@ internal class OptionalResult<T> constructor(val value: T?) {
 
     val isEmpty: Boolean
         get() = value == null
-
 }

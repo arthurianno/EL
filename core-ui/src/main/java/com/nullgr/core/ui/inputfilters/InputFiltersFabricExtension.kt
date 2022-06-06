@@ -5,7 +5,8 @@ import android.text.InputFilter
 /**
  * Factory function that creates [AllowedCharactersInputFilter]
  */
-fun allowedCharactersInputFilter(validationString: String) = AllowedCharactersInputFilter(validationString)
+fun allowedCharactersInputFilter(validationString: String) =
+    AllowedCharactersInputFilter(validationString)
 
 /**
  * Factory function that creates [OnlyDigitsInputFilter]

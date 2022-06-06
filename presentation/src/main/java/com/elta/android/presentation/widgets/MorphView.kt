@@ -230,11 +230,35 @@ class MorphView @JvmOverloads constructor(
         initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.list)
         initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.list)
 
-        initializeValues(smallOvalSize.xMin, smallOvalSize.xMax, 2500f, frameDuration, xRValues.list)
-        initializeValues(smallOvalSize.yMin, smallOvalSize.yMax, 2000f, frameDuration, yRValues.list)
+        initializeValues(
+            smallOvalSize.xMin,
+            smallOvalSize.xMax,
+            2500f,
+            frameDuration,
+            xRValues.list
+        )
+        initializeValues(
+            smallOvalSize.yMin,
+            smallOvalSize.yMax,
+            2000f,
+            frameDuration,
+            yRValues.list
+        )
 
-        initializeValues(largeOvalSize.xMin, largeOvalSize.xMax, 2500f, frameDuration, xRLargeValues.list)
-        initializeValues(largeOvalSize.yMin, largeOvalSize.yMax, 2000f, frameDuration, yRLargeValues.list)
+        initializeValues(
+            largeOvalSize.xMin,
+            largeOvalSize.xMax,
+            2500f,
+            frameDuration,
+            xRLargeValues.list
+        )
+        initializeValues(
+            largeOvalSize.yMin,
+            largeOvalSize.yMax,
+            2000f,
+            frameDuration,
+            yRLargeValues.list
+        )
 
         val max0 = max(smallAngleValues.list.size, largeAngleValues.list.size)
         val max1 = max(xRValues.list.size, yRValues.list.size)
@@ -253,7 +277,8 @@ class MorphView @JvmOverloads constructor(
             val xRLargeValue = xRLargeValues.next()
             val yRLargeValue = yRLargeValues.next()
 
-            val key = "$smallAngleValue-$largeAngleValue-$xRValue-$yRValue-$xRLargeValue-$yRLargeValue"
+            val key =
+                "$smallAngleValue-$largeAngleValue-$xRValue-$yRValue-$xRLargeValue-$yRLargeValue"
             keys.add(key).also { added ->
                 if (added) {
                     oval1.angle = smallAngleValue
@@ -396,7 +421,8 @@ class MorphView @JvmOverloads constructor(
         inline fun getPath(index: Int): Path = if (index == 0) p1 else if (index == 1) p2 else p3
     }
 
-    class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+    class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) :
+        Iterator<T> {
 
         private val size = list.size
         private var current = -1

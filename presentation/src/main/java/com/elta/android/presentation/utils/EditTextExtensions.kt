@@ -1,8 +1,8 @@
 package com.elta.android.presentation.utils
 
-import android.support.v7.widget.AppCompatEditText
 import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
+import androidx.appcompat.widget.AppCompatEditText
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.reactivex.functions.Consumer
 

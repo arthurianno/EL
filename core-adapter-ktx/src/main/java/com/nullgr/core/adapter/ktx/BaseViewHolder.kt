@@ -8,5 +8,5 @@ import android.view.ViewGroup
  *
  * @author vchernyshov
  */
-open class BaseViewHolder(parent: ViewGroup, layoutId: Int)
-    : ViewHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+open class BaseViewHolder(parent: ViewGroup, layoutId: Int) :
+    ViewHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))

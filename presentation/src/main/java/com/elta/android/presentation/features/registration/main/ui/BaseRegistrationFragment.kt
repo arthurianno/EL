@@ -11,6 +11,7 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
 import kotlinx.android.synthetic.main.fragment_auth_base.*
+import me.dmdev.rxpm.bindTo
 
 abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragment<PM>() {
 
@@ -27,7 +28,8 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        policyDescriptionTextView.text = getString(R.string.registration_main_description_privacy_policy)
+        policyDescriptionTextView.text =
+            getString(R.string.registration_main_description_privacy_policy)
         policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
             .bindTo(pm.privacyPolicyClickAction)
         policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_personal_data_clickable_mask))

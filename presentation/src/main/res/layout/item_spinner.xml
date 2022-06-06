@@ -4,7 +4,7 @@
     android:layout_height="48dp"
     android:background="?selectableItemBackground">
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/spinnerTitleView"
         style="@style/New.Title2.BlackBlue"
         android:layout_width="match_parent"

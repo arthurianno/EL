@@ -1,8 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.items.ListItem
 
 /**
@@ -34,7 +33,11 @@ open class DynamicAdapter constructor(
         manager.onBindViewHolder(items, position, holder)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
         if (payloads.isEmpty()) manager.onBindViewHolder(items, position, holder)
         else manager.onBindViewHolder(items, position, holder, payloads)
     }
@@ -62,9 +65,18 @@ open class DynamicAdapter constructor(
      * @param enableDiffUtils True if you want use [DiffUtil] to calculate DiffResult, false otherwise.
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
-    fun updateData(newItems: List<ListItem>, enableDiffUtils: Boolean = true, detectMoves: Boolean = true) {
+    fun updateData(
+        newItems: List<ListItem>,
+        enableDiffUtils: Boolean = true,
+        detectMoves: Boolean = true
+    ) {
         when (enableDiffUtils) {
-            true -> diffCalculator?.calculateDiff(this, ArrayList(items), ArrayList(newItems), detectMoves)
+            true -> diffCalculator?.calculateDiff(
+                this,
+                ArrayList(items),
+                ArrayList(newItems),
+                detectMoves
+            )
             else -> {
                 setData(newItems)
                 notifyDataSetChanged()
@@ -80,7 +92,7 @@ open class DynamicAdapter constructor(
 
     fun getItem(position: Int): ListItem? {
         return when {
-            !items.isEmpty() && position >= 0 -> items[position]
+            items.isNotEmpty() && position >= 0 -> items[position]
             else -> null
         }
     }

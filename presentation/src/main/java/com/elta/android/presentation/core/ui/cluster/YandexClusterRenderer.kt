@@ -288,8 +288,11 @@ class YandexClusterRenderer(
             old != new
     }
 
-    private fun pinCount(clusters: Set<Cluster>): Int = clusters.asSequence().map { it.size() }.sum()
-    private fun clusterCount(clusters: Set<Cluster>): Int = clusters.asSequence().filter { it.isCluster() }.count()
+    private fun pinCount(clusters: Set<Cluster>): Int =
+        clusters.asSequence().map { it.size() }.sum()
+
+    private fun clusterCount(clusters: Set<Cluster>): Int =
+        clusters.asSequence().filter { it.isCluster() }.count()
 
     private fun updateCurrent(newClusters: Set<Cluster>) {
         currentClusters.clear()

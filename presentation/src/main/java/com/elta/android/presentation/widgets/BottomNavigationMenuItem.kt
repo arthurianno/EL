@@ -28,18 +28,22 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
     }
 
     fun setItemSelected(isSelected: Boolean) {
-        bindColors(when (isSelected) {
-            true -> checkNotNull(selectedColor)
-            else -> checkNotNull(normalColor)
-        })
+        bindColors(
+            when (isSelected) {
+                true -> checkNotNull(selectedColor)
+                else -> checkNotNull(normalColor)
+            }
+        )
     }
 
     private fun readAttrs(attrs: AttributeSet?) {
         attrs?.let {
-            val array = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationMenuItem, 0, 0)
+            val array =
+                context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationMenuItem, 0, 0)
             icon = array.getDrawable(R.styleable.BottomNavigationMenuItem_bnm_icon)
             title = array.getString(R.styleable.BottomNavigationMenuItem_bnm_title)
-            selectedColor = array.getColor(R.styleable.BottomNavigationMenuItem_bnm_selected_color, -1)
+            selectedColor =
+                array.getColor(R.styleable.BottomNavigationMenuItem_bnm_selected_color, -1)
             normalColor = array.getColor(R.styleable.BottomNavigationMenuItem_bnm_normal_color, -1)
             array.recycle()
         }

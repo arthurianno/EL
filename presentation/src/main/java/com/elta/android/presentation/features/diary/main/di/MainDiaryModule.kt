@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.diary.main.di
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.diary.main.ui.adapter.MainDiaryDelegatesFactory
 import com.nullgr.core.adapter.AdapterDelegatesFactory

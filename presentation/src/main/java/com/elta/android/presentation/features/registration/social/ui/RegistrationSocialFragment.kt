@@ -9,6 +9,7 @@ import com.elta.android.presentation.features.registration.social.pm.Registratio
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
 import kotlinx.android.synthetic.main.fragment_auth_base.*
+import me.dmdev.rxpm.bindTo
 
 class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm>() {
 

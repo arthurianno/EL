@@ -9,6 +9,8 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import kotlinx.android.synthetic.main.activity_app.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 
 class AppActivity : BaseActivity<AppPm>() {
 
@@ -16,7 +18,8 @@ class AppActivity : BaseActivity<AppPm>() {
     override val classToken: Class<AppPm> = AppPm::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         DynamicLinkProcessor.from(intent)

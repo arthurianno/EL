@@ -34,8 +34,9 @@ import io.reactivex.Observable
  */
 @SuppressLint("VisibleForTests")
 class ContactsQueryBuilder<T : BaseContact> private constructor(
-        private val clazz: Class<*>,
-        private val contactsLoadEngine: ContactsLoadEngine) {
+    private val clazz: Class<*>,
+    private val contactsLoadEngine: ContactsLoadEngine
+) {
 
     private val whereSelectionBuilder: StringBuilder by lazy { StringBuilder() }
     private var property: QueryProperty? = null
@@ -43,7 +44,10 @@ class ContactsQueryBuilder<T : BaseContact> private constructor(
     private var includeEmails: Boolean = true
 
     companion object {
-        internal fun <R : BaseContact> createQuery(clazz: Class<R>, contactsLoadEngine: ContactsLoadEngine): ContactsQueryBuilder<R> {
+        internal fun <R : BaseContact> createQuery(
+            clazz: Class<R>,
+            contactsLoadEngine: ContactsLoadEngine
+        ): ContactsQueryBuilder<R> {
             return ContactsQueryBuilder(clazz, contactsLoadEngine)
         }
     }
@@ -123,7 +127,7 @@ class ContactsQueryBuilder<T : BaseContact> private constructor(
 
     private fun buildLoadEngineConfiguration(): ContactsLoadEngine {
         return contactsLoadEngine
-                .withIncludeAdditionalData(includePhones, includeEmails)
-                .withQueryConfiguration(clazz, property, whereSelectionBuilder.toString())
+            .withIncludeAdditionalData(includePhones, includeEmails)
+            .withQueryConfiguration(clazz, property, whereSelectionBuilder.toString())
     }
 }

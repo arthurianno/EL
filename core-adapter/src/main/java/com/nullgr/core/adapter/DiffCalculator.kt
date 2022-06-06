@@ -1,6 +1,6 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.util.ListUpdateCallback
+import androidx.recyclerview.widget.ListUpdateCallback
 import com.nullgr.core.adapter.items.ListItem
 
 /**
@@ -19,10 +19,11 @@ interface DiffCalculator {
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
     fun calculateDiff(
-            adapter: DynamicAdapter,
-            before: List<ListItem>,
-            after: List<ListItem>,
-            detectMoves: Boolean)
+        adapter: DynamicAdapter,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    )
 
     /**
      * Used to calculate difference and dispatch result to [ListUpdateCallback].
@@ -33,8 +34,9 @@ interface DiffCalculator {
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
     fun calculateDiff(
-            updateCallback: ListUpdateCallback,
-            before: List<ListItem>,
-            after: List<ListItem>,
-            detectMoves: Boolean)
+        updateCallback: ListUpdateCallback,
+        before: List<ListItem>,
+        after: List<ListItem>,
+        detectMoves: Boolean
+    )
 }

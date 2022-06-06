@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.items.ListItem
@@ -33,8 +33,9 @@ abstract class ParentAdapterDelegate(
         }
     }
 
-    protected open fun createOrGetAdapter(item: ListItem): DynamicAdapter = adapters[item.getUniqueProperty()]
-        ?: DynamicAdapter(factory).also { adapters[item.getUniqueProperty()] = it }
+    protected open fun createOrGetAdapter(item: ListItem): DynamicAdapter =
+        adapters[item.getUniqueProperty()]
+            ?: DynamicAdapter(factory).also { adapters[item.getUniqueProperty()] = it }
 
     protected open fun createOrGetCompositeDisposable(item: ListItem): CompositeDisposable =
         disposables[item.getUniqueProperty()]

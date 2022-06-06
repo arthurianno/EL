@@ -10,56 +10,71 @@
       "properties": [
         {
           "id": "1:392071321748032581",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:2740189061387891066",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:6903008663868988168",
-          "name": "name"
+          "name": "name",
+          "type": 9
         },
         {
           "id": "4:4228641277243866155",
-          "name": "type"
+          "name": "type",
+          "type": 9
         },
         {
           "id": "5:4636704346031725540",
-          "name": "region"
+          "name": "region",
+          "type": 9
         },
         {
           "id": "6:735437868986304645",
-          "name": "city"
+          "name": "city",
+          "type": 9
         },
         {
           "id": "7:9058751639033436457",
-          "name": "address"
+          "name": "address",
+          "type": 9
         },
         {
           "id": "8:551080887049802226",
-          "name": "phone"
+          "name": "phone",
+          "type": 9
         },
         {
           "id": "9:3053822631022506412",
-          "name": "latitude"
+          "name": "latitude",
+          "type": 8
         },
         {
           "id": "10:3975185315051658766",
-          "name": "longitude"
+          "name": "longitude",
+          "type": 8
         },
         {
           "id": "11:5877632020839739909",
-          "name": "timeStamp"
+          "name": "timeStamp",
+          "type": 5
         },
         {
           "id": "12:5732498039669845223",
-          "name": "modifiedState"
+          "name": "modifiedState",
+          "type": 9
         },
         {
           "id": "13:5607327283194514943",
+          "name": "fullAddress",
           "indexId": "1:5049058603170790455",
-          "name": "fullAddress"
+          "type": 9,
+          "flags": 2048
         }
       ],
       "relations": []
@@ -71,71 +86,89 @@
       "properties": [
         {
           "id": "1:7105984032723577790",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:1803987764994271304",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:4547071645338469172",
-          "name": "type"
+          "name": "type",
+          "type": 9
         },
         {
           "id": "4:7098375176323475402",
-          "name": "additionTime"
+          "name": "additionTime",
+          "type": 6
         },
         {
           "id": "5:5561471174870734704",
-          "name": "tagId"
+          "name": "tagId",
+          "type": 9
         },
         {
           "id": "6:2220357999565801382",
-          "name": "note"
+          "name": "note",
+          "type": 9
         },
         {
           "id": "7:6241854495862624254",
-          "name": "modificationTime"
+          "name": "modificationTime",
+          "type": 6
         },
         {
           "id": "8:9157379137866537319",
-          "name": "value"
+          "name": "value",
+          "type": 8
         },
         {
           "id": "9:6583229833092561246",
-          "name": "name"
+          "name": "name",
+          "type": 9
         },
         {
           "id": "10:5886246000041659660",
-          "name": "kind"
+          "name": "kind",
+          "type": 9
         },
         {
           "id": "11:8405758619725871361",
-          "name": "duration"
+          "name": "duration",
+          "type": 6
         },
         {
           "id": "12:6400976524049145017",
-          "name": "activityType"
+          "name": "activityType",
+          "type": 9
         },
         {
           "id": "13:4436020323931534475",
-          "name": "mealTag"
+          "name": "mealTag",
+          "type": 9
         },
         {
           "id": "14:4716768788257142137",
-          "name": "insulinType"
+          "name": "insulinType",
+          "type": 9
         },
         {
           "id": "15:8865794857143658417",
-          "name": "state"
+          "name": "state",
+          "type": 9
         },
         {
           "id": "17:8536437484320236218",
-          "name": "additionTimeString"
+          "name": "additionTimeString",
+          "type": 9
         },
         {
           "id": "18:6594923039236404749",
-          "name": "temperature"
+          "name": "temperature",
+          "type": 8
         }
       ],
       "relations": []
@@ -147,31 +180,39 @@
       "properties": [
         {
           "id": "1:5348712621338611844",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:2158825089604613816",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "4:8150391136256062536",
-          "name": "image"
+          "name": "image",
+          "type": 9
         },
         {
           "id": "5:2917272193991273202",
-          "name": "isReadOnly"
+          "name": "isReadOnly",
+          "type": 1
         },
         {
           "id": "6:119621998202467244",
-          "name": "modificationTime"
+          "name": "modificationTime",
+          "type": 6
         },
         {
           "id": "7:5946479875638262848",
-          "name": "state"
+          "name": "state",
+          "type": 9
         },
         {
           "id": "8:5970261778621166859",
-          "name": "name"
+          "name": "name",
+          "type": 9
         }
       ],
       "relations": []
@@ -183,43 +224,54 @@
       "properties": [
         {
           "id": "1:1865160032317136918",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:4800922387146183524",
-          "name": "diabetes"
+          "name": "diabetes",
+          "type": 9
         },
         {
           "id": "3:9092619775383579111",
-          "name": "weight"
+          "name": "weight",
+          "type": 8
         },
         {
           "id": "4:7362034935937347791",
-          "name": "gender"
+          "name": "gender",
+          "type": 9
         },
         {
           "id": "5:1786304790586423578",
-          "name": "email"
+          "name": "email",
+          "type": 9
         },
         {
           "id": "6:4133381220410196660",
-          "name": "timeStamp"
+          "name": "timeStamp",
+          "type": 6
         },
         {
           "id": "7:2523905964927448841",
-          "name": "firstName"
+          "name": "firstName",
+          "type": 9
         },
         {
           "id": "8:856644629161886932",
-          "name": "lastName"
+          "name": "lastName",
+          "type": 9
         },
         {
           "id": "9:6229958913033243616",
-          "name": "minValue"
+          "name": "minValue",
+          "type": 8
         },
         {
           "id": "10:8731844995908226622",
-          "name": "maxValue"
+          "name": "maxValue",
+          "type": 8
         }
       ],
       "relations": []
@@ -231,23 +283,29 @@
       "properties": [
         {
           "id": "1:2523033500597706414",
-          "name": "lastSalePointsSync"
+          "name": "lastSalePointsSync",
+          "type": 6
         },
         {
           "id": "2:7455150272527992115",
-          "name": "lastEventsSync"
+          "name": "lastEventsSync",
+          "type": 6
         },
         {
           "id": "3:4784702952835774170",
-          "name": "lastTagsSync"
+          "name": "lastTagsSync",
+          "type": 6
         },
         {
           "id": "4:1157207118847719823",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "5:7421900256969611969",
-          "name": "lastGoogleFitSync"
+          "name": "lastGoogleFitSync",
+          "type": 6
         }
       ],
       "relations": []
@@ -259,20 +317,27 @@
       "properties": [
         {
           "id": "1:1894848623894413212",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:363624470685208839",
-          "name": "type"
+          "name": "type",
+          "type": 9
         },
         {
           "id": "3:6234446942258716219",
-          "name": "isLinked"
+          "name": "isLinked",
+          "type": 1
         },
         {
           "id": "7:6679018445521461808",
+          "name": "profileId",
           "indexId": "5:7982913992379413599",
-          "name": "profileId"
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ProfileCacheDto"
         }
       ],
       "relations": []
@@ -284,11 +349,14 @@
       "properties": [
         {
           "id": "1:6875425958406846896",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:657907652554447407",
-          "name": "pin"
+          "name": "pin",
+          "type": 9
         }
       ],
       "relations": []
@@ -300,23 +368,29 @@
       "properties": [
         {
           "id": "1:9191512851221276955",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:5394495955551797957",
-          "name": "title"
+          "name": "title",
+          "type": 9
         },
         {
           "id": "3:2223169240129351502",
-          "name": "time"
+          "name": "time",
+          "type": 9
         },
         {
           "id": "5:5736442705211247614",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "6:1590675622822674901",
-          "name": "schedule"
+          "name": "schedule",
+          "type": 9
         }
       ],
       "relations": []
@@ -328,35 +402,44 @@
       "properties": [
         {
           "id": "1:6534346994157213235",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:5626098089724851404",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:8432849502964397699",
-          "name": "email"
+          "name": "email",
+          "type": 9
         },
         {
           "id": "4:4247834290607105604",
-          "name": "name"
+          "name": "name",
+          "type": 9
         },
         {
           "id": "5:4281746726435778337",
-          "name": "status"
+          "name": "status",
+          "type": 9
         },
         {
           "id": "6:412025849003372876",
-          "name": "modificationTime"
+          "name": "modificationTime",
+          "type": 6
         },
         {
           "id": "7:5486485348885741996",
-          "name": "state"
+          "name": "state",
+          "type": 9
         },
         {
           "id": "8:1305597996417891010",
-          "name": "customName"
+          "name": "customName",
+          "type": 9
         }
       ],
       "relations": []
@@ -368,23 +451,29 @@
       "properties": [
         {
           "id": "1:1542682869767898369",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:3895628364884474168",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:4084723739578882284",
-          "name": "address"
+          "name": "address",
+          "type": 9
         },
         {
           "id": "4:6009268326789608252",
-          "name": "name"
+          "name": "name",
+          "type": 9
         },
         {
           "id": "5:3490367012322743610",
-          "name": "isPrimary"
+          "name": "isPrimary",
+          "type": 1
         }
       ],
       "relations": []
@@ -396,39 +485,49 @@
       "properties": [
         {
           "id": "1:2148338596001665644",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:4150497300683907468",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:6053460287085527455",
-          "name": "deviceDate"
+          "name": "deviceDate",
+          "type": 9
         },
         {
           "id": "4:7890009120523723440",
-          "name": "syncDate"
+          "name": "syncDate",
+          "type": 9
         },
         {
           "id": "5:203315695263249193",
-          "name": "temperature"
+          "name": "temperature",
+          "type": 5
         },
         {
           "id": "6:3537436629162817320",
-          "name": "batteryLevel"
+          "name": "batteryLevel",
+          "type": 5
         },
         {
           "id": "7:4399329800404962053",
-          "name": "software"
+          "name": "software",
+          "type": 8
         },
         {
           "id": "8:6212590879586954819",
-          "name": "hardware"
+          "name": "hardware",
+          "type": 8
         },
         {
           "id": "10:6655224264396305099",
-          "name": "lastSyncedEvent"
+          "name": "lastSyncedEvent",
+          "type": 9
         }
       ],
       "relations": []
@@ -440,23 +539,29 @@
       "properties": [
         {
           "id": "1:3528926957512000350",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:6056234610708105544",
-          "name": "secondaryId"
+          "name": "secondaryId",
+          "type": 9
         },
         {
           "id": "3:4072144334422161834",
-          "name": "state"
+          "name": "state",
+          "type": 9
         },
         {
           "id": "4:7092182216273253898",
-          "name": "className"
+          "name": "className",
+          "type": 9
         },
         {
           "id": "5:7347029842216060908",
-          "name": "meta"
+          "name": "meta",
+          "type": 9
         }
       ],
       "relations": []
@@ -468,27 +573,34 @@
       "properties": [
         {
           "id": "1:127007190709599695",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "2:931611259750674868",
-          "name": "isUserLoggedIn"
+          "name": "isUserLoggedIn",
+          "type": 1
         },
         {
           "id": "3:259882331440132405",
-          "name": "isFeedbackSent"
+          "name": "isFeedbackSent",
+          "type": 1
         },
         {
           "id": "4:3237283968184737773",
-          "name": "isEmailConfirmed"
+          "name": "isEmailConfirmed",
+          "type": 1
         },
         {
           "id": "5:389016516142161600",
-          "name": "isOnboardingPassed"
+          "name": "isOnboardingPassed",
+          "type": 1
         },
         {
           "id": "6:3983104656624443690",
-          "name": "isFirstHomeEntrance"
+          "name": "isFirstHomeEntrance",
+          "type": 1
         }
       ],
       "relations": []
@@ -500,20 +612,27 @@
       "properties": [
         {
           "id": "1:3102842089124470983",
-          "name": "type"
+          "name": "type",
+          "type": 9
         },
         {
           "id": "2:949995477402119970",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "3:8741562037095094461",
-          "name": "isActive"
+          "name": "isActive",
+          "type": 1
         },
         {
           "id": "4:2000932439839269344",
+          "name": "profileId",
           "indexId": "6:8670197050320643670",
-          "name": "profileId"
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ProfileCacheDto"
         }
       ],
       "relations": []
@@ -523,8 +642,8 @@
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
-  "modelVersion": 4,
-  "modelVersionParserMinimum": 4,
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
   "retiredEntityUids": [
     7986449784983157444,
     8128370386624572352,

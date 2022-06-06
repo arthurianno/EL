@@ -16,6 +16,7 @@ import com.nullgr.core.ui.extensions.toggleView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_update_firmware.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 class FirmwareFragment : BaseFragment<FirmwarePm>() {
 

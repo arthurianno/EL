@@ -7,6 +7,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.glucose.p
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_glucose.*
+import me.dmdev.rxpm.bindTo
 
 class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialogPm>() {
 

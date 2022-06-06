@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsDailyGlucoseDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsGroupDelegate

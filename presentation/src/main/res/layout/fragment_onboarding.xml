@@ -8,7 +8,7 @@
 
     <include layout="@layout/layout_toolbar" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         style="@style/Caption1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:layout_marginEnd="@dimen/padding_base"
         android:text="@string/on_boarding_subtitle" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/onBoardingHeaderTextView"
         style="@style/Headline1"
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         android:layout_marginBottom="@dimen/padding_base"
         android:text="@string/on_boarding_header_user_sex" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -40,7 +40,7 @@
         android:layout_height="90dp"
         android:padding="@dimen/padding_base">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/previewPageButtonView"
             style="@style/Button.Small.Light"
             android:layout_width="84dp"
@@ -61,7 +61,7 @@
             app:numberOfIndicators="3"
             app:paddingBetweenIndicators="6dp" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/nextPageButtonView"
             style="@style/Button.Small.Dark"
             android:layout_width="84dp"

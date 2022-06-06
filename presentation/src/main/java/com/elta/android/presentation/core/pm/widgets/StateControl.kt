@@ -7,12 +7,14 @@ import com.elta.android.presentation.core.ui.state_view.StateView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 
 class StateControl(pm: PresentationModel) {
-    val dataState = pm.State<StateData>()
-    val visibilityState = pm.State<Boolean>()
-    val stateAction = pm.Action<Unit>()
-    val actionEnableState = pm.State(true)
+    val dataState = pm.state<StateData>()
+    val visibilityState = pm.state<Boolean>()
+    val stateAction = pm.action<Unit>()
+    val actionEnableState = pm.state(true)
 }
 
 fun PresentationModel.stateControl(): StateControl = StateControl(this)
@@ -25,9 +27,10 @@ inline fun StateControl.bind(view: StateView, compositeDisposable: CompositeDisp
             .subscribe(view.state())
     )
 
-    compositeDisposable.add(visibilityState.observable
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(view.visibility())
+    compositeDisposable.add(
+        visibilityState.observable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(view.visibility())
     )
 
     compositeDisposable.add(

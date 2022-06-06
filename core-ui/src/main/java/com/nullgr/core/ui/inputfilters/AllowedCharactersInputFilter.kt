@@ -11,7 +11,14 @@ import android.widget.EditText
  * @author Grishko Nikita
  */
 class AllowedCharactersInputFilter(private val validationString: String) : InputFilter {
-    override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence? {
+    override fun filter(
+        source: CharSequence?,
+        start: Int,
+        end: Int,
+        dest: Spanned?,
+        dstart: Int,
+        dend: Int
+    ): CharSequence? {
         if (source != null && end != 0 && !validationString.contains(source[end - 1])) {
             return source.subSequence(start, end - 1)
         }

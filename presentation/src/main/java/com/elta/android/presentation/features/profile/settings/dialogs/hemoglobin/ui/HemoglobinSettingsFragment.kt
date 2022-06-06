@@ -3,9 +3,9 @@ package com.elta.android.presentation.features.profile.settings.dialogs.hemoglob
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.view.HapticFeedbackConstants
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
@@ -21,6 +21,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
+import me.dmdev.rxpm.bindTo
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
@@ -49,7 +50,14 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         }
 
         val inset = view.resources.getDimensionPixelSize(R.dimen.calendar_day_padding)
-        calendarView.addDecorator(BackgroundDecorator(drawable(R.drawable.selector_calendar_date, inset)))
+        calendarView.addDecorator(
+            BackgroundDecorator(
+                drawable(
+                    R.drawable.selector_calendar_date,
+                    inset
+                )
+            )
+        )
     }
 
     override fun onBindPresentationModel(pm: HemoglobinSettingsPm) {
@@ -58,14 +66,16 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
-        pm.dateSelectedState.bindTo { calendarView.selectedDate = CalendarDay.from(it.toLocalDate()) }
+        pm.dateSelectedState.bindTo {
+            calendarView.selectedDate = CalendarDay.from(it.toLocalDate())
+        }
         pm.dateState.bindTo(dateView.text())
         pm.hemoglobinValueState.bindTo(hemoglobinValueView.text())
-        Observable.merge(minusView.clicks(), minusView.sequenceClicks()).bindTo {
+        Observable.merge(minusView.clicks(), minusView.sequenceClicks()).subscribe {
             minusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             pm.minusAction.consumer.accept(Unit)
         }
-        Observable.merge(plusView.clicks(), plusView.sequenceClicks()).bindTo {
+        Observable.merge(plusView.clicks(), plusView.sequenceClicks()).subscribe {
             plusView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             pm.plusAction.consumer.accept(Unit)
         }
@@ -75,11 +85,17 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             }
             calendarView.invalidateDecorators()
         }
-        pm.hemoglobinItemsState.bindTo(adapter, compositeUnbind)
+        pm.hemoglobinItemsState.observable.bindTo(adapter, compositeUnbind)
     }
 
     private inline fun drawable(drawable: Int, inset: Int): Drawable =
-        InsetDrawable(ContextCompat.getDrawable(checkNotNull(context), drawable), 0, inset, 0, inset)
+        InsetDrawable(
+            ContextCompat.getDrawable(checkNotNull(context), drawable),
+            0,
+            inset,
+            0,
+            inset
+        )
 
     companion object {
         fun newInstance(): HemoglobinSettingsFragment = HemoglobinSettingsFragment()

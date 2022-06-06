@@ -26,7 +26,9 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
+import me.dmdev.rxpm.action
 import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -39,22 +41,22 @@ class FirmwarePm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val buttonAction = Action<Unit>()
-    val updateState = State<UpdateState>(UpdateState.Progress(resources))
+    val buttonAction = action<Unit>()
+    val updateState = state<UpdateState>(UpdateState.Progress(resources))
 
     val btControl = bluetoothControl2()
 
-    private val getDeviceInfoAction = Action<String>()
-    private val checkUpdatesAction = Action<Unit>()
-    private val startUpdateAction = Action<Unit>()
-    private val downloadFirmwareAction = Action<Unit>()
+    private val getDeviceInfoAction = action<String>()
+    private val checkUpdatesAction = action<Unit>()
+    private val startUpdateAction = action<Unit>()
+    private val downloadFirmwareAction = action<Unit>()
 
-    private val deviceAddressState = State<String>()
-    private val deviceInfo = State<GlucometerInfo>()
-    private val firmwareState = State<Firmware>()
-    private val firmwareFileState = State<FirmwareFile>()
+    private val deviceAddressState = state<String>()
+    private val deviceInfo = state<GlucometerInfo>()
+    private val firmwareState = state<Firmware>()
+    private val firmwareFileState = state<FirmwareFile>()
 
-    private val delayedSetStateAction = Action<UpdateState>()
+    private val delayedSetStateAction = action<UpdateState>()
 
     override fun onCreate() {
         super.onCreate()
@@ -66,7 +68,11 @@ class FirmwarePm @Inject constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
-            is FirmwareNotSupportedByAppError -> setState(UpdateState.UnsupportedFirmwareVersion(resources))
+            is FirmwareNotSupportedByAppError -> setState(
+                UpdateState.UnsupportedFirmwareVersion(
+                    resources
+                )
+            )
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
             is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
@@ -82,8 +88,9 @@ class FirmwarePm @Inject constructor(
     private fun bindStateBehavior() {
         delayedSetStateAction.observable
             .concatMap {
-                val delay = if (it is UpdateState.Progress || updateState.valueOrNull.hasUserInput()) ZERO_DELAY
-                else NEXT_STATE_DELAY
+                val delay =
+                    if (it is UpdateState.Progress || updateState.valueOrNull.hasUserInput()) ZERO_DELAY
+                    else NEXT_STATE_DELAY
                 Observable.just(it).delay(delay, TimeUnit.MILLISECONDS)
             }
             .subscribe(updateState.consumer)
@@ -114,7 +121,9 @@ class FirmwarePm @Inject constructor(
                         router.exit()
                         router.navigateTo(Screens.PlayMarketScreen)
                     }
-                    is UpdateState.FirmwareDownloadingError -> downloadFirmwareAction.consumer.accept(Unit)
+                    is UpdateState.FirmwareDownloadingError -> downloadFirmwareAction.consumer.accept(
+                        Unit
+                    )
                     is UpdateState.FirmwareUpdateError -> startUpdateAction.consumer.accept(Unit)
                     is UpdateState.GlucometerOfflineError -> startUpdateAction.consumer.accept(Unit)
                 }
@@ -230,7 +239,8 @@ class FirmwarePm @Inject constructor(
 
     private inline fun UpdateState?.hasUserInput(): Boolean = this?.button != null
 
-    private inline fun getDeviceVersion(): String? = deviceInfo.valueOrNull?.softwareVersion?.toString()
+    private inline fun getDeviceVersion(): String? =
+        deviceInfo.valueOrNull?.softwareVersion?.toString()
 
     private inline fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
         return this

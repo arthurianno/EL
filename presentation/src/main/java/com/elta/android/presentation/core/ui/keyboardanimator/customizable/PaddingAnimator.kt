@@ -2,11 +2,11 @@ package com.elta.android.presentation.core.ui.keyboardanimator.customizable
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.transition.ChangeBounds
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 
 /**
  * Default [Animator] which sets bottom padding to the animated view.
@@ -24,5 +24,6 @@ class PaddingAnimator : Animator {
         return false
     }
 
-    private fun View.setBottomPadding(padding: Int) = setPadding(paddingLeft, paddingTop, paddingRight, padding)
+    private fun View.setBottomPadding(padding: Int) =
+        setPadding(paddingLeft, paddingTop, paddingRight, padding)
 }

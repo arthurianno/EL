@@ -93,8 +93,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private inline fun GlucoseIndexItem.Type.geValue(glucose: GlucoseStatisticModel?): String =
         when (this) {
-            GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(glucose?.averageLevel
-                ?: ZERO.toDouble())
+            GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(
+                glucose?.averageLevel
+                    ?: ZERO.toDouble()
+            )
             GlucoseIndexItem.Type.TOTAL -> glucose?.eventsCount.toString()
             GlucoseIndexItem.Type.HIGH -> glucose?.eventsHighCount.toString()
             GlucoseIndexItem.Type.NORMAL -> glucose?.eventsNormalCount.toString()
@@ -151,11 +153,17 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         value: String,
         date: LocalDate?
     ): String {
-        return if (date != null) getDescriptionByDay(stat.allDays[date]?.activity?.eventsCount, value)
+        return if (date != null) getDescriptionByDay(
+            stat.allDays[date]?.activity?.eventsCount,
+            value
+        )
         else getDescriptionByPeriod(stat.activity.eventsCount, value)
     }
 
-    private inline fun GeneralIndexItem.Type.getDescriptionByDay(eventsCount: Int?, value: String): String =
+    private inline fun GeneralIndexItem.Type.getDescriptionByDay(
+        eventsCount: Int?,
+        value: String
+    ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_by_day_bread,
@@ -180,7 +188,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private inline fun GeneralIndexItem.Type.getDescriptionByPeriod(eventsCount: Int?, value: String): String =
+    private inline fun GeneralIndexItem.Type.getDescriptionByPeriod(
+        eventsCount: Int?,
+        value: String
+    ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_by_period_bread,
@@ -205,7 +216,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private fun GeneralIndexItem.Type.getValueByDate(model: StatisticByPeriodModel, date: LocalDate?): String =
+    private fun GeneralIndexItem.Type.getValueByDate(
+        model: StatisticByPeriodModel,
+        date: LocalDate?
+    ): String =
         when (date == null) {
             true -> getValue(model)
             else -> getValue(model.allDays[date])
@@ -257,8 +271,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         val duration = this ?: ZERO
         val days = TimeUnit.SECONDS.toDays(duration)
         val hours = TimeUnit.SECONDS.toHours(duration) - days * HOURS_IN_DAY
-        val minutes = TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.SECONDS.toHours(duration) * MINUTES_IN_HOUR
-        val seconds = TimeUnit.SECONDS.toSeconds(duration) - TimeUnit.SECONDS.toMinutes(duration) * SECONDS_IN_MINUTE
+        val minutes =
+            TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.SECONDS.toHours(duration) * MINUTES_IN_HOUR
+        val seconds =
+            TimeUnit.SECONDS.toSeconds(duration) - TimeUnit.SECONDS.toMinutes(duration) * SECONDS_IN_MINUTE
 
         val time = StringBuilder().apply {
             if (days > ZERO) {

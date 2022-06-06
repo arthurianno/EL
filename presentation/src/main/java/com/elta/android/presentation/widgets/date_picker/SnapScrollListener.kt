@@ -1,7 +1,7 @@
 package com.elta.android.presentation.widgets.date_picker
 
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.elta.android.presentation.utils.checkMainThread
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -28,7 +28,8 @@ class SnapOnScrollListener(
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         if (behavior == Behavior.NOTIFY_ON_SCROLL_STATE_IDLE &&
-            newState == RecyclerView.SCROLL_STATE_IDLE) {
+            newState == RecyclerView.SCROLL_STATE_IDLE
+        ) {
             maybeNotifySnapPositionChange(recyclerView)
         }
     }
@@ -58,7 +59,8 @@ fun RecyclerView.attachSnapHelperWithListener(
     onSnapPositionChangeListener: OnSnapPositionChangeListener
 ) {
     snapHelper.attachToRecyclerView(this)
-    val snapOnScrollListener = SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
+    val snapOnScrollListener =
+        SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
     addOnScrollListener(snapOnScrollListener)
 }
 

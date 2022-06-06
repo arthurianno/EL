@@ -6,10 +6,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.annotation.Px
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.Px
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
@@ -27,10 +27,13 @@ class ShopClusterPinView @JvmOverloads constructor(
 
     @Px
     private var bgSecondaryMargin = 0
+
     @Px
     private var textPadding = 0
+
     @Px
     private var sideSize = 0
+
     @Px
     private var textHeight = 0
     private var text = ""

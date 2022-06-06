@@ -323,7 +323,7 @@
     },
     {
       "id": "11:2672464361589836854",
-      "lastPropertyId": "7:5486485348885741996",
+      "lastPropertyId": "8:1305597996417891010",
       "name": "ObserverCacheDto",
       "properties": [
         {
@@ -353,6 +353,10 @@
         {
           "id": "7:5486485348885741996",
           "name": "state"
+        },
+        {
+          "id": "8:1305597996417891010",
+          "name": "customName"
         }
       ],
       "relations": []

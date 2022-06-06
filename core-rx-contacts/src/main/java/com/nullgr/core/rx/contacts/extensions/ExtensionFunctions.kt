@@ -17,10 +17,10 @@ internal infix fun List<BaseContact>.has(id: Int): Boolean = this.any { it.id ==
  * Observable that emits empty [ArrayList] of [ContactPhone]
  */
 internal val emptyPhoneContactsList: Observable<ArrayList<ContactPhone>>
-        by lazy { Observable.just(arrayListOf<ContactPhone>()) }
+    by lazy { Observable.just(arrayListOf()) }
 
 /**
  * Observable that emits empty [ArrayList] of [ContactEmail]
  */
 internal val emptyEmailContactsList: Observable<ArrayList<ContactEmail>>
-        by lazy { Observable.just(arrayListOf<ContactEmail>()) }
+    by lazy { Observable.just(arrayListOf()) }

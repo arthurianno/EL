@@ -1,7 +1,7 @@
 package com.nullgr.core.adapter.ktx
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.items.ListItem
 
@@ -11,7 +11,7 @@ import com.nullgr.core.adapter.items.ListItem
  *
  * @author vchernyshov
  */
-abstract class AdapterDelegate: AdapterDelegate() {
+abstract class AdapterDelegate : AdapterDelegate() {
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return BaseViewHolder(parent, layoutResource)

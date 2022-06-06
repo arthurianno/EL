@@ -17,7 +17,8 @@ import kotlinx.android.synthetic.main.layout_bottom_sheet_toolbar.*
 class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPrivacyPolicyPm>() {
 
     override val screenLayout: Int = R.layout.fragment_registration_privacy_policy
-    override val classToken: Class<RegistrationPrivacyPolicyPm> = RegistrationPrivacyPolicyPm::class.java
+    override val classToken: Class<RegistrationPrivacyPolicyPm> =
+        RegistrationPrivacyPolicyPm::class.java
 
     private var url: String? = null
 
@@ -54,7 +55,7 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
     }
 
     override fun onBindPresentationModel(pm: RegistrationPrivacyPolicyPm) {
-        homeButtonView.clicks().bindTo { dialog.dismiss() }
+        homeButtonView.clicks().subscribe { dialog?.dismiss() }
     }
 
     companion object {

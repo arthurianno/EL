@@ -3,9 +3,9 @@ package com.elta.android.presentation.widgets.decoration
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
-import android.support.annotation.DimenRes
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.annotation.DimenRes
+import androidx.recyclerview.widget.RecyclerView
 
 class MarginItemDecoration(
     context: Context,
@@ -28,7 +28,12 @@ class MarginItemDecoration(
         marginBetween = if (marginBetween != 0) marginBetween / 2 else 0
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
         val position = parent.getChildAdapterPosition(view)
         val last = state.itemCount.minus(1)
         when (position) {

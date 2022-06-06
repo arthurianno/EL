@@ -23,8 +23,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -65,9 +65,6 @@ dependencies {
     implementation project(':core-interactor')
     implementation project(':core-rx')
     implementation project(':common')
-
-//    implementation commonDependencies.appCoreInteractor
-    implementation commonDependencies.supportCompatV7
 
     implementation commonDependencies.rxKotlin
 

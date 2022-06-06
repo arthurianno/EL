@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.statistic.period.di
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.statistic.period.ui.adapter.PeriodDelegatesFactory
 import com.nullgr.core.adapter.AdapterDelegatesFactory

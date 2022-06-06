@@ -29,13 +29,18 @@ import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_event_form.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     override val screenLayout: Int = R.layout.fragment_event_form
-    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        TransparentLightStatusBarConfigProvider
     override val backgroundColor: Int? = null
 
     private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
@@ -83,7 +88,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.mainActionTitleState.bindTo(formSaveButtonView.text())
         pm.mainActionVisibilityState.observable
             .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(formSaveButtonView.visibility())
+            .subscribe(formSaveButtonView.visibility())
         pm.formInput.bindTo(formInputView)
         pm.formSelector.bind(formVariantSelectorView, compositeUnbind)
         pm.tagSelector.bind(formTagSelectorView, compositeUnbind)
@@ -93,7 +98,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
-        formNoteView.textChanges().bindTo { scrollableView.scrollToBottom() }
+        formNoteView.textChanges().subscribe { scrollableView.scrollToBottom() }
     }
 
     override fun onStart() {
@@ -119,8 +124,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
     }
 
     override fun handleBack() {
-        view?.hideKeyboardFun()
-        passTo(presentationModel.backHandleAction)
+        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     abstract fun getEventType(): EventType
@@ -140,7 +144,7 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
 
     @Suppress("MagicNumber")
     private fun observeAppBarChanges() {
-        formPickerView.valueChangesFormatted().bindTo(toolbarSubTitleView.text())
+        formPickerView.valueChangesFormatted().subscribe(toolbarSubTitleView.text())
 
         scrollableView.setOnTouchListener { _, me ->
             isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
@@ -154,8 +158,8 @@ abstract class BaseEventFragment<T : BaseEventPm> : BaseFragment<T>() {
             false
         }
 
-        appBarLayoutView.collapseProgress().bindTo {
-            val alpha = 1 - Math.abs(it / 100f)
+        appBarLayoutView.collapseProgress().subscribe {
+            val alpha = 1 - abs(it / 100f)
             formPickerView.alpha = alpha
             eventInfoContainerView.alpha = alpha
 

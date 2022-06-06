@@ -28,8 +28,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -88,23 +88,14 @@ dependencies {
     implementation project(':common')
     api project(':domain')
 
+    implementation commonDependencies.coroutines
+
     implementation commonDependencies.libs
-//    implementation commonDependencies.appCore
-//    implementation commonDependencies.appCoreAdapterKtx
+
+    implementation commonDependencies.materialDesign
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-    implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
 
     implementation commonDependencies.rxKotlin
@@ -142,8 +133,9 @@ dependencies {
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseAnalytics
     implementation commonDependencies.firebaseInAppMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location

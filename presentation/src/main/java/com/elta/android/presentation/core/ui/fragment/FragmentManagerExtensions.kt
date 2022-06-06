@@ -1,7 +1,7 @@
 package com.elta.android.presentation.core.ui.fragment
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 fun FragmentManager.replaceContainer(containers: Map<String, Fragment>, tag: String) {
     beginTransaction().apply {

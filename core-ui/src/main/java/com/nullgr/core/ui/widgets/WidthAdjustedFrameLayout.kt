@@ -18,9 +18,18 @@ class WidthAdjustedFrameLayout : FrameLayout {
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
 
-        val attributes = context.theme.obtainStyledAttributes(attrs, R.styleable.WidthAdjustedFrameLayout, defStyleAttr, 0)
+        val attributes = context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.WidthAdjustedFrameLayout,
+            defStyleAttr,
+            0
+        )
 
         with(attributes) {
             leftOffset = getDimensionPixelSize(R.styleable.WidthAdjustedFrameLayout_leftOffset, 0)
@@ -35,6 +44,12 @@ class WidthAdjustedFrameLayout : FrameLayout {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(View.MeasureSpec.makeMeasureSpec(screenWidth - leftOffset - rightOffset, View.MeasureSpec.EXACTLY), heightMeasureSpec)
+        super.onMeasure(
+            View.MeasureSpec.makeMeasureSpec(
+                screenWidth - leftOffset - rightOffset,
+                View.MeasureSpec.EXACTLY
+            ),
+            heightMeasureSpec
+        )
     }
 }

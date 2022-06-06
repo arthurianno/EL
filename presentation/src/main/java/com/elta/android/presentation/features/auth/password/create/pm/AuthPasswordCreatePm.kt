@@ -5,6 +5,8 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.messages.SnackBarMessageData
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -13,8 +15,8 @@ class AuthPasswordCreatePm @Inject constructor(
     services: ServiceFacade
 ) : BaseAuthPm(services) {
 
-    private val token = State<String>()
-    private val passwordChangedSuccessAction = Action<Unit>()
+    private val token = state<String>()
+    private val passwordChangedSuccessAction = action<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {

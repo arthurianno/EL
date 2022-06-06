@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.devices.all.ui.builder.DevicesOptionsItemsBuilder
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class DevicesPm @Inject constructor(
@@ -19,9 +20,9 @@ class DevicesPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val addNewDeviceAction = Action<Unit>()
+    val addNewDeviceAction = action<Unit>()
 
-    private val getGlucometersAction = Action<Unit>()
+    private val getGlucometersAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()

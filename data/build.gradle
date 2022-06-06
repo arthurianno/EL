@@ -24,8 +24,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -112,6 +112,8 @@ dependencies {
     implementation commonDependencies.nordicDfu
     implementation commonDependencies.rxBluetooth
     implementation commonDependencies.rxReplaying
+
+    implementation 'org.greenrobot:essentials:3.1.0'
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

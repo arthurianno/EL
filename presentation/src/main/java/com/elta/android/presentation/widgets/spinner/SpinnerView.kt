@@ -5,14 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.PopupWindow
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.spinner.adapter.SpinnerDelegatesFactory
@@ -43,7 +43,8 @@ class SpinnerView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_spinner, this, true)
-        popupContainerView = LayoutInflater.from(context).inflate(R.layout.layout_popup_list, null) as RecyclerView
+        popupContainerView =
+            LayoutInflater.from(context).inflate(R.layout.layout_popup_list, null) as RecyclerView
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SpinnerView)
 
         val diffCalculator = RxDiffCalculator(ComputationToMainSchedulersFacade())
@@ -65,8 +66,14 @@ class SpinnerView @JvmOverloads constructor(
 
         isArrowVisible = typedArray.getBoolean(R.styleable.SpinnerView_showArrow, true)
         spinnerArrowView.toggleView(isArrowVisible)
-        val topicDrawableResId = typedArray.getResourceId(R.styleable.SpinnerView_topicDrawable, R.drawable.ic_calendar)
-        spinnerTopicIconView.setImageDrawable(ContextCompat.getDrawable(context, topicDrawableResId))
+        val topicDrawableResId =
+            typedArray.getResourceId(R.styleable.SpinnerView_topicDrawable, R.drawable.ic_calendar)
+        spinnerTopicIconView.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                topicDrawableResId
+            )
+        )
 
         typedArray.recycle()
     }

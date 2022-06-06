@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
@@ -16,11 +16,11 @@
         app:leftOffset="16dp"
         app:rightOffset="16dp">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopNameView"
                 style="@style/Title1"
                 android:layout_width="0dp"
@@ -35,7 +35,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopAddressView"
                 style="@style/Caption2"
                 android:layout_width="0dp"
@@ -48,7 +48,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/shopNameView"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopDistanceView"
                 style="@style/TextStyle2"
                 android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopRouteView"
                 style="@style/Button.Small.W"
                 android:layout_marginStart="16dp"
@@ -70,7 +70,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/shopAddressView" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopCallView"
                 style="@style/Button.Small.Blue2"
                 android:layout_marginStart="8dp"
@@ -81,8 +81,8 @@
                 app:layout_constraintStart_toEndOf="@+id/shopRouteView"
                 app:layout_constraintTop_toBottomOf="@+id/shopAddressView" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.nullgr.core.ui.widgets.WidthAdjustedFrameLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

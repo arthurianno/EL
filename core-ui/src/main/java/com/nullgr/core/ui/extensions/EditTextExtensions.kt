@@ -140,8 +140,9 @@ fun EditText.makeSecure() {
  * if it was ***null*** then [PasswordTransformationMethod] or ***null*** in other case
  */
 fun EditText.toggleSecure() {
-    if (this.transformationMethod == null) transformationMethod = PasswordTransformationMethod.getInstance()
+    if (this.transformationMethod == null) transformationMethod =
+        PasswordTransformationMethod.getInstance()
     else this.transformationMethod = null
 }
 
-private val noFilters: Array<InputFilter?>  by lazy { arrayOfNulls<InputFilter>(0) }
+private val noFilters: Array<InputFilter?> by lazy { arrayOfNulls<InputFilter>(0) }

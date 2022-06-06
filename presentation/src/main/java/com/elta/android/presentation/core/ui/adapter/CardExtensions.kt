@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.github.captain_miao.optroundcardview.OptRoundCardView
 import com.nullgr.core.adapter.items.ListItem
 

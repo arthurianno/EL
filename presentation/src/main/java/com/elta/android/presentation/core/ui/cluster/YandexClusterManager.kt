@@ -42,8 +42,10 @@ class YandexClusterManager(
             val currentZoom = cameraPosition.zoom.toInt()
             if (lastZoom != currentZoom) lastZoom = currentZoom
             val visibleRect = withContext(Dispatchers.Main) {
-                VisibleRect(map.visibleRegion.topLeft.toLatLng(),
-                    map.visibleRegion.bottomRight.toLatLng())
+                VisibleRect(
+                    map.visibleRegion.topLeft.toLatLng(),
+                    map.visibleRegion.bottomRight.toLatLng()
+                )
             }
             val algorithmParameter = DefaultAlgorithmParameter(visibleRect, lastZoom)
             calculateClusters(algorithmParameter)

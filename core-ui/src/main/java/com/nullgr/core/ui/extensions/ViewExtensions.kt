@@ -41,9 +41,11 @@ fun <T : View> T.toggleView(show: Boolean) {
  * @param defaultTrueState [View] visibility which will be set when true pass as [state]
  * @param defaultFalseState [View] visibility which will be set when false passed as [state]
  */
-fun <T : View> T.toggleVisibilityState(state: Boolean,
-                                       defaultTrueState: Int = View.VISIBLE,
-                                       defaultFalseState: Int = View.GONE) {
+fun <T : View> T.toggleVisibilityState(
+    state: Boolean,
+    defaultTrueState: Int = View.VISIBLE,
+    defaultFalseState: Int = View.GONE
+) {
     visibility = if (state) defaultTrueState else defaultFalseState
 }
 
@@ -123,13 +125,17 @@ fun toggleViews(state: Boolean, vararg views: View?) {
  * Calling [toggleVisibilityState] for array of [View]
  * @param views array of views
  */
-fun toggleViewsVisibilityState(state: Boolean, vararg views: View?,
-                               defaultTrueState: Int = View.VISIBLE,
-                               defaultFalseState: Int = View.GONE) {
+fun toggleViewsVisibilityState(
+    state: Boolean,
+    vararg views: View?,
+    defaultTrueState: Int = View.VISIBLE,
+    defaultFalseState: Int = View.GONE
+) {
     views.forEach {
         it?.toggleVisibilityState(state, defaultTrueState, defaultFalseState)
     }
 }
+
 /**
  * Calling [View.setEnabled] for array of [View]
  * @param views array of views

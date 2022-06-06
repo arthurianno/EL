@@ -44,7 +44,8 @@ class ObserverMapper @Inject constructor(
             ObserverItem(
                 id = id,
                 type = status.toIcon(),
-                title = userName ?: resources.getString(R.string.profile_observers_user_name_placeholder),
+                title = userName
+                    ?: resources.getString(R.string.profile_observers_user_name_placeholder),
                 description = email,
                 action = R.drawable.ic_arrow_left,
                 status = status

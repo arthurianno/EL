@@ -45,7 +45,10 @@ fun Float?.formatDistance(resources: ResourceProvider): String {
     return when {
         this == null -> ""
         this < KILOMETER -> resources.getString(R.string.shops_map_distance_m_pattern, this.toInt())
-        else -> resources.getString(R.string.shops_map_distance_km_pattern, (this / KILOMETER).toInt())
+        else -> resources.getString(
+            R.string.shops_map_distance_km_pattern,
+            (this / KILOMETER).toInt()
+        )
     }
 }
 

@@ -6,12 +6,12 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.decodeBitmap
@@ -53,19 +53,25 @@ class RangeBarView @JvmOverloads constructor(
 
     @ColorRes
     private val defaultBackgroundColorRes = R.color.pale_gray
+
     @ColorRes
     private val defaultRangeBarColorRes = R.color.shade_g_green_a
+
     @ColorRes
     private val defaultIndicatorsColorRes = R.color.white
+
     @ColorRes
     private val defaultTextColor = R.color.black_blue
 
     @ColorInt
     private var viewBackgroundColor = 0
+
     @ColorInt
     private var rangeBarColor = 0
+
     @ColorInt
     private var dragIndicatorsColor = 0
+
     @ColorInt
     private var textColor = 0
 
@@ -128,7 +134,8 @@ class RangeBarView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         beforeOnMeasure(widthMeasureSpec)
-        val height = rangeBarHeight + trianglesHeight + trianglesPadding + titleHeight + titlePadding
+        val height =
+            rangeBarHeight + trianglesHeight + trianglesPadding + titleHeight + titlePadding
         val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
         setMeasuredDimension(widthMeasureSpec, newHeightMeasureSpec)
         afterOnMeasure()
@@ -212,16 +219,40 @@ class RangeBarView @JvmOverloads constructor(
 
     private fun Canvas.drawStartDragIndicators() {
         val x1 = rangeBarRect.left + dragIndicatorsPadding * 2
-        drawLine(x1, dragIndicatorsTopY, x1, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        drawLine(
+            x1,
+            dragIndicatorsTopY,
+            x1,
+            dragIndicatorsTopY + dragIndicatorsHeight,
+            dragIndicatorsPaint
+        )
         val x2 = x1 + dragIndicatorsWidth + dragIndicatorsPadding
-        drawLine(x2, dragIndicatorsTopY, x2, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        drawLine(
+            x2,
+            dragIndicatorsTopY,
+            x2,
+            dragIndicatorsTopY + dragIndicatorsHeight,
+            dragIndicatorsPaint
+        )
     }
 
     private fun Canvas.drawEndDragIndicators() {
         val x1 = rangeBarRect.right - dragIndicatorsPadding * 2
-        drawLine(x1, dragIndicatorsTopY, x1, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        drawLine(
+            x1,
+            dragIndicatorsTopY,
+            x1,
+            dragIndicatorsTopY + dragIndicatorsHeight,
+            dragIndicatorsPaint
+        )
         val x2 = x1 - dragIndicatorsWidth - dragIndicatorsPadding
-        drawLine(x2, dragIndicatorsTopY, x2, dragIndicatorsTopY + dragIndicatorsHeight, dragIndicatorsPaint)
+        drawLine(
+            x2,
+            dragIndicatorsTopY,
+            x2,
+            dragIndicatorsTopY + dragIndicatorsHeight,
+            dragIndicatorsPaint
+        )
     }
 
     // ---- Init methods ---- //
@@ -264,7 +295,8 @@ class RangeBarView @JvmOverloads constructor(
                 R.styleable.RangeBarView_rbv_range_end,
                 DEFAULT_END_VALUE.toFloat()
             )
-            valuesRange = startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize()
+            valuesRange =
+                startRangeValue.toDouble().normalize()..endRangeValue.toDouble().normalize()
             minRange = a.getFloat(R.styleable.RangeBarView_rbv_min_range, Float.NaN).toDouble()
             a.recycle()
         } else {
@@ -325,7 +357,12 @@ class RangeBarView @JvmOverloads constructor(
 
         val backgroundLeft = paddingLeft.toFloat() + titleOffset
         val backgroundRight = fullViewWidth - titleOffset
-        backgroundRect.set(backgroundLeft, rangeBarTopY, backgroundRight, rangeBarTopY + rangeBarHeight)
+        backgroundRect.set(
+            backgroundLeft,
+            rangeBarTopY,
+            backgroundRight,
+            rangeBarTopY + rangeBarHeight
+        )
 
         val rangeBarLeft = backgroundRect.left + backgroundRect.width() * startProgress
         val rangeBarRight = backgroundRect.left + backgroundRect.width() * endProgress
@@ -364,8 +401,10 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun onValuesChanged() {
-        val start = ((valuesRange.endInclusive - valuesRange.start) * startProgress + valuesRange.start).normalize()
-        val end = ((valuesRange.endInclusive - valuesRange.start) * endProgress + valuesRange.start).normalize()
+        val start =
+            ((valuesRange.endInclusive - valuesRange.start) * startProgress + valuesRange.start).normalize()
+        val end =
+            ((valuesRange.endInclusive - valuesRange.start) * endProgress + valuesRange.start).normalize()
 
         if (values.start != start || values.end != end) {
             values.start = start
@@ -375,8 +414,10 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun onValuesChangedOutside() {
-        startProgress = ((values.start - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
-        endProgress = ((values.end - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
+        startProgress =
+            ((values.start - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
+        endProgress =
+            ((values.end - valuesRange.start) / (valuesRange.endInclusive - valuesRange.start)).toFloat()
         onProgressChanged()
         invalidate()
     }

@@ -13,6 +13,8 @@ import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
 
@@ -35,19 +37,19 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> : BaseFragment<PM>() {
     @Suppress("LongMethod")
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        passwordVisibilityButtonView.clicks().bindTo {
+        passwordVisibilityButtonView.clicks().subscribe {
             passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure())
         }
 
         pm.emailInput.bindTo(emailInputView)
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .bindTo(emailInputView.error())
+            .subscribe(emailInputView.error())
 
         pm.passwordInput.bindTo(passwordInputView)
         pm.passwordInput.error.observable
             .distinctUntilChanged()
-            .bindTo(passwordInputView.error())
+            .subscribe(passwordInputView.error())
 
         pm.continueEnabledState.bindTo { continueButtonView.isEnabled = it }
         continueButtonView.clicks().bindTo(pm.continueAction)

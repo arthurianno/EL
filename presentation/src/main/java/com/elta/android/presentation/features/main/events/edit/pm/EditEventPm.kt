@@ -20,6 +20,8 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSele
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class EditEventPm @Inject constructor(
@@ -29,13 +31,13 @@ class EditEventPm @Inject constructor(
     services: ServiceFacade
 ) : BaseEventPm(services) {
 
-    val deleteEventAction = Action<Unit>()
+    val deleteEventAction = action<Unit>()
 
-    private val loadScreenAction = Action<Unit>()
-    private val eventIdState = State<String>()
-    private val eventState = State<Event>()
-    private val isFormChangedState = State(false)
-    private val eventFormHolderState = State(EventFormModel())
+    private val loadScreenAction = action<Unit>()
+    private val eventIdState = state<String>()
+    private val eventState = state<Event>()
+    private val isFormChangedState = state(false)
+    private val eventFormHolderState = state(EventFormModel())
 
     private val deleteDialogData: DialogData by lazy { Dialogs.EventDelete(resources) }
 
@@ -127,7 +129,8 @@ class EditEventPm @Inject constructor(
     private fun createEditEventParams(i: Unit): UpdateEventUseCase.Params {
         val form = eventFormHolderState.value
         return UpdateEventUseCase.Params(
-            eventState.value.copy(value = form.value,
+            eventState.value.copy(
+                value = form.value,
                 kind = form.kind,
                 name = form.name,
                 duration = form.duration,

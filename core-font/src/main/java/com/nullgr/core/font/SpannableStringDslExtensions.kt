@@ -1,7 +1,6 @@
 package com.nullgr.core.font
 
 import android.graphics.Typeface
-import android.support.annotation.ColorInt
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
@@ -9,6 +8,7 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import androidx.annotation.ColorInt
 
 /**
  * Creates [SpannableString] from `this` [CharSequence] and calls the specified function [builderFunction] with
@@ -221,8 +221,10 @@ interface BaseSpanEntry {
 
     fun toSpannable(spannableString: SpannableString): SpannableString {
         val spanIndexPair = getSpanIndexes(spannableString)
-        spannableString.setSpan(getSpan(), spanIndexPair.first, spanIndexPair.second,
-                this.flag ?: Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(
+            getSpan(), spanIndexPair.first, spanIndexPair.second,
+            this.flag ?: Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         return spannableString
     }
 }

@@ -42,7 +42,8 @@ object DatePickerDataProvider {
 
         if (selectedDate.isBefore(todayDate) && selectedDate.isBefore(lastDayOfMonth)) {
 
-            val maxAvailableDate = if (todayDate.isBefore(lastDayOfMonth)) todayDate else lastDayOfMonth
+            val maxAvailableDate =
+                if (todayDate.isBefore(lastDayOfMonth)) todayDate else lastDayOfMonth
             tempDate = LocalDate.from(selectedDate)
 
             do {

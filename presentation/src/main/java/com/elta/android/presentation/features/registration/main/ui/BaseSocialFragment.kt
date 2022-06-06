@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.registration.main.ui
 import com.elta.android.presentation.features.registration.main.pm.BaseSocialPm
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.fragment_auth_base.*
+import me.dmdev.rxpm.bindTo
 
 abstract class BaseSocialFragment<PM : BaseSocialPm> : BaseRegistrationFragment<PM>() {
 

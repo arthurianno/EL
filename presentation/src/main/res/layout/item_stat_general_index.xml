@@ -11,7 +11,7 @@
         android:layout_height="1dp"
         android:background="@color/shade_black3" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -20,7 +20,7 @@
         android:paddingEnd="16dp"
         android:paddingBottom="18dp">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/generalIndexIconView"
             android:layout_width="32dp"
             android:layout_height="32dp"
@@ -29,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_event_medicaments" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/generalIndexTitleView"
             style="@style/New.Title1.BlackBlue"
             android:layout_width="0dp"
@@ -43,7 +43,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Короткий" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/generalIndexDescriptionView"
             style="@style/New.Caption1.ShadeBlack0"
             android:layout_width="0dp"
@@ -57,7 +57,7 @@
             app:layout_constraintTop_toBottomOf="@+id/generalIndexTitleView"
             tools:text="Инсулин" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/bottomDividerView"

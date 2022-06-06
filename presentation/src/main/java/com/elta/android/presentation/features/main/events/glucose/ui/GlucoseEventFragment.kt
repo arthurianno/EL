@@ -27,13 +27,18 @@ import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_glucose_event.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     override val screenLayout: Int = R.layout.fragment_glucose_event
     override val classToken: Class<GlucoseEventPm> = GlucoseEventPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = TransparentLightStatusBarConfigProvider
+    override val statusBarConfigProvider: StatusBarConfigProvider =
+        TransparentLightStatusBarConfigProvider
     override val backgroundColor: Int? = null
 
     private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
@@ -108,7 +113,7 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
         pm.mainActionTitleState.bindTo(formSaveButtonView.text())
         pm.mainActionVisibilityState.observable
             .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .bindTo(formSaveButtonView.visibility())
+            .subscribe(formSaveButtonView.visibility())
 
         pm.tagSelector.bind(formTagSelectorView, compositeUnbind)
         pm.dateSelector.bind(formDateSelectorView, compositeUnbind)
@@ -117,12 +122,11 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
-        formNoteView.textChanges().bindTo { scrollableView.scrollToBottom() }
+        formNoteView.textChanges().subscribe { scrollableView.scrollToBottom() }
     }
 
     override fun handleBack() {
-        view?.hideKeyboardFun()
-        passTo(presentationModel.backHandleAction)
+        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     private fun observeAppBarChanges() {
@@ -138,8 +142,8 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
             false
         }
 
-        appBarLayoutView.collapseProgress().bindTo {
-            val alpha = 1 - Math.abs(it / 100f)
+        appBarLayoutView.collapseProgress().subscribe {
+            val alpha = 1 - abs(it / 100f)
             glucoseEventValueTextView.alpha = alpha
             glucoseEventUnitsTextView.alpha = alpha
             eventInfoContainerView.alpha = alpha

@@ -22,6 +22,7 @@ import com.elta.android.presentation.features.main.records.ui.adapter.items.Reco
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -33,7 +34,7 @@ class MainRecordsPm @Inject constructor(
 
     val mainScreenState = stateControl()
 
-    private val loadScreenAction = Action<Unit>()
+    private val loadScreenAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -95,12 +96,20 @@ class MainRecordsPm @Inject constructor(
         when {
             hasEvents -> mainScreenState.visibilityState.consumer.accept(false)
             isFirstEntrance -> {
-                mainScreenState.dataState.consumer.accept(States.MainRecordsScreenFirstLaunchState(resources))
+                mainScreenState.dataState.consumer.accept(
+                    States.MainRecordsScreenFirstLaunchState(
+                        resources
+                    )
+                )
                 mainScreenState.visibilityState.consumer.accept(true)
             }
             else -> {
-                mainScreenState.dataState.consumer.accept(States.MainRecordsScreenNewDayState(resources,
-                    dayPeriod.greetingTitle()))
+                mainScreenState.dataState.consumer.accept(
+                    States.MainRecordsScreenNewDayState(
+                        resources,
+                        dayPeriod.greetingTitle()
+                    )
+                )
                 mainScreenState.visibilityState.consumer.accept(true)
             }
         }

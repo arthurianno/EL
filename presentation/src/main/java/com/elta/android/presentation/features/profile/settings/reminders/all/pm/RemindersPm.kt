@@ -14,6 +14,7 @@ import com.elta.android.presentation.features.profile.settings.reminders.all.map
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class RemindersPm @Inject constructor(
@@ -22,9 +23,9 @@ class RemindersPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val newReminderAction = Action<Unit>()
+    val newReminderAction = action<Unit>()
 
-    private val getReminders = Action<Unit>()
+    private val getReminders = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -69,7 +70,11 @@ class RemindersPm @Inject constructor(
     }
 
     private fun handleSuccess(reminders: List<Reminder>) {
-        items.consumer.accept(if (reminders.isEmpty()) emptyList() else mapper.mapFromObject(reminders))
+        items.consumer.accept(
+            if (reminders.isEmpty()) emptyList() else mapper.mapFromObject(
+                reminders
+            )
+        )
     }
 
     private fun handleReminderDelete(i: Unit) {

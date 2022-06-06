@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.layout_sync_state_device_found.*
 import kotlinx.android.synthetic.main.layout_sync_state_how_to_connect.*
 import kotlinx.android.synthetic.main.layout_sync_state_sync_completed.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
 abstract class ConnectDeviceFragment<T : ConnectDevicePm> : BaseListFragment<T>() {
 
@@ -45,16 +46,40 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> : BaseListFragment<T>(
         toAppButtonView.clicks().bindTo(pm.toAppAction)
         manualStartButtonView.clicks().bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(actionButtonView::setEnabled)
-        pm.state.bindTo { state ->
+        pm.mstate.bindTo { state ->
             syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
             }
         }
 
-        pm.retrySearchControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
-        pm.retryPinControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
-        pm.retryConnectControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
-        pm.retrySyncControl.bindTo { data, sc -> makeSnackBarWithAction(checkNotNull(view), data, sc) }
+        pm.retrySearchControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                checkNotNull(view),
+                data,
+                sc
+            )
+        }
+        pm.retryPinControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                checkNotNull(view),
+                data,
+                sc
+            )
+        }
+        pm.retryConnectControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                checkNotNull(view),
+                data,
+                sc
+            )
+        }
+        pm.retrySyncControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                checkNotNull(view),
+                data,
+                sc
+            )
+        }
 
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
 

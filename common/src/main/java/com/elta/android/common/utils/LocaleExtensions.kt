@@ -20,7 +20,7 @@ fun updateResources(context: Context, lang: String): Context {
 
             val localeList = LocaleList(locale)
             LocaleList.setDefault(localeList)
-            configuration.locales = localeList
+            configuration.setLocales(localeList)
 
             context.createConfigurationContext(configuration)
         }

@@ -9,13 +9,13 @@
     android:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/menuIconView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:src="@drawable/ic_menu_home" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/menuTitleView"
         style="@style/BottomMenuTitle"
         android:layout_width="wrap_content"

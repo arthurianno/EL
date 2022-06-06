@@ -14,7 +14,8 @@ data class MainProfileIndicatorItem(
         if (other is MainProfileIndicatorItem) {
             return mutableSetOf<Payload>().apply {
                 if (glucoseLevelMin != other.glucoseLevelMin ||
-                    glucoseLevelMax != other.glucoseLevelMax) add(Payload.GLUCOSE_LEVEL_CHANGED)
+                    glucoseLevelMax != other.glucoseLevelMax
+                ) add(Payload.GLUCOSE_LEVEL_CHANGED)
                 if (diabetesType != other.diabetesType) add(Payload.DIABETES_CHANGED)
                 if (weight != other.weight) add(Payload.WEIGHT_CHANGED)
                 if (hemoglobin != other.hemoglobin) add(Payload.HEMOGLOBIN_CHANGED)

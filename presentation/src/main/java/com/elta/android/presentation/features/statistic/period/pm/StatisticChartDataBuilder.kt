@@ -28,8 +28,7 @@ fun StatisticByPeriodModel.toChartModel(selectedDate: LocalDate?): StatisticsCha
 
     if (minLevel == maxLevel) {
         val settings = glucose.settings
-        val value = minLevel
-        when (value) {
+        when (val value = minLevel) {
             in settings.normal -> {
                 minLevel = settings.normal.start
                 maxLevel = settings.normal.end

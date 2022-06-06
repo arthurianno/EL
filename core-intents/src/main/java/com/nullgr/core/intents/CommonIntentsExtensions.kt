@@ -11,26 +11,30 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.MediaStore
-import android.support.annotation.ColorInt
-import android.support.annotation.RequiresPermission
-import android.support.customtabs.CustomTabsIntent
 import android.telephony.PhoneNumberUtils
 import android.text.TextUtils
 import android.widget.Toast
-import com.nullgr.core.rx.RxBus
-import com.nullgr.core.rx.SingletonRxBusProvider
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresPermission
+import androidx.browser.customtabs.CustomTabsIntent
 import com.nullgr.core.intents.rxresult.RxActivityResult
 import com.nullgr.core.intents.rxresult.RxResolveResultActivity
+import com.nullgr.core.rx.RxBus
+import com.nullgr.core.rx.SingletonRxBusProvider
 import io.reactivex.Observable
-import java.util.*
+import java.util.UUID
 
 /**
  * Factory function that creates new [Intent] with [Intent.ACTION_DIAL] and given [number] as target
  */
 fun callIntent(number: String): Intent {
     return Intent(Intent.ACTION_DIAL)
-            .setData(Uri.parse(if (number.toLowerCase().startsWith("tel:")) number
-            else String.format("tel:%s", PhoneNumberUtils.stripSeparators(number))))
+        .setData(
+            Uri.parse(
+                if (number.lowercase().startsWith("tel:")) number
+                else String.format("tel:%s", PhoneNumberUtils.stripSeparators(number))
+            )
+        )
 }
 
 /**
@@ -82,7 +86,11 @@ fun shareTextIntent(text: String): Intent {
  * @return [Intent] to open application or to open GooglePlay. Can be null if application dosen't exist,
  * and [googlePlayRedirect] flag has false value
  */
-fun applicationIntent(context: Context, packageName: String, googlePlayRedirect: Boolean = false): Intent? {
+fun applicationIntent(
+    context: Context,
+    packageName: String,
+    googlePlayRedirect: Boolean = false
+): Intent? {
 
     val pm = context.packageManager
 
@@ -179,8 +187,11 @@ fun selectContactEmailIntent(): Intent {
  * @param lng [Double] longitude
  */
 fun navigationIntent(lat: Double, lng: Double): Intent {
-    return Intent(Intent.ACTION_VIEW, Uri.parse(String.format("google.navigation:q=%s,%s", lat, lng)))
-            .apply { `package` = "com.google.android.apps.maps" }
+    return Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse(String.format("google.navigation:q=%s,%s", lat, lng))
+    )
+        .apply { `package` = "com.google.android.apps.maps" }
 }
 
 /**
@@ -194,8 +205,10 @@ fun navigationIntent(lat: Double, lng: Double): Intent {
 @Throws(IllegalStateException::class)
 fun shareImageAndTextIntent(context: Context, image: Bitmap, text: String?): Intent {
 
-    val path = MediaStore.Images.Media.insertImage(context.contentResolver,
-            image, String.format("ShareImage_%s", UUID.randomUUID().toString()), null)
+    val path = MediaStore.Images.Media.insertImage(
+        context.contentResolver,
+        image, String.format("ShareImage_%s", UUID.randomUUID().toString()), null
+    )
 
     if (TextUtils.isEmpty(path))
         throw IllegalStateException("Unable to insert image!")
@@ -226,8 +239,10 @@ fun shareListOfImagesAndTextIntent(context: Context, images: List<Bitmap>, text:
     val uriList = arrayListOf<Uri>()
 
     for (bitmap in images) {
-        val path = MediaStore.Images.Media.insertImage(context.contentResolver,
-                bitmap, String.format("ShareImage_%s", UUID.randomUUID().toString()), null)
+        val path = MediaStore.Images.Media.insertImage(
+            context.contentResolver,
+            bitmap, String.format("ShareImage_%s", UUID.randomUUID().toString()), null
+        )
 
         if (TextUtils.isEmpty(path))
             throw IllegalStateException("Unable to insert image!")
@@ -285,7 +300,11 @@ fun Intent?.launch(context: Context?, noActivityErrorMessage: String? = null) {
  * Extension function to start activity for result in pretty way,
  * or display [noActivityErrorMessage] if activity dosen't exist.
  */
-fun Intent?.launchForResult(context: Activity?, requestCode: Int, noActivityErrorMessage: String? = null) {
+fun Intent?.launchForResult(
+    context: Activity?,
+    requestCode: Int,
+    noActivityErrorMessage: String? = null
+) {
     if (this != null && context != null && this.resolveActivity(context.packageManager) != null) {
         context.startActivityForResult(this, requestCode)
     } else if (!noActivityErrorMessage.isNullOrEmpty()) {
@@ -301,7 +320,6 @@ fun Intent?.sendBroadcast(context: Context?) {
         context.sendBroadcast(this)
     }
 }
-
 
 /**
  * Extension function to start service in pretty way
@@ -336,16 +354,16 @@ fun Intent?.launchService(context: Context?) {
 fun Intent?.launchForResult(context: Activity?): Observable<RxActivityResult> {
     return if (this != null && context != null && this.resolveActivity(context.packageManager) != null)
         Observable
-                .fromCallable {
-                    RxResolveResultActivity
-                            .newInstance(context, this)
-                            .launch(context)
-                }.flatMap {
-                    SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)
-                            .filter { it is RxActivityResult }
-                            .map { it as RxActivityResult }
-                            .flatMap { Observable.just(it) }
-                }
+            .fromCallable {
+                RxResolveResultActivity
+                    .newInstance(context, this)
+                    .launch(context)
+            }.flatMap {
+                SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)
+                    .filter { it is RxActivityResult }
+                    .map { it as RxActivityResult }
+                    .flatMap { Observable.just(it) }
+            }
     else
         Observable.error<RxActivityResult>(ActivityNotFoundException())
 }

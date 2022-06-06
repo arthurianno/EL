@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
@@ -21,7 +21,11 @@ class RecordsHeaderDelegate(
     override val layoutResource: Int = R.layout.item_records_header
     override val itemType: Any = RecordsHeaderItem::class
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as RecordsHeaderItem
         holder as ViewHolder
         bindGlucose(holder, item)
@@ -29,7 +33,12 @@ class RecordsHeaderDelegate(
         bindInsulin(holder, item)
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         val item = items[position] as RecordsHeaderItem
         holder as ViewHolder
         when (payload) {

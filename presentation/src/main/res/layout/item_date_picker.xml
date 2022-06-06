@@ -8,7 +8,7 @@
     android:paddingTop="21dp"
     android:paddingBottom="21dp">
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dayOfWeekTitleView"
         style="@style/New.Caption2"
         android:layout_width="wrap_content"
@@ -17,7 +17,7 @@
         android:textColor="@color/color_text_day_of_week"
         tools:text="Чт" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dayOfMonthTitleView"
         style="@style/New.Body2"
         android:layout_width="wrap_content"

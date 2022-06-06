@@ -12,11 +12,14 @@ class FirebaseTracker @Inject constructor(val context: Context) : AnalyticsTrack
         get() = FirebaseAnalytics.getInstance(context)
 
     override fun track(event: AnalyticsEvent) {
-        firebaseAnalytics.logEvent(event.name, Bundle().apply {
-            event.params.forEach { param ->
-                this.putString(param.key, param.value)
+        firebaseAnalytics.logEvent(
+            event.name,
+            Bundle().apply {
+                event.params.forEach { param ->
+                    this.putString(param.key, param.value)
+                }
             }
-        })
+        )
     }
 
     override fun setStableParams(stableParams: Map<String, String>) {

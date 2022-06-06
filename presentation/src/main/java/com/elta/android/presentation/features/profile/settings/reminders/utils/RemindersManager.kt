@@ -36,7 +36,8 @@ class RemindersManager @Inject constructor(
     private val bus: RxBus
 ) {
 
-    private val manager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val manager: AlarmManager =
+        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     init {
         Observable.merge(

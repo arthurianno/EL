@@ -17,6 +17,9 @@ import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import com.nullgr.core.adapter.items.ListItem
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
@@ -31,19 +34,19 @@ abstract class BaseRemindPm constructor(
     val dateSelector = formSelectorControl()
     val timeSelector = formSelectorControl()
 
-    val showDatePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
-    val showTimePickerDialog = Command<ZonedDateTime>(bufferSize = 1)
-    val saveReminderAction = Action<Unit>()
-    val dateTimeSelectedAction = Action<ZonedDateTime>()
-    val selectedScheduleAction = Action<ListItem>()
-    val backHandleAction = Action<Unit>()
-    val schedulesState = State<List<SpinnerItem>>()
-    val schedulesDefaultState = State<String>()
-    val saveChangesEnableState = State(false)
+    val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val saveReminderAction = action<Unit>()
+    val dateTimeSelectedAction = action<ZonedDateTime>()
+    val selectedScheduleAction = action<ListItem>()
+    val backHandleAction = action<Unit>()
+    val schedulesState = state<List<SpinnerItem>>()
+    val schedulesDefaultState = state<String>()
+    val saveChangesEnableState = state(false)
 
-    protected val exitDialogAction = Action<Unit>()
-    protected val selectedDateState = State(ZonedDateTime.now())
-    protected val reminderFormHolderState = State(ReminderFormModel())
+    protected val exitDialogAction = action<Unit>()
+    protected val selectedDateState = state(ZonedDateTime.now())
+    protected val reminderFormHolderState = state(ReminderFormModel())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 

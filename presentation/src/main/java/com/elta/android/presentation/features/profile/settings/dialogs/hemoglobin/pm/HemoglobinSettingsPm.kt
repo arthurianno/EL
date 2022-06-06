@@ -23,6 +23,8 @@ import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.nullgr.core.adapter.items.ListItem
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
@@ -35,20 +37,20 @@ class HemoglobinSettingsPm @Inject constructor(
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
-    val dateState = State("")
-    val dateSelectedAction = Action<ZonedDateTime>()
-    val dateSelectedState = State(ZonedDateTime.now())
+    val dateState = state("")
+    val dateSelectedAction = action<ZonedDateTime>()
+    val dateSelectedState = state(ZonedDateTime.now())
 
-    val hemoglobinValueState = State<String>()
-    val hemoglobinItemsState = State<List<ListItem>>()
+    val hemoglobinValueState = state<String>()
+    val hemoglobinItemsState = state<List<ListItem>>()
 
-    val minusAction = Action<Unit>()
-    val plusAction = Action<Unit>()
+    val minusAction = action<Unit>()
+    val plusAction = action<Unit>()
 
-    private val profileState = State<Profile>()
-    private val inputValueState = State(DEFAULT_VALUE)
-    private val loadScreeAction = Action<Unit>()
-    private val hemoglobinEventsState = State<List<Event>>()
+    private val profileState = state<Profile>()
+    private val inputValueState = state(DEFAULT_VALUE)
+    private val loadScreeAction = action<Unit>()
+    private val hemoglobinEventsState = state<List<Event>>()
 
     override fun onCreate() {
         super.onCreate()

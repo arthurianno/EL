@@ -23,6 +23,9 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
 import io.reactivex.Observable
 import io.reactivex.Single
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
@@ -38,17 +41,21 @@ class ProfileSettingsPm @Inject constructor(
 
     val unlinkNetworkDialogControl = dialogControl<DialogData, DialogResult>()
     val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
-    val openPrivacyPolicyCommand = Command<Unit>(bufferSize = 1)
+    val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
 
-    private val socialNetworkState = State<SocialNetworkType>()
-    private val getProfileSettingsAction = Action<Unit>()
-    private val linkSocialUserAction = Action<Unit>()
-    private val unlinkSocialUserAction = Action<Unit>()
-    private val profileState = State<Profile>()
-    private val checkGoogleFitAuthAction = Action<Unit>()
+    private val socialNetworkState = state<SocialNetworkType>()
+    private val getProfileSettingsAction = action<Unit>()
+    private val linkSocialUserAction = action<Unit>()
+    private val unlinkSocialUserAction = action<Unit>()
+    private val profileState = state<Profile>()
+    private val checkGoogleFitAuthAction = action<Unit>()
 
     private val unlinkNetworkDialogData: DialogData by lazy { Dialogs.EventUnlinkNetwork(resources) }
-    private val googleFitActivatedDialogData: DialogData by lazy { Dialogs.GoogleFitActivated(resources) }
+    private val googleFitActivatedDialogData: DialogData by lazy {
+        Dialogs.GoogleFitActivated(
+            resources
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -84,7 +91,9 @@ class ProfileSettingsPm @Inject constructor(
                     ProfileSettingsItem.Type.NAME -> router.navigateTo(Screens.SetName)
                     ProfileSettingsItem.Type.GENDER -> router.navigateTo(Screens.SetGender)
                     ProfileSettingsItem.Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
-                    ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
+                    ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(
+                        Unit
+                    )
                     ProfileSettingsItem.Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }

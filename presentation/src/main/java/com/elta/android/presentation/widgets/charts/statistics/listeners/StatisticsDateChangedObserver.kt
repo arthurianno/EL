@@ -27,17 +27,18 @@ class StatisticsDateChangedObserver(
         observer: Observer<in StatisticsSelectionResult>
     ) : MainThreadDisposable() {
 
-        var valueListener: OnStatisticsDateChangedListener? = object : OnStatisticsDateChangedListener {
-            override fun onDateChanged(date: LocalDate) {
-                if (!isDisposed)
-                    observer.onNext(StatisticsSelectionResult(date))
-            }
+        var valueListener: OnStatisticsDateChangedListener? =
+            object : OnStatisticsDateChangedListener {
+                override fun onDateChanged(date: LocalDate) {
+                    if (!isDisposed)
+                        observer.onNext(StatisticsSelectionResult(date))
+                }
 
-            override fun onUnselectedAll() {
-                if (!isDisposed)
-                    observer.onNext(StatisticsSelectionResult(null))
+                override fun onUnselectedAll() {
+                    if (!isDisposed)
+                        observer.onNext(StatisticsSelectionResult(null))
+                }
             }
-        }
 
         override fun onDispose() {
             view.setOnStatisticsDateChangedListener(null)
