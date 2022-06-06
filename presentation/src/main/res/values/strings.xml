@@ -213,7 +213,7 @@
     <string name="main_records_event_time_mask">в %s (UTC %s)</string>
 
     <!-- EVENTS -->
-    <string name="events_options_chooser_title_tags">Тег для группировки</string>
+    <string name="events_options_chooser_title_tags">Событие для группировки</string>
     <string name="events_options_chooser_title_activities">Вид активности</string>
     <string name="events_options_chooser_title_insulin">Тип инсулина</string>
 
