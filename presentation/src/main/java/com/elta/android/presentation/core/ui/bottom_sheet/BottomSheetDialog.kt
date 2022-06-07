@@ -6,7 +6,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.content.Context
-import android.content.DialogInterface
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.os.Build
@@ -31,7 +30,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 /**
  * Base class for [android.app.Dialog]s styled as a bottom sheet.
  */
-class BottomSheetDialog : AppCompatDialog {
+class BottomSheetDialog(context: Context, @StyleRes theme: Int = 0) : AppCompatDialog(
+    context,
+    getThemeResId(context, theme)
+) {
     private var behavior: BottomSheetBehavior<FrameLayout>? = null
     private val handler = Handler()
     private val startDelay = 0L
@@ -49,35 +51,28 @@ class BottomSheetDialog : AppCompatDialog {
     private var isAnimationFinished = false
     private var isDismissing = false
 
-    @JvmOverloads
-    constructor(context: Context, @StyleRes theme: Int = 0) : super(
-        context,
-        getThemeResId(context, theme)
-    ) {
-        // We hide the type bar for any style configuration. Otherwise, there will be a gap
-        // above the bottom sheet when it is expanded.
+    init {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setOnShowListener()
     }
 
-    protected constructor(
-        context: Context,
-        cancelable: Boolean,
-        cancelListener: DialogInterface.OnCancelListener?
-    ) : super(context, cancelable, cancelListener) {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-        this.cancelable = cancelable
-        setOnShowListener()
-    }
+//    protected constructor(
+//        context: Context,
+//        cancelable: Boolean,
+//        cancelListener: DialogInterface.OnCancelListener?
+//    ) : super(context, cancelable, cancelListener) {
+//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+//        this.cancelable = cancelable
+//        setOnShowListener()
+//    }
 
     override fun setContentView(@LayoutRes layoutResId: Int) {
         super.setContentView(wrapInBottomSheet(layoutResId, null, null))
     }
 
-    override fun onCreate(savedInstanceState: Bundle) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val window = window
-        if (window != null) {
+        window?.let { window ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -128,8 +123,8 @@ class BottomSheetDialog : AppCompatDialog {
 
     override fun onStart() {
         super.onStart()
-        if (behavior != null && behavior!!.getState() == BottomSheetBehavior.STATE_HIDDEN) {
-            behavior!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+        if (behavior?.state == BottomSheetBehavior.STATE_HIDDEN) {
+            behavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -156,7 +151,7 @@ class BottomSheetDialog : AppCompatDialog {
 
     fun closeSmooth() {
         animateOut()
-        behavior!!.setState(BottomSheetBehavior.STATE_HIDDEN)
+        behavior?.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun wrapInBottomSheet(
@@ -164,25 +159,25 @@ class BottomSheetDialog : AppCompatDialog {
         view: View?,
         params: ViewGroup.LayoutParams?
     ): View {
-        var view = view
+        var mView = view
         val container: FrameLayout =
             View.inflate(context, R.layout.design_bottom_sheet_dialog, null) as FrameLayout
         val coordinator: CoordinatorLayout =
             container.findViewById<CoordinatorLayout>(R.id.coordinator)
-        if (layoutResId != 0 && view == null) {
-            view = layoutInflater.inflate(layoutResId, coordinator, false)
+        if (layoutResId != 0 && mView == null) {
+            mView = layoutInflater.inflate(layoutResId, coordinator, false)
         }
         val bottomSheet: FrameLayout =
             coordinator.findViewById(R.id.design_bottom_sheet)
         behavior = BottomSheetBehavior.from(bottomSheet).apply {
-            setBottomSheetCallback(bottomSheetCallback)
+            addBottomSheetCallback(bottomSheetCallback)
             isHideable = cancelable
             setPeekHeight(0)
         }
         if (params == null) {
-            bottomSheet.addView(view)
+            bottomSheet.addView(mView)
         } else {
-            bottomSheet.addView(view, params)
+            bottomSheet.addView(mView, params)
         }
         // We treat the CoordinatorLayout as outside the dialog though it is technically inside
         coordinator
@@ -222,7 +217,7 @@ class BottomSheetDialog : AppCompatDialog {
                 }
             }
         )
-        bottomSheet.setOnTouchListener { view, event -> // Consume the event and prevent it from falling through
+        bottomSheet.setOnTouchListener { _, _ ->
             true
         }
         return container
@@ -241,7 +236,7 @@ class BottomSheetDialog : AppCompatDialog {
 
     private fun setOnShowListener() {
         setOnShowListener {
-            if (behavior?.getState() != initialState) {
+            if (behavior?.state != initialState) {
                 handler.postDelayed({ behavior?.setState(initialState) }, startDelay)
             }
         }
@@ -252,13 +247,13 @@ class BottomSheetDialog : AppCompatDialog {
     }
 
     private fun animateOut() {
-        if (!isDismissing && !outAnimator!!.isStarted) {
+        if (!isDismissing && outAnimator?.isStarted == false) {
             outAnimator?.start()
         }
     }
 
     private fun checkAndDismiss() {
-        val newState = behavior!!.getState()
+        val newState = behavior?.state
         if ((newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) &&
             isAnimationFinished &&
             !isDismissing
@@ -270,8 +265,8 @@ class BottomSheetDialog : AppCompatDialog {
 
     private val bottomSheetCallback: BottomSheetBehavior.BottomSheetCallback =
         object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(p0: View, p1: Int) {
-                if (p1 == BottomSheetBehavior.STATE_HIDDEN || p1 == BottomSheetBehavior.STATE_COLLAPSED) {
+            override fun onStateChanged(var1: View, var2: Int) {
+                if (var2 == BottomSheetBehavior.STATE_HIDDEN || var2 == BottomSheetBehavior.STATE_COLLAPSED) {
                     checkAndDismiss()
                     animateOut()
                 }
@@ -282,11 +277,11 @@ class BottomSheetDialog : AppCompatDialog {
 
     companion object {
         private fun getThemeResId(context: Context, themeId: Int): Int {
-            var themeId = themeId
-            if (themeId == 0) {
+            var mThemeId = themeId
+            if (mThemeId == 0) {
                 // If the provided theme is 0, then retrieve the dialogTheme from our theme
                 val outValue = TypedValue()
-                themeId = if (context.theme.resolveAttribute(
+                mThemeId = if (context.theme.resolveAttribute(
                         R.attr.bottomSheetDialogTheme,
                         outValue,
                         true
@@ -298,7 +293,7 @@ class BottomSheetDialog : AppCompatDialog {
                     R.style.Theme_Design_Light_BottomSheetDialog
                 }
             }
-            return themeId
+            return mThemeId
         }
     }
 }
