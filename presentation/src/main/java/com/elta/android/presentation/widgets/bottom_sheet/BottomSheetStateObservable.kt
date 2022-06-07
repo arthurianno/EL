@@ -17,7 +17,7 @@ class BottomSheetStateObservable(
         }
         val listener = Listener(behavior, observer)
         observer.onSubscribe(listener)
-        behavior.setBottomSheetCallback(listener.bottomSheetCallback)
+        behavior.addBottomSheetCallback(listener.bottomSheetCallback)
     }
 
     class Listener(
@@ -36,7 +36,7 @@ class BottomSheetStateObservable(
         }
 
         override fun onDispose() {
-            behavior.setBottomSheetCallback(null)
+            behavior.removeBottomSheetCallback(bottomSheetCallback)
         }
     }
 }

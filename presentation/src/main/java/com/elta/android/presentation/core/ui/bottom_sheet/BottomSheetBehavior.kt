@@ -1,4 +1,6 @@
 package com.elta.android.presentation.core.ui.bottom_sheet
+
+// TODO Удалить этот класс. Используем стандартный
 //
 // import android.content.Context
 // import android.util.AttributeSet
