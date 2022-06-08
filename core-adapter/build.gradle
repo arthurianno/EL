@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -35,6 +34,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
 }
 
 configurations.all {
@@ -45,10 +49,6 @@ configurations.all {
 
 kapt {
     correctErrorTypes = true
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {

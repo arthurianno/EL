@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "io.objectbox"
@@ -183,6 +182,9 @@ android {
             universalApk true
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 kapt {
@@ -199,9 +201,6 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-}
-androidExtensions {
-    experimental = true
 }
 
 android.applicationVariants.all { variant ->

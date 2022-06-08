@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.AppNavigator
 import com.elta.android.presentation.core.navigation.BackHandler
@@ -50,14 +51,16 @@ abstract class BaseActivity<T : BasePm> :
     @Inject
     override lateinit var router: FlowRouter
 
+    protected abstract val binding: ViewBinding
+
     protected abstract val screenLayout: Int
 
     protected abstract val classToken: Class<T>
 
     protected open val navigator: Navigator = AppNavigator(this)
 
-    protected val currentFragment: BaseFragment<*>?
-        get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
+    protected val currentFragment: BaseFragment<*, *>?
+        get() = supportFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*, *>
 
     private var errorStateView: StateView? = null
     private var emptyStateView: StateView? = null

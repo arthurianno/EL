@@ -98,6 +98,7 @@ def libraryVersions = [
         coroutinesVersion          : '1.3.9',
         androidxCore               : '1.8.0',
         androidxAppCompact         : '1.4.2',
+        androidxFragment           : '1.4.1',
         androidxRecyclerView       : '1.2.1',
         androidxBrowser            : '1.4.0',
         androidxMutlidex           : '2.0.1',
@@ -189,6 +190,7 @@ ext.commonDependencies = [
 
         androidxCore          : "androidx.core:core:${libraryVersions.androidxCore}",
         androidxCoreKtx       : "androidx.core:core-ktx:${libraryVersions.androidxCore}",
+        androidxFragmentKtx   : "androidx.fragment:fragment-ktx:${libraryVersions.androidxFragment}",
         androidxAppCompact    : "androidx.appcompat:appcompat:${libraryVersions.androidxAppCompact}",
         androidxRecyclerView  : "androidx.recyclerview:recyclerview:${libraryVersions.androidxRecyclerView}",
         androidxBrowser       : "androidx.browser:browser:${libraryVersions.androidxBrowser}",

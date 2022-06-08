@@ -4,6 +4,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.viewbinding.ViewBinding
 import com.a65apps.clustering.core.Cluster
 import com.a65apps.clustering.core.VisibleRect
 import com.a65apps.clustering.core.algorithm.DefaultAlgorithmParameter
@@ -35,7 +36,9 @@ import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
-abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
+abstract class BaseYandexMapFragment<T : BasePm, B : ViewBinding>(
+    bindingInflater: Inflater<B>
+) : BaseFragment<T, B>(bindingInflater) {
 
     protected abstract val userLocationPinRes: Int
     protected abstract val clusterPinProvider: ClusterPinProvider

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.utils.hideKeyboardFun
@@ -14,10 +15,16 @@ import dagger.android.support.AndroidSupportInjection
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() {
+abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
+    private val bindingInflater: Inflater<B>
+) : PmBottomSheetFragment<T>() {
 
     @Inject
     lateinit var factory: PmFactory
+
+    private var _binding: B? = null
+    protected val binding: B
+        get() = checkNotNull(_binding)
 
     protected abstract val screenLayout: Int
     protected abstract val classToken: Class<T>
@@ -40,8 +47,15 @@ abstract class BaseBottomSheetFragment<T : BasePm> : PmBottomSheetFragment<T>() 
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        inflater.inflate(screenLayout, container, false)
+    ): View? {
+        _binding = bindingInflater.invoke(inflater, container, false)
+        return _binding?.root
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
 
     override fun providePresentationModel(): T = factory.createViewModel(classToken)
 

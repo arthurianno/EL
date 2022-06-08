@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentMainRecordsBinding
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenTransparentStatusBarConfigProvider
@@ -16,10 +17,10 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import io.reactivex.rxkotlin.Observables
-import kotlinx.android.synthetic.main.fragment_main_records.*
 import javax.inject.Inject
 
-class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
+class MainRecordsFragment :
+    BaseListFragment<MainRecordsPm, FragmentMainRecordsBinding>(FragmentMainRecordsBinding::inflate) {
 
     @Inject
     lateinit var bus: RxBus
@@ -38,7 +39,7 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
         super.onViewCreated(view, savedInstanceState)
         itemsView?.addItemDecoration(
             MainScreenMarginItemDecoration(
-                checkNotNull(context),
+                requireContext(),
                 R.dimen.overlap_first_item_margin
             )
         )
@@ -46,7 +47,7 @@ class MainRecordsFragment : BaseListFragment<MainRecordsPm>() {
 
     override fun onBindPresentationModel(pm: MainRecordsPm) {
         super.onBindPresentationModel(pm)
-        pm.mainScreenState.bind(mainScreenStateView, compositeUnbind)
+        pm.mainScreenState.bind(binding.mainScreenStateView, compositeUnbind)
         pm.mainScreenState
             .visibilityState
             .observable.map { !it }

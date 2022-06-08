@@ -5,7 +5,11 @@ import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
+import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
@@ -18,10 +22,10 @@ import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_settings_dialog_hemoglobin.*
 import me.dmdev.rxpm.bindTo
+import net.cachapa.expandablelayout.ExpandableLayout
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
@@ -32,12 +36,31 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     override val dialogType = DialogType.HbA1C
     override val classToken: Class<HemoglobinSettingsPm> = HemoglobinSettingsPm::class.java
 
+    private val calendarContainerView =
+        binding.dialogContentContainerView.findViewById<ExpandableLayout>(R.id.calendarContainerView)
+    private val itemsView =
+        binding.dialogContentContainerView.findViewById<RecyclerView>(R.id.itemsView)
+    private val arrowView =
+        binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.arrowView)
+    private val minusView =
+        binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.minusView)
+    private val plusView =
+        binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.plusView)
+    private val dateView =
+        binding.dialogContentContainerView.findViewById<AppCompatTextView>(R.id.dateView)
+    private val hemoglobinValueView =
+        binding.dialogContentContainerView.findViewById<AppCompatTextView>(R.id.hemoglobinValueView)
+    private val calendarView =
+        binding.dialogContentContainerView.findViewById<MaterialCalendarView>(R.id.calendarView)
+    private val hemoglobinContentView =
+        binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.hemoglobinContentView)
+
     @Inject
     lateinit var adapter: DynamicAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        itemsView.layoutManager = FixedLinearLayoutManager(checkNotNull(activity))
+        itemsView.layoutManager = FixedLinearLayoutManager(requireActivity())
         itemsView.adapter = adapter
 
         arrowView.setOnClickListener {
@@ -63,7 +86,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     override fun onBindPresentationModel(pm: HemoglobinSettingsPm) {
         super.onBindPresentationModel(pm)
         pm.progressState.bindTo {
-            progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            binding.progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             hemoglobinContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
         pm.dateSelectedState.bindTo {
@@ -88,9 +111,9 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
         pm.hemoglobinItemsState.observable.bindTo(adapter, compositeUnbind)
     }
 
-    private inline fun drawable(drawable: Int, inset: Int): Drawable =
+    private fun drawable(drawable: Int, inset: Int): Drawable =
         InsetDrawable(
-            ContextCompat.getDrawable(checkNotNull(context), drawable),
+            ContextCompat.getDrawable(requireContext(), drawable),
             0,
             inset,
             0,

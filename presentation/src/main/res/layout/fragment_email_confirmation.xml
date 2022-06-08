@@ -12,6 +12,7 @@
         android:visibility="gone">
 
         <include
+            android:id="@+id/toolbar"
             layout="@layout/layout_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

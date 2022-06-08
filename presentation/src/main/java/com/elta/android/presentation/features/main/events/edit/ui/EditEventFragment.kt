@@ -9,29 +9,30 @@ import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.fragment_event_form.*
 import me.dmdev.rxpm.bindTo
 
 class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
     override val classToken: Class<EditEventPm> = EditEventPm::class.java
 
-    override fun getEventType() = checkNotNull(arguments)[EXTRA_EVENT_TYPE] as EventType
+    override fun getEventType() = arguments?.get(EXTRA_EVENT_TYPE) as EventType
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationModel.setEventId(checkNotNull(arguments)[EXTRA_EVENT_ID] as String)
+        presentationModel.setEventId(arguments?.getString(EXTRA_EVENT_ID).orEmpty())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuButtonView.show()
-        menuButtonView.setText(R.string.event_menu_remove)
+        with(binding) {
+            menuButtonView.show()
+            menuButtonView.setText(R.string.event_menu_remove)
+        }
     }
 
     override fun onBindPresentationModel(pm: EditEventPm) {
         super.onBindPresentationModel(pm)
-        menuButtonView.clicks().bindTo(pm.deleteEventAction)
+        binding.menuButtonView.clicks().bindTo(pm.deleteEventAction)
         bindProgressDialog(pm)
     }
 

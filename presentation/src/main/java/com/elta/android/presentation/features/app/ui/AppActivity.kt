@@ -6,16 +6,17 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
-import kotlinx.android.synthetic.main.activity_app.*
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 
 class AppActivity : BaseActivity<AppPm>() {
-
     override val screenLayout: Int = R.layout.activity_app
     override val classToken: Class<AppPm> = AppPm::class.java
+
+    override val binding by lazy { ActivityAppBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.systemUiVisibility =
@@ -35,9 +36,9 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
-        pm.networkStateCommand.bindTo(connectionStatusView.changeState())
-        pm.syncStatusVisibility.bindTo(syncStatusView.visibleChanges())
-        pm.syncStatusState.bindTo(syncStatusView.statusChanges())
+        pm.networkStateCommand.bindTo(binding.connectionStatusView.changeState())
+        pm.syncStatusVisibility.bindTo(binding.syncStatusView.visibleChanges())
+        pm.syncStatusState.bindTo(binding.syncStatusView.statusChanges())
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -54,11 +55,11 @@ class AppActivity : BaseActivity<AppPm>() {
         findLastNestedFragmentAndSendEvent(currentFragment)
     }
 
-    private tailrec fun findLastNestedFragmentAndSendEvent(parentFragment: BaseFragment<*>?) {
+    private tailrec fun findLastNestedFragmentAndSendEvent(parentFragment: BaseFragment<*, *>?) {
         val nestedFragment = parentFragment
             ?.childFragmentManager
             ?.findFragmentById(R.id.containerView)
-            as? BaseFragment<*>
+            as? BaseFragment<*, *>
 
         if (nestedFragment == null) {
             parentFragment?.javaClass?.simpleName?.passTo(presentationModel.onStopAction)
