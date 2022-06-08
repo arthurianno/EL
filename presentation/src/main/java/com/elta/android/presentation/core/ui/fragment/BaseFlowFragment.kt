@@ -2,6 +2,7 @@ package com.elta.android.presentation.core.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
+import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.FragmentNavigator
@@ -15,7 +16,9 @@ import com.github.terrakok.cicerone.NavigatorHolder
 import me.dmdev.rxpm.passTo
 import javax.inject.Inject
 
-abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider {
+abstract class BaseFlowFragment<T : BasePm, B : ViewBinding>(
+    bindingInflater: Inflater<B>
+) : BaseFragment<T, B>(bindingInflater), RouterProvider {
 
     @Inject
     lateinit var globalRouter: FlowRouter
@@ -24,8 +27,8 @@ abstract class BaseFlowFragment<T : BasePm> : BaseFragment<T>(), RouterProvider 
     private val navigatorHolder: NavigatorHolder by lazy { cicerone.getNavigatorHolder() }
     private lateinit var navigator: Navigator
 
-    private val currentFragment: BaseFragment<*>?
-        get() = childFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*>
+    private val currentFragment: BaseFragment<*, *>?
+        get() = childFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*, *>
 
     override val router: FlowRouter by lazy { cicerone.router }
 

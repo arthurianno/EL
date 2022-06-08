@@ -38,6 +38,9 @@ android {
             jvmArgs '-noverify'
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 kapt {
@@ -83,6 +86,7 @@ dependencies {
     api project(':domain')
 
     implementation commonDependencies.coroutines
+    implementation commonDependencies.androidxFragmentKtx
 
     implementation commonDependencies.libs
 

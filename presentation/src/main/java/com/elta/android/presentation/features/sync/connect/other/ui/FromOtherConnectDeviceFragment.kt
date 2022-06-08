@@ -7,7 +7,6 @@ import com.elta.android.presentation.features.sync.connect.base.ui.ConnectDevice
 import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePm
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class FromOtherConnectDeviceFragment : ConnectDeviceFragment<FromOtherConnectDevicePm>() {
 
@@ -15,9 +14,11 @@ class FromOtherConnectDeviceFragment : ConnectDeviceFragment<FromOtherConnectDev
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeButtonView.setImageResource(R.drawable.ic_back)
-        homeButtonView.show()
-        menuButtonView.hide()
+        with(binding.toolbar) {
+            homeButtonView.setImageResource(R.drawable.ic_back)
+            homeButtonView.show()
+            menuButtonView.hide()
+        }
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.onboaring.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -12,6 +11,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentOnboardingBinding
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
@@ -21,12 +21,11 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.fragment_onboarding.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
 import me.dmdev.rxpm.bindTo
 
 @Suppress("LabeledExpression")
-class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
+class OnBoardingFragment :
+    BaseListFragment<OnBoardingPm, FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_onboarding
     override val classToken: Class<OnBoardingPm> = OnBoardingPm::class.java
@@ -37,11 +36,13 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeButtonView.hide()
-        menuButtonView.text = getString(R.string.on_boarding_toolbar_menu_button)
+        with(binding.toolbar) {
+            homeButtonView.hide()
+            menuButtonView.text = getString(R.string.on_boarding_toolbar_menu_button)
+        }
         itemsView?.let {
             snapHelper.attachToRecyclerView(it)
-            indicatorsView.attachToRecyclerView(it)
+            binding.indicatorsView.attachToRecyclerView(it)
             it.setOnTouchListener { _, event ->
                 val action = event.action
                 if (action == MotionEvent.ACTION_DOWN) {
@@ -52,21 +53,22 @@ class OnBoardingFragment : BaseListFragment<OnBoardingPm>() {
         }
     }
 
-    override fun provideLayoutManager(context: Context?): RecyclerView.LayoutManager =
-        FixedLinearLayoutManager(checkNotNull(context), LinearLayoutManager.HORIZONTAL)
+    override fun provideLayoutManager(): RecyclerView.LayoutManager =
+        FixedLinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL)
 
     override fun onBindPresentationModel(pm: OnBoardingPm) {
         super.onBindPresentationModel(pm)
         pm.currentPageState.bindTo { page -> itemsView?.smoothScrollToPosition(page) }
-        pm.titleState.observable.skip(1).subscribe { onBoardingHeaderTextView.animateText(it) }
-        pm.titleState.observable.take(1).subscribe(onBoardingHeaderTextView.text())
-        pm.previousPageVisibilityState.bindTo(previewPageButtonView.fadeVisibility())
-        pm.nextPageVisibilityState.bindTo(nextPageButtonView.fadeVisibility())
+        pm.titleState.observable.skip(1)
+            .subscribe { binding.onBoardingHeaderTextView.animateText(it) }
+        pm.titleState.observable.take(1).subscribe(binding.onBoardingHeaderTextView.text())
+        pm.previousPageVisibilityState.bindTo(binding.previewPageButtonView.fadeVisibility())
+        pm.nextPageVisibilityState.bindTo(binding.nextPageButtonView.fadeVisibility())
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
 
-        previewPageButtonView.clicks().bindTo(pm.previousPageAction)
-        nextPageButtonView.clicks().bindTo(pm.nextPageAction)
-        menuButtonView.clicks().bindTo(pm.skipPageAction)
+        binding.previewPageButtonView.clicks().bindTo(pm.previousPageAction)
+        binding.nextPageButtonView.clicks().bindTo(pm.nextPageAction)
+        binding.toolbar.menuButtonView.clicks().bindTo(pm.skipPageAction)
 
         bindProgressDialog(pm)
     }

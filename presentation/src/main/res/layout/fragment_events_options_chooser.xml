@@ -12,7 +12,9 @@
         android:background="@drawable/bg_gradient_green"
         android:orientation="vertical">
 
-        <include layout="@layout/layout_toolbar" />
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/layout_toolbar" />
 
         <View
             android:layout_width="match_parent"

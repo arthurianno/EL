@@ -6,18 +6,20 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentAuthPasswordCreateBinding
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
-import kotlinx.android.synthetic.main.fragment_auth_password_create.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 
-class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
+class AuthPasswordCreateFragment :
+    BaseFragment<AuthPasswordCreatePm, FragmentAuthPasswordCreateBinding>(
+        FragmentAuthPasswordCreateBinding::inflate
+    ) {
 
     override val screenLayout: Int = R.layout.fragment_auth_password_create
     override val classToken: Class<AuthPasswordCreatePm> = AuthPasswordCreatePm::class.java
@@ -32,19 +34,19 @@ class AuthPasswordCreateFragment : BaseFragment<AuthPasswordCreatePm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+        binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 
     override fun onBindPresentationModel(pm: AuthPasswordCreatePm) {
         super.onBindPresentationModel(pm)
-        passwordVisibilityButtonView.clicks()
-            .subscribe { passwordVisibilityButtonView.toggleSecureIcon(passwordInputView.toggleSecure()) }
-        pm.passwordInput.bindTo(passwordInputView)
+        binding.passwordVisibilityButtonView.clicks()
+            .subscribe { binding.passwordVisibilityButtonView.toggleSecureIcon(binding.passwordInputView.toggleSecure()) }
+        pm.passwordInput.bindTo(binding.passwordInputView)
         pm.passwordInput.error.observable
             .distinctUntilChanged()
-            .subscribe(passwordInputView.error())
-        pm.continueEnabledState.bindTo { saveButtonView.isEnabled = it }
-        saveButtonView.clicks().bindTo(pm.continueAction)
+            .subscribe(binding.passwordInputView.error())
+        pm.continueEnabledState.bindTo { binding.saveButtonView.isEnabled = it }
+        binding.saveButtonView.clicks().bindTo(pm.continueAction)
         bindProgressDialog(pm)
     }
 

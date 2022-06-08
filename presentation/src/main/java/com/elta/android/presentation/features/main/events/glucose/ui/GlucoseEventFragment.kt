@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentGlucoseEventBinding
 import com.elta.android.presentation.features.main.events.base.initializer.DEFAULT_NOTE_LENGTH
 import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
 import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
@@ -26,14 +27,14 @@ import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hideKeyboard
-import kotlinx.android.synthetic.main.fragment_glucose_event.*
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
+class GlucoseEventFragment :
+    BaseFragment<GlucoseEventPm, FragmentGlucoseEventBinding>(FragmentGlucoseEventBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_glucose_event
     override val classToken: Class<GlucoseEventPm> = GlucoseEventPm::class.java
@@ -54,25 +55,27 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        insetsListener = instance(formSaveButtonView, formContainerView) { offset ->
-            if (!isTouchingScroll || !isTouchingAppBar) {
-                val isOffsetZero = offset == 0
-                appBarLayoutView?.setExpanded(isOffsetZero, true)
-                if (isOffsetZero) requireActivity().findAndClearFocus()
-                if (!isOffsetZero) scrollableView.scrollToBottom()
+        with(binding) {
+            insetsListener = instance(formSaveButtonView, formContainerView) { offset ->
+                if (!isTouchingScroll || !isTouchingAppBar) {
+                    val isOffsetZero = offset == 0
+                    appBarLayoutView?.setExpanded(isOffsetZero, true)
+                    if (isOffsetZero) requireActivity().findAndClearFocus()
+                    if (!isOffsetZero) scrollableView.scrollToBottom()
+                }
             }
+            maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
+            with(viewsState) {
+                glucoseEventValueTextView.alpha = valueViewAlpha
+                glucoseEventUnitsTextView.alpha = valueViewAlpha
+                eventInfoContainerView.alpha = eventInfoAlpha
+                toolbarTitleView.translationY = titleTranslation
+                toolbarSubTitleView.translationY = subTitleTranslation
+                toolbarSubTitleView.alpha = subTitleAlpha
+                formSaveButtonView.visibility = buttonVisibility
+            }
+            formNoteView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
         }
-        maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
-        with(viewsState) {
-            glucoseEventValueTextView.alpha = valueViewAlpha
-            glucoseEventUnitsTextView.alpha = valueViewAlpha
-            eventInfoContainerView.alpha = eventInfoAlpha
-            toolbarTitleView.translationY = titleTranslation
-            toolbarSubTitleView.translationY = subTitleTranslation
-            toolbarSubTitleView.alpha = subTitleAlpha
-            formSaveButtonView.visibility = buttonVisibility
-        }
-        formNoteView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
     }
 
     override fun onStart() {
@@ -87,13 +90,15 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
 
     override fun onPause() {
         super.onPause()
-        with(viewsState) {
-            valueViewAlpha = glucoseEventValueTextView.alpha
-            eventInfoAlpha = eventInfoContainerView.alpha
-            titleTranslation = toolbarTitleView.translationY
-            subTitleTranslation = toolbarSubTitleView.translationY
-            subTitleAlpha = toolbarSubTitleView.alpha
-            buttonVisibility = formSaveButtonView.visibility
+        with(binding) {
+            viewsState.apply {
+                valueViewAlpha = glucoseEventValueTextView.alpha
+                eventInfoAlpha = eventInfoContainerView.alpha
+                titleTranslation = toolbarTitleView.translationY
+                subTitleTranslation = toolbarSubTitleView.translationY
+                subTitleAlpha = toolbarSubTitleView.alpha
+                buttonVisibility = formSaveButtonView.visibility
+            }
         }
     }
 
@@ -101,28 +106,28 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
         bindProgressDialog(pm)
-        formSaveButtonView.clicks().bindTo(pm.mainAction)
-        menuButtonView.clicks().bindTo(pm.shareAction)
+        binding.formSaveButtonView.clicks().bindTo(pm.mainAction)
+        binding.menuButtonView.clicks().bindTo(pm.shareAction)
 
         pm.glucoseValueState.bindTo {
-            glucoseEventValueTextView.text = it
-            toolbarSubTitleView.text = it
+            binding.glucoseEventValueTextView.text = it
+            binding.toolbarSubTitleView.text = it
         }
-        pm.glucoseInfoState.bindTo(eventInfoTextView.text())
-        pm.glucoseLevelBackgroundState.bindTo { appBarLayoutView.setBackgroundResource(it) }
-        pm.mainActionTitleState.bindTo(formSaveButtonView.text())
+        pm.glucoseInfoState.bindTo(binding.eventInfoTextView.text())
+        pm.glucoseLevelBackgroundState.bindTo { binding.appBarLayoutView.setBackgroundResource(it) }
+        pm.mainActionTitleState.bindTo(binding.formSaveButtonView.text())
         pm.mainActionVisibilityState.observable
             .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .subscribe(formSaveButtonView.visibility())
+            .subscribe(binding.formSaveButtonView.visibility())
 
-        pm.tagSelector.bind(formTagSelectorView, compositeUnbind)
-        pm.dateSelector.bind(formDateSelectorView, compositeUnbind)
-        pm.timeSelector.bind(formTimeSelectorView, compositeUnbind)
-        pm.noteInput.bindTo(formNoteView)
+        pm.tagSelector.bind(binding.formTagSelectorView, compositeUnbind)
+        pm.dateSelector.bind(binding.formDateSelectorView, compositeUnbind)
+        pm.timeSelector.bind(binding.formTimeSelectorView, compositeUnbind)
+        pm.noteInput.bindTo(binding.formNoteView)
 
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
-        formNoteView.textChanges().subscribe { scrollableView.scrollToBottom() }
+        binding.formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
     }
 
     override fun handleBack() {
@@ -130,31 +135,33 @@ class GlucoseEventFragment : BaseFragment<GlucoseEventPm>() {
     }
 
     private fun observeAppBarChanges() {
-        scrollableView.setOnTouchListener { _, me ->
-            isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
-            isTouchingAppBar = isTouchingScroll
-            false
-        }
+        binding.apply {
+            scrollableView.setOnTouchListener { _, me ->
+                isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
+                isTouchingAppBar = isTouchingScroll
+                false
+            }
 
-        glucoseEventFormContainerView.setOnTouchListener { _, me ->
-            isTouchingAppBar = me.action == MotionEvent.ACTION_MOVE
-            isTouchingScroll = isTouchingAppBar
-            false
-        }
+            glucoseEventFormContainerView.setOnTouchListener { _, me ->
+                isTouchingAppBar = me.action == MotionEvent.ACTION_MOVE
+                isTouchingScroll = isTouchingAppBar
+                false
+            }
 
-        appBarLayoutView.collapseProgress().subscribe {
-            val alpha = 1 - abs(it / 100f)
-            glucoseEventValueTextView.alpha = alpha
-            glucoseEventUnitsTextView.alpha = alpha
-            eventInfoContainerView.alpha = alpha
+            appBarLayoutView.collapseProgress().subscribe {
+                val alpha = 1 - abs(it / 100f)
+                glucoseEventValueTextView.alpha = alpha
+                glucoseEventUnitsTextView.alpha = alpha
+                eventInfoContainerView.alpha = alpha
 
-            val translation = maxTranslation * it / 100f
-            toolbarTitleView.translationY = translation
-            toolbarSubTitleView.alpha = 1 - alpha
-            toolbarSubTitleView.translationY = translation
-            if (isTouchingScroll || isTouchingAppBar) {
-                view?.hideKeyboard()
-                requireActivity().findAndClearFocus()
+                val translation = maxTranslation * it / 100f
+                toolbarTitleView.translationY = translation
+                toolbarSubTitleView.alpha = 1 - alpha
+                toolbarSubTitleView.translationY = translation
+                if (isTouchingScroll || isTouchingAppBar) {
+                    view?.hideKeyboard()
+                    requireActivity().findAndClearFocus()
+                }
             }
         }
     }

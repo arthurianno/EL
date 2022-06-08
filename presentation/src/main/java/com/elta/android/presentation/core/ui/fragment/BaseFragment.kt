@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
@@ -33,10 +34,18 @@ import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
+internal typealias Inflater<B> = (LayoutInflater, ViewGroup?, Boolean) -> B
+
+abstract class BaseFragment<T : BasePm, B : ViewBinding>(
+    private val bindingInflater: Inflater<B>
+) : PmFragment<T>(), BackHandler {
 
     @Inject
     lateinit var factory: PmFactory
+
+    private var _binding: B? = null
+    protected val binding
+        get() = checkNotNull(_binding)
 
     protected abstract val screenLayout: Int
 
@@ -63,13 +72,19 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
         super.onAttach(context)
     }
 
-    @CallSuper
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        inflater.inflate(screenLayout, container, false)
+    ): View? {
+        _binding = bindingInflater(inflater, container, false)
+        return _binding?.root
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         errorStateView = view.findViewById<View>(R.id.errorStateView) as? StateView
@@ -142,4 +157,13 @@ abstract class BaseFragment<T : BasePm> : PmFragment<T>(), BackHandler {
     companion object {
         const val DEBOUNCE = 300L
     }
+}
+
+private inline fun <reified V : ViewBinding> ViewGroup.toBinding(layoutInflater: LayoutInflater): V {
+    return V::class.java.getMethod(
+        "inflate",
+        LayoutInflater::class.java,
+        ViewGroup::class.java,
+        Boolean::class.java
+    ).invoke(null, layoutInflater, this, false) as V
 }

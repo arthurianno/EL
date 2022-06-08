@@ -13,6 +13,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentBluetoothBinding
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.google.android.gms.common.api.ApiException
@@ -26,12 +27,12 @@ import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.intents.launchForResult
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.android.synthetic.main.fragment_bluetooth.*
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 import timber.log.Timber
 
-class BluetoothFragment : BaseListFragment<BluetoothPm>() {
+class BluetoothFragment :
+    BaseListFragment<BluetoothPm, FragmentBluetoothBinding>(FragmentBluetoothBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_bluetooth
     override val classToken: Class<BluetoothPm> = BluetoothPm::class.java
@@ -41,7 +42,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logView.movementMethod = ScrollingMovementMethod()
+        binding.logView.movementMethod = ScrollingMovementMethod()
     }
 
     override fun onBindPresentationModel(pm: BluetoothPm) {
@@ -66,11 +67,11 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
     }
 
     private fun bindViews(pm: BluetoothPm) {
-        pm.updateEnabledState.bindTo { updateFirmwareButtonView.isEnabled = it }
-        pm.downloadEnabledState.bindTo { downloadFirmwareButtonView.isEnabled = it }
-        pm.pinEnabledState.bindTo { setPinButtonView.isEnabled = it }
-        pm.pinInputControl.bindTo(commandInputView)
-        pm.logState.bindTo(logView.text())
+        pm.updateEnabledState.bindTo { binding.updateFirmwareButtonView.isEnabled = it }
+        pm.downloadEnabledState.bindTo { binding.downloadFirmwareButtonView.isEnabled = it }
+        pm.pinEnabledState.bindTo { binding.setPinButtonView.isEnabled = it }
+        pm.pinInputControl.bindTo(binding.commandInputView)
+        pm.logState.bindTo(binding.logView.text())
     }
 
     private fun observeCommands(pm: BluetoothPm) {
@@ -78,7 +79,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
             .log("Command", "enable bluetooth")
             .subscribe {
                 Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                    .launchForResult(checkNotNull(activity), REQUEST_CODE_ENABLE_BLUETOOTH)
+                    .launchForResult(requireActivity(), REQUEST_CODE_ENABLE_BLUETOOTH)
             }
         pm.requestLocationPermissionsCommand.observable
             .log("Command", "request permissions")
@@ -91,7 +92,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
         pm.requestEnableLocationCommand.observable
             .log("Command", "enable location")
             .subscribe {
-                val result = SettingsClient(checkNotNull(context))
+                val result = SettingsClient(requireContext())
                     .checkLocationSettings(
                         LocationSettingsRequest.Builder()
                             .addLocationRequest(LocationRequest.create())
@@ -106,7 +107,7 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
                             LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
                                 try {
                                     (e as? ResolvableApiException)?.startResolutionForResult(
-                                        checkNotNull(activity),
+                                        requireActivity(),
                                         REQUEST_CODE_ENABLE_LOCATION
                                     )
                                 } catch (e1: IntentSender.SendIntentException) {
@@ -122,12 +123,14 @@ class BluetoothFragment : BaseListFragment<BluetoothPm>() {
     }
 
     private fun bindClicks(pm: BluetoothPm) {
-        getInfoButtonView.clicks().bindTo(pm.getInfoAction)
-        getEventsButtonView.clicks().bindTo(pm.getEventsAction)
-        setPinButtonView.clicks().bindTo(pm.setPinAction)
-        checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
-        downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
-        updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
+        with(binding) {
+            getInfoButtonView.clicks().bindTo(pm.getInfoAction)
+            getEventsButtonView.clicks().bindTo(pm.getEventsAction)
+            setPinButtonView.clicks().bindTo(pm.setPinAction)
+            checkFirmwareButtonView.clicks().bindTo(pm.checkFirmwareAction)
+            downloadFirmwareButtonView.clicks().bindTo(pm.downloadFirmwareAction)
+            updateFirmwareButtonView.clicks().bindTo(pm.updateFirmwareAction)
+        }
     }
 
     companion object {

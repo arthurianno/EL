@@ -11,7 +11,7 @@ fun createDialog(
     fragment: Fragment,
     dc: DialogControl<DialogData, DialogResult>,
     data: DialogData
-) = createDialog(checkNotNull(fragment.activity), dc, data)
+) = createDialog(fragment.requireActivity(), dc, data)
 
 fun createDialog(
     activity: Activity,

@@ -63,7 +63,7 @@ fun makeSnackBarWithAction(
     data: SnackBarData,
     control: SnackBarControl<SnackBarData>
 ): Snackbar =
-    makeSnackBar(checkNotNull(view), data)
+    makeSnackBar(view, data)
         .also { snackBar -> snackBar.duration = data.duration ?: Snackbar.LENGTH_INDEFINITE }
         .setActionTextColor(ContextCompat.getColor(view.context, R.color.shade_blue))
         .setAction(data.button) { control.sendResult() }

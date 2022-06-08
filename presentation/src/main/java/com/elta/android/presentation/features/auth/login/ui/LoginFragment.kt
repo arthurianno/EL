@@ -7,7 +7,6 @@ import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.registration.main.ui.BaseSocialFragment
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.fragment_auth_base.*
 
 class LoginFragment : BaseSocialFragment<LoginPm>() {
 
@@ -19,8 +18,10 @@ class LoginFragment : BaseSocialFragment<LoginPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        privacyPolicyView.hide()
-        authTitleIconView.show()
+        with(binding) {
+            privacyPolicyView.hide()
+            authTitleIconView.show()
+        }
     }
 
     companion object {

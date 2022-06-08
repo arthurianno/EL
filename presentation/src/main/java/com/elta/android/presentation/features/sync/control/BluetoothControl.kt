@@ -51,7 +51,7 @@ fun BluetoothControl.bindTo(
         .subscribe {
             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 .launchForResult(
-                    checkNotNull(fragment.activity),
+                    fragment.requireActivity(),
                     BluetoothControl.REQUEST_CODE_ENABLE_BLUETOOTH
                 )
         }
@@ -85,7 +85,7 @@ fun BluetoothControl.resolveResults(requestCode: Int, resultCode: Int) {
 }
 
 fun enableLocation(fragment: Fragment) {
-    val result = SettingsClient(checkNotNull(fragment.context))
+    val result = SettingsClient(fragment.requireContext())
         .checkLocationSettings(
             LocationSettingsRequest.Builder()
                 .addLocationRequest(LocationRequest.create())
@@ -100,7 +100,7 @@ fun enableLocation(fragment: Fragment) {
                 LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
                     try {
                         (e as? ResolvableApiException)?.startResolutionForResult(
-                            checkNotNull(fragment.activity),
+                            fragment.requireActivity(),
                             BluetoothControl.REQUEST_CODE_ENABLE_LOCATION
                         )
                     } catch (e1: IntentSender.SendIntentException) {

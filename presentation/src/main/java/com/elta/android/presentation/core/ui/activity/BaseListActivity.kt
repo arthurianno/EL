@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.nullgr.core.adapter.DynamicAdapter
 import javax.inject.Inject
 
+@Deprecated("Класс не используется. Можно удалить")
 abstract class BaseListActivity<T : BaseListPm> : BaseActivity<T>() {
 
     @Inject

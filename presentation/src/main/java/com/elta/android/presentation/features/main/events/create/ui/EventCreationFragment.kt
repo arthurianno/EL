@@ -10,7 +10,7 @@ class EventCreationFragment : BaseEventFragment<EventCreationPm>() {
 
     override val classToken: Class<EventCreationPm> = EventCreationPm::class.java
 
-    override fun getEventType() = checkNotNull(arguments)[EXTRA_EVENT_TYPE] as EventType
+    override fun getEventType() = arguments?.get(EXTRA_EVENT_TYPE) as EventType
 
     companion object {
         fun newInstance(eventType: EventType): EventCreationFragment {

@@ -6,12 +6,13 @@ import android.view.View
 import androidx.annotation.CallSuper
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
+import com.elta.android.presentation.databinding.FragmentBaseSettingsDialogBinding
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
 import com.jakewharton.rxbinding2.view.clicks
-import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
 import me.dmdev.rxpm.bindTo
 
-abstract class BaseSettingsDialogFragment<T : BaseSettingsDialogPm> : BaseBottomSheetFragment<T>() {
+abstract class BaseSettingsDialogFragment<T : BaseSettingsDialogPm> :
+    BaseBottomSheetFragment<T, FragmentBaseSettingsDialogBinding>(FragmentBaseSettingsDialogBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_base_settings_dialog
     protected abstract val contentLayout: Int
@@ -19,19 +20,21 @@ abstract class BaseSettingsDialogFragment<T : BaseSettingsDialogPm> : BaseBottom
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialogIconView.setImageResource(dialogType.toIcon())
-        dialogTitleView.setText(dialogType.toTitle())
-        dialogSubTitleView.setText(dialogType.toSubTitle())
-        dialogDescriptionTitleView.setText(dialogType.toDescription())
-        dialogActionButtonView.setText(dialogType.toActionButtonTitle())
-        LayoutInflater.from(activity).inflate(contentLayout, dialogContentContainerView, true)
+        with(binding) {
+            dialogIconView.setImageResource(dialogType.toIcon())
+            dialogTitleView.setText(dialogType.toTitle())
+            dialogSubTitleView.setText(dialogType.toSubTitle())
+            dialogDescriptionTitleView.setText(dialogType.toDescription())
+            dialogActionButtonView.setText(dialogType.toActionButtonTitle())
+            LayoutInflater.from(activity).inflate(contentLayout, dialogContentContainerView, true)
+        }
     }
 
     @CallSuper
     override fun onBindPresentationModel(pm: T) {
-        dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
-        dialogActionButtonView.clicks().bindTo(pm.mainAction)
-        pm.actionButtonEnabledCommand.bindTo(dialogActionButtonView::setEnabled)
+        binding.dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
+        binding.dialogActionButtonView.clicks().bindTo(pm.mainAction)
+        pm.actionButtonEnabledCommand.bindTo(binding.dialogActionButtonView::setEnabled)
         pm.closeDialogCommand.bindTo { dialog?.dismiss() }
     }
 

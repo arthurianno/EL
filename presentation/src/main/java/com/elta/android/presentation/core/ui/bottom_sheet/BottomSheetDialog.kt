@@ -56,16 +56,6 @@ class BottomSheetDialog(context: Context, @StyleRes theme: Int = 0) : AppCompatD
         setOnShowListener()
     }
 
-//    protected constructor(
-//        context: Context,
-//        cancelable: Boolean,
-//        cancelListener: DialogInterface.OnCancelListener?
-//    ) : super(context, cancelable, cancelListener) {
-//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-//        this.cancelable = cancelable
-//        setOnShowListener()
-//    }
-
     override fun setContentView(@LayoutRes layoutResId: Int) {
         super.setContentView(wrapInBottomSheet(layoutResId, null, null))
     }

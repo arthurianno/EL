@@ -1,12 +1,12 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui
 
 import android.view.View
+import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.pm.GlucoseRangeDialogPm
+import com.elta.android.presentation.widgets.range_bar.RangeBarView
 import com.nullgr.core.ui.extensions.toggleVisibilityState
-import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_settings_dialog_glucose.*
 import me.dmdev.rxpm.bindTo
 
 class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialogPm>() {
@@ -15,12 +15,17 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
     override val dialogType = DialogType.GLUCOSE
     override val classToken: Class<GlucoseRangeDialogPm> = GlucoseRangeDialogPm::class.java
 
+    private val glucoseRangeBarView =
+        binding.dialogContentContainerView.findViewById<RangeBarView>(R.id.glucoseRangeBarView)
+    private val glucoseRangeContentView =
+        binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.glucoseRangeContentView)
+
     override fun onBindPresentationModel(pm: GlucoseRangeDialogPm) {
         super.onBindPresentationModel(pm)
         pm.glucoseRangeState.bindTo(glucoseRangeBarView.values())
         glucoseRangeBarView.valuesChanges().bindTo(pm.glucoseRangeChangedAction)
         pm.progressState.bindTo {
-            progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            binding.progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             glucoseRangeContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
     }

@@ -30,6 +30,8 @@
 
     </FrameLayout>
 
-    <include layout="@layout/layout_bottom_sheet_toolbar" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/layout_bottom_sheet_toolbar" />
 
 </FrameLayout>
