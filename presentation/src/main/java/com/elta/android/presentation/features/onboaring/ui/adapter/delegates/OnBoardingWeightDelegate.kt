@@ -6,17 +6,17 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemOnboardingWeightBinding
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
-import kotlinx.android.synthetic.main.item_onboarding_weight.*
 import java.util.concurrent.TimeUnit
 
 class OnBoardingWeightDelegate(
     private val bus: RxBus
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemOnboardingWeightBinding>(ItemOnboardingWeightBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_onboarding_weight
     override val itemType: Any = OnBoardingWeightItem::class
@@ -24,7 +24,7 @@ class OnBoardingWeightDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                weightView.valueChanges().throttleLast(INTERVAL, TimeUnit.MILLISECONDS)
+                binding.weightView.valueChanges().throttleLast(INTERVAL, TimeUnit.MILLISECONDS)
                     .subscribe { newValue ->
                         withAdapterPosition<OnBoardingWeightItem> { _, item, _ ->
                             item.weight = newValue
@@ -41,11 +41,8 @@ class OnBoardingWeightDelegate(
         holder: RecyclerView.ViewHolder
     ) {
         val item = items[position] as OnBoardingWeightItem
-
-        with(holder as ViewHolder) {
-            if (item.initialValue != null && item.weight == null) {
-                weightView.setValue(item.initialValue)
-            }
+        if (item.initialValue != null && item.weight == null) {
+            binding.weightView.setValue(item.initialValue)
         }
     }
 

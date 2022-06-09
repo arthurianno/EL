@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.databinding.ItemRecordsHeaderBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
@@ -11,12 +12,11 @@ import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView
-import kotlinx.android.synthetic.main.item_records_header.*
 
 class RecordsHeaderDelegate(
     private val bus: RxBus,
     private val resources: ResourceProvider
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemRecordsHeaderBinding>(ItemRecordsHeaderBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_records_header
     override val itemType: Any = RecordsHeaderItem::class
@@ -59,7 +59,7 @@ class RecordsHeaderDelegate(
     }
 
     private fun bindGlucose(holder: ViewHolder, item: RecordsHeaderItem) {
-        with(holder) {
+        with(binding) {
             glucoseEmptyValueView.toggleView(item.glucoseLevel == null)
             glucoseValueContainerView.toggleView(item.glucoseLevel != null)
 
@@ -69,20 +69,16 @@ class RecordsHeaderDelegate(
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
             item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
 
-            itemView.background = item.background
+            holder.itemView.background = item.background
         }
     }
 
     private fun bindBread(holder: ViewHolder, item: RecordsHeaderItem) {
-        with(holder) {
-            breadValueView.text = item.breadLevel.formatAsValueOrEmpty()
-        }
+        binding.breadValueView.text = item.breadLevel.formatAsValueOrEmpty()
     }
 
     private fun bindInsulin(holder: ViewHolder, item: RecordsHeaderItem) {
-        with(holder) {
-            insulinValueView.text = item.insulinLevel.formatAsValueOrEmpty()
-        }
+        binding.insulinValueView.text = item.insulinLevel.formatAsValueOrEmpty()
     }
 
     private fun String?.formatAsValueOrEmpty(): String =

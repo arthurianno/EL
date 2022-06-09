@@ -9,9 +9,9 @@ import com.elta.android.presentation.features.main.records.ui.adapter.items.Reco
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsDailyGlucoseItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsHeaderItem
+import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject

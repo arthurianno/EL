@@ -4,9 +4,9 @@ import com.elta.android.presentation.features.main.events.chooser.ui.adapter.del
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.delegate.ChooserHeaderDelegate
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 

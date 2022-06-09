@@ -6,18 +6,18 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemProfileAdditionalSettingsBinding
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
-import kotlinx.android.synthetic.main.item_profile_additional_settings.*
 
 class ReminderDelegate(
     private val bus: RxBus,
     private val resources: ResourceProvider
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemProfileAdditionalSettingsBinding>(ItemProfileAdditionalSettingsBinding::inflate) {
 
     override val itemType = ReminderItem::class
     override val layoutResource = R.layout.item_profile_additional_settings
@@ -40,7 +40,7 @@ class ReminderDelegate(
         holder: RecyclerView.ViewHolder
     ) {
         val item = items[position] as ReminderItem
-        with(holder as ViewHolder) {
+        with(binding) {
             settingsTypeIconView.setImageResource(item.type)
             settingsActionIconView.setImageResource(item.action)
             settingsNameView.text = item.title
@@ -55,7 +55,7 @@ class ReminderDelegate(
         payload: Any
     ) {
         val item = items[position] as ReminderItem
-        with(holder as ViewHolder) {
+        with(binding) {
             when (payload) {
                 ReminderItem.Payload.TITLE_CHANGED -> settingsNameView.text = item.title
                 ReminderItem.Payload.DESCRIPTION_CHANGED ->

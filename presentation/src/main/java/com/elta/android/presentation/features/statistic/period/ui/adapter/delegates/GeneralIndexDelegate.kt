@@ -3,18 +3,17 @@ package com.elta.android.presentation.features.statistic.period.ui.adapter.deleg
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ItemStatGeneralIndexBinding
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
-import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.font.toSpannable
 import com.nullgr.core.font.typeface
 import com.nullgr.core.ui.extensions.toggleView
-import kotlinx.android.synthetic.main.item_record.*
-import kotlinx.android.synthetic.main.item_stat_general_index.*
 
-class GeneralIndexDelegate : AdapterDelegate() {
+class GeneralIndexDelegate :
+    AdapterDelegate<ItemStatGeneralIndexBinding>(ItemStatGeneralIndexBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_stat_general_index
     override val itemType: Any = GeneralIndexItem::class
@@ -25,8 +24,7 @@ class GeneralIndexDelegate : AdapterDelegate() {
         holder: RecyclerView.ViewHolder
     ) {
         val item = items[position] as GeneralIndexItem
-
-        with(holder as ViewHolder) {
+        with(binding) {
             generalIndexIconView.setImageResource(item.icon)
             generalIndexTitleView.text = item.title
             setDescription(generalIndexDescriptionView, item)
@@ -41,10 +39,10 @@ class GeneralIndexDelegate : AdapterDelegate() {
         payload: Any
     ) {
         val item = items[position] as GeneralIndexItem
-        with(holder as ViewHolder) {
+        with(binding) {
             when (payload) {
                 GeneralIndexItem.Payload.ICON_CHANGED -> generalIndexIconView.setImageResource(item.icon)
-                GeneralIndexItem.Payload.TITLE_CHANGED -> recordTitleView.text = item.title
+                GeneralIndexItem.Payload.TITLE_CHANGED -> generalIndexTitleView.text = item.title
                 GeneralIndexItem.Payload.DESCRIPTION_CHANGED -> setDescription(
                     generalIndexDescriptionView,
                     item

@@ -8,16 +8,16 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemProfileAdditionalSettingsBinding
 import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
-import kotlinx.android.synthetic.main.item_profile_additional_settings.*
 
 class ObserverDelegate(
     private val bus: RxBus
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemProfileAdditionalSettingsBinding>(ItemProfileAdditionalSettingsBinding::inflate) {
 
     override val itemType = ObserverItem::class
     override val layoutResource = R.layout.item_profile_additional_settings
@@ -42,7 +42,7 @@ class ObserverDelegate(
         val item = items[position] as ObserverItem
         with(holder as ViewHolder) {
             fillItem(item)
-            settingsDescriptionNameView.text = item.description
+            binding.settingsDescriptionNameView.text = item.description
         }
     }
 
@@ -62,18 +62,20 @@ class ObserverDelegate(
     }
 
     private fun ViewHolder.fillItem(item: ObserverItem) {
-        settingsTypeIconView.setImageResource(item.type)
-        settingsActionIconView.setImageResource(item.action)
-        settingsNameView.text = item.title
+        with(binding) {
+            settingsTypeIconView.setImageResource(item.type)
+            settingsActionIconView.setImageResource(item.action)
+            settingsNameView.text = item.title
 
-        when (item.status) {
-            ObserverStatus.CONFIRMED -> {
-                settingsActionIconView.visibility = View.VISIBLE
-                itemView.isClickable = true
-            }
-            else -> {
-                settingsActionIconView.visibility = View.GONE
-                itemView.isClickable = false
+            when (item.status) {
+                ObserverStatus.CONFIRMED -> {
+                    settingsActionIconView.visibility = View.VISIBLE
+                    itemView.isClickable = true
+                }
+                else -> {
+                    settingsActionIconView.visibility = View.GONE
+                    itemView.isClickable = false
+                }
             }
         }
     }

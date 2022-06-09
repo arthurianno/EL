@@ -3,11 +3,13 @@ package com.elta.android.presentation.features.profile.settings.reminders.all.ui
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ItemProfileSettingsHeaderBinding
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 
-class ReminderHeaderDelegate : AdapterDelegate() {
+class ReminderHeaderDelegate :
+    AdapterDelegate<ItemProfileSettingsHeaderBinding>(ItemProfileSettingsHeaderBinding::inflate) {
 
     override val itemType = ReminderHeaderItem::class
     override val layoutResource = R.layout.item_profile_settings_header

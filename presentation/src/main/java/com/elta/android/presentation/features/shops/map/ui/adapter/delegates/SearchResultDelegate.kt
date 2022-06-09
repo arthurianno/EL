@@ -7,16 +7,16 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.bindCardCorners
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemSearchResultBinding
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
-import kotlinx.android.synthetic.main.item_search_result.*
 
 class SearchResultDelegate(
     private val bus: RxBus
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemSearchResultBinding>(ItemSearchResultBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_search_result
     override val itemType: Any = SearchResultItem::class
@@ -40,8 +40,7 @@ class SearchResultDelegate(
     ) {
         bindCardCorners(items, position, holder)
         val item = items[position] as SearchResultItem
-
-        with(holder as ViewHolder) {
+        with(binding) {
             nameView.text = item.name
             addressView.text = item.address
         }

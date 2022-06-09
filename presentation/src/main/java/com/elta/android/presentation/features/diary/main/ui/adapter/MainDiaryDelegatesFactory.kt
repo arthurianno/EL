@@ -5,9 +5,9 @@ import com.elta.android.presentation.features.main.records.ui.adapter.delegates.
 import com.elta.android.presentation.features.main.records.ui.adapter.delegates.RecordsGroupDelegate
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 

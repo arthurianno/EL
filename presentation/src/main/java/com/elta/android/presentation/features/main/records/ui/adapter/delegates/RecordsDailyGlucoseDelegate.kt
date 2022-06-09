@@ -2,13 +2,13 @@ package com.elta.android.presentation.features.main.records.ui.adapter.delegates
 
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ItemRecordsDailyGlucoseBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsDailyGlucoseItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
-import com.nullgr.core.adapter.ktx.ViewHolder
-import kotlinx.android.synthetic.main.item_records_daily_glucose.*
 
-class RecordsDailyGlucoseDelegate : AdapterDelegate() {
+class RecordsDailyGlucoseDelegate :
+    AdapterDelegate<ItemRecordsDailyGlucoseBinding>(ItemRecordsDailyGlucoseBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_records_daily_glucose
     override val itemType: Any = RecordsDailyGlucoseItem::class
@@ -19,7 +19,7 @@ class RecordsDailyGlucoseDelegate : AdapterDelegate() {
         holder: RecyclerView.ViewHolder
     ) {
         val item = items[position] as RecordsDailyGlucoseItem
-        with(holder as ViewHolder) {
+        with(binding) {
             dailyRecordsSubTitleView.text = item.lastEventTimeTitle
             glucoseDailyView.setChartDataModel(item.chartDataModel)
         }
@@ -33,7 +33,7 @@ class RecordsDailyGlucoseDelegate : AdapterDelegate() {
     ) {
         super.onBindViewHolder(items, position, holder, payload)
         val item = items[position] as RecordsDailyGlucoseItem
-        with(holder as ViewHolder) {
+        with(binding) {
             when (payload) {
                 RecordsDailyGlucoseItem.Payload.LAST_EVENT_CHANGED ->
                     dailyRecordsSubTitleView.text = item.lastEventTimeTitle
