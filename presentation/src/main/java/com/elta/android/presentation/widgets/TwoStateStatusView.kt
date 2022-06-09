@@ -8,8 +8,8 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ViewConnectionStatusBinding
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.view_connection_status.view.*
 
 class TwoStateStatusView @JvmOverloads constructor(
     context: Context,
@@ -18,7 +18,7 @@ class TwoStateStatusView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val hideViewCallback = Runnable {
-        statusExpandableLayout.collapse(true)
+        binding.statusExpandableLayout.collapse(true)
     }
 
     private var colorAnimator: ValueAnimator
@@ -28,6 +28,9 @@ class TwoStateStatusView @JvmOverloads constructor(
 
     private var state1Color: Int = Color.BLUE
     private var state2Color: Int = Color.GREEN
+    private val binding: ViewConnectionStatusBinding by lazy {
+        ViewConnectionStatusBinding.bind(this)
+    }
 
     init {
         inflate(context, R.layout.view_connection_status, this)
@@ -43,7 +46,7 @@ class TwoStateStatusView @JvmOverloads constructor(
             array.recycle()
         }
         colorAnimator = ObjectAnimator.ofInt(
-            statusBackgroundView,
+            binding.statusBackgroundView,
             "backgroundColor",
             state1Color,
             state2Color
@@ -62,7 +65,7 @@ class TwoStateStatusView @JvmOverloads constructor(
         else drawState1()
     }
 
-    private fun drawState1() {
+    private fun drawState1() = with(binding) {
         if (colorAnimator.isRunning)
             colorAnimator.cancel()
         removeCallbacks(hideViewCallback)
@@ -71,7 +74,7 @@ class TwoStateStatusView @JvmOverloads constructor(
         statusExpandableLayout.expand(true)
     }
 
-    private fun drawState2() {
+    private fun drawState2() = with(binding) {
         statusTextView.text = state2Text
         colorAnimator.start()
         postDelayed(hideViewCallback, HIDE_VIEW_DELAY)

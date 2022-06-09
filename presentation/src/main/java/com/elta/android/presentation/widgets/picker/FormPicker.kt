@@ -9,13 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutFormPickerBinding
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.extensions.toggleView
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.layout_form_picker.view.*
 import java.util.concurrent.TimeUnit
 
 @Suppress("UnnecessaryParentheses")
@@ -32,6 +32,10 @@ class FormPicker @JvmOverloads constructor(
         }
 
     private val disposable = CompositeDisposable()
+
+    private val binding: LayoutFormPickerBinding by lazy {
+        LayoutFormPickerBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_form_picker, this, true)
@@ -54,35 +58,35 @@ class FormPicker @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    fun setValue(value: Double) {
+    fun setValue(value: Double) = with(binding) {
         val left = value.toInt()
         val right = ((value - left) * TEN).toInt()
         leftPickerView.updateValue(left)
         rightPickerView.updateValue(right)
     }
 
-    fun setValues(firstValue: Int, secondValue: Int) {
+    fun setValues(firstValue: Int, secondValue: Int) = with(binding) {
         leftPickerView.updateValue(firstValue)
         rightPickerView.updateValue(secondValue)
     }
 
     fun valueChanges(): Observable<Double> =
         Observables.combineLatest(
-            ValueChangeObservable(leftPickerView),
-            ValueChangeObservable(rightPickerView)
+            ValueChangeObservable(binding.leftPickerView),
+            ValueChangeObservable(binding.rightPickerView)
         ) { left: Int, right: Int ->
             config?.resultMappingFunction?.invoke(left, right) ?: 0.0
         }
 
     fun valueChangesFormatted(): Observable<String> =
         Observables.combineLatest(
-            ValueChangeObservable(leftPickerView),
-            ValueChangeObservable(rightPickerView)
+            ValueChangeObservable(binding.leftPickerView),
+            ValueChangeObservable(binding.rightPickerView)
         ) { left: Int, right: Int ->
             config?.formatter?.invoke(resources, left, right) ?: EMPTY_STRING
         }
 
-    private fun initPicker() {
+    private fun initPicker() = with(binding) {
         config?.let { c ->
             leftPickerView.maxValue = c.firstPickerMaxValue
             leftPickerView.minValue = c.firstPickerMinValue
@@ -102,7 +106,7 @@ class FormPicker @JvmOverloads constructor(
         savedState?.let { setValues(it.leftValue, it.rightValue) }
     }
 
-    override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable = with(binding) {
         val superState = super.onSaveInstanceState()
         val savedState = SavedState(superState)
         savedState.leftValue = leftPickerView.value

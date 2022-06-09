@@ -39,6 +39,7 @@ class RecordsDailyGlucoseDelegate :
                     dailyRecordsSubTitleView.text = item.lastEventTimeTitle
                 RecordsDailyGlucoseItem.Payload.CHART_DATA_CHANGED ->
                     glucoseDailyView.setChartDataModel(item.chartDataModel)
+                else -> {}
             }
         }
     }

@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutBottomSheetViewBinding
 import com.elta.android.presentation.widgets.animation.AnimatorEvent
 import com.elta.android.presentation.widgets.animation.AnimatorEventObservable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -17,7 +18,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.layout_bottom_sheet_view.view.*
 import java.util.concurrent.TimeUnit
 
 class BottomSheetView @JvmOverloads constructor(
@@ -46,6 +46,9 @@ class BottomSheetView @JvmOverloads constructor(
         get() = behavior.state != BottomSheetBehavior.STATE_HIDDEN
     private var isOutAnimationEnded: Boolean = false
     private var isInAnimationStarted: Boolean = false
+    private val binding: LayoutBottomSheetViewBinding by lazy {
+        LayoutBottomSheetViewBinding.bind(this)
+    }
 
     init {
         val inflater = LayoutInflater.from(context)
@@ -59,24 +62,24 @@ class BottomSheetView @JvmOverloads constructor(
             array.recycle()
         }
 
-        val sheetView = inflater.inflate(bottomSheetLayout, bottomSheetContainer, false)
+        val sheetView = inflater.inflate(bottomSheetLayout, binding.bottomSheetContainer, false)
 
-        bottomSheetContainer.addView(sheetView)
+        binding.bottomSheetContainer.addView(sheetView)
 
-        behavior = BottomSheetBehavior.from(bottomSheetContainer)
+        behavior = BottomSheetBehavior.from(binding.bottomSheetContainer)
         behavior.peekHeight = 0
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
         setBackgroundColor(color1)
         visibility = View.INVISIBLE
 
-        touchOutsideView.setOnClickListener {
+        binding.touchOutsideView.setOnClickListener {
             if (isShowing) {
                 hideInternal(false)
             }
         }
 
-        bottomSheetContainer.setOnTouchListener { _, _ ->
+        binding.bottomSheetContainer.setOnTouchListener { _, _ ->
             // Consume the event and prevent it from falling through
             true
         }
