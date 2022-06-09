@@ -49,13 +49,13 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
         val day = element.additionTime.toLocalDate()
         var destinationByDay1 = byTypePerDay[day]
         if (destinationByDay1 == null) {
-            destinationByDay1 = emptyMap()
+            destinationByDay1 = hashMapOf()
             byTypePerDay[day] = destinationByDay1
         }
 
         var destinationByType1 = destinationByDay1[type]
         if (destinationByType1 == null) {
-            destinationByType1 = emptyList()
+            destinationByType1 = arrayListOf()
             (destinationByDay1 as MutableMap)[type] = destinationByType1
         }
         (destinationByType1 as MutableList).add(element)

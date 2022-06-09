@@ -54,16 +54,40 @@ class PeriodStatisticInteractorTest {
     fun buildBreadStatisticModelByPeriod_3days_2withNotZeroBreadEvents_correct() {
         val events = arrayListOf(
             // first day
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)), value = 2.0),
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)), value = 0.0),
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)),
+                value = 2.0
+            ),
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)),
+                value = 0.0
+            ),
 
             // second day
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(1), value = 0.0),
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(1), value = 0.0),
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(1),
+                value = 0.0
+            ),
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(1),
+                value = 0.0
+            ),
 
             // third day
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(2), value = 4.0),
-            EventTestFactory.create(type = EventType.BREAD, date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(2), value = 6.0)
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 12)).plusDays(2),
+                value = 4.0
+            ),
+            EventTestFactory.create(
+                type = EventType.BREAD,
+                date = ZonedDateTime.now().with(LocalTime.of(12, 12, 13)).plusDays(2),
+                value = 6.0
+            )
         )
 
         val expected = BreadStatisticModelByPeriod(averageLevel = 6.0)
@@ -76,16 +100,48 @@ class PeriodStatisticInteractorTest {
     @Test
     fun buildInsulinStatisticModelByPeriod_correct() {
         val events = arrayListOf(
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRASHORT, value = 10.0),
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRASHORT, value = 0.0),
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.SHORT, value = 10.0),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.ULTRASHORT,
+                value = 10.0
+            ),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.ULTRASHORT,
+                value = 0.0
+            ),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.SHORT,
+                value = 10.0
+            ),
 
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.INTERMIDIATE, value = 10.0),
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.LONG, value = 10.0),
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRALONG, value = 10.0),
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRALONG, value = 0.0),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.INTERMIDIATE,
+                value = 10.0
+            ),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.LONG,
+                value = 10.0
+            ),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.ULTRALONG,
+                value = 10.0
+            ),
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.ULTRALONG,
+                value = 0.0
+            ),
 
-            EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.MIXED, value = 10.0)
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulinType = InsulinType.MIXED,
+                value = 10.0
+            )
         )
 
         val expected = InsulinStatisticModelByPeriod(
@@ -113,7 +169,7 @@ class PeriodStatisticInteractorTest {
 
         val expected = GlucoseStatisticModel(
             settings = settings,
-            averageLevel = (events.sumByDouble { it.value ?: 0.0 } / events.size).round(2),
+            averageLevel = (events.sumOf { it.value ?: 0.0 } / events.size).round(2),
             maxLevel = 100.0,
             minLevel = 2.0,
 
