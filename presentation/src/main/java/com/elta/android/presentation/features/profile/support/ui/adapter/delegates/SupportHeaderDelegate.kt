@@ -3,12 +3,14 @@ package com.elta.android.presentation.features.profile.support.ui.adapter.delega
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ItemSupportHeaderBinding
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportHeaderItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 
-class SupportHeaderDelegate : AdapterDelegate() {
+class SupportHeaderDelegate :
+    AdapterDelegate<ItemSupportHeaderBinding>(ItemSupportHeaderBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_support_header
     override val itemType: Any = SupportHeaderItem::class

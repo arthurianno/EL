@@ -5,11 +5,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutBottomNavigationViewBinding
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nullgr.core.ui.extensions.children
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.layout_bottom_navigation_view.view.*
 
 class BottomNavigationView @JvmOverloads constructor(
     context: Context,
@@ -22,10 +22,13 @@ class BottomNavigationView @JvmOverloads constructor(
 
     private val tabClicks = PublishRelay.create<Int>()
     private var selectedTab: BottomNavigationMenuItem? = null
+    private val binding: LayoutBottomNavigationViewBinding by lazy {
+        LayoutBottomNavigationViewBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_bottom_navigation_view, this, true)
-        bottomNavigationView.children().forEach { child ->
+        binding.bottomNavigationView.children().forEach { child ->
             if (child is BottomNavigationMenuItem) {
                 child.setOnClickListener { item ->
                     if (item.id != selectedTab?.id) {
@@ -49,7 +52,7 @@ class BottomNavigationView @JvmOverloads constructor(
         if (tabId == selectedTab?.id) {
             return
         }
-        bottomNavigationView.children().forEach { child ->
+        binding.bottomNavigationView.children().forEach { child ->
             if (child is BottomNavigationMenuItem && tabId == child.id) {
                 selectedTab?.setItemSelected(false)
                 selectedTab = child

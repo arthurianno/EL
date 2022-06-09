@@ -6,7 +6,6 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.extensions.hide
-import kotlinx.android.synthetic.main.fragment_event_form.view.*
 
 object WeightFormInitializer : FormInitializer() {
 
@@ -26,7 +25,7 @@ object WeightFormInitializer : FormInitializer() {
         formatter = formatterFunction
     )
 
-    override fun View.initHeaderView() {
+    override fun View.initHeaderView() = with(binding) {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_weight)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_weight)
     }
@@ -36,7 +35,7 @@ object WeightFormInitializer : FormInitializer() {
         setValue(DEFAULT_PICKER_VALUE)
     }
 
-    override fun View.initFormView() {
+    override fun View.initFormView() = with(binding) {
         formVariantSelectorView.hide()
         formInputView.hide()
         eventInfoTextView.setText(R.string.events_helper_text_weight)

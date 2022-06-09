@@ -6,7 +6,11 @@ import org.threeten.bp.ZonedDateTime
 
 fun List<Reminder>.sortByTime(): List<Reminder> = sortedBy { it.date }
 
-inline fun getNextReminderDate(type: ScheduleType, reminderDate: ZonedDateTime, now: ZonedDateTime): ZonedDateTime? {
+fun getNextReminderDate(
+    type: ScheduleType,
+    reminderDate: ZonedDateTime,
+    now: ZonedDateTime
+): ZonedDateTime? {
     return if (reminderDate.isAfter(now)) reminderDate
     else when (type) {
         ScheduleType.NONE -> null
@@ -37,8 +41,12 @@ inline fun getNextReminderDate(type: ScheduleType, reminderDate: ZonedDateTime, 
     }
 }
 
-inline fun getNextReminder(reminder: Reminder): Reminder? =
-    getNextReminderDate(reminder.scheduleType, reminder.date, ZonedDateTime.now())?.let { reminder.copy(date = it) }
+fun getNextReminder(reminder: Reminder): Reminder? =
+    getNextReminderDate(
+        reminder.scheduleType,
+        reminder.date,
+        ZonedDateTime.now()
+    )?.let { reminder.copy(date = it) }
 
-inline fun Reminder.isInThePast(): Boolean = date.isBefore(ZonedDateTime.now())
-inline fun Reminder.isOneTime(): Boolean = scheduleType == ScheduleType.NONE
+fun Reminder.isInThePast(): Boolean = date.isBefore(ZonedDateTime.now())
+fun Reminder.isOneTime(): Boolean = scheduleType == ScheduleType.NONE

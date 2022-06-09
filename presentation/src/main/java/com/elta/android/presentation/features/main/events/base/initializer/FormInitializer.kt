@@ -3,25 +3,30 @@ package com.elta.android.presentation.features.main.events.base.initializer
 import android.text.InputFilter
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.presentation.databinding.FragmentEventFormBinding
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
-import kotlinx.android.synthetic.main.fragment_event_form.view.*
 
 abstract class FormInitializer {
 
     abstract val pickerConfiguration: FormMeasurementConfig?
 
+    private var _binding: FragmentEventFormBinding? = null
+    val binding: FragmentEventFormBinding
+        get() = checkNotNull(_binding)
+
     fun init(view: View) {
+        _binding = FragmentEventFormBinding.bind(view)
         with(view) {
             initHeaderView()
-            formPickerView.initPickerView()
+            binding.formPickerView.initPickerView()
             initFormView()
             initNoteView()
         }
     }
 
     open fun View.initNoteView() {
-        formNoteView.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_NOTE_LENGTH))
+        binding.formNoteView.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_NOTE_LENGTH))
     }
 
     abstract fun View.initHeaderView()

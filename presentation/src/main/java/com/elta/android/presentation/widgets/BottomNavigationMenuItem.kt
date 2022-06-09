@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
-import kotlinx.android.synthetic.main.view_bottom_navigation_menu_item.view.*
+import com.elta.android.presentation.databinding.ViewBottomNavigationMenuItemBinding
 
 class BottomNavigationMenuItem @JvmOverloads constructor(
     context: Context,
@@ -19,6 +19,9 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
     private var title: String? = null
     private var selectedColor: Int? = null
     private var normalColor: Int? = null
+    private val binding: ViewBottomNavigationMenuItemBinding by lazy {
+        ViewBottomNavigationMenuItemBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_bottom_navigation_menu_item, this, true)
@@ -49,13 +52,13 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
         }
     }
 
-    private fun bindItem() {
+    private fun bindItem() = with(binding) {
         menuIconView.setImageDrawable(checkNotNull(icon))
         menuTitleView.text = checkNotNull(title)
         bindColors(normalColor)
     }
 
-    private fun bindColors(color: Int?) {
+    private fun bindColors(color: Int?) = with(binding) {
         menuTitleView.setTextColor(checkNotNull(color))
         menuIconView.imageTintList = ColorStateList.valueOf(checkNotNull(color))
     }

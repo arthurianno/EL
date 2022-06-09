@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutHorizontalDatePickerBinding
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDelegatesFactory
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
@@ -19,7 +20,6 @@ import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.layout_horizontal_date_picker.view.*
 import org.threeten.bp.LocalDate
 
 class HorizontalDatePickerView @JvmOverloads constructor(
@@ -37,27 +37,33 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private val adapter: DynamicAdapter
     private val snapHelper by lazy { LinearSnapHelper() }
 
+    private val binding: LayoutHorizontalDatePickerBinding by lazy {
+        LayoutHorizontalDatePickerBinding.bind(this)
+    }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_horizontal_date_picker, this, true)
         val diffCalculator = RxDiffCalculator(ComputationToMainSchedulersFacade())
         val delegatesFactory = DatePickerDelegatesFactory()
         adapter = DynamicAdapter(delegatesFactory, diffCalculator)
 
-        dateItemsView.layoutManager =
-            FixedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL)
-        dateItemsView.adapter = adapter
-        datePickerSelectorView.layoutParams.width = getSelectorWidth()
-        dateItemsView.attachSnapHelperWithListener(
-            snapHelper,
-            SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
-            object : OnSnapPositionChangeListener {
-                override fun onSnapPositionChange(position: Int) {
-                    if (needToPerformHapticFeedBack)
-                        performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                    onPickerItemScrolled(position)
+        with(binding) {
+            dateItemsView.layoutManager =
+                FixedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL)
+            dateItemsView.adapter = adapter
+            datePickerSelectorView.layoutParams.width = getSelectorWidth()
+            dateItemsView.attachSnapHelperWithListener(
+                snapHelper,
+                SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
+                object : OnSnapPositionChangeListener {
+                    override fun onSnapPositionChange(position: Int) {
+                        if (needToPerformHapticFeedBack)
+                            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        onPickerItemScrolled(position)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     fun date(): Consumer<LocalDate> = Consumer {
@@ -69,7 +75,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     }
 
     fun dateChanged(): Observable<LocalDate> =
-        PageChangeListener(dateItemsView, snapHelper)
+        PageChangeListener(binding.dateItemsView, snapHelper)
             .map {
                 val item = adapter.items[it] as DatePickerItem
                 item.date
@@ -87,7 +93,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         }
     }
 
-    private fun onPickerItemScrolled(position: Int) {
+    private fun onPickerItemScrolled(position: Int) = with(binding) {
         dateItemsView.linearLayoutManager?.let {
             val firstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
             val lastVisiblePosition = it.findLastVisibleItemPosition()
@@ -99,7 +105,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         selectedPosition = position
     }
 
-    private fun scrollToDate(date: LocalDate) {
+    private fun scrollToDate(date: LocalDate) = with(binding) {
         val datePosition = items.indexOfFirst { it.date == date }
         val scrollPosition = datePosition - CENTER_OFFSET
         dateItemsView.linearLayoutManager?.scrollToPositionWithOffset(scrollPosition, SCROLL_OFFSET)

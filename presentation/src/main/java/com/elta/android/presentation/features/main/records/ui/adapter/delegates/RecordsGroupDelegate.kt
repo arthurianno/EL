@@ -7,18 +7,18 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.GroupItem
 import com.elta.android.presentation.core.ui.adapter.ParentAdapterDelegate
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemRecordsGroupBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.ViewHolder
-import kotlinx.android.synthetic.main.item_records_group.*
 import net.cachapa.expandablelayout.ExpandableLayout
 
 class RecordsGroupDelegate(
     private val viewPool: RecyclerView.RecycledViewPool,
     factory: AdapterDelegatesFactory
-) : ParentAdapterDelegate(factory) {
+) : ParentAdapterDelegate<ItemRecordsGroupBinding>(factory, ItemRecordsGroupBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_records_group
     override val itemType: Any = RecordsGroupItem::class
@@ -26,12 +26,14 @@ class RecordsGroupDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         return super.onCreateViewHolder(parent).apply {
             with(this as ViewHolder) {
-                itemsView.layoutManager = FixedLinearLayoutManager(itemView.context)
-                itemsView.setRecycledViewPool(viewPool)
-                groupStateView.setOnClickListener {
-                    withAdapterPosition<RecordsGroupItem> { _, item, _ ->
-                        item.isExpanded = !itemsContainerView.isExpanded
-                        toggleState(itemsContainerView, true, groupStateView, item)
+                binding.run {
+                    itemsView.layoutManager = FixedLinearLayoutManager(itemView.context)
+                    itemsView.setRecycledViewPool(viewPool)
+                    groupStateView.setOnClickListener {
+                        withAdapterPosition<RecordsGroupItem> { _, item, _ ->
+                            item.isExpanded = !itemsContainerView.isExpanded
+                            toggleState(itemsContainerView, true, groupStateView, item)
+                        }
                     }
                 }
             }
@@ -44,8 +46,7 @@ class RecordsGroupDelegate(
         holder: RecyclerView.ViewHolder
     ) {
         val item = items[position] as RecordsGroupItem
-
-        with(holder as ViewHolder) {
+        with(binding) {
             groupIconView.setImageResource(item.icon)
             groupNameView.text = item.name
             toggleState(itemsContainerView, false, groupStateView, item)
@@ -60,7 +61,7 @@ class RecordsGroupDelegate(
         payload: Any
     ) {
         val item = items[position] as RecordsGroupItem
-        with(holder as ViewHolder) {
+        with(binding) {
             when (payload) {
                 RecordsGroupItem.Payload.EXPANDED_STATE_CHANGED ->
                     toggleState(itemsContainerView, false, groupStateView, item)

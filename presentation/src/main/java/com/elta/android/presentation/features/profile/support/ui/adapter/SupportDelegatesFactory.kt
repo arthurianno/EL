@@ -4,9 +4,9 @@ import com.elta.android.presentation.features.profile.support.ui.adapter.delegat
 import com.elta.android.presentation.features.profile.support.ui.adapter.delegates.SupportHeaderDelegate
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportActionItem
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportHeaderItem
+import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 

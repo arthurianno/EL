@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -47,10 +46,6 @@ kapt {
     correctErrorTypes = true
 }
 
-androidExtensions {
-    experimental = true
-}
-
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
@@ -66,16 +61,16 @@ dependencies {
     androidTestImplementation commonTestDependencies.junit
     androidTestImplementation commonTestDependencies.mockito
     androidTestImplementation commonTestDependencies.mockitoAndroid
-    androidTestImplementation (commonTestDependencies.espressoCore) {
+    androidTestImplementation(commonTestDependencies.espressoCore) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (commonTestDependencies.androidRunner) {
+    androidTestImplementation(commonTestDependencies.androidRunner) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (commonTestDependencies.androidRules) {
+    androidTestImplementation(commonTestDependencies.androidRules) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation (commonTestDependencies.espressoIntents) {
+    androidTestImplementation(commonTestDependencies.espressoIntents) {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
     androidTestImplementation(commonTestDependencies.espressoContrib) {

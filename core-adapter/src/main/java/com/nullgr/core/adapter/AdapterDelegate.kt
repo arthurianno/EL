@@ -1,8 +1,11 @@
 package com.nullgr.core.adapter
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.items.ListItem
+
+typealias Inflater<B> = (LayoutInflater, ViewGroup?, Boolean) -> B
 
 /**
  * Delegate of specific [ListItem] that responses for creating and binds view for item.
@@ -10,8 +13,7 @@ import com.nullgr.core.adapter.items.ListItem
  * @author vchernyshov
  * @author a.komarovskyi
  */
-abstract class AdapterDelegate {
-
+abstract class AdapterDelegate() {
     /**
      * Id of layout resource that represents item.
      */

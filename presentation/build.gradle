@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
@@ -57,10 +57,6 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {

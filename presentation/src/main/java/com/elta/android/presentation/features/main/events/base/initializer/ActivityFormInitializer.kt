@@ -7,7 +7,6 @@ import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.fragment_event_form.view.*
 import java.util.concurrent.TimeUnit
 
 object ActivityFormInitializer : FormInitializer() {
@@ -37,7 +36,7 @@ object ActivityFormInitializer : FormInitializer() {
         formatter = formatterFunction
     )
 
-    override fun View.initHeaderView() {
+    override fun View.initHeaderView() = with(binding) {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_activity)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_activity)
     }
@@ -47,7 +46,7 @@ object ActivityFormInitializer : FormInitializer() {
         setValues(DEFAULT_PICKER_VALUE, DEFAULT_PICKER_VALUE)
     }
 
-    override fun View.initFormView() {
+    override fun View.initFormView() = with(binding) {
         formInputView.hide()
         formVariantSelectorView.show()
         formVariantSelectorView.hint = resources.getString(R.string.events_creation_hint_activities)
