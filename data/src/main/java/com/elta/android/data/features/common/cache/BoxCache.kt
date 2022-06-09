@@ -25,7 +25,7 @@ abstract class BoxCache<T>(
         when (condition) {
             is CommonConditions.All -> box.removeAll()
             is CommonConditions.ById -> box.remove(condition.id)
-            is CommonConditions.ByIds -> box.removeByKeys(condition.ids)
+            is CommonConditions.ByIds -> box.removeByIds(condition.ids)
             else -> throw IllegalDeleteConditionError(condition)
         }
     }

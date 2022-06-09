@@ -63,7 +63,7 @@ class DbSalePointsCache @Inject constructor(
             emptyList()
         } else {
             val regex = Regex(TWO_AND_MORE_SPACES)
-            val tokens = query.toLowerCase().trim().replace(regex, SPACE).split(SPACE)
+            val tokens = query.lowercase().trim().replace(regex, SPACE).split(SPACE)
             val builder = box.query()
             tokens.forEachIndexed { index, token ->
                 builder.contains(

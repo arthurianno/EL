@@ -26,8 +26,10 @@ const val FROM_PATTERN = "yyyyMMddHHmmss"
  * Use #toStorageDateTime function
  */
 
-inline fun ZonedDateTime.toGlucometerDateTime() = toDateTimeUtc().toStringWithFormat(TO_PATTERN)
+fun ZonedDateTime.toGlucometerDateTime() = toDateTimeUtc().toStringWithFormat(TO_PATTERN)
 
-inline fun String.fromGlucometerDateTime() = ZonedDateTime.of("20$this".toLocalDateTime(FROM_PATTERN), ZoneOffset.UTC)
+fun String.fromGlucometerDateTime() =
+    ZonedDateTime.of("20$this".toLocalDateTime(FROM_PATTERN), ZoneOffset.UTC)
 
-inline fun ZonedDateTime.toStorageDateTime() = this.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault())
+fun ZonedDateTime.toStorageDateTime() =
+    this.toOffsetDateTime().atZoneSameInstant(ZoneId.systemDefault())
