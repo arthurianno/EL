@@ -101,7 +101,7 @@ def libraryVersions = [
         androidxFragment           : '1.4.1',
         androidxRecyclerView       : '1.2.1',
         androidxBrowser            : '1.4.0',
-        androidxMutlidex           : '2.0.1',
+        androidxMutlidexVersion    : '2.0.1',
         materialDesignVersion      : '1.6.1'
 ]
 
@@ -194,7 +194,7 @@ ext.commonDependencies = [
         androidxAppCompact    : "androidx.appcompat:appcompat:${libraryVersions.androidxAppCompact}",
         androidxRecyclerView  : "androidx.recyclerview:recyclerview:${libraryVersions.androidxRecyclerView}",
         androidxBrowser       : "androidx.browser:browser:${libraryVersions.androidxBrowser}",
-        androidxMultidex      : "androidx.multidex:multidex:${libraryVersions.androidxMutlidex}",
+        androidxMultidex      : "androidx.multidex:multidex:${libraryVersions.androidxMutlidexVersion}",
         materialDesign        : "com.google.android.material:material:${libraryVersions.materialDesignVersion}"
 ]
 
