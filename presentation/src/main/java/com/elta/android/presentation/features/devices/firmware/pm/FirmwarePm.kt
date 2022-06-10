@@ -126,6 +126,10 @@ class FirmwarePm @Inject constructor(
                     )
                     is UpdateState.FirmwareUpdateError -> startUpdateAction.consumer.accept(Unit)
                     is UpdateState.GlucometerOfflineError -> startUpdateAction.consumer.accept(Unit)
+                    is UpdateState.Downloading -> {}
+                    is UpdateState.Progress -> {}
+                    is UpdateState.Updated -> {}
+                    is UpdateState.Updating -> {}
                 }
             }
             .untilDestroy()
@@ -237,19 +241,19 @@ class FirmwarePm @Inject constructor(
         setState(UpdateState.Updated(resources, firmwareState.valueOrNull?.version))
     }
 
-    private inline fun UpdateState?.hasUserInput(): Boolean = this?.button != null
+    private fun UpdateState?.hasUserInput(): Boolean = this?.button != null
 
-    private inline fun getDeviceVersion(): String? =
+    private fun getDeviceVersion(): String? =
         deviceInfo.valueOrNull?.softwareVersion?.toString()
 
-    private inline fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
+    private fun <T> Single<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Single<T> {
         return this
             .doOnSubscribe { progressConsumer.accept(true) }
             .doOnSuccess { progressConsumer.accept(false) }
             .doOnError { progressConsumer.accept(false) }
     }
 
-    private inline fun Completable.bindProgressExtended(progressConsumer: Consumer<Boolean>): Completable {
+    private fun Completable.bindProgressExtended(progressConsumer: Consumer<Boolean>): Completable {
         return this
             .doOnSubscribe { progressConsumer.accept(true) }
             .doOnComplete { progressConsumer.accept(false) }

@@ -347,10 +347,11 @@ class ShopsMapPm @Inject constructor(
                 searchItems.consumer.accept(emptyList())
                 searchResultSelectedAction.consumer.accept(clicks.item)
             }
+            else -> {}
         }
     }
 
-    private inline fun SalePoint.toItem(): ListItem =
+    private fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,
             name = name,
@@ -359,7 +360,7 @@ class ShopsMapPm @Inject constructor(
             phone = phone
         )
 
-    private inline fun SalePoint.toGeoPoint(): GeoPoint =
+    private fun SalePoint.toGeoPoint(): GeoPoint =
         GeoPoint(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
@@ -368,7 +369,7 @@ class ShopsMapPm @Inject constructor(
             meta = "$city, $address"
         )
 
-    private inline fun Type.toIcon(): GeoPointIcon =
+    private fun Type.toIcon(): GeoPointIcon =
         when (this) {
             Type.SALE -> GeoPointIcon(
                 normal = R.drawable.ic_normal_pin_shop,
