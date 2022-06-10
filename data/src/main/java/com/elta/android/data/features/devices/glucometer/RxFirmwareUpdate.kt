@@ -43,9 +43,11 @@ fun startFirmwareUpdate(
     starter.setForceDfu(true)
     starter.start(context, EltaDfuService::class.java)
 
-    emitter.setDisposable(Disposables.fromAction {
-        DfuServiceListenerHelper.unregisterProgressListener(context, listener)
-    })
+    emitter.setDisposable(
+        Disposables.fromAction {
+            DfuServiceListenerHelper.unregisterProgressListener(context, listener)
+        }
+    )
 }
 
 @Suppress("MaxLineLength")

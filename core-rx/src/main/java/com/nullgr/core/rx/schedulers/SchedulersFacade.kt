@@ -16,5 +16,4 @@ interface SchedulersFacade {
     val subscribeOn: Scheduler
 
     val observeOn: Scheduler
-
 }

@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.annotation.SuppressLint
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
@@ -42,9 +43,11 @@ fun BluetoothLeScannerCompat.startScan(
     // pass empty list to organize own filter
     startScan(emptyList(), settings, callback)
 
-    emitter.setDisposable(Disposables.fromAction {
-        stopScan(callback)
-    })
+    emitter.setDisposable(
+        Disposables.fromAction {
+            stopScan(callback)
+        }
+    )
 }
     .filter { it.isFiltered(filters) }
     .scan(mutableSetOf<ScanResult>()) { results, result ->
@@ -69,6 +72,7 @@ fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {
     return false
 }
 
+@SuppressLint("MissingPermission")
 fun ScanResult.isFiltered(filters: List<ScanFilter>): Boolean {
     val deviceName = device.name ?: scanRecord?.deviceName
     filters.forEach { filter ->

@@ -167,7 +167,7 @@ ext.commonDependencies = [
         firebaseInAppMessaging: "com.google.firebase:firebase-inappmessaging-display",
         firebaseDynamicLinks  : "com.google.firebase:firebase-dynamic-links",
 
-        ktlint                : "com.github.shyiko:ktlint:${libraryVersions.ktlintVersion}",
+//        ktlint                : "com.github.shyiko:ktlint:${libraryVersions.ktlintVersion}",
 
         cicerone              : "com.github.terrakok:cicerone:${libraryVersions.ciceroneVersion}",
         exoPlayer             : "com.google.android.exoplayer:exoplayer:${libraryVersions.exoPlayer}",

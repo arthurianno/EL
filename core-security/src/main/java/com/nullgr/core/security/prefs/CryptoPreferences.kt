@@ -26,17 +26,22 @@ import com.nullgr.core.security.prefs.crypto.PreferencesCrypton
  *
  * @author Grishko Nikita
  */
-class CryptoPreferences(private val context: Context,
-                        private val keyAlias: String,
-                        private val preferencesFileName: String? = null) {
+class CryptoPreferences(
+    private val context: Context,
+    private val keyAlias: String,
+    private val preferencesFileName: String? = null
+) {
 
     companion object {
         private const val DEFAULT_INNER_PREF_NAME = "-crypto-preferences"
     }
 
     private val innerPreferences: SharedPreferences by lazy {
-        context.getSharedPreferences(preferencesFileName
-            ?: "${context.packageName}$DEFAULT_INNER_PREF_NAME", Context.MODE_PRIVATE)
+        context.getSharedPreferences(
+            preferencesFileName
+                ?: "${context.packageName}$DEFAULT_INNER_PREF_NAME",
+            Context.MODE_PRIVATE
+        )
     }
 
     private val prefsCrypton by lazy { PreferencesCrypton.from(context, keyAlias) }

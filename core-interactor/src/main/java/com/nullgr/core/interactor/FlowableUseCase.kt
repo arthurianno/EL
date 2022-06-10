@@ -10,7 +10,8 @@ import io.reactivex.Flowable
  * @author vchernyshov
  */
 abstract class FlowableUseCase<T, in Params> protected constructor(
-        private val schedulersFacade: SchedulersFacade) {
+    private val schedulersFacade: SchedulersFacade
+) {
 
     /**
      * Builds a [Flowable] which will be used when the current [FlowableUseCase] is executed.

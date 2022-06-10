@@ -1,10 +1,10 @@
 package com.elta.android.data.features.sale_points.mapper
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sale_points.dto.CoordinatesDto
 import com.elta.android.data.features.sale_points.dto.SalePointDto
-import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.sale_points.dto.TypeDto
 import javax.inject.Inject
 

@@ -224,8 +224,6 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
     implementation project(':core-all')
     implementation project(':core-security')
     implementation project(':core-rx')

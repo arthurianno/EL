@@ -17,8 +17,10 @@ class LogOutUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
         authRepo.logout()
-            .andThen(Observable.fromIterable(SocialNetworkType.values().asIterable())
-                .concatMapCompletable { type ->
-                    socialRepo.logout(type)
-                })
+            .andThen(
+                Observable.fromIterable(SocialNetworkType.values().asIterable())
+                    .concatMapCompletable { type ->
+                        socialRepo.logout(type)
+                    }
+            )
 }

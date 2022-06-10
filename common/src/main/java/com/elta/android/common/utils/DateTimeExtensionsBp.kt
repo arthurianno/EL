@@ -52,10 +52,12 @@ inline fun String.toLocalDateTime(pattern: String): LocalDateTime =
     LocalDateTime.parse(this, DateTimeFormatterCache.getOrCreateFormatter(pattern))
 
 inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
-    this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+    this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO)
+)
 
 inline fun ZonedDateTime.toIsoString(): String = this.format(
-    DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+    DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO)
+)
 
 inline fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
 inline fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)

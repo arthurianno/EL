@@ -78,9 +78,11 @@ fun <E, T : Collection<E>> logAll(
 ) {
     val sb = StringBuilder().apply {
         prefix?.let { append("$prefix: ") }
-        append(iterable.joinToString { element ->
-            transform?.invoke(element) ?: element.toString()
-        })
+        append(
+            iterable.joinToString { element ->
+                transform?.invoke(element) ?: element.toString()
+            }
+        )
     }
     Timber.tag(tag).d(sb.toString())
 }
