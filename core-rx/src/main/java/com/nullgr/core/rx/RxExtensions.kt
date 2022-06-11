@@ -111,8 +111,8 @@ inline fun <T> Flowable<T>.zipWithTimer(delay: Long): Flowable<T> {
  */
 inline fun <T> Single<T>.bindProgress(progressConsumer: Consumer<Boolean>): Single<T> {
     return this
-            .doOnSubscribe { progressConsumer.accept(true) }
-            .doFinally { progressConsumer.accept(false) }
+        .doOnSubscribe { progressConsumer.accept(true) }
+        .doFinally { progressConsumer.accept(false) }
 }
 
 /**
@@ -122,8 +122,8 @@ inline fun <T> Single<T>.bindProgress(progressConsumer: Consumer<Boolean>): Sing
  */
 inline fun <T> Observable<T>.bindProgress(progressConsumer: Consumer<Boolean>): Observable<T> {
     return this
-            .doOnSubscribe { progressConsumer.accept(true) }
-            .doFinally { progressConsumer.accept(false) }
+        .doOnSubscribe { progressConsumer.accept(true) }
+        .doFinally { progressConsumer.accept(false) }
 }
 
 /**
@@ -133,8 +133,8 @@ inline fun <T> Observable<T>.bindProgress(progressConsumer: Consumer<Boolean>): 
  */
 inline fun <T> Flowable<T>.bindProgress(progressConsumer: Consumer<Boolean>): Flowable<T> {
     return this
-            .doOnSubscribe { progressConsumer.accept(true) }
-            .doFinally { progressConsumer.accept(false) }
+        .doOnSubscribe { progressConsumer.accept(true) }
+        .doFinally { progressConsumer.accept(false) }
 }
 
 /**
@@ -144,8 +144,8 @@ inline fun <T> Flowable<T>.bindProgress(progressConsumer: Consumer<Boolean>): Fl
  */
 inline fun Completable.bindProgress(progressConsumer: Consumer<Boolean>): Completable {
     return this
-            .doOnSubscribe { progressConsumer.accept(true) }
-            .doFinally { progressConsumer.accept(false) }
+        .doOnSubscribe { progressConsumer.accept(true) }
+        .doFinally { progressConsumer.accept(false) }
 }
 
 /**
@@ -155,8 +155,8 @@ inline fun Completable.bindProgress(progressConsumer: Consumer<Boolean>): Comple
  */
 inline fun <T> Single<List<T>>.bindEmpty(emptyConsumer: Consumer<Boolean>): Single<List<T>> {
     return this
-            .doOnSuccess { emptyConsumer.accept(it.isEmpty()) }
-            .doOnError { emptyConsumer.accept(false) }
+        .doOnSuccess { emptyConsumer.accept(it.isEmpty()) }
+        .doOnError { emptyConsumer.accept(false) }
 }
 
 /**
@@ -166,8 +166,8 @@ inline fun <T> Single<List<T>>.bindEmpty(emptyConsumer: Consumer<Boolean>): Sing
  */
 inline fun <T> Observable<List<T>>.bindEmpty(emptyConsumer: Consumer<Boolean>): Observable<List<T>> {
     return this
-            .doOnNext { emptyConsumer.accept(it.isEmpty()) }
-            .doOnError { emptyConsumer.accept(false) }
+        .doOnNext { emptyConsumer.accept(it.isEmpty()) }
+        .doOnError { emptyConsumer.accept(false) }
 }
 
 /**
@@ -177,8 +177,8 @@ inline fun <T> Observable<List<T>>.bindEmpty(emptyConsumer: Consumer<Boolean>): 
  */
 inline fun <T> Flowable<List<T>>.bindEmpty(emptyConsumer: Consumer<Boolean>): Flowable<List<T>> {
     return this
-            .doOnNext { emptyConsumer.accept(it.isEmpty()) }
-            .doOnError { emptyConsumer.accept(false) }
+        .doOnNext { emptyConsumer.accept(it.isEmpty()) }
+        .doOnError { emptyConsumer.accept(false) }
 }
 
 /**

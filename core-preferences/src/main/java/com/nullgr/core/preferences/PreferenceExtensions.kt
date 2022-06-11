@@ -81,4 +81,3 @@ inline fun SharedPreferences.edit(operation: (SharedPreferences.Editor) -> Unit)
     operation(editor)
     editor.apply()
 }
-

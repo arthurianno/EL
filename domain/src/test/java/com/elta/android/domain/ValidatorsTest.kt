@@ -94,8 +94,10 @@ class ValidatorsTest {
     fun medicaments_WithMaxName_True() {
         val name = StringBuilder()
         name.setLength(120)
-        assert(MedicamentsValidator.isValid(
-            name = name.toString(), date = ZonedDateTime.now())
+        assert(
+            MedicamentsValidator.isValid(
+                name = name.toString(), date = ZonedDateTime.now()
+            )
         )
     }
 

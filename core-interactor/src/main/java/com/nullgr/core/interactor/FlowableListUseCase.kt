@@ -8,5 +8,6 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
  * @author vchernyshov
  */
 abstract class FlowableListUseCase<T, in Params> constructor(
-        schedulersFacade: SchedulersFacade) :
-        FlowableUseCase<List<T>, Params>(schedulersFacade)
+    schedulersFacade: SchedulersFacade
+) :
+    FlowableUseCase<List<T>, Params>(schedulersFacade)

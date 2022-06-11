@@ -15,8 +15,10 @@ import javax.crypto.SecretKey
  * @author Grishko Nikita
  */
 @TargetApi(18)
-internal class KeyWrapper(private val context: Context,
-                          private val keyAlias: String) {
+internal class KeyWrapper(
+    private val context: Context,
+    private val keyAlias: String
+) {
     companion object {
         private const val RSA_ALGORITHM = "RSA/ECB/PKCS1Padding"
     }

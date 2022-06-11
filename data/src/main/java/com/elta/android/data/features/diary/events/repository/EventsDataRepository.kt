@@ -73,8 +73,9 @@ class EventsDataRepository @Inject constructor(
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
                 cacheSource.updateEvents(it)
-                    .andThen(remoteSource.updateEvents(it)
-                        .onErrorResumeNext { syncManager.saveAsUpdated(event) }
+                    .andThen(
+                        remoteSource.updateEvents(it)
+                            .onErrorResumeNext { syncManager.saveAsUpdated(event) }
                     )
             }
 
@@ -82,8 +83,9 @@ class EventsDataRepository @Inject constructor(
         Single.fromCallable { listOf(SimpleEventDto(event.id, EventTypeDto.valueOf(event.type.name))) }
             .flatMapCompletable {
                 cacheSource.deleteEvents(it)
-                    .andThen(remoteSource.deleteEvents(it)
-                        .onErrorResumeNext { syncManager.saveAsDeleted(event) }
+                    .andThen(
+                        remoteSource.deleteEvents(it)
+                            .onErrorResumeNext { syncManager.saveAsDeleted(event) }
                     )
             }
 

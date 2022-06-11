@@ -82,9 +82,11 @@ class SingleSubscriberRelay<T> private constructor() : Relay<T>() {
         return subscriber.get() != null
     }
 
-    internal class PublishDisposable<T>(private val actual: Observer<in T>,
-                                        val parent: SingleSubscriberRelay<T>)
-        : AtomicBoolean(), Disposable {
+    internal class PublishDisposable<T>(
+        private val actual: Observer<in T>,
+        val parent: SingleSubscriberRelay<T>
+    ) :
+        AtomicBoolean(), Disposable {
 
         companion object {
             private const val serialVersionUID = 3562861878281475070L

@@ -36,20 +36,23 @@ class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
         }.onErrorResumeNext(SocialNetworkType.OK.authAndGetToken(context))
 
     override fun getSocialUser(): Single<SocialUserDto> = Single.create { emitter ->
-        ok.requestAsync("users.getCurrentUser", null, OkRequestMode.DEFAULT, object : OkListener {
-            override fun onSuccess(json: JSONObject) {
-                if (!emitter.isDisposed) {
-                    val name = json["first_name"] as String
-                    emitter.onSuccess(SocialUserDto(name))
+        ok.requestAsync(
+            "users.getCurrentUser", null, OkRequestMode.DEFAULT,
+            object : OkListener {
+                override fun onSuccess(json: JSONObject) {
+                    if (!emitter.isDisposed) {
+                        val name = json["first_name"] as String
+                        emitter.onSuccess(SocialUserDto(name))
+                    }
                 }
-            }
 
-            override fun onError(error: String) {
-                if (!emitter.isDisposed) {
-                    emitter.onError(RuntimeException(error))
+                override fun onError(error: String) {
+                    if (!emitter.isDisposed) {
+                        emitter.onError(RuntimeException(error))
+                    }
                 }
             }
-        })
+        )
     }
 
     override fun logout() = Completable.fromCallable { ok.clearTokens() }

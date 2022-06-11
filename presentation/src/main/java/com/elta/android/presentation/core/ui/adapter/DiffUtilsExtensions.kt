@@ -10,7 +10,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import me.dmdev.rxpm.PresentationModel
 
 inline fun calculate(
     adapter: DynamicAdapter,

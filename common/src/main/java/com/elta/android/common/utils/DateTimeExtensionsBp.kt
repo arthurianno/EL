@@ -34,51 +34,59 @@ object DateTimeFormatterCache {
     }
 }
 
-inline fun TemporalAccessor.toStringWithFormat(pattern: String, locale: Locale = Locale.getDefault()): String {
+fun TemporalAccessor.toStringWithFormat(
+    pattern: String,
+    locale: Locale = Locale.getDefault()
+): String {
     return DateTimeFormatterCache.getOrCreateFormatter(pattern, locale)
         .format(this)
 }
 
-inline fun TemporalAccessor.toStringWithFormat(format: DateTimeFormatter): String =
+fun TemporalAccessor.toStringWithFormat(format: DateTimeFormatter): String =
     format.format(this)
 
-inline fun String.toDate(pattern: String): ZonedDateTime =
+fun String.toDate(pattern: String): ZonedDateTime =
     ZonedDateTime.parse(this, DateTimeFormatterCache.getOrCreateFormatter(pattern))
 
-inline fun String.toDate(formatter: DateTimeFormatter): ZonedDateTime =
+fun String.toDate(formatter: DateTimeFormatter): ZonedDateTime =
     ZonedDateTime.parse(this, formatter)
 
-inline fun String.toLocalDateTime(pattern: String): LocalDateTime =
+fun String.toLocalDateTime(pattern: String): LocalDateTime =
     LocalDateTime.parse(this, DateTimeFormatterCache.getOrCreateFormatter(pattern))
 
-inline fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
-    this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+fun String.toIsoDate(): ZonedDateTime = ZonedDateTime.parse(
+    this, DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO)
+)
 
-inline fun ZonedDateTime.toIsoString(): String = this.format(
-    DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO))
+fun ZonedDateTime.toIsoString(): String = this.format(
+    DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO)
+)
 
-inline fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
-inline fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
+fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
 
-inline fun ZonedDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
-inline fun ZonedDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+fun ZonedDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
+fun ZonedDateTime.atEndOfDay() = this.with(LocalTime.MAX)
 
-inline fun LocalDate.isToday(): Boolean = LocalDate.now() == this
-inline fun LocalDate.isYesterday(): Boolean = LocalDate.now().minusDays(1) == this
+fun LocalDate.isToday(): Boolean = LocalDate.now() == this
+fun LocalDate.isYesterday(): Boolean = LocalDate.now().minusDays(1) == this
 
-inline fun systemOffset(): ZoneOffset = ZoneOffset.systemDefault().rules.getOffset(LocalDateTime.now())
+fun systemOffset(): ZoneOffset = ZoneOffset.systemDefault().rules.getOffset(LocalDateTime.now())
 
-inline fun LocalDateTime.toMillis(offset: ZoneOffset = systemOffset()) = toInstant(offset).toEpochMilli()
+fun LocalDateTime.toMillis(offset: ZoneOffset = systemOffset()) = toInstant(offset).toEpochMilli()
 
-inline fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) = atStartOfDay().toInstant(offset).toEpochMilli()
+fun LocalDate.toMillis(offset: ZoneOffset = systemOffset()) =
+    atStartOfDay().toInstant(offset).toEpochMilli()
 
-inline fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
+fun ZonedDateTime.toMillis() = toInstant().toEpochMilli()
 
-inline fun ZonedDateTime.toMillisUtc() = toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * MILLIS_IN_SECOND
+fun ZonedDateTime.toMillisUtc() =
+    toInstant().atOffset(ZoneOffset.UTC).toEpochSecond() * MILLIS_IN_SECOND
 
-inline fun Long.toZonedDateTime() = ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+fun Long.toZonedDateTime() =
+    ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
-inline fun ZonedDateTime.toDateTimeUtc() = toOffsetDateTime().atZoneSameInstant(ZoneOffset.UTC)
+fun ZonedDateTime.toDateTimeUtc() = toOffsetDateTime().atZoneSameInstant(ZoneOffset.UTC)
 
 /**
  * Simple class which contains number of common and wide useful date formats.

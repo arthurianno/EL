@@ -46,11 +46,7 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
     implementation project(':core-interactor')
-
-//    implementation commonDependencies.appCoreInteractor
 
     implementation commonDependencies.rxKotlin
 

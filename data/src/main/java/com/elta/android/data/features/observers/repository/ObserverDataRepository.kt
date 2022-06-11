@@ -42,8 +42,9 @@ class ObserverDataRepository @Inject constructor(
         Single.just(listOf(SimpleObserverDto(id)))
             .flatMapCompletable {
                 cacheSource.deleteObserverInvite(it)
-                    .andThen(remoteSource.deleteObserverInvite(it)
-                        .onConnectionErrorCompletes()
+                    .andThen(
+                        remoteSource.deleteObserverInvite(it)
+                            .onConnectionErrorCompletes()
                     )
             }
 }

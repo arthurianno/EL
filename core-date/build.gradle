@@ -63,5 +63,3 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')
