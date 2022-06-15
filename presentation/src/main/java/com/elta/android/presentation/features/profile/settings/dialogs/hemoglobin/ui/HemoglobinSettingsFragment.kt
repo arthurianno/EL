@@ -36,24 +36,33 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     override val dialogType = DialogType.HbA1C
     override val classToken: Class<HemoglobinSettingsPm> = HemoglobinSettingsPm::class.java
 
-    private val calendarContainerView =
+    private val calendarContainerView by lazy {
         binding.dialogContentContainerView.findViewById<ExpandableLayout>(R.id.calendarContainerView)
-    private val itemsView =
+    }
+    private val itemsView by lazy {
         binding.dialogContentContainerView.findViewById<RecyclerView>(R.id.itemsView)
-    private val arrowView =
+    }
+    private val arrowView by lazy {
         binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.arrowView)
-    private val minusView =
+    }
+    private val minusView by lazy {
         binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.minusView)
-    private val plusView =
+    }
+    private val plusView by lazy {
         binding.dialogContentContainerView.findViewById<AppCompatImageView>(R.id.plusView)
-    private val dateView =
+    }
+    private val dateView by lazy {
         binding.dialogContentContainerView.findViewById<AppCompatTextView>(R.id.dateView)
-    private val hemoglobinValueView =
+    }
+    private val hemoglobinValueView by lazy {
         binding.dialogContentContainerView.findViewById<AppCompatTextView>(R.id.hemoglobinValueView)
-    private val calendarView =
+    }
+    private val calendarView by lazy {
         binding.dialogContentContainerView.findViewById<MaterialCalendarView>(R.id.calendarView)
-    private val hemoglobinContentView =
+    }
+    private val hemoglobinContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.hemoglobinContentView)
+    }
 
     @Inject
     lateinit var adapter: DynamicAdapter

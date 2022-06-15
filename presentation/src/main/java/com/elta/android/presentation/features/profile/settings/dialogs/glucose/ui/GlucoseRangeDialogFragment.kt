@@ -15,10 +15,12 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
     override val dialogType = DialogType.GLUCOSE
     override val classToken: Class<GlucoseRangeDialogPm> = GlucoseRangeDialogPm::class.java
 
-    private val glucoseRangeBarView =
+    private val glucoseRangeBarView by lazy {
         binding.dialogContentContainerView.findViewById<RangeBarView>(R.id.glucoseRangeBarView)
-    private val glucoseRangeContentView =
+    }
+    private val glucoseRangeContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.glucoseRangeContentView)
+    }
 
     override fun onBindPresentationModel(pm: GlucoseRangeDialogPm) {
         super.onBindPresentationModel(pm)
