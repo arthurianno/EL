@@ -21,6 +21,7 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
     private val glucoseRangeContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.glucoseRangeContentView)
     }
+
     override fun onBindPresentationModel(pm: GlucoseRangeDialogPm) {
         super.onBindPresentationModel(pm)
         pm.glucoseRangeState.bindTo(glucoseRangeBarView.values())
