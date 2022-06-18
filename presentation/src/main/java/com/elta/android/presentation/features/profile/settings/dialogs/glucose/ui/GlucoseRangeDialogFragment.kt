@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui
 
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
@@ -15,11 +16,12 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
     override val dialogType = DialogType.GLUCOSE
     override val classToken: Class<GlucoseRangeDialogPm> = GlucoseRangeDialogPm::class.java
 
-    private val glucoseRangeBarView =
+    private val glucoseRangeBarView by lazy {
         binding.dialogContentContainerView.findViewById<RangeBarView>(R.id.glucoseRangeBarView)
-    private val glucoseRangeContentView =
+    }
+    private val glucoseRangeContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.glucoseRangeContentView)
-
+    }
     override fun onBindPresentationModel(pm: GlucoseRangeDialogPm) {
         super.onBindPresentationModel(pm)
         pm.glucoseRangeState.bindTo(glucoseRangeBarView.values())
