@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui
 
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
