@@ -1,5 +1,6 @@
 package com.elta.android.presentation.core.ui.fragment
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,16 +9,19 @@ import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
+import com.elta.android.presentation.core.ui.bottom_sheet.BottomSheetDialog
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.visibility
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import me.dmdev.rxpm.base.PmDialogFragment
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
     private val bindingInflater: Inflater<B>
-) : PmBottomSheetFragment<T>() {
+) : PmDialogFragment<T>() {
 
     @Inject
     lateinit var factory: PmFactory
@@ -25,13 +29,11 @@ abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
     private var _binding: B? = null
     protected val binding: B
         get() = checkNotNull(_binding)
+    protected val compositeUnbind = CompositeDisposable()
 
     protected abstract val screenLayout: Int
     protected abstract val classToken: Class<T>
     open val progressDialog: ProgressDialog by lazy { ProgressDialog.newInstance() }
-
-    override val presentationModel: T
-        get() = providePresentationModel()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,6 +60,9 @@ abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
     }
 
     override fun providePresentationModel(): T = factory.createViewModel(classToken)
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        BottomSheetDialog(requireContext(), theme)
 
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable

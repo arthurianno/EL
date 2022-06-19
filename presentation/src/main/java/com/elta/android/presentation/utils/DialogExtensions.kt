@@ -25,9 +25,9 @@ inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer
         val fragment = fragmentManager.findFragmentByTag(PROGRESS_TAG)
         if (fragment != null && !it) {
             (fragment as ProgressDialog).dismissAllowingStateLoss()
-            fragmentManager.executePendingTransactions()
+            Runnable { fragmentManager.executePendingTransactions() }
         } else if (fragment == null && it) {
             show(fragmentManager, PROGRESS_TAG)
-            fragmentManager.executePendingTransactions()
+            Runnable { fragmentManager.executePendingTransactions() }
         }
     }

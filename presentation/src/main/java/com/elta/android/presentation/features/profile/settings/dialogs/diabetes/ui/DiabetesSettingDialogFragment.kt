@@ -19,15 +19,23 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
     override val contentLayout = R.layout.layout_settings_dialog_diabetes
     override val dialogType = DialogType.DIABETES
     override val classToken: Class<DiabetesSettingDialogPm> = DiabetesSettingDialogPm::class.java
-
     private val diabetesViews = arrayListOf<TextView>()
+
+    private val firstColumnContainerView by lazy {
+        binding.dialogContentContainerView.findViewById<LinearLayout>(
+            R.id.firstColumnContainerView
+        )
+    }
+    private val secondColumnContainerView by lazy {
+        binding.dialogContentContainerView.findViewById<LinearLayout>(
+            R.id.secondColumnContainerView
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.firstColumnContainerView)
-            .children().forEach { diabetesViews.add(it as TextView) }
-        binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.secondColumnContainerView)
-            .children().forEach { diabetesViews.add(it as TextView) }
+        firstColumnContainerView.children().forEach { diabetesViews.add(it as TextView) }
+        secondColumnContainerView.children().forEach { diabetesViews.add(it as TextView) }
     }
 
     override fun onBindPresentationModel(pm: DiabetesSettingDialogPm) {
