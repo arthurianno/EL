@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.ViewConnectionStatusBinding
@@ -54,7 +53,6 @@ class StatusView @JvmOverloads constructor(
     }
 
     private fun setVisible(visibility: Visibility) {
-        Log.d("MYTAG", "setVisible: $visibility")
         if (visibility.value) show()
         else hide(visibility.delay)
     }

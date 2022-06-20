@@ -33,7 +33,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private var selectedPosition: Int = 0
     private var needToPerformHapticFeedBack = false
 
-    private val items = arrayListOf<DatePickerItem>()
+    private val items = mutableListOf<DatePickerItem>()
     private val adapter: DynamicAdapter
     private val snapHelper by lazy { LinearSnapHelper() }
 
@@ -70,7 +70,7 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         if (date != it) {
             needToPerformHapticFeedBack = false
             date = it
-            setUpDatePicker()
+            setUpDatePicker(it)
         }
     }
 
@@ -82,15 +82,13 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             }
             .doOnNext { date = it }
 
-    private fun setUpDatePicker() {
-        date?.let {
-            if (it !in items) {
-                items.replace(DatePickerDataProvider.buildDatePickerDates(it))
-                adapter.updateData(items, false)
-            }
-            postDelayed({ scrollToDate(it) }, INVALIDATE_RECYCLER_VIEW_DELAY)
-            postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
+    private fun setUpDatePicker(date: LocalDate) {
+        if (date !in items) {
+            items.replace(DatePickerDataProvider.buildDatePickerDates(date))
+            adapter.updateData(items, false)
         }
+        postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY)
+        postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
     }
 
     private fun onPickerItemScrolled(position: Int) = with(binding) {
