@@ -20,5 +20,6 @@
         style="@style/BottomMenuTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         tools:text="@string/bottom_navigation_menu_main_title" />
 </merge>

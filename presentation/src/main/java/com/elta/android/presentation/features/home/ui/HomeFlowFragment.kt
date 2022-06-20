@@ -123,7 +123,7 @@ class HomeFlowFragment :
     private fun initBottomSheetItemsView() {
         binding.homeBottomSheetView.findViewById<RecyclerView>(R.id.bottomSheetItemsView).apply {
             layoutManager = FixedLinearLayoutManager(requireActivity())
-            adapter = adapter
+            adapter = this@HomeFlowFragment.adapter
         }
     }
 
