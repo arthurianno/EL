@@ -34,7 +34,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/todayButtonView"
-                style="@style/New.Body1.ShadeBlack2"
+                style="@style/New.Body1.BlackBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
