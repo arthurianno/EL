@@ -9,6 +9,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
+import com.elta.android.presentation.widgets.status.StatusView
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 
@@ -17,6 +18,9 @@ class AppActivity : BaseActivity<AppPm>() {
     override val classToken: Class<AppPm> = AppPm::class.java
 
     override val binding by lazy { ActivityAppBinding.inflate(layoutInflater) }
+    private val statusView by lazy {
+        findViewById<StatusView>(R.id.syncStatusView)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.systemUiVisibility =
@@ -37,8 +41,8 @@ class AppActivity : BaseActivity<AppPm>() {
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
         pm.networkStateCommand.bindTo(binding.connectionStatusView.changeState())
-        pm.syncStatusVisibility.bindTo(binding.syncStatusView.visibleChanges())
-        pm.syncStatusState.bindTo(binding.syncStatusView.statusChanges())
+        pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
+        pm.syncStatusState.bindTo(statusView.statusChanges())
     }
 
     override fun onNewIntent(intent: Intent?) {
