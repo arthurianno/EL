@@ -20,17 +20,19 @@ open class DynamicAdapter constructor(
     constructor(factory: AdapterDelegatesFactory, calculator: DiffCalculator? = null) :
         this(HashCodeBasedAdapterDelegatesManager(factory), calculator)
 
-    var items = arrayListOf<ListItem>()
+    private val _items = mutableListOf<ListItem>()
+    val items: List<ListItem>
+        get() = _items
 
     override fun getItemViewType(position: Int): Int {
-        return manager.getItemViewType(items, position)
+        return manager.getItemViewType(_items, position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         manager.onCreateViewHolder(parent, viewType)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        manager.onBindViewHolder(items, position, holder)
+        manager.onBindViewHolder(_items, position, holder)
     }
 
     override fun onBindViewHolder(
@@ -38,8 +40,8 @@ open class DynamicAdapter constructor(
         position: Int,
         payloads: List<Any>
     ) {
-        if (payloads.isEmpty()) manager.onBindViewHolder(items, position, holder)
-        else manager.onBindViewHolder(items, position, holder, payloads)
+        if (payloads.isEmpty()) manager.onBindViewHolder(_items, position, holder)
+        else manager.onBindViewHolder(_items, position, holder, payloads)
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
@@ -54,9 +56,9 @@ open class DynamicAdapter constructor(
         manager.onViewRecycled(holder)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = _items.size
 
-    fun getItemPosition(listItem: ListItem): Int = items.indexOf(listItem)
+    fun getItemPosition(listItem: ListItem): Int = _items.indexOf(listItem)
 
     /**
      * Updates items of adapter.
@@ -73,8 +75,8 @@ open class DynamicAdapter constructor(
         when (enableDiffUtils) {
             true -> diffCalculator?.calculateDiff(
                 this,
-                ArrayList(items),
-                ArrayList(newItems),
+                _items,
+                newItems,
                 detectMoves
             )
             else -> {
@@ -85,14 +87,14 @@ open class DynamicAdapter constructor(
     }
 
     fun setData(newItems: List<ListItem>) {
-        this.items.clear()
-        this.items.addAll(newItems)
-        manager.setDelegates(this.items)
+        this._items.clear()
+        this._items.addAll(newItems)
+        manager.setDelegates(this._items)
     }
 
     fun getItem(position: Int): ListItem? {
         return when {
-            items.isNotEmpty() && position >= 0 -> items[position]
+            _items.isNotEmpty() && position >= 0 -> _items[position]
             else -> null
         }
     }

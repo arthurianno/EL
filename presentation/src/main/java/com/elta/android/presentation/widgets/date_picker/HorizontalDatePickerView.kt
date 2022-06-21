@@ -11,12 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutHorizontalDatePickerBinding
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
-import com.elta.android.presentation.widgets.date_picker.adapter.DatePickerDelegatesFactory
 import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
-import com.nullgr.core.adapter.DynamicAdapter
-import com.nullgr.core.adapter.RxDiffCalculator
 import com.nullgr.core.collections.replace
-import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
@@ -33,8 +29,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     private var selectedPosition: Int = 0
     private var needToPerformHapticFeedBack = false
 
-    private val items = arrayListOf<DatePickerItem>()
-    private val adapter: DynamicAdapter
+    private val items = mutableListOf<DatePickerItem>()
+    private val adapter: DateAdapter by lazy { DateAdapter() }
     private val snapHelper by lazy { LinearSnapHelper() }
 
     private val binding: LayoutHorizontalDatePickerBinding by lazy {
@@ -43,9 +39,6 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_horizontal_date_picker, this, true)
-        val diffCalculator = RxDiffCalculator(ComputationToMainSchedulersFacade())
-        val delegatesFactory = DatePickerDelegatesFactory()
-        adapter = DynamicAdapter(delegatesFactory, diffCalculator)
 
         with(binding) {
             dateItemsView.layoutManager =
@@ -70,27 +63,26 @@ class HorizontalDatePickerView @JvmOverloads constructor(
         if (date != it) {
             needToPerformHapticFeedBack = false
             date = it
-            setUpDatePicker()
+            setUpDatePicker(it)
         }
     }
 
     fun dateChanged(): Observable<LocalDate> =
         PageChangeListener(binding.dateItemsView, snapHelper)
             .map {
-                val item = adapter.items[it] as DatePickerItem
+                val item = adapter.currentList[it] as DatePickerItem
                 item.date
             }
             .doOnNext { date = it }
 
-    private fun setUpDatePicker() {
-        date?.let {
-            if (it !in items) {
-                items.replace(DatePickerDataProvider.buildDatePickerDates(it))
-                adapter.updateData(items, false)
-            }
-            postDelayed({ scrollToDate(it) }, INVALIDATE_RECYCLER_VIEW_DELAY)
-            postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
+    private fun setUpDatePicker(date: LocalDate) {
+        if (date !in items) {
+            items.replace(DatePickerDataProvider.buildDatePickerDates(date))
+            adapter.submitList(items)
+//            adapter.updateData(items, false)
         }
+        postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY)
+        postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
     }
 
     private fun onPickerItemScrolled(position: Int) = with(binding) {

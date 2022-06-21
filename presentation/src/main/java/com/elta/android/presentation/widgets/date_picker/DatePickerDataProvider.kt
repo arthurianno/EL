@@ -8,7 +8,7 @@ import org.threeten.bp.YearMonth
 object DatePickerDataProvider {
 
     private const val DAYS_OFFSET = 3
-    private val dayOfWeekResources = arrayListOf(
+    private val dayOfWeekResources = listOf(
         R.string.date_picker_day_of_week_1,
         R.string.date_picker_day_of_week_2,
         R.string.date_picker_day_of_week_3,
@@ -18,16 +18,13 @@ object DatePickerDataProvider {
         R.string.date_picker_day_of_week_7
     )
 
-    fun buildDatePickerDates(currentDate: LocalDate): ArrayList<DatePickerItem> {
-        val dates = arrayListOf<DatePickerItem>()
-
-        val selectedDate = currentDate
+    fun buildDatePickerDates(currentDate: LocalDate): List<DatePickerItem> {
+        val dates = mutableListOf<DatePickerItem>()
         val todayDate = LocalDate.now()
+        var tempDate = LocalDate.from(currentDate)
 
-        var tempDate = LocalDate.from(selectedDate)
-
-        val firstDayOfMonth = YearMonth.from(selectedDate).atDay(1)
-        val lastDayOfMonth = YearMonth.from(selectedDate).atEndOfMonth()
+        val firstDayOfMonth = YearMonth.from(currentDate).atDay(1)
+        val lastDayOfMonth = YearMonth.from(currentDate).atEndOfMonth()
 
         dates.add(tempDate.toItem())
 
@@ -40,11 +37,11 @@ object DatePickerDataProvider {
 
         var inFutureDateStart: LocalDate
 
-        if (selectedDate.isBefore(todayDate) && selectedDate.isBefore(lastDayOfMonth)) {
+        if (currentDate.isBefore(todayDate) && currentDate.isBefore(lastDayOfMonth)) {
 
             val maxAvailableDate =
                 if (todayDate.isBefore(lastDayOfMonth)) todayDate else lastDayOfMonth
-            tempDate = LocalDate.from(selectedDate)
+            tempDate = LocalDate.from(currentDate)
 
             do {
                 tempDate = tempDate.plusDays(1)
@@ -53,7 +50,7 @@ object DatePickerDataProvider {
 
             inFutureDateStart = LocalDate.from(maxAvailableDate)
         } else {
-            inFutureDateStart = LocalDate.from(selectedDate)
+            inFutureDateStart = LocalDate.from(currentDate)
         }
 
         var inPastDateStart = LocalDate.from(firstDayOfMonth)
@@ -70,10 +67,10 @@ object DatePickerDataProvider {
 
     private fun LocalDate.toItem(isAvailable: Boolean = true): DatePickerItem =
         DatePickerItem(
-            this,
-            dayOfWeek.value,
-            dayOfMonth,
-            dayOfWeekResources[dayOfWeek.value - 1],
-            isAvailable
+            date = this,
+            dayOfWeek = dayOfWeek.value,
+            dayOfMonth = dayOfMonth,
+            dayOfWeekResId = dayOfWeekResources[dayOfWeek.value - 1],
+            isAvailable = isAvailable
         )
 }

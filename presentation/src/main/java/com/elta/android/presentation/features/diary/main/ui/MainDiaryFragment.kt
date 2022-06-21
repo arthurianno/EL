@@ -40,7 +40,7 @@ class MainDiaryFragment :
         binding.todayButtonView.clicks().bindTo(pm.todayClickedAction)
         pm.items.bindTo {
             itemsView?.toggleVisibilityState(
-                it.isNotEmpty(),
+                state = it.isNotEmpty(),
                 defaultFalseState = View.INVISIBLE
             )
         }
