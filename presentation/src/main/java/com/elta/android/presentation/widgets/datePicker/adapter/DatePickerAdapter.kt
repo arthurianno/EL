@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.date_picker
+package com.elta.android.presentation.widgets.datePicker.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.databinding.ItemDatePickerBinding
-import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
+import com.elta.android.presentation.widgets.datePicker.model.DatePickerItem
 
 class DateAdapter : ListAdapter<DatePickerItem, DateViewHolder>(diffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateViewHolder {

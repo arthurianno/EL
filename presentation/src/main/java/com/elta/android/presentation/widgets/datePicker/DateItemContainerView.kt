@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.date_picker
+package com.elta.android.presentation.widgets.datePicker
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.date_picker
+package com.elta.android.presentation.widgets.datePicker
 
 import android.content.Context
 import android.util.AttributeSet
@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutHorizontalDatePickerBinding
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
-import com.elta.android.presentation.widgets.date_picker.adapter.items.DatePickerItem
+import com.elta.android.presentation.widgets.datePicker.adapter.DateAdapter
+import com.elta.android.presentation.widgets.datePicker.model.DatePickerItem
 import com.nullgr.core.collections.replace
 import com.nullgr.core.ui.extensions.getDisplaySize
 import io.reactivex.Observable
@@ -77,9 +78,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     private fun setUpDatePicker(date: LocalDate) {
         if (date !in items) {
-            items.replace(DatePickerDataProvider.buildDatePickerDates(date))
+            items.replace(DatePickerDataProvider.buildDatePickerDates())
             adapter.submitList(items)
-//            adapter.updateData(items, false)
         }
         postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY)
         postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
