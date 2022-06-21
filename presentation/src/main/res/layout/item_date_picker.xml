@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.elta.android.presentation.widgets.date_picker.DateItemContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.elta.android.presentation.widgets.datePicker.DateItemContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -26,4 +26,4 @@
         android:duplicateParentState="true"
         android:textColor="@color/color_text_day_of_month"
         tools:text="14" />
-</com.elta.android.presentation.widgets.date_picker.DateItemContainerView>
+</com.elta.android.presentation.widgets.datePicker.DateItemContainerView>

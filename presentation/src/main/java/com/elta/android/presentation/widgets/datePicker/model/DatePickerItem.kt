@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.date_picker.adapter.items
+package com.elta.android.presentation.widgets.datePicker.model
 
 import com.nullgr.core.adapter.items.ListItem
 import org.threeten.bp.LocalDate

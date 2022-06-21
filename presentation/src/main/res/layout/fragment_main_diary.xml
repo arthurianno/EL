@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-        <com.elta.android.presentation.widgets.date_picker.HorizontalDatePickerView
+        <com.elta.android.presentation.widgets.datePicker.HorizontalDatePickerView
             android:id="@+id/datePickerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
