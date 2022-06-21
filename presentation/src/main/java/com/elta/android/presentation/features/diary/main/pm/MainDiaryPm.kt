@@ -97,13 +97,11 @@ class MainDiaryPm @Inject constructor(
             .untilDestroy()
 
         selectedDateState.observable
-            .map { it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR) }
+            .map {
+                todayButtonVisibilityState.consumer.accept(!it.isToday())
+                it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR)
+            }
             .subscribe(monthTitleState.consumer)
-            .untilDestroy()
-
-        selectedDateState.observable
-            .map { !it.isToday() }
-            .subscribe(todayButtonVisibilityState.consumer)
             .untilDestroy()
 
         todayClickedAction.observable
