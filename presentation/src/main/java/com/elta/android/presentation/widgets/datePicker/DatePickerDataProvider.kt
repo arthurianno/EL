@@ -20,9 +20,10 @@ object DatePickerDataProvider {
     fun buildDatePickerDates(): List<DatePickerItem> {
         val dates = mutableListOf<DatePickerItem>()
         dates.add(0, LocalDate.now().toItem())
+        val stopDate = LocalDate.now().minusYears(1)
         do {
             dates.add(0, dates[0].date.minusDays(1).toItem())
-        } while (dates[0].date > LocalDate.now().minusYears(1))
+        } while (dates[0].date > stopDate)
 
         repeat(DAYS_OFFSET) {
             dates.add(LocalDate.now().plusDays(it.toLong()).toItem(false))
