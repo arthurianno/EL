@@ -33,7 +33,6 @@ import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
 import org.threeten.bp.ZonedDateTime
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 abstract class BaseEventFragment<T : BaseEventPm> :
@@ -94,9 +93,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             )
         }
         pm.mainActionTitleState.bindTo(binding.formSaveButtonView.text())
-        pm.mainActionVisibilityState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .subscribe(binding.formSaveButtonView.visibility())
+        pm.mainActionVisibilityState.bindTo(binding.formSaveButtonView.visibility())
         pm.formInput.bindTo(binding.formInputView)
         pm.formSelector.bind(binding.formVariantSelectorView, compositeUnbind)
         pm.tagSelector.bind(binding.formTagSelectorView, compositeUnbind)
@@ -106,7 +103,10 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
-        binding.formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
+        binding.formNoteView.textChanges().subscribe(
+            { binding.scrollableView.scrollToBottom() },
+            {}
+        )
     }
 
     override fun onStart() {
@@ -192,8 +192,4 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         var subTitleAlpha: Float = 0f,
         var buttonVisibility: Int = View.INVISIBLE
     )
-
-    private companion object {
-        const val DEBOUNCE = 100L
-    }
 }
