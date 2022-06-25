@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FregmentInviteObserverBinding
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
-import com.elta.android.presentation.utils.error
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
@@ -32,7 +31,7 @@ class InviteObserverFragment :
         pm.emailInput.bindTo(binding.emailInputView)
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .subscribe(binding.emailInputView.error())
+            .subscribe { binding.emailInputView.error = it }
         pm.continueEnabledState.bindTo { binding.continueButtonView.isEnabled = it }
         binding.continueButtonView.clicks().bindTo(pm.continueAction)
     }
