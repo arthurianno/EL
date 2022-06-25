@@ -62,11 +62,11 @@ fun ZonedDateTime.toIsoString(): String = this.format(
     DateTimeFormatterCache.getOrCreateFormatter(DATE_PATTERN_ISO)
 )
 
-fun LocalDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
-fun LocalDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+fun LocalDateTime.atStartOfDay(): LocalDateTime = this.with(LocalTime.MIDNIGHT)
+fun LocalDateTime.atEndOfDay(): LocalDateTime = this.with(LocalTime.MAX)
 
-fun ZonedDateTime.atStartOfDay() = this.with(LocalTime.MIDNIGHT)
-fun ZonedDateTime.atEndOfDay() = this.with(LocalTime.MAX)
+fun ZonedDateTime.atStartOfDay(): ZonedDateTime = this.with(LocalTime.MIDNIGHT)
+fun ZonedDateTime.atEndOfDay(): ZonedDateTime = this.with(LocalTime.MAX)
 
 fun LocalDate.isToday(): Boolean = LocalDate.now() == this
 fun LocalDate.isYesterday(): Boolean = LocalDate.now().minusDays(1) == this
