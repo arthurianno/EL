@@ -294,10 +294,11 @@ object Screens {
     // STATISTICS FLOW
     data class PeriodScreen(val period: Period) : SupportAppScreen() {
         override fun getFragment() = PeriodFragment.newInstance(period)
-//        override fun getScreenKey(): String {
-//            val superKey = super.getScreenKey()
-//            return "$superKey-${period.name}"
-//        }
+        override val screenKey: String
+            get() {
+                val superKey = super.screenKey
+                return "$superKey-${period.name}"
+            }
     }
 
     data class ViewPdfScreen(val uri: Uri) : SupportAppScreen() {
