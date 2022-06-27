@@ -51,15 +51,15 @@ fun webIntent(url: String): Intent {
  * @param body email body (optional)
  */
 fun emailIntent(to: String, subject: String? = null, body: String? = null): Intent {
-    return Intent(android.content.Intent.ACTION_SEND).apply {
-        type = "plain/text"
+    return Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:")
         putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (!subject.isNullOrEmpty()) {
-            putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_SUBJECT, subject)
         }
         if (!body.isNullOrEmpty()) {
-            putExtra(android.content.Intent.EXTRA_TEXT, body)
+            putExtra(Intent.EXTRA_TEXT, body)
         }
     }
 }
@@ -365,5 +365,5 @@ fun Intent?.launchForResult(context: Activity?): Observable<RxActivityResult> {
                     .flatMap { Observable.just(it) }
             }
     else
-        Observable.error<RxActivityResult>(ActivityNotFoundException())
+        Observable.error(ActivityNotFoundException())
 }
