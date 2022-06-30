@@ -4,6 +4,6 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.items.ListItem
 
-abstract class BaseViewHolder<in I : ListItem>(view: View) : RecyclerView.ViewHolder(view) {
+abstract class BaseListItemViewHolder<in I : ListItem>(view: View) : RecyclerView.ViewHolder(view) {
     abstract fun bind(item: I)
 }
