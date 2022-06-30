@@ -1,10 +1,11 @@
-package com.elta.android.presentation.features.diary.main.ui.adapter
+package com.elta.android.presentation.features.main.records.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.elta.android.presentation.core.ui.adapter.DefaultDiffCallback
 import com.elta.android.presentation.databinding.ItemRecordBinding
+import com.elta.android.presentation.features.main.records.ui.adapter.holder.ItemRecordViewHolder
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.RxBus

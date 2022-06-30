@@ -1,10 +1,11 @@
-package com.elta.android.presentation.features.diary.main.ui.adapter
+package com.elta.android.presentation.features.main.records.ui.adapter.holder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.elta.android.presentation.core.ui.adapter.BaseViewHolder
+import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.core.ui.adapter.GroupItem
 import com.elta.android.presentation.databinding.ItemRecordsGroupBinding
+import com.elta.android.presentation.features.main.records.ui.adapter.RecordItemGroupAdapter
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import net.cachapa.expandablelayout.ExpandableLayout
@@ -13,7 +14,7 @@ class ItemRecordsGroupViewHolder(
     private val binding: ItemRecordsGroupBinding,
     viewPool: RecyclerView.RecycledViewPool,
     private val adapter: RecordItemGroupAdapter
-) : BaseViewHolder<RecordsGroupItem>(binding.root) {
+) : BaseListItemViewHolder<RecordsGroupItem>(binding.root) {
 
     init {
         with(binding) {
