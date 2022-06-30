@@ -48,4 +48,23 @@ class RecordDelegate(
             recordLabelView.toggleView(item.showLabel)
         }
     }
+
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
+        val item = items[position] as RecordItem
+        with(binding) {
+            when (payload) {
+                RecordItem.Payload.ICON_CHANGED -> recordIconView.setImageResource(item.icon)
+                RecordItem.Payload.TITLE_CHANGED -> recordTitleView.text = item.title
+                RecordItem.Payload.TYPE_CHANGED -> recordTypeView.text = item.type
+                RecordItem.Payload.COUNT_CHANGED -> recordCountView.text = item.count
+                RecordItem.Payload.DATE_CHANGED -> recordDateView.text = item.date
+                RecordItem.Payload.LABEL_CHANGED -> recordLabelView.toggleView(item.showLabel)
+            }
+        }
+    }
 }

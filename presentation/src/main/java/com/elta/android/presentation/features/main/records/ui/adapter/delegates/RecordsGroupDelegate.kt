@@ -54,6 +54,23 @@ class RecordsGroupDelegate(
         }
     }
 
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
+        val item = items[position] as RecordsGroupItem
+        with(binding) {
+            when (payload) {
+                RecordsGroupItem.Payload.EXPANDED_STATE_CHANGED ->
+                    toggleState(itemsContainerView, false, groupStateView, item)
+                RecordsGroupItem.Payload.ITEMS_CHANGED ->
+                    setItems(itemsView, true, item)
+            }
+        }
+    }
+
     private fun toggleState(
         layout: ExpandableLayout,
         animate: Boolean,
