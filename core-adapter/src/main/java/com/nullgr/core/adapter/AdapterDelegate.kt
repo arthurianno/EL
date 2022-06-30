@@ -89,22 +89,6 @@ abstract class AdapterDelegate() {
     }
 
     /**
-     * Extended version of [onBindViewHolder] with payloads.
-     *
-     * @param items List of items.
-     * @param position Position of item in items.
-     * @param holder ViewHolder for this item type.
-     * @param payload Nested payload.
-     */
-    open fun onBindViewHolder(
-        items: List<ListItem>,
-        position: Int,
-        holder: RecyclerView.ViewHolder,
-        payload: Any
-    ) {
-    }
-
-    /**
      * @see [RecyclerView.Adapter.onViewRecycled]
      */
     open fun onViewRecycled(holder: RecyclerView.ViewHolder) {}
