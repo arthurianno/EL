@@ -3,27 +3,37 @@ package com.elta.android.presentation.features.main.events.chooser.ui
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentEventsOptionsChooserBinding
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.EventOptionsChooseAdapter
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 class EventsOptionsChooserFragment :
-    BaseListFragment<EventsOptionsChooserPm, FragmentEventsOptionsChooserBinding>(
+    BaseRecyclerViewFragment<EventsOptionsChooserPm, FragmentEventsOptionsChooserBinding>(
         FragmentEventsOptionsChooserBinding::inflate
     ) {
 
+    @Inject
+    lateinit var eventOptionsChooseAdapter: EventOptionsChooseAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { eventOptionsChooseAdapter }
     override val screenLayout: Int = R.layout.fragment_events_options_chooser
     override val classToken: Class<EventsOptionsChooserPm> = EventsOptionsChooserPm::class.java
+
     override val statusBarConfigProvider: StatusBarConfigProvider =
         TransparentLightStatusBarConfigProvider
 
@@ -53,6 +63,7 @@ class EventsOptionsChooserFragment :
     }
 
     companion object {
+
         fun newInstance(config: ChooserConfiguration): EventsOptionsChooserFragment {
             return EventsOptionsChooserFragment().apply {
                 arguments = bundle(EXTRA_CHOOSER_DATA to config)
