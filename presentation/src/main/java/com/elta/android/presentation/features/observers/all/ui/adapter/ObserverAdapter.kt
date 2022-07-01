@@ -28,14 +28,10 @@ class ObserverAdapter @Inject constructor(
             }
             ObserverHeaderItem::class.java.hashCode() -> {
                 ObserverHeaderViewHolder(
-                    ItemProfileSettingsBinding.inflate(
-                        inflater,
-                        parent,
-                        false
-                    )
+                    ItemProfileSettingsBinding.inflate(inflater, parent, false)
                 )
             }
-            else -> throw IllegalArgumentException("No delegate defined for ${viewType::class.simpleName}")
+            else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }
 }

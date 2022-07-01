@@ -11,7 +11,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
-import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.dialog.buttons
@@ -19,13 +18,13 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.databinding.FragmentHomeFlowBinding
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.widgets.BottomNavigationView
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
-import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
@@ -44,7 +43,7 @@ class HomeFlowFragment :
     override val classToken: Class<HomeFlowPm> = HomeFlowPm::class.java
 
     @Inject
-    lateinit var adapter: DynamicAdapter
+    lateinit var adapter: HomeBottomSheetAdapter
 
     @Inject
     lateinit var bus: RxBus
@@ -70,7 +69,7 @@ class HomeFlowFragment :
         binding.homeActionView.clicks()
             .subscribe { binding.homeActionView.isSelected.not().passTo(pm.homeAction) }
         pm.selectedItemIdState.bindTo(binding.homeBottomNavigationView.selection())
-        pm.bottomSheetItems.observable.bindTo(adapter, compositeUnbind)
+        pm.bottomSheetItems.bindTo { adapter.submitList(it) }
         pm.closeBottomSheetCommand.bindTo { binding.homeBottomSheetView.hide() }
         pm.showBottomSheetCommand.bindTo { binding.homeBottomSheetView.show() }
         Observables.combineLatest(
