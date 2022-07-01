@@ -329,7 +329,7 @@
     <string name="sync_connect_button_retry">Повторить</string>
 
     <!-- DIARY FLOR -->
-    <string name="diary_empty_state_title">В этот день у вас нет ни одной записи</string>
+    <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
     <string name="diary_screen_title">Дневник событий</string>
     <string name="diary_button_today">Сегодня</string>
 
