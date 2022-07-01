@@ -2,8 +2,8 @@ package com.nullgr.core.ui.widgets
 
 import android.content.Context
 import android.graphics.Canvas
-import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatTextView
 import com.nullgr.core.ui.R
 import com.nullgr.core.ui.widgets.extensions.initTypeface
 
@@ -30,7 +30,11 @@ class TextView : AppCompatTextView {
         }
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         if (!isInEditMode) {
             initTypeface(this, context, attrs)
             initialize(context, attrs)
@@ -50,6 +54,5 @@ class TextView : AppCompatTextView {
             translateToBottom = ta.hasValue(R.styleable.TextView_translateToBottom)
         }
         ta.recycle()
-
     }
 }

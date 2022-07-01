@@ -1,7 +1,7 @@
 package com.elta.android.presentation.utils.appbar
 
-import android.support.design.widget.AppBarLayout
 import com.elta.android.presentation.utils.checkMainThread
+import com.google.android.material.appbar.AppBarLayout
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable

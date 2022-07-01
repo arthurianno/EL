@@ -30,6 +30,9 @@ import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class MainProfilePm @Inject constructor(
@@ -42,15 +45,15 @@ class MainProfilePm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val userFullNameState = State<String>()
-    val profileSettingsAction = Action<Unit>()
-    val openDiabetesTypeDialogCommand = Command<Unit>(bufferSize = 1)
-    val openHemoglobinTypeDialogCommand = Command<Unit>(bufferSize = 1)
-    val openGlucoseRangeDialogCommand = Command<Unit>(bufferSize = 1)
+    val userFullNameState = state<String>()
+    val profileSettingsAction = action<Unit>()
+    val openDiabetesTypeDialogCommand = command<Unit>(bufferSize = 1)
+    val openHemoglobinTypeDialogCommand = command<Unit>(bufferSize = 1)
+    val openGlucoseRangeDialogCommand = command<Unit>(bufferSize = 1)
 
-    private val getProfileSettingsAction = Action<Unit>()
-    private val updateProfileByEventAction = Action<Unit>()
-    private val updateProfileAction = Action<Profile>()
+    private val getProfileSettingsAction = action<Unit>()
+    private val updateProfileByEventAction = action<Unit>()
+    private val updateProfileAction = action<Profile>()
 
     override fun onCreate() {
         super.onCreate()
@@ -120,10 +123,20 @@ class MainProfilePm @Inject constructor(
 
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
-            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(Unit)
-            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(Unit)
-            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
-            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(Unit)
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(
+                Unit
+            )
+            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(
+                Unit
+            )
+            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(
+                Screens.EventsCreationScreen(
+                    EventType.WEIGHT
+                )
+            )
+            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(
+                Unit
+            )
         }
 
     private fun bindEventsChangedAction() =
@@ -190,7 +203,8 @@ class MainProfilePm @Inject constructor(
 
     private fun updateFullNameState(profile: Profile) {
         userFullNameState.consumer.accept(
-            profile.createFullName(resourceProvider.getString(R.string.profile_name_placeholder)))
+            profile.createFullName(resourceProvider.getString(R.string.profile_name_placeholder))
+        )
     }
 
     private fun createUpdateProfileUseCaseParams(profile: Profile) =

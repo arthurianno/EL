@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.builder
 
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.elta.android.domain.features.user.interactor.googleFitApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -25,17 +25,34 @@ class ProfileSettingsItemsBuilder @Inject constructor(
         with(profile) {
 
             add(createHeaderItem(resources.getString(R.string.profile_personal_information)))
-            add(createSettingsItem(R.drawable.ic_acc_name,
-                createFullName(resources.getString(R.string.profile_full_name_placeholder)),
-                ProfileSettingsItem.Type.NAME))
-            add(createSettingsItem(R.drawable.ic_settings_gender,
-                createGender(this), ProfileSettingsItem.Type.GENDER))
+            add(
+                createSettingsItem(
+                    R.drawable.ic_acc_name,
+                    createFullName(resources.getString(R.string.profile_full_name_placeholder)),
+                    ProfileSettingsItem.Type.NAME
+                )
+            )
+            add(
+                createSettingsItem(
+                    R.drawable.ic_settings_gender,
+                    createGender(this), ProfileSettingsItem.Type.GENDER
+                )
+            )
 
             add(createHeaderItem(resources.getString(R.string.profile_security)))
-            add(createSettingsItem(R.drawable.ic_key_pass,
-                resources.getString(R.string.profile_change_password), ProfileSettingsItem.Type.PASSWORD))
-            add(createSettingsItem(R.drawable.ic_mail,
-                this.email ?: "", ProfileSettingsItem.Type.EMAIL))
+            add(
+                createSettingsItem(
+                    R.drawable.ic_key_pass,
+                    resources.getString(R.string.profile_change_password),
+                    ProfileSettingsItem.Type.PASSWORD
+                )
+            )
+            add(
+                createSettingsItem(
+                    R.drawable.ic_mail,
+                    this.email ?: "", ProfileSettingsItem.Type.EMAIL
+                )
+            )
 
             add(createHeaderItem(resources.getString(R.string.profile_linked_social_networks)))
             addAll(createSocialItems(this))
@@ -43,20 +60,42 @@ class ProfileSettingsItemsBuilder @Inject constructor(
             add(ProfileSettingsSeparatorItem)
 
             add(createHeaderItem(resources.getString(R.string.profile_additional_settings)))
-            add(createSettingsItem(R.drawable.ic_notification,
-                resources.getString(R.string.profile_notification), ProfileSettingsItem.Type.NOTIFICATION))
-            add(createSettingsItem(R.drawable.ic_doc,
-                resources.getString(R.string.profile_legal_information), ProfileSettingsItem.Type.LEGAL_INFO))
+            add(
+                createSettingsItem(
+                    R.drawable.ic_notification,
+                    resources.getString(R.string.profile_notification),
+                    ProfileSettingsItem.Type.NOTIFICATION
+                )
+            )
+            add(
+                createSettingsItem(
+                    R.drawable.ic_doc,
+                    resources.getString(R.string.profile_legal_information),
+                    ProfileSettingsItem.Type.LEGAL_INFO
+                )
+            )
             createHealthAppItem(profile)?.let { add(it) }
-            add(createSettingsItem(R.drawable.ic_app_info, resources.getString(R.string.profile_app_version,
-                BuildConfig.VERSION_NAME), ProfileSettingsItem.Type.APP_VERSION))
+            add(
+                createSettingsItem(
+                    R.drawable.ic_app_info,
+                    resources.getString(
+                        R.string.profile_app_version,
+                        BuildConfig.LIBRARY_PACKAGE_NAME // TODO Нужно добавлять номер версии (имя версии)
+                    ),
+                    ProfileSettingsItem.Type.APP_VERSION
+                )
+            )
         }
     }
 
     private fun createHeaderItem(title: String) =
         ProfileSettingsHeaderItem(title)
 
-    private fun createSettingsItem(@DrawableRes icon: Int, title: String, type: ProfileSettingsItem.Type) =
+    private fun createSettingsItem(
+        @DrawableRes icon: Int,
+        title: String,
+        type: ProfileSettingsItem.Type
+    ) =
         ProfileSettingsItem(icon, title, type)
 
     private fun createSocialItems(profile: Profile): List<ListItem> {
@@ -64,12 +103,30 @@ class ProfileSettingsItemsBuilder @Inject constructor(
         profile.socialNetworks?.let { list ->
             list.forEach { network ->
                 when (network.type) {
-                    SocialNetworkType.FB -> socialNetworks.add(createSettingsSocialItem(R.drawable.ic_facebook,
-                        resources.getString(R.string.facebook), network.isLinked, SocialNetworkType.FB))
-                    SocialNetworkType.VK -> socialNetworks.add(createSettingsSocialItem(R.drawable.ic_vk,
-                        resources.getString(R.string.vkontakte), network.isLinked, SocialNetworkType.VK))
-                    SocialNetworkType.OK -> socialNetworks.add(createSettingsSocialItem(R.drawable.ic_ok,
-                        resources.getString(R.string.odnoklasniki), network.isLinked, SocialNetworkType.OK))
+                    SocialNetworkType.FB -> socialNetworks.add(
+                        createSettingsSocialItem(
+                            R.drawable.ic_facebook,
+                            resources.getString(R.string.facebook),
+                            network.isLinked,
+                            SocialNetworkType.FB
+                        )
+                    )
+                    SocialNetworkType.VK -> socialNetworks.add(
+                        createSettingsSocialItem(
+                            R.drawable.ic_vk,
+                            resources.getString(R.string.vkontakte),
+                            network.isLinked,
+                            SocialNetworkType.VK
+                        )
+                    )
+                    SocialNetworkType.OK -> socialNetworks.add(
+                        createSettingsSocialItem(
+                            R.drawable.ic_ok,
+                            resources.getString(R.string.odnoklasniki),
+                            network.isLinked,
+                            SocialNetworkType.OK
+                        )
+                    )
                 }
             }
         }

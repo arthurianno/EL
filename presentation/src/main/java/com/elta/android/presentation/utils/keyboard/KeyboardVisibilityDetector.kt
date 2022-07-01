@@ -35,12 +35,16 @@ object KeyboardVisibilityDetector {
 
             if (previousHeight != -1) {
                 val statusBarHeight = viewHolder.resizableLayout.top
-                val isKeyboardVisible = contentHeight < viewHolder.nonResizableLayout.height - statusBarHeight
+                val isKeyboardVisible =
+                    contentHeight < viewHolder.nonResizableLayout.height - statusBarHeight
 
-                listener(KeyboardVisibilityChanged(
-                    visible = isKeyboardVisible,
-                    contentHeight = contentHeight,
-                    contentHeightBeforeResize = previousHeight))
+                listener(
+                    KeyboardVisibilityChanged(
+                        visible = isKeyboardVisible,
+                        contentHeight = contentHeight,
+                        contentHeightBeforeResize = previousHeight
+                    )
+                )
             }
 
             previousHeight = contentHeight

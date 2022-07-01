@@ -10,7 +10,7 @@ import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
-import kotlinx.android.synthetic.main.fragment_auth_base.*
+import me.dmdev.rxpm.bindTo
 
 abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragment<PM>() {
 
@@ -21,16 +21,17 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        privacyPolicyView.show()
-        authTitleIconView.hide()
+        binding.privacyPolicyView.show()
+        binding.authTitleIconView.hide()
     }
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        policyDescriptionTextView.text = getString(R.string.registration_main_description_privacy_policy)
-        policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
+        binding.policyDescriptionTextView.text =
+            getString(R.string.registration_main_description_privacy_policy)
+        binding.policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
             .bindTo(pm.privacyPolicyClickAction)
-        policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_personal_data_clickable_mask))
+        binding.policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_personal_data_clickable_mask))
             .bindTo(pm.personalDataClickAction)
         pm.openPrivacyPolicyCommand.bindTo {
             childFragmentManager.showDialog(
@@ -43,6 +44,6 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
             )
         }
 
-        policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
+        binding.policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
     }
 }

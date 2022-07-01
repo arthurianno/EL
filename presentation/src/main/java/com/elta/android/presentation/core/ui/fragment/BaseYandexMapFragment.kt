@@ -4,6 +4,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.viewbinding.ViewBinding
 import com.a65apps.clustering.core.Cluster
 import com.a65apps.clustering.core.VisibleRect
 import com.a65apps.clustering.core.algorithm.DefaultAlgorithmParameter
@@ -35,7 +36,9 @@ import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
-abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
+abstract class BaseYandexMapFragment<T : BasePm, B : ViewBinding>(
+    bindingInflater: Inflater<B>
+) : BaseFragment<T, B>(bindingInflater) {
 
     protected abstract val userLocationPinRes: Int
     protected abstract val clusterPinProvider: ClusterPinProvider
@@ -102,8 +105,10 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
 
     fun addMyLocationPin(location: Location) {
         userLocationMapObject?.let { mapObjects?.remove(it) }
-        userLocationMapObject = mapObjects?.addPlacemark(location.toPoint(), myLocationImageProvider)
-        userLocationMapObject?.userData = GeoPoint(location.latitude, location.longitude, isUserPoint = true)
+        userLocationMapObject =
+            mapObjects?.addPlacemark(location.toPoint(), myLocationImageProvider)
+        userLocationMapObject?.userData =
+            GeoPoint(location.latitude, location.longitude, isUserPoint = true)
     }
 
     fun replacePins(points: List<GeoPoint>) {
@@ -131,7 +136,11 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
                 cameraPosition.azimuth,
                 cameraPosition.tilt
             )
-            nonNullMap.move(cameraPosition, Animation(Animation.Type.SMOOTH, CLUSTER_ANIMATION_DURATION), null)
+            nonNullMap.move(
+                cameraPosition,
+                Animation(Animation.Type.SMOOTH, CLUSTER_ANIMATION_DURATION),
+                null
+            )
         }
     }
 
@@ -146,7 +155,8 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
             val parameter = DefaultAlgorithmParameter(
                 VisibleRect(
                     m.visibleRegion.topLeft.toLatLng(),
-                    m.visibleRegion.bottomRight.toLatLng()),
+                    m.visibleRegion.bottomRight.toLatLng()
+                ),
                 m.cameraPosition.zoom.toInt()
             )
             clusterManager = YandexClusterManager(
@@ -194,7 +204,10 @@ abstract class BaseYandexMapFragment<T : BasePm> : BaseFragment<T>() {
     private fun setSelectedPin(geoPoint: GeoPoint, isMoveToPin: Boolean, withAnimation: Boolean) {
         selectedObjectRelay.asConsumer().accept(geoPoint)
         drawPinObject(geoPoint)
-        if (isMoveToPin) moveTo(location = geoPoint.toPoint(), duration = if (withAnimation) null else 0f)
+        if (isMoveToPin) moveTo(
+            location = geoPoint.toPoint(),
+            duration = if (withAnimation) null else 0f
+        )
     }
 
     private fun getSelectedGeoPoint() = selectedObjectRelay.value

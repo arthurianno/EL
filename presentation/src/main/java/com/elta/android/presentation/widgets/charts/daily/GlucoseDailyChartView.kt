@@ -11,12 +11,12 @@ import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.distanceBetween
@@ -136,7 +136,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     fun getScrollPosition(): Float {
-        val lastEventEntry = chartPoints.entries.maxBy { it.value.x }
+        val lastEventEntry = chartPoints.entries.maxByOrNull { it.value.x }
         if (lastEventEntry != null) {
             return lastEventEntry.value.x - scrollOffset
         }
@@ -145,8 +145,10 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         onBeforeMeasure()
-        val newWidthMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewWidth.toInt(), MeasureSpec.EXACTLY)
-        val newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
+        val newWidthMeasureSpec =
+            MeasureSpec.makeMeasureSpec(fullViewWidth.toInt(), MeasureSpec.EXACTLY)
+        val newHeightMeasureSpec =
+            MeasureSpec.makeMeasureSpec(fullViewHeight.toInt(), MeasureSpec.EXACTLY)
         super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
         onAfterMeasure()
     }
@@ -230,10 +232,16 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
         chartPointTitleBackgroundRect.set(bgStartX, bgStartY, bgEndX, bgEndY)
         chartPointBackgroundPaint.color = backgroundColor
-        drawRoundRect(chartPointTitleBackgroundRect, chartPointTitleBackgroundCorners, chartPointTitleBackgroundCorners, chartPointBackgroundPaint)
+        drawRoundRect(
+            chartPointTitleBackgroundRect,
+            chartPointTitleBackgroundCorners,
+            chartPointTitleBackgroundCorners,
+            chartPointBackgroundPaint
+        )
 
         val textX = chartPointTitleBackgroundRect.right - chartPointTitleBackgroundWidth / 2
-        val textY = chartPointTitleBackgroundRect.bottom - chartPointTitleBackgroundHeight / 2 + chartPointTitleHeight / 4
+        val textY =
+            chartPointTitleBackgroundRect.bottom - chartPointTitleBackgroundHeight / 2 + chartPointTitleHeight / 4
         chartPointTitlePaint.color = chartPointTitleColor
         drawText(text, textX, textY, chartPointTitlePaint)
     }
@@ -258,7 +266,12 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             bgBottom
         )
         selectedItemTimeBgPaint.color = selectionColor
-        drawRoundRect(selectedItemTimeBgRect, chartPointTitleBackgroundCorners, chartPointTitleBackgroundCorners, selectedItemTimeBgPaint)
+        drawRoundRect(
+            selectedItemTimeBgRect,
+            chartPointTitleBackgroundCorners,
+            chartPointTitleBackgroundCorners,
+            selectedItemTimeBgPaint
+        )
         drawText(time, pointF.x, timeTitleY, selectedItemTimeTitlePaint)
 
         selectedItemTrianglePaint.color = selectionColor
@@ -271,10 +284,22 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         drawPath(selectedItemTriangleTop, selectedItemTrianglePaint)
         selectedItemTriangleTop.reset()
 
-        selectedItemTriangleBottom.moveTo(pointF.x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
-        selectedItemTriangleBottom.lineTo(pointF.x + selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
-        selectedItemTriangleBottom.lineTo(pointF.x, selectedItemTimeBgRect.top - selectedItemTriangleHeight)
-        selectedItemTriangleBottom.lineTo(pointF.x - selectedItemTriangleWidth / 2, selectedItemTimeBgRect.top)
+        selectedItemTriangleBottom.moveTo(
+            pointF.x - selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
+        selectedItemTriangleBottom.lineTo(
+            pointF.x + selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
+        selectedItemTriangleBottom.lineTo(
+            pointF.x,
+            selectedItemTimeBgRect.top - selectedItemTriangleHeight
+        )
+        selectedItemTriangleBottom.lineTo(
+            pointF.x - selectedItemTriangleWidth / 2,
+            selectedItemTimeBgRect.top
+        )
         selectedItemTriangleBottom.close()
         drawPath(selectedItemTriangleBottom, selectedItemTrianglePaint)
         selectedItemTriangleBottom.reset()
@@ -421,7 +446,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private fun onBeforeMeasure() {
         val fontMetrics = timeTitlePaint.fontMetrics
         titleHeight = fontMetrics.descent - fontMetrics.ascent
-        fullViewHeight = chartOffset * 2 + clearChartHeight + titlePadding + titleHeight + titlePadding
+        fullViewHeight =
+            chartOffset * 2 + clearChartHeight + titlePadding + titleHeight + titlePadding
         fullViewWidth = singleHourWidth * FULL_DAY_HOURS + timeLineOffset * 2
 
         val fontMetricsChartPoint = chartPointTitlePaint.fontMetrics
@@ -440,7 +466,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         if (_chartDataModel != null) {
             onDataModelChanged()
         }
-        timeTitleY = chartOffset * 2 + clearChartHeight + titlePadding + (titleHeight * 0.75).toInt()
+        timeTitleY =
+            chartOffset * 2 + clearChartHeight + titlePadding + (titleHeight * 0.75).toInt()
         scrollOffset = getDisplaySize(context).first * 0.8f
     }
 
@@ -459,7 +486,12 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             if (highMax != null) {
                 val highRangePercents = (highMax - normalMax) / fullRange
                 val highRangeHeight = clearChartHeight * highRangePercents
-                highRangeRect.set(0, 0, fullViewWidth.toInt(), chartOffset.toInt() + highRangeHeight.toInt())
+                highRangeRect.set(
+                    0,
+                    0,
+                    fullViewWidth.toInt(),
+                    chartOffset.toInt() + highRangeHeight.toInt()
+                )
             } else {
                 highRangeRect.set(0, 0, 0, 0)
             }
@@ -479,12 +511,21 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             if (lowMax != null) {
                 val lowRangePercents = (lowMax - start) / fullRange
                 val lowRangeHeight = (clearChartHeight * lowRangePercents).toInt()
-                lowRangeRect.set(0, normalRangeRect.bottom, fullViewWidth.toInt(), normalRangeRect.bottom + lowRangeHeight + chartOffset.toInt())
+                lowRangeRect.set(
+                    0,
+                    normalRangeRect.bottom,
+                    fullViewWidth.toInt(),
+                    normalRangeRect.bottom + lowRangeHeight + chartOffset.toInt()
+                )
             } else {
                 lowRangeRect.set(0, 0, 0, 0)
             }
 
-            glucoseRangesOverlayView?.applyParentRanges(highRangeRect, normalRangeRect, lowRangeRect)
+            glucoseRangesOverlayView?.applyParentRanges(
+                highRangeRect,
+                normalRangeRect,
+                lowRangeRect
+            )
         }
     }
 
@@ -501,7 +542,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
         val valuesStart = dataModel().chartRangesModel.start
         val valuesEnd = dataModel().chartRangesModel.end
-        val y = top + chartOffset.toInt() + clearChartHeight * (1 - (value - valuesStart) / (valuesEnd - valuesStart))
+        val y =
+            top + chartOffset.toInt() + clearChartHeight * (1 - (value - valuesStart) / (valuesEnd - valuesStart))
         return PointF(x, y.toFloat())
     }
 

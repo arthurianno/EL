@@ -16,7 +16,7 @@ class SalePointToCacheMapper @Inject constructor() : Mapper<SalePointDto, SalePo
                 region = region,
                 city = city,
                 address = address,
-                fullAddress = "$city $address $name".toLowerCase(),
+                fullAddress = "$city $address $name".lowercase(),
                 phone = phone,
                 latitude = coordinates.latitude,
                 longitude = coordinates.longitude,

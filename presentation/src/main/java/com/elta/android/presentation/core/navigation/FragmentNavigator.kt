@@ -1,8 +1,8 @@
 package com.elta.android.presentation.core.navigation
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.elta.android.presentation.R
 
 open class FragmentNavigator(
     fragment: Fragment
-) : ExtendedNavigator(fragment.activity, fragment.childFragmentManager, R.id.containerView)
+) : ExtendedNavigator(fragment.requireActivity(), fragment.childFragmentManager, R.id.containerView)

@@ -2,7 +2,7 @@ package com.elta.android.presentation.utils.dynamic_links
 
 import android.net.Uri
 import com.elta.android.presentation.Screens
-import ru.terrakok.cicerone.android.support.SupportAppScreen
+import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 
 object NotificationNavigationMapper {
 

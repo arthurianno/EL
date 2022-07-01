@@ -14,13 +14,13 @@
         android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             style="@style/New.Headline3.BlackBlue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sync_state_title_device_found" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -29,7 +29,7 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         style="@style/New.Title2.ShadeBlack0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,14 +39,14 @@
         android:lineSpacingExtra="2dp"
         android:text="@string/sync_state_subtitle_device_found" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="36dp"
         android:overScrollMode="never" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/actionButtonView"
         style="@style/Button.Large"
         android:text="@string/sync_state_action_button_device_found" />

@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.ContactsContract
 import com.nullgr.core.rx.contacts.domain.UserContact
 import com.nullgr.core.rx.contacts.extensions.has
-import java.util.*
+import java.util.Collections
 
 /**
  * Map given cursor to collection of unique [UserContact]
@@ -24,7 +24,9 @@ internal object CursorToContactsMapper : CursorMapper<List<UserContact>> {
 
                         if (!(contactsResult has contactId)) {
 
-                            contactsResult.add(UserContact(contactId.toLong(),
+                            contactsResult.add(
+                                UserContact(
+                                    contactId.toLong(),
                                     getDisplayName(cursor),
                                     getLookUpKey(cursor),
                                     getStarred(cursor),
@@ -32,7 +34,9 @@ internal object CursorToContactsMapper : CursorMapper<List<UserContact>> {
                                     getThumbnail(cursor),
                                     getHasPhones(cursor),
                                     null,
-                                    null))
+                                    null
+                                )
+                            )
                         }
                     } while (cursor.moveToNext())
                 }
@@ -67,7 +71,8 @@ internal object CursorToContactsMapper : CursorMapper<List<UserContact>> {
     }
 
     private fun getThumbnail(cursor: Cursor): Uri? {
-        val uri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI))
+        val uri =
+            cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI))
         if (uri != null && !uri.isEmpty()) {
             return Uri.parse(uri)
         }

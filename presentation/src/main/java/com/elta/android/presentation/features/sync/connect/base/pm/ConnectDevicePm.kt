@@ -27,7 +27,10 @@ import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeoutException
 
 abstract class ConnectDevicePm constructor(
@@ -37,17 +40,17 @@ abstract class ConnectDevicePm constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val skipAction = Action<Unit>()
+    val skipAction = action<Unit>()
 
-    val connectDeviceAction = Action<Unit>()
-    val connectDeviceEnabledState = State(false)
+    val connectDeviceAction = action<Unit>()
+    val connectDeviceEnabledState = state(false)
 
-    val startScanAction = Action<Unit>()
-    val toAppAction = Action<Unit>()
+    val startScanAction = action<Unit>()
+    val toAppAction = action<Unit>()
 
-    val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
+    val openPinCodeDialogCommand = command<String>(bufferSize = 1)
 
-    val state = State(ViewState.HOW_TO_CONNECT)
+    val mstate = state(ViewState.HOW_TO_CONNECT)
 
     val btControl = bluetoothControl()
 
@@ -59,8 +62,8 @@ abstract class ConnectDevicePm constructor(
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
-    private val startSyncAction = Action<Unit>()
-    private val syncProgressState = State(false)
+    private val startSyncAction = action<Unit>()
+    private val syncProgressState = state(false)
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -90,13 +93,13 @@ abstract class ConnectDevicePm constructor(
         )
     }
 
-    private val showRetrySearchAction = Action<Unit>()
-    private val showRetryPinAction = Action<Unit>()
-    private val showRetrySyncAction = Action<Unit>()
-    private val showRetryConnectAction = Action<Unit>()
+    private val showRetrySearchAction = action<Unit>()
+    private val showRetryPinAction = action<Unit>()
+    private val showRetrySyncAction = action<Unit>()
+    private val showRetryConnectAction = action<Unit>()
 
-    private val internalConnectDeviceAction = Action<Unit>()
-    private val pinState = State<String>()
+    private val internalConnectDeviceAction = action<Unit>()
+    private val pinState = state<String>()
 
     protected abstract fun navigateToApp(i: Unit)
 
@@ -118,9 +121,15 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(
+                Unit
+            )
+            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
+                Unit
+            )
+            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(
+                Unit
+            )
             is TimeoutException -> {
                 val devices = items.valueOrNull
                 if (devices == null || devices.isEmpty()) {
@@ -158,7 +167,7 @@ abstract class ConnectDevicePm constructor(
                     .bindProgress()
                     .doOnComplete {
                         startSyncAction.consumer.accept(Unit)
-                        state.consumer.accept(ViewState.CONNECTED)
+                        mstate.consumer.accept(ViewState.CONNECTED)
                     }
                     .doOnError(::handleError)
             }
@@ -176,7 +185,7 @@ abstract class ConnectDevicePm constructor(
             .flatMap {
                 findGlucometersUseCase.execute()
                     .doOnSubscribe {
-                        state.consumer.accept(ViewState.SEARCH)
+                        mstate.consumer.accept(ViewState.SEARCH)
                     }
                     .doOnNext(::handleSearchResults)
                     .doOnError(::handleError)
@@ -197,7 +206,7 @@ abstract class ConnectDevicePm constructor(
                     .doOnNext { events ->
                         if (events > 0) bus.event(Events.EventsChanged(true))
                     }
-                    .doOnComplete { state.consumer.accept(ViewState.SYNC_COMPLETED) }
+                    .doOnComplete { mstate.consumer.accept(ViewState.SYNC_COMPLETED) }
                     .doOnError(::handleError)
             }
             .retry()
@@ -268,7 +277,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun handleSearchResults(results: List<Glucometer>) {
         if (results.isNotEmpty()) {
-            state.consumer.accept(ViewState.FOUND)
+            mstate.consumer.accept(ViewState.FOUND)
             retrySearchControl.dismiss()
         }
         scanResults.clear()
@@ -290,7 +299,7 @@ abstract class ConnectDevicePm constructor(
         )
 
     private fun bindAnalytics() {
-        state.observable
+        mstate.observable
             .filter { it == ViewState.SYNC_COMPLETED }
             .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
             .subscribe()

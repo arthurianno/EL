@@ -1,8 +1,8 @@
 package com.nullgr.core.adapter
 
-import android.support.v4.util.SparseArrayCompat
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.collection.SparseArrayCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.exceptions.DelegateNotFoundException
 import com.nullgr.core.adapter.items.ListItem
 
@@ -13,7 +13,8 @@ import com.nullgr.core.adapter.items.ListItem
  * @author vchernyshov
  * @author a.komarovskyi
  */
-class SparseAdapterDelegatesManager(private val delegatesFactory: AdapterDelegatesFactory): AdapterDelegatesManager {
+class SparseAdapterDelegatesManager(private val delegatesFactory: AdapterDelegatesFactory) :
+    AdapterDelegatesManager {
 
     companion object {
         internal const val FALLBACK_DELEGATE_VIEW_TYPE = Integer.MAX_VALUE - 1
@@ -59,31 +60,43 @@ class SparseAdapterDelegatesManager(private val delegatesFactory: AdapterDelegat
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            getDelegateForViewTypeOrThrowException(viewType).onCreateViewHolder(parent)
+        getDelegateForViewTypeOrThrowException(viewType).onCreateViewHolder(parent)
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder) =
-            getDelegateForViewTypeOrThrowException(vh.itemViewType).onBindViewHolder(items, position, vh)
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        vh: RecyclerView.ViewHolder
+    ) =
+        getDelegateForViewTypeOrThrowException(vh.itemViewType).onBindViewHolder(
+            items,
+            position,
+            vh
+        )
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder,
-                         payloads: List<Any>) {
-            getDelegateForViewTypeOrThrowException(vh.itemViewType)
-                    .onBindViewHolder(items, position, vh, payloads)
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        vh: RecyclerView.ViewHolder,
+        payloads: List<Any>
+    ) {
+        getDelegateForViewTypeOrThrowException(vh.itemViewType)
+            .onBindViewHolder(items, position, vh, payloads)
     }
 
     override fun onViewRecycled(vh: RecyclerView.ViewHolder) =
-            getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewRecycled(vh)
+        getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewRecycled(vh)
 
     override fun onFailedToRecycleView(vh: RecyclerView.ViewHolder): Boolean =
-            getDelegateForViewTypeOrThrowException(vh.itemViewType).onFailedToRecycleView(vh)
+        getDelegateForViewTypeOrThrowException(vh.itemViewType).onFailedToRecycleView(vh)
 
     override fun onViewAttachedToWindow(vh: RecyclerView.ViewHolder) =
-            getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewAttachedToWindow(vh)
+        getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewAttachedToWindow(vh)
 
     override fun onViewDetachedFromWindow(vh: RecyclerView.ViewHolder) =
-            getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewDetachedFromWindow(vh)
+        getDelegateForViewTypeOrThrowException(vh.itemViewType).onViewDetachedFromWindow(vh)
 
     private fun getDelegateForViewTypeOrThrowException(viewType: Int): AdapterDelegate {
-        val delegate =  delegates[viewType]
+        val delegate = delegates[viewType]
         return when (delegate) {
             null -> throw DelegateNotFoundException()
             else -> delegate
@@ -92,8 +105,10 @@ class SparseAdapterDelegatesManager(private val delegatesFactory: AdapterDelegat
 
     private fun getDelegateForPosition(items: List<ListItem>, position: Int): AdapterDelegate? {
         return (0 until delegates.size())
-                .map { delegates[it] }
-                .firstOrNull { delegate -> delegate?.let { it.isForViewType(items, position)} ?: false }
+            .map { delegates[it] }
+            .firstOrNull { delegate ->
+                delegate?.let { it.isForViewType(items, position) } ?: false
+            }
     }
 
     private fun addDelegate(delegate: AdapterDelegate): SparseAdapterDelegatesManager {
@@ -107,16 +122,20 @@ class SparseAdapterDelegatesManager(private val delegatesFactory: AdapterDelegat
         return addDelegate(viewType, false, delegate)
     }
 
-    private fun addDelegate(viewType: Int,
-                            allowReplacingDelegate: Boolean,
-                            delegate: AdapterDelegate): SparseAdapterDelegatesManager {
+    private fun addDelegate(
+        viewType: Int,
+        allowReplacingDelegate: Boolean,
+        delegate: AdapterDelegate
+    ): SparseAdapterDelegatesManager {
         when {
             viewType == FALLBACK_DELEGATE_VIEW_TYPE ->
                 throw IllegalArgumentException(
-                        "View type $FALLBACK_DELEGATE_VIEW_TYPE is reserved for fallback delegate")
+                    "View type $FALLBACK_DELEGATE_VIEW_TYPE is reserved for fallback delegate"
+                )
             !allowReplacingDelegate && delegates.get(viewType) != null ->
                 throw IllegalArgumentException(
-                        "AdapterDelegate is already registered for viewType $viewType")
+                    "AdapterDelegate is already registered for viewType $viewType"
+                )
             else -> {
                 delegates.put(viewType, delegate)
                 return this

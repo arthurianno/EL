@@ -8,7 +8,7 @@ import com.elta.android.presentation.features.registration.main.ui.BaseRegistrat
 import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.ui.extensions.hide
-import kotlinx.android.synthetic.main.fragment_auth_base.*
+import me.dmdev.rxpm.bindTo
 
 class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm>() {
 
@@ -20,19 +20,17 @@ class RegistrationSocialFragment : BaseRegistrationFragment<RegistrationSocialPm
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val network = arguments?.getSerializable(EXTRA_NETWORK) as? SocialNetworkType
-        if (network != null) {
-            presentationModel.setSocialNetwork(network)
-        }
+        network?.let { presentationModel.setSocialNetwork(it) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        socialNetworksView.hide()
+        binding.socialNetworksView.hide()
     }
 
     override fun onBindPresentationModel(pm: RegistrationSocialPm) {
         super.onBindPresentationModel(pm)
-        pm.authTitleState.bindTo(authTitleView.text())
+        pm.authTitleState.bindTo(binding.authTitleView.text())
     }
 
     companion object {

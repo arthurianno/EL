@@ -21,12 +21,18 @@ internal object CursorFactory {
      * @param selectionString custom WHERE string
      * @return instance of [Cursor]
      */
-    fun getCursor(contentResolver: ContentResolver, clazz: Class<*>, selectionString: String?): Cursor {
-        return contentResolver.query(clazzToUri(clazz),
-                ProjectionFactory.getProjectionForClazz(clazz),
-                selectionString,
-                null,
-                null)
+    fun getCursor(
+        contentResolver: ContentResolver,
+        clazz: Class<*>,
+        selectionString: String?
+    ): Cursor? {
+        return contentResolver.query(
+            clazzToUri(clazz),
+            ProjectionFactory.getProjectionForClazz(clazz),
+            selectionString,
+            null,
+            null
+        )
     }
 
     /**
@@ -36,12 +42,14 @@ internal object CursorFactory {
      * @param uri uri to fetch data from [ContentResolver]
      * @return instance of [Cursor]
      */
-    fun getCursor(contentResolver: ContentResolver, clazz: Class<*>, uri: Uri): Cursor {
-        return contentResolver.query(uri,
-                ProjectionFactory.getProjectionForClazz(clazz),
-                null,
-                null,
-                null)
+    fun getCursor(contentResolver: ContentResolver, clazz: Class<*>, uri: Uri): Cursor? {
+        return contentResolver.query(
+            uri,
+            ProjectionFactory.getProjectionForClazz(clazz),
+            null,
+            null,
+            null
+        )
     }
 
     /**

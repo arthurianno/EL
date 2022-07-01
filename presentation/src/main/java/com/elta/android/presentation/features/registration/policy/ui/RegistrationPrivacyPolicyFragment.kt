@@ -7,17 +7,20 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
+import com.elta.android.presentation.databinding.FragmentRegistrationPrivacyPolicyBinding
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.fragment_registration_privacy_policy.*
-import kotlinx.android.synthetic.main.layout_bottom_sheet_toolbar.*
 
-class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPrivacyPolicyPm>() {
+class RegistrationPrivacyPolicyFragment :
+    BaseBottomSheetFragment<RegistrationPrivacyPolicyPm, FragmentRegistrationPrivacyPolicyBinding>(
+        FragmentRegistrationPrivacyPolicyBinding::inflate
+    ) {
 
     override val screenLayout: Int = R.layout.fragment_registration_privacy_policy
-    override val classToken: Class<RegistrationPrivacyPolicyPm> = RegistrationPrivacyPolicyPm::class.java
+    override val classToken: Class<RegistrationPrivacyPolicyPm> =
+        RegistrationPrivacyPolicyPm::class.java
 
     private var url: String? = null
 
@@ -28,33 +31,33 @@ class RegistrationPrivacyPolicyFragment : BaseBottomSheetFragment<RegistrationPr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        privacyContentScrollView.viewTreeObserver.addOnScrollChangedListener {
-            toolbarView.z = when (privacyContentScrollView.scrollY) {
+        binding.privacyContentScrollView.viewTreeObserver.addOnScrollChangedListener {
+            binding.toolbar.toolbarView.z = when (binding.privacyContentScrollView.scrollY) {
                 0 -> ZERO_Z_INDEX
                 else -> DEFAULT_Z_INDEX
             }
         }
 
-        webView.webViewClient = object : WebViewClient() {
+        binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                progressView.show()
+                binding.progressView.show()
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
-                progressView.hide()
+                binding.progressView.hide()
             }
         }
 
-        with(webView.settings) {
+        with(binding.webView.settings) {
             builtInZoomControls = false
             displayZoomControls = false
         }
 
-        url?.let { webView.loadUrl(it) }
+        url?.let { binding.webView.loadUrl(it) }
     }
 
     override fun onBindPresentationModel(pm: RegistrationPrivacyPolicyPm) {
-        homeButtonView.clicks().bindTo { dialog.dismiss() }
+        binding.toolbar.homeButtonView.clicks().subscribe { dialog?.dismiss() }
     }
 
     companion object {

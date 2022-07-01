@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.getDisplaySize
@@ -44,13 +44,28 @@ class GlucoseRangesOverlayView @JvmOverloads constructor(
 
     fun applyParentRanges(highRect: Rect, normalRect: Rect, lowRect: Rect) {
         highRangeStartRect.set(0, highRect.top, rangeBarWidth, highRect.bottom)
-        highRangeEndRect.set(fullViewWidth - rangeBarWidth, highRect.top, fullViewWidth, highRect.bottom)
+        highRangeEndRect.set(
+            fullViewWidth - rangeBarWidth,
+            highRect.top,
+            fullViewWidth,
+            highRect.bottom
+        )
 
         normalRangeStartRect.set(0, normalRect.top, rangeBarWidth, normalRect.bottom)
-        normalRangeEndRect.set(fullViewWidth - rangeBarWidth, normalRect.top, fullViewWidth, normalRect.bottom)
+        normalRangeEndRect.set(
+            fullViewWidth - rangeBarWidth,
+            normalRect.top,
+            fullViewWidth,
+            normalRect.bottom
+        )
 
         lowRangeStartRect.set(0, lowRect.top, rangeBarWidth, lowRect.bottom)
-        lowRangeEndRect.set(fullViewWidth - rangeBarWidth, lowRect.top, fullViewWidth, lowRect.bottom)
+        lowRangeEndRect.set(
+            fullViewWidth - rangeBarWidth,
+            lowRect.top,
+            fullViewWidth,
+            lowRect.bottom
+        )
         invalidate()
     }
 

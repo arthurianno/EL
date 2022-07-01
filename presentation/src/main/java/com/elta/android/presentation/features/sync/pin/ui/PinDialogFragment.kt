@@ -6,13 +6,17 @@ import android.view.WindowManager
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
 import com.elta.android.presentation.core.ui.keyboardanimator.simple.SimpleKeyboardAnimator
+import com.elta.android.presentation.databinding.FragmentEnterPinDialogBinding
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
-import kotlinx.android.synthetic.main.fragment_enter_pin_dialog.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
-class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
+class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm, FragmentEnterPinDialogBinding>(
+    FragmentEnterPinDialogBinding::inflate
+) {
 
     override val screenLayout: Int = R.layout.fragment_enter_pin_dialog
     override val classToken: Class<PinDialogPm> = PinDialogPm::class.java
@@ -32,12 +36,12 @@ class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm>() {
     }
 
     override fun onBindPresentationModel(pm: PinDialogPm) {
-        dialogCloseButtonView.clicks().bindTo { dialog.dismiss() }
-        dialogActionButtonView.clicks().bindTo(pm.mainAction)
-        pm.actionButtonEnabledState.bindTo(dialogActionButtonView::setEnabled)
-        pm.closeDialogCommand.bindTo { dialog.dismiss() }
-        pm.pinInputControl.bindTo(pinCodeInputView)
-        pm.deviceNameState.bindTo(deviceNameView.text())
+        binding.dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
+        binding.dialogActionButtonView.clicks().bindTo(pm.mainAction)
+        pm.actionButtonEnabledState.bindTo(binding.dialogActionButtonView::setEnabled)
+        pm.closeDialogCommand.bindTo { dialog?.dismiss() }
+        pm.pinInputControl.bindTo(binding.pinCodeInputView)
+        pm.deviceNameState.bindTo(binding.deviceNameView.text())
     }
 
     companion object {

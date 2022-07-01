@@ -2,8 +2,8 @@ package com.nullgr.core.security.fingerprint
 
 import android.content.Context
 import android.os.Handler
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
-import android.support.v4.os.CancellationSignal
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
+import androidx.core.os.CancellationSignal
 import com.nullgr.core.security.fingerprint.utils.isKeyguardSecure
 
 /**
@@ -60,36 +60,37 @@ open class FingerprintAuthenticationManager protected constructor(
     private var selfCancelled: Boolean = false
     private val handler by lazy { Handler() }
     private val resetAfterErrorRunnable = Runnable { view.onResetFingerprintUiStateAfterError() }
-    private val authenticationCallback = object : FingerprintManagerCompat.AuthenticationCallback() {
+    private val authenticationCallback =
+        object : FingerprintManagerCompat.AuthenticationCallback() {
 
-        override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
-            if (selfCancelled) return
-            view.onShowAuthenticationError(errMsgId, errString?.toString())
-            handler.removeCallbacks(resetAfterErrorRunnable)
-            handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
-        }
+            override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
+                if (selfCancelled) return
+                view.onShowAuthenticationError(errMsgId, errString?.toString())
+                handler.removeCallbacks(resetAfterErrorRunnable)
+                handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
+            }
 
-        override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
-            view.onShowAuthenticationSuccess()
-            handler.postDelayed({
-                resultListener.onSuccess(result?.cryptoObject)
-            }, successMessageDelay)
-        }
+            override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
+                view.onShowAuthenticationSuccess()
+                handler.postDelayed({
+                    resultListener.onSuccess(result?.cryptoObject)
+                }, successMessageDelay)
+            }
 
-        override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence) {
-            if (selfCancelled) return
-            view.onShowAuthenticationHelp(helpMsgId, helpString.toString())
-            handler.removeCallbacks(resetAfterErrorRunnable)
-            handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
-        }
+            override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence) {
+                if (selfCancelled) return
+                view.onShowAuthenticationHelp(helpMsgId, helpString.toString())
+                handler.removeCallbacks(resetAfterErrorRunnable)
+                handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
+            }
 
-        override fun onAuthenticationFailed() {
-            if (selfCancelled) return
-            view.onShowAuthenticationError()
-            handler.removeCallbacks(resetAfterErrorRunnable)
-            handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
+            override fun onAuthenticationFailed() {
+                if (selfCancelled) return
+                view.onShowAuthenticationError()
+                handler.removeCallbacks(resetAfterErrorRunnable)
+                handler.postDelayed(resetAfterErrorRunnable, resetAfterErrorDelay)
+            }
         }
-    }
 
     /**
      * Check current status of fingerprint hardware.
@@ -113,7 +114,13 @@ open class FingerprintAuthenticationManager protected constructor(
         }
         cancellationSignal = CancellationSignal()
         selfCancelled = false
-        fingerprintManagerCompat.authenticate(cryptoObject, 0, cancellationSignal, authenticationCallback, null)
+        fingerprintManagerCompat.authenticate(
+            cryptoObject,
+            0,
+            cancellationSignal,
+            authenticationCallback,
+            null
+        )
         view.onShowFingerprintListening()
     }
 
@@ -129,7 +136,8 @@ open class FingerprintAuthenticationManager protected constructor(
     }
 
     class Builder(private val context: Context) {
-        private val fingerprintManagerCompat: FingerprintManagerCompat = FingerprintManagerCompat.from(context)
+        private val fingerprintManagerCompat: FingerprintManagerCompat =
+            FingerprintManagerCompat.from(context)
         private var view: FingerprintView? = null
         private var resultListener: FingerprintResultListener? = null
         private var successMessageDelay: Long? = null

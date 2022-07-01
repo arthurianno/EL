@@ -2,7 +2,7 @@
 
 package com.elta.android.presentation.utils
 
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import io.reactivex.functions.Consumer
@@ -20,13 +20,14 @@ inline fun MaterialDialog.shows(): Consumer<Unit> = Consumer {
     show()
 }
 
-inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer<in Boolean> = Consumer {
-    val fragment = fragmentManager.findFragmentByTag(PROGRESS_TAG)
-    if (fragment != null && !it) {
-        (fragment as ProgressDialog).dismissAllowingStateLoss()
-        fragmentManager.executePendingTransactions()
-    } else if (fragment == null && it) {
-        show(fragmentManager, PROGRESS_TAG)
-        fragmentManager.executePendingTransactions()
+inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer<in Boolean> =
+    Consumer {
+        val fragment = fragmentManager.findFragmentByTag(PROGRESS_TAG)
+        if (fragment != null && !it) {
+            (fragment as ProgressDialog).dismissAllowingStateLoss()
+            Runnable { fragmentManager.executePendingTransactions() }
+        } else if (fragment == null && it) {
+            show(fragmentManager, PROGRESS_TAG)
+            Runnable { fragmentManager.executePendingTransactions() }
+        }
     }
-}

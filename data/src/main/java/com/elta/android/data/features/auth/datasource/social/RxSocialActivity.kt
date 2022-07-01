@@ -19,7 +19,7 @@ class RxSocialActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val network = intent.extras[EXTRA_SOCIAL] as SocialNetworkType
+        val network = intent.extras?.get(EXTRA_SOCIAL) as SocialNetworkType
         delegate = network.getDelegate(this)
         delegate.onCreate(savedInstanceState)
     }

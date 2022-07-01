@@ -7,6 +7,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentUpdateFirmwareBinding
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
@@ -14,10 +15,10 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.toggleView
 import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.android.synthetic.main.fragment_update_firmware.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
-class FirmwareFragment : BaseFragment<FirmwarePm>() {
+class FirmwareFragment :
+    BaseFragment<FirmwarePm, FragmentUpdateFirmwareBinding>(FragmentUpdateFirmwareBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_update_firmware
     override val classToken: Class<FirmwarePm> = FirmwarePm::class.java
@@ -33,20 +34,20 @@ class FirmwareFragment : BaseFragment<FirmwarePm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+        binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 
     override fun onBindPresentationModel(pm: FirmwarePm) {
         super.onBindPresentationModel(pm)
-        actionButtonView.clicks().bindTo(pm.buttonAction)
-        pm.updateState.bindTo {
-            with(it) {
-                updateIconView.setImageResource(icon)
-                updateTitleView.text = title
-                updateDescriptionView.text = description
-                updateHintView.toggleView(hint != null)
-                actionButtonView.text = button
-                actionButtonView.toggleView(button != null)
+        binding.actionButtonView.clicks().bindTo(pm.buttonAction)
+        pm.updateState.bindTo { updateState ->
+            with(binding) {
+                updateIconView.setImageResource(updateState.icon)
+                updateTitleView.text = updateState.title
+                updateDescriptionView.text = updateState.description
+                updateHintView.toggleView(updateState.hint != null)
+                actionButtonView.text = updateState.button
+                actionButtonView.toggleView(updateState.button != null)
             }
         }
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)

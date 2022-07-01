@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.profile.settings.dialogs.diabetes
 
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.presentation.R
@@ -11,16 +12,25 @@ import com.elta.android.presentation.utils.toStringRes
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.toggleVisibilityState
-import kotlinx.android.synthetic.main.fragment_base_settings_dialog.*
-import kotlinx.android.synthetic.main.layout_settings_dialog_diabetes.*
+import me.dmdev.rxpm.bindTo
 
 class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSettingDialogPm>() {
 
     override val contentLayout = R.layout.layout_settings_dialog_diabetes
     override val dialogType = DialogType.DIABETES
     override val classToken: Class<DiabetesSettingDialogPm> = DiabetesSettingDialogPm::class.java
-
     private val diabetesViews = arrayListOf<TextView>()
+
+    private val firstColumnContainerView by lazy {
+        binding.dialogContentContainerView.findViewById<LinearLayout>(
+            R.id.firstColumnContainerView
+        )
+    }
+    private val secondColumnContainerView by lazy {
+        binding.dialogContentContainerView.findViewById<LinearLayout>(
+            R.id.secondColumnContainerView
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,11 +57,13 @@ class DiabetesSettingDialogFragment : BaseSettingsDialogFragment<DiabetesSetting
             }
         }
         diabetesViews.forEach { view ->
-            view.clicks().bindTo { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
+            view.clicks()
+                .subscribe { pm.diabetesTypeSelectedAction.consumer.accept(view.tag as Diabetes) }
         }
         pm.progressState.bindTo {
-            progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
-            diabetesContentView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
+            binding.progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.diabetesContentView)
+                .toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
     }
 

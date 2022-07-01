@@ -4,9 +4,9 @@ package com.elta.android.presentation.core.ui.keyboardanimator.customizable
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.view.View
 import android.view.Window
+import androidx.annotation.RequiresApi
 import com.elta.android.presentation.core.ui.keyboardanimator.BaseKeyboardAnimator
 
 /**

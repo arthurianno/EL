@@ -17,15 +17,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -61,8 +55,6 @@ dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
     implementation project(':core-rx')
     implementation project(':core-security')
     implementation project(':core-hardware')
@@ -73,11 +65,6 @@ dependencies {
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-
-//    implementation commonDependencies.appCoreRx
-//    implementation commonDependencies.appCoreSecurity
-//    implementation commonDependencies.appCoreHardware
-//    implementation commonDependencies.appCoreIntents
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxNetwork
@@ -112,6 +99,8 @@ dependencies {
     implementation commonDependencies.nordicDfu
     implementation commonDependencies.rxBluetooth
     implementation commonDependencies.rxReplaying
+
+    implementation 'org.greenrobot:essentials:3.1.0'
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

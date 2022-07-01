@@ -7,14 +7,16 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentEditObserverBinding
 import com.elta.android.presentation.features.observers.edit.pm.EditObserverPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.applyLengthFilter
-import kotlinx.android.synthetic.main.fragment_edit_observer.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
-class EditObserverFragment : BaseFragment<EditObserverPm>() {
+class EditObserverFragment :
+    BaseFragment<EditObserverPm, FragmentEditObserverBinding>(FragmentEditObserverBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_edit_observer
     override val classToken: Class<EditObserverPm> = EditObserverPm::class.java
@@ -29,17 +31,18 @@ class EditObserverFragment : BaseFragment<EditObserverPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuButtonView.text = getString(R.string.profile_observer_edit_delete_button)
-        nameInputView.applyLengthFilter(MAX_NAME_LENGTH)
+        binding.toolbar.menuButtonView.text =
+            getString(R.string.profile_observer_edit_delete_button)
+        binding.nameInputView.applyLengthFilter(MAX_NAME_LENGTH)
     }
 
     override fun onBindPresentationModel(pm: EditObserverPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
-        menuButtonView.clicks().bindTo(pm.deleteObserverAction)
-        saveButtonView.clicks().bindTo(pm.saveObserverAction)
-        pm.saveButtonEnabledState.bindTo { saveButtonView.isEnabled = it }
-        pm.observerNameInput.bindTo(nameInputView)
+        binding.toolbar.menuButtonView.clicks().bindTo(pm.deleteObserverAction)
+        binding.saveButtonView.clicks().bindTo(pm.saveObserverAction)
+        pm.saveButtonEnabledState.bindTo { binding.saveButtonView.isEnabled = it }
+        pm.observerNameInput.bindTo(binding.nameInputView)
         pm.deleteObserverDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 

@@ -39,8 +39,10 @@ class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
             }
 
             override fun onError(error: String?) {
-                Odnoklassniki.getInstance().requestAuthorization(activity, activity.getString(R.string.OK_REDIRECT_URL),
-                    OkAuthType.ANY, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN)
+                Odnoklassniki.getInstance().requestAuthorization(
+                    activity, activity.getString(R.string.OK_REDIRECT_URL),
+                    OkAuthType.ANY, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN
+                )
             }
         })
     }

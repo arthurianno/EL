@@ -1,8 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.items.ListItem
 
 /**
@@ -21,22 +20,28 @@ open class DynamicAdapter constructor(
     constructor(factory: AdapterDelegatesFactory, calculator: DiffCalculator? = null) :
         this(HashCodeBasedAdapterDelegatesManager(factory), calculator)
 
-    var items = arrayListOf<ListItem>()
+    private val _items = mutableListOf<ListItem>()
+    val items: List<ListItem>
+        get() = _items
 
     override fun getItemViewType(position: Int): Int {
-        return manager.getItemViewType(items, position)
+        return manager.getItemViewType(_items, position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         manager.onCreateViewHolder(parent, viewType)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        manager.onBindViewHolder(items, position, holder)
+        manager.onBindViewHolder(_items, position, holder)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
-        if (payloads.isEmpty()) manager.onBindViewHolder(items, position, holder)
-        else manager.onBindViewHolder(items, position, holder, payloads)
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
+        if (payloads.isEmpty()) manager.onBindViewHolder(_items, position, holder)
+        else manager.onBindViewHolder(_items, position, holder, payloads)
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
@@ -51,9 +56,9 @@ open class DynamicAdapter constructor(
         manager.onViewRecycled(holder)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = _items.size
 
-    fun getItemPosition(listItem: ListItem): Int = items.indexOf(listItem)
+    fun getItemPosition(listItem: ListItem): Int = _items.indexOf(listItem)
 
     /**
      * Updates items of adapter.
@@ -62,9 +67,18 @@ open class DynamicAdapter constructor(
      * @param enableDiffUtils True if you want use [DiffUtil] to calculate DiffResult, false otherwise.
      * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
      */
-    fun updateData(newItems: List<ListItem>, enableDiffUtils: Boolean = true, detectMoves: Boolean = true) {
+    fun updateData(
+        newItems: List<ListItem>,
+        enableDiffUtils: Boolean = true,
+        detectMoves: Boolean = true
+    ) {
         when (enableDiffUtils) {
-            true -> diffCalculator?.calculateDiff(this, ArrayList(items), ArrayList(newItems), detectMoves)
+            true -> diffCalculator?.calculateDiff(
+                this,
+                _items,
+                newItems,
+                detectMoves
+            )
             else -> {
                 setData(newItems)
                 notifyDataSetChanged()
@@ -73,14 +87,14 @@ open class DynamicAdapter constructor(
     }
 
     fun setData(newItems: List<ListItem>) {
-        this.items.clear()
-        this.items.addAll(newItems)
-        manager.setDelegates(this.items)
+        this._items.clear()
+        this._items.addAll(newItems)
+        manager.setDelegates(this._items)
     }
 
     fun getItem(position: Int): ListItem? {
         return when {
-            !items.isEmpty() && position >= 0 -> items[position]
+            _items.isNotEmpty() && position >= 0 -> _items[position]
             else -> null
         }
     }

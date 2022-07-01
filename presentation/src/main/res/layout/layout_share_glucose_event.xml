@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="360dp"
     android:layout_height="360dp"
     tools:background="@drawable/bg_gradient_red">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dateView"
         style="@style/New.Caption1.White"
         android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="@+id/logoView"
         tools:text="2.03 в 13:12" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/bubbleView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logoView" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/valueView"
         style="@style/New.Headline2.BlackBlue"
         android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
         app:layout_constraintTop_toTopOf="@+id/bubbleView"
         tools:text="2,4" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/measurementValueView"
         style="@style/New.Title1.BlackBlue"
         android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
         app:layout_constraintStart_toStartOf="@+id/bubbleView"
         app:layout_constraintTop_toBottomOf="@+id/valueView" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/emojiView"
         android:layout_width="54dp"
         android:layout_height="46dp"
@@ -72,4 +72,4 @@
         app:layout_constraintTop_toBottomOf="@+id/bubbleView"
         tools:src="@drawable/ic_emj_boom" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,6 +40,8 @@ import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
@@ -57,34 +59,34 @@ class GlucoseEventPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val glucoseValueState = State<String>()
-    val glucoseInfoState = State<String>()
-    val glucoseLevelBackgroundState = State<Int>()
+    val glucoseValueState = state<String>()
+    val glucoseInfoState = state<String>()
+    val glucoseLevelBackgroundState = state<Int>()
 
     val tagSelector = formSelectorControl()
     val dateSelector = formSelectorControl(false)
     val timeSelector = formSelectorControl(false)
     val noteInput = inputControl()
 
-    val mainActionTitleState = State<String>()
-    val mainActionVisibilityState = State(false)
-    val mainAction = Action<Unit>()
+    val mainActionTitleState = state<String>()
+    val mainActionVisibilityState = state(false)
+    val mainAction = action<Unit>()
 
-    val backHandleAction = Action<Unit>()
-    val exitDialogAction = Action<Unit>()
-    val shareAction = Action<Unit>()
+    val backHandleAction = action<Unit>()
+    val exitDialogAction = action<Unit>()
+    val shareAction = action<Unit>()
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
-    private val selectedDateState = State<ZonedDateTime>()
-    private val eventIdState = State<String>()
-    private val glucoseLevelSettingsState = State<GlucoseLevelSettings>()
-    private val eventState = State<Event>()
+    private val selectedDateState = state<ZonedDateTime>()
+    private val eventIdState = state<String>()
+    private val glucoseLevelSettingsState = state<GlucoseLevelSettings>()
+    private val eventState = state<Event>()
 
-    private val eventFormHolderState = State(GlucoseFormModel())
+    private val eventFormHolderState = state(GlucoseFormModel())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
-    private val loadScreenAction = Action<Unit>()
+    private val loadScreenAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -155,7 +157,10 @@ class GlucoseEventPm @Inject constructor(
     private fun bindEvent(event: Event) {
         glucoseValueState.consumer.accept(NumberFormatter.format(event.getValue()))
         glucoseInfoState.consumer.accept(
-            resources.getString(R.string.event_form_glucose_info_mask_title, event.getFormattedTemperature())
+            resources.getString(
+                R.string.event_form_glucose_info_mask_title,
+                event.getFormattedTemperature()
+            )
         )
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
         selectedDateState.consumer.accept(event.additionTime)
@@ -171,8 +176,10 @@ class GlucoseEventPm @Inject constructor(
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(ChooserType.GROUP_TAGS, EventType.GLUCOSE,
-                    (tagSelector.option.value.meta as? Tag)?.id)
+                ChooserConfiguration(
+                    ChooserType.GROUP_TAGS, EventType.GLUCOSE,
+                    (tagSelector.option.value.meta as? Tag)?.id
+                )
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
@@ -233,7 +240,10 @@ class GlucoseEventPm @Inject constructor(
                     .bindProgress()
                     .trackEvent(AnalyticsEventType.SHARE_GLUCOSE)
                     .map { uri ->
-                        Screens.ShareEventScreen(uri, resources.getString(R.string.event_share_dialog_title))
+                        Screens.ShareEventScreen(
+                            uri,
+                            resources.getString(R.string.event_share_dialog_title)
+                        )
                     }
                     .doOnSuccess(router::navigateTo)
             }
@@ -290,7 +300,10 @@ class GlucoseEventPm @Inject constructor(
         SaveEventBitmapUseCase.Params(
             event = eventState.value,
             glucoseLevelSettings = glucoseLevelSettingsState.value,
-            bitmap = shareImageBuilder.createBitmap(eventState.value, glucoseLevelSettingsState.value)
+            bitmap = shareImageBuilder.createBitmap(
+                eventState.value,
+                glucoseLevelSettingsState.value
+            )
         )
 
     private fun Event.isGlucoseEventChanged(

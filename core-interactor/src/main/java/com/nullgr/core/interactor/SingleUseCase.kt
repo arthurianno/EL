@@ -10,7 +10,8 @@ import io.reactivex.Single
  * @author vchernyshov
  */
 abstract class SingleUseCase<T, in Params> protected constructor(
-        private val schedulersFacade: SchedulersFacade) {
+    private val schedulersFacade: SchedulersFacade
+) {
 
     /**
      * Builds a [Single] which will be used when the current [SingleUseCase] is executed.

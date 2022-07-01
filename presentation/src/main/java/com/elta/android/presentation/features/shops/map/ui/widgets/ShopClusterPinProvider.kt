@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.shops.map.ui.widgets
 
 import android.content.Context
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.a65apps.clustering.core.Cluster
 import com.a65apps.clustering.yandex.view.ClusterPinProvider
 import com.a65apps.clustering.yandex.view.YandexPinProvider

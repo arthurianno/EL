@@ -2,7 +2,7 @@ package com.elta.android.data.features.reports.datasource
 
 import android.content.Context
 import android.net.Uri
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 import okhttp3.ResponseBody
 import org.greenrobot.essentials.io.IoUtils
 import java.io.File

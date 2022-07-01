@@ -4,13 +4,14 @@ import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobi
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.delegates.HemoglobinHeaderDelegate
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.items.HemoglobinHeaderItem
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.items.HemoglobinItem
+import com.nullgr.core.adapter.AdapterDelegate
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.items.ListItem
-import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
-class HemoglobinEventsDelegatesFactory @Inject constructor(val bus: RxBus) : AdapterDelegatesFactory {
+class HemoglobinEventsDelegatesFactory @Inject constructor(val bus: RxBus) :
+    AdapterDelegatesFactory {
 
     override fun createDelegate(clazz: Class<ListItem>): AdapterDelegate =
         when (clazz) {

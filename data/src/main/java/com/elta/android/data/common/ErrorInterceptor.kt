@@ -23,7 +23,7 @@ class ErrorInterceptor @Inject constructor(
     private val context: Context
 ) : Interceptor {
 
-    override fun intercept(chain: Interceptor.Chain): Response? {
+    override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val response = chain.proceed(request)
 

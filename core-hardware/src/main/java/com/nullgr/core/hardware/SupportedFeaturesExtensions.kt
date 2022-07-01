@@ -71,4 +71,3 @@ fun Context?.isLocationEnabled(): Boolean {
 
     return gpsEnabled || networkEnabled
 }
-

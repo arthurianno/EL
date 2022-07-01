@@ -1,22 +1,22 @@
 package com.elta.android.presentation.features.shops.map.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.bindCardCorners
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemSearchResultBinding
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
-import kotlinx.android.synthetic.main.item_search_result.*
 
 class SearchResultDelegate(
     private val bus: RxBus
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemSearchResultBinding>(ItemSearchResultBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_search_result
     override val itemType: Any = SearchResultItem::class
@@ -33,17 +33,25 @@ class SearchResultDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         bindCardCorners(items, position, holder)
         val item = items[position] as SearchResultItem
-
-        with(holder as ViewHolder) {
+        with(binding) {
             nameView.text = item.name
             addressView.text = item.address
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         when (payload) {
             SearchResultItem.Payload.CARD_TYPE_CHANGED -> bindCardCorners(items, position, holder)
         }

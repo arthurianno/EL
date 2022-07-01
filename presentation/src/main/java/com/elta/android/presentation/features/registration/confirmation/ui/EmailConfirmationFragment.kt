@@ -6,14 +6,17 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentEmailConfirmationBinding
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
-import kotlinx.android.synthetic.main.fragment_email_confirmation.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
-class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
+class EmailConfirmationFragment :
+    BaseFragment<EmailConfirmationPm, FragmentEmailConfirmationBinding>(
+        FragmentEmailConfirmationBinding::inflate
+    ) {
 
     override val screenLayout: Int = R.layout.fragment_email_confirmation
     override val classToken: Class<EmailConfirmationPm> = EmailConfirmationPm::class.java
@@ -28,15 +31,16 @@ class EmailConfirmationFragment : BaseFragment<EmailConfirmationPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuButtonView.text = getString(R.string.registration_email_confirmation_login_button)
+        binding.toolbar.menuButtonView.text =
+            getString(R.string.registration_email_confirmation_login_button)
     }
 
     override fun onBindPresentationModel(pm: EmailConfirmationPm) {
         super.onBindPresentationModel(pm)
-        menuButtonView.clicks().bindTo(pm.loginWithAnotherAccountAction)
-        confirmationSuccessStateView.clicks().bindTo(pm.continueAction)
-        pm.contentVisibilityCommand.bindTo(confirmationNextActionView.visibility())
-        errorStateView.clicks().bindTo(pm.confirmEmailAction)
+        binding.toolbar.menuButtonView.clicks().bindTo(pm.loginWithAnotherAccountAction)
+        binding.confirmationSuccessStateView.clicks().bindTo(pm.continueAction)
+        pm.contentVisibilityCommand.bindTo(binding.confirmationNextActionView.visibility())
+        binding.errorStateView.clicks().bindTo(pm.confirmEmailAction)
         bindProgressDialog(pm)
     }
 

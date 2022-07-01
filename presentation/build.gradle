@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
@@ -21,15 +21,9 @@ android {
         versionName rootProject.ext.applicationVersionName
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -43,6 +37,9 @@ android {
         unitTests.all {
             jvmArgs '-noverify'
         }
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 
@@ -62,15 +59,9 @@ configurations {
     }
 }
 
-androidExtensions {
-    experimental = true
-}
-
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
-
-    ktlint commonDependencies.ktlint
 
     implementation project(':core-all')
     implementation project(':core-resources')
@@ -88,23 +79,15 @@ dependencies {
     implementation project(':common')
     api project(':domain')
 
+    implementation commonDependencies.coroutines
+    implementation commonDependencies.androidxFragmentKtx
+
     implementation commonDependencies.libs
-//    implementation commonDependencies.appCore
-//    implementation commonDependencies.appCoreAdapterKtx
+
+    implementation commonDependencies.materialDesign
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-    implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
 
     implementation commonDependencies.rxKotlin
@@ -142,8 +125,9 @@ dependencies {
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseAnalytics
     implementation commonDependencies.firebaseInAppMessaging
     implementation commonDependencies.firebaseDynamicLinks
     implementation commonDependencies.location

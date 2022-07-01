@@ -1,7 +1,7 @@
 package com.nullgr.core.ui.animation
 
 import android.animation.Animator
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 
 // Copied from https://github.com/android/android-ktx
 /**
@@ -56,10 +56,10 @@ fun Animator.doOnPause(action: (animator: Animator) -> Unit) = addPauseListener(
  * Add a listener to this Animator using the provided actions.
  */
 fun Animator.addListener(
-        onEnd: ((animator: Animator) -> Unit)? = null,
-        onStart: ((animator: Animator) -> Unit)? = null,
-        onCancel: ((animator: Animator) -> Unit)? = null,
-        onRepeat: ((animator: Animator) -> Unit)? = null
+    onEnd: ((animator: Animator) -> Unit)? = null,
+    onStart: ((animator: Animator) -> Unit)? = null,
+    onCancel: ((animator: Animator) -> Unit)? = null,
+    onRepeat: ((animator: Animator) -> Unit)? = null
 ): Animator.AnimatorListener {
     val listener = object : Animator.AnimatorListener {
         override fun onAnimationRepeat(animator: Animator) {
@@ -87,8 +87,8 @@ fun Animator.addListener(
  */
 @RequiresApi(19)
 fun Animator.addPauseListener(
-        onResume: ((animator: Animator) -> Unit)? = null,
-        onPause: ((animator: Animator) -> Unit)? = null
+    onResume: ((animator: Animator) -> Unit)? = null,
+    onPause: ((animator: Animator) -> Unit)? = null
 ): Animator.AnimatorPauseListener {
     val listener = object : Animator.AnimatorPauseListener {
         override fun onAnimationPause(animator: Animator) {

@@ -3,34 +3,34 @@ package com.elta.android.presentation.features.main.events.glucose.share
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutShareGlucoseEventBinding
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.getBitmapFromView
-import kotlinx.android.synthetic.main.layout_share_glucose_event.view.*
 import javax.inject.Inject
 
 class ShareImageBuilder @Inject constructor(val context: Context) {
 
-    private val inflatedView by lazy {
-        LayoutInflater.from(context).inflate(R.layout.layout_share_glucose_event, null, false)
+    private val binding: LayoutShareGlucoseEventBinding by lazy {
+        LayoutShareGlucoseEventBinding.inflate(LayoutInflater.from(context))
     }
 
     fun createBitmap(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Bitmap {
-        with(inflatedView) {
+        with(binding) {
             val glucoseLevel = event.glucoseLevel(glucoseLevelSettings)
-            background = glucoseLevel.toBackground()
-            valueView?.text = NumberFormatter.format(event.value ?: 0.0)
-            emojiView?.setImageResource(glucoseLevel.toEmoji())
-            dateView?.text = event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
+            root.background = glucoseLevel.toBackground()
+            valueView.text = NumberFormatter.format(event.value ?: 0.0)
+            emojiView.setImageResource(glucoseLevel.toEmoji())
+            dateView.text = event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
         }
-        return inflatedView.getBitmapFromView(GLUCOSE_SHARE_EVENT_PICTURE_SIZE)
+        return binding.root.getBitmapFromView(GLUCOSE_SHARE_EVENT_PICTURE_SIZE)
     }
 
     private fun GlucoseLevel?.toBackground(): Drawable? =

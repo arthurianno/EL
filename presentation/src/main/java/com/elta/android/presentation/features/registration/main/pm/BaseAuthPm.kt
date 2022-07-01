@@ -8,6 +8,8 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 
 abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
@@ -15,12 +17,12 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     val emailInput = inputControl(hideErrorOnUserInput = false)
     val passwordInput = inputControl(hideErrorOnUserInput = false)
 
-    val isEmailValidState = State(false)
-    val isPasswordValidState = State(false)
+    val isEmailValidState = state(false)
+    val isPasswordValidState = state(false)
 
-    val continueEnabledState = State(false)
-    val continueAction = Action<Unit>()
-    val menuAction = Action<Unit>()
+    val continueEnabledState = state(false)
+    val continueAction = action<Unit>()
+    val menuAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -41,7 +43,12 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     override fun handleError(error: Throwable) {
         when (error is EmailAlreadyRegisteredError || error is IncorrectLoginOrPasswordError) {
             true -> {
-                setErrorStateData(States.SimpleError(icon = R.drawable.ic_warning, description = error.message))
+                setErrorStateData(
+                    States.SimpleError(
+                        icon = R.drawable.ic_warning,
+                        description = error.message
+                    )
+                )
                 setErrorViewVisibility(true)
             }
             else -> super.handleError(error)

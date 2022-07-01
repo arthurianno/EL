@@ -6,7 +6,6 @@ import com.nullgr.core.rx.contacts.domain.UserContact
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 /**
  * @author Grishko Nikita
@@ -35,24 +34,26 @@ class ExtensionFunctionsTest {
     @Test
     fun getEmptyEmailContactList_ObservableWithEmptyList_True() {
         emptyEmailContactsList
-                .subscribe { contactEmails ->
-                    Assert.assertTrue(contactEmails.isEmpty())
-                }
+            .subscribe { contactEmails ->
+                Assert.assertTrue(contactEmails.isEmpty())
+            }
     }
 
     @Test
     fun getEmptyPhoneContactsList_ObservableWithEmptyList_True() {
         emptyPhoneContactsList
-                .subscribe { contactPhones ->
-                    Assert.assertTrue(contactPhones.isEmpty())
-                }
+            .subscribe { contactPhones ->
+                Assert.assertTrue(contactPhones.isEmpty())
+            }
     }
 
     private fun newContact(index: Int): UserContact {
-        return UserContact(index.toLong(),
-                "Name$index",
-                "Key$index",
-                false, null, null,
-                false, null, null)
+        return UserContact(
+            index.toLong(),
+            "Name$index",
+            "Key$index",
+            false, null, null,
+            false, null, null
+        )
     }
 }

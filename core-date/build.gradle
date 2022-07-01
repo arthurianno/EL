@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -21,8 +20,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     buildTypes {
@@ -47,10 +46,6 @@ kapt {
     correctErrorTypes = true
 }
 
-androidExtensions {
-    experimental = true
-}
-
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
@@ -68,5 +63,3 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
-
-//apply from: rootProject.file('release-bintray.gradle')

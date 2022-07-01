@@ -1,6 +1,6 @@
 package com.elta.android.presentation.utils
 
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.presentation.R
 import com.nullgr.core.resources.ResourceProvider

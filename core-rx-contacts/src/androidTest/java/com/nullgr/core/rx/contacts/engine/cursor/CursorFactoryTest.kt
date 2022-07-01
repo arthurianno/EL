@@ -4,8 +4,8 @@ import android.Manifest
 import android.content.ContentResolver
 import android.provider.ContactsContract
 import android.support.test.InstrumentationRegistry
-import android.support.test.rule.GrantPermissionRule
 import android.support.test.runner.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.nullgr.core.rx.contacts.domain.ContactEmail
 import com.nullgr.core.rx.contacts.domain.ContactPhone
 import com.nullgr.core.rx.contacts.domain.UserContact
@@ -35,20 +35,24 @@ class CursorFactoryTest {
 
     @get:Rule
     val runtimePermissionRule = GrantPermissionRule.grant(
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.WRITE_CONTACTS)!!
+        Manifest.permission.READ_CONTACTS,
+        Manifest.permission.WRITE_CONTACTS
+    )!!
 
     @Test
     fun getCursor_UserContactAndNullSelection_NotNull() {
-        val cursor = CursorFactory.getCursor(contentResolver!!, UserContact::class.java, null as String?)
+        val cursor =
+            CursorFactory.getCursor(contentResolver!!, UserContact::class.java, null as String?)
         assertNotNull(cursor)
     }
 
     @Test
     fun getCursor_ContactEmailAndEmailUri_NotNull() {
-        val cursor = CursorFactory.getCursor(contentResolver!!,
-                ContactEmail::class.java,
-                ContactsContract.CommonDataKinds.Email.CONTENT_URI)
+        val cursor = CursorFactory.getCursor(
+            contentResolver!!,
+            ContactEmail::class.java,
+            ContactsContract.CommonDataKinds.Email.CONTENT_URI
+        )
         assertNotNull(cursor)
     }
 

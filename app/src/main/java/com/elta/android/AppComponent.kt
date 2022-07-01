@@ -27,34 +27,36 @@ import timber.log.Timber
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [
-    // common
-    AndroidSupportInjectionModule::class,
-    AppModule::class,
-    // data
-    ApiModule::class,
-    ApiConstantsModule::class,
-    NetworkModule::class,
-    TokenModule::class,
-    DataSourceModule::class,
-    MappersModule::class,
-    CacheModule::class,
-    StorageModule::class,
-    GlucometerModule::class,
-    LocalSyncModule::class,
-    // domain
-    RepoModule::class,
-    // presentation
-    PmModule::class,
-    ActivityBuilder::class,
-    FragmentBuilder::class,
-    NotificationModule::class,
-    ReceiverBuilder::class,
-    // navigation
-    NavigationModule::class,
-    // analytics
-    AnalyticsModule::class
-])
+@Component(
+    modules = [
+        // common
+        AndroidSupportInjectionModule::class,
+        AppModule::class,
+        // data
+        ApiModule::class,
+        ApiConstantsModule::class,
+        NetworkModule::class,
+        TokenModule::class,
+        DataSourceModule::class,
+        MappersModule::class,
+        CacheModule::class,
+        StorageModule::class,
+        GlucometerModule::class,
+        LocalSyncModule::class,
+        // domain
+        RepoModule::class,
+        // presentation
+        PmModule::class,
+        ActivityBuilder::class,
+        FragmentBuilder::class,
+        NotificationModule::class,
+        ReceiverBuilder::class,
+        // navigation
+        NavigationModule::class,
+        // analytics
+        AnalyticsModule::class
+    ]
+)
 interface AppComponent {
 
     @Component.Builder

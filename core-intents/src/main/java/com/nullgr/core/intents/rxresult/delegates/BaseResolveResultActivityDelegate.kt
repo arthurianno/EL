@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
+import com.nullgr.core.intents.rxresult.RxActivityResult
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
-import com.nullgr.core.intents.rxresult.RxActivityResult
 
 /**
  * @author Grishko Nikita

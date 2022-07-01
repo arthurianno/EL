@@ -5,13 +5,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
         android:paddingBottom="16dp">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/titleFieldView"
             style="@style/New.Body1"
             android:layout_width="0dp"
@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Последняя синхронизация:" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/descriptionFieldView"
             style="@style/New.Body1.ShadeBlack2"
             android:layout_width="0dp"
@@ -44,7 +44,7 @@
             tools:text="Сегодня в 12:03" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/dividerView"

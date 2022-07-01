@@ -89,7 +89,8 @@ class GlucometersManager @Inject constructor(
 
     fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
 
-    fun isSupportedByApplication(firmwareFile: FirmwareFile): Boolean = isSupported(firmwareFile.compatible)
+    fun isSupportedByApplication(firmwareFile: FirmwareFile): Boolean =
+        isSupported(firmwareFile.compatible)
 
     fun findDevices(): Observable<List<ScanResult>> =
         Observable.just(client.state)
@@ -348,19 +349,20 @@ class GlucometersManager @Inject constructor(
             }
         }
 
-    private inline fun String.isPinError(): Boolean = this == "pin.error"
-    private inline fun String.isPinCommand(): Boolean = startsWith("pin")
-    private inline fun String.isEmptyEvent(): Boolean = contains("rd000000000000000000")
-    private inline fun String.isOk(): Boolean = endsWith("ok")
-    private inline fun String.isError(): Boolean = contains("error")
-    private inline fun String.isEvent(): Boolean = startsWith("rd")
-    private inline fun isSupported(compatible: String): Boolean {
+    private fun String.isPinError(): Boolean = this == "pin.error"
+    private fun String.isPinCommand(): Boolean = startsWith("pin")
+    private fun String.isEmptyEvent(): Boolean = contains("rd000000000000000000")
+    private fun String.isOk(): Boolean = endsWith("ok")
+    private fun String.isError(): Boolean = contains("error")
+    private fun String.isEvent(): Boolean = startsWith("rd")
+    private fun isSupported(compatible: String): Boolean {
         val appVersionCode = FIRMWARE_VERSION.replace(".", "").toInt()
         val compatibleVersionCode = compatible.replace(".", "").toInt()
         return appVersionCode >= compatibleVersionCode
     }
 
-    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean = batteryLevel ?: 0 >= MIN_LEVEL
+    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
+        batteryLevel ?: 0 >= MIN_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
@@ -382,7 +384,8 @@ class GlucometersManager @Inject constructor(
                 val pin = pinStorage.getPin(address)
                 if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
 
-                val startCommands = mutableListOf(Commands.SetPin(pin), Commands.SetTime(ZonedDateTime.now()),
+                val startCommands = mutableListOf(
+                    Commands.SetPin(pin), Commands.SetTime(ZonedDateTime.now()),
                     Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
                 )
 

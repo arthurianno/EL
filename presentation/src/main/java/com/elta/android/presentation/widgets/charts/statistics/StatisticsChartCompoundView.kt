@@ -5,12 +5,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutStatisticsChartCompoundViewBinding
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.widgets.charts.statistics.listeners.OnStatisticsDateChangedListener
 import com.elta.android.presentation.widgets.charts.statistics.listeners.StatisticsDateChangedObserver
 import com.elta.android.presentation.widgets.charts.statistics.models.StatisticsChartDataModel
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.layout_statistics_chart_compound_view.view.*
 import org.threeten.bp.LocalDate
 
 @Suppress("MagicNumber")
@@ -20,15 +20,20 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binding: LayoutStatisticsChartCompoundViewBinding by lazy {
+        LayoutStatisticsChartCompoundViewBinding.bind(this)
+    }
+
     init {
-        LayoutInflater.from(context).inflate(R.layout.layout_statistics_chart_compound_view, this, true)
+        LayoutInflater.from(context)
+            .inflate(R.layout.layout_statistics_chart_compound_view, this, true)
     }
 
     fun setOnStatisticsDateChangedListener(listener: OnStatisticsDateChangedListener) {
-        chartView.setOnStatisticsDateChangedListener(listener)
+        binding.chartView.setOnStatisticsDateChangedListener(listener)
     }
 
-    fun dateChanged(): Observable<LocalDate> = StatisticsDateChangedObserver(chartView)
+    fun dateChanged(): Observable<LocalDate> = StatisticsDateChangedObserver(binding.chartView)
         .flatMap {
             when (it.date != null) {
                 true -> Observable.just(it.date)
@@ -38,18 +43,18 @@ class StatisticsChartCompoundView @JvmOverloads constructor(
 
     fun setChartModel(model: StatisticsChartDataModel) {
         bindValues(model.values)
-        chartView.chartDataModel = model
+        binding.chartView.chartDataModel = model
         scrollToEnd()
     }
 
-    private fun scrollToEnd() {
+    private fun scrollToEnd() = with(binding) {
         postDelayed({
             val scrollX = chartView.getScrollPosition()
             statisticsScrollView.scrollTo(scrollX.toInt(), 0)
         }, SCROLL_DELAY)
     }
 
-    private fun bindValues(values: List<Double>) {
+    private fun bindValues(values: List<Double>) = with(binding) {
         firstValueView.text = NumberFormatter.format(values[0])
         secondValueView.text = NumberFormatter.format(values[1])
         thirdValueView.text = NumberFormatter.format(values[2])

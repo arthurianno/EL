@@ -25,16 +25,16 @@
             android:paddingEnd="16dp"
             android:paddingBottom="8dp">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 style="@style/New.Headline4.BlackBlue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/diary_screen_title" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/todayButtonView"
-                style="@style/New.Body1.ShadeBlack2"
+                style="@style/New.Body1.BlackBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
@@ -51,13 +51,13 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/selectedMonthTitleView"
                 style="@style/New.Body1.BlackBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-        <com.elta.android.presentation.widgets.date_picker.HorizontalDatePickerView
+        <com.elta.android.presentation.widgets.datePicker.HorizontalDatePickerView
             android:id="@+id/datePickerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/itemsView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -4,12 +4,12 @@ package com.elta.android.presentation.core.ui.keyboardanimator.simple
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.transition.ChangeBounds
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.annotation.RequiresApi
 import com.elta.android.presentation.core.ui.keyboardanimator.BaseKeyboardAnimator
 
 /**

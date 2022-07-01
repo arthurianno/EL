@@ -1,22 +1,22 @@
 package com.elta.android.presentation.features.sync.connect.base.ui.adapter.delegates
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.withAdapterPosition
+import com.elta.android.presentation.databinding.ItemDeviceBinding
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import com.nullgr.core.adapter.ktx.ViewHolder
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView
-import kotlinx.android.synthetic.main.item_device.*
 
 class DeviceDelegate(
     private val bus: RxBus
-) : AdapterDelegate() {
+) : AdapterDelegate<ItemDeviceBinding>(ItemDeviceBinding::inflate) {
 
     override val layoutResource: Int = R.layout.item_device
     override val itemType: Any = DeviceItem::class
@@ -33,10 +33,14 @@ class DeviceDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val item = items[position] as DeviceItem
 
-        with(holder as ViewHolder) {
+        with(binding) {
             deviceNameView.text = item.name
             deviceAddressView.text = item.address
             deviceChooserView.toggleView(item.isSelected)
@@ -44,11 +48,16 @@ class DeviceDelegate(
         }
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, holder: RecyclerView.ViewHolder, payload: Any) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payload: Any
+    ) {
         super.onBindViewHolder(items, position, holder, payload)
         val item = items[position] as DeviceItem
 
-        with(holder as ViewHolder) {
+        with(binding) {
             when (payload) {
                 DeviceItem.Payload.SELECTION_CHANGED -> deviceChooserView.toggleView(item.isSelected)
                 DeviceItem.Payload.POSITION_CHANGED -> dividerView.toggleView(!item.isTheLast)

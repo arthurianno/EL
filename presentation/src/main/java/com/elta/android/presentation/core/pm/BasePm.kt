@@ -19,7 +19,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.state
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -30,17 +33,17 @@ abstract class BasePm(
 
     lateinit var router: FlowRouter
 
-    val progressState = State(false)
-    val progressDialogState = State(false)
+    val progressState = state(false)
+    val progressDialogState = state(false)
 
-    val hideKeyBoardCommand = Command<Unit>()
-    val showKeyBoardCommand = Command<Unit>()
-    val showSnackBarCommand = Command<SnackBarData>(bufferSize = 1)
+    val hideKeyBoardCommand = command<Unit>()
+    val showKeyBoardCommand = command<Unit>()
+    val showSnackBarCommand = command<SnackBarData>(bufferSize = 1)
 
-    val retryAction = Action<Unit>()
+    val retryAction = action<Unit>()
 
-    val networkStateAction = Action<Boolean>()
-    val networkStateCommand = Command<Boolean>(bufferSize = 1)
+    val networkStateAction = action<Boolean>()
+    val networkStateCommand = command<Boolean>(bufferSize = 1)
 
     val errorControl = stateControl()
     val emptyControl = stateControl()

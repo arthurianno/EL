@@ -6,7 +6,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentSender
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -57,12 +57,19 @@ class BluetoothControl2 {
 
 fun PresentationModel.bluetoothControl2(): BluetoothControl2 = BluetoothControl2()
 
-fun BluetoothControl2.bindTo(compositeUnbind: CompositeDisposable, permissions: RxPermissions, fragment: Fragment) {
+fun BluetoothControl2.bindTo(
+    compositeUnbind: CompositeDisposable,
+    permissions: RxPermissions,
+    fragment: Fragment
+) {
     bluetoothRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                .launchForResult(checkNotNull(fragment.activity), BluetoothControl2.REQUEST_CODE_ENABLE_BLUETOOTH)
+                .launchForResult(
+                    fragment.requireActivity(),
+                    BluetoothControl2.REQUEST_CODE_ENABLE_BLUETOOTH
+                )
         }
         .addTo(compositeUnbind)
     locationPermissionsRequestRelay
@@ -92,7 +99,7 @@ fun BluetoothControl2.resolveResults(requestCode: Int, resultCode: Int) {
 }
 
 fun enableLocation2(fragment: Fragment) {
-    val result = SettingsClient(checkNotNull(fragment.context))
+    val result = SettingsClient(fragment.requireContext())
         .checkLocationSettings(
             LocationSettingsRequest.Builder()
                 .addLocationRequest(LocationRequest.create())
@@ -107,7 +114,7 @@ fun enableLocation2(fragment: Fragment) {
                 LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
                     try {
                         (e as? ResolvableApiException)?.startResolutionForResult(
-                            checkNotNull(fragment.activity),
+                            fragment.requireActivity(),
                             BluetoothControl2.REQUEST_CODE_ENABLE_LOCATION
                         )
                     } catch (e1: IntentSender.SendIntentException) {

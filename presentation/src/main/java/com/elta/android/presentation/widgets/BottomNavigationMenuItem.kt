@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.elta.android.presentation.R
-import kotlinx.android.synthetic.main.view_bottom_navigation_menu_item.view.*
+import com.elta.android.presentation.databinding.ViewBottomNavigationMenuItemBinding
 
 class BottomNavigationMenuItem @JvmOverloads constructor(
     context: Context,
@@ -19,6 +19,9 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
     private var title: String? = null
     private var selectedColor: Int? = null
     private var normalColor: Int? = null
+    private val binding: ViewBottomNavigationMenuItemBinding by lazy {
+        ViewBottomNavigationMenuItemBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_bottom_navigation_menu_item, this, true)
@@ -28,30 +31,34 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
     }
 
     fun setItemSelected(isSelected: Boolean) {
-        bindColors(when (isSelected) {
-            true -> checkNotNull(selectedColor)
-            else -> checkNotNull(normalColor)
-        })
+        bindColors(
+            when (isSelected) {
+                true -> checkNotNull(selectedColor)
+                else -> checkNotNull(normalColor)
+            }
+        )
     }
 
     private fun readAttrs(attrs: AttributeSet?) {
         attrs?.let {
-            val array = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationMenuItem, 0, 0)
+            val array =
+                context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationMenuItem, 0, 0)
             icon = array.getDrawable(R.styleable.BottomNavigationMenuItem_bnm_icon)
             title = array.getString(R.styleable.BottomNavigationMenuItem_bnm_title)
-            selectedColor = array.getColor(R.styleable.BottomNavigationMenuItem_bnm_selected_color, -1)
+            selectedColor =
+                array.getColor(R.styleable.BottomNavigationMenuItem_bnm_selected_color, -1)
             normalColor = array.getColor(R.styleable.BottomNavigationMenuItem_bnm_normal_color, -1)
             array.recycle()
         }
     }
 
-    private fun bindItem() {
+    private fun bindItem() = with(binding) {
         menuIconView.setImageDrawable(checkNotNull(icon))
         menuTitleView.text = checkNotNull(title)
         bindColors(normalColor)
     }
 
-    private fun bindColors(color: Int?) {
+    private fun bindColors(color: Int?) = with(binding) {
         menuTitleView.setTextColor(checkNotNull(color))
         menuIconView.imageTintList = ColorStateList.valueOf(checkNotNull(color))
     }

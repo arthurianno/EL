@@ -6,13 +6,17 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentAuthPasswordRecoveryBinding
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.utils.error
 import com.jakewharton.rxbinding2.view.clicks
-import kotlinx.android.synthetic.main.fragment_auth_password_recovery.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
-class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
+class AuthPasswordRecoveryFragment :
+    BaseFragment<AuthPasswordRecoveryPm, FragmentAuthPasswordRecoveryBinding>(
+        FragmentAuthPasswordRecoveryBinding::inflate
+    ) {
 
     override val screenLayout: Int = R.layout.fragment_auth_password_recovery
     override val classToken: Class<AuthPasswordRecoveryPm> = AuthPasswordRecoveryPm::class.java
@@ -20,17 +24,17 @@ class AuthPasswordRecoveryFragment : BaseFragment<AuthPasswordRecoveryPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+        binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
     }
 
     override fun onBindPresentationModel(pm: AuthPasswordRecoveryPm) {
         super.onBindPresentationModel(pm)
-        pm.emailInput.bindTo(emailInputView)
+        pm.emailInput.bindTo(binding.emailInputView)
         pm.emailInput.error.observable
             .distinctUntilChanged()
-            .bindTo(emailInputView.error())
-        pm.continueEnabledState.bindTo { sendLinkButtonView.isEnabled = it }
-        sendLinkButtonView.clicks().bindTo(pm.continueAction)
+            .subscribe(binding.emailInputView.error())
+        pm.continueEnabledState.bindTo { binding.sendLinkButtonView.isEnabled = it }
+        binding.sendLinkButtonView.clicks().bindTo(pm.continueAction)
         bindProgressDialog(pm)
     }
 

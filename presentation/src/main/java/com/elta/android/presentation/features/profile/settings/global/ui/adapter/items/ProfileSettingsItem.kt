@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.adapter.items
 
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.nullgr.core.adapter.items.ListItem
 
 data class ProfileSettingsItem(

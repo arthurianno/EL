@@ -33,7 +33,7 @@
             android:gravity="top"
             android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/sixValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                 android:gravity="center_vertical|end"
                 tools:text="6" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fifthValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                 android:gravity="center_vertical|end"
                 tools:text="5" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fourthValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -63,7 +63,7 @@
                 android:gravity="center_vertical|end"
                 tools:text="4" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/thirdValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -73,7 +73,7 @@
                 android:gravity="center_vertical|end"
                 tools:text="3" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/secondValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -83,7 +83,7 @@
                 android:gravity="center_vertical|end"
                 tools:text="2" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firstValueView"
                 style="@style/New.Overline.ShadeBlack2"
                 android:layout_width="match_parent"
@@ -93,6 +93,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical|end"
                 tools:text="1" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.7dp"

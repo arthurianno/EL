@@ -15,6 +15,8 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.gender.model.GenderModel
 import com.nullgr.core.date.toTimestamp
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.checkControl
 import me.dmdev.rxpm.widget.dialogControl
 import java.util.Date
@@ -26,21 +28,21 @@ class ProfileSetGenderPm @Inject constructor(
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {
 
-    val continueAction = Action<Unit>()
-    val backHandleAction = Action<Unit>()
-    val saveChangesEnableState = State(false)
-    val checkNotSpecifiedVisibility = State<Boolean>()
+    val continueAction = action<Unit>()
+    val backHandleAction = action<Unit>()
+    val saveChangesEnableState = state(false)
+    val checkNotSpecifiedVisibility = state<Boolean>()
     val checkNotSpecified = checkControl()
     val checkMale = checkControl()
     val checkFemale = checkControl()
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
-    private val profileGenderState = State<GenderModel>()
-    private val changedProfileGenderState = State<GenderModel>()
-    private val isGenderChangedState = State(false)
-    private val getProfileAction = Action<Unit>()
-    private val exitDialogAction = Action<Unit>()
-    private val profileState = State<Profile>()
+    private val profileGenderState = state<GenderModel>()
+    private val changedProfileGenderState = state<GenderModel>()
+    private val isGenderChangedState = state(false)
+    private val getProfileAction = action<Unit>()
+    private val exitDialogAction = action<Unit>()
+    private val profileState = state<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -78,7 +80,8 @@ class ProfileSetGenderPm @Inject constructor(
             .untilDestroy()
 
         Observable.merge(
-            checkNotSpecified.checkedChanges.observable.filter { it }.map { GenderModel.NOT_SPECIFIED },
+            checkNotSpecified.checkedChanges.observable.filter { it }
+                .map { GenderModel.NOT_SPECIFIED },
             checkMale.checkedChanges.observable.filter { it }.map { GenderModel.MALE },
             checkFemale.checkedChanges.observable.filter { it }.map { GenderModel.FEMALE }
         )

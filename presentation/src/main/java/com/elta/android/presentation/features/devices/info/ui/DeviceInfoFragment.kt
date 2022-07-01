@@ -7,14 +7,16 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentDeviceInfoBinding
 import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
-import kotlinx.android.synthetic.main.fragment_device_info.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
-class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
+class DeviceInfoFragment :
+    BaseListFragment<DeviceInfoPm, FragmentDeviceInfoBinding>(FragmentDeviceInfoBinding::inflate) {
 
     override val screenLayout: Int = R.layout.fragment_device_info
     override val classToken: Class<DeviceInfoPm> = DeviceInfoPm::class.java
@@ -22,23 +24,23 @@ class DeviceInfoFragment : BaseListFragment<DeviceInfoPm>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val name = checkNotNull(arguments).getSerializable(DEVICE_NAME) as String
-        val address = checkNotNull(arguments).getSerializable(DEVICE_ADDRESS) as String
+        val name = arguments?.getString(DEVICE_NAME).orEmpty()
+        val address = arguments?.getString(DEVICE_ADDRESS).orEmpty()
         presentationModel.setDeviceData(name, address)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuButtonView.text = getString(R.string.profile_device_info_delete)
+        binding.toolbar.menuButtonView.text = getString(R.string.profile_device_info_delete)
     }
 
     override fun onBindPresentationModel(pm: DeviceInfoPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
-        menuButtonView.clicks().bindTo(pm.deleteDeviceAction)
-        checkUpdateButtonView.clicks().bindTo(pm.checkUpdateAction)
-        pm.nameDeviceState.bindTo(titleTextView.text())
-        pm.descriptionAddressState.bindTo(descriptionTextView.text())
+        binding.toolbar.menuButtonView.clicks().bindTo(pm.deleteDeviceAction)
+        binding.checkUpdateButtonView.clicks().bindTo(pm.checkUpdateAction)
+        pm.nameDeviceState.bindTo(binding.titleTextView.text())
+        pm.descriptionAddressState.bindTo(binding.descriptionTextView.text())
         pm.deleteDeviceDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 

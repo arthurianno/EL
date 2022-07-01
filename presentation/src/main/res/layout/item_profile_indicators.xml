@@ -1,32 +1,32 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp">
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="16dp" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gEnd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_end="16dp" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gCenter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/glucoseLevelView"
         style="@style/IndicatorCardView"
         android:layout_width="0dp"
@@ -41,11 +41,11 @@
         app:layout_constraintStart_toStartOf="@+id/gStart"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/glucoseLevelIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
@@ -55,7 +55,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_range_sugar" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/glucoseLevelTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
@@ -66,7 +66,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/glucoseLevelIconView" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/glucoseLevelDescriptionView"
                 style="@style/New.Caption1.Transparent"
                 android:layout_width="wrap_content"
@@ -90,7 +90,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/glucoseLevelDescriptionView">
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/glucoseLevelMinView"
                     style="@style/New.Body2.White"
                     android:layout_width="0dp"
@@ -100,7 +100,7 @@
                     android:gravity="center"
                     tools:text="4,0" />
 
-                <android.support.v7.widget.AppCompatImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -108,7 +108,7 @@
                     android:gravity="center"
                     app:srcCompat="@drawable/ic_img_range_2" />
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/glucoseLevelMaxView"
                     style="@style/New.Body2.White"
                     android:layout_width="0dp"
@@ -119,7 +119,7 @@
                     tools:text="10,0" />
             </LinearLayout>
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/range"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -128,10 +128,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/ic_img_range_3" />
-        </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/diabetesTypeView"
         style="@style/IndicatorCardView"
         android:layout_width="0dp"
@@ -146,11 +146,11 @@
         app:layout_constraintStart_toStartOf="@+id/gCenter"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/diabetesTypeIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
@@ -160,7 +160,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_diabet_type" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/diabetesTypeTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
@@ -171,7 +171,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/diabetesTypeIconView" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/diabetesTypeButtonView"
                 style="@style/New.Body2.White"
                 android:layout_width="0dp"
@@ -187,10 +187,10 @@
                 app:layout_constraintVertical_bias="0.6"
                 tools:text="Второй тип" />
 
-        </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/weightView"
         style="@style/IndicatorCardView"
         android:layout_width="0dp"
@@ -203,11 +203,11 @@
         app:layout_constraintEnd_toEndOf="@id/gCenter"
         app:layout_constraintStart_toStartOf="@+id/gStart">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/weightIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
@@ -217,7 +217,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_weight_type" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/weightTitleView"
                 style="@style/New.Button2.BlackBlue"
                 android:layout_width="wrap_content"
@@ -228,7 +228,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/weightIconView" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/weightValueView"
                 style="@style/New.Body2.BlackBlue"
                 android:layout_width="wrap_content"
@@ -246,7 +246,7 @@
                 app:layout_constraintTop_toTopOf="@+id/weightTitleView"
                 tools:text="90 кг" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/weightIcon2View"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -256,10 +256,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/ic_img_weight_2" />
 
-        </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/hemoglobinView"
         style="@style/IndicatorCardView"
         android:layout_width="0dp"
@@ -272,11 +272,11 @@
         app:layout_constraintEnd_toStartOf="@+id/gEnd"
         app:layout_constraintStart_toStartOf="@+id/gCenter">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/hemoglobinIconView"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
@@ -286,7 +286,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_hb_a_1_c" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/hemoglobinTitleView"
                 style="@style/New.Button2.White"
                 android:layout_width="wrap_content"
@@ -297,7 +297,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/hemoglobinIconView" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/hemoglobinValueView"
                 style="@style/New.Body2.White"
                 android:layout_width="wrap_content"
@@ -314,7 +314,7 @@
                 app:layout_constraintTop_toTopOf="@+id/hemoglobinTitleView"
                 tools:text="5,2 %" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/hemoglobinIcon2View"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -324,6 +324,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/ic_img_hb_a_1_c_2" />
-        </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
-</android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,15 +5,16 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.PopupWindow
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ViewSpinnerBinding
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.spinner.adapter.SpinnerDelegatesFactory
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
@@ -25,7 +26,6 @@ import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.schedulers.ComputationToMainSchedulersFacade
 import com.nullgr.core.ui.extensions.toggleView
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.view_spinner.view.*
 
 @Suppress("MagicNumber")
 class SpinnerView @JvmOverloads constructor(
@@ -40,10 +40,14 @@ class SpinnerView @JvmOverloads constructor(
     private val popupContainerView: RecyclerView
     private val isArrowVisible: Boolean
     private val spinnerClicks = PublishRelay.create<ListItem>()
+    private val binding: ViewSpinnerBinding by lazy {
+        ViewSpinnerBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_spinner, this, true)
-        popupContainerView = LayoutInflater.from(context).inflate(R.layout.layout_popup_list, null) as RecyclerView
+        popupContainerView =
+            LayoutInflater.from(context).inflate(R.layout.layout_popup_list, null) as RecyclerView
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SpinnerView)
 
         val diffCalculator = RxDiffCalculator(ComputationToMainSchedulersFacade())
@@ -64,9 +68,15 @@ class SpinnerView @JvmOverloads constructor(
         popupContainerView.layoutManager = FixedLinearLayoutManager(context)
 
         isArrowVisible = typedArray.getBoolean(R.styleable.SpinnerView_showArrow, true)
-        spinnerArrowView.toggleView(isArrowVisible)
-        val topicDrawableResId = typedArray.getResourceId(R.styleable.SpinnerView_topicDrawable, R.drawable.ic_calendar)
-        spinnerTopicIconView.setImageDrawable(ContextCompat.getDrawable(context, topicDrawableResId))
+        binding.spinnerArrowView.toggleView(isArrowVisible)
+        val topicDrawableResId =
+            typedArray.getResourceId(R.styleable.SpinnerView_topicDrawable, R.drawable.ic_calendar)
+        binding.spinnerTopicIconView.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                topicDrawableResId
+            )
+        )
 
         typedArray.recycle()
     }
@@ -87,7 +97,7 @@ class SpinnerView @JvmOverloads constructor(
     override fun onItemSelected(item: SpinnerItem, title: String?) {
         if (popupWindow.isShowing) dismissDropDown()
         spinnerClicks.accept(item)
-        title?.let { spinnerTitleView.text = it }
+        title?.let { binding.spinnerTitleView.text = it }
     }
 
     fun spinnerClicks(): Observable<ListItem> = spinnerClicks.hide()
@@ -97,20 +107,20 @@ class SpinnerView @JvmOverloads constructor(
     }
 
     fun setTitle(title: String) {
-        spinnerTitleView.text = title
+        binding.spinnerTitleView.text = title
     }
 
     private fun showDropDown() {
         if (isArrowVisible) animateArrow(true)
         measurePopUpDimension()
-        popupWindow.showAsDropDown(spinnerTitleView, 0, -1 * height)
+        popupWindow.showAsDropDown(binding.spinnerTitleView, 0, -1 * height)
     }
 
     private fun measurePopUpDimension() {
         val widthSpec = MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.UNSPECIFIED)
         val heightSpec = MeasureSpec.makeMeasureSpec(getPopUpHeight(), MeasureSpec.AT_MOST)
         popupContainerView.measure(widthSpec, heightSpec)
-        popupWindow.width = spinnerTitleView.measuredWidth
+        popupWindow.width = binding.spinnerTitleView.measuredWidth
         popupWindow.height = popupContainerView.measuredHeight
     }
 
@@ -124,7 +134,7 @@ class SpinnerView @JvmOverloads constructor(
     private fun animateArrow(shouldRotateUp: Boolean) {
         val start = if (shouldRotateUp) 0 else MAX_LEVEL
         val end = if (shouldRotateUp) MAX_LEVEL else 0
-        arrowAnimator = ObjectAnimator.ofInt(spinnerArrowView.drawable, "level", start, end)
+        arrowAnimator = ObjectAnimator.ofInt(binding.spinnerArrowView.drawable, "level", start, end)
         arrowAnimator?.interpolator = LinearOutSlowInInterpolator()
         arrowAnimator?.start()
     }

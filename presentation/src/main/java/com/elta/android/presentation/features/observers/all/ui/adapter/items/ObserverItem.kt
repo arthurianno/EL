@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.observers.all.ui.adapter.items
 
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.nullgr.core.adapter.items.ListItem
 

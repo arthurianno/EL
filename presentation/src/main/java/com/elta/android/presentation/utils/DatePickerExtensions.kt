@@ -20,7 +20,13 @@ fun Context?.showDatePickerDialog(
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
         onDateSelectedFunction.invoke(date.with(LocalDate.of(year, month + 1, dayOfMonth)))
     }
-    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
+    DatePickerDialog(
+        this,
+        onDateSelectedListener,
+        date.year,
+        date.month.ordinal,
+        date.dayOfMonth
+    ).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -37,7 +43,13 @@ fun Context?.showDatePickerDialog(
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
         onDateSelectedFunction.invoke(LocalDate.of(year, month + 1, dayOfMonth))
     }
-    DatePickerDialog(this, onDateSelectedListener, date.year, date.month.ordinal, date.dayOfMonth).apply {
+    DatePickerDialog(
+        this,
+        onDateSelectedListener,
+        date.year,
+        date.month.ordinal,
+        date.dayOfMonth
+    ).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
         show()
@@ -78,5 +90,11 @@ fun Context?.showTimePickerWithoutPastTimeDialog(
             }
         }
 
-    TimePickerDialog(this, onTimeSelectedListener, selectedDate.hour, selectedDate.minute, true).show()
+    TimePickerDialog(
+        this,
+        onTimeSelectedListener,
+        selectedDate.hour,
+        selectedDate.minute,
+        true
+    ).show()
 }

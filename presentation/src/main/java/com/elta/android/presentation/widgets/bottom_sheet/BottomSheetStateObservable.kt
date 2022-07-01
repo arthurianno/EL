@@ -1,8 +1,8 @@
 package com.elta.android.presentation.widgets.bottom_sheet
 
-import android.support.design.widget.BottomSheetBehavior
 import android.view.View
 import com.elta.android.presentation.utils.checkMainThread
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
@@ -17,7 +17,7 @@ class BottomSheetStateObservable(
         }
         val listener = Listener(behavior, observer)
         observer.onSubscribe(listener)
-        behavior.setBottomSheetCallback(listener.bottomSheetCallback)
+        behavior.addBottomSheetCallback(listener.bottomSheetCallback)
     }
 
     class Listener(
@@ -36,7 +36,7 @@ class BottomSheetStateObservable(
         }
 
         override fun onDispose() {
-            behavior.setBottomSheetCallback(null)
+            behavior.removeBottomSheetCallback(bottomSheetCallback)
         }
     }
 }

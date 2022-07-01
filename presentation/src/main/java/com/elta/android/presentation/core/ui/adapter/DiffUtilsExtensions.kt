@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.ui.adapter
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.adapter.items.ListItem
 import io.reactivex.Observable
@@ -10,7 +10,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import me.dmdev.rxpm.PresentationModel
 
 inline fun calculate(
     adapter: DynamicAdapter,
@@ -55,13 +54,13 @@ fun Observable<List<ListItem>>.bindTo(
         .addTo(compositeUnbind)
 }
 
-fun PresentationModel.State<List<ListItem>>.bindTo(
-    adapter: DynamicAdapter,
-    compositeUnbind: CompositeDisposable,
-    strategy: UpdateStrategy = UpdateStrategy.LATEST
-) {
-    this.observable.bindTo(adapter, compositeUnbind, strategy)
-}
+// fun PresentationModel.State<List<ListItem>>.bindTo(
+//    adapter: DynamicAdapter,
+//    compositeUnbind: CompositeDisposable,
+//    strategy: UpdateStrategy = UpdateStrategy.LATEST
+// ) {
+//    this.observable.bindTo(adapter, compositeUnbind, strategy)
+// }
 
 enum class UpdateStrategy {
     LATEST, SEQUENCE

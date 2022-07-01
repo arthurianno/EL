@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
+apply plugin: "io.objectbox"
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
 def CREDENTIALS_RELEASE = '../keystore/credentials-release.properties'
@@ -25,12 +27,6 @@ def CONFIG_DEEP_LINK_HOST = 'deep.link.host'
 def CONFIG_APP_ID_SUFFIX = 'app.id.suffix'
 def CONFIG_APP_NAME_SUFFIX = 'app.name.suffix'
 def CONFIG_LOG_ENABLED = 'log.enabled'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
 
 android {
 
@@ -160,15 +156,9 @@ android {
         }
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -192,6 +182,9 @@ android {
             universalApk true
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 kapt {
@@ -208,9 +201,6 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-}
-androidExtensions {
-    experimental = true
 }
 
 android.applicationVariants.all { variant ->
@@ -230,11 +220,10 @@ android.applicationVariants.all { variant ->
     }
 }
 
+
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
-
-    ktlint commonDependencies.ktlint
 
     implementation project(':core-all')
     implementation project(':core-security')
@@ -249,22 +238,13 @@ dependencies {
     api project(':data')
 
     implementation commonDependencies.libs
-//    implementation commonDependencies.appCore
-//    implementation commonDependencies.appCoreSecurity
+
+    implementation commonDependencies.materialDesign
+
+    implementation commonDependencies.androidxMultidex
 
     implementation commonDependencies.googleFit
     implementation commonDependencies.googleAuth
-    implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
     implementation commonDependencies.materialDialogs
     implementation commonDependencies.yandexMapKit
     implementation commonDependencies.cardView
@@ -305,19 +285,18 @@ dependencies {
     implementation commonDependencies.okHttp
     implementation commonDependencies.okHttpLogger
     implementation commonDependencies.gson
-    implementation(commonDependencies.crashlytics) {
-        transitive = true
-    }
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseCrashlytics
+    implementation commonDependencies.firebaseAnalytics
     implementation commonDependencies.location
     implementation commonDependencies.datePicker
 
     implementation commonDependencies.nordicScanner
 
+    implementation commonDependencies.guavaConflictLost
+
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
-
-apply plugin: 'com.google.gms.google-services'

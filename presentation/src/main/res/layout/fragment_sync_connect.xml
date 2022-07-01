@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
     <include
-        android:id="@+id/toolbarView"
+        android:id="@+id/toolbar"
         layout="@layout/layout_toolbar" />
 
     <FrameLayout
@@ -16,28 +16,33 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarView">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <include
+            android:id="@+id/layoutSyncStateHowToConnect"
             layout="@layout/layout_sync_state_how_to_connect"
             android:visibility="visible" />
 
         <include
+            android:id="@+id/layoutSyncStateSearch"
             layout="@layout/layout_sync_state_search"
             android:visibility="gone" />
 
         <include
+            android:id="@+id/layoutSyncStateDeviceFound"
             layout="@layout/layout_sync_state_device_found"
             android:visibility="gone" />
 
         <include
+            android:id="@+id/layoutSyncStateConnected"
             layout="@layout/layout_sync_state_connected"
             android:visibility="gone" />
 
         <include
+            android:id="@+id/layoutSyncStateSyncCompleted"
             layout="@layout/layout_sync_state_sync_completed"
             android:visibility="gone" />
 
     </FrameLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

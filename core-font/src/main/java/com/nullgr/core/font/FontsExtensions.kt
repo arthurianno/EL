@@ -1,8 +1,8 @@
 package com.nullgr.core.font
 
+import android.app.ActionBar
 import android.content.Context
 import android.graphics.Typeface
-import android.support.v7.app.ActionBar
 import android.util.Log
 import android.widget.Toolbar
 

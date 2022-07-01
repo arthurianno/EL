@@ -1,10 +1,10 @@
 package com.elta.android.presentation.features.profile.settings.reminders.all.ui.widgets
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.state_view.StateData
 import com.elta.android.presentation.core.ui.state_view.StateView

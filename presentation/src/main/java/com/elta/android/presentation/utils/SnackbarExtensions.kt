@@ -1,20 +1,20 @@
 package com.elta.android.presentation.utils
 
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import android.support.annotation.StyleRes
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.TextViewCompat
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StyleRes
+import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.google.android.material.snackbar.Snackbar
 
 fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {
     with(view) {
-        val textView = findViewById<TextView>(android.support.design.R.id.snackbar_text)
+        val textView = findViewById<TextView>(R.id.snackbar_text)
         textView?.let {
             TextViewCompat.setTextAppearance(it, style)
             it.maxLines = Int.MAX_VALUE
@@ -33,7 +33,7 @@ fun Snackbar.applySnackbarHeight(): Snackbar {
 fun Snackbar.applyTextDrawable(@DrawableRes drawable: Int?): Snackbar {
     drawable?.let { nonNullDrawable ->
         with(view) {
-            val textView = findViewById<TextView>(android.support.design.R.id.snackbar_text)
+            val textView = findViewById<TextView>(R.id.snackbar_text)
             textView?.let {
                 it.compoundDrawablePadding = paddingLeft
                 it.setPadding(0, 0, 0, 0)
@@ -63,7 +63,7 @@ fun makeSnackBarWithAction(
     data: SnackBarData,
     control: SnackBarControl<SnackBarData>
 ): Snackbar =
-    makeSnackBar(checkNotNull(view), data)
+    makeSnackBar(view, data)
         .also { snackBar -> snackBar.duration = data.duration ?: Snackbar.LENGTH_INDEFINITE }
         .setActionTextColor(ContextCompat.getColor(view.context, R.color.shade_blue))
         .setAction(data.button) { control.sendResult() }

@@ -7,13 +7,17 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentProfileSettingsBinding
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.ui.fragments.showDialog
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
-class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
+class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
+    FragmentProfileSettingsBinding::inflate
+) {
 
     override val screenLayout: Int = R.layout.fragment_profile_settings
     override val classToken: Class<ProfileSettingsPm> = ProfileSettingsPm::class.java
@@ -21,10 +25,10 @@ class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarTitleView.text = getString(R.string.profile_settings)
+        binding.toolbar.toolbarTitleView.text = getString(R.string.profile_settings)
         itemsView?.addItemDecoration(
             SettingsMarginItemDecoration(
-                checkNotNull(context),
+                requireContext(),
                 R.dimen.settings_top_margin,
                 R.dimen.settings_bottom_margin
             )

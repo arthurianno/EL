@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dialogTitleView"
             style="@style/New.Headline4.BlackBlue"
             android:layout_width="0dp"
@@ -26,7 +26,7 @@
             android:includeFontPadding="false"
             android:text="@string/sync_state_pin_dialog_title" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/dialogCloseButtonView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialogDescriptionTitleView"
         style="@style/New.Title2.ShadeBlack0"
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
         android:paddingTop="2dp"
         android:paddingBottom="6dp">
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/pinCodeInputView"
             style="@style/New.Headline2.ShadeGreen2"
             android:layout_width="match_parent"
@@ -72,7 +72,7 @@
 
     </FrameLayout>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/deviceNameView"
         style="@style/New.Caption1.ShadeBlack2"
         android:layout_width="match_parent"
@@ -86,7 +86,7 @@
         android:gravity="center_vertical"
         tools:text="Подключаемое устройство СателлитOnline" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialogActionButtonView"
         style="@style/Button.Large"
         android:focusable="true"

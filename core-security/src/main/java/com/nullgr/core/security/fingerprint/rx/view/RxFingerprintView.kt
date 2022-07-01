@@ -19,15 +19,19 @@ internal class RxFingerprintView(private val stateConsumer: Consumer<Fingerprint
 
     override fun onShowAuthenticationError(errorMessageId: Int?, errorMessage: String?) {
         stateConsumer.accept(
-            FingerprintViewState(FingerprintViewState.State.AUTHENTICATION_ERROR,
-                FingerprintViewState.Meta(errorMessageId, errorMessage))
+            FingerprintViewState(
+                FingerprintViewState.State.AUTHENTICATION_ERROR,
+                FingerprintViewState.Meta(errorMessageId, errorMessage)
+            )
         )
     }
 
     override fun onShowAuthenticationHelp(helpMessageId: Int, helpMessage: String) {
         stateConsumer.accept(
-            FingerprintViewState(FingerprintViewState.State.AUTHENTICATION_HELP,
-                FingerprintViewState.Meta(helpMessageId, helpMessage))
+            FingerprintViewState(
+                FingerprintViewState.State.AUTHENTICATION_HELP,
+                FingerprintViewState.Meta(helpMessageId, helpMessage)
+            )
         )
     }
 

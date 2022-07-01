@@ -1,7 +1,7 @@
 package com.elta.android.presentation.core.pm.widgets
 
-import android.support.design.widget.BaseTransientBottomBar
-import android.support.design.widget.Snackbar
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Maybe

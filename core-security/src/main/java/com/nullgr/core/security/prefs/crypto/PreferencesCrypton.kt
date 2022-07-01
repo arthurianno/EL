@@ -15,7 +15,6 @@ import java.security.GeneralSecurityException
 import java.security.InvalidKeyException
 import javax.crypto.SecretKey
 
-
 /**
  * This class provides the functionality of encryption/decryption for
  * [com.nullgr.core.security.prefs.CryptoPreferences] depending on current SDK version.

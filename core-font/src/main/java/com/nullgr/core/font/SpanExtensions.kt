@@ -2,13 +2,13 @@ package com.nullgr.core.font
 
 import android.content.Context
 import android.graphics.Typeface
-import android.support.annotation.ColorInt
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import androidx.annotation.ColorInt
 
 /**
  * This method create [SpannableString] from original [String] by attaching [TypefaceSpan] to it.
@@ -28,10 +28,12 @@ import android.text.style.RelativeSizeSpan
  * If something went wrong, or if [context], [fontFullName] or [this]
  * receiver will have a null value - original [String] will be returned
  */
-fun String?.applyFont(context: Context?,
-                      fontFullName: String,
-                      start: Int? = null,
-                      end: Int? = null): CharSequence? {
+fun String?.applyFont(
+    context: Context?,
+    fontFullName: String,
+    start: Int? = null,
+    end: Int? = null
+): CharSequence? {
     if (context == null) return this
     if (this.isNullOrEmpty()) return this
 
@@ -59,15 +61,21 @@ fun String?.applyFont(context: Context?,
  * @return [CharSequence] child. If typeface span will be attached successfully it will be an instance of [SpannableString].
  * If something went wrong,  [this] receiver will have a null value - original [String] will be returned
  */
-fun String?.applyRelativeSize(size: Float,
-                              start: Int? = null,
-                              end: Int? = null): CharSequence? {
+fun String?.applyRelativeSize(
+    size: Float,
+    start: Int? = null,
+    end: Int? = null
+): CharSequence? {
 
     if (this.isNullOrEmpty()) return this
 
     return SpannableString(this).apply {
-        setSpan(RelativeSizeSpan(size), start ?: 0, end
-                ?: length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        setSpan(
+            RelativeSizeSpan(size), start ?: 0,
+            end
+                ?: length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 }
 
@@ -87,15 +95,21 @@ fun String?.applyRelativeSize(size: Float,
  * @return [CharSequence] child. If typeface span will be attached successfully it will be an instance of [SpannableString].
  * If something went wrong,  [this] receiver will have a null value - original [String] will be returned
  */
-fun String?.applyAbsoluteSize(pixelSize: Int,
-                              start: Int? = null,
-                              end: Int? = null): CharSequence? {
+fun String?.applyAbsoluteSize(
+    pixelSize: Int,
+    start: Int? = null,
+    end: Int? = null
+): CharSequence? {
 
     if (this.isNullOrEmpty()) return this
 
     return SpannableString(this).apply {
-        setSpan(AbsoluteSizeSpan(pixelSize), start ?: 0, end
-                ?: length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        setSpan(
+            AbsoluteSizeSpan(pixelSize), start ?: 0,
+            end
+                ?: length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 }
 
@@ -115,15 +129,21 @@ fun String?.applyAbsoluteSize(pixelSize: Int,
  * @return [CharSequence] child. If typeface span will be attached successfully it will be an instance of [SpannableString].
  * If something went wrong,  [this] receiver will have a null value - original [String] will be returned
  */
-fun String?.applyForegroundColor(@ColorInt color: Int,
-                                 start: Int? = null,
-                                 end: Int? = null): CharSequence? {
+fun String?.applyForegroundColor(
+    @ColorInt color: Int,
+    start: Int? = null,
+    end: Int? = null
+): CharSequence? {
 
     if (this.isNullOrEmpty()) return this
 
     return SpannableString(this).apply {
-        setSpan(ForegroundColorSpan(color), start ?: 0, end
-                ?: length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        setSpan(
+            ForegroundColorSpan(color), start ?: 0,
+            end
+                ?: length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 }
 
@@ -143,15 +163,21 @@ fun String?.applyForegroundColor(@ColorInt color: Int,
  * @return [CharSequence] child. If typeface span will be attached successfully it will be an instance of [SpannableString].
  * If something went wrong,  [this] receiver will have a null value - original [String] will be returned
  */
-fun String?.applyBackgroundColor(@ColorInt color: Int,
-                                 start: Int? = null,
-                                 end: Int? = null): CharSequence? {
+fun String?.applyBackgroundColor(
+    @ColorInt color: Int,
+    start: Int? = null,
+    end: Int? = null
+): CharSequence? {
 
     if (this.isNullOrEmpty()) return this
 
     return SpannableString(this).apply {
-        setSpan(BackgroundColorSpan(color), start ?: 0, end
-                ?: length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        setSpan(
+            BackgroundColorSpan(color), start ?: 0,
+            end
+                ?: length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 }
 

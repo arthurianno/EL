@@ -57,7 +57,7 @@ class AppModule(private val enableLog: Boolean) {
 
     @Provides
     @Singleton
-    fun provideErrorParser(resources: ResourceProvider): ExceptionParser =
+    fun provideErrorParser(): ExceptionParser =
         SimpleExceptionParser()
 
     @Provides

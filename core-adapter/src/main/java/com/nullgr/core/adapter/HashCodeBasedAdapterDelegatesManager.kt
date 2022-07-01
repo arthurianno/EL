@@ -1,7 +1,7 @@
 package com.nullgr.core.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.nullgr.core.adapter.exceptions.DelegateNotFoundException
 import com.nullgr.core.adapter.items.ListItem
 
@@ -12,7 +12,8 @@ import com.nullgr.core.adapter.items.ListItem
  *
  * @author vchernyshov
  */
-class HashCodeBasedAdapterDelegatesManager(private val delegatesFactory: AdapterDelegatesFactory) : AdapterDelegatesManager {
+class HashCodeBasedAdapterDelegatesManager(private val delegatesFactory: AdapterDelegatesFactory) :
+    AdapterDelegatesManager {
 
     private var delegates = hashMapOf<Int, AdapterDelegate>()
 
@@ -34,11 +35,20 @@ class HashCodeBasedAdapterDelegatesManager(private val delegatesFactory: Adapter
         return getDelegateOrThrowException(viewType).onCreateViewHolder(parent)
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        vh: RecyclerView.ViewHolder
+    ) {
         getDelegateOrThrowException(vh.itemViewType).onBindViewHolder(items, position, vh)
     }
 
-    override fun onBindViewHolder(items: List<ListItem>, position: Int, vh: RecyclerView.ViewHolder, payloads: List<Any>) {
+    override fun onBindViewHolder(
+        items: List<ListItem>,
+        position: Int,
+        vh: RecyclerView.ViewHolder,
+        payloads: List<Any>
+    ) {
         getDelegateOrThrowException(vh.itemViewType).onBindViewHolder(items, position, vh, payloads)
     }
 

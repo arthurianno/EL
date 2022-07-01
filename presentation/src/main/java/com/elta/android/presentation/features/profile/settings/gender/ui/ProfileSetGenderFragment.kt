@@ -5,12 +5,17 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentProfileSetGenderBinding
 import com.elta.android.presentation.features.profile.settings.gender.pm.ProfileSetGenderPm
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
-import kotlinx.android.synthetic.main.fragment_profile_set_gender.*
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
+import me.dmdev.rxpm.widget.bindTo
 
-class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
+class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfileSetGenderBinding>(
+    FragmentProfileSetGenderBinding::inflate
+) {
 
     override val screenLayout: Int = R.layout.fragment_profile_set_gender
     override val classToken: Class<ProfileSetGenderPm> = ProfileSetGenderPm::class.java
@@ -19,17 +24,17 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm>() {
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
-        pm.checkNotSpecifiedVisibility.bindTo(notSpecifiedButtonView.visibility())
-        pm.checkNotSpecified.bindTo(notSpecifiedButtonView)
-        pm.checkMale.bindTo(maleButtonView)
-        pm.checkFemale.bindTo(femaleButtonView)
-        pm.saveChangesEnableState.bindTo { continueButtonView.isEnabled = it }
-        continueButtonView.clicks().bindTo(pm.continueAction)
+        pm.checkNotSpecifiedVisibility.bindTo(binding.notSpecifiedButtonView.visibility())
+        pm.checkNotSpecified.bindTo(binding.notSpecifiedButtonView)
+        pm.checkMale.bindTo(binding.maleButtonView)
+        pm.checkFemale.bindTo(binding.femaleButtonView)
+        pm.saveChangesEnableState.bindTo { binding.continueButtonView.isEnabled = it }
+        binding.continueButtonView.clicks().bindTo(pm.continueAction)
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     override fun handleBack() {
-        passTo(presentationModel.backHandleAction)
+        Unit.passTo(presentationModel.backHandleAction)
     }
 
     companion object {

@@ -14,6 +14,9 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -24,15 +27,15 @@ class EventsOptionsChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val toolbarTitleCommand = State<String>()
-    val appBarBackgroundCommand = State<Int>()
-    val confirmButtonVisibilityCommand = Command<Boolean>(bufferSize = 1)
-    val selectionConfirmedAction = Action<Unit>()
+    val toolbarTitleCommand = state<String>()
+    val appBarBackgroundCommand = state<Int>()
+    val confirmButtonVisibilityCommand = command<Boolean>(bufferSize = 1)
+    val selectionConfirmedAction = action<Unit>()
 
-    private val selectedItemIdState = State(NONE_ID)
-    private val previousSelectionState = State<String>()
-    private val configurationState = State<ChooserConfiguration>()
-    private val loadChooserOptionsAction = Action<ChooserConfiguration>()
+    private val selectedItemIdState = state(NONE_ID)
+    private val previousSelectionState = state<String>()
+    private val configurationState = state<ChooserConfiguration>()
+    private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
     override fun onCreate() {
         super.onCreate()
@@ -133,7 +136,10 @@ class EventsOptionsChooserPm @Inject constructor(
     }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =
-        GetChooserOptionsUseCase.Params(chooserConfiguration.eventType, chooserConfiguration.chooserType)
+        GetChooserOptionsUseCase.Params(
+            chooserConfiguration.eventType,
+            chooserConfiguration.chooserType
+        )
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         toolbarTitleCommand.consumer.accept(

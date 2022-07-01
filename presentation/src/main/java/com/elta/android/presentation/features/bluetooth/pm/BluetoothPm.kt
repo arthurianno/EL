@@ -13,8 +13,8 @@ import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUs
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
-import com.elta.android.domain.features.firmware.interactor.GetFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
+import com.elta.android.domain.features.firmware.interactor.GetFirmwareUseCase
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.presentation.Clicks
@@ -24,6 +24,9 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,35 +42,35 @@ class BluetoothPm @Inject constructor(
     services: ServiceFacade
 ) : BaseListPm(services) {
 
-    val getInfoAction = Action<Unit>()
-    val getEventsAction = Action<Unit>()
-    val setPinAction = Action<Unit>()
-    val pinEnabledState = State(false)
+    val getInfoAction = action<Unit>()
+    val getEventsAction = action<Unit>()
+    val setPinAction = action<Unit>()
+    val pinEnabledState = state(false)
 
-    val checkFirmwareAction = Action<Unit>()
-    val downloadFirmwareAction = Action<Unit>()
-    val updateFirmwareAction = Action<Unit>()
+    val checkFirmwareAction = action<Unit>()
+    val downloadFirmwareAction = action<Unit>()
+    val updateFirmwareAction = action<Unit>()
 
-    val firmwareState = State<Firmware>()
-    val firmwareFileState = State<FirmwareFile>()
-    val downloadEnabledState = State(false)
-    val updateEnabledState = State(false)
+    val firmwareState = state<Firmware>()
+    val firmwareFileState = state<FirmwareFile>()
+    val downloadEnabledState = state(false)
+    val updateEnabledState = state(false)
 
     var glucometer: Glucometer? = null
 
     private val scanResults = mutableSetOf<Glucometer>()
     val pinInputControl = inputControl()
-    val logState = State("Log:")
-    val requestEnableBluetoothCommand = Command<Unit>(bufferSize = 1)
-    val requestLocationPermissionsCommand = Command<Unit>(bufferSize = 1)
-    val requestEnableLocationCommand = Command<Unit>(bufferSize = 1)
+    val logState = state("Log:")
+    val requestEnableBluetoothCommand = command<Unit>(bufferSize = 1)
+    val requestLocationPermissionsCommand = command<Unit>(bufferSize = 1)
+    val requestEnableLocationCommand = command<Unit>(bufferSize = 1)
 
-    val bluetoothEnabledAction = Action<Unit>()
-    val locationPermissionsGrantedAction = Action<Unit>()
-    val locationEnabledAction = Action<Unit>()
-    val startScanAction = Action<Unit>()
+    val bluetoothEnabledAction = action<Unit>()
+    val locationPermissionsGrantedAction = action<Unit>()
+    val locationEnabledAction = action<Unit>()
+    val startScanAction = action<Unit>()
 
-    val openPinCodeDialogCommand = Command<String>(bufferSize = 1)
+    val openPinCodeDialogCommand = command<String>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -198,7 +201,8 @@ class BluetoothPm @Inject constructor(
             .doOnNext { click ->
                 if (click.item.address != glucometer?.address) {
                     glucometer = scanResults.firstOrNull { it.address == click.item.address }
-                    val newItems = items.value.map { (it as DeviceItem).copy(isSelected = it.address == click.item.address) }
+                    val newItems =
+                        items.value.map { (it as DeviceItem).copy(isSelected = it.address == click.item.address) }
                     items.consumer.accept(newItems)
                 }
                 enableUpdateButton()
@@ -224,7 +228,9 @@ class BluetoothPm @Inject constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is BluetoothNotEnabledError -> requestEnableBluetoothCommand.consumer.accept(Unit)
-            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(
+                Unit
+            )
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
             is GlucometerPinIncorrectOrNotFoundError -> {
                 openPinCodeDialogCommand.consumer.accept("SatelliteOnline")

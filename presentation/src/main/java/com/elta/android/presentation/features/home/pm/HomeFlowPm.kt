@@ -41,7 +41,10 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Singles
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -57,14 +60,14 @@ class HomeFlowPm @Inject constructor(
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
-    val bottomSheetItems = State<List<ListItem>>()
-    val closeBottomSheetCommand = Command<Unit>()
-    val showBottomSheetCommand = Command<Unit>()
-    val pulseCommand = Command<Boolean>()
-    val homeAction = Action<Boolean>()
-    val menuItemSelectedAction = Action<Int>()
-    val menuItemRestoredAction = Action<Int>()
-    val selectedItemIdState = State(R.id.mainMenuItemView)
+    val bottomSheetItems = state<List<ListItem>>()
+    val closeBottomSheetCommand = command<Unit>()
+    val showBottomSheetCommand = command<Unit>()
+    val pulseCommand = command<Boolean>()
+    val homeAction = action<Boolean>()
+    val menuItemSelectedAction = action<Int>()
+    val menuItemRestoredAction = action<Int>()
+    val selectedItemIdState = state(R.id.mainMenuItemView)
 
     val btControl = bluetoothControl2()
     val retryDeviceNotFoundControl = snackBarControl<SnackBarData>()
@@ -73,19 +76,19 @@ class HomeFlowPm @Inject constructor(
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
     val likeAppDialogControl = dialogControl<DialogData, DialogResult>()
 
-    private val loadEvents = Action<Unit>()
-    private val startSyncAction = Action<Unit>()
-    private val startAutoSyncAction = Action<Unit>()
-    private val syncProgressState = State(false)
-    private val showRetrySyncAction = Action<Unit>()
+    private val loadEvents = action<Unit>()
+    private val startSyncAction = action<Unit>()
+    private val startAutoSyncAction = action<Unit>()
+    private val syncProgressState = state(false)
+    private val showRetrySyncAction = action<Unit>()
 
-    private val syncWithBackendProgressState = State(false)
-    private val startSyncWithBackendAction = Action<Unit>()
+    private val syncWithBackendProgressState = state(false)
+    private val startSyncWithBackendAction = action<Unit>()
 
-    private val feedbackAction = Action<Unit>()
-    private val likeAppDialogAction = Action<Int>()
-    private val feedbackDialogAction = Action<Unit>()
-    private val googlePlayDialogAction = Action<Unit>()
+    private val feedbackAction = action<Unit>()
+    private val likeAppDialogAction = action<Int>()
+    private val feedbackDialogAction = action<Unit>()
+    private val googlePlayDialogAction = action<Unit>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
 
@@ -155,7 +158,14 @@ class HomeFlowPm @Inject constructor(
     }
 
     override fun navigateToLaunchScreen() {
-        router.newTabs(arrayOf(Screens.MainTab, Screens.DiaryTab, Screens.StatisticTab, Screens.ProfileTab))
+        router.newTabs(
+            arrayOf(
+                Screens.MainTab,
+                Screens.DiaryTab,
+                Screens.StatisticTab,
+                Screens.ProfileTab
+            )
+        )
         router.navigateToTab(Screens.MainTab)
     }
 
@@ -358,7 +368,8 @@ class HomeFlowPm @Inject constructor(
                 if (auto) {
                     if (error.cause is BluetoothNotEnabledError ||
                         error.cause is LocationNotEnabledError ||
-                        error.cause is LocationPermissionNotGrantedError) {
+                        error.cause is LocationPermissionNotGrantedError
+                    ) {
                         bus.event(Events.Sync.Glucometer.Error)
                     } else {
                         bus.event(Events.Sync.Glucometer.ErrorWithMessage)

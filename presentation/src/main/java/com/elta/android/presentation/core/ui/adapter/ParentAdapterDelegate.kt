@@ -1,16 +1,19 @@
 package com.elta.android.presentation.core.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.nullgr.core.adapter.AdapterDelegatesFactory
 import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.adapter.Inflater
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.adapter.ktx.AdapterDelegate
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 
-abstract class ParentAdapterDelegate(
-    protected val factory: AdapterDelegatesFactory
-) : AdapterDelegate() {
+abstract class ParentAdapterDelegate<B : ViewBinding>(
+    protected val factory: AdapterDelegatesFactory,
+    bindingInflater: Inflater<B>
+) : AdapterDelegate<B>(bindingInflater) {
 
     protected val adapters = mutableMapOf<Any, DynamicAdapter>()
     protected val disposables = mutableMapOf<Any, CompositeDisposable>()
@@ -33,8 +36,9 @@ abstract class ParentAdapterDelegate(
         }
     }
 
-    protected open fun createOrGetAdapter(item: ListItem): DynamicAdapter = adapters[item.getUniqueProperty()]
-        ?: DynamicAdapter(factory).also { adapters[item.getUniqueProperty()] = it }
+    protected open fun createOrGetAdapter(item: ListItem): DynamicAdapter =
+        adapters[item.getUniqueProperty()]
+            ?: DynamicAdapter(factory).also { adapters[item.getUniqueProperty()] = it }
 
     protected open fun createOrGetCompositeDisposable(item: ListItem): CompositeDisposable =
         disposables[item.getUniqueProperty()]

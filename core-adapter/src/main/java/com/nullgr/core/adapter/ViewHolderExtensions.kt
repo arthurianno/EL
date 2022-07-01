@@ -2,8 +2,8 @@
 
 package com.nullgr.core.adapter
 
-import android.support.v7.widget.*
-import com.nullgr.core.adapter.items.*
+import androidx.recyclerview.widget.RecyclerView
+import com.nullgr.core.adapter.items.ListItem
 
 /**
  * Extension function that allows to get items from adapter via ViewHolder.

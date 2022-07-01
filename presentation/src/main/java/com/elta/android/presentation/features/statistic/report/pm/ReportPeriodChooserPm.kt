@@ -9,6 +9,9 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
@@ -17,11 +20,11 @@ class ReportPeriodChooserPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val mainAction = Action<Unit>()
-    val closeDialogCommand = Command<Unit>(bufferSize = 1)
-    val selectDateAction = Action<LocalDate>()
-    val selectedRangeState = State(buildRange())
-    val titleState = State<String>()
+    val mainAction = action<Unit>()
+    val closeDialogCommand = command<Unit>(bufferSize = 1)
+    val selectDateAction = action<LocalDate>()
+    val selectedRangeState = state(buildRange())
+    val titleState = state<String>()
 
     override fun onCreate() {
         super.onCreate()

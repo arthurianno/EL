@@ -2,12 +2,14 @@ package com.elta.android.presentation.widgets.selector
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.ViewFormSelectorBinding
 import com.elta.android.presentation.utils.checkMainThread
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.nullgr.core.ui.extensions.toggleView
@@ -15,7 +17,6 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.view_form_selector.view.*
 
 class FormSelectorView @JvmOverloads constructor(
     context: Context,
@@ -42,6 +43,10 @@ class FormSelectorView @JvmOverloads constructor(
 
     private val textColor: Int by lazy { ContextCompat.getColor(context, R.color.black_blue) }
     private val hintColor: Int by lazy { ContextCompat.getColor(context, R.color.shade_black2) }
+
+    private val binding: ViewFormSelectorBinding by lazy {
+        ViewFormSelectorBinding.bind(this)
+    }
 
     init {
         inflate(context, R.layout.view_form_selector, this)
@@ -74,13 +79,13 @@ class FormSelectorView @JvmOverloads constructor(
         }
     }
 
-    private fun initDefault() {
+    private fun initDefault() = with(binding) {
         selectorArrowView.toggleView(needDrawArrow)
         bindIcon()
         bindValue()
     }
 
-    private fun bindValue() {
+    private fun bindValue() = with(binding) {
         when {
             isEmpty() -> {
                 selectorTitleView.text = hint
@@ -93,7 +98,7 @@ class FormSelectorView @JvmOverloads constructor(
         }
     }
 
-    private fun bindIcon() {
+    private fun bindIcon() = with(binding) {
         selectorIconView.toggleView(icon != null)
         icon?.let { selectorIconView.setImageDrawable(it) }
     }

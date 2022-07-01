@@ -1,7 +1,7 @@
 package com.nullgr.core.security.fingerprint.rx
 
 import android.content.Context
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import com.nullgr.core.rx.asConsumer
 import com.nullgr.core.rx.asObservable
 import com.nullgr.core.rx.relay.SingleSubscriberRelay
@@ -54,7 +54,8 @@ class RxFingerprintAuthenticationManger constructor(
     resetAfterErrorDelay: Long? = null
 ) {
     private val viewStateRelay = SingleSubscriberRelay.create<FingerprintViewState>()
-    private val resultRelay = SingleSubscriberRelay.create<OptionalResult<FingerprintManagerCompat.CryptoObject?>>()
+    private val resultRelay =
+        SingleSubscriberRelay.create<OptionalResult<FingerprintManagerCompat.CryptoObject?>>()
 
     private val rxFingerprintView = RxFingerprintView(viewStateRelay.asConsumer())
 
@@ -105,7 +106,7 @@ class RxFingerprintAuthenticationManger constructor(
             .flatMapCompletable {
                 Completable.complete()
             }
-    
+
     /**
      * Stops scanning for fingerprint.
      */
@@ -117,7 +118,9 @@ class RxFingerprintAuthenticationManger constructor(
         return resultRelay.asObservable()
             .doOnSubscribe {
                 val status = checkFingerprintStatus()
-                if (status == FingerprintStatus.READY) fingerprintAuthenticationManager.startListening(cryptoObject)
+                if (status == FingerprintStatus.READY) fingerprintAuthenticationManager.startListening(
+                    cryptoObject
+                )
                 else throw FingerprintNotAvailableException(status)
             }.doOnDispose {
                 fingerprintAuthenticationManager.stopListening()

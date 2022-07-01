@@ -2,10 +2,10 @@ package com.elta.android.presentation.core.ui.keyboardanimator
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 
 /**
  * Base class for keyboard animators. [WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE] will

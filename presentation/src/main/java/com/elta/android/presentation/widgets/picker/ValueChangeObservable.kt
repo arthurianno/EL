@@ -24,11 +24,12 @@ class ValueChangeObservable(
         observer: Observer<in Int>
     ) : MainThreadDisposable() {
 
-        var valueListener: NumberPicker.OnValueChangeListener? = NumberPicker.OnValueChangeListener { _, _, newValue ->
-            if (!isDisposed) {
-                observer.onNext(newValue)
+        var valueListener: NumberPicker.OnValueChangeListener? =
+            NumberPicker.OnValueChangeListener { _, _, newValue ->
+                if (!isDisposed) {
+                    observer.onNext(newValue)
+                }
             }
-        }
 
         override fun onDispose() {
             view.removeOnValueChangedListener(valueListener)

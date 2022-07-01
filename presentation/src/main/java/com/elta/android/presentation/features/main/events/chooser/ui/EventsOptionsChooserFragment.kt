@@ -7,6 +7,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
+import com.elta.android.presentation.databinding.FragmentEventsOptionsChooserBinding
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
@@ -14,10 +15,12 @@ import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
-import kotlinx.android.synthetic.main.fragment_events_options_chooser.*
-import kotlinx.android.synthetic.main.layout_toolbar.*
+import me.dmdev.rxpm.bindTo
 
-class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() {
+class EventsOptionsChooserFragment :
+    BaseListFragment<EventsOptionsChooserPm, FragmentEventsOptionsChooserBinding>(
+        FragmentEventsOptionsChooserBinding::inflate
+    ) {
 
     override val screenLayout: Int = R.layout.fragment_events_options_chooser
     override val classToken: Class<EventsOptionsChooserPm> = EventsOptionsChooserPm::class.java
@@ -33,17 +36,19 @@ class EventsOptionsChooserFragment : BaseListFragment<EventsOptionsChooserPm>() 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarView.applyWindowInsetsForChildrenView()
-        toolbarTitleView.setTextColor(Color.WHITE)
-        homeButtonView.setColorFilter(Color.WHITE)
+        with(binding.toolbar) {
+            toolbarView.applyWindowInsetsForChildrenView()
+            toolbarTitleView.setTextColor(Color.WHITE)
+            homeButtonView.setColorFilter(Color.WHITE)
+        }
     }
 
     override fun onBindPresentationModel(pm: EventsOptionsChooserPm) {
         super.onBindPresentationModel(pm)
-        pm.toolbarTitleCommand.bindTo(toolbarTitleView.text())
-        pm.appBarBackgroundCommand.bindTo { appBarLayoutView.setBackgroundResource(it) }
-        pm.confirmButtonVisibilityCommand.bindTo(confirmButtonView.visibility())
-        confirmButtonView.clicks().bindTo(pm.selectionConfirmedAction)
+        pm.toolbarTitleCommand.bindTo(binding.toolbar.toolbarTitleView.text())
+        pm.appBarBackgroundCommand.bindTo { binding.appBarLayoutView.setBackgroundResource(it) }
+        pm.confirmButtonVisibilityCommand.bindTo(binding.confirmButtonView.visibility())
+        binding.confirmButtonView.clicks().bindTo(pm.selectionConfirmedAction)
         bindProgressDialog(pm)
     }
 

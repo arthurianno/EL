@@ -8,13 +8,12 @@ import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import kotlinx.android.synthetic.main.fragment_event_form.view.*
 
 object MedicamentsFormInitializer : FormInitializer() {
 
     override val pickerConfiguration: FormMeasurementConfig? = null
 
-    override fun View.initHeaderView() {
+    override fun View.initHeaderView() = with(binding) {
         toolbarTitleView.text = resources.getString(R.string.events_form_screen_title_medicaments)
         appBarLayoutView.setBackgroundResource(R.drawable.bg_gradient_medicine)
         eventInfoContainerView.hide()
@@ -24,16 +23,16 @@ object MedicamentsFormInitializer : FormInitializer() {
         hide()
     }
 
-    override fun View.initFormView() {
+    override fun View.initFormView() = with(binding) {
         formVariantSelectorView.hide()
         formInputView.show()
         formInputView.setHint(R.string.events_creation_hint_medicine)
         formInputView.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE
-        formInputView.setSingleLine(false)
+        formInputView.isSingleLine = false
         formInputView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
     }
 
-    override fun View.initNoteView() {
+    override fun View.initNoteView() = with(binding) {
         formNoteView.hide()
     }
 }

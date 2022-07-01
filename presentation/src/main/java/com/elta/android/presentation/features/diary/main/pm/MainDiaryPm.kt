@@ -16,6 +16,9 @@ import com.elta.android.presentation.features.diary.main.DiaryEventsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
@@ -27,17 +30,17 @@ class MainDiaryPm @Inject constructor(
 
     override val isEmptyScreen = false
 
-    val datePickerDateState = State(LocalDate.now())
-    val dateSelectedAction = Action<LocalDate>()
-    val selectDateInDialogAction = Action<Unit>()
-    val dateInDialogSelectedAction = Action<LocalDate>()
-    val showDatePickerDialogCommand = Command<LocalDate>()
-    val monthTitleState = State<String>()
-    val todayButtonVisibilityState = State<Boolean>()
-    val todayClickedAction = Action<Unit>()
+    val datePickerDateState = state(LocalDate.now())
+    val dateSelectedAction = action<LocalDate>()
+    val selectDateInDialogAction = action<Unit>()
+    val dateInDialogSelectedAction = action<LocalDate>()
+    val showDatePickerDialogCommand = command<LocalDate>()
+    val monthTitleState = state<String>()
+    val todayButtonVisibilityState = state<Boolean>()
+    val todayClickedAction = action<Unit>()
 
-    private val loadScreenAction = Action<LocalDate>()
-    private val selectedDateState = State(LocalDate.now())
+    private val loadScreenAction = action<LocalDate>()
+    private val selectedDateState = state(LocalDate.now())
 
     override fun onCreate() {
         super.onCreate()
@@ -94,13 +97,11 @@ class MainDiaryPm @Inject constructor(
             .untilDestroy()
 
         selectedDateState.observable
-            .map { it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR) }
+            .map {
+                todayButtonVisibilityState.consumer.accept(!it.isToday())
+                it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR)
+            }
             .subscribe(monthTitleState.consumer)
-            .untilDestroy()
-
-        selectedDateState.observable
-            .map { !it.isToday() }
-            .subscribe(todayButtonVisibilityState.consumer)
             .untilDestroy()
 
         todayClickedAction.observable
@@ -112,7 +113,9 @@ class MainDiaryPm @Inject constructor(
 
     private fun handleSuccess(blocks: List<EventsBlock>) {
         items.consumer.accept(
-            blocks.mapIndexed { index, event -> mapper.apply { expand = index == 0 }.mapFromObject(event) }
+            blocks.mapIndexed { index, event ->
+                mapper.apply { expand = index == 0 }.mapFromObject(event)
+            }
         )
     }
 

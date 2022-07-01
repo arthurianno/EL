@@ -1,16 +1,16 @@
 package com.elta.android.presentation.widgets.picker
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.elta.android.presentation.R
+import com.elta.android.presentation.databinding.LayoutTwoSectionPickerBinding
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.layout_two_section_picker.view.*
 import java.util.concurrent.TimeUnit
 
 @Suppress("UnnecessaryParentheses")
@@ -21,6 +21,10 @@ class TwoSectionPicker @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val disposable = CompositeDisposable()
+
+    private val binding: LayoutTwoSectionPickerBinding by lazy {
+        LayoutTwoSectionPickerBinding.bind(this)
+    }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_two_section_picker, this, true)
@@ -42,7 +46,7 @@ class TwoSectionPicker @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    fun setValue(value: Double) {
+    fun setValue(value: Double) = with(binding) {
         val left = value.toInt()
         val right = ((value - left) * TEN).toInt()
         leftPickerView.value = left
@@ -51,8 +55,8 @@ class TwoSectionPicker @JvmOverloads constructor(
 
     fun valueChanges(): Observable<Double> =
         Observables.combineLatest(
-            ValueChangeObservable(leftPickerView),
-            ValueChangeObservable(rightPickerView)
+            ValueChangeObservable(binding.leftPickerView),
+            ValueChangeObservable(binding.rightPickerView)
         ) { left: Int, right: Int -> left + right.toDouble() / TEN }
 
     companion object {

@@ -2,9 +2,9 @@ package com.elta.android.presentation.core.ui.keyboardanimator.customizable
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.view.View
 import android.view.WindowInsets
+import androidx.annotation.RequiresApi
 import kotlin.math.min
 
 /**
@@ -12,7 +12,8 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class WindowInsetsListener(private val onOffsetChanged: (Int) -> Boolean) : View.OnApplyWindowInsetsListener {
+class WindowInsetsListener(private val onOffsetChanged: (Int) -> Boolean) :
+    View.OnApplyWindowInsetsListener {
 
     private var previousOffset: Int = 0
 
@@ -30,10 +31,10 @@ class WindowInsetsListener(private val onOffsetChanged: (Int) -> Boolean) : View
     }
 
     private fun WindowInsets.consumeBottomInset(): WindowInsets =
-            replaceSystemWindowInsets(
-                    systemWindowInsetLeft,
-                    systemWindowInsetTop,
-                    systemWindowInsetRight,
-                    min(systemWindowInsetBottom, stableInsetBottom)
-            )
+        replaceSystemWindowInsets(
+            systemWindowInsetLeft,
+            systemWindowInsetTop,
+            systemWindowInsetRight,
+            min(systemWindowInsetBottom, stableInsetBottom)
+        )
 }

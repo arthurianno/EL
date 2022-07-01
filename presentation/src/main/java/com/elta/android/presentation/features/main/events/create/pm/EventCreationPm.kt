@@ -15,6 +15,7 @@ import com.elta.android.presentation.features.main.events.base.model.EventFormMo
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class EventCreationPm @Inject constructor(
@@ -22,8 +23,8 @@ class EventCreationPm @Inject constructor(
     services: ServiceFacade
 ) : BaseEventPm(services) {
 
-    private val isFormNotEmptyState = State(false)
-    private val eventFormHolderState = State(EventFormModel())
+    private val isFormNotEmptyState = state(false)
+    private val eventFormHolderState = state(EventFormModel())
 
     override fun onCreate() {
         super.onCreate()

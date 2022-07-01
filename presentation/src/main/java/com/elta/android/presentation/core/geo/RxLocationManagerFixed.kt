@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.IntentSender
 import android.location.Location
-import android.support.annotation.RequiresPermission
-import android.support.v4.app.Fragment
+import androidx.annotation.RequiresPermission
+import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -62,11 +62,13 @@ class RxLocationManagerFixed(
         val result = SettingsClient(checkNotNull(fragment.context))
             .checkLocationSettings(
                 LocationSettingsRequest.Builder()
-                    .addLocationRequest(LocationRequest.create().apply {
-                        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                        interval = updatesInterval
-                        updateCount?.let { numUpdates = it }
-                    })
+                    .addLocationRequest(
+                        LocationRequest.create().apply {
+                            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                            interval = updatesInterval
+                            updateCount?.let { numUpdates = it }
+                        }
+                    )
                     .setAlwaysShow(true)
                     .build()
             )

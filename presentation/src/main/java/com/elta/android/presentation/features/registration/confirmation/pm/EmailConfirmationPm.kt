@@ -7,6 +7,9 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import io.reactivex.Completable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class EmailConfirmationPm @Inject constructor(
@@ -17,12 +20,12 @@ class EmailConfirmationPm @Inject constructor(
 
     override val isEmptyScreen: Boolean = true
 
-    val loginWithAnotherAccountAction = Action<Unit>()
-    val continueAction = Action<Unit>()
-    val contentVisibilityCommand = Command<Boolean>(bufferSize = 1)
-    val confirmEmailAction = Action<Unit>()
+    val loginWithAnotherAccountAction = action<Unit>()
+    val continueAction = action<Unit>()
+    val contentVisibilityCommand = command<Boolean>(bufferSize = 1)
+    val confirmEmailAction = action<Unit>()
 
-    private val token = State<String>()
+    private val token = state<String>()
 
     @Suppress("LongMethod")
     override fun onCreate() {

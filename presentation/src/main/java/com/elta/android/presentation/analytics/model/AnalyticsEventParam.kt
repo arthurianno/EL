@@ -2,7 +2,7 @@
 
 package com.elta.android.presentation.analytics.model
 
-import android.support.annotation.StringDef
+import androidx.annotation.StringDef
 
 @StringDef(
     AnalyticsEventParam.LOG_TYPE,

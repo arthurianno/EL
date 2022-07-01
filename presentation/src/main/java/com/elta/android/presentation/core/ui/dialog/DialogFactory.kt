@@ -2,7 +2,7 @@ package com.elta.android.presentation.core.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.elta.android.presentation.R
 import me.dmdev.rxpm.widget.DialogControl
@@ -11,7 +11,7 @@ fun createDialog(
     fragment: Fragment,
     dc: DialogControl<DialogData, DialogResult>,
     data: DialogData
-) = createDialog(checkNotNull(fragment.activity), dc, data)
+) = createDialog(fragment.requireActivity(), dc, data)
 
 fun createDialog(
     activity: Activity,

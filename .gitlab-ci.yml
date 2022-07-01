@@ -1,4 +1,4 @@
-image: javiersantos/android-ci:latest
+image: jangrewe/gitlab-ci-android
 
 cache:
   key: ${CI_PROJECT_ID}
@@ -20,7 +20,7 @@ complexCheck:
   stage: check
   script:
   # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
-  - ./gradlew testDebugUnitTest -x lint
+  - ./gradlew ktlintCheck testDebugUnitTest -x lint
   only:
   - merge_requests
   - /^v(\d+)\.(\d+)\.(\d+)\-beta$/

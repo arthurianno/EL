@@ -1,6 +1,7 @@
 package com.elta.android.presentation.core.pm
 
 import com.nullgr.core.adapter.items.ListItem
+import me.dmdev.rxpm.state
 
 abstract class BaseListPm(
     services: ServiceFacade
@@ -9,5 +10,5 @@ abstract class BaseListPm(
     override val isEmptyScreen: Boolean
         get() = !items.hasValue()
 
-    val items = State<List<ListItem>>()
+    val items = state<List<ListItem>>()
 }

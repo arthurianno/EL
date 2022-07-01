@@ -7,13 +7,13 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 
-inline fun atEndOhHour(h: Int = 0): Long =
+internal fun atEndOhHour(h: Int = 0): Long =
     LocalDateTime.of(LocalDate.now(), LocalTime.of(h, 59, 59)).toMillis()
 
-inline fun atHour(h: Int = 0): Long =
+internal fun atHour(h: Int = 0): Long =
     LocalDateTime.of(LocalDate.now(), LocalTime.of(h, 0, 0)).toMillis()
 
-inline fun atHalfPastHour(h: Int = 0): Long =
+internal fun atHalfPastHour(h: Int = 0): Long =
     LocalDateTime.of(LocalDate.now(), LocalTime.of(h, 30, 0)).toMillis()
 
-inline fun atStartOfDay() = LocalDateTime.now().with(LocalTime.MIDNIGHT).toMillis()
+internal fun atStartOfDay() = LocalDateTime.now().with(LocalTime.MIDNIGHT).toMillis()

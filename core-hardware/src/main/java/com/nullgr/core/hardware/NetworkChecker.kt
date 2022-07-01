@@ -27,9 +27,9 @@ class NetworkChecker(context: Context) {
      */
     fun isConnectedOverWifi(): Boolean {
         val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null
-                && networkInfo.isConnectedOrConnecting
-                && networkInfo.type == ConnectivityManager.TYPE_WIFI
+        return networkInfo != null &&
+            networkInfo.isConnectedOrConnecting &&
+            networkInfo.type == ConnectivityManager.TYPE_WIFI
     }
 
     /**
@@ -39,9 +39,9 @@ class NetworkChecker(context: Context) {
      */
     fun isConnectedOverCellular(): Boolean {
         val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null
-                && networkInfo.isConnectedOrConnecting
-                && networkInfo.type != ConnectivityManager.TYPE_WIFI
+        return networkInfo != null &&
+            networkInfo.isConnectedOrConnecting &&
+            networkInfo.type != ConnectivityManager.TYPE_WIFI
     }
 
     /**
@@ -51,9 +51,9 @@ class NetworkChecker(context: Context) {
      */
     fun isInRoaming(): Boolean {
         val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null
-                && networkInfo.isConnectedOrConnecting
-                && networkInfo.type != ConnectivityManager.TYPE_WIFI
-                && networkInfo.isRoaming
+        return networkInfo != null &&
+            networkInfo.isConnectedOrConnecting &&
+            networkInfo.type != ConnectivityManager.TYPE_WIFI &&
+            networkInfo.isRoaming
     }
 }

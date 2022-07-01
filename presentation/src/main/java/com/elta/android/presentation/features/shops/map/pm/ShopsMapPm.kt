@@ -42,6 +42,9 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -54,44 +57,44 @@ class ShopsMapPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
-    val items = State<List<ListItem>>()
-    val geoPoints = State<Pair<List<GeoPoint>, Int>>()
-    val titleState = State<String>()
-    val searchHintState = State<String>()
+    val items = state<List<ListItem>>()
+    val geoPoints = state<Pair<List<GeoPoint>, Int>>()
+    val titleState = state<String>()
+    val searchHintState = state<String>()
 
-    val checkPermissionStatusCommand = Command<Unit>(bufferSize = 1)
-    val requestPermissionCommand = Command<Unit>(bufferSize = 1)
+    val checkPermissionStatusCommand = command<Unit>(bufferSize = 1)
+    val requestPermissionCommand = command<Unit>(bufferSize = 1)
     val locationControl = locationControl(rxLocationManager)
 
-    val addMyLocationPinCommand = Command<Location>()
-    val navigateToLocationCommand = Command<ExtendedLocation>()
-    val moveToMyLocationAction = Action<Unit>()
+    val addMyLocationPinCommand = command<Location>()
+    val navigateToLocationCommand = command<ExtendedLocation>()
+    val moveToMyLocationAction = action<Unit>()
 
-    val shopListItemSelectedAction = Action<Int>()
-    val shopItemGeoPointSelectedAction = Action<GeoPoint>()
-    val selectGeoPointCommand = Command<GeoPoint>()
-    val selectShopItemCommand = Command<Int>()
+    val shopListItemSelectedAction = action<Int>()
+    val shopItemGeoPointSelectedAction = action<GeoPoint>()
+    val selectGeoPointCommand = command<GeoPoint>()
+    val selectShopItemCommand = command<Int>()
 
-    val searchItems = State<List<ListItem>>()
+    val searchItems = state<List<ListItem>>()
     val searchInput = inputControl()
-    val searchClearAction = Action<Unit>()
-    val searchCloseCommand = Command<Unit>()
-    val showDefaultScreenStateCommand = Command<List<Point>>()
+    val searchClearAction = action<Unit>()
+    val searchCloseCommand = command<Unit>()
+    val showDefaultScreenStateCommand = command<List<Point>>()
 
-    private val searchAction = Action<String>()
-    private val searchResultSelectedAction = Action<SearchResultItem>()
+    private val searchAction = action<String>()
+    private val searchResultSelectedAction = action<SearchResultItem>()
 
-    private val shopsTypeState = State<Type>()
-    private val permissionStatusResultAction = Action<PermissionStatus>()
-    private val fetchMyLocationAction = Action<Unit>()
-    private val myLocationState = State<Location>()
-    private val defaultLocationState = State<Location>()
-    private val loadScreenAction = Action<Unit>()
-    private val salePointsState = State<List<SalePoint>>()
-    private val foundedLocation = State<Location>()
-    private val selectedPointId = State<Any>()
-    private val coldStartState = State(true)
-    private val manualNavigateToUserLocation = State(false)
+    private val shopsTypeState = state<Type>()
+    private val permissionStatusResultAction = action<PermissionStatus>()
+    private val fetchMyLocationAction = action<Unit>()
+    private val myLocationState = state<Location>()
+    private val defaultLocationState = state<Location>()
+    private val loadScreenAction = action<Unit>()
+    private val salePointsState = state<List<SalePoint>>()
+    private val foundedLocation = state<Location>()
+    private val selectedPointId = state<Any>()
+    private val coldStartState = state(true)
+    private val manualNavigateToUserLocation = state(false)
 
     private val backgroundScheduler: Scheduler = Schedulers.computation()
 
@@ -135,7 +138,9 @@ class ShopsMapPm @Inject constructor(
     }
 
     override fun handleError(error: Throwable) {
-        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(Unit)
+        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(
+            Unit
+        )
         else super.handleError(error)
     }
 
@@ -179,7 +184,14 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         defaultLocationState.observable
-            .doOnNext { navigateToLocationCommand.consumer.accept(ExtendedLocation(it, DEFAULT_LOCATION_ZOOM)) }
+            .doOnNext {
+                navigateToLocationCommand.consumer.accept(
+                    ExtendedLocation(
+                        it,
+                        DEFAULT_LOCATION_ZOOM
+                    )
+                )
+            }
             .doOnNext(foundedLocation.consumer)
             .subscribe()
             .untilDestroy()
@@ -335,10 +347,11 @@ class ShopsMapPm @Inject constructor(
                 searchItems.consumer.accept(emptyList())
                 searchResultSelectedAction.consumer.accept(clicks.item)
             }
+            else -> {}
         }
     }
 
-    private inline fun SalePoint.toItem(): ListItem =
+    private fun SalePoint.toItem(): ListItem =
         ShopItem(
             id = id,
             name = name,
@@ -347,7 +360,7 @@ class ShopsMapPm @Inject constructor(
             phone = phone
         )
 
-    private inline fun SalePoint.toGeoPoint(): GeoPoint =
+    private fun SalePoint.toGeoPoint(): GeoPoint =
         GeoPoint(
             latitude = coordinates.latitude,
             longitude = coordinates.longitude,
@@ -356,7 +369,7 @@ class ShopsMapPm @Inject constructor(
             meta = "$city, $address"
         )
 
-    private inline fun Type.toIcon(): GeoPointIcon =
+    private fun Type.toIcon(): GeoPointIcon =
         when (this) {
             Type.SALE -> GeoPointIcon(
                 normal = R.drawable.ic_normal_pin_shop,
@@ -370,7 +383,8 @@ class ShopsMapPm @Inject constructor(
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
-            return geoPoints.valueOrNull?.first?.find { it.id == shopItem.id }?.also { it.selected = true }
+            return geoPoints.valueOrNull?.first?.find { it.id == shopItem.id }
+                ?.also { it.selected = true }
                 ?: emptyGeoPoint
         }
         return emptyGeoPoint

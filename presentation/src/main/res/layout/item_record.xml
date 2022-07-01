@@ -11,7 +11,7 @@
         android:layout_height="1dp"
         android:background="@drawable/divider" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
@@ -20,7 +20,7 @@
         android:paddingEnd="16dp"
         android:paddingBottom="12dp">
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/recordIconView"
             android:layout_width="32dp"
             android:layout_height="32dp"
@@ -37,7 +37,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/recordIconView"
             app:layout_constraintEnd_toEndOf="@+id/recordIconView" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recordTitleView"
             style="@style/New.Body2.BlackBlue"
             android:layout_width="0dp"
@@ -51,7 +51,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Короткий" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recordTypeView"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="0dp"
@@ -66,14 +66,14 @@
             app:layout_constraintTop_toBottomOf="@+id/recordTitleView"
             tools:text="Инсулин" />
 
-        <android.support.constraint.Barrier
+        <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrierView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="start"
             app:constraint_referenced_ids="recordCountView,recordDateView" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recordCountView"
             style="@style/New.Body2.ShadeGreen"
             android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="3 ед" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recordDateView"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="wrap_content"
@@ -92,5 +92,5 @@
             app:layout_constraintTop_toBottomOf="@+id/recordCountView"
             tools:text="в 11:30 (UTC +4)" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

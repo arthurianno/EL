@@ -20,7 +20,7 @@
                 android:padding="5dp"
                 tools:background="@color/black">
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/statusTextView"
                     style="@style/New.Caption1.White"
                     android:layout_width="wrap_content"

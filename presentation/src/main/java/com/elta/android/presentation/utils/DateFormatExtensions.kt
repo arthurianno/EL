@@ -25,8 +25,13 @@ inline fun ZonedDateTime.toEventDate(r: ResourceProvider) =
 inline fun ZonedDateTime.toSyncDate(r: ResourceProvider) =
     when {
         toLocalDate().isToday() -> "${r.getString(R.string.event_date_today)} ${toEventTime(r)}"
-        toLocalDate().isYesterday() -> "${r.getString(R.string.event_date_yesterday)} ${toEventTime(r)}"
+        toLocalDate().isYesterday() -> "${r.getString(R.string.event_date_yesterday)} ${
+        toEventTime(
+            r
+        )
+        }"
         else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
     }
 
-infix fun LocalDateTime.daysTo(other: LocalDateTime): Long = Duration.between(other, this).abs().toDays()
+infix fun LocalDateTime.daysTo(other: LocalDateTime): Long =
+    Duration.between(other, this).abs().toDays()

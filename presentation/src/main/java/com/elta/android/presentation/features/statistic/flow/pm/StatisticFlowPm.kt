@@ -13,6 +13,9 @@ import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.messages.SnackBarMessageData
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -20,10 +23,10 @@ class StatisticFlowPm @Inject constructor(
     services: ServiceFacade
 ) : BaseFlowPm(services) {
 
-    val periodSelectedAction = Action<Int>()
-    val selectedPeriodIdState = State(R.id.periodSevenDaysView)
-    val menuAction = Action<Unit>()
-    val showReportPeriodChooser = Command<Unit>(bufferSize = 1)
+    val periodSelectedAction = action<Int>()
+    val selectedPeriodIdState = state(R.id.periodSevenDaysView)
+    val menuAction = action<Unit>()
+    val showReportPeriodChooser = command<Unit>(bufferSize = 1)
 
     override fun onCreate() {
         super.onCreate()
@@ -33,7 +36,8 @@ class StatisticFlowPm @Inject constructor(
             .trackEvent {
                 AnalyticsEvent(
                     AnalyticsEventType.PERIOD_TAB,
-                    hashMapOf(AnalyticsEventParam.PERIOD to getPeriodParam(it.second.count)))
+                    hashMapOf(AnalyticsEventParam.PERIOD to getPeriodParam(it.second.count))
+                )
             }
             .doOnNext { router.navigateToTab(Screens.PeriodScreen(it.second)) }
             .map { it.first }

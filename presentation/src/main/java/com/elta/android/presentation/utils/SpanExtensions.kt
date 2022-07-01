@@ -32,12 +32,19 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
         TextUtils.copySpansFrom(spannable, 0, ss.length, null, ss, 0)
 
         text = ss.withSpan {
-            setSpan(span, startIndex, startIndex + spanText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(
+                span,
+                startIndex,
+                startIndex + spanText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
-        it.setDisposable(Disposables.fromAction {
-            spannable.removeSpan(span)
-        })
+        it.setDisposable(
+            Disposables.fromAction {
+                spannable.removeSpan(span)
+            }
+        )
     }
 }
 

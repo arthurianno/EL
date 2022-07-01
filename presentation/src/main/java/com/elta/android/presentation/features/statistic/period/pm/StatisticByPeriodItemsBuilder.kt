@@ -28,11 +28,11 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 ) {
 
     fun build(model: StatisticByPeriodModel, date: LocalDate? = null): List<ListItem> {
-        val items = arrayListOf<ListItem>()
+        val items = mutableListOf<ListItem>()
 
         items.add(model.toChartItem(date))
 
-        val glucoseIndexItems = arrayListOf<ListItem>()
+        val glucoseIndexItems = mutableListOf<ListItem>()
         val glucoseStatisticModel = when (date == null) {
             true -> model.glucose
             else -> model.allDays[date]?.glucose
@@ -74,7 +74,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         return GlucoseDailyChartItem(ChartItemsBuilder.build(this), dateTitle)
     }
 
-    private inline fun GlucoseIndexItem.Type.getBg(glucose: GlucoseStatisticModel?): Drawable? =
+    private fun GlucoseIndexItem.Type.getBg(glucose: GlucoseStatisticModel?): Drawable? =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> glucose.getAverageBg()
             GlucoseIndexItem.Type.TOTAL -> resources.getDrawable(R.drawable.bg_glucose_index_total)
@@ -83,7 +83,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GlucoseIndexItem.Type.LOW -> resources.getDrawable(R.drawable.bg_glucose_index_low)
         }
 
-    private inline fun GlucoseStatisticModel?.getAverageBg(): Drawable? =
+    private fun GlucoseStatisticModel?.getAverageBg(): Drawable? =
         when {
             this.isAverageIn(this?.settings?.high) -> resources.getDrawable(R.drawable.bg_glucose_index_high)
             this.isAverageIn(this?.settings?.normal) -> resources.getDrawable(R.drawable.bg_glucose_index_normal)
@@ -91,17 +91,19 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             else -> resources.getDrawable(R.drawable.bg_glucose_index_total)
         }
 
-    private inline fun GlucoseIndexItem.Type.geValue(glucose: GlucoseStatisticModel?): String =
+    private fun GlucoseIndexItem.Type.geValue(glucose: GlucoseStatisticModel?): String =
         when (this) {
-            GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(glucose?.averageLevel
-                ?: ZERO.toDouble())
+            GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(
+                glucose?.averageLevel
+                    ?: ZERO.toDouble()
+            )
             GlucoseIndexItem.Type.TOTAL -> glucose?.eventsCount.toString()
             GlucoseIndexItem.Type.HIGH -> glucose?.eventsHighCount.toString()
             GlucoseIndexItem.Type.NORMAL -> glucose?.eventsNormalCount.toString()
             GlucoseIndexItem.Type.LOW -> glucose?.eventsLowCount.toString()
         }
 
-    private inline fun GlucoseIndexItem.Type.geUnit(glucose: GlucoseStatisticModel?): String =
+    private fun GlucoseIndexItem.Type.geUnit(glucose: GlucoseStatisticModel?): String =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> resources.getString(R.string.statistic_glucose_index_average_unit)
             GlucoseIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_glucose_index_total_unit)
@@ -119,7 +121,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private inline fun GlucoseIndexItem.Type.getDescription(): String =
+    private fun GlucoseIndexItem.Type.getDescription(): String =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> resources.getString(R.string.statistic_glucose_index_description_average)
             GlucoseIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_glucose_index_description_total)
@@ -128,7 +130,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GlucoseIndexItem.Type.LOW -> resources.getString(R.string.statistic_glucose_index_description_low)
         }
 
-    private inline fun GeneralIndexItem.Type.getIcon(): Int =
+    private fun GeneralIndexItem.Type.getIcon(): Int =
         when (this) {
             GeneralIndexItem.Type.BREAD -> R.drawable.ic_event_bread_with_bg
             GeneralIndexItem.Type.TOTAL -> R.drawable.ic_event_insulin_with_bg
@@ -137,7 +139,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GeneralIndexItem.Type.ACTIVITY -> R.drawable.ic_event_activity_with_bg
         }
 
-    private inline fun GeneralIndexItem.Type.getTitle(): String =
+    private fun GeneralIndexItem.Type.getTitle(): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(R.string.statistic_general_index_title_bread)
             GeneralIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_general_index_title_insulin)
@@ -146,16 +148,22 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GeneralIndexItem.Type.ACTIVITY -> resources.getString(R.string.statistic_general_index_title_activity)
         }
 
-    private inline fun GeneralIndexItem.Type.getDescriptionByDate(
+    private fun GeneralIndexItem.Type.getDescriptionByDate(
         stat: StatisticByPeriodModel,
         value: String,
         date: LocalDate?
     ): String {
-        return if (date != null) getDescriptionByDay(stat.allDays[date]?.activity?.eventsCount, value)
+        return if (date != null) getDescriptionByDay(
+            stat.allDays[date]?.activity?.eventsCount,
+            value
+        )
         else getDescriptionByPeriod(stat.activity.eventsCount, value)
     }
 
-    private inline fun GeneralIndexItem.Type.getDescriptionByDay(eventsCount: Int?, value: String): String =
+    private fun GeneralIndexItem.Type.getDescriptionByDay(
+        eventsCount: Int?,
+        value: String
+    ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_by_day_bread,
@@ -180,7 +188,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private inline fun GeneralIndexItem.Type.getDescriptionByPeriod(eventsCount: Int?, value: String): String =
+    private fun GeneralIndexItem.Type.getDescriptionByPeriod(
+        eventsCount: Int?,
+        value: String
+    ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_by_period_bread,
@@ -205,13 +216,16 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             )
         }
 
-    private fun GeneralIndexItem.Type.getValueByDate(model: StatisticByPeriodModel, date: LocalDate?): String =
+    private fun GeneralIndexItem.Type.getValueByDate(
+        model: StatisticByPeriodModel,
+        date: LocalDate?
+    ): String =
         when (date == null) {
             true -> getValue(model)
             else -> getValue(model.allDays[date])
         }
 
-    private inline fun GeneralIndexItem.Type.getValue(stat: StatisticByPeriodModel?): String =
+    private fun GeneralIndexItem.Type.getValue(stat: StatisticByPeriodModel?): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_bread,
@@ -232,7 +246,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GeneralIndexItem.Type.ACTIVITY -> stat?.activity?.averageDuration.asTimeString(resources)
         }
 
-    private inline fun GeneralIndexItem.Type.getValue(stat: DailyStatisticModel?): String =
+    private fun GeneralIndexItem.Type.getValue(stat: DailyStatisticModel?): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_bread,
@@ -257,8 +271,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         val duration = this ?: ZERO
         val days = TimeUnit.SECONDS.toDays(duration)
         val hours = TimeUnit.SECONDS.toHours(duration) - days * HOURS_IN_DAY
-        val minutes = TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.SECONDS.toHours(duration) * MINUTES_IN_HOUR
-        val seconds = TimeUnit.SECONDS.toSeconds(duration) - TimeUnit.SECONDS.toMinutes(duration) * SECONDS_IN_MINUTE
+        val minutes =
+            TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.SECONDS.toHours(duration) * MINUTES_IN_HOUR
+        val seconds =
+            TimeUnit.SECONDS.toSeconds(duration) - TimeUnit.SECONDS.toMinutes(duration) * SECONDS_IN_MINUTE
 
         val time = StringBuilder().apply {
             if (days > ZERO) {

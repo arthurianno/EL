@@ -1,7 +1,6 @@
 package com.nullgr.core.font
 
 import android.text.Spannable
-import java.util.*
 
 /**
  * Class that provides ability to build and apply complicated span decor to text in easy way
@@ -97,7 +96,15 @@ class SpanSet internal constructor(private var target: CharSequence?) {
 
         private fun addTempSpanToSet() {
             tempSpan?.let {
-                spanSet.add(SpanEntry(tempStartIndex, tempEndIndex, tempTextPart, tempSpan, tempFlag))
+                spanSet.add(
+                    SpanEntry(
+                        tempStartIndex,
+                        tempEndIndex,
+                        tempTextPart,
+                        tempSpan,
+                        tempFlag
+                    )
+                )
             }
         }
 
@@ -117,8 +124,11 @@ class SpanSet internal constructor(private var target: CharSequence?) {
                         }
                     }
 
-                    spannableString.setSpan(it.span, startIndex, endIndex, it.flag
-                            ?: Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    spannableString.setSpan(
+                        it.span, startIndex, endIndex,
+                        it.flag
+                            ?: Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
 
                 return spannableString
@@ -127,9 +137,11 @@ class SpanSet internal constructor(private var target: CharSequence?) {
         }
     }
 
-    private data class SpanEntry(var startIndex: Int? = null,
-                                 var endIndex: Int? = null,
-                                 val textPart: String? = null,
-                                 var span: Any? = null,
-                                 val flag: Int? = null)
+    private data class SpanEntry(
+        var startIndex: Int? = null,
+        var endIndex: Int? = null,
+        val textPart: String? = null,
+        var span: Any? = null,
+        val flag: Int? = null
+    )
 }
