@@ -23,6 +23,7 @@ import com.nullgr.core.adapter.items.ListItem
  *
  * @author Grishko Nikita
  */
+@Deprecated("Класс не используется. Можно удалить")
 class ConditionBasedDividerItemDecoration(context: Context, @DrawableRes resId: Int? = null) :
     RecyclerView.ItemDecoration() {
 
