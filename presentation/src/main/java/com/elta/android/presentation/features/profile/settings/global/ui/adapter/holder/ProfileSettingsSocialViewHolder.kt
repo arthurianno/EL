@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates
+package com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder
 
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
@@ -9,21 +9,27 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.nullgr.core.rx.RxBus
 
 class ProfileSettingsSocialViewHolder(
-    private val bus: RxBus,
-    private val binding: ItemProfileSettingsSocialBinding
-) :
-    BaseListItemViewHolder<ProfileSettingsSocialItem>(binding.root) {
-    private fun ProfileSettingsSocialItem.getActionIcon() =
-        if (isLinked) R.drawable.ic_delete else R.drawable.ic_add
-
+    private val binding: ItemProfileSettingsSocialBinding,
+    private val bus: RxBus
+) : BaseListItemViewHolder<ProfileSettingsSocialItem>(binding.root) {
     override fun bind(item: ProfileSettingsSocialItem) {
         with(binding) {
             socialNetworkIconView.setImageResource(item.networkIcon)
             socialTitleView.text = item.title
             socialActionIconView.setImageResource(item.getActionIcon())
-            itemView.setOnClickListener {
+//            itemView.setOnClickListener {
+//                bus.click(Clicks.ProfileSettingsSocialItemClicked(item))
+//            }
+            root.setOnClickListener {
                 bus.click(Clicks.ProfileSettingsSocialItemClicked(item))
             }
         }
     }
+
+    private fun ProfileSettingsSocialItem.getActionIcon() =
+        if (isLinked) {
+            R.drawable.ic_delete
+        } else {
+            R.drawable.ic_add
+        }
 }

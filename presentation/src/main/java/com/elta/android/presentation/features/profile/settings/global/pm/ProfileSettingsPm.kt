@@ -95,6 +95,7 @@ class ProfileSettingsPm @Inject constructor(
                         Unit
                     )
                     ProfileSettingsItem.Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
+                    ProfileSettingsItem.Type.APP_VERSION -> {} // TODO click by app version
                     else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }
             }

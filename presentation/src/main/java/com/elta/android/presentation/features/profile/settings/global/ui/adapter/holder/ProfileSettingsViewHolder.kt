@@ -1,6 +1,5 @@
-package com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates
+package com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder
 
-import android.content.res.Resources
 import android.view.View
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
@@ -11,13 +10,21 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.nullgr.core.rx.RxBus
 
 class ProfileSettingsViewHolder(
-    private val bus: RxBus,
-    private val resources: Resources,
-    private val binding: ItemProfileSettingsBinding
+    private val binding: ItemProfileSettingsBinding,
+    private val bus: RxBus
 ) : BaseListItemViewHolder<ProfileSettingsItem>(binding.root) {
     private fun toggleFocus(isFocus: Boolean) {
         with(binding) {
-            settingsTitleView.setTextColor(resources.getColor(if (isFocus) R.color.black_blue else R.color.shade_black2))
+            settingsTitleView.setTextColor(
+                root.context.resources.getColor(
+                    if (isFocus) {
+                        R.color.black_blue
+                    } else {
+                        R.color.shade_black2
+                    },
+                    root.context.theme
+                )
+            )
             nextIconView.visibility = if (isFocus) View.VISIBLE else View.INVISIBLE
             itemView.isClickable = isFocus
         }

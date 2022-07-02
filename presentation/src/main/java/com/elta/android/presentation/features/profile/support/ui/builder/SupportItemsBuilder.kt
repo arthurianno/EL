@@ -35,6 +35,30 @@ class SupportItemsBuilder @Inject constructor(
         )
         add(
             SupportActionItem(
+                icon = R.drawable.ic_support_mail,
+                title = resourceProvider.getString(R.string.telegram),
+                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+                action = SupportAction.TelegramAction
+            )
+        )
+        add(
+            SupportActionItem(
+                icon = R.drawable.ic_support_mail,
+                title = resourceProvider.getString(R.string.whatsapp),
+                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+                action = SupportAction.WhatsAppAction
+            )
+        )
+        add(
+            SupportActionItem(
+                icon = R.drawable.ic_support_mail,
+                title = resourceProvider.getString(R.string.viber),
+                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+                action = SupportAction.ViberAction
+            )
+        )
+        add(
+            SupportActionItem(
                 icon = R.drawable.ic_support_center,
                 title = resourceProvider.getString(R.string.profile_support_service_centers),
                 subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),

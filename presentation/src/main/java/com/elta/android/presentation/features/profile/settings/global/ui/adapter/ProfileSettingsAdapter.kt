@@ -9,11 +9,11 @@ import com.elta.android.presentation.databinding.ItemProfileSettingsHeaderBindin
 import com.elta.android.presentation.databinding.ItemProfileSettingsHealthAppBinding
 import com.elta.android.presentation.databinding.ItemProfileSettingsSocialBinding
 import com.elta.android.presentation.databinding.ItemSeparatorBinding
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHeaderViewHolder
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHealthAppViewHolder
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsSeparatorViewHolder
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsSocialViewHolder
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsViewHolder
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsHeaderViewHolder
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsHealthAppViewHolder
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsSeparatorViewHolder
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsSocialViewHolder
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsViewHolder
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
@@ -35,8 +35,8 @@ class ProfileSettingsAdapter @Inject constructor(
             }
             ProfileSettingsHealthAppItem::class.java.hashCode() -> {
                 ProfileSettingsHealthAppViewHolder(
-                    bus,
-                    ItemProfileSettingsHealthAppBinding.inflate(inflater, parent, false)
+                    ItemProfileSettingsHealthAppBinding.inflate(inflater, parent, false),
+                    bus
                 )
             }
             ProfileSettingsSeparatorItem::class.java.hashCode() -> {
@@ -45,17 +45,15 @@ class ProfileSettingsAdapter @Inject constructor(
                 )
             }
             ProfileSettingsItem::class.java.hashCode() -> {
-                val binding = ItemProfileSettingsBinding.inflate(inflater, parent, false)
                 ProfileSettingsViewHolder(
-                    bus,
-                    binding.root.context.resources,
-                    binding
+                    ItemProfileSettingsBinding.inflate(inflater, parent, false),
+                    bus
                 )
             }
             ProfileSettingsSocialItem::class.java.hashCode() -> {
                 ProfileSettingsSocialViewHolder(
-                    bus,
-                    ItemProfileSettingsSocialBinding.inflate(inflater, parent, false)
+                    ItemProfileSettingsSocialBinding.inflate(inflater, parent, false),
+                    bus
                 )
             }
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")

@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates
+package com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder
 
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemSeparatorBinding

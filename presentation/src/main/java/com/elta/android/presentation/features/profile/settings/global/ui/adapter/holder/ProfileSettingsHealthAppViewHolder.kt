@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates
+package com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder
 
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.click
@@ -8,10 +8,9 @@ import com.elta.android.presentation.features.profile.settings.global.ui.adapter
 import com.nullgr.core.rx.RxBus
 
 class ProfileSettingsHealthAppViewHolder(
-    private val bus: RxBus,
-    private val binding: ItemProfileSettingsHealthAppBinding
-) :
-    BaseListItemViewHolder<ProfileSettingsHealthAppItem>(binding.root) {
+    private val binding: ItemProfileSettingsHealthAppBinding,
+    private val bus: RxBus
+) : BaseListItemViewHolder<ProfileSettingsHealthAppItem>(binding.root) {
     override fun bind(item: ProfileSettingsHealthAppItem) {
         with(binding) {
             healthAppIconView.setImageResource(item.icon)
