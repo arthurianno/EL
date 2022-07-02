@@ -2,23 +2,33 @@ package com.elta.android.presentation.features.profile.settings.global.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileSettingsBinding
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.ProfileSettingsAdapter
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
+import javax.inject.Inject
 
-class ProfileSettingsFragment : BaseListFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
-    FragmentProfileSettingsBinding::inflate
-) {
-
+class ProfileSettingsFragment :
+    BaseRecyclerViewFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
+        FragmentProfileSettingsBinding::inflate
+    ) {
+    @Inject
+    lateinit var profileSettingsAdapter: ProfileSettingsAdapter
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy {
+        profileSettingsAdapter
+    }
     override val screenLayout: Int = R.layout.fragment_profile_settings
     override val classToken: Class<ProfileSettingsPm> = ProfileSettingsPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider

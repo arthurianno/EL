@@ -6,9 +6,9 @@ import android.graphics.Rect
 import android.view.View
 import androidx.annotation.DimenRes
 import androidx.recyclerview.widget.RecyclerView
+import com.elta.android.presentation.core.ui.adapter.BaseListAdapter
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
-import com.nullgr.core.adapter.DynamicAdapter
 
 @Suppress("MagicNumber")
 class SettingsMarginItemDecoration(
@@ -51,7 +51,7 @@ class SettingsMarginItemDecoration(
     }
 
     private fun getItemByPosition(parent: RecyclerView, position: Int) =
-        (parent.adapter as DynamicAdapter).items[position]
+        (parent.adapter as BaseListAdapter).currentList[position]
 
     private fun getPixelSize(resources: Resources, @DimenRes margin: Int): Int =
         if (margin == 0) 0 else resources.getDimensionPixelSize(margin)
