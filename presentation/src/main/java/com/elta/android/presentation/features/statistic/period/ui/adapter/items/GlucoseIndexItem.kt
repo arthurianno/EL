@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable
 import com.nullgr.core.adapter.items.ListItem
 
 data class GlucoseIndexItem(
-    val type: GlucoseIndexItem.Type,
+    val type: Type,
     val bg: Drawable?,
     val value: String,
     val unit: String,
