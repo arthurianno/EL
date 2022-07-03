@@ -2,20 +2,29 @@ package com.elta.android.presentation.features.profile.settings.reminders.all.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentRemindersBinding
 import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
+import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.ReminderAdapter
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 class RemindersFragment :
-    BaseListFragment<RemindersPm, FragmentRemindersBinding>(FragmentRemindersBinding::inflate) {
+    BaseRecyclerViewFragment<RemindersPm, FragmentRemindersBinding>(FragmentRemindersBinding::inflate) {
 
+    @Inject
+    lateinit var reminderAdapter: ReminderAdapter
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { reminderAdapter }
     override val screenLayout: Int = R.layout.fragment_reminders
     override val classToken: Class<RemindersPm> = RemindersPm::class.java
+
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
