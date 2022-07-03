@@ -37,15 +37,9 @@ class SupportPm @Inject constructor(
             is SupportAction.CallAction -> router.navigateTo(Screens.CallScreen(action.phone))
             is SupportAction.MailAction -> router.navigateTo(Screens.EmailScreen(action.email))
             SupportAction.ServiceCentersAction -> router.startFlow(Screens.ServiceCentersMap)
-            SupportAction.TelegramAction -> {
-                router.navigateTo(Screens.TelegramScreen(SUPPORT_PHONE))
-            }
-            SupportAction.ViberAction -> {
-                router.navigateTo(Screens.ViberScreen(SUPPORT_PHONE))
-            }
-            SupportAction.WhatsAppAction -> {
-                router.navigateTo(Screens.WhatsAppScreen(SUPPORT_PHONE))
-            }
+            SupportAction.TelegramAction -> router.navigateTo(Screens.TelegramScreen(SUPPORT_PHONE))
+            SupportAction.ViberAction -> router.navigateTo(Screens.ViberScreen(SUPPORT_PHONE))
+            SupportAction.WhatsAppAction -> router.navigateTo(Screens.WhatsAppScreen(SUPPORT_PHONE))
         }
     }
 }

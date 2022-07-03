@@ -31,6 +31,9 @@ import javax.inject.Inject
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
 
+    @Inject
+    lateinit var adapter: HemoglobinEventsAdapter
+
     override val contentLayout = R.layout.layout_settings_dialog_hemoglobin
     override val dialogType = DialogType.HbA1C
     override val classToken: Class<HemoglobinSettingsPm> = HemoglobinSettingsPm::class.java
@@ -59,12 +62,10 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     private val calendarView by lazy {
         binding.dialogContentContainerView.findViewById<MaterialCalendarView>(R.id.calendarView)
     }
+
     private val hemoglobinContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.hemoglobinContentView)
     }
-
-    @Inject
-    lateinit var adapter: HemoglobinEventsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

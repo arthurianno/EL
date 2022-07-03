@@ -21,6 +21,7 @@ class RemindersFragment :
 
     @Inject
     lateinit var reminderAdapter: ReminderAdapter
+
     override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { reminderAdapter }
     override val screenLayout: Int = R.layout.fragment_reminders
     override val classToken: Class<RemindersPm> = RemindersPm::class.java

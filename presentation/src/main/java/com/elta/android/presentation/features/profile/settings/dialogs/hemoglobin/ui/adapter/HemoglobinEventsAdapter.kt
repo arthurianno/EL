@@ -19,17 +19,14 @@ class HemoglobinEventsAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            HemoglobinHeaderItem::class.java.hashCode() -> {
-                HemoglobinHeaderViewHolder(
-                    ItemHemoglobinHeaderBinding.inflate(inflater, parent, false)
-                )
-            }
-            HemoglobinItem::class.java.hashCode() -> {
-                HemoglobinViewHolder(
-                    ItemHemoglobinBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
+            HemoglobinHeaderItem::class.java.hashCode() -> HemoglobinHeaderViewHolder(
+                ItemHemoglobinHeaderBinding.inflate(inflater, parent, false)
+            )
+
+            HemoglobinItem::class.java.hashCode() -> HemoglobinViewHolder(
+                ItemHemoglobinBinding.inflate(inflater, parent, false),
+                bus
+            )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }

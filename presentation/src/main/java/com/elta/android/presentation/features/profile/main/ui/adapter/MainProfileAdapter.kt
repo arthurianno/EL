@@ -22,23 +22,17 @@ class MainProfileAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            MainProfileIndicatorItem::class.java.hashCode() -> {
-                MainProfileIndicatorViewHolder(
-                    ItemProfileIndicatorsBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
-            MainProfileHeaderItem::class.java.hashCode() -> {
-                MainProfileHeaderViewHolder(
-                    ItemProfileHeaderBinding.inflate(inflater, parent, false)
-                )
-            }
-            MainProfileAdditionalItem::class.java.hashCode() -> {
-                MainProfileAdditionalViewHolder(
-                    ItemProfileFunctionsBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
+            MainProfileIndicatorItem::class.java.hashCode() -> MainProfileIndicatorViewHolder(
+                ItemProfileIndicatorsBinding.inflate(inflater, parent, false),
+                bus
+            )
+            MainProfileHeaderItem::class.java.hashCode() -> MainProfileHeaderViewHolder(
+                ItemProfileHeaderBinding.inflate(inflater, parent, false)
+            )
+            MainProfileAdditionalItem::class.java.hashCode() -> MainProfileAdditionalViewHolder(
+                ItemProfileFunctionsBinding.inflate(inflater, parent, false),
+                bus
+            )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }

@@ -17,9 +17,6 @@ class ProfileSettingsSocialViewHolder(
             socialNetworkIconView.setImageResource(item.networkIcon)
             socialTitleView.text = item.title
             socialActionIconView.setImageResource(item.getActionIcon())
-//            itemView.setOnClickListener {
-//                bus.click(Clicks.ProfileSettingsSocialItemClicked(item))
-//            }
             root.setOnClickListener {
                 bus.click(Clicks.ProfileSettingsSocialItemClicked(item))
             }

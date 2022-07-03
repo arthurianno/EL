@@ -28,34 +28,24 @@ class ProfileSettingsAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            ProfileSettingsHeaderItem::class.java.hashCode() -> {
-                ProfileSettingsHeaderViewHolder(
-                    ItemProfileSettingsHeaderBinding.inflate(inflater, parent, false)
-                )
-            }
-            ProfileSettingsHealthAppItem::class.java.hashCode() -> {
-                ProfileSettingsHealthAppViewHolder(
-                    ItemProfileSettingsHealthAppBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
-            ProfileSettingsSeparatorItem::class.java.hashCode() -> {
-                ProfileSettingsSeparatorViewHolder(
-                    ItemSeparatorBinding.inflate(inflater, parent, false)
-                )
-            }
-            ProfileSettingsItem::class.java.hashCode() -> {
-                ProfileSettingsViewHolder(
-                    ItemProfileSettingsBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
-            ProfileSettingsSocialItem::class.java.hashCode() -> {
-                ProfileSettingsSocialViewHolder(
-                    ItemProfileSettingsSocialBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
+            ProfileSettingsHeaderItem::class.java.hashCode() -> ProfileSettingsHeaderViewHolder(
+                ItemProfileSettingsHeaderBinding.inflate(inflater, parent, false)
+            )
+            ProfileSettingsHealthAppItem::class.java.hashCode() -> ProfileSettingsHealthAppViewHolder(
+                ItemProfileSettingsHealthAppBinding.inflate(inflater, parent, false),
+                bus
+            )
+            ProfileSettingsSeparatorItem::class.java.hashCode() -> ProfileSettingsSeparatorViewHolder(
+                ItemSeparatorBinding.inflate(inflater, parent, false)
+            )
+            ProfileSettingsItem::class.java.hashCode() -> ProfileSettingsViewHolder(
+                ItemProfileSettingsBinding.inflate(inflater, parent, false),
+                bus
+            )
+            ProfileSettingsSocialItem::class.java.hashCode() -> ProfileSettingsSocialViewHolder(
+                ItemProfileSettingsSocialBinding.inflate(inflater, parent, false),
+                bus
+            )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }

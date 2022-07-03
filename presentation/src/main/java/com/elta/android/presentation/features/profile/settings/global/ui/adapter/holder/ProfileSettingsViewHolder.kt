@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder
 
-import android.view.View
+import androidx.core.view.isInvisible
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
@@ -25,7 +25,7 @@ class ProfileSettingsViewHolder(
                     root.context.theme
                 )
             )
-            nextIconView.visibility = if (isFocus) View.VISIBLE else View.INVISIBLE
+            nextIconView.isInvisible = !isFocus
             itemView.isClickable = isFocus
         }
     }
@@ -38,7 +38,7 @@ class ProfileSettingsViewHolder(
                 ProfileSettingsItem.Type.EMAIL -> toggleFocus(false)
                 ProfileSettingsItem.Type.APP_VERSION -> {
                     toggleFocus(false)
-                    dividerView.visibility = View.INVISIBLE
+                    dividerView.isInvisible = true
                 }
                 else -> toggleFocus(true)
             }

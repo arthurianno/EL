@@ -26,12 +26,11 @@ class ProfileSettingsFragment :
     ) {
     @Inject
     lateinit var profileSettingsAdapter: ProfileSettingsAdapter
-    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy {
-        profileSettingsAdapter
-    }
+
     override val screenLayout: Int = R.layout.fragment_profile_settings
     override val classToken: Class<ProfileSettingsPm> = ProfileSettingsPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { profileSettingsAdapter }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

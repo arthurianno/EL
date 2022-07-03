@@ -19,17 +19,13 @@ class ReminderAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            ReminderHeaderItem::class.java.hashCode() -> {
-                ReminderHeaderViewHolder(
-                    ItemProfileSettingsHeaderBinding.inflate(inflater, parent, false)
-                )
-            }
-            ReminderItem::class.java.hashCode() -> {
-                ReminderViewHolder(
-                    ItemProfileAdditionalSettingsBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
+            ReminderHeaderItem::class.java.hashCode() -> ReminderHeaderViewHolder(
+                ItemProfileSettingsHeaderBinding.inflate(inflater, parent, false)
+            )
+            ReminderItem::class.java.hashCode() -> ReminderViewHolder(
+                ItemProfileAdditionalSettingsBinding.inflate(inflater, parent, false),
+                bus
+            )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }
