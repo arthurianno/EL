@@ -1,19 +1,31 @@
 package com.elta.android.presentation.features.statistic.period.ui
 
 import android.os.Bundle
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentStatisticPeriodBinding
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
+import com.elta.android.presentation.features.statistic.period.ui.adapter.PeriodAdapter
 import com.elta.android.presentation.utils.bundle
+import com.nullgr.core.adapter.items.ListItem
+import javax.inject.Inject
 
 class PeriodFragment :
-    BaseListFragment<PeriodPm, FragmentStatisticPeriodBinding>(FragmentStatisticPeriodBinding::inflate) {
+    BaseRecyclerViewFragment<PeriodPm, FragmentStatisticPeriodBinding>(
+        FragmentStatisticPeriodBinding::inflate
+    ) {
 
+    @Inject
+    lateinit var periodAdapter: PeriodAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { periodAdapter }
     override val screenLayout: Int = R.layout.fragment_statistic_period
     override val classToken: Class<PeriodPm> = PeriodPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider? = null
+
     override val backgroundColor: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
