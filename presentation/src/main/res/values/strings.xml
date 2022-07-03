@@ -512,6 +512,9 @@
     <string name="profile_support_email_description">Написать</string>
     <string name="profile_support_service_centers">Куда обратиться</string>
     <string name="profile_support_service_centers_description">Карта сервисных центров</string>
+    <string name="telegram">Telegram</string>
+    <string name="whatsapp">WhatsApp</string>
+    <string name="viber">Viber</string>
 
     <!-- STATISTICS -->
     <string name="statistic_title">Статистика</string>

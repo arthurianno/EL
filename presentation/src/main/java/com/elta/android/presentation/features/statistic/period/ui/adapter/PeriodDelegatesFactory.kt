@@ -1,8 +1,6 @@
 package com.elta.android.presentation.features.statistic.period.ui.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.delegates.ProfileSettingsHeaderDelegate
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GeneralIndexDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseDailyChartDelegate
 import com.elta.android.presentation.features.statistic.period.ui.adapter.delegates.GlucoseIndexDelegate
@@ -31,7 +29,6 @@ class PeriodDelegatesFactory @Inject constructor(
             GlucoseIndexItem::class.java -> GlucoseIndexDelegate()
             GlucoseIndexesItem::class.java -> GlucoseIndexesDelegate(viewPool, this)
             GeneralIndexItem::class.java -> GeneralIndexDelegate()
-            ProfileSettingsHeaderItem::class.java -> ProfileSettingsHeaderDelegate()
             else -> throw IllegalArgumentException("No delegate defined for ${clazz.simpleName}")
         }
 }

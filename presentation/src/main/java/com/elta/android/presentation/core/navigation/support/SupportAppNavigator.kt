@@ -2,6 +2,7 @@ package com.elta.android.presentation.core.navigation.support
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -19,6 +20,10 @@ import com.github.terrakok.cicerone.Replace
  * Feature [BackTo] works only for fragments.<br></br>
  * Recommendation: most useful for Single-Activity application.
  */
+private const val MARKET_SCHEME = "market"
+private const val MARKET_AUTHORITY = "details"
+private const val MARKET_ID = "id"
+
 open class SupportAppNavigator(
     activity: FragmentActivity,
     fragmentManager: FragmentManager,
@@ -239,7 +244,16 @@ open class SupportAppNavigator(
      * @param activityIntent intent passed to start Activity for the `screenKey`
      */
     protected fun unexistingActivity(screen: SupportAppScreen?, activityIntent: Intent?) {
-        // Do nothing by default
+        activity.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.Builder()
+                    .scheme(MARKET_SCHEME)
+                    .authority(MARKET_AUTHORITY)
+                    .appendQueryParameter(MARKET_ID, activityIntent?.`package`)
+                    .build()
+            )
+        )
     }
 
     /**

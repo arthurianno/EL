@@ -64,7 +64,10 @@ import com.elta.android.presentation.utils.pdfActionIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
 import com.nullgr.core.intents.emailIntent
+import com.nullgr.core.intents.telegramIntent
+import com.nullgr.core.intents.viberIntent
 import com.nullgr.core.intents.webIntent
+import com.nullgr.core.intents.whatsAppIntent
 
 object Screens {
 
@@ -289,6 +292,21 @@ object Screens {
     data class EmailScreen(val email: String) : SupportAppScreen() {
         override fun getActivityIntent(context: Context): Intent =
             emailIntent(email)
+    }
+
+    data class WhatsAppScreen(val number: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context): Intent =
+            whatsAppIntent(number)
+    }
+
+    data class TelegramScreen(val number: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context): Intent =
+            telegramIntent(number)
+    }
+
+    data class ViberScreen(val number: String) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context): Intent =
+            viberIntent(number)
     }
 
     // STATISTICS FLOW

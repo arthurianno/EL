@@ -1,28 +1,38 @@
 package com.elta.android.presentation.features.profile.main.ui
 
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentMainProfileBinding
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
+import com.elta.android.presentation.features.profile.main.ui.adapter.MainProfileAdapter
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 import kotlin.math.abs
 
 class MainProfileFragment :
-    BaseListFragment<MainProfilePm, FragmentMainProfileBinding>(FragmentMainProfileBinding::inflate) {
+    BaseRecyclerViewFragment<MainProfilePm, FragmentMainProfileBinding>(FragmentMainProfileBinding::inflate) {
 
+    @Inject
+    lateinit var mainProfileAdapter: MainProfileAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { mainProfileAdapter }
     override val screenLayout = R.layout.fragment_main_profile
     override val classToken: Class<MainProfilePm> = MainProfilePm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider =
         TransparentStatusBarConfigProvider
+
     override val backgroundColor = R.color.pale_gray
 
     override fun onBindPresentationModel(pm: MainProfilePm) {

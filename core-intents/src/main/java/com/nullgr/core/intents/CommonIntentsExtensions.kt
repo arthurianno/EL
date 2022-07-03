@@ -64,6 +64,21 @@ fun emailIntent(to: String, subject: String? = null, body: String? = null): Inte
     }
 }
 
+fun whatsAppIntent(number: String): Intent =
+    Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number")).apply {
+        `package` = "com.whatsapp"
+    }
+
+fun telegramIntent(number: String): Intent =
+    Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/$number")).apply {
+        `package` = "org.telegram.messenger"
+    }
+
+fun viberIntent(number: String): Intent =
+    Intent(Intent.ACTION_VIEW, Uri.parse("viber://contact?number=${number.drop(1)}")).apply {
+        `package` = "com.viber.voip"
+    }
+
 /**
  * Factory function that creates new [Intent] with [Intent.ACTION_SEND]
  * @param text [String] text to share

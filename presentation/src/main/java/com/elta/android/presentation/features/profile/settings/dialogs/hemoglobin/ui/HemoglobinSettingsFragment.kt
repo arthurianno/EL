@@ -11,15 +11,14 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.features.profile.settings.dialogs.base.ui.BaseSettingsDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.pm.HemoglobinSettingsPm
+import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.adapter.HemoglobinEventsAdapter
 import com.elta.android.presentation.utils.sequenceClicks
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.simple_date_picker.BackgroundDecorator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
-import com.nullgr.core.adapter.DynamicAdapter
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
@@ -31,6 +30,9 @@ import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettingsPm>() {
+
+    @Inject
+    lateinit var adapter: HemoglobinEventsAdapter
 
     override val contentLayout = R.layout.layout_settings_dialog_hemoglobin
     override val dialogType = DialogType.HbA1C
@@ -60,12 +62,10 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
     private val calendarView by lazy {
         binding.dialogContentContainerView.findViewById<MaterialCalendarView>(R.id.calendarView)
     }
+
     private val hemoglobinContentView by lazy {
         binding.dialogContentContainerView.findViewById<LinearLayout>(R.id.hemoglobinContentView)
     }
-
-    @Inject
-    lateinit var adapter: DynamicAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -117,7 +117,7 @@ class HemoglobinSettingsFragment : BaseSettingsDialogFragment<HemoglobinSettings
             }
             calendarView.invalidateDecorators()
         }
-        pm.hemoglobinItemsState.observable.bindTo(adapter, compositeUnbind)
+        pm.hemoglobinItemsState.bindTo(adapter::submitList)
     }
 
     private fun drawable(drawable: Int, inset: Int): Drawable =
