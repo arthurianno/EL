@@ -29,34 +29,25 @@ class PeriodAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            GlucoseDailyChartItem::class.java.hashCode() -> {
-                GlucoseDailyChartViewHolder(
-                    ItemGlucoseDailyChartBinding.inflate(inflater, parent, false)
-                )
-            }
-            GlucoseStatisticChartItem::class.java.hashCode() -> {
-                GlucoseStatisticChartViewHolder(
-                    ItemGlucoseStatisticChartBinding.inflate(inflater, parent, false),
-                    bus
-                )
-            }
-            GlucoseIndexItem::class.java.hashCode() -> {
-                GlucoseIndexViewHolder(
-                    ItemStatGlucoseIndexBinding.inflate(inflater, parent, false)
-                )
-            }
-            GlucoseIndexesItem::class.java.hashCode() -> {
-                GlucoseIndexesViewHolder(
-                    ItemStatGlucoseIndexesSliderBinding.inflate(inflater, parent, false),
-                    viewPool,
-                    GlucoseItemGroupAdapter()
-                )
-            }
-            GeneralIndexItem::class.java.hashCode() -> {
-                GeneralIndexViewHolder(
-                    ItemStatGeneralIndexBinding.inflate(inflater, parent, false)
-                )
-            }
+            GlucoseDailyChartItem::class.java.hashCode() -> GlucoseDailyChartViewHolder(
+                ItemGlucoseDailyChartBinding.inflate(inflater, parent, false)
+            )
+
+            GlucoseStatisticChartItem::class.java.hashCode() -> GlucoseStatisticChartViewHolder(
+                ItemGlucoseStatisticChartBinding.inflate(inflater, parent, false),
+                bus
+            )
+            GlucoseIndexItem::class.java.hashCode() -> GlucoseIndexViewHolder(
+                ItemStatGlucoseIndexBinding.inflate(inflater, parent, false)
+            )
+            GlucoseIndexesItem::class.java.hashCode() -> GlucoseIndexesViewHolder(
+                ItemStatGlucoseIndexesSliderBinding.inflate(inflater, parent, false),
+                viewPool,
+                GlucoseItemGroupAdapter()
+            )
+            GeneralIndexItem::class.java.hashCode() -> GeneralIndexViewHolder(
+                ItemStatGeneralIndexBinding.inflate(inflater, parent, false)
+            )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }
