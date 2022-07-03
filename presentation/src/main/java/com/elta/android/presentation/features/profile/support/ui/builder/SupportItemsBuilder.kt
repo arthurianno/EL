@@ -35,7 +35,7 @@ class SupportItemsBuilder @Inject constructor(
         )
         add(
             SupportActionItem(
-                icon = R.drawable.ic_support_mail,
+                icon = R.drawable.ic_telegram,
                 title = resourceProvider.getString(R.string.telegram),
                 subTitle = resourceProvider.getString(R.string.profile_support_email_description),
                 action = SupportAction.TelegramAction
@@ -43,7 +43,7 @@ class SupportItemsBuilder @Inject constructor(
         )
         add(
             SupportActionItem(
-                icon = R.drawable.ic_support_mail,
+                icon = R.drawable.ic_whatsapp,
                 title = resourceProvider.getString(R.string.whatsapp),
                 subTitle = resourceProvider.getString(R.string.profile_support_email_description),
                 action = SupportAction.WhatsAppAction
@@ -51,7 +51,7 @@ class SupportItemsBuilder @Inject constructor(
         )
         add(
             SupportActionItem(
-                icon = R.drawable.ic_support_mail,
+                icon = R.drawable.ic_viber,
                 title = resourceProvider.getString(R.string.viber),
                 subTitle = resourceProvider.getString(R.string.profile_support_email_description),
                 action = SupportAction.ViberAction

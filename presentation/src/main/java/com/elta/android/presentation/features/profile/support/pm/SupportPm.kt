@@ -9,6 +9,8 @@ import com.elta.android.presentation.features.profile.support.model.SupportActio
 import com.elta.android.presentation.features.profile.support.ui.builder.SupportItemsBuilder
 import javax.inject.Inject
 
+private const val SUPPORT_PHONE = "+79152767676"
+
 class SupportPm @Inject constructor(
     services: ServiceFacade,
     private val itemsBuilder: SupportItemsBuilder
@@ -35,9 +37,15 @@ class SupportPm @Inject constructor(
             is SupportAction.CallAction -> router.navigateTo(Screens.CallScreen(action.phone))
             is SupportAction.MailAction -> router.navigateTo(Screens.EmailScreen(action.email))
             SupportAction.ServiceCentersAction -> router.startFlow(Screens.ServiceCentersMap)
-            SupportAction.TelegramAction -> {}
-            SupportAction.ViberAction -> {}
-            SupportAction.WhatsAppAction -> {}
+            SupportAction.TelegramAction -> {
+                router.navigateTo(Screens.TelegramScreen(SUPPORT_PHONE))
+            }
+            SupportAction.ViberAction -> {
+                router.navigateTo(Screens.ViberScreen(SUPPORT_PHONE))
+            }
+            SupportAction.WhatsAppAction -> {
+                router.navigateTo(Screens.WhatsAppScreen(SUPPORT_PHONE))
+            }
         }
     }
 }
