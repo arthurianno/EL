@@ -9,16 +9,16 @@ import com.elta.android.presentation.databinding.ItemGlucoseStatisticChartBindin
 import com.elta.android.presentation.databinding.ItemStatGeneralIndexBinding
 import com.elta.android.presentation.databinding.ItemStatGlucoseIndexBinding
 import com.elta.android.presentation.databinding.ItemStatGlucoseIndexesSliderBinding
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GeneralIndexViewHolder
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GlucoseDailyChartViewHolder
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GlucoseIndexViewHolder
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GlucoseIndexesViewHolder
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GlucoseStatisticChartViewHolder
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GeneralIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseDailyChartItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
-import com.elta.android.presentation.features.statistic.period.ui.holder.GeneralIndexViewHolder
-import com.elta.android.presentation.features.statistic.period.ui.holder.GlucoseDailyChartViewHolder
-import com.elta.android.presentation.features.statistic.period.ui.holder.GlucoseIndexViewHolder
-import com.elta.android.presentation.features.statistic.period.ui.holder.GlucoseIndexesViewHolder
-import com.elta.android.presentation.features.statistic.period.ui.holder.GlucoseStatisticChartViewHolder
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 

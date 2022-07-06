@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.statistic.period.ui.holder
+package com.elta.android.presentation.features.statistic.period.ui.adapter.holder
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView

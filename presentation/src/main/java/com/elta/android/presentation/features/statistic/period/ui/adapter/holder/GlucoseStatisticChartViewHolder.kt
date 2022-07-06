@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.statistic.period.ui.holder
+package com.elta.android.presentation.features.statistic.period.ui.adapter.holder
 
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.click
