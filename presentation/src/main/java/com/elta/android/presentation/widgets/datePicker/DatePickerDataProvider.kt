@@ -24,7 +24,9 @@ object DatePickerDataProvider {
         do {
             dates.add(0, dates[0].date.minusDays(1).toItem())
         } while (dates[0].date > stopDate)
-
+        repeat(DAYS_OFFSET) {
+            dates.add(0, dates[0].date.minusDays(1).toItem(false))
+        }
         (1..DAYS_OFFSET).map {
             dates.add(LocalDate.now().plusDays(it.toLong()).toItem(false))
         }
