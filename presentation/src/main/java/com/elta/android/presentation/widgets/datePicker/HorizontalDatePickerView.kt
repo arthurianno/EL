@@ -78,8 +78,9 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 
     private fun setUpDatePicker(date: LocalDate) {
         if (date !in items) {
-            items.replace(DatePickerDataProvider.buildDatePickerDates())
+            items.replace(DatePickerDataProvider.buildDatePickerDates(date))
             adapter.submitList(items)
+            adapter.notifyDataSetChanged()
         }
         postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY)
         postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)

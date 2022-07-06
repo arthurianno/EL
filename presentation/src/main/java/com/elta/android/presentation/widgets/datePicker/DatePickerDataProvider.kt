@@ -17,10 +17,13 @@ object DatePickerDataProvider {
         R.string.date_picker_day_of_week_7
     )
 
-    fun buildDatePickerDates(): List<DatePickerItem> {
+    fun buildDatePickerDates(date: LocalDate): List<DatePickerItem> {
         val dates = mutableListOf<DatePickerItem>()
         dates.add(0, LocalDate.now().toItem())
-        val stopDate = LocalDate.now().minusYears(1)
+        while (dates[0].date > date) {
+            dates.add(0, dates[0].date.minusDays(1).toItem())
+        }
+        val stopDate = dates[0].date.minusYears(1)
         do {
             dates.add(0, dates[0].date.minusDays(1).toItem())
         } while (dates[0].date > stopDate)
