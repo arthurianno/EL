@@ -15,7 +15,6 @@ import com.elta.android.presentation.features.statistic.period.ui.adapter.items.
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseDailyChartItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
-import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
@@ -29,8 +28,6 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     fun build(model: StatisticByPeriodModel, date: LocalDate? = null): List<ListItem> {
         val items = mutableListOf<ListItem>()
-
-        items.add(model.toChartItem(date))
 
         val glucoseIndexItems = mutableListOf<ListItem>()
         val glucoseStatisticModel = when (date == null) {
@@ -299,16 +296,6 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
         return time.toString()
     }
-
-    private fun StatisticByPeriodModel.toChartItem(selectedDate: LocalDate?) =
-        GlucoseStatisticChartItem(
-            datesTitle = resources.getString(
-                R.string.statistic_chart_period_dates_mask,
-                period.start.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT),
-                period.end.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT)
-            ),
-            chartModel = this.toChartModel(selectedDate)
-        )
 
     private fun Int?.toString() = (this ?: ZERO).toString()
 
