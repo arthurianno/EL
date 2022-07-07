@@ -18,7 +18,6 @@ object DatePickerDataProvider {
     )
 
     fun buildDatePickerDates(date: LocalDate): List<DatePickerItem> = createDatePickerList()
-        .createListToDate(date)
         .createListToDate(date.minusYears(1))
         .addItemsAfterStart(DAYS_OFFSET)
         .addItemsBeforeToday(DAYS_OFFSET)
