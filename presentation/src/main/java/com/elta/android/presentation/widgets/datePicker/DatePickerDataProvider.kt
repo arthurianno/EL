@@ -17,24 +17,34 @@ object DatePickerDataProvider {
         R.string.date_picker_day_of_week_7
     )
 
-    fun buildDatePickerDates(date: LocalDate): List<DatePickerItem> {
-        val dates = mutableListOf<DatePickerItem>()
-        dates.add(0, LocalDate.now().toItem())
-        while (dates[0].date > date) {
-            dates.add(0, dates[0].date.minusDays(1).toItem())
+    fun buildDatePickerDates(date: LocalDate): List<DatePickerItem> = createDatePickerList()
+        .createListToDate(date)
+        .createListToDate(date.minusYears(1))
+        .addItemsAfterStart(DAYS_OFFSET)
+        .addItemsBeforeToday(DAYS_OFFSET)
+
+    private fun createDatePickerList() = mutableListOf(LocalDate.now().toItem())
+
+    private fun MutableList<DatePickerItem>.addItemsAfterStart(count: Int): MutableList<DatePickerItem> =
+        this.apply {
+            repeat(count) {
+                this.add(0, this[0].date.minusDays(1).toItem(false))
+            }
         }
-        val stopDate = dates[0].date.minusYears(1)
-        do {
-            dates.add(0, dates[0].date.minusDays(1).toItem())
-        } while (dates[0].date > stopDate)
-        repeat(DAYS_OFFSET) {
-            dates.add(0, dates[0].date.minusDays(1).toItem(false))
+
+    private fun MutableList<DatePickerItem>.addItemsBeforeToday(count: Int): MutableList<DatePickerItem> =
+        this.apply {
+            (1..count).map {
+                this.add(LocalDate.now().plusDays(it.toLong()).toItem(false))
+            }
         }
-        (1..DAYS_OFFSET).map {
-            dates.add(LocalDate.now().plusDays(it.toLong()).toItem(false))
+
+    private fun MutableList<DatePickerItem>.createListToDate(date: LocalDate): MutableList<DatePickerItem> =
+        this.apply {
+            while (this[0].date > date) {
+                this.add(0, this[0].date.minusDays(1).toItem())
+            }
         }
-        return dates
-    }
 
     private fun LocalDate.toItem(isAvailable: Boolean = true): DatePickerItem =
         DatePickerItem(
