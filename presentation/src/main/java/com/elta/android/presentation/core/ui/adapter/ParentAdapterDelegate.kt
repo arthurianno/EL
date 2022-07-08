@@ -10,6 +10,7 @@ import com.nullgr.core.adapter.ktx.AdapterDelegate
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 
+@Deprecated("Класс не используется. Можно удалить")
 abstract class ParentAdapterDelegate<B : ViewBinding>(
     protected val factory: AdapterDelegatesFactory,
     bindingInflater: Inflater<B>

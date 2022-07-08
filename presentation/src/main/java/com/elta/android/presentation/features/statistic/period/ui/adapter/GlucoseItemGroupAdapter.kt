@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.elta.android.presentation.core.ui.adapter.DefaultDiffCallback
 import com.elta.android.presentation.databinding.ItemStatGlucoseIndexBinding
+import com.elta.android.presentation.features.statistic.period.ui.adapter.holder.GlucoseIndexViewHolder
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
-import com.elta.android.presentation.features.statistic.period.ui.holder.GlucoseIndexViewHolder
 import com.nullgr.core.adapter.items.ListItem
 
 class GlucoseItemGroupAdapter :

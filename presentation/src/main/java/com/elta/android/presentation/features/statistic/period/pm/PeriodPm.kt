@@ -2,17 +2,20 @@
 
 package com.elta.android.presentation.features.statistic.period.pm
 
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.statistics.interactor.GetStatisticByPeriodUseCase
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.statistic.period.ui.Period
+import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseStatisticChartItem
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
@@ -28,6 +31,7 @@ class PeriodPm @Inject constructor(
     private val loadScreenAction = action<Period>()
     private val periodState = state<Period>()
     private val statisticsByPeriodState = state<StatisticByPeriodModel>()
+    val chartModel = state<GlucoseStatisticChartItem>()
 
     override fun onCreate() {
         super.onCreate()
@@ -39,7 +43,10 @@ class PeriodPm @Inject constructor(
                 getStatisticByPeriodUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess(statisticsByPeriodState.consumer)
+                    .doOnSuccess {
+                        statisticsByPeriodState.consumer.accept(it)
+                        chartModel.consumer.accept(it.toChartItem(null))
+                    }
                     .doOnError(::handleError)
             }
             .retry()
@@ -65,7 +72,10 @@ class PeriodPm @Inject constructor(
     override fun onBind() {
         super.onBind()
         bus.clicks<Clicks.DateInStatisticsClicked>()
-            .map { buildItems(statisticsByPeriodState.value, it.date) }
+            .map {
+                chartModel.consumer.accept(statisticsByPeriodState.value.toChartItem(it.date))
+                buildItems(statisticsByPeriodState.value, it.date)
+            }
             .subscribe(items.consumer)
             .untilUnbind()
     }
@@ -83,6 +93,16 @@ class PeriodPm @Inject constructor(
                 Period.THIRTY -> Periods.ThirtyDays()
                 Period.NINETY -> Periods.NinetyDays()
             }
+        )
+
+    private fun StatisticByPeriodModel.toChartItem(selectedDate: LocalDate?) =
+        GlucoseStatisticChartItem(
+            datesTitle = resources.getString(
+                R.string.statistic_chart_period_dates_mask,
+                period.start.toStringWithFormat(StatisticByPeriodItemsBuilder.STATISTIC_CHART_DATE_FORMAT),
+                period.end.toStringWithFormat(StatisticByPeriodItemsBuilder.STATISTIC_CHART_DATE_FORMAT)
+            ),
+            chartModel = this.toChartModel(selectedDate)
         )
 
     private fun buildItems(model: StatisticByPeriodModel, date: LocalDate? = null) =
