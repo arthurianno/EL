@@ -7,7 +7,18 @@ data class Profile(
     val secondName: String? = null,
     val gender: Gender? = null,
     val email: String? = null,
-    val glucoseLevelSettings: GlucoseLevelSettings? = null,
+    val glucoseLevelSettings: GlucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
+        GlucoseLevelSettings.NORMAL_START,
+        GlucoseLevelSettings.NORMAL_END
+    ),
+    val glucoseLevelBeforeEatSettings: GlucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
+        GlucoseLevelSettings.NORMAL_START,
+        GlucoseLevelSettings.NORMAL_END
+    ),
+    val glucoseLevelAfterEatSettings: GlucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
+        GlucoseLevelSettings.NORMAL_START,
+        GlucoseLevelSettings.NORMAL_END
+    ),
     val diabetes: Diabetes? = null,
     val weight: Double? = null,
     val hba1cLevel: Double? = null,

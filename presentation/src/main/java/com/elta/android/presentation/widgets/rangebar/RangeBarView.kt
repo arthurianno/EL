@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.range_bar
+package com.elta.android.presentation.widgets.rangebar
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,8 +15,8 @@ import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.decodeBitmap
-import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
-import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
+import com.elta.android.presentation.widgets.rangebar.listeners.OnRageBarValuesChangeListener
+import com.elta.android.presentation.widgets.rangebar.listeners.RangeValuesChangedObserver
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.spToPx
@@ -111,8 +111,9 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     fun setValues(start: Double, end: Double) {
-        if (start !in valuesRange || end !in valuesRange)
+        if (start !in valuesRange || end !in valuesRange) {
             throw IllegalArgumentException("Values must be in : $valuesRange")
+        }
         values = Values(start.normalize(), end.normalize())
         onValuesChangedOutside()
     }
@@ -285,7 +286,8 @@ class RangeBarView @JvmOverloads constructor(
                 ContextCompat.getColor(context, defaultTextColor)
             )
             resultFraction = a.getInteger(
-                R.styleable.RangeBarView_rbv_fraction_digits_count, FRACTION_DIGITS_COUNT
+                R.styleable.RangeBarView_rbv_fraction_digits_count,
+                FRACTION_DIGITS_COUNT
             )
             val startRangeValue = a.getFloat(
                 R.styleable.RangeBarView_rbv_range_start,

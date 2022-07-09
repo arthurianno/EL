@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.range_bar.listeners
+package com.elta.android.presentation.widgets.rangebar.listeners
 
 interface OnRageBarValuesChangeListener {
 
