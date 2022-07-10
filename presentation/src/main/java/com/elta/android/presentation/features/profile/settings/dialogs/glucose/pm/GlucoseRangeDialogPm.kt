@@ -44,11 +44,11 @@ class GlucoseRangeDialogPm @Inject constructor(
 
         profileState.observable
             .doOnNext { profile ->
-                profile.glucoseLevelBeforeEatSettings.normal.let {
-                    beforeEatGlucoseRangeState.consumer.accept(it.start to it.end)
+                with(profile.glucoseLevelBeforeEatSettings.normal) {
+                    beforeEatGlucoseRangeState.consumer.accept(start to end)
                 }
-                profile.glucoseLevelAfterEatSettings.normal.let {
-                    afterEatGlucoseRangeState.consumer.accept(it.start to it.end)
+                with(profile.glucoseLevelAfterEatSettings.normal) {
+                    afterEatGlucoseRangeState.consumer.accept(start to end)
                 }
             }
             .subscribe()

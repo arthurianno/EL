@@ -58,7 +58,7 @@ class GlucoseRangeDialogFragment : BaseSettingsDialogFragment<GlucoseRangeDialog
     ): RangeBarView =
         this.findViewById<CardView>(cardView)
             .apply {
-                findViewById<AppCompatTextView>(R.id.glucoseDiapasonTitle).text = getString(title)
+                findViewById<AppCompatTextView>(R.id.glucoseDiapasonTitle).setText(title)
             }
             .findViewById(R.id.glucoseRangeBarView)
 }
