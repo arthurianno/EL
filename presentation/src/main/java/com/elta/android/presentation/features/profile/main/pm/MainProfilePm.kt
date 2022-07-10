@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.profile.main.pm
 
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
@@ -197,9 +198,26 @@ class MainProfilePm @Inject constructor(
 
     private fun Single<Profile>.handleProfileUseCase() =
         doOnSuccess(::updateFullNameState)
+            .map { it.copy(glucoseLevelBeforeEatSettings = it.glucoseLevelSettings) } // TODO После подключения сохранения профиля на бэке убрать.
+            .map { it.createGlucoseLevels() }
             .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
             .doOnSuccess { bus.event(Events.ProfileUpdated) }
+
+    private fun Profile.createGlucoseLevels(): Profile {
+        return this.copy(
+            glucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
+                normalStart = minOf(
+                    glucoseLevelAfterEatSettings.normal.start,
+                    glucoseLevelBeforeEatSettings.normal.start
+                ),
+                normalEnd = maxOf(
+                    glucoseLevelBeforeEatSettings.normal.end,
+                    glucoseLevelAfterEatSettings.normal.end
+                )
+            )
+        )
+    }
 
     private fun updateFullNameState(profile: Profile) {
         userFullNameState.consumer.accept(

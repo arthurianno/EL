@@ -16,27 +16,41 @@ class GlucoseRangeDialogPm @Inject constructor(
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
-    val glucoseRangeChangedAction = action<Pair<Double, Double>>()
-    val glucoseRangeState = state(DEFAULT_GLUCOSE_START to DEFAULT_GLUCOSE_END)
+    val beforeEatGlucoseRangeChangedAction = action<Pair<Double, Double>>()
+    val afterEatGlucoseRangeChangedAction = action<Pair<Double, Double>>()
+    val beforeEatGlucoseRangeState = state(DEFAULT_GLUCOSE_START to DEFAULT_GLUCOSE_END)
+    val afterEatGlucoseRangeState = state(DEFAULT_GLUCOSE_START to DEFAULT_GLUCOSE_END)
     private val profileState = state<Profile>()
     private val loadScreeAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
 
-        glucoseRangeChangedAction.observable
-            .filter { it != glucoseRangeState.valueOrNull }
-            .doOnNext(glucoseRangeState.consumer)
+        beforeEatGlucoseRangeChangedAction.observable
+            .filter { it != beforeEatGlucoseRangeState.valueOrNull }
+            .doOnNext(beforeEatGlucoseRangeState.consumer)
+            .map { it.isRangeChanged() }
+            .doOnNext { actionButtonEnabledCommand.consumer.accept(it) }
+            .subscribe()
+            .untilDestroy()
+
+        afterEatGlucoseRangeChangedAction.observable
+            .filter { it != afterEatGlucoseRangeState.valueOrNull }
+            .doOnNext(afterEatGlucoseRangeState.consumer)
             .map { it.isRangeChanged() }
             .doOnNext { actionButtonEnabledCommand.consumer.accept(it) }
             .subscribe()
             .untilDestroy()
 
         profileState.observable
-            .filter { it.glucoseLevelSettings != null }
-            .map { it.glucoseLevelSettings?.normal }
-            .map { it.start to it.end }
-            .doOnNext(glucoseRangeState.consumer)
+            .doOnNext { profile ->
+                with(profile.glucoseLevelBeforeEatSettings.normal) {
+                    beforeEatGlucoseRangeState.consumer.accept(start to end)
+                }
+                with(profile.glucoseLevelAfterEatSettings.normal) {
+                    afterEatGlucoseRangeState.consumer.accept(start to end)
+                }
+            }
             .subscribe()
             .untilDestroy()
 
@@ -53,6 +67,7 @@ class GlucoseRangeDialogPm @Inject constructor(
             .flatMapSingle {
                 getProfileUseCase.execute(Unit)
                     .bindProgress()
+                    .map { it.copy(glucoseLevelBeforeEatSettings = it.glucoseLevelSettings) } // TODO После подключения сохранения профиля на бэке убрать.
                     .doOnSuccess(profileState.consumer)
                     .doOnError(::handleError)
             }
@@ -77,8 +92,16 @@ class GlucoseRangeDialogPm @Inject constructor(
     private fun updateProfile(i: Unit): Profile =
         profileState.value.copy(
             glucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
-                normalStart = glucoseRangeState.value.first,
-                normalEnd = glucoseRangeState.value.second
+                normalStart = beforeEatGlucoseRangeState.value.first,
+                normalEnd = beforeEatGlucoseRangeState.value.second
+            ),
+            glucoseLevelBeforeEatSettings = GlucoseLevelSettings.fromNormalValues(
+                normalStart = beforeEatGlucoseRangeState.value.first,
+                normalEnd = beforeEatGlucoseRangeState.value.second
+            ),
+            glucoseLevelAfterEatSettings = GlucoseLevelSettings.fromNormalValues(
+                normalStart = afterEatGlucoseRangeState.value.first,
+                normalEnd = afterEatGlucoseRangeState.value.second
             )
         )
 

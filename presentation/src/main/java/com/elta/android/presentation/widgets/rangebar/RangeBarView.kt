@@ -1,4 +1,4 @@
-package com.elta.android.presentation.widgets.range_bar
+package com.elta.android.presentation.widgets.rangebar
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,13 +15,14 @@ import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.decodeBitmap
-import com.elta.android.presentation.widgets.range_bar.listeners.OnRageBarValuesChangeListener
-import com.elta.android.presentation.widgets.range_bar.listeners.RangeValuesChangedObserver
+import com.elta.android.presentation.widgets.rangebar.listeners.OnRageBarValuesChangeListener
+import com.elta.android.presentation.widgets.rangebar.listeners.RangeValuesChangedObserver
 import com.nullgr.core.font.getTypeface
 import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.spToPx
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
+import kotlin.math.roundToInt
 
 @Suppress("MagicNumbers", "TooManyFunctions")
 class RangeBarView @JvmOverloads constructor(
@@ -111,10 +112,10 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     fun setValues(start: Double, end: Double) {
-        if (start !in valuesRange || end !in valuesRange)
-            throw IllegalArgumentException("Values must be in : $valuesRange")
-        values = Values(start.normalize(), end.normalize())
-        onValuesChangedOutside()
+        if (start in valuesRange && end in valuesRange) {
+            values = Values(start.normalize(), end.normalize())
+            onValuesChangedOutside()
+        }
     }
 
     fun addOnValuesChangeListener(listener: OnRageBarValuesChangeListener) {
@@ -285,7 +286,8 @@ class RangeBarView @JvmOverloads constructor(
                 ContextCompat.getColor(context, defaultTextColor)
             )
             resultFraction = a.getInteger(
-                R.styleable.RangeBarView_rbv_fraction_digits_count, FRACTION_DIGITS_COUNT
+                R.styleable.RangeBarView_rbv_fraction_digits_count,
+                FRACTION_DIGITS_COUNT
             )
             val startRangeValue = a.getFloat(
                 R.styleable.RangeBarView_rbv_range_start,
@@ -431,7 +433,7 @@ class RangeBarView @JvmOverloads constructor(
     // ------- Utility methods ------ //
 
     private fun Double.normalize(): Double =
-        Math.round(this * 10.times(resultFraction)) / 10.times(resultFraction).toDouble()
+        (this * 10.times(resultFraction)).roundToInt() / 10.times(resultFraction).toDouble()
 
     private fun Double.format() = NumberFormatter.numberFormat.format(this)
 
@@ -445,14 +447,14 @@ class RangeBarView @JvmOverloads constructor(
 
     private fun Float.validateTouchXForLeftEdge(): Float =
         when {
-            this < rangeBarRect.left -> Math.max(backgroundRect.left, this)
-            else -> Math.min(rangeBarRect.right - minSpaceBetweenValues, this)
+            this < rangeBarRect.left -> backgroundRect.left.coerceAtLeast(this)
+            else -> (rangeBarRect.right - minSpaceBetweenValues).coerceAtMost(this)
         }
 
     private fun Float.validateTouchXForRightEdge(): Float =
         when {
-            this > rangeBarRect.right -> Math.min(backgroundRect.right, this)
-            else -> Math.max(rangeBarRect.left + minSpaceBetweenValues, this)
+            this > rangeBarRect.right -> backgroundRect.right.coerceAtMost(this)
+            else -> (rangeBarRect.left + minSpaceBetweenValues).coerceAtLeast(this)
         }
 
     private fun disableParentTouch() {

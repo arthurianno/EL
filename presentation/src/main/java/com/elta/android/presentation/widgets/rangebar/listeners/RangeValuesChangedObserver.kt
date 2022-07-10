@@ -1,7 +1,7 @@
-package com.elta.android.presentation.widgets.range_bar.listeners
+package com.elta.android.presentation.widgets.rangebar.listeners
 
 import com.elta.android.presentation.utils.checkMainThread
-import com.elta.android.presentation.widgets.range_bar.RangeBarView
+import com.elta.android.presentation.widgets.rangebar.RangeBarView
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
@@ -28,8 +28,9 @@ class RangeValuesChangedObserver(
 
         var valueListener: OnRageBarValuesChangeListener? = object : OnRageBarValuesChangeListener {
             override fun onValuesChanged(start: Double, end: Double) {
-                if (!isDisposed)
+                if (!isDisposed) {
                     observer.onNext(start to end)
+                }
             }
         }
 
