@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.profile.support.ui.builder
 
+import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.support.model.SupportAction
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportActionItem
 import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportHeaderItem
+import com.elta.android.presentation.features.profile.support.ui.adapter.items.SupportVersionItem
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
@@ -63,6 +65,23 @@ class SupportItemsBuilder @Inject constructor(
                 title = resourceProvider.getString(R.string.profile_support_service_centers),
                 subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),
                 action = SupportAction.ServiceCentersAction
+            )
+        )
+        add(
+            SupportHeaderItem(
+                text = resourceProvider.getString(R.string.profile_support_versions_header)
+            )
+        )
+        add(
+            SupportVersionItem(
+                title = resourceProvider.getString(R.string.profile_support_firmware_version),
+                version = "2.8" // TODO после подключеня глюкометра реализовать получение номера версии ПО глюкометра через sharedPreference
+            )
+        )
+        add(
+            SupportVersionItem(
+                title = resourceProvider.getString(R.string.profile_support_app_version),
+                version = BuildConfig.APP_VERSION
             )
         )
     }

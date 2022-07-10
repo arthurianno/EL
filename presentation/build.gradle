@@ -19,6 +19,7 @@ android {
 
         versionCode rootProject.ext.applicationVersionCode
         versionName rootProject.ext.applicationVersionName
+        buildConfigField("String", "APP_VERSION", "\"${versionName}\"")
     }
 
     compileOptions {
