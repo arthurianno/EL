@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:paddingStart="16dp"
-    android:paddingTop="9dp"
+    android:paddingTop="32dp"
     android:paddingEnd="16dp"
     android:paddingBottom="17dp"
     android:text="@string/profile_support_actions_header" />

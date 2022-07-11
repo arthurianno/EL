@@ -387,6 +387,8 @@
     <string name="profile_settings_dialog_glucose_description">Задайте свой целевой диапазон измерений глюкозы</string>
     <string name="profile_settings_dialog_glucose_action_button">Установить</string>
     <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nЦелевой диапазон будет использоваться на графике главного экрана.</string>
+    <string name="before_eat">До еды</string>
+    <string name="after_eat">После еды</string>
 
     <string name="profile_settings_dialog_hba1c_title">HbA1c</string>
     <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
@@ -506,6 +508,7 @@
     <string name="profile_support_title">Поддержка</string>
     <string name="profile_support_subtitle">Служба заботы о пользователях</string>
     <string name="profile_support_actions_header">Доступные действия</string>
+    <string name="profile_support_versions_header">Информация об устройствах</string>
     <string name="profile_support_phone_number">8 800 250 17 50</string>
     <string name="profile_support_phone_number_description">Позвонить</string>
     <string name="profile_support_email">service@eltaltd.ru</string>
@@ -515,6 +518,9 @@
     <string name="telegram">Telegram</string>
     <string name="whatsapp">WhatsApp</string>
     <string name="viber">Viber</string>
+    <string name="profile_support_firmware_version">Версия ПО глюкометра:</string>
+    <string name="profile_support_app_version">Версия приложения:</string>
+
 
     <!-- STATISTICS -->
     <string name="statistic_title">Статистика</string>
@@ -608,6 +614,5 @@
     <string name="firmware_offline_error_title">Ошибка подключения</string>
     <string name="firmware_offline_error_description">Во время обновления ПО глюкометра\nпроизошла ошибка подключения\nк глюкоментру</string>
     <string name="firmware_offline_error_button">Повторить</string>
-    <string name="before_eat">До еды</string>
-    <string name="after_eat">После еды</string>
+
 </resources>
