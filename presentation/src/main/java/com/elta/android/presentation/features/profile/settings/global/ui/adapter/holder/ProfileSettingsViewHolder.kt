@@ -13,6 +13,26 @@ class ProfileSettingsViewHolder(
     private val binding: ItemProfileSettingsBinding,
     private val bus: RxBus
 ) : BaseListItemViewHolder<ProfileSettingsItem>(binding.root) {
+    override fun bind(item: ProfileSettingsItem) {
+        with(binding) {
+            settingsIconView.setImageResource(item.icon)
+            settingsTitleView.text = item.title
+            when (item.type) {
+                ProfileSettingsItem.Type.EMAIL -> toggleFocus(false)
+                ProfileSettingsItem.Type.DELETE_PROFILE -> nextIconView.isInvisible = true
+                ProfileSettingsItem.Type.APP_VERSION -> {
+                    toggleFocus(false)
+                    dividerView.isInvisible = true
+                }
+                else -> toggleFocus(true)
+            }
+
+            itemView.setOnClickListener {
+                bus.click(Clicks.ProfileSettingsItemClicked(item.type))
+            }
+        }
+    }
+
     private fun toggleFocus(isFocus: Boolean) {
         with(binding) {
             settingsTitleView.setTextColor(
@@ -27,25 +47,6 @@ class ProfileSettingsViewHolder(
             )
             nextIconView.isInvisible = !isFocus
             itemView.isClickable = isFocus
-        }
-    }
-
-    override fun bind(item: ProfileSettingsItem) {
-        with(binding) {
-            settingsIconView.setImageResource(item.icon)
-            settingsTitleView.text = item.title
-            when (item.type) {
-                ProfileSettingsItem.Type.EMAIL -> toggleFocus(false)
-                ProfileSettingsItem.Type.APP_VERSION -> {
-                    toggleFocus(false)
-                    dividerView.isInvisible = true
-                }
-                else -> toggleFocus(true)
-            }
-
-            itemView.setOnClickListener {
-                bus.click(Clicks.ProfileSettingsItemClicked(item.type))
-            }
         }
     }
 }

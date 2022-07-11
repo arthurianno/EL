@@ -93,4 +93,12 @@ sealed class Dialogs : DialogData {
         override val positive: String = resources.getString(R.string.profile_google_fit_activated_positive_button),
         override val message: String = resources.getString(R.string.profile_google_fit_activated_message)
     ) : Dialogs()
+
+    data class DeleteProfile(
+        val resources: ResourceProvider,
+        override val title: String = resources.getString(R.string.profile_delete_title),
+        override val message: String = resources.getString(R.string.profile_delete_text),
+        override val negative: String = resources.getString(R.string.profile_delete_button_dissmit),
+        override val positive: String = resources.getString(R.string.profile_delete_button_confirm)
+    ) : Dialogs()
 }

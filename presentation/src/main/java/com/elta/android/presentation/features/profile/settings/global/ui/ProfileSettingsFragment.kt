@@ -54,6 +54,7 @@ class ProfileSettingsFragment :
                 RegistrationPrivacyPolicyFragment.newInstance(getString(R.string.registration_privacy_policy))
             )
         }
+        pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

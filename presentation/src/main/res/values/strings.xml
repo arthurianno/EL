@@ -375,6 +375,11 @@
     <string name="odnoklasniki">OK</string>
     <string name="profile_app_version">Версия приложения: %s</string>
     <string name="profile_exit_from_app">Выйти из учетной записи</string>
+    <string name="profile_delete">Удалить профиль</string>
+    <string name="profile_delete_title">Удалить профиль?</string>
+    <string name="profile_delete_button_confirm">Да</string>
+    <string name="profile_delete_button_dissmit">Нет</string>
+    <string name="profile_delete_text">После удаления профиля все ранее внесенные данные будут так же удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>

@@ -30,6 +30,7 @@ data class ProfileSettingsItem(
         EMAIL,
         NOTIFICATION,
         LEGAL_INFO,
+        DELETE_PROFILE,
         APP_VERSION
     }
 }

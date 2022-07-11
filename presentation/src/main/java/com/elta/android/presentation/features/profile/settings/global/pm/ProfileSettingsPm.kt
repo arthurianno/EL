@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
+import com.elta.android.domain.features.auth.interactor.DeleteProfileUseCase
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
 import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
@@ -19,7 +20,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem.Type
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class ProfileSettingsPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
+    private val deleteProfileUseCase: DeleteProfileUseCase,
     private val linkSocialNetworkUseCase: LinkSocialNetworkUseCase,
     private val unlinkSocialNetworkUseCase: UnLinkSocialNetworkUseCase,
     private val checkGoogleFitAuthUseCase: CheckGoogleFitAuthUseCase,
@@ -41,6 +43,7 @@ class ProfileSettingsPm @Inject constructor(
 
     val unlinkNetworkDialogControl = dialogControl<DialogData, DialogResult>()
     val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
+    val profileDeleteDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
 
     private val socialNetworkState = state<SocialNetworkType>()
@@ -56,6 +59,7 @@ class ProfileSettingsPm @Inject constructor(
             resources
         )
     }
+    private val profileDeleteDialogData: DialogData by lazy { Dialogs.DeleteProfile(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -88,14 +92,13 @@ class ProfileSettingsPm @Inject constructor(
             .map { it.type }
             .doOnNext { type ->
                 when (type) {
-                    ProfileSettingsItem.Type.NAME -> router.navigateTo(Screens.SetName)
-                    ProfileSettingsItem.Type.GENDER -> router.navigateTo(Screens.SetGender)
-                    ProfileSettingsItem.Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
-                    ProfileSettingsItem.Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(
-                        Unit
-                    )
-                    ProfileSettingsItem.Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
-                    ProfileSettingsItem.Type.APP_VERSION -> {} // TODO click by app version
+                    Type.NAME -> router.navigateTo(Screens.SetName)
+                    Type.GENDER -> router.navigateTo(Screens.SetGender)
+                    Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
+                    Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
+                    Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
+                    Type.DELETE_PROFILE -> deleteProfile()
+                    Type.APP_VERSION -> {} // TODO click by app version
                     else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }
             }
@@ -127,6 +130,20 @@ class ProfileSettingsPm @Inject constructor(
             .untilDestroy()
     }
 
+    private fun deleteProfile() {
+        profileDeleteDialogControl.showForResult(profileDeleteDialogData)
+            .filter { it == DialogResult.POSITIVE }
+            .subscribe {
+                deleteProfileUseCase.execute()
+                    .bindProgress()
+                    .doOnError(::handleError)
+                    .subscribe {
+                        router.newRootFlow(Screens.AuthFlow)
+                    }
+            }
+            .untilDestroy()
+    }
+
     private fun observeGoogleFitAction() {
         checkGoogleFitAuthAction.observable
             .map { profileState.value }
@@ -141,8 +158,9 @@ class ProfileSettingsPm @Inject constructor(
     }
 
     private fun showGoogleFitEnabledDialog(isEnabled: Boolean) {
-        if (isEnabled)
+        if (isEnabled) {
             googleFitActivatedDialogControl.show(googleFitActivatedDialogData)
+        }
     }
 
     private fun observeNetworksActions() {
