@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.profile.settings.global.ui
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.ListAdapter
@@ -17,7 +16,6 @@ import com.elta.android.presentation.features.registration.policy.ui.Registratio
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
-import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 import javax.inject.Inject
@@ -56,21 +54,7 @@ class ProfileSettingsFragment :
                 RegistrationPrivacyPolicyFragment.newInstance(getString(R.string.registration_privacy_policy))
             )
         }
-        pm.openDeleteDialogCommand.bindTo(deleteProfileDialog())
-    }
-
-    private fun deleteProfileDialog() = Consumer<Unit> {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.profile_delete_title)
-            .setMessage(R.string.profile_delete_text)
-            .setPositiveButton(R.string.profile_delete_button_confirm) { dialog, _ ->
-                presentationModel.deleteProfile.consumer.accept(Unit)
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.profile_delete_button_dissmit) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

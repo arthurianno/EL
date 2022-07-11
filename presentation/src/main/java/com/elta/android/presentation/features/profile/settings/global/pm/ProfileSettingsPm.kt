@@ -43,9 +43,8 @@ class ProfileSettingsPm @Inject constructor(
 
     val unlinkNetworkDialogControl = dialogControl<DialogData, DialogResult>()
     val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
+    val profileDeleteDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
-    val openDeleteDialogCommand = command<Unit>()
-    val deleteProfile = action<Unit>()
 
     private val socialNetworkState = state<SocialNetworkType>()
     private val getProfileSettingsAction = action<Unit>()
@@ -60,24 +59,13 @@ class ProfileSettingsPm @Inject constructor(
             resources
         )
     }
+    private val profileDeleteDialogData: DialogData by lazy { Dialogs.DeleteProfile(resources) }
 
     override fun onCreate() {
         super.onCreate()
         observeClicks()
         observeNetworksActions()
         observeGoogleFitAction()
-
-        deleteProfile.observable
-            .skipWhileInProgress()
-            .subscribe {
-                deleteProfileUseCase.execute()
-                    .bindProgress()
-                    .doOnError(::handleError)
-                    .subscribe {
-                        router.newRootFlow(Screens.AuthFlow)
-                    }
-            }
-            .untilDestroy()
 
         getProfileSettingsAction.observable
             .skipWhileInProgress()
@@ -109,7 +97,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
-                    Type.DELETE_PROFILE -> openDeleteDialogCommand.consumer.accept(Unit)
+                    Type.DELETE_PROFILE -> deleteProfile()
                     Type.APP_VERSION -> {} // TODO click by app version
                     else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }
@@ -139,6 +127,20 @@ class ProfileSettingsPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+    }
+
+    private fun deleteProfile() {
+        profileDeleteDialogControl.showForResult(profileDeleteDialogData)
+            .filter { it == DialogResult.POSITIVE }
+            .subscribe {
+                deleteProfileUseCase.execute()
+                    .bindProgress()
+                    .doOnError(::handleError)
+                    .subscribe {
+                        router.newRootFlow(Screens.AuthFlow)
+                    }
+            }
             .untilDestroy()
     }
 
