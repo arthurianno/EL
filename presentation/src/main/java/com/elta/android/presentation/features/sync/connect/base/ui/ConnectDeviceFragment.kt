@@ -95,10 +95,10 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
 
     private fun ConnectDevicePm.ViewState.getId() =
         when (this) {
-            ConnectDevicePm.ViewState.HOW_TO_CONNECT -> R.id.stateHowToConnectView
-            ConnectDevicePm.ViewState.SEARCH -> R.id.stateSearchView
-            ConnectDevicePm.ViewState.FOUND -> R.id.stateDeviceFoundView
-            ConnectDevicePm.ViewState.CONNECTED -> R.id.stateConnectedView
-            ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.stateSyncCompletedView
+            ConnectDevicePm.ViewState.SEARCH -> R.id.layoutSyncStateSearch
+            ConnectDevicePm.ViewState.FOUND -> R.id.layoutSyncStateDeviceFound
+            ConnectDevicePm.ViewState.CONNECTED -> R.id.layoutSyncStateConnected
+            ConnectDevicePm.ViewState.HOW_TO_CONNECT -> R.id.layoutSyncStateHowToConnect
+            ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.layoutSyncStateSyncCompleted
         }
 }
