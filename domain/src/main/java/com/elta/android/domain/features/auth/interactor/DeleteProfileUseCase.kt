@@ -22,6 +22,7 @@ class DeleteProfileUseCase @Inject constructor(
                 Observable.fromIterable(SocialNetworkType.values().asIterable())
                     .concatMapCompletable { type ->
                         socialRepo.logout(type)
-                    })
+                    }
+            )
             .andThen(authRepo.logout())
 }
