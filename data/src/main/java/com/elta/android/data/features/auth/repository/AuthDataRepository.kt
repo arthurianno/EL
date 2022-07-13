@@ -101,6 +101,10 @@ class AuthDataRepository @Inject constructor(
             userHolder.currentUser = null
         }
 
+    override fun deleteAccount(): Completable =
+        source.deleteAccount()
+
+
     private fun saveUserCredentials(tokens: TokensDto, email: String) {
         saveTokens(tokens)
         userHolder.currentUser = email.hashCode().toLong()
