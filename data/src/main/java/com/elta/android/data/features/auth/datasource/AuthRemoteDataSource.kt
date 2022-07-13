@@ -46,4 +46,7 @@ class AuthRemoteDataSource @Inject constructor(
     override fun confirmEmail(token: String): Completable =
         api.confirmEmail(TokenRequest(token))
             .onErrorComplete { error -> error is EmailAlreadyConfirmedError }
+
+    override fun deleteAccount(): Completable =
+        api.deleteAccount()
 }
