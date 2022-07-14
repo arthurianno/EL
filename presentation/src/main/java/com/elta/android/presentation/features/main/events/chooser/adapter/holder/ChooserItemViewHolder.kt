@@ -1,10 +1,10 @@
-package com.elta.android.presentation.features.main.events.chooser.ui.adapter.holder
+package com.elta.android.presentation.features.main.events.chooser.adapter.holder
 
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemChooserBinding
-import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserItem
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView
 
@@ -17,7 +17,7 @@ class ChooserItemViewHolder(
             chooserIconView.toggleView(item.iconId != null)
             item.iconId?.let { chooserIconView.setImageResource(it) }
             chooserTitleView.text = item.title
-            chooserSelectedIconView.toggleView(item.isSelected)
+            chooserRightIconView.toggleView(item.isSelected)
             root.setOnClickListener {
                 bus.click(Clicks.ChooserOptionClicked(item.id))
             }

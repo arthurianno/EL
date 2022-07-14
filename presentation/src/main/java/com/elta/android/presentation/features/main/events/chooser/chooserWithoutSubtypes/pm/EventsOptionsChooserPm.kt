@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.chooser.pm
+package com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.pm
 
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
@@ -10,10 +10,10 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.builder.ChooserOptionsItemsBuilder
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
-import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
-import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -100,6 +100,8 @@ class EventsOptionsChooserPm @Inject constructor(
                     when (configurationState.value.chooserType) {
                         ChooserType.VARIANTS -> Events.ChooserVariantSelected(it)
                         ChooserType.GROUP_TAGS -> Events.ChooserTagSelected(it)
+                        else ->
+                            throw IllegalArgumentException("EventsOptionsChooser can`t work with chooser type")
                     }
                 )
             }

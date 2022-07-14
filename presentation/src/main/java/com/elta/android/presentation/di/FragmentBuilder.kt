@@ -19,8 +19,9 @@ import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.di.HomeFlowModule
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
+import com.elta.android.presentation.features.main.events.chooser.chooserWithSubtypes.ui.EventsOptionsChooserWithSubtypesFragment
+import com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.chooser.di.EventsOptionsChooserModule
-import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
@@ -164,6 +165,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector(modules = [EventsOptionsChooserModule::class])
     abstract fun bindEventsOptionsChooserFragment(): EventsOptionsChooserFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [EventsOptionsChooserModule::class])
+    abstract fun bindEventsOptionsChooserWithSubtypesFragment(): EventsOptionsChooserWithSubtypesFragment
 
     @FragmentScope
     @ContributesAndroidInjector

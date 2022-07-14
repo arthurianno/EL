@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.chooser.ui
+package com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -10,9 +10,9 @@ import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentEventsOptionsChooserBinding
+import com.elta.android.presentation.features.main.events.chooser.adapter.EventOptionsChooseAdapter
+import com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
-import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
-import com.elta.android.presentation.features.main.events.chooser.ui.adapter.EventOptionsChooseAdapter
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
 import com.jakewharton.rxbinding2.view.clicks
