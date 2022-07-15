@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -22,9 +21,8 @@ import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
-import com.elta.android.presentation.features.main.events.chooser.chooserWithSubtypes.ui.EventsOptionsChooserWithSubtypesFragment
-import com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
+import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
@@ -189,11 +187,7 @@ object Screens {
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
-        override fun getFragment() = if (config.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE) {
-            EventsOptionsChooserWithSubtypesFragment.newInstance(config)
-        } else {
-            EventsOptionsChooserFragment.newInstance(config)
-        }
+        override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
     }
 
     data class ShareEventScreen(val uri: Uri, val title: String) : SupportAppScreen() {

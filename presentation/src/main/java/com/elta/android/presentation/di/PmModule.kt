@@ -17,8 +17,7 @@ import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
-import com.elta.android.presentation.features.main.events.chooser.chooserWithSubtypes.pm.EventsOptionsChooserWithSubtypesPm
-import com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.pm.EventsOptionsChooserPm
+import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
 import com.elta.android.presentation.features.main.events.glucose.pm.GlucoseEventPm
@@ -179,11 +178,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(EventsOptionsChooserPm::class)
     abstract fun bindEventsOptionsChooserPm(pm: EventsOptionsChooserPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(EventsOptionsChooserWithSubtypesPm::class)
-    abstract fun bindEventsOptionsChooserWithSubtypesPm(pm: EventsOptionsChooserWithSubtypesPm): PresentationModel
 
     @Binds
     @IntoMap

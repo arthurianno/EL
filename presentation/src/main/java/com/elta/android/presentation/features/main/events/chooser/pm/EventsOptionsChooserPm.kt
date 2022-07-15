@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.chooser.chooserWithoutSubtypes.pm
+package com.elta.android.presentation.features.main.events.chooser.pm
 
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
@@ -10,10 +10,10 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserItem
-import com.elta.android.presentation.features.main.events.chooser.builder.ChooserOptionsItemsBuilder
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state

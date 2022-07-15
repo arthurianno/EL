@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.main.events.chooser.builder
+package com.elta.android.presentation.features.main.events.chooser.ui.builder
 
 import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
@@ -7,10 +7,10 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserHeaderItem
-import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserItem
-import com.elta.android.presentation.features.main.events.chooser.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
