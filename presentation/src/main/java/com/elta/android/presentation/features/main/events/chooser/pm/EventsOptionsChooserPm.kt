@@ -149,10 +149,10 @@ class EventsOptionsChooserPm @Inject constructor(
             resources.getString(
                 when {
                     configuration.chooserType == ChooserType.VARIANTS &&
-                            configuration.eventType == EventType.INSULIN ->
+                    configuration.eventType == EventType.INSULIN ->
                         R.string.events_options_chooser_title_insulin
                     configuration.chooserType == ChooserType.VARIANTS &&
-                            configuration.eventType == EventType.ACTIVITY ->
+                    configuration.eventType == EventType.ACTIVITY ->
                         R.string.events_options_chooser_title_activities
                     else ->
                         R.string.events_options_chooser_title_tags
