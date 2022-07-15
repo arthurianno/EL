@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.main.events.chooser.ui.adapter.holder
 
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemChooserBinding
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
@@ -19,7 +21,7 @@ class ChooserWithSubtypeItemViewHolder(
             chooserRightIconView.toggleView(true)
             chooserRightIconView.setImageResource(R.drawable.ic_arrow_left)
             root.setOnClickListener {
-                // click
+                bus.click(Clicks.ChooserWithSubtypesOptionClicked(item))
             }
         }
     }

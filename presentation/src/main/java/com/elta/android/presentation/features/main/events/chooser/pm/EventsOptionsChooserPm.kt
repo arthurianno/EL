@@ -100,8 +100,9 @@ class EventsOptionsChooserPm @Inject constructor(
                     when (configurationState.value.chooserType) {
                         ChooserType.VARIANTS -> Events.ChooserVariantSelected(it)
                         ChooserType.GROUP_TAGS -> Events.ChooserTagSelected(it)
-                        else ->
-                            throw IllegalArgumentException("EventsOptionsChooser can`t work with chooser type")
+                        ChooserType.VARIANTS_WITH_SUBTYPE -> Events.ChooserVariantWithSubtypesSelected(
+                            it
+                        )
                     }
                 )
             }
@@ -148,10 +149,10 @@ class EventsOptionsChooserPm @Inject constructor(
             resources.getString(
                 when {
                     configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == EventType.INSULIN ->
+                            configuration.eventType == EventType.INSULIN ->
                         R.string.events_options_chooser_title_insulin
                     configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == EventType.ACTIVITY ->
+                            configuration.eventType == EventType.ACTIVITY ->
                         R.string.events_options_chooser_title_activities
                     else ->
                         R.string.events_options_chooser_title_tags

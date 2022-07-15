@@ -3,6 +3,7 @@ package com.elta.android.presentation
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
@@ -24,6 +25,7 @@ sealed class Clicks : Click {
     data class AddUserEvent(val meta: Any) : Clicks()
     data class RecordClicked(val item: RecordItem) : Clicks()
     data class ChooserOptionClicked(val id: String) : Clicks()
+    data class ChooserWithSubtypesOptionClicked(val item: ChooserWithSubtypeItem) : Clicks()
     data class DeviceClicked(val item: DeviceItem) : Clicks()
     data class ProfileAdditionalClicked(val item: MainProfileAdditionalItem) : Clicks()
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
