@@ -100,6 +100,9 @@ class EventsOptionsChooserPm @Inject constructor(
                     when (configurationState.value.chooserType) {
                         ChooserType.VARIANTS -> Events.ChooserVariantSelected(it)
                         ChooserType.GROUP_TAGS -> Events.ChooserTagSelected(it)
+                        ChooserType.VARIANTS_WITH_SUBTYPE -> Events.ChooserVariantWithSubtypesSelected(
+                            it
+                        )
                     }
                 )
             }

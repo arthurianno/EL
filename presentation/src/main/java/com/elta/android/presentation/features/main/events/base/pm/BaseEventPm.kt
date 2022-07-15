@@ -129,20 +129,30 @@ abstract class BaseEventPm constructor(
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
-            .map {
-                ChooserConfiguration(
-                    ChooserType.VARIANTS,
-                    eventTypeState.value,
-                    generateChooserId()
-                )
+            .map { createChooserConfiguration() }
+            .subscribe {
+                router.navigateTo(Screens.EventsChooserScreen(it))
             }
-            .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
 
         bus.events<Events.ChooserVariantSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(formSelector.option.consumer)
             .untilDestroy()
+    }
+
+    private fun createChooserConfiguration() = if (eventTypeState.value == EventType.INSULIN) {
+        ChooserConfiguration(
+            ChooserType.VARIANTS_WITH_SUBTYPE,
+            eventTypeState.value,
+            generateChooserId()
+        )
+    } else {
+        ChooserConfiguration(
+            ChooserType.VARIANTS,
+            eventTypeState.value,
+            generateChooserId()
+        )
     }
 
     private fun bindFormTagSelection() {

@@ -10,6 +10,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
@@ -56,7 +57,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
 
     private fun mapAsInsulinItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as InsulinType
-        return ChooserItem(
+        return ChooserWithSubtypeItem(
             id = source.id,
             title = resourceProvider.getString(meta.toName()),
             iconId = null,

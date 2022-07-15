@@ -17,7 +17,7 @@ internal fun buildChooserOptions(
 ) = when {
     chooserType == ChooserType.GROUP_TAGS ->
         tagsRepository.getTags().map(::mapTags)
-    chooserType == ChooserType.VARIANTS && eventType == EventType.INSULIN ->
+    chooserType == ChooserType.VARIANTS_WITH_SUBTYPE && eventType == EventType.INSULIN ->
         Observable.just(InsulinType.values()).map(::mapInsulinTypes)
     chooserType == ChooserType.VARIANTS && eventType == EventType.ACTIVITY ->
         Observable.just(ActivityType.values()).map(::mapActivityTypes)
