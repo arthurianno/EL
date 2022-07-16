@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MedicamentName
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -42,8 +43,19 @@ class ChooserOptionsItemsBuilder @Inject constructor(
             is ActivityType -> mapAsActivityItem(source)
             is InsulinType -> mapAsInsulinItem(source)
             is Tag -> mapAsTagItem(source)
+            is MedicamentName -> mapAsMedicamentItem(source)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
+
+    private fun mapAsMedicamentItem(source: ChooserOptionModel): ListItem {
+        val meta = source.meta as MedicamentName
+        return ChooserItem(
+            id = source.id,
+            title = source.id,
+            iconId = null,
+            meta = meta
+        )
+    }
 
     private fun mapAsActivityItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as ActivityType

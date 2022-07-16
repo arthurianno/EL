@@ -6,6 +6,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BaseListPm
@@ -36,6 +37,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
+    private val openSubtypesOptionsAction = action<ChooserConfiguration>()
 
     override fun onCreate() {
         super.onCreate()
@@ -90,6 +92,20 @@ class EventsOptionsChooserPm @Inject constructor(
             }
             .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
+            .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
+            .map {
+                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.id)
+            }
+            .doOnNext(openSubtypesOptionsAction.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        openSubtypesOptionsAction.observable
+            .doOnNext { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .subscribe()
             .untilDestroy()
 
@@ -148,7 +164,7 @@ class EventsOptionsChooserPm @Inject constructor(
         toolbarTitleCommand.consumer.accept(
             resources.getString(
                 when {
-                    configuration.chooserType == ChooserType.VARIANTS &&
+                    configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
                         configuration.eventType == EventType.INSULIN ->
                         R.string.events_options_chooser_title_insulin
                     configuration.chooserType == ChooserType.VARIANTS &&
