@@ -6,7 +6,7 @@ data class ChooserWithSubtypeItem(
     val id: String,
     val title: String,
     val iconId: Int?,
-    val meta: Any,
+    val meta: Any
 ) : ListItem {
     override fun getUniqueProperty() = id
 }

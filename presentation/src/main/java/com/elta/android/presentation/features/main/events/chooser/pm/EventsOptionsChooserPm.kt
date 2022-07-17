@@ -37,7 +37,6 @@ class EventsOptionsChooserPm @Inject constructor(
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
-    private val openSubtypesOptionsAction = action<ChooserConfiguration>()
 
     override fun onCreate() {
         super.onCreate()
@@ -58,11 +57,6 @@ class EventsOptionsChooserPm @Inject constructor(
                     .bindProgress()
                     .map { options -> itemsBuilder.buildItems(configurationState.value, options) }
                     .doOnNext(items.consumer)
-                    .doOnNext {
-                        previousSelectionState.valueOrNull?.let { previousId ->
-                            selectedItemIdState.consumer.accept(previousId)
-                        }
-                    }
                     .doOnError(::handleError)
             }
             .retry()
@@ -87,8 +81,8 @@ class EventsOptionsChooserPm @Inject constructor(
 
         bus.clicks<Clicks.ChooserOptionClicked>()
             .map {
-                if (it.id == selectedItemIdState.value) NONE_ID
-                else it.id
+                if (it.item.id == selectedItemIdState.value) NONE_ID
+                else it.item.id
             }
             .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
@@ -98,15 +92,11 @@ class EventsOptionsChooserPm @Inject constructor(
         bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
             .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.id)
+                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.title)
             }
-            .doOnNext(openSubtypesOptionsAction.consumer)
-            .subscribe()
-            .untilDestroy()
-
-        openSubtypesOptionsAction.observable
-            .doOnNext { router.navigateTo(Screens.EventsChooserScreen(it)) }
-            .subscribe()
+            .subscribe {
+                router.navigateTo(Screens.EventsChooserScreen(it))
+            }
             .untilDestroy()
 
         selectionConfirmedAction.observable
@@ -122,7 +112,15 @@ class EventsOptionsChooserPm @Inject constructor(
                     }
                 )
             }
-            .doOnNext { router.exit() }
+            .doOnNext {
+                val configuration = configurationState.value
+                if (configuration.eventType == EventType.INSULIN &&
+                    configuration.chooserType == ChooserType.VARIANTS
+                ) {
+                    router.exit()
+                }
+                router.exit()
+            }
             .subscribe()
             .untilDestroy()
     }
@@ -148,11 +146,20 @@ class EventsOptionsChooserPm @Inject constructor(
         val chooserItem = item as? ChooserItem
         return ChooserResult(
             id = selectedItemId,
-            name = chooserItem?.title,
+            name = getChooserResultName(chooserItem),
             iconId = chooserItem?.iconId,
             meta = chooserItem?.meta
         )
     }
+
+    private fun getChooserResultName(chooserItem: ChooserItem?) =
+        if (configurationState.value.eventType == EventType.INSULIN &&
+            previousSelectionState.value != NONE_ID
+        ) {
+            "${previousSelectionState.value}(${chooserItem?.title.orEmpty()})"
+        } else {
+            chooserItem?.title
+        }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =
         GetChooserOptionsUseCase.Params(
@@ -191,7 +198,13 @@ class EventsOptionsChooserPm @Inject constructor(
     }
 
     private fun setPreviousSelection(configuration: ChooserConfiguration) {
-        previousSelectionState.consumer.accept(configuration.id ?: NONE_ID)
+        previousSelectionState.consumer.accept(
+            if (configuration.chooserType == ChooserType.VARIANTS) {
+                configuration.id
+            } else {
+                NONE_ID
+            }
+        )
     }
 
     companion object {

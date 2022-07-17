@@ -19,7 +19,7 @@ class ChooserItemViewHolder(
             chooserTitleView.text = item.title
             chooserRightIconView.toggleView(item.isSelected)
             root.setOnClickListener {
-                bus.click(Clicks.ChooserOptionClicked(item.id))
+                bus.click(Clicks.ChooserOptionClicked(item))
             }
         }
     }
