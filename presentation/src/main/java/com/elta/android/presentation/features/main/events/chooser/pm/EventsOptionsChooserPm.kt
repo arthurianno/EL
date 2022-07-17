@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.chooser.pm
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -15,6 +16,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import com.elta.android.presentation.utils.toName
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -162,10 +164,20 @@ class EventsOptionsChooserPm @Inject constructor(
         }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =
-        GetChooserOptionsUseCase.Params(
-            chooserConfiguration.eventType,
-            chooserConfiguration.chooserType
-        )
+        try {
+            GetChooserOptionsUseCase.Params(
+                chooserConfiguration.eventType,
+                chooserConfiguration.chooserType,
+                getInsulinTypeByString(previousSelectionState.value)
+            )
+        } catch (e: Exception) {
+            GetChooserOptionsUseCase.Params(
+                chooserConfiguration.eventType,
+                chooserConfiguration.chooserType,
+                null
+            )
+        }
+
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         toolbarTitleCommand.consumer.accept(
@@ -196,6 +208,18 @@ class EventsOptionsChooserPm @Inject constructor(
             }
         )
     }
+
+    private fun getInsulinTypeByString(string: String) =
+        when (string) {
+            resources.getString(InsulinType.INTERMIDIATE.toName()) -> InsulinType.INTERMIDIATE
+            resources.getString(InsulinType.ULTRASHORT.toName()) -> InsulinType.ULTRASHORT
+            resources.getString(InsulinType.LONG.toName()) -> InsulinType.LONG
+            resources.getString(InsulinType.MIXED.toName()) -> InsulinType.MIXED
+            resources.getString(InsulinType.ULTRALONG.toName()) -> InsulinType.ULTRALONG
+            resources.getString(InsulinType.SHORT.toName()) -> InsulinType.SHORT
+            else -> throw IllegalArgumentException()
+        }
+
 
     private fun setPreviousSelection(configuration: ChooserConfiguration) {
         previousSelectionState.consumer.accept(
