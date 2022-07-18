@@ -11,8 +11,8 @@ import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSource
-import com.elta.android.data.features.diary.insulin.datasource.InsulinNameDataSource
-import com.elta.android.data.features.diary.insulin.datasource.InsulinNameRemoteDataSource
+import com.elta.android.data.features.diary.insulin.datasource.InsulinDrugNameDataSource
+import com.elta.android.data.features.diary.insulin.datasource.InsulinDrugNameRemoteDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
@@ -109,7 +109,7 @@ abstract class DataSourceModule {
     @Remote
     @Binds
     @Singleton
-    abstract fun bindInsulinNameRemoteDataSource(source: InsulinNameRemoteDataSource): InsulinNameDataSource
+    abstract fun bindInsulinDrugNameRemoteDataSource(source: InsulinDrugNameRemoteDataSource): InsulinDrugNameDataSource
 
     @Binds
     @Singleton

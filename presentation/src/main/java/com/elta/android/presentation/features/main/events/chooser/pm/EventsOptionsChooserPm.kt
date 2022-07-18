@@ -164,19 +164,12 @@ class EventsOptionsChooserPm @Inject constructor(
         }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =
-        try {
-            GetChooserOptionsUseCase.Params(
-                chooserConfiguration.eventType,
-                chooserConfiguration.chooserType,
-                getInsulinTypeByString(previousSelectionState.value)
-            )
-        } catch (e: Exception) {
-            GetChooserOptionsUseCase.Params(
-                chooserConfiguration.eventType,
-                chooserConfiguration.chooserType,
-                null
-            )
-        }
+        GetChooserOptionsUseCase.Params(
+            chooserConfiguration.eventType,
+            chooserConfiguration.chooserType,
+            getInsulinTypeByString(previousSelectionState.value)
+        )
+
 
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
@@ -218,7 +211,7 @@ class EventsOptionsChooserPm @Inject constructor(
             resources.getString(InsulinType.MIXED.toName()) -> InsulinType.MIXED
             resources.getString(InsulinType.ULTRALONG.toName()) -> InsulinType.ULTRALONG
             resources.getString(InsulinType.SHORT.toName()) -> InsulinType.SHORT
-            else -> throw IllegalArgumentException()
+            else -> null
         }
 
 
