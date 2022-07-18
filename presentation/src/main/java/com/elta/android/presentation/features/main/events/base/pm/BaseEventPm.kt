@@ -162,8 +162,9 @@ abstract class BaseEventPm constructor(
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
-                    ChooserType.GROUP_TAGS, eventTypeState.value,
-                    (tagSelector.option.value.meta as? Tag)?.id
+                    chooserType = ChooserType.GROUP_TAGS,
+                    eventType = eventTypeState.value,
+                    id = (tagSelector.option.value.meta as? Tag)?.id
                 )
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }

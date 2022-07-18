@@ -42,8 +42,19 @@ class ChooserOptionsItemsBuilder @Inject constructor(
             is ActivityType -> mapAsActivityItem(source)
             is InsulinType -> mapAsInsulinItem(source)
             is Tag -> mapAsTagItem(source)
+            is String -> mapAsInsulinNameItem(source)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
+
+    private fun mapAsInsulinNameItem(source: ChooserOptionModel): ListItem {
+        val meta = source.meta as String
+        return ChooserItem(
+            id = source.id,
+            title = source.id,
+            iconId = null,
+            meta = meta
+        )
+    }
 
     private fun mapAsActivityItem(source: ChooserOptionModel): ListItem {
         val meta = source.meta as ActivityType
