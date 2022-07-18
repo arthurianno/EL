@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class InsulinDrugNameRemoteDataSource @Inject constructor(
     private val api: InsulinDrugNameApi
-    ) : InsulinDrugNameDataSource {
+) : InsulinDrugNameDataSource {
 
     override fun getDrugNamesByInsulinType(type: InsulinType) = api.getDrugNamesByInsulinType(type)
 }
