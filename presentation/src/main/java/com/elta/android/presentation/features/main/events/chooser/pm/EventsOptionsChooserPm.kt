@@ -174,14 +174,17 @@ class EventsOptionsChooserPm @Inject constructor(
         toolbarTitleCommand.consumer.accept(
             when {
                 configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
-                    configuration.eventType == EventType.INSULIN ->
+                    configuration.eventType == EventType.INSULIN -> {
                     resources.getString(R.string.events_options_chooser_title_insulin)
+                }
                 configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.ACTIVITY ->
+                    configuration.eventType == EventType.ACTIVITY -> {
                     resources.getString(R.string.events_options_chooser_title_activities)
+                }
                 configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.INSULIN ->
-                    previousSelectionState.valueOrNull ?: "Error"
+                    configuration.eventType == EventType.INSULIN -> {
+                    previousSelectionState.valueOrNull
+                }
                 else ->
                     resources.getString(R.string.events_options_chooser_title_tags)
             }
