@@ -27,6 +27,10 @@ class FlowRouter(private val parentRouter: Router?) : UiThreadRouter() {
         executeCommands(AttachTab(screen))
     }
 
+    fun exitManyTimes(times: Int) {
+        repeat(times) { exit() }
+    }
+
     private fun runCommand(command: Router.() -> Unit) {
         if (parentRouter != null)
             parentRouter.command()

@@ -119,9 +119,10 @@ class EventsOptionsChooserPm @Inject constructor(
                 if (configuration.eventType == EventType.INSULIN &&
                     configuration.chooserType == ChooserType.VARIANTS
                 ) {
+                    router.exitManyTimes(TIMES_EXIT_TO_LEAVE_CHOOSER)
+                } else {
                     router.exit()
                 }
-                router.exit()
             }
             .subscribe()
             .untilDestroy()
@@ -229,5 +230,6 @@ class EventsOptionsChooserPm @Inject constructor(
     companion object {
         private const val NONE_ID = "none_id"
         private const val CLICK_DELAY = 100L // millis
+        private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
     }
 }
