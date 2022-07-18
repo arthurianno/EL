@@ -101,14 +101,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
         profile.socialNetworks?.let { list ->
             list.forEach { network ->
                 when (network.type) {
-                    SocialNetworkType.FB -> socialNetworks.add(
-                        ProfileSettingsSocialItem(
-                            networkIcon = R.drawable.ic_facebook,
-                            title = resources.getString(R.string.facebook),
-                            isLinked = network.isLinked,
-                            type = SocialNetworkType.FB
-                        )
-                    )
+                    SocialNetworkType.FB -> {}
                     SocialNetworkType.VK -> socialNetworks.add(
                         ProfileSettingsSocialItem(
                             networkIcon = R.drawable.ic_vk,

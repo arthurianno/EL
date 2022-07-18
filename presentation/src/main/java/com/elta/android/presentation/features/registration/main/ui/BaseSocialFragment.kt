@@ -9,7 +9,6 @@ abstract class BaseSocialFragment<PM : BaseSocialPm> : BaseRegistrationFragment<
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
         with(binding) {
-            facebookButtonView.clicks().bindTo(pm.fbAction)
             vkButtonView.clicks().bindTo(pm.vkAction)
             okButtonView.clicks().bindTo(pm.okAction)
         }

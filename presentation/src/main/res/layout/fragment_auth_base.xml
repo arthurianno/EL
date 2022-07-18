@@ -130,11 +130,6 @@
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/facebookButtonView"
-                        style="@style/Button.Social"
-                        app:srcCompat="@drawable/ic_facebook" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/vkButtonView"
                         style="@style/Button.Social"
                         android:layout_marginStart="16dp"
