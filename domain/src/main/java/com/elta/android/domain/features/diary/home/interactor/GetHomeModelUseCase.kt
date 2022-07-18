@@ -4,7 +4,6 @@ import com.elta.android.common.utils.atEndOfDay
 import com.elta.android.common.utils.atStartOfDay
 import com.elta.android.domain.features.diary.events.model.addTag
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -33,7 +32,7 @@ class GetHomeModelUseCase @Inject constructor(
             userInfoRepo.getUserInfo().toObservable().applyScheduler(schedulers)
         ) { events, tags, profile, userInfo ->
             val eventsWithTags = events.map { it.addTag(tags) }
-            val glucoseLevelSettings = profile.glucoseLevelSettings ?: GlucoseLevelSettings()
+            val glucoseLevelSettings = profile.glucoseLevelSettings
             buildHomeModel(eventsWithTags, tags, glucoseLevelSettings, userInfo)
         }
     }

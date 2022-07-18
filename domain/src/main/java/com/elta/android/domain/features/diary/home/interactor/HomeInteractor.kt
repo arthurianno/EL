@@ -12,6 +12,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import timber.log.Timber
 import java.util.Date
 import kotlin.math.abs
 
@@ -23,6 +24,9 @@ fun buildHomeModel(
 ): HomeModel {
 
     val sortedEvents = events.sortAndFilter()
+    sortedEvents.forEach { event ->
+        Timber.i("<<<<<<< GetHomeModelUseCase >>>>>>  Event: id = ${event.id} , additionTime = ${event.additionTime} , value = ${event.value} , type = ${event.type}, state = ${event.state}")
+    }
 
     var lastBreadEvent: Event? = null
     var lastInsulinEvent: Event? = null

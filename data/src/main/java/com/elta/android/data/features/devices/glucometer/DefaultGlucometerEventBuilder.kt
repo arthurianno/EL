@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.glucometer
 
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import org.threeten.bp.ZonedDateTime
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +16,10 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val tokens = getTokens(response)
         val dateToken = tokens.first
         val temperatureAndValueToken = tokens.second
+
+        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Response : $response")
+        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Tokens : $tokens")
+        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Value : ${extractValue(temperatureAndValueToken)}")
 
         return GlucometerEventDto(
             id = generator.generate(userId, glucometerId, dateToken),
