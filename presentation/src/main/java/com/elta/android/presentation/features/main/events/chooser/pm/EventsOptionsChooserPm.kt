@@ -184,6 +184,7 @@ class EventsOptionsChooserPm @Inject constructor(
                 configuration.chooserType == ChooserType.VARIANTS &&
                     configuration.eventType == EventType.INSULIN -> {
                     previousSelectionState.valueOrNull
+                        ?: resources.getString(R.string.events_options_chooser_title_tags)
                 }
                 else ->
                     resources.getString(R.string.events_options_chooser_title_tags)
