@@ -170,8 +170,6 @@ class EventsOptionsChooserPm @Inject constructor(
             getInsulinTypeByString(previousSelectionState.value)
         )
 
-
-
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         toolbarTitleCommand.consumer.accept(
             when {
@@ -213,7 +211,6 @@ class EventsOptionsChooserPm @Inject constructor(
             resources.getString(InsulinType.SHORT.toName()) -> InsulinType.SHORT
             else -> null
         }
-
 
     private fun setPreviousSelection(configuration: ChooserConfiguration) {
         previousSelectionState.consumer.accept(
