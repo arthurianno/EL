@@ -10,6 +10,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
@@ -119,12 +120,17 @@ class EventsOptionsChooserPm @Inject constructor(
                 if (configuration.eventType == EventType.INSULIN &&
                     configuration.chooserType == ChooserType.VARIANTS
                 ) {
+                    router.leaveChooser()
+                } else {
                     router.exit()
                 }
-                router.exit()
             }
             .subscribe()
             .untilDestroy()
+    }
+
+    private fun FlowRouter.leaveChooser() {
+        repeat(TIMES_EXIT_TO_LEAVE_CHOOSER) { exit() }
     }
 
     private fun performSelection(id: String) {
@@ -229,5 +235,6 @@ class EventsOptionsChooserPm @Inject constructor(
     companion object {
         private const val NONE_ID = "none_id"
         private const val CLICK_DELAY = 100L // millis
+        private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
     }
 }
