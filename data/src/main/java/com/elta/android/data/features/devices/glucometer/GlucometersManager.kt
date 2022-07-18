@@ -44,6 +44,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
+import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -161,6 +162,9 @@ class GlucometersManager @Inject constructor(
                 if (!response.isEmptyEvent()) responses.add(response)
             }
             .map { events ->
+                events.forEach {
+                    Timber.i("<<<<<<< getGlucometerEvents >>>>>>  Response : $it")
+                }
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
@@ -331,6 +335,7 @@ class GlucometersManager @Inject constructor(
                 if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED)
                     device.establishConnection(false)
                         .onErrorResumeNext { e: Throwable ->
+                            Timber.e(javaClass.simpleName, e.message, e)
                             if (e is BleDisconnectedException) Observable.error(GlucometerOfflineError)
                             else Observable.error(e)
                         }
@@ -382,6 +387,9 @@ class GlucometersManager @Inject constructor(
                 val responses = it.second
 
                 val pin = pinStorage.getPin(address)
+
+                Timber.i("<<<<<<<Sync>>>>>>  Pin: $pin")
+
                 if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
 
                 val startCommands = mutableListOf(
@@ -389,8 +397,13 @@ class GlucometersManager @Inject constructor(
                     Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
                 )
 
+                Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
+
                 val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                Timber.i("<<<<<<<Sync>>>>>>  Info from cache by address: $info")
+
                 val lastEvent = info?.lastSyncedEvent
+                Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
 
                 Observable.range(0, EVENTS_COUNT)
                     .map { index -> Commands.ReadEvent(index) as GlucometerCommand }
@@ -410,6 +423,9 @@ class GlucometersManager @Inject constructor(
                 it.switchMap { pair ->
                     val bytes = pair.first
                     val response = bytes.toString(Charset.defaultCharset())
+
+                    Timber.i("<<<<<<<Sync>>>>>>  Response: $response")
+
                     if (response.isError()) Observable.error(CommandError)
                     else Observable.just(Pair(response, pair.second))
                 }
@@ -489,11 +505,21 @@ class GlucometersManager @Inject constructor(
         }
 
     private fun updateGlucometerInfo(address: String, responses: List<String>, lastEvent: String?) {
+        Timber.i("<<<<<<<Sync>>>>>> update -  Address: $address")
+        Timber.i("<<<<<<<Sync>>>>>> update - Responses: $responses")
+        Timber.i("<<<<<<<Sync>>>>>> update - LastEvent: $lastEvent")
         val info = infoBuilder.buildFrom(address, responses, ZonedDateTime.now(), lastEvent)
         val cachedInfo = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+        Timber.i("<<<<<<<Sync>>>>>> update -  CachedInfo: $cachedInfo")
         val newInfo = glucometersInfoToCacheMapper.mapFromObject(info)
-        if (cachedInfo == null) glucometersInfoCache.add(listOf(newInfo))
-        else glucometersInfoCache.update(listOf(newInfo))
+        Timber.i("<<<<<<<Sync>>>>>> update -  NewInfo: $newInfo")
+        if (cachedInfo == null) {
+            Timber.i("<<<<<<<Sync>>>>>> update -  Add Info: $newInfo")
+            glucometersInfoCache.add(listOf(newInfo))
+        } else {
+            Timber.i("<<<<<<<Sync>>>>>> update -  Update Info: $newInfo")
+            glucometersInfoCache.update(listOf(newInfo))
+        }
     }
 
     data class SyncResponseHolder(
@@ -509,6 +535,6 @@ class GlucometersManager @Inject constructor(
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000
         private const val SYNC_DELAY = 500L
-        private const val COMMAND_DELAY = 4L
+        private const val COMMAND_DELAY = 20L
     }
 }
