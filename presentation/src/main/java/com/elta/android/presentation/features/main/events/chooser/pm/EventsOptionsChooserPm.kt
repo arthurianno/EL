@@ -44,9 +44,9 @@ class EventsOptionsChooserPm @Inject constructor(
         super.onCreate()
 
         configurationState.observable
-            .doOnNext(::setUpToolbarTitle)
             .doOnNext(::setUpAppBarBackground)
             .doOnNext(::setPreviousSelection)
+            .doOnNext(::setUpToolbarTitle)
             .doOnNext(loadChooserOptionsAction.consumer)
             .subscribe()
             .untilDestroy()
@@ -181,18 +181,19 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         toolbarTitleCommand.consumer.accept(
-            resources.getString(
-                when {
-                    configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
-                        configuration.eventType == EventType.INSULIN ->
-                        R.string.events_options_chooser_title_insulin
-                    configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == EventType.ACTIVITY ->
-                        R.string.events_options_chooser_title_activities
-                    else ->
-                        R.string.events_options_chooser_title_tags
-                }
-            )
+            when {
+                configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
+                    configuration.eventType == EventType.INSULIN ->
+                    resources.getString(R.string.events_options_chooser_title_insulin)
+                configuration.chooserType == ChooserType.VARIANTS &&
+                    configuration.eventType == EventType.ACTIVITY ->
+                    resources.getString(R.string.events_options_chooser_title_activities)
+                configuration.chooserType == ChooserType.VARIANTS &&
+                    configuration.eventType == EventType.INSULIN ->
+                    previousSelectionState.valueOrNull ?: "Error"
+                else ->
+                    resources.getString(R.string.events_options_chooser_title_tags)
+            }
         )
     }
 

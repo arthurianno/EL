@@ -42,7 +42,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
             is ActivityType -> mapAsActivityItem(source)
             is InsulinType -> mapAsInsulinItem(source)
             is Tag -> mapAsTagItem(source)
-            is String -> mapAsInsulinNameItem(source) // TODO: Добавить модель под названи инсулина
+            is String -> mapAsInsulinNameItem(source)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
 
