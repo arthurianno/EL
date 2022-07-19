@@ -22,5 +22,6 @@ object BreadValidator : FormValidator {
     ): Boolean = validateValue(value) && validateKind(kind) && date != null && validateNote(note)
 
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
-    private fun validateKind(kind: String?): Boolean = kind?.length ?: 0 <= kindMaxLength
+    private fun validateKind(kind: String?): Boolean =
+        kind?.length ?: 0 <= kindMaxLength && validateSpecSymbols(kind)
 }
