@@ -91,7 +91,7 @@ abstract class BaseEventPm constructor(
             kind = form.kind,
             name = form.name,
             duration = form.duration,
-            insulin = form.insulinType,
+            insulin = form.insulin,
             date = form.date,
             note = form.note
         )
