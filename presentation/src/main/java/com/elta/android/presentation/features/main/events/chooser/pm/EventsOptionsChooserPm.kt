@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.chooser.pm
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
@@ -156,9 +157,20 @@ class EventsOptionsChooserPm @Inject constructor(
             id = selectedItemId,
             name = getChooserResultName(chooserItem),
             iconId = chooserItem?.iconId,
-            meta = chooserItem?.meta
+            meta = getChooserMeta(chooserItem)
         )
     }
+
+    private fun getChooserMeta(chooserItem: ChooserItem?): Any? =
+        if (configurationState.value.eventType == EventType.INSULIN) {
+            Insulin(
+                name = previousSelectionState.value,
+                drug = chooserItem?.title.orEmpty(),
+                type = getInsulinTypeByString(previousSelectionState.value) ?: InsulinType.MIXED
+            )
+        } else {
+            chooserItem?.meta
+        }
 
     private fun getChooserResultName(chooserItem: ChooserItem?) =
         if (configurationState.value.eventType == EventType.INSULIN &&
