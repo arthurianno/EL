@@ -15,6 +15,7 @@ sealed class Events : Event {
     data class HomeBottomSheetStateChanged(val opened: Boolean) : Events()
     data class RecordsAttachedStateChanged(val attached: Boolean) : Events()
     data class ChooserVariantSelected(val chooserResult: ChooserResult) : Events()
+    data class ChooserVariantWithSubtypesSelected(val chooserResult: ChooserResult) : Events()
     data class ChooserTagSelected(val chooserResult: ChooserResult) : Events()
     data class EventsChanged(val isCreated: Boolean) : Events()
     data class ProfileChanged(val profile: Profile) : Events()

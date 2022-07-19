@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.diary.events.model.form
 
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import org.threeten.bp.ZonedDateTime
 
 object ActivityValidator : FormValidator {
@@ -10,7 +10,7 @@ object ActivityValidator : FormValidator {
         kind: String?,
         name: String?,
         duration: Long?,
-        insulin: InsulinType?,
+        insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
     ): Boolean = validateDuration(duration) && date != null && validateNote(note)

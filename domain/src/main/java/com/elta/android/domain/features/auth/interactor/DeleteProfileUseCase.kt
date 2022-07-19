@@ -17,11 +17,12 @@ class DeleteProfileUseCase @Inject constructor(
 ) : CompletableUseCase<Unit>(schedulers) {
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
-        authRepo.logout()
+        authRepo.deleteAccount()
             .andThen(
                 Observable.fromIterable(SocialNetworkType.values().asIterable())
                     .concatMapCompletable { type ->
                         socialRepo.logout(type)
                     }
             )
+            .andThen(authRepo.logout())
 }

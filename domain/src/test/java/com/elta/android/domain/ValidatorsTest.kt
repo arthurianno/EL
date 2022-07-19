@@ -1,5 +1,6 @@
 package com.elta.android.domain
 
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator
 import com.elta.android.domain.features.diary.events.model.form.BreadValidator
@@ -61,18 +62,42 @@ class ValidatorsTest {
 
     @Test
     fun insulin_LowerBoundAndDate_True() {
-        assert(InsulinValidator.isValid(value = 0.1, date = ZonedDateTime.now(), insulin = InsulinType.SHORT))
+        assert(
+            InsulinValidator.isValid(
+                value = 0.1,
+                date = ZonedDateTime.now(),
+                insulin = Insulin("", "", InsulinType.SHORT)
+            )
+        )
     }
 
     @Test
     fun insulin_TopBoundAndDate_True() {
-        assert(InsulinValidator.isValid(value = 99.9, date = ZonedDateTime.now(), insulin = InsulinType.SHORT))
+        assert(
+            InsulinValidator.isValid(
+                value = 99.9,
+                date = ZonedDateTime.now(),
+                insulin = Insulin("", "", InsulinType.SHORT)
+            )
+        )
     }
 
     @Test
     fun insulin_OutOfBoundAndDate_False() {
-        assert(!InsulinValidator.isValid(value = 0.0, date = ZonedDateTime.now(), insulin = InsulinType.SHORT))
-        assert(!InsulinValidator.isValid(value = 100.0, date = ZonedDateTime.now(), insulin = InsulinType.SHORT))
+        assert(
+            !InsulinValidator.isValid(
+                value = 0.0,
+                date = ZonedDateTime.now(),
+                insulin = Insulin("", "", InsulinType.SHORT)
+            )
+        )
+        assert(
+            !InsulinValidator.isValid(
+                value = 100.0,
+                date = ZonedDateTime.now(),
+                insulin = Insulin("", "", InsulinType.SHORT)
+            )
+        )
     }
 
     @Test
@@ -96,7 +121,8 @@ class ValidatorsTest {
         name.setLength(120)
         assert(
             MedicamentsValidator.isValid(
-                name = name.toString(), date = ZonedDateTime.now()
+                name = name.toString(),
+                date = ZonedDateTime.now()
             )
         )
     }

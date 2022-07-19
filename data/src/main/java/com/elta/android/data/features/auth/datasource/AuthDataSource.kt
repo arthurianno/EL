@@ -26,4 +26,6 @@ interface AuthDataSource {
     fun checkTokenOwner(token: String): Single<TokenOwnerDto>
 
     fun confirmEmail(token: String): Completable
+
+    fun deleteAccount(): Completable
 }
