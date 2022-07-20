@@ -25,4 +25,6 @@ interface AuthRepository {
     fun confirmEmail(token: String): Completable
 
     fun logout(): Completable
+
+    fun deleteAccount(): Completable
 }

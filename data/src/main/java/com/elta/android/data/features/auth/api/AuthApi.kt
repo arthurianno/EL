@@ -12,6 +12,7 @@ import com.elta.android.data.features.auth.dto.TokensDto
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -45,4 +46,7 @@ interface AuthApi {
 
     @POST("api/auth/v1/accounts/email/confirm")
     fun confirmEmail(@Body request: TokenRequest): Completable
+
+    @DELETE("api/auth/v1/accounts/delete")
+    fun deleteAccount(): Completable
 }

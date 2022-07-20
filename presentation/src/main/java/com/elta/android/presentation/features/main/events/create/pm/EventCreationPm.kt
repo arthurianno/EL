@@ -106,7 +106,7 @@ class EventCreationPm @Inject constructor(
             date = form.date,
             tag = form.tag,
             activity = form.activityType,
-            insulin = form.insulinType,
+            insulin = form.insulin?.type,
             note = form.note,
             eventType = checkNotNull(form.eventType)
         )

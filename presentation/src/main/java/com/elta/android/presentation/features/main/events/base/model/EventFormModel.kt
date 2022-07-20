@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.main.events.base.model
 
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.tags.model.Tag
 import org.threeten.bp.ZonedDateTime
 
@@ -43,6 +43,9 @@ data class EventFormModel(
     val activityType: ActivityType?
         get() = meta as? ActivityType
 
-    val insulinType: InsulinType?
-        get() = meta as? InsulinType
+//    val insulinType: InsulinType?
+//        get() = meta as? InsulinType
+
+    val insulin: Insulin?
+        get() = meta as? Insulin
 }
