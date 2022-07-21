@@ -43,9 +43,6 @@ data class EventFormModel(
     val activityType: ActivityType?
         get() = meta as? ActivityType
 
-//    val insulinType: InsulinType?
-//        get() = meta as? InsulinType
-
     val insulin: Insulin?
         get() = meta as? Insulin
 }
