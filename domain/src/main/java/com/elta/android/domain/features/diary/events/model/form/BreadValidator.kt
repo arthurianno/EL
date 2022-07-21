@@ -19,9 +19,9 @@ object BreadValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateValue(value) && validateKind(kind) && date != null && validateNote(note)
+    ): Boolean = validateValue(value) && validateKind(kind) && date != null && isValidNote(note)
 
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
     private fun validateKind(kind: String?): Boolean =
-        kind?.length ?: 0 <= kindMaxLength && validateSpecSymbols(kind)
+        kind?.length ?: 0 <= kindMaxLength && isContainsOnlySpecSymbols(kind)
 }
