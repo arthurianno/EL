@@ -17,9 +17,9 @@ interface FormValidator {
     ): Boolean
 
     fun isValidNote(note: String?): Boolean =
-        (note?.length ?: 0) <= NOTE_MAX_LENGTH && isContainsOnlySpecSymbols(note?.trim())
+        (note?.length ?: 0) <= NOTE_MAX_LENGTH && isValidWithSpecSymbols(note?.trim())
 
-    fun isContainsOnlySpecSymbols(string: String?) =
+    fun isValidWithSpecSymbols(string: String?) =
         string?.all { !it.isLetterOrDigit() }?.not() ?: true
 
     companion object {

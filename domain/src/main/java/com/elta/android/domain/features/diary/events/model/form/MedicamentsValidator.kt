@@ -16,7 +16,7 @@ object MedicamentsValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateName(name) && date != null && isContainsOnlySpecSymbols(name)
+    ): Boolean = validateName(name) && date != null && isValidWithSpecSymbols(name)
 
     private fun validateName(name: String?): Boolean =
         if (name == null) false else name.length in diapason
