@@ -16,7 +16,11 @@ interface FormValidator {
         note: String? = null
     ): Boolean
 
-    fun validateNote(note: String?): Boolean = (note?.length ?: 0) <= NOTE_MAX_LENGTH
+    fun isValidNote(note: String?): Boolean =
+        (note?.length ?: 0) <= NOTE_MAX_LENGTH && isValidWithSpecSymbols(note?.trim())
+
+    fun isValidWithSpecSymbols(string: String?) =
+        string?.all { !it.isLetterOrDigit() }?.not() ?: true
 
     companion object {
         const val NOTE_MAX_LENGTH = 120

@@ -13,7 +13,7 @@ object ActivityValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateDuration(duration) && date != null && validateNote(note)
+    ): Boolean = isValidDuration(duration) && date != null && isValidNote(note)
 
-    private fun validateDuration(duration: Long?): Boolean = duration != null && duration > 0
+    private fun isValidDuration(duration: Long?): Boolean = duration != null && duration > 0
 }

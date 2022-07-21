@@ -18,7 +18,7 @@ object GlucoseValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateValue(value) && date != null && validateNote(note)
+    ): Boolean = validateValue(value) && date != null && isValidNote(note)
 
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
 }
