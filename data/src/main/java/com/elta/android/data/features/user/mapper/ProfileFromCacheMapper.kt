@@ -27,9 +27,17 @@ class ProfileFromCacheMapper @Inject constructor(
                     firstName = firstName,
                     lastName = lastName
                 ),
-                glucoseLevel = GlucoseLevelDto(
-                    minValue = minValue,
-                    maxValue = maxValue
+                glucoseLevelsBeforeEating = GlucoseLevelDto(
+                    minBeforeEatingValue,
+                    maxBeforeEatingValue
+                ),
+                glucoseLevelsAfterEating = GlucoseLevelDto(
+                    minAfterEatingValue,
+                    maxAfterEatingValue
+                ),
+                glucoseLevelsAverage = GlucoseLevelDto(
+                    minAverageValue,
+                    maxAverageValue
                 ),
                 email = email,
                 timeStamp = timeStamp,

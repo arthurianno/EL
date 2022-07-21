@@ -35,8 +35,18 @@ class ProfileCachedDataSource @Inject constructor(
                         timeStamp = profile.timeStamp,
                         firstName = profile.person?.firstName ?: cachedProfile.firstName,
                         lastName = profile.person?.lastName ?: cachedProfile.lastName,
-                        minValue = profile.glucoseLevel?.minValue ?: cachedProfile.minValue,
-                        maxValue = profile.glucoseLevel?.maxValue ?: cachedProfile.maxValue
+                        minBeforeEatingValue = profile.glucoseLevelsBeforeEating?.minValue
+                            ?: cachedProfile.minBeforeEatingValue,
+                        maxBeforeEatingValue = profile.glucoseLevelsBeforeEating?.maxValue
+                            ?: cachedProfile.maxBeforeEatingValue,
+                        minAfterEatingValue = profile.glucoseLevelsAfterEating?.minValue
+                            ?: cachedProfile.minAfterEatingValue,
+                        maxAfterEatingValue = profile.glucoseLevelsAfterEating?.maxValue
+                            ?: cachedProfile.maxAfterEatingValue,
+                        minAverageValue = profile.glucoseLevelsAverage?.minValue
+                            ?: cachedProfile.minAverageValue,
+                        maxAverageValue = profile.glucoseLevelsAverage?.maxValue
+                            ?: cachedProfile.maxAverageValue
                     )
                     newProfile.tempSocialNetworks = profile.socialNetworks?.let { socials ->
                         networkToCacheMapper.mapFromObjects(socials)

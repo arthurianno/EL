@@ -32,8 +32,17 @@ class MockedProfileApi : ProfileApi {
                     firstName = "Анатолий",
                     lastName = "Савин"
                 ),
-                glucoseLevel = GlucoseLevelDto(
-                    1.2, 5.7
+                glucoseLevelsAverage = GlucoseLevelDto(
+                    1.2,
+                    5.7
+                ),
+                glucoseLevelsBeforeEating = GlucoseLevelDto(
+                    1.2,
+                    5.7
+                ),
+                glucoseLevelsAfterEating = GlucoseLevelDto(
+                    1.2,
+                    5.7
                 ),
                 email = "test@gmail.com",
                 socialNetworks = listOf(

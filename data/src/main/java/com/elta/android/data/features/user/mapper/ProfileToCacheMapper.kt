@@ -25,8 +25,12 @@ class ProfileToCacheMapper @Inject constructor(
                 timeStamp = timeStamp,
                 firstName = person?.firstName,
                 lastName = person?.lastName,
-                minValue = glucoseLevel?.minValue,
-                maxValue = glucoseLevel?.maxValue
+                minBeforeEatingValue = glucoseLevelsBeforeEating?.minValue,
+                maxBeforeEatingValue = glucoseLevelsBeforeEating?.maxValue,
+                minAfterEatingValue = glucoseLevelsAfterEating?.minValue,
+                maxAfterEatingValue = glucoseLevelsAfterEating?.maxValue,
+                minAverageValue = glucoseLevelsAverage?.minValue,
+                maxAverageValue = glucoseLevelsAverage?.maxValue
             )
             profile.tempSocialNetworks = source.socialNetworks?.let {
                 mapper.mapFromObjects(it)
