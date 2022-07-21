@@ -19,8 +19,12 @@ data class ProfileCacheDto(
     val lastName: String?,
 
     // represents GlucoseLevelDto
-    val minValue: Double?,
-    val maxValue: Double?
+    val minBeforeEatingValue: Double?,
+    val maxBeforeEatingValue: Double?,
+    val minAfterEatingValue: Double?,
+    val maxAfterEatingValue: Double?,
+    val minAverageValue: Double?,
+    val maxAverageValue: Double?
 ) {
     @Backlink(to = "profile")
     lateinit var socialNetworks: ToMany<NetworkCacheDto>

@@ -27,12 +27,18 @@ class ProfileToDtoMapper @Inject constructor(
                         lastName = secondName
                     )
                 },
-                glucoseLevel = glucoseLevelSettings?.let {
-                    GlucoseLevelDto(
-                        minValue = it.normal.start,
-                        maxValue = it.normal.end
-                    )
-                },
+                glucoseLevelsAverage = GlucoseLevelDto(
+                    minValue = glucoseLevelSettings.normal.start,
+                    maxValue = glucoseLevelSettings.normal.end
+                ),
+                glucoseLevelsBeforeEating = GlucoseLevelDto(
+                    minValue = glucoseLevelBeforeEatSettings.normal.start,
+                    maxValue = glucoseLevelBeforeEatSettings.normal.end
+                ),
+                glucoseLevelsAfterEating = GlucoseLevelDto(
+                    minValue = glucoseLevelAfterEatSettings.normal.start,
+                    maxValue = glucoseLevelAfterEatSettings.normal.end
+                ),
                 email = email,
                 socialNetworks = null,
                 healthApps = healthApps?.let { healthAppsMapper.mapFromObjects(it) },
