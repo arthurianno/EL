@@ -6,6 +6,8 @@ import com.elta.android.data.features.devices.dto.VersionDto
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeParseException
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,8 +49,13 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
     }
 
     protected open fun extractDate(param: String): LocalDateTime? {
-        val payload = param.split(".")[1]
-        return "20$payload".toLocalDateTime("yyyyMMddHHmmss")
+        return try {
+            val payload = param.split(".")[1]
+            "20$payload".toLocalDateTime("yyyyMMddHHmmss")
+        } catch (ex: DateTimeParseException) {
+            Timber.e(ex)
+            LocalDateTime.now()
+        }
     }
 
     protected open fun extractVersion(param: String): VersionDto {
