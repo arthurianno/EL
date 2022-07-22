@@ -23,4 +23,9 @@ sealed class SnackBarMessageData(
         SnackBarMessageData(
             message = resourceProvider.getString(R.string.error_server_not_responding_snackbar_message)
         )
+
+    class NetworkConnectionMessage(resourceProvider: ResourceProvider) :
+        SnackBarMessageData(
+            message = resourceProvider.getString(R.string.error_no_connection)
+        )
 }

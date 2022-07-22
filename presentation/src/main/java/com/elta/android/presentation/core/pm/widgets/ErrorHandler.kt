@@ -43,13 +43,19 @@ class ErrorHandler(private val pm: BasePm) {
                     }
                     pm.setErrorViewVisibility(true)
                 } else {
-                    if (error !is NetworkConnectionError) {
-                        pm.setErrorViewVisibility(false)
-                        val messageData = if (error.isServerUnavailableError())
-                            SnackBarMessageData.ServerUnavailableMessage(pm.resources)
-                        else
-                            SnackBarMessageData.SimpleTextMessage(error.message ?: "")
-                        pm.showSnackBar(messageData)
+                    when (error) {
+                        is NetworkConnectionError -> {
+                            val messageData = SnackBarMessageData.NetworkConnectionMessage(pm.resources)
+                            pm.showSnackBar(messageData)
+                        }
+                        else -> {
+                            pm.setErrorViewVisibility(false)
+                            val messageData = if (error.isServerUnavailableError())
+                                SnackBarMessageData.ServerUnavailableMessage(pm.resources)
+                            else
+                                SnackBarMessageData.SimpleTextMessage(error.message ?: "")
+                            pm.showSnackBar(messageData)
+                        }
                     }
                 }
         }
