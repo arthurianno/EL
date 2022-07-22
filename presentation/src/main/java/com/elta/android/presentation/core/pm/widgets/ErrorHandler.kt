@@ -50,10 +50,11 @@ class ErrorHandler(private val pm: BasePm) {
                         }
                         else -> {
                             pm.setErrorViewVisibility(false)
-                            val messageData = if (error.isServerUnavailableError())
+                            val messageData = if (error.isServerUnavailableError()) {
                                 SnackBarMessageData.ServerUnavailableMessage(pm.resources)
-                            else
-                                SnackBarMessageData.SimpleTextMessage(error.message ?: "")
+                            } else {
+                                SnackBarMessageData.SimpleTextMessage(error.message.orEmpty())
+                            }
                             pm.showSnackBar(messageData)
                         }
                     }
