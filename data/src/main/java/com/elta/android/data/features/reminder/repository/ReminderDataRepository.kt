@@ -1,6 +1,7 @@
 package com.elta.android.data.features.reminder.repository
 
 import com.elta.android.common.di.qualifires.Cache
+import com.elta.android.common.errors.ReminderAlreadyExistsError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.reminder.dto.ReminderDto
@@ -27,10 +28,26 @@ class ReminderDataRepository @Inject constructor(
         source.getReminderById(id)
             .map(toDomainMapper::mapFromObject)
 
-    override fun addReminder(reminder: Reminder): Single<String> =
-        createSingleRemindersDto(reminder)
+    override fun addReminder(reminder: Reminder): Single<String> {
+        val allRemindersDto = getReminders().map(toDtoMapper::mapFromObjects)
+        val currentReminderAsListDto = createSingleRemindersDto(reminder).toObservable()
+
+        return Observable.zip(
+            currentReminderAsListDto,
+            allRemindersDto
+        ) { reminderAsList, allReminders ->
+            val remindersDateToTimeList =
+                allReminders.map { it.time.toLocalDate() to it.time.toLocalTime() }
+            val currentReminderDateToTime =
+                reminderAsList.map { it.time.toLocalDate() to it.time.toLocalTime() }
+
+            if (remindersDateToTimeList.containsAll(currentReminderDateToTime)) throw ReminderAlreadyExistsError()
+
+            reminderAsList
+        }
             .flatMapCompletable { source.addReminders(it) }
             .toSingleDefault(reminder.id)
+    }
 
     override fun updateReminder(reminder: Reminder): Single<String> =
         createSingleRemindersDto(reminder)
