@@ -14,6 +14,7 @@ import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.utils.showTimePickerWithoutPastTimeDialog
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.ui.toast.showToast
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
@@ -44,6 +45,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> :
         binding.scheduleView.spinnerClicks().bindTo(pm.selectedScheduleAction)
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
+        pm.showExistingReminderDialog.bindTo { activity.showToast(getString(R.string.reminder_is_exists)) }
     }
 
     override fun handleBack() {

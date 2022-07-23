@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.reminders.base.pm
 
+import com.elta.android.common.errors.ReminderAlreadyExistsError
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.Dialogs
@@ -36,6 +37,7 @@ abstract class BaseRemindPm constructor(
 
     val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
     val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
+    val showExistingReminderDialog = command<Unit>()
     val saveReminderAction = action<Unit>()
     val dateTimeSelectedAction = action<ZonedDateTime>()
     val selectedScheduleAction = action<ListItem>()
@@ -123,6 +125,13 @@ abstract class BaseRemindPm constructor(
         dateTimeSelectedAction.observable
             .subscribe(selectedDateState.consumer)
             .untilDestroy()
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is ReminderAlreadyExistsError -> showExistingReminderDialog.consumer.accept(Unit)
+            else -> super.handleError(error)
+        }
     }
 
     private fun String.toSimpleSelectorOption() = SelectorOption(this)
