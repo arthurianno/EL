@@ -22,7 +22,6 @@ class MockedEventsApi(private val context: Context) : EventsApi {
 
     override fun getEvents(lastSync: Long?, page: Int, pageSize: Int): Observable<EventsDto> =
         Observable.fromCallable {
-
             if (list.isEmpty()) {
                 (0..3).forEach { inner ->
                     EventTypeDto.values().forEachIndexed { index, type ->
@@ -30,22 +29,26 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                             EventMockedFactory.create(
                                 type = type,
                                 value = (1..12).random().toDouble(),
-                                activityType = if (type == EventTypeDto.ACTIVITY)
+                                activityType = if (type == EventTypeDto.ACTIVITY) {
                                     ActivityTypeDto.values().random()
-                                else
-                                    null,
-                                mealTag = if (index % 2 == 0)
-                                    MealTagDto.AFTERMEAL
-                                else
-                                    MealTagDto.BEFOREMEAL,
-                                insulinType = if (type == EventTypeDto.INSULIN)
+                                } else {
+                                    null
+                                },
+                                mealTag = if (index % 2 == 0) {
+                                    MealTagDto.AfterMeal
+                                } else {
+                                    MealTagDto.BeforeMeal
+                                },
+                                insulinType = if (type == EventTypeDto.INSULIN) {
                                     InsulinTypeDto.values().random()
-                                else
-                                    null,
-                                tagId = if (inner == 0)
+                                } else {
+                                    null
+                                },
+                                tagId = if (inner == 0) {
                                     TagMockedFactory.nextId
-                                else
-                                    null,
+                                } else {
+                                    null
+                                },
                                 note = if (index % 2 == 0) "Test note" else null,
                                 state = StateDto.values().random()
                             )
