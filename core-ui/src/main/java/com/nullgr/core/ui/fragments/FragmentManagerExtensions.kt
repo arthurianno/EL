@@ -55,8 +55,7 @@ fun FragmentManager.removeScreen(fragment: Fragment, exitAnimation: Int = 0) {
 fun FragmentManager.findCurrentScreen(containerId: Int): Fragment? {
     return if (backStackEntryCount > 0) {
         val entry = getBackStackEntryAt(backStackEntryCount - 1)
-        if (entry != null) findFragmentByTag(entry.name)
-        else null
+        findFragmentByTag(entry.name)
     } else {
         findFragmentById(containerId)
     }
@@ -79,13 +78,15 @@ fun FragmentManager.back(depth: Int) {
 fun FragmentManager.backToScreen(clazz: Class<*>) {
     var count = 0
     for (entry in backStackEntryCount - 1 downTo 0) {
-        if (!clazz.canonicalName.equals(getBackStackEntryAt(entry).name, ignoreCase = true))
+        if (!clazz.canonicalName.equals(getBackStackEntryAt(entry).name, ignoreCase = true)) {
             count++
-        else
+        } else {
             break
+        }
     }
-    if (count > 0)
+    if (count > 0) {
         back(count)
+    }
 }
 
 fun FragmentManager.clearBackStack() {

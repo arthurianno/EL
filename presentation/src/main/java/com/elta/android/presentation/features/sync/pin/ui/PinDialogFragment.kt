@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
-import com.elta.android.presentation.core.ui.keyboardanimator.simple.SimpleKeyboardAnimator
 import com.elta.android.presentation.databinding.FragmentEnterPinDialogBinding
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.utils.bundle
@@ -24,7 +23,6 @@ class PinDialogFragment : BaseBottomSheetFragment<PinDialogPm, FragmentEnterPinD
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
             window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-            window?.let { SimpleKeyboardAnimator(it).start() }
         }
     }
 
