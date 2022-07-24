@@ -307,6 +307,10 @@ abstract class ConnectDevicePm constructor(
     }
 
     enum class ViewState {
-        HOW_TO_CONNECT, SEARCH, FOUND, CONNECTED, SYNC_COMPLETED
+        HOW_TO_CONNECT,
+        SEARCH,
+        FOUND,
+        CONNECTED,
+        SYNC_COMPLETED
     }
 }
