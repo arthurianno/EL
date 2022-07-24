@@ -1,5 +1,5 @@
 package com.elta.android.domain.features.user.model
 
 enum class Gender {
-    MALE, FEMALE
+    MALE, FEMALE, NOT_SPECIFIED
 }

@@ -31,7 +31,6 @@ class ProfileSetGenderPm @Inject constructor(
     val continueAction = action<Unit>()
     val backHandleAction = action<Unit>()
     val saveChangesEnableState = state(false)
-    val checkNotSpecifiedVisibility = state<Boolean>()
     val checkNotSpecified = checkControl()
     val checkMale = checkControl()
     val checkFemale = checkControl()
@@ -100,8 +99,7 @@ class ProfileSetGenderPm @Inject constructor(
 
     private fun updateGenderChangedState(genderModel: GenderModel) {
         isGenderChangedState.consumer.accept(
-            profileGenderState.value != genderModel &&
-                genderModel != GenderModel.NOT_SPECIFIED
+            profileGenderState.value != genderModel
         )
     }
 
@@ -125,9 +123,9 @@ class ProfileSetGenderPm @Inject constructor(
         when (profile.gender) {
             Gender.MALE -> checkMale.checked.consumer.accept(true)
             Gender.FEMALE -> checkFemale.checked.consumer.accept(true)
-            else -> checkNotSpecified.checked.consumer.accept(true)
+            Gender.NOT_SPECIFIED -> checkNotSpecified.checked.consumer.accept(true)
+            else -> throw NullPointerException()
         }
-        checkNotSpecifiedVisibility.consumer.accept(profile.gender == null)
         profileGenderState.consumer.accept(
             profile.gender?.let { GenderModel.valueOf(it.name) } ?: GenderModel.NOT_SPECIFIED
         )
@@ -137,7 +135,7 @@ class ProfileSetGenderPm @Inject constructor(
         val profileGender = when (changedProfileGenderState.value) {
             GenderModel.MALE -> Gender.MALE
             GenderModel.FEMALE -> Gender.FEMALE
-            else -> null
+            GenderModel.NOT_SPECIFIED -> Gender.NOT_SPECIFIED
         }
         return UpdateProfileUseCase.Params(
             profileState.value.copy(
