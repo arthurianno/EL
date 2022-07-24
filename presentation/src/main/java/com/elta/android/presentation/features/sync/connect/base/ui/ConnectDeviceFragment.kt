@@ -49,6 +49,16 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
         pm.mstate.bindTo { state ->
             binding.syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
+                if (state == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
+                    binding.toolbar.homeButtonView.apply {
+                        setImageResource(R.drawable.ic_dialog_close)
+                        setOnClickListener {
+                            pm.toAppAction.consumer.accept(Unit)
+                        }
+                    }
+                } else {
+                    binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_back)
+                }
             }
         }
 

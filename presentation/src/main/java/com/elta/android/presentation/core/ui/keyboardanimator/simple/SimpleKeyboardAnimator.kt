@@ -15,6 +15,7 @@ import com.elta.android.presentation.core.ui.keyboardanimator.BaseKeyboardAnimat
 /**
  * This animator starts delayed [ChangeBounds] transition before system get chance to apply insets.
  */
+@Deprecated("Класс использовался во фрагменте ввода пинкода глюкометра. Можно удалить или изменить. Работал с ошибкой при появлении клавиатуры")
 @RequiresApi(Build.VERSION_CODES.KITKAT_WATCH)
 @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
 class SimpleKeyboardAnimator(window: Window) : BaseKeyboardAnimator(window) {
