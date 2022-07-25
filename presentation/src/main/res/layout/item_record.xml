@@ -29,8 +29,20 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_event_medicaments" />
 
-        <View
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/recordLabelView"
+            android:visibility="gone"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginStart="18dp"
+            android:background="@drawable/ic_white_circle"
+            tools:src="@drawable/ic_skiing"
+            app:layout_constraintEnd_toEndOf="@+id/recordIconView"
+            app:layout_constraintTop_toTopOf="@+id/recordIconView"/>
+        <View
+            android:id="@+id/recordRedDotView"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:background="@drawable/ic_record_label"

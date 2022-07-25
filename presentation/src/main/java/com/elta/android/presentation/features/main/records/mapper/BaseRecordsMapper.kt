@@ -38,7 +38,8 @@ open class BaseRecordsMapper(
             count = formatValue(),
             date = formatDate(),
             showLabel = note != null,
-            eventType = this.type
+            eventType = this.type,
+            labelIcon = mealTag?.toIcon()
         )
 
     protected fun Event.formatValue(): String? =
