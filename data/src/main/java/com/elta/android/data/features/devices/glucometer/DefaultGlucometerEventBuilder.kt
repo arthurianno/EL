@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.glucometer
 
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeParseException
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +20,8 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
 
         Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Response : $response")
         Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Tokens : $tokens")
-        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Value : ${extractValue(temperatureAndValueToken)}")
+        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Date : ${extractDate(dateToken)}")
+        Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Temperature : ${extractValue(temperatureAndValueToken)}")
 
         return GlucometerEventDto(
             id = generator.generate(userId, glucometerId, dateToken),
@@ -36,8 +38,14 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         return Pair(dateToken, temperatureAndValueToken)
     }
 
-    protected open fun extractDate(token: String): ZonedDateTime? =
-        token.fromGlucometerDateTime()
+    protected open fun extractDate(token: String): ZonedDateTime? {
+        return try {
+            token.fromGlucometerDateTime()
+        } catch (ex: DateTimeParseException) {
+            Timber.e(ex)
+            ZonedDateTime.now()
+        }
+    }
 
     protected open fun extractTemperature(token: String): Int? = token.substring(0, 3).toInt()
 
