@@ -7,18 +7,15 @@ import com.elta.android.presentation.core.ui.adapter.BaseListAdapter
 import com.elta.android.presentation.databinding.ItemProfileSettingsBinding
 import com.elta.android.presentation.databinding.ItemProfileSettingsHeaderBinding
 import com.elta.android.presentation.databinding.ItemProfileSettingsHealthAppBinding
-import com.elta.android.presentation.databinding.ItemProfileSettingsSocialBinding
 import com.elta.android.presentation.databinding.ItemSeparatorBinding
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsHeaderViewHolder
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsHealthAppViewHolder
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsSeparatorViewHolder
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsSocialViewHolder
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.holder.ProfileSettingsViewHolder
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
@@ -40,10 +37,6 @@ class ProfileSettingsAdapter @Inject constructor(
             )
             ProfileSettingsItem::class.java.hashCode() -> ProfileSettingsViewHolder(
                 ItemProfileSettingsBinding.inflate(inflater, parent, false),
-                bus
-            )
-            ProfileSettingsSocialItem::class.java.hashCode() -> ProfileSettingsSocialViewHolder(
-                ItemProfileSettingsSocialBinding.inflate(inflater, parent, false),
                 bus
             )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")

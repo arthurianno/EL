@@ -2,14 +2,11 @@ package com.elta.android.presentation.features.profile.settings.global.ui.builde
 
 import com.elta.android.domain.features.user.interactor.googleFitApp
 import com.elta.android.domain.features.user.model.Profile
-import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSeparatorItem
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.elta.android.presentation.utils.createFullName
 import com.elta.android.presentation.utils.toString
 import com.nullgr.core.adapter.items.ListItem
@@ -55,11 +52,6 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                 )
             )
 
-            add(ProfileSettingsHeaderItem(resources.getString(R.string.profile_linked_social_networks)))
-            addAll(createSocialItems(this))
-
-            add(ProfileSettingsSeparatorItem)
-
             add(ProfileSettingsHeaderItem(resources.getString(R.string.profile_additional_settings)))
             add(
                 ProfileSettingsItem(
@@ -94,34 +86,6 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                 )
             )
         }
-    }
-
-    private fun createSocialItems(profile: Profile): List<ListItem> {
-        val socialNetworks = mutableListOf<ListItem>()
-        profile.socialNetworks?.let { list ->
-            list.forEach { network ->
-                when (network.type) {
-                    SocialNetworkType.FB -> {}
-                    SocialNetworkType.VK -> socialNetworks.add(
-                        ProfileSettingsSocialItem(
-                            networkIcon = R.drawable.ic_vk,
-                            title = resources.getString(R.string.vkontakte),
-                            isLinked = network.isLinked,
-                            type = SocialNetworkType.VK
-                        )
-                    )
-                    SocialNetworkType.OK -> socialNetworks.add(
-                        ProfileSettingsSocialItem(
-                            networkIcon = R.drawable.ic_ok,
-                            title = resources.getString(R.string.odnoklasniki),
-                            isLinked = network.isLinked,
-                            type = SocialNetworkType.OK
-                        )
-                    )
-                }
-            }
-        }
-        return socialNetworks
     }
 
     private fun createHealthAppItem(profile: Profile): ListItem? =

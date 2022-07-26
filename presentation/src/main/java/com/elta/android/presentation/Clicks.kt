@@ -10,7 +10,6 @@ import com.elta.android.presentation.features.observers.all.ui.adapter.items.Obs
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
-import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsSocialItem
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
 import com.elta.android.presentation.features.profile.support.model.SupportAction
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
@@ -31,7 +30,6 @@ sealed class Clicks : Click {
     data class ProfileAdditionalClicked(val item: MainProfileAdditionalItem) : Clicks()
     data class ProfileIndicatorClicked(val item: MainProfileIndicatorItem.Type) : Clicks()
     data class ProfileSettingsItemClicked(val type: ProfileSettingsItem.Type) : Clicks()
-    data class ProfileSettingsSocialItemClicked(val item: ProfileSettingsSocialItem) : Clicks()
     data class ProfileSettingsHealthAppItemClicked(val type: HealthAppType) : Clicks()
     data class ReminderItemClicked(val item: ReminderItem) : Clicks()
     data class ActiveDeviceItemClicked(val item: ActiveDeviceItem) : Clicks()
