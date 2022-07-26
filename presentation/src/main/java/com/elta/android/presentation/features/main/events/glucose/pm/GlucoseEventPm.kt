@@ -338,7 +338,7 @@ class GlucoseEventPm @Inject constructor(
         tagId: String?,
         note: String?,
         mealTag: MealTag?
-    ): Boolean = this.tagId != tagId || this.note.orEmpty() !== note || this.mealTag != mealTag
+    ): Boolean = this.tagId != tagId || this.note.orEmpty() != note || this.mealTag != mealTag
 
     private fun ChooserResult.toSelectorOption() =
         SelectorOption(
