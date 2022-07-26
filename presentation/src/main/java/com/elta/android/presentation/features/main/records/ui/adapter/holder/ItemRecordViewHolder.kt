@@ -7,7 +7,6 @@ import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemRecordBinding
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.nullgr.core.rx.RxBus
-import com.nullgr.core.ui.extensions.toggleView
 
 class ItemRecordViewHolder(
     private val binding: ItemRecordBinding,
@@ -24,7 +23,7 @@ class ItemRecordViewHolder(
             item.labelIcon?.let {
                 recordLabelView.setImageResource(it)
                 recordLabelView.visibility = View.VISIBLE
-            } ?: recordRedDotView.toggleView(item.showLabel)
+            }
             root.setOnClickListener {
                 bus.click(Clicks.RecordClicked(item))
             }
