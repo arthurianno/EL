@@ -45,7 +45,6 @@ import com.elta.android.presentation.features.registration.confirmation.pm.Email
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
-import com.elta.android.presentation.features.registration.social.pm.RegistrationSocialPm
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
 import com.elta.android.presentation.features.shops.start.pm.ShopsStartPm
@@ -91,11 +90,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(RegistrationMainPm::class)
     abstract fun bindRegistrationMainPm(pm: RegistrationMainPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(RegistrationSocialPm::class)
-    abstract fun bindRegistrationSocialPm(pm: RegistrationSocialPm): PresentationModel
 
     @Binds
     @IntoMap

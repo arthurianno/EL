@@ -56,7 +56,6 @@ import com.elta.android.presentation.features.registration.confirmation.ui.Email
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
-import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.di.ShopsMapModule
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
@@ -96,10 +95,6 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRegistrationMainFragment(): RegistrationMainFragment
-
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun bindRegistrationSocialFragment(): RegistrationSocialFragment
 
     @FragmentScope
     @ContributesAndroidInjector
