@@ -184,7 +184,7 @@ fun ActivityType.toIcon(): Int =
 @DrawableRes
 fun MealTag.toIcon(): Int {
     return when (this) {
-        MealTag.BeforeMeal -> R.drawable.ic_facebook
-        MealTag.AfterMeal -> R.drawable.ic_viber
+        MealTag.BEFOREMEAL -> R.drawable.img_red_apple
+        MealTag.AFTERMEAL -> R.drawable.img_subtract_apple
     }
 }
