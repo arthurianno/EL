@@ -41,7 +41,6 @@ class RegistrationMainPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-
     }
 
     private fun createRegisterParams(i: Unit): RegisterUseCase.Params =
