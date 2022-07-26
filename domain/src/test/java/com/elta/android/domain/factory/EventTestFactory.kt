@@ -16,7 +16,7 @@ object EventTestFactory {
         value: Double? = null,
         duration: Long = 2 * 60 * 60 + 30 * 60,
         activityType: ActivityType? = null,
-        mealTag: MealTag? = null,
+        mealTag: MealTag = MealTag.BEFOREMEAL,
         insulinType: InsulinType? = null,
         tagId: String? = null,
         date: ZonedDateTime = ZonedDateTime.now()

@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.model.TagImage
 import com.elta.android.presentation.R
@@ -179,3 +180,11 @@ fun ActivityType.toIcon(): Int =
         ActivityType.MARTIALARTS -> R.drawable.ic_martial_arts
         ActivityType.ANOTHER -> R.drawable.ic_another
     }
+
+@DrawableRes
+fun MealTag.toIcon(): Int {
+    return when (this) {
+        MealTag.BEFOREMEAL -> R.drawable.img_red_apple
+        MealTag.AFTERMEAL -> R.drawable.img_subtract_apple
+    }
+}

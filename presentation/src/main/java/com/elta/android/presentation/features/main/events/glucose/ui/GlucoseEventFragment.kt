@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.glucose.ui
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
@@ -30,7 +31,6 @@ import com.nullgr.core.ui.extensions.hideKeyboard
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class GlucoseEventFragment :
@@ -59,7 +59,7 @@ class GlucoseEventFragment :
             insetsListener = instance(formSaveButtonView, formContainerView) { offset ->
                 if (!isTouchingScroll || !isTouchingAppBar) {
                     val isOffsetZero = offset == 0
-                    appBarLayoutView?.setExpanded(isOffsetZero, true)
+                    appBarLayoutView.setExpanded(isOffsetZero, true)
                     if (isOffsetZero) requireActivity().findAndClearFocus()
                     if (!isOffsetZero) scrollableView.scrollToBottom()
                 }
@@ -117,7 +117,6 @@ class GlucoseEventFragment :
         pm.glucoseLevelBackgroundState.bindTo { binding.appBarLayoutView.setBackgroundResource(it) }
         pm.mainActionTitleState.bindTo(binding.formSaveButtonView.text())
         pm.mainActionVisibilityState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
             .subscribe(binding.formSaveButtonView.visibility())
 
         pm.tagSelector.bind(binding.formTagSelectorView, compositeUnbind)
@@ -127,7 +126,29 @@ class GlucoseEventFragment :
 
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
-        binding.formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
+        with(binding) {
+            formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
+            beforeEatingAttribute.clicks().bindTo(pm.beforeMealAction)
+            afterEatingAttribute.clicks().bindTo(pm.afterMealAction)
+            pm.mealSelector.bindTo(::toggleMealTagButtons)
+        }
+    }
+
+    private fun toggleMealTagButtons(it: MealTag?) {
+        when (it) {
+            MealTag.BEFOREMEAL -> {
+                binding.afterEatingAttribute.isSelected = false
+                binding.beforeEatingAttribute.isSelected = true
+            }
+            MealTag.AFTERMEAL -> {
+                binding.afterEatingAttribute.isSelected = true
+                binding.beforeEatingAttribute.isSelected = false
+            }
+            else -> {
+                binding.afterEatingAttribute.isSelected = false
+                binding.beforeEatingAttribute.isSelected = false
+            }
+        }
     }
 
     override fun handleBack() {

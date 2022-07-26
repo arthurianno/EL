@@ -35,9 +35,9 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                                     null
                                 },
                                 mealTag = if (index % 2 == 0) {
-                                    MealTagDto.AfterMeal
+                                    MealTagDto.AFTERMEAL
                                 } else {
-                                    MealTagDto.BeforeMeal
+                                    MealTagDto.BEFOREMEAL
                                 },
                                 insulinType = if (type == EventTypeDto.INSULIN) {
                                     InsulinTypeDto.values().random()

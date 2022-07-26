@@ -11,7 +11,8 @@ data class RecordItem(
     val count: String? = null,
     val date: String,
     val showLabel: Boolean,
-    val eventType: EventType
+    val eventType: EventType,
+    val labelIcon: Int? = null
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = id
