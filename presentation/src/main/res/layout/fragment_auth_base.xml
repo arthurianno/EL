@@ -122,26 +122,11 @@
                         android:text="@string/registration_main_description_privacy_policy" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/socialNetworksView"
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="28dp"
                     android:layout_marginTop="20dp"
-                    android:layout_marginBottom="32dp"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/vkButtonView"
-                        style="@style/Button.Social"
-                        android:layout_marginStart="16dp"
-                        app:srcCompat="@drawable/ic_vk" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/okButtonView"
-                        style="@style/Button.Social"
-                        android:layout_marginStart="16dp"
-                        app:srcCompat="@drawable/ic_ok" />
-                </LinearLayout>
+                    android:layout_marginBottom="32dp" />
             </LinearLayout>
         </ScrollView>
     </FrameLayout>

@@ -105,15 +105,6 @@ class ProfileSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.clicks<Clicks.ProfileSettingsSocialItemClicked>()
-            .map { it.item }
-            .doOnNext { socialNetworkState.consumer.accept(it.type) }
-            .subscribe {
-                if (it.isLinked) unlinkSocialUserAction.consumer.accept(Unit)
-                else linkSocialUserAction.consumer.accept(Unit)
-            }
-            .untilDestroy()
-
         bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
             .map { it.type }
             .map(::createSwitchHealthAppParams)

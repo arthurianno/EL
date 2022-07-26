@@ -18,7 +18,10 @@ class ProfileSettingsViewHolder(
             settingsIconView.setImageResource(item.icon)
             settingsTitleView.text = item.title
             when (item.type) {
-                ProfileSettingsItem.Type.EMAIL -> toggleFocus(false)
+                ProfileSettingsItem.Type.EMAIL -> {
+                    toggleFocus(false)
+                    dividerView.isInvisible = true
+                }
                 ProfileSettingsItem.Type.DELETE_PROFILE -> nextIconView.isInvisible = true
                 ProfileSettingsItem.Type.APP_VERSION -> {
                     toggleFocus(false)

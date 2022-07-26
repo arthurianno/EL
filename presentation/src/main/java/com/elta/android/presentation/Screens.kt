@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
-import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
@@ -46,7 +45,6 @@ import com.elta.android.presentation.features.registration.activation.ui.Activat
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
-import com.elta.android.presentation.features.registration.social.ui.RegistrationSocialFragment
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
@@ -86,10 +84,6 @@ object Screens {
 
     object RegistrationMain : SupportAppScreen() {
         override fun getFragment(): Fragment = RegistrationMainFragment.newInstance()
-    }
-
-    data class RegistrationSocial(val network: SocialNetworkType) : SupportAppScreen() {
-        override fun getFragment(): Fragment = RegistrationSocialFragment.newInstance(network)
     }
 
     object ActivateProfile : SupportAppScreen() {
