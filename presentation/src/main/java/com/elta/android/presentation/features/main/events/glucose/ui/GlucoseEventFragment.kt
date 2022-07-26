@@ -130,17 +130,23 @@ class GlucoseEventFragment :
             formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
             beforeEatingAttribute.clicks().bindTo(pm.beforeMealAction)
             afterEatingAttribute.clicks().bindTo(pm.afterMealAction)
-            pm.mealSelector.bindTo {
-                when (it) {
-                    MealTag.BEFOREMEAL -> {
-                        binding.afterEatingAttribute.isSelected = false
-                        binding.beforeEatingAttribute.isSelected = true
-                    }
-                    MealTag.AFTERMEAL -> {
-                        binding.afterEatingAttribute.isSelected = true
-                        binding.beforeEatingAttribute.isSelected = false
-                    }
-                }
+            pm.mealSelector.bindTo(::toggleMealTagButtons)
+        }
+    }
+
+    private fun toggleMealTagButtons(it: MealTag?) {
+        when (it) {
+            MealTag.BEFOREMEAL -> {
+                binding.afterEatingAttribute.isSelected = false
+                binding.beforeEatingAttribute.isSelected = true
+            }
+            MealTag.AFTERMEAL -> {
+                binding.afterEatingAttribute.isSelected = true
+                binding.beforeEatingAttribute.isSelected = false
+            }
+            else -> {
+                binding.afterEatingAttribute.isSelected = false
+                binding.beforeEatingAttribute.isSelected = false
             }
         }
     }

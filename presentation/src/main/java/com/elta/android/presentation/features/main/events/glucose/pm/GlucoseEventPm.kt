@@ -123,15 +123,20 @@ class GlucoseEventPm @Inject constructor(
     private fun observeEventChanges() {
         Observables.combineLatest(
             tagSelector.option.observable,
-            noteInput.text.observable,
-            mealSelector.observable
-        ) { tag, note, mealTag ->
+            noteInput.text.observable
+        ) { tag, note ->
             eventFormHolderState.value.copy(
                 tag = tag.meta as? Tag,
-                noteValue = note,
-                mealTag = mealTag
+                noteValue = note
             )
         }
+            .doOnNext { eventFormHolderState.consumer.accept(it) }
+            .map(::checkIsChanged)
+            .subscribe(mainActionVisibilityState.consumer)
+            .untilDestroy()
+
+        mealSelector.observable
+            .map { eventFormHolderState.value.copy(mealTag = it) }
             .doOnNext { eventFormHolderState.consumer.accept(it) }
             .map(::checkIsChanged)
             .subscribe(mainActionVisibilityState.consumer)
@@ -187,7 +192,7 @@ class GlucoseEventPm @Inject constructor(
         glucoseLevelBackgroundState.consumer.accept(
             event.glucoseLevel(glucoseLevelSettingsState.value).toBackground()
         )
-        mealSelector.consumer.accept(event.mealTag)
+        event.mealTag?.let { mealSelector.consumer.accept(it) }
     }
 
     private fun bindFormTagSelection() {

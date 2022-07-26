@@ -6,5 +6,5 @@ import com.elta.android.domain.features.diary.tags.model.Tag
 data class GlucoseFormModel(
     val tag: Tag? = null,
     val noteValue: String? = null,
-    val mealTag: MealTag = MealTag.BEFOREMEAL
+    val mealTag: MealTag? = null
 )

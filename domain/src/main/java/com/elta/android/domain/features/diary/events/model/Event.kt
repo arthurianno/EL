@@ -16,7 +16,7 @@ data class Event(
     val temperature: Double?,
     val duration: Long?,
     val activityType: ActivityType?,
-    val mealTag: MealTag,
+    val mealTag: MealTag?,
     val insulinType: InsulinType?,
     val type: EventType,
     val state: State
