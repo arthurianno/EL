@@ -8,6 +8,7 @@ import com.elta.android.domain.features.diary.events.interactor.SaveEventBitmapU
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -67,6 +68,7 @@ class GlucoseEventPm @Inject constructor(
     val dateSelector = formSelectorControl(false)
     val timeSelector = formSelectorControl(false)
     val noteInput = inputControl()
+    val mealSelector = state<MealTag>()
 
     val mainActionTitleState = state<String>()
     val mainActionVisibilityState = state(false)
@@ -75,6 +77,8 @@ class GlucoseEventPm @Inject constructor(
     val backHandleAction = action<Unit>()
     val exitDialogAction = action<Unit>()
     val shareAction = action<Unit>()
+    val beforeMealAction = action<Unit>()
+    val afterMealAction = action<Unit>()
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
@@ -92,12 +96,24 @@ class GlucoseEventPm @Inject constructor(
         super.onCreate()
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
         bindFormTagSelection()
+        bindMealTagsSelection()
         bindDateSelectors()
         bindHandleBack()
         observeEventChanges()
         observeSaveEventAction()
         bindShare()
         loadEvent()
+    }
+
+    private fun bindMealTagsSelection() {
+        beforeMealAction.observable
+            .doOnNext { mealSelector.consumer.accept(MealTag.BEFOREMEAL) }
+            .subscribe()
+            .untilDestroy()
+        afterMealAction.observable
+            .doOnNext { mealSelector.consumer.accept(MealTag.AFTERMEAL) }
+            .subscribe()
+            .untilDestroy()
     }
 
     fun setEventData(id: String) {
@@ -107,13 +123,16 @@ class GlucoseEventPm @Inject constructor(
     private fun observeEventChanges() {
         Observables.combineLatest(
             tagSelector.option.observable,
-            noteInput.text.observable
-        ) { tag, note ->
-            eventFormHolderState.value.apply {
-                this.tag = tag.meta as? Tag
-                this.noteValue = note
-            }
+            noteInput.text.observable,
+            mealSelector.observable
+        ) { tag, note, mealTag ->
+            eventFormHolderState.value.copy(
+                tag = tag.meta as? Tag,
+                noteValue = note,
+                mealTag = mealTag
+            )
         }
+            .doOnNext { eventFormHolderState.consumer.accept(it) }
             .map(::checkIsChanged)
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
@@ -168,6 +187,7 @@ class GlucoseEventPm @Inject constructor(
         glucoseLevelBackgroundState.consumer.accept(
             event.glucoseLevel(glucoseLevelSettingsState.value).toBackground()
         )
+        mealSelector.consumer.accept(event.mealTag)
     }
 
     private fun bindFormTagSelection() {
@@ -177,7 +197,8 @@ class GlucoseEventPm @Inject constructor(
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
-                    ChooserType.GROUP_TAGS, EventType.GLUCOSE,
+                    ChooserType.GROUP_TAGS,
+                    EventType.GLUCOSE,
                     (tagSelector.option.value.meta as? Tag)?.id
                 )
             }
@@ -205,7 +226,8 @@ class GlucoseEventPm @Inject constructor(
     private fun checkIsChanged(eventFormModel: GlucoseFormModel): Boolean =
         eventState.valueOrNull?.isGlucoseEventChanged(
             tagId = eventFormModel.tag?.id,
-            note = eventFormModel.note
+            note = eventFormModel.noteValue,
+            mealTag = eventFormModel.mealTag
         ) ?: false
 
     private fun observeSaveEventAction() {
@@ -285,10 +307,11 @@ class GlucoseEventPm @Inject constructor(
     private fun createEditEventParams(i: Unit): UpdateEventUseCase.Params {
         val form = eventFormHolderState.value
         return UpdateEventUseCase.Params(
-            eventState.value.copy(
+            event = eventState.value.copy(
                 tagId = form.tag?.id,
                 tag = form.tag,
-                note = form.note
+                note = form.noteValue,
+                mealTag = form.mealTag
             )
         )
     }
@@ -308,8 +331,9 @@ class GlucoseEventPm @Inject constructor(
 
     private fun Event.isGlucoseEventChanged(
         tagId: String?,
-        note: String?
-    ): Boolean = this.tagId != tagId || this.note !== note
+        note: String?,
+        mealTag: MealTag?
+    ): Boolean = this.tagId != tagId || this.note.orEmpty() !== note || this.mealTag != mealTag
 
     private fun ChooserResult.toSelectorOption() =
         SelectorOption(

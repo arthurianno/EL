@@ -29,7 +29,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 temperature = data.temperature,
                 duration = data.duration,
                 activityType = data.activityType?.let { ActivityType.valueOf(it.name) },
-                mealTag = data.mealTag?.let { MealTag.valueOf(it.name) },
+                mealTag = data.mealTag?.let { MealTag.valueOf(it.name) } ?: MealTag.BEFOREMEAL,
                 insulinType = data.insulinType?.let { InsulinType.valueOf(it.name) },
                 state = State.valueOf(state.name)
             )

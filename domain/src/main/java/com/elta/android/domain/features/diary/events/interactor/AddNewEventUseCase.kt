@@ -4,6 +4,7 @@ import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.State
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -38,7 +39,7 @@ class AddNewEventUseCase @Inject constructor(
                 activityType = p.activity,
                 insulinType = p.insulin,
                 type = p.eventType,
-                mealTag = null,
+                mealTag = MealTag.BEFOREMEAL,
                 state = State.CREATED
             )
         )
