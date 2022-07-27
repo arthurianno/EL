@@ -1,5 +1,6 @@
 package com.elta.android.data.features.sync.mappers
 
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.sync.cache.dto.LocalSyncCachedDto
 import com.elta.android.data.features.sync.configuration.LocalSyncMapper
@@ -10,7 +11,7 @@ class ProfileSyncMapper : LocalSyncMapper<Profile> {
     override fun mapToUpdate(entity: Profile): LocalSyncCachedDto =
         LocalSyncCachedDto(
             id = Profile::class.hashCode().toLong(),
-            secondaryId = checkNotNull(entity.email),
+            secondaryId = entity.email ?: throw NetworkConnectionError(),
             state = StateDto.UPDATED,
             className = Profile::class.java.simpleName
         )
