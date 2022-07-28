@@ -27,7 +27,7 @@ inline fun ProgressDialog.visibility(fragmentManager: FragmentManager): Consumer
             (fragment as ProgressDialog).dismissAllowingStateLoss()
             Runnable { fragmentManager.executePendingTransactions() }
         } else if (fragment == null && it) {
-            show(fragmentManager, PROGRESS_TAG)
+            showNow(fragmentManager, PROGRESS_TAG)
             Runnable { fragmentManager.executePendingTransactions() }
         }
     }
