@@ -622,5 +622,6 @@
     <string name="error_no_connection">Нет подключения</string>
     <string name="reminder_is_exists">Напоминание не может быть создано на одинаковые время и дату с уже ранее созданным</string>
     <string name="events_creation_eating_label_text">Отметка о приёме пищи</string>
+    <string name="bluetooth_disabled">Bluetooth отключён</string>
 
 </resources>

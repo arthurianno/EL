@@ -58,12 +58,20 @@ abstract class ConnectDevicePm constructor(
     val retryPinControl = snackBarControl<SnackBarData>()
     val retryConnectControl = snackBarControl<SnackBarData>()
     val retrySyncControl = snackBarControl<SnackBarData>()
+    val retryEnableBluetoothControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
     private val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
+
+    private val bluetoothNotEnabled: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            resources.getString(R.string.bluetooth_disabled),
+            resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -93,6 +101,7 @@ abstract class ConnectDevicePm constructor(
         )
     }
 
+    private val showRetryEnableBluetoothAction = action<Unit>()
     private val showRetrySearchAction = action<Unit>()
     private val showRetryPinAction = action<Unit>()
     private val showRetrySyncAction = action<Unit>()
@@ -121,9 +130,15 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(
-                Unit
-            )
+            is BluetoothNotEnabledError -> {
+                bus.event(Events.Sync.Glucometer.Error)
+
+                btControl.requestEnableBluetoothCommand.consumer.accept(
+                    Unit
+                )
+
+                showRetryEnableBluetoothAction.consumer.accept(Unit)
+            }
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
                 Unit
             )
@@ -215,6 +230,13 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindRetryActions() {
+        showRetryEnableBluetoothAction.observable
+            .switchMapMaybe {
+                retryEnableBluetoothControl.showForResult(bluetoothNotEnabled)
+            }
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
+
         showRetrySearchAction.observable
             .switchMapMaybe {
                 retrySearchControl.showForResult(deviceNotFound)

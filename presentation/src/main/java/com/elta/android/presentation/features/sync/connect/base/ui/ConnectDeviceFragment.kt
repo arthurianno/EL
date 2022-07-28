@@ -91,6 +91,14 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
             )
         }
 
+        pm.retryEnableBluetoothControl.bindTo { data, sc ->
+            makeSnackBarWithAction(
+                binding.root,
+                data,
+                sc
+            )
+        }
+
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
 
         pm.openPinCodeDialogCommand.bindTo {
