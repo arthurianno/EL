@@ -381,6 +381,9 @@
     <string name="profile_delete_button_dissmit">Нет</string>
     <string name="profile_delete_text">После удаления профиля все ранее внесенные данные будут так же удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
+    <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
+    <string name="profile_is_deleted_body">Для восстановления учетной записи  обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
+
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
@@ -622,6 +625,7 @@
     <string name="error_no_connection">Нет подключения</string>
     <string name="reminder_is_exists">Напоминание не может быть создано на одинаковые время и дату с уже ранее созданным</string>
     <string name="events_creation_eating_label_text">Отметка о приёме пищи</string>
+    <string name="ok">OK</string>
     <string name="bluetooth_disabled">Bluetooth отключён</string>
 
 </resources>
