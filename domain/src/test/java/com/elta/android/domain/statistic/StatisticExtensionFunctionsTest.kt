@@ -2,6 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.statistics.interactor.average
 import com.elta.android.domain.features.statistics.interactor.checkMax
@@ -80,13 +81,20 @@ class StatisticExtensionFunctionsTest {
 
     @Test
     fun eventIsBolusInsulin_ultraShort_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRASHORT)
+        val event = EventTestFactory.create(
+            type = EventType.INSULIN,
+            insulin = Insulin("", "", InsulinType.ULTRASHORT)
+        )
         assert(event.isBolusInsulin())
     }
 
     @Test
     fun eventIsBolusInsulin_short_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.SHORT)
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.SHORT)
+            )
         assert(event.isBolusInsulin())
     }
 
@@ -98,19 +106,30 @@ class StatisticExtensionFunctionsTest {
 
     @Test
     fun eventIsBasalInsulin_intermidiate_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.INTERMIDIATE)
+        val event = EventTestFactory.create(
+            type = EventType.INSULIN,
+            insulin = Insulin("", "", InsulinType.INTERMIDIATE)
+        )
         assert(event.isBasalInsulin())
     }
 
     @Test
     fun eventIsBasalInsulin_ultraLong_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRALONG)
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.ULTRALONG)
+            )
         assert(event.isBasalInsulin())
     }
 
     @Test
     fun eventIsBasalInsulin_long_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.LONG)
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.LONG)
+            )
         assert(event.isBasalInsulin())
     }
 
@@ -122,13 +141,21 @@ class StatisticExtensionFunctionsTest {
 
     @Test
     fun eventIsNotMixedInsulin_mixed_false() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.MIXED)
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.MIXED)
+            )
         assert(!event.isNotMixedInsulin())
     }
 
     @Test
     fun eventIsNotMixedInsulin_notMixed_true() {
-        val event = EventTestFactory.create(type = EventType.INSULIN, insulinType = InsulinType.ULTRALONG)
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.ULTRALONG)
+            )
         assert(event.isNotMixedInsulin())
     }
 

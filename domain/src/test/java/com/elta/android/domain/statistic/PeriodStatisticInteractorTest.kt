@@ -2,6 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildActivityStatisticModel
@@ -102,44 +103,44 @@ class PeriodStatisticInteractorTest {
         val events = arrayListOf(
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.ULTRASHORT,
+                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.ULTRASHORT,
+                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 0.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.SHORT,
+                insulin = Insulin("", "", InsulinType.SHORT),
                 value = 10.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.INTERMIDIATE,
+                insulin = Insulin("", "", InsulinType.INTERMIDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.LONG,
+                insulin = Insulin("", "", InsulinType.LONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.ULTRALONG,
+                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.ULTRALONG,
+                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 0.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulinType = InsulinType.MIXED,
+                insulin = Insulin("", "", InsulinType.MIXED),
                 value = 10.0
             )
         )

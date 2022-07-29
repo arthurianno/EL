@@ -139,6 +139,7 @@ class EditEventPm @Inject constructor(
                 tag = form.tag,
                 activityType = form.activityType,
                 insulinType = form.insulin?.type,
+                medicament = form.insulin?.drug,
                 note = form.note,
                 type = checkNotNull(form.eventType)
             )
@@ -153,7 +154,8 @@ class EditEventPm @Inject constructor(
             duration = eventFormModel.duration,
             date = eventFormModel.date,
             tagId = eventFormModel.tag?.id,
-            insulin = eventFormModel.insulin?.type,
+            insulinType = eventFormModel.insulin?.type,
+            medicament = eventFormModel.insulin?.drug,
             activity = eventFormModel.activityType,
             note = eventFormModel.note
         ) ?: false

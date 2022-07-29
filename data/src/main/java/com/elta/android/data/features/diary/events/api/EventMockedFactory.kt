@@ -30,6 +30,7 @@ object EventMockedFactory {
         activityType: ActivityTypeDto? = null,
         mealTag: MealTagDto? = null,
         insulinType: InsulinTypeDto? = null,
+        medicament: String? = null,
         tagId: String? = null,
         note: String? = null,
         state: StateDto = StateDto.CREATED
@@ -50,6 +51,7 @@ object EventMockedFactory {
                 activityType = activityType,
                 mealTag = mealTag,
                 insulinType = insulinType,
+                medicament = medicament,
                 type = type
             )
         )

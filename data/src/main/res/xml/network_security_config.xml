@@ -5,8 +5,10 @@
     </domain-config>
     <debug-overrides>
         <trust-anchors>
-            <certificates src="@raw/vdiabete_com"/>
+            <certificates src="@raw/vdiabete_com" />
             <certificates src="@raw/vdiabete_test" />
+            <certificates src="@raw/vdiabete_test1" />
+            <certificates src="@raw/vdiabete_test2" />
         </trust-anchors>
     </debug-overrides>
 </network-security-config>

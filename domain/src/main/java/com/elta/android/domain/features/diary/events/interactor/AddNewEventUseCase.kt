@@ -37,6 +37,7 @@ class AddNewEventUseCase @Inject constructor(
                 duration = p.duration,
                 activityType = p.activity,
                 insulinType = p.insulin,
+                medicament = p.medicament,
                 type = p.eventType,
                 mealTag = null,
                 state = State.CREATED
@@ -52,6 +53,7 @@ class AddNewEventUseCase @Inject constructor(
         val date: ZonedDateTime? = null,
         val tag: Tag? = null,
         val insulin: InsulinType? = null,
+        val medicament: String? = null,
         val activity: ActivityType? = null,
         val note: String? = null,
         val eventType: EventType

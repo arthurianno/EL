@@ -23,5 +23,6 @@ data class EventCachedDto(
     val activityType: String?,
     val mealTag: String?,
     val insulinType: String?,
+    val medicament: String?,
     val state: String
 )
