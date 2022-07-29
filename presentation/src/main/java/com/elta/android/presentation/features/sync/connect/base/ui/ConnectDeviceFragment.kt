@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
@@ -62,28 +64,28 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
             }
         }
 
-        pm.retrySearchControl.bindTo { data, sc ->
+        pm.retrySearchControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,
                 sc
             )
         }
-        pm.retryPinControl.bindTo { data, sc ->
+        pm.retryPinControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,
                 sc
             )
         }
-        pm.retryConnectControl.bindTo { data, sc ->
+        pm.retryConnectControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,
                 sc
             )
         }
-        pm.retrySyncControl.bindTo { data, sc ->
+        pm.retrySyncControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,
@@ -91,7 +93,7 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
             )
         }
 
-        pm.retryEnableBluetoothControl.bindTo { data, sc ->
+        pm.retryEnableBluetoothControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,

@@ -68,36 +68,36 @@ abstract class ConnectDevicePm constructor(
 
     private val bluetoothNotEnabled: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.bluetooth_disabled),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.bluetooth_disabled),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_device_not_found),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_device_not_found),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val incorrectPinCode: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_incorrect_pin_code),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_incorrect_pin_code),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val connectError: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_connect_error),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_connect_error),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val syncError: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_sync_error),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_sync_error),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
@@ -131,13 +131,7 @@ abstract class ConnectDevicePm constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is BluetoothNotEnabledError -> {
-                bus.event(Events.Sync.Glucometer.Error)
-
-                btControl.requestEnableBluetoothCommand.consumer.accept(
-                    Unit
-                )
-
-                showRetryEnableBluetoothAction.consumer.accept(Unit)
+                handleBluetoothDisableError()
             }
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
                 Unit
@@ -156,6 +150,12 @@ abstract class ConnectDevicePm constructor(
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
+    }
+
+    private fun handleBluetoothDisableError() {
+        bus.event(Events.Sync.Glucometer.Error)
+        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+        showRetryEnableBluetoothAction.consumer.accept(Unit)
     }
 
     private fun bindActions() {
