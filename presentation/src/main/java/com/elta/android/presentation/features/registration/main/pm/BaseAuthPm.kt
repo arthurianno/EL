@@ -2,14 +2,19 @@ package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
+import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
+import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 
 abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
@@ -23,6 +28,9 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     val continueEnabledState = state(false)
     val continueAction = action<Unit>()
     val menuAction = action<Unit>()
+
+    val profileIsDeletedDialogControl = dialogControl<DialogData, DialogResult>()
+    private val profileIsDeletedDialogData: DialogData by lazy { Dialogs.ProfileIsDeleted(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -41,8 +49,12 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     }
 
     override fun handleError(error: Throwable) {
-        when (error is EmailAlreadyRegisteredError || error is IncorrectLoginOrPasswordError) {
-            true -> {
+        when (error) {
+            is ProfileIsDeletedError -> profileIsDeletedDialogControl.show(
+                profileIsDeletedDialogData
+            )
+            is EmailAlreadyRegisteredError,
+            is IncorrectLoginOrPasswordError -> {
                 setErrorStateData(
                     States.SimpleError(
                         icon = R.drawable.ic_warning,

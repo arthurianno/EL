@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.registration.main.ui
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -56,6 +57,7 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
         pm.continueEnabledState.bindTo { binding.continueButtonView.isEnabled = it }
         binding.continueButtonView.clicks().bindTo(pm.continueAction)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.menuAction)
+        pm.profileIsDeletedDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         bindProgressDialog(pm)
     }
 }
