@@ -58,6 +58,7 @@ abstract class ConnectDevicePm constructor(
     val retryPinControl = snackBarControl<SnackBarData>()
     val retryConnectControl = snackBarControl<SnackBarData>()
     val retrySyncControl = snackBarControl<SnackBarData>()
+    val retryEnableBluetoothControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
@@ -65,34 +66,42 @@ abstract class ConnectDevicePm constructor(
     private val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
 
+    private val bluetoothNotEnabled: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            message = resources.getString(R.string.bluetooth_disabled),
+            button = resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
+
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_device_not_found),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_device_not_found),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val incorrectPinCode: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_incorrect_pin_code),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_incorrect_pin_code),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val connectError: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_connect_error),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_connect_error),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
     private val syncError: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
-            resources.getString(R.string.sync_connect_sync_error),
-            resources.getString(R.string.sync_connect_button_retry)
+            message = resources.getString(R.string.sync_connect_sync_error),
+            button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
 
+    private val showRetryEnableBluetoothAction = action<Unit>()
     private val showRetrySearchAction = action<Unit>()
     private val showRetryPinAction = action<Unit>()
     private val showRetrySyncAction = action<Unit>()
@@ -121,9 +130,9 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> btControl.requestEnableBluetoothCommand.consumer.accept(
-                Unit
-            )
+            is BluetoothNotEnabledError -> {
+                handleBluetoothDisableError()
+            }
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
                 Unit
             )
@@ -141,6 +150,12 @@ abstract class ConnectDevicePm constructor(
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
+    }
+
+    private fun handleBluetoothDisableError() {
+        bus.event(Events.Sync.Glucometer.Error)
+        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+        showRetryEnableBluetoothAction.consumer.accept(Unit)
     }
 
     private fun bindActions() {
@@ -215,6 +230,13 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindRetryActions() {
+        showRetryEnableBluetoothAction.observable
+            .switchMapMaybe {
+                retryEnableBluetoothControl.showForResult(bluetoothNotEnabled)
+            }
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
+
         showRetrySearchAction.observable
             .switchMapMaybe {
                 retrySearchControl.showForResult(deviceNotFound)
