@@ -164,7 +164,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun getChooserMeta(chooserItem: ChooserItem?): Any? =
         if (configurationState.value.eventType == EventType.INSULIN) {
             Insulin(
-                name = previousSelectionState.value,
+                previousName = previousSelectionState.value,
                 drug = chooserItem?.title.orEmpty(),
                 type = getInsulinTypeByString(previousSelectionState.value) ?: InsulinType.MIXED
             )

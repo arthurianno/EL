@@ -32,7 +32,8 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
                     duration = duration,
                     activityType = activityType?.let { ActivityTypeDto.valueOf(it.name) },
                     mealTag = mealTag?.let { MealTagDto.valueOf(it.name) },
-                    insulinType = insulinType?.let { InsulinTypeDto.valueOf(it.name) }
+                    insulinType = insulinType?.let { InsulinTypeDto.valueOf(it.name) },
+                    medicament = medicament
                 )
             )
         }

@@ -9,7 +9,7 @@ import java.util.UUID
 object TagTestFactory {
 
     private val ids = arrayListOf<String>().apply {
-        (0..10).forEach {
+        (0..10).map {
             add(UUID.randomUUID().toString())
         }
     }

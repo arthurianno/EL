@@ -31,6 +31,7 @@ class EventsBuilder @Inject constructor(
             duration = source.duration,
             activityType = activityTypeMapper.mapFromObject(source.activityType),
             insulinType = null,
+            medicament = null,
             type = EventType.ACTIVITY,
             mealTag = null,
             state = State.CREATED

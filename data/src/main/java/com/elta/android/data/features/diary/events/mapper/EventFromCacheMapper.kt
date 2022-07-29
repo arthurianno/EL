@@ -26,7 +26,8 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                     activityType = activityType?.let { ActivityTypeDto.valueOf(it) },
                     mealTag = mealTag?.let { MealTagDto.valueOf(it) },
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it) },
-                    type = EventTypeDto.valueOf(type)
+                    type = EventTypeDto.valueOf(type),
+                    medicament = medicament
                 ),
                 additionTime = additionTimeString,
                 tagId = tagId,

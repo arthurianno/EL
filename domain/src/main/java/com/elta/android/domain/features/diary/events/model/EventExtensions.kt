@@ -29,7 +29,8 @@ fun Event.isChanged(
     duration: Long? = null,
     date: ZonedDateTime? = null,
     tagId: String? = null,
-    insulin: InsulinType? = null,
+    insulinType: InsulinType? = null,
+    medicament: String? = null,
     activity: ActivityType? = null,
     note: String? = null
 ): Boolean =
@@ -39,7 +40,8 @@ fun Event.isChanged(
         this.duration != duration ||
         this.additionTime != date ||
         this.tagId != tagId ||
-        this.insulinType != insulin ||
+        this.insulinType != insulinType ||
+        this.medicament != medicament ||
         this.activityType != activity ||
         this.note != note
 

@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.edit.pm.mapper
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toIcon
@@ -18,11 +19,7 @@ fun Event.getPickerValues(): Pair<Int, Int>? =
         else -> value.toPickerValues()
     }
 
-fun Event.getValue(): Double =
-    when (value == null) {
-        true -> 0.0
-        else -> checkNotNull(value)
-    }
+fun Event.getValue(): Double = value ?: 0.0
 
 fun Event.getFormattedTemperature(): String =
     temperature?.let { NumberFormatter.format(it) } ?: "-"
@@ -46,7 +43,7 @@ fun Event.getTag(res: ResourceProvider): SelectorOption? {
 fun Event.getSelectorOption(res: ResourceProvider): SelectorOption? =
     when (type) {
         EventType.ACTIVITY -> activityType.toSelectorOption(res)
-        EventType.INSULIN -> insulinType.toSelectorOption(res)
+        EventType.INSULIN -> insulinType.toSelectorOption(medicament, res)
         else -> null
     }
 
@@ -59,10 +56,16 @@ private fun ActivityType?.toSelectorOption(res: ResourceProvider): SelectorOptio
     )
 }
 
-private fun InsulinType?.toSelectorOption(res: ResourceProvider): SelectorOption? {
-    if (this == null) return null
-    return SelectorOption(res.getString(this.toName()), meta = this)
-}
+private fun InsulinType?.toSelectorOption(
+    medicament: String?,
+    res: ResourceProvider
+): SelectorOption? =
+    this?.let {
+        SelectorOption(
+            text = "${res.getString(it.toName())}($medicament)",
+            meta = Insulin(previousName = "", drug = medicament.orEmpty(), type = it)
+        )
+    }
 
 private fun Long?.toPickerValues(): Pair<Int, Int> {
     if (this == null) return 0 to 0
