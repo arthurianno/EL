@@ -23,7 +23,7 @@ class ProfileToDomainMapper @Inject constructor(
             Profile(
                 diabetes = diabetes?.let { Diabetes.valueOf(it.name) },
                 weight = weight,
-                gender = gender?.let { Gender.valueOf(it.name) },
+                gender = gender?.let { Gender.valueOf(it.name) } ?: Gender.NOT_SPECIFIED,
                 firstName = person?.firstName,
                 secondName = person?.lastName,
                 glucoseLevelSettings = glucoseLevelsAverage.toSettings(),
