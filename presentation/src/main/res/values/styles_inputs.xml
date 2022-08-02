@@ -61,6 +61,7 @@
     <style name="EventFormInputStyle.Note" parent="EventFormInputStyle">
         <item name="met_helperText">@null</item>
         <item name="met_baseColor">@color/white</item>
+        <item name="android:maxLength">120</item>
         <item name="android:inputType">textMultiLine|textCapSentences</item>
     </style>
 
