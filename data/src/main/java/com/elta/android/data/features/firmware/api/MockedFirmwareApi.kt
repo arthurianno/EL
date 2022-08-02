@@ -16,22 +16,22 @@ class MockedFirmwareApi(
 
     override fun getFirmwareInfo(): Single<FirmwareDto> =
         Single.fromCallable {
-            val stream = context.resources.openRawResource(R.raw.satellite_online_16)
+            val stream = context.resources.openRawResource(R.raw.satellite_online_30)
             val hash = IoUtils.getMd5(stream)
             Timber.d("firmware hash: $hash")
             FirmwareDto(
                 actual = ActualFirmwareDto(
-                    version = "1.6",
+                    version = "3.0",
                     size = 0,
                     hash = hash
                 ),
-                compatible = "1.6"
+                compatible = "3.0"
             )
         }
 
     override fun downloadFirmware(version: String): Single<ResponseBody> =
         Single.fromCallable {
-            val stream = context.resources.openRawResource(R.raw.satellite_online_16)
+            val stream = context.resources.openRawResource(R.raw.satellite_online_30)
             ResponseBody.create(MediaType.parse("application/octet-stream"), stream.readBytes())
         }
 }
