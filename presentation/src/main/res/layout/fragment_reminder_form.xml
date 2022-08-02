@@ -25,6 +25,7 @@
                 android:id="@+id/formInputView"
                 style="@style/EventFormInputStyle"
                 android:layout_width="match_parent"
+                android:maxLength="100"
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_reminders_reminder_name_hint"
                 android:paddingTop="16dp"
