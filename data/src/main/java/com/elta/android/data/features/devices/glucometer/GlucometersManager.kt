@@ -85,7 +85,9 @@ class GlucometersManager @Inject constructor(
 
     private val connections = mutableMapOf<String, RxBleConnection>()
     private val infoCommands = listOf(
-        Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
+        Commands.GetDate,
+        Commands.GetBatteryAndTemperature,
+        Commands.GetVersion
     )
 
     fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
@@ -192,7 +194,11 @@ class GlucometersManager @Inject constructor(
                             glucometersCache.add(listOf(newDevice.apply { isPrimary = true }))
                         }
 
-                        if (primaryDevice != null && !primaryDevice.address.equals(device.address, true)) {
+                        if (primaryDevice != null && !primaryDevice.address.equals(
+                                device.address,
+                                true
+                            )
+                        ) {
                             glucometersCache.add(listOf(newDevice))
                         }
                     }
@@ -234,7 +240,11 @@ class GlucometersManager @Inject constructor(
                             .take(1)
                             .switchMapCompletable { response ->
                                 when (response.isOk()) {
-                                    true -> startFirmwareUpdate(context, file.path, address.toDfuAddress())
+                                    true -> startFirmwareUpdate(
+                                        context,
+                                        file.path,
+                                        address.toDfuAddress()
+                                    )
                                     else -> Completable.error(GlucometerToDfuModeError)
                                 }
                             }
@@ -271,7 +281,10 @@ class GlucometersManager @Inject constructor(
             if (glucometersToUpdate.isNotEmpty()) glucometersCache.update(glucometersToUpdate)
         }
 
-    private fun RxBleConnection.simpleRequest(address: String, cmd: GlucometerCommand): Observable<String> {
+    private fun RxBleConnection.simpleRequest(
+        address: String,
+        cmd: GlucometerCommand
+    ): Observable<String> {
         val input = cmd.toGlucometerString()
         val notification = setupNotification(UART_TX)
             .switchMap { it }
@@ -281,7 +294,10 @@ class GlucometersManager @Inject constructor(
         return Observables.combineLatest(notification.take(1), command) { response, _ -> response }
     }
 
-    private fun RxBleConnection.request(address: String, cmd: GlucometerCommand): Observable<String> {
+    private fun RxBleConnection.request(
+        address: String,
+        cmd: GlucometerCommand
+    ): Observable<String> {
         val input = cmd.toGlucometerString()
         val notification = setupNotification(UART_TX)
             .switchMap { it }
@@ -332,16 +348,18 @@ class GlucometersManager @Inject constructor(
         Observable.just(getBleDevice(address))
             .switchMap { device ->
                 val connection = connections[address]
-                if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED)
+                if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED) {
                     device.establishConnection(false)
                         .onErrorResumeNext { e: Throwable ->
                             Timber.e(javaClass.simpleName, e.message, e)
-                            if (e is BleDisconnectedException) Observable.error(GlucometerOfflineError)
+                            if (e is BleDisconnectedException) Observable.error(
+                                GlucometerOfflineError
+                            )
                             else Observable.error(e)
                         }
                         .compose(ReplayingShare.instance())
                         .doOnNext { connections[address] = it }
-                else Observable.just(connection)
+                } else Observable.just(connection)
             }
 
     private fun Observable<RxBleConnection>.checkPinAndSend(address: String): Observable<RxBleConnection> =
@@ -367,7 +385,7 @@ class GlucometersManager @Inject constructor(
     }
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
-        batteryLevel ?: 0 >= MIN_LEVEL
+        (batteryLevel ?: 0) >= MIN_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
@@ -381,7 +399,9 @@ class GlucometersManager @Inject constructor(
     private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()
             .switchMap { client.findConnection(address) }
-            .switchMap { connection -> connection.setupNotification(UART_TX).map { Pair(connection, it) } }
+            .switchMap { connection ->
+                connection.setupNotification(UART_TX).map { Pair(connection, it) }
+            }
             .concatMap {
                 val connection = it.first
                 val responses = it.second
@@ -393,13 +413,17 @@ class GlucometersManager @Inject constructor(
                 if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
 
                 val startCommands = mutableListOf(
-                    Commands.SetPin(pin), Commands.SetTime(ZonedDateTime.now()),
-                    Commands.GetDate, Commands.GetBatteryAndTemperature, Commands.GetVersion
+                    Commands.SetPin(pin),
+                    Commands.SetTime(ZonedDateTime.now()),
+                    Commands.GetDate,
+                    Commands.GetBatteryAndTemperature,
+                    Commands.GetVersion
                 )
 
                 Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
 
-                val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                val info =
+                    glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                 Timber.i("<<<<<<<Sync>>>>>>  Info from cache by address: $info")
 
                 val lastEvent = info?.lastSyncedEvent
@@ -411,8 +435,10 @@ class GlucometersManager @Inject constructor(
                     .concatMap { command ->
                         Observable.just(command).delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
                             .concatMapSingle {
-                                val input = command.toGlucometerString().toByteArray(Charset.defaultCharset())
-                                connection.writeCharacteristic(UART_RX, input).map { Pair(responses, lastEvent) }
+                                val input = command.toGlucometerString()
+                                    .toByteArray(Charset.defaultCharset())
+                                connection.writeCharacteristic(UART_RX, input)
+                                    .map { Pair(responses, lastEvent) }
                             }
                     }
             }
@@ -443,7 +469,11 @@ class GlucometersManager @Inject constructor(
             // Glucometers memory organized like stack, so the most recent event will be on the top
             // or in holder if there are no new events
             .doOnNext { holder ->
-                updateGlucometerInfo(address, holder.info, holder.events.firstOrNull() ?: holder.lastSyncedEvent)
+                updateGlucometerInfo(
+                    address,
+                    holder.info,
+                    holder.events.firstOrNull() ?: holder.lastSyncedEvent
+                )
             }
             .map(SyncResponseHolder::events)
             .map { events ->
@@ -489,7 +519,8 @@ class GlucometersManager @Inject constructor(
     private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
         eventsCache.getAll(
             EventsConditions.ByTypeAndIds(
-                EventTypeDto.GLUCOSE, fromGlucometer.map { it.id.hashCode().toLong() }.toLongArray()
+                EventTypeDto.GLUCOSE,
+                fromGlucometer.map { it.id.hashCode().toLong() }.toLongArray()
             )
         )
 
@@ -509,7 +540,8 @@ class GlucometersManager @Inject constructor(
         Timber.i("<<<<<<<Sync>>>>>> update - Responses: $responses")
         Timber.i("<<<<<<<Sync>>>>>> update - LastEvent: $lastEvent")
         val info = infoBuilder.buildFrom(address, responses, ZonedDateTime.now(), lastEvent)
-        val cachedInfo = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+        val cachedInfo =
+            glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
         Timber.i("<<<<<<<Sync>>>>>> update -  CachedInfo: $cachedInfo")
         val newInfo = glucometersInfoToCacheMapper.mapFromObject(info)
         Timber.i("<<<<<<<Sync>>>>>> update -  NewInfo: $newInfo")
@@ -529,8 +561,9 @@ class GlucometersManager @Inject constructor(
     )
 
     companion object {
-        private const val FIRMWARE_VERSION = "1.8" // version of firmware supported by application
-        private const val MIN_LEVEL = 1 // minimal level of battery required to start firmware update
+        private const val FIRMWARE_VERSION = "3.0" // version of firmware supported by application
+        private const val MIN_LEVEL =
+            1 // minimal level of battery required to start firmware update
         private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
         private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
         private const val EVENTS_COUNT = 1000
