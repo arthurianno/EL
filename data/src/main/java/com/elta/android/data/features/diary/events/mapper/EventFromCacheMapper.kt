@@ -7,6 +7,7 @@ import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                     mealTag = mealTag?.let { MealTagDto.valueOf(it) },
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it) },
                     type = EventTypeDto.valueOf(type),
-                    medicament = medicament
+                    insulinMedicament = InsulinMedicamentDataDto(medicament = medicament)
                 ),
                 additionTime = additionTimeString,
                 tagId = tagId,

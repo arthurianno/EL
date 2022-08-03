@@ -226,6 +226,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun getInsulinTypeByString(string: String) =
         when (string) {
             resources.getString(InsulinType.INTERMIDIATE.toName()) -> InsulinType.INTERMIDIATE
+            resources.getString(InsulinType.ULTRAFAST.toName()) -> InsulinType.ULTRAFAST
             resources.getString(InsulinType.ULTRASHORT.toName()) -> InsulinType.ULTRASHORT
             resources.getString(InsulinType.LONG.toName()) -> InsulinType.LONG
             resources.getString(InsulinType.MIXED.toName()) -> InsulinType.MIXED

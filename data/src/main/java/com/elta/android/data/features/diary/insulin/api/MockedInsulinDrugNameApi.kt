@@ -7,6 +7,7 @@ class MockedInsulinDrugNameApi : InsulinDrugNameApi {
     override fun getDrugNamesByInsulinType(type: InsulinType): Observable<List<String>> =
         Observable.just(
             when (type) {
+                InsulinType.ULTRAFAST -> insulinDrugNamesUF
                 InsulinType.ULTRASHORT -> insulinDrugNamesUS
                 InsulinType.SHORT -> insulinDrugNamesS
                 InsulinType.INTERMIDIATE -> insulinDrugNamesI
@@ -17,9 +18,66 @@ class MockedInsulinDrugNameApi : InsulinDrugNameApi {
         )
 }
 
-private val insulinDrugNamesUS = listOf("US1", "US2")
-private val insulinDrugNamesS = listOf("S1", "S2", "S3")
-private val insulinDrugNamesI = listOf("I1")
-private val insulinDrugNamesL = listOf("L1", "L2", "L3")
-private val insulinDrugNamesUL = listOf("UL1", "UL2", "UL3", "UL4")
-private val insulinDrugNamesM = listOf("M1")
+private val insulinDrugNamesUF = listOf(
+    "Фиасп",
+    "Люмжев",
+    "Люмжев 200"
+)
+private val insulinDrugNamesUS = listOf(
+    "Хумалог",
+    "Инсулин лизпро",
+    "РинЛиз",
+    "Хумалог 200",
+    "НовоРапид",
+    "РинФаст",
+    "Росинсулин аспарт Р",
+    "Апидра"
+)
+private val insulinDrugNamesS = listOf(
+    "Актрапид НМ",
+    "Хумулин Регуляр",
+    "Инсуман Рапид ГТ",
+    "Биосулин Р",
+    "Генсулин Р",
+    "Ринсулин Р",
+    "Росинсулин Р",
+    "Возулим-Р",
+    "Моноинсулин ЧР"
+)
+private val insulinDrugNamesI = listOf(
+    "Протафан HM",
+    "Хумулин НПХ",
+    "Инсуман Базал ГТ",
+    "Биосулин Н",
+    "Генсулин Н",
+    "Ринсулин НПХ",
+    "Росинсулин С",
+    "Возулим-Н",
+    "Протамин-инсулин ЧС"
+)
+private val insulinDrugNamesL = listOf(
+    "Лантус",
+    "Инсулин гларгин",
+    "РинГлар",
+    "Базаглар",
+    "Туджео",
+    "Левемир"
+)
+private val insulinDrugNamesUL = listOf(
+    "Тресиба"
+)
+private val insulinDrugNamesM = listOf(
+    "Хумулин М3",
+    "Инсуман Комб 25 ГТ",
+    "Биосулин 30/70",
+    "Генсулин М30",
+    "Ринсулин Микс 30/70",
+    "Росинсулин М микс 30/70",
+    "Возулим-30/70",
+    "Хумалог Микс 25",
+    "Хумалог Микс 50",
+    "РинЛиз Микс 25",
+    "НовоМикс 30",
+    "РинФаст Микс 30",
+    "Райзодег"
+)

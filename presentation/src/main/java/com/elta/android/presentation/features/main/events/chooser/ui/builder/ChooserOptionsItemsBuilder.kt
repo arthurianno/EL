@@ -26,8 +26,8 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     fun buildItems(
         configuration: ChooserConfiguration,
         options: List<ChooserOptionModel>
-    ): MutableList<ListItem> {
-        return arrayListOf<ListItem>().apply {
+    ): List<ListItem> {
+        return mutableListOf<ListItem>().apply {
             add(ChooserHeaderItem(configuration.toHeaderTitle()))
             if (configuration.eventType == EventType.ACTIVITY) {
                 addAll(options.map { mapFromObject(it) }.sortedWith(activitiesComparator))

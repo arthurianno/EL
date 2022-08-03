@@ -6,6 +6,7 @@ import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import org.threeten.bp.ZonedDateTime
@@ -51,7 +52,7 @@ object EventMockedFactory {
                 activityType = activityType,
                 mealTag = mealTag,
                 insulinType = insulinType,
-                medicament = medicament,
+                insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
                 type = type
             )
         )
