@@ -29,7 +29,7 @@ import javax.inject.Inject
 class OnBoardingPm @Inject constructor(
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    services: ServiceFacade
+    services: ServiceFacade,
 ) : BaseListPm(services) {
 
     val pageChangedAction = action<Int>()
@@ -173,20 +173,17 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
-
         handlePreviousPageItems(prevPage)
-
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
     }
 
     private fun handlePreviousPageItems(prevPage: Int) {
-        val currentItem = items.value[prevPage] as OnBoardingItem
+        val currentItem = items.value[prevPage] as? OnBoardingItem
         when (currentItem) {
-            is OnBoardingWeightItem -> {
-                createInitialWeightItem()
-            }
+            is OnBoardingWeightItem -> createInitialWeightItem()
+            null -> throw IllegalArgumentException("Item is not ${OnBoardingItem::class.java} or null")
         }
     }
 
