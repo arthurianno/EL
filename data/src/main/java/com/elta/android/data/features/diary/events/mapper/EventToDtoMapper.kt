@@ -7,6 +7,7 @@ import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.domain.features.diary.events.model.Event
@@ -33,7 +34,7 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
                     activityType = activityType?.let { ActivityTypeDto.valueOf(it.name) },
                     mealTag = mealTag?.let { MealTagDto.valueOf(it.name) },
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it.name) },
-                    medicament = medicament
+                    insulinMedicament = InsulinMedicamentDataDto(medicament = medicament)
                 )
             )
         }

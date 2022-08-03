@@ -37,20 +37,23 @@ internal fun mapTags(list: List<Tag>): List<ChooserOptionModel> =
 internal fun mapInsulinTypes(types: Array<InsulinType>): List<ChooserOptionModel> =
     types.map {
         ChooserOptionModel(
-            id = it.toString(), meta = it
+            id = it.toString(),
+            meta = it
         )
     }.toMutableList()
 
 internal fun mapActivityTypes(types: Array<ActivityType>): List<ChooserOptionModel> =
     types.map {
         ChooserOptionModel(
-            id = it.toString(), meta = it
+            id = it.toString(),
+            meta = it
         )
     }.toMutableList()
 
 internal fun mapInsulinDrugNames(list: List<String>): List<ChooserOptionModel> =
     list.map {
         ChooserOptionModel(
-            id = it, meta = it
+            id = it,
+            meta = it
         )
     }

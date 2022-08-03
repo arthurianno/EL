@@ -26,8 +26,8 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     fun buildItems(
         configuration: ChooserConfiguration,
         options: List<ChooserOptionModel>
-    ): MutableList<ListItem> {
-        return arrayListOf<ListItem>().apply {
+    ): List<ListItem> {
+        return mutableListOf<ListItem>().apply {
             add(ChooserHeaderItem(configuration.toHeaderTitle()))
             if (configuration.eventType == EventType.ACTIVITY) {
                 addAll(options.map { mapFromObject(it) }.sortedWith(activitiesComparator))
@@ -89,7 +89,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     private fun ChooserConfiguration.toHeaderTitle(): String =
         resourceProvider.getString(
             when {
-                chooserType == ChooserType.VARIANTS && eventType == EventType.INSULIN ->
+                (chooserType == ChooserType.VARIANTS || chooserType == ChooserType.VARIANTS_WITH_SUBTYPE) && eventType == EventType.INSULIN ->
                     R.string.events_options_chooser_header_variants_insulin
                 chooserType == ChooserType.VARIANTS && eventType == EventType.ACTIVITY ->
                     R.string.events_options_chooser_header_variants_activity

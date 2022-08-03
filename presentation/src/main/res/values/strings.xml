@@ -128,10 +128,11 @@
     <string name="event_type_bread_no_name">Приём пищи</string>
     <string name="event_type_activity_no_name">Физическая активность</string>
     <string name="event_type_glucose_no_name">Измерение глюкозы</string>
-    <string name="tag_name_no_tag">Без тега</string>
+    <string name="tag_name_no_tag">Без метки</string>
     <string name="event_type_weight_no_name">Взвешивание</string>
 
     <!-- INSULIN TYPES -->
+    <string name="insulin_type_ultrafast">Сверхбыстрый</string>
     <string name="insulin_type_ultrashort">Ультракороткий</string>
     <string name="insulin_type_short">Короткий</string>
     <string name="insulin_type_intermidiate">Средний</string>
@@ -217,7 +218,7 @@
     <string name="events_options_chooser_title_activities">Вид активности</string>
     <string name="events_options_chooser_title_insulin">Тип инсулина</string>
 
-    <string name="events_options_chooser_header_tags">Доступные теги</string>
+    <string name="events_options_chooser_header_tags">Доступные метки</string>
     <string name="events_options_chooser_header_variants_insulin">Доступные варианты</string>
     <string name="events_options_chooser_header_variants_activity">Доступные виды</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
