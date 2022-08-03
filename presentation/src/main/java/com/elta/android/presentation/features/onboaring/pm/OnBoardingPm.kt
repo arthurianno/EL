@@ -173,9 +173,29 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
+
+        handlePreviousPageItems(prevPage)
+
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
+    }
+
+    private fun handlePreviousPageItems(prevPage: Int) {
+        val currentItem = items.value[prevPage] as OnBoardingItem
+        when (currentItem) {
+            is OnBoardingWeightItem -> {
+                createInitialWeightItem()
+            }
+        }
+    }
+
+    private fun createInitialWeightItem() {
+        val weightItem = OnBoardingWeightItem(
+            resources.getString(R.string.on_boarding_header_user_weight),
+            INITIAL_WEIGHT
+        )
+        savePageData(weightItem)
     }
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
