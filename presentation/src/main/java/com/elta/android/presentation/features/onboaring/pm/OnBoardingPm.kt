@@ -23,13 +23,14 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.nullgr.core.date.toTimestamp
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
 class OnBoardingPm @Inject constructor(
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    services: ServiceFacade
+    services: ServiceFacade,
 ) : BaseListPm(services) {
 
     val pageChangedAction = action<Int>()
@@ -173,9 +174,24 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
+        handleWeightItem(prevPage)
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
+    }
+
+    private fun handleWeightItem(prevPage: Int) {
+        (items.value[prevPage] as? OnBoardingItem)?.let {
+            createInitialWeightItem()
+        } ?: Timber.e("Item is not ${OnBoardingItem::class.java} or null")
+    }
+
+    private fun createInitialWeightItem() {
+        val weightItem = OnBoardingWeightItem(
+            resources.getString(R.string.on_boarding_header_user_weight),
+            INITIAL_WEIGHT
+        )
+        savePageData(weightItem)
     }
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
