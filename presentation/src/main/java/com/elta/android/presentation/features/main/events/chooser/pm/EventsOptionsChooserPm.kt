@@ -162,7 +162,10 @@ class EventsOptionsChooserPm @Inject constructor(
     }
 
     private fun getChooserMeta(chooserItem: ChooserItem?): Any? =
-        if (configurationState.value.eventType == EventType.INSULIN) {
+        if (
+            configurationState.value.eventType == EventType.INSULIN &&
+            configurationState.value.chooserType != ChooserType.GROUP_TAGS
+        ) {
             Insulin(
                 previousName = previousSelectionState.value,
                 drug = chooserItem?.title.orEmpty(),
