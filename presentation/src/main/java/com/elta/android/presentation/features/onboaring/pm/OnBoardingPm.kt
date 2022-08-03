@@ -23,6 +23,7 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.nullgr.core.date.toTimestamp
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -173,18 +174,16 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
-        handlePreviousPageItems(prevPage)
+        handleWeightItem(prevPage)
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
     }
 
-    private fun handlePreviousPageItems(prevPage: Int) {
-        val currentItem = items.value[prevPage] as? OnBoardingItem
-        when (currentItem) {
-            is OnBoardingWeightItem -> createInitialWeightItem()
-            null -> throw IllegalArgumentException("Item is not ${OnBoardingItem::class.java} or null")
-        }
+    private fun handleWeightItem(prevPage: Int) {
+        (items.value[prevPage] as? OnBoardingItem)?.let {
+            createInitialWeightItem()
+        } ?: Timber.e("Item is not ${OnBoardingItem::class.java} or null")
     }
 
     private fun createInitialWeightItem() {
