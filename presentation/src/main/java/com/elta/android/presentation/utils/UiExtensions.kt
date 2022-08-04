@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.VectorDrawable
+import android.util.TypedValue
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -189,4 +190,20 @@ inline fun <reified ViewClass> Activity.lostFocusOnClickOutside(event: MotionEve
         }
     }
     return true
+}
+
+fun Context.convertDpToPx(dp: Float): Float {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        dp,
+        this.resources.displayMetrics
+    )
+}
+
+fun Activity.isKeyboardOpen(viewRoot: View): Boolean {
+    val visibleBounds = Rect()
+    viewRoot.getWindowVisibleDisplayFrame(visibleBounds)
+    val heightDiff = viewRoot.height - visibleBounds.height()
+    val marginOfError = Math.round(this.convertDpToPx(50F))
+    return heightDiff > marginOfError
 }

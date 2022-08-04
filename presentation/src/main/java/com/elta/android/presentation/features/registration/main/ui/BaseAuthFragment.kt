@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthBaseBinding
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.error
+import com.elta.android.presentation.utils.isKeyboardOpen
 import com.elta.android.presentation.utils.lostFocusOnClickOutside
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
@@ -42,6 +43,17 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
             frameView.setOnTouchListener { view, event ->
                 requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
             }
+            root.setOnApplyWindowInsetsListener { view, insets ->
+                clearFocusesFromInputs(view)
+                view.onApplyWindowInsets(insets)
+            }
+        }
+    }
+
+    private fun clearFocusesFromInputs(view: View) {
+        if (!requireActivity().isKeyboardOpen(view)) {
+            binding.emailInputView.clearFocus()
+            binding.passwordInputView.clearFocus()
         }
     }
 
