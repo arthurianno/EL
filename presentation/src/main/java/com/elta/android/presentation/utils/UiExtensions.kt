@@ -5,13 +5,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.VectorDrawable
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.OnApplyWindowInsetsListener
@@ -167,4 +170,23 @@ fun VectorDrawable.toBitmap(): Bitmap {
     setBounds(0, 0, canvas.width, canvas.height)
     draw(canvas)
     return bitmap
+}
+
+inline fun <reified ViewClass> Activity.lostFocusOnClickOutside(event: MotionEvent, viewRoot: View): Boolean {
+    if (event.action == MotionEvent.ACTION_DOWN) {
+        currentFocus?.let {
+            if (it::class.java == ViewClass::class.java) {
+                val outRect = Rect()
+                it.getGlobalVisibleRect(outRect)
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                    it.clearFocus()
+                    val imm =
+                        getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(it.windowToken, 0)
+                    viewRoot.requestFocus()
+                }
+            }
+        }
+    }
+    return true
 }

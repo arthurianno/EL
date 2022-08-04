@@ -10,9 +10,11 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthBaseBinding
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.error
+import com.elta.android.presentation.utils.lostFocusOnClickOutside
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
 import com.jakewharton.rxbinding2.view.clicks
+import com.rengwuxian.materialedittext.MaterialEditText
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 
@@ -34,6 +36,12 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
             continueButtonView.setText(continueButtonText)
             authTitleView.setText(authTitleText)
             authSubtitleView.setText(authSubtitleText)
+            scrollView.setOnTouchListener { view, event ->
+                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
+            }
+            frameView.setOnTouchListener { view, event ->
+                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
+            }
         }
     }
 
