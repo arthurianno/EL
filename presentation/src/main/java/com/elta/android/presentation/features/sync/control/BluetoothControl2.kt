@@ -128,24 +128,26 @@ fun enableLocation2(fragment: Fragment) {
 }
 
 fun checkBluetoothPermissions(activity: Activity) {
-    if (ActivityCompat
-        .checkSelfPermission(
-                activity,
-                android.Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        if (ActivityCompat
             .checkSelfPermission(
                     activity,
+                    android.Manifest.permission.BLUETOOTH_SCAN
+                ) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat
+                .checkSelfPermission(
+                        activity,
+                        android.Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(
+                    android.Manifest.permission.BLUETOOTH_SCAN,
                     android.Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
-    ) {
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(
-                android.Manifest.permission.BLUETOOTH_SCAN,
-                android.Manifest.permission.BLUETOOTH_CONNECT
-            ),
-            1
-        )
+                ),
+                1
+            )
+        }
     }
 }
