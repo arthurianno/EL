@@ -11,7 +11,7 @@ class CheckTokenOwnerUseCase @Inject constructor(
     schedulers: SchedulersFacade
 ) : SingleUseCase<Boolean, CheckTokenOwnerUseCase.Params>(schedulers) {
 
-    override fun buildUseCaseObservable(params: CheckTokenOwnerUseCase.Params?): Single<Boolean> {
+    override fun buildUseCaseObservable(params: Params?): Single<Boolean> {
         val p = checkNotNull(params)
         return repository.checkTokenOwner(p.token)
     }
