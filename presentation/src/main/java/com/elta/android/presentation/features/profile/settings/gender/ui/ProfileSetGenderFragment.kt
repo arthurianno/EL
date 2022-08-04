@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileSetGenderBinding
 import com.elta.android.presentation.features.profile.settings.gender.pm.ProfileSetGenderPm
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.view.visibility
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
@@ -23,6 +24,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfil
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+        pm.checkNotSpecifiedVisibility.bindTo(binding.notSpecifiedButtonView.visibility())
         pm.checkNotSpecified.bindTo(binding.notSpecifiedButtonView)
         pm.checkMale.bindTo(binding.maleButtonView)
         pm.checkFemale.bindTo(binding.femaleButtonView)
