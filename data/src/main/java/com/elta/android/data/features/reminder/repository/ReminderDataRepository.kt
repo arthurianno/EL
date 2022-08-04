@@ -36,23 +36,37 @@ class ReminderDataRepository @Inject constructor(
             currentReminderAsListDto,
             allRemindersDto
         ) { reminderAsList, allReminders ->
-            val remindersDateToTimeList =
-                allReminders.map { it.time.toLocalDate() to it.time.toLocalTime() }
-            val currentReminderDateToTime =
-                reminderAsList.map { it.time.toLocalDate() to it.time.toLocalTime() }
-
-            if (remindersDateToTimeList.containsAll(currentReminderDateToTime)) throw ReminderAlreadyExistsError()
-
-            reminderAsList
+            checkForExistingReminders(allReminders, reminderAsList)
         }
             .flatMapCompletable { source.addReminders(it) }
             .toSingleDefault(reminder.id)
     }
 
-    override fun updateReminder(reminder: Reminder): Single<String> =
-        createSingleRemindersDto(reminder)
+    override fun updateReminder(reminder: Reminder): Single<String> {
+        val currentReminder = createSingleRemindersDto(reminder).toObservable()
+        val allRemindersDto = getReminders().map(toDtoMapper::mapFromObjects)
+
+        return Observable.zip(
+            currentReminder,
+            allRemindersDto
+        ) { reminderAsList, allReminders ->
+            checkForExistingReminders(allReminders, reminderAsList)
+        }
             .flatMapCompletable { source.updateReminders(it) }
             .toSingleDefault(reminder.id)
+    }
+
+    private fun checkForExistingReminders(
+        allReminders: List<ReminderDto>,
+        reminderAsList: List<ReminderDto>,
+    ): List<ReminderDto> {
+        val remindersDateToTimeList =
+            allReminders.map { it.time.toLocalDate() to it.time.toLocalTime() }
+        val currentReminderDateToTime =
+            reminderAsList.map { it.time.toLocalDate() to it.time.toLocalTime() }
+        if (remindersDateToTimeList.containsAll(currentReminderDateToTime)) throw ReminderAlreadyExistsError()
+        return reminderAsList
+    }
 
     override fun deleteReminder(reminder: Reminder): Single<String> =
         createSingleRemindersDto(reminder)
