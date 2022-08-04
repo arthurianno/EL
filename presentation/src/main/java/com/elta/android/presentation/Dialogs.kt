@@ -106,7 +106,7 @@ sealed class Dialogs : DialogData {
         val resources: ResourceProvider,
         override val title: String = resources.getString(R.string.profile_is_deleted_title),
         override val message: String = resources.getString(R.string.profile_is_deleted_body),
-        override val negative: String? = null,
+        override val negative: String? = resources.getString(R.string.profile_support_email_description),
         override val positive: String? = resources.getString(R.string.ok)
     ) : Dialogs()
 }

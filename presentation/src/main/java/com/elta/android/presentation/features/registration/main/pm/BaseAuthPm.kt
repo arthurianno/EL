@@ -7,6 +7,7 @@ import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -50,9 +51,7 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is ProfileIsDeletedError -> profileIsDeletedDialogControl.show(
-                profileIsDeletedDialogData
-            )
+            is ProfileIsDeletedError -> profileIsDeleted()
             is EmailAlreadyRegisteredError,
             is IncorrectLoginOrPasswordError -> {
                 setErrorStateData(
@@ -65,6 +64,14 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
             }
             else -> super.handleError(error)
         }
+    }
+
+    private fun profileIsDeleted() {
+        profileIsDeletedDialogControl.showForResult(profileIsDeletedDialogData)
+            .filter { it == DialogResult.NEGATIVE }
+            .subscribe {
+                router.navigateTo(Screens.EmailScreen(resources.getString(R.string.profile_support_email)))
+            }
     }
 
     private fun validateEmail(email: String): Boolean =
