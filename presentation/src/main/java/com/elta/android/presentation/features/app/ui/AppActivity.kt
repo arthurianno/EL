@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
+import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import com.elta.android.presentation.widgets.status.StatusView
 import me.dmdev.rxpm.bindTo
@@ -36,6 +37,11 @@ class AppActivity : BaseActivity<AppPm>() {
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkBluetoothPermissions(this)
     }
 
     override fun onBindPresentationModel(pm: AppPm) {
