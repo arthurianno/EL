@@ -70,7 +70,10 @@ class EditObserverPm @Inject constructor(
 
     private fun bindObserverState() {
         observerState.observable
-            .filter { it.name != null }
+            .filter {
+                it.name != null ||
+                    it.customName != null
+            }
             .map { checkNotNull(it.userName) }
             .doOnNext(observerNameInput.text.consumer)
             .subscribe()
