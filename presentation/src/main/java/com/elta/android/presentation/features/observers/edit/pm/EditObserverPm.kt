@@ -77,7 +77,7 @@ class EditObserverPm @Inject constructor(
             .untilDestroy()
 
         observerNameInput.textChanges.observable
-            .map { it.isNotEmpty() && it != observerState.value.name }
+            .map { it.isNotBlank() && it != observerState.value.name }
             .doOnNext(saveButtonEnabledState.consumer)
             .subscribe()
             .untilDestroy()
