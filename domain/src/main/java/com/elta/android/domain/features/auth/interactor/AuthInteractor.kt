@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 val emailPattern: Pattern =
     Pattern.compile(
-        "^([a-z0-9_.-]{1,64}+)@([a-z0-9_.-]+)\\.([a-z.]{2,7})$",
+        "^([a-z0-9_.-]{1,64}+)@([a-z]+)\\.([a-z]{2,7})$",
         Pattern.CASE_INSENSITIVE
     )
 
