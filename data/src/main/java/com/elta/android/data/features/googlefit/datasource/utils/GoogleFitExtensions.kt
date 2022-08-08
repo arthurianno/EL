@@ -9,10 +9,18 @@ import com.google.android.gms.fitness.request.SessionReadRequest
 import java.util.concurrent.TimeUnit
 
 private val ignoreActivities = arrayListOf(
-    FitnessActivities.SLEEP, FitnessActivities.SLEEP_AWAKE, FitnessActivities.SLEEP_DEEP,
-    FitnessActivities.SLEEP_LIGHT, FitnessActivities.SLEEP_REM, FitnessActivities.STATUS_ACTIVE,
-    FitnessActivities.STATUS_COMPLETED, FitnessActivities.STILL, FitnessActivities.TILTING,
-    FitnessActivities.MIME_TYPE_PREFIX, FitnessActivities.IN_VEHICLE, FitnessActivities.EXTRA_STATUS
+    FitnessActivities.SLEEP,
+    FitnessActivities.SLEEP_AWAKE,
+    FitnessActivities.SLEEP_DEEP,
+    FitnessActivities.SLEEP_LIGHT,
+    FitnessActivities.SLEEP_REM,
+    FitnessActivities.STATUS_ACTIVE,
+    FitnessActivities.STATUS_COMPLETED,
+    FitnessActivities.STILL,
+    FitnessActivities.TILTING,
+    FitnessActivities.MIME_TYPE_PREFIX,
+    FitnessActivities.IN_VEHICLE,
+    FitnessActivities.EXTRA_STATUS
 )
 
 fun makeFitnessOptions(): FitnessOptions =

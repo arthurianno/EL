@@ -1,9 +1,14 @@
 package com.elta.android.data.features.googlefit.datasource.utils
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.nullgr.core.intents.launch
 import com.nullgr.core.rx.RxBus
@@ -24,10 +29,34 @@ class RxGoogleFitAuthActivity : Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            sendResult(true)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                ACTIVITY_RECOGNITION_PERMISSIONS_REQUEST_CODE -> sendResult(true)
+                GOOGLE_FIT_PERMISSIONS_REQUEST_CODE -> requestActivitiesPermission()
+                else -> {
+                    sendResult(false)
+                }
+            }
         } else {
             sendResult(false)
+        }
+    }
+
+    private fun requestActivitiesPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                    ACTIVITY_RECOGNITION_PERMISSIONS_REQUEST_CODE
+                )
+            }
+        } else {
+            sendResult(true)
         }
     }
 
@@ -39,6 +68,7 @@ class RxGoogleFitAuthActivity : Activity() {
 
     companion object {
         private const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 101
+        private const val ACTIVITY_RECOGNITION_PERMISSIONS_REQUEST_CODE = 102
 
         fun newInstance(context: Context): Intent =
             Intent(context, RxGoogleFitAuthActivity::class.java).apply {
