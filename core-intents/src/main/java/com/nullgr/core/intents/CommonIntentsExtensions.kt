@@ -106,7 +106,6 @@ fun applicationIntent(
     packageName: String,
     googlePlayRedirect: Boolean = false
 ): Intent? {
-
     val pm = context.packageManager
 
     val packagePresent = try {
@@ -219,21 +218,24 @@ fun navigationIntent(lat: Double, lng: Double): Intent {
 @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 @Throws(IllegalStateException::class)
 fun shareImageAndTextIntent(context: Context, image: Bitmap, text: String?): Intent {
-
     val path = MediaStore.Images.Media.insertImage(
         context.contentResolver,
-        image, String.format("ShareImage_%s", UUID.randomUUID().toString()), null
+        image,
+        String.format("ShareImage_%s", UUID.randomUUID().toString()),
+        null
     )
 
-    if (TextUtils.isEmpty(path))
+    if (TextUtils.isEmpty(path)) {
         throw IllegalStateException("Unable to insert image!")
+    }
 
     val imageUri = Uri.parse(path)
 
     return Intent().apply {
         action = Intent.ACTION_SEND
-        if (!text.isNullOrEmpty())
+        if (!text.isNullOrEmpty()) {
             putExtra(Intent.EXTRA_TEXT, text)
+        }
         putExtra(Intent.EXTRA_STREAM, imageUri)
         type = "image/*"
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -250,25 +252,28 @@ fun shareImageAndTextIntent(context: Context, image: Bitmap, text: String?): Int
 @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 @Throws(IllegalStateException::class)
 fun shareListOfImagesAndTextIntent(context: Context, images: List<Bitmap>, text: String?): Intent {
-
     val uriList = arrayListOf<Uri>()
 
     for (bitmap in images) {
         val path = MediaStore.Images.Media.insertImage(
             context.contentResolver,
-            bitmap, String.format("ShareImage_%s", UUID.randomUUID().toString()), null
+            bitmap,
+            String.format("ShareImage_%s", UUID.randomUUID().toString()),
+            null
         )
 
-        if (TextUtils.isEmpty(path))
+        if (TextUtils.isEmpty(path)) {
             throw IllegalStateException("Unable to insert image!")
+        }
 
         uriList.add(Uri.parse(path))
     }
 
     return Intent().apply {
         action = Intent.ACTION_SEND
-        if (!text.isNullOrEmpty())
+        if (!text.isNullOrEmpty()) {
             putExtra(Intent.EXTRA_TEXT, text)
+        }
         putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
         type = "image/*"
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -303,8 +308,8 @@ fun CustomTabsIntent.launch(context: Context, url: String) {
  * Extension function to start activity in pretty way,
  * or display [noActivityErrorMessage] if activity dosen't exist.
  */
-fun Intent?.launch(context: Context?, noActivityErrorMessage: String? = null) {
-    if (this != null && context != null && this.resolveActivity(context.packageManager) != null) {
+fun Intent.launch(context: Context, noActivityErrorMessage: String? = null) {
+    if (this.resolveActivity(context.packageManager) != null) {
         context.startActivity(this)
     } else if (!noActivityErrorMessage.isNullOrEmpty()) {
         Toast.makeText(context, noActivityErrorMessage, Toast.LENGTH_SHORT).show()
@@ -315,12 +320,12 @@ fun Intent?.launch(context: Context?, noActivityErrorMessage: String? = null) {
  * Extension function to start activity for result in pretty way,
  * or display [noActivityErrorMessage] if activity dosen't exist.
  */
-fun Intent?.launchForResult(
-    context: Activity?,
+fun Intent.launchForResult(
+    context: Activity,
     requestCode: Int,
     noActivityErrorMessage: String? = null
 ) {
-    if (this != null && context != null && this.resolveActivity(context.packageManager) != null) {
+    if (this.resolveActivity(context.packageManager) != null) {
         context.startActivityForResult(this, requestCode)
     } else if (!noActivityErrorMessage.isNullOrEmpty()) {
         Toast.makeText(context, noActivityErrorMessage, Toast.LENGTH_SHORT).show()
@@ -330,19 +335,15 @@ fun Intent?.launchForResult(
 /**
  * Extension function to send broadcast in pretty way
  */
-fun Intent?.sendBroadcast(context: Context?) {
-    if (this != null && context != null) {
-        context.sendBroadcast(this)
-    }
+fun Intent.sendBroadcast(context: Context) {
+    context.sendBroadcast(this)
 }
 
 /**
  * Extension function to start service in pretty way
  */
-fun Intent?.launchService(context: Context?) {
-    if (this != null && context != null) {
-        context.startService(this)
-    }
+fun Intent.launchService(context: Context) {
+    context.startService(this)
 }
 
 /**
@@ -366,8 +367,8 @@ fun Intent?.launchService(context: Context?) {
  * which contains result code [RxActivityResult.resultCode] and result intent [RxActivityResult.intent],
  * or [Observable.error] with [ActivityNotFoundException] if activity dosen't exist
  */
-fun Intent?.launchForResult(context: Activity?): Observable<RxActivityResult> {
-    return if (this != null && context != null && this.resolveActivity(context.packageManager) != null)
+fun Intent.launchForResult(context: Activity): Observable<RxActivityResult> {
+    return if (this.resolveActivity(context.packageManager) != null) {
         Observable
             .fromCallable {
                 RxResolveResultActivity
@@ -379,6 +380,7 @@ fun Intent?.launchForResult(context: Activity?): Observable<RxActivityResult> {
                     .map { it as RxActivityResult }
                     .flatMap { Observable.just(it) }
             }
-    else
+    } else {
         Observable.error(ActivityNotFoundException())
+    }
 }
