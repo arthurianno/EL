@@ -70,14 +70,17 @@ class EditObserverPm @Inject constructor(
 
     private fun bindObserverState() {
         observerState.observable
-            .filter { it.name != null }
+            .filter {
+                !it.name.isNullOrBlank() ||
+                    !it.customName.isNullOrBlank()
+            }
             .map { checkNotNull(it.userName) }
             .doOnNext(observerNameInput.text.consumer)
             .subscribe()
             .untilDestroy()
 
         observerNameInput.textChanges.observable
-            .map { it.isNotEmpty() && it != observerState.value.name }
+            .map { it.isNotBlank() && it != observerState.value.name }
             .doOnNext(saveButtonEnabledState.consumer)
             .subscribe()
             .untilDestroy()
