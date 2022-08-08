@@ -1,6 +1,5 @@
 package com.elta.android.data.features.auth.repository
 
-import com.elta.android.data.common.onConnectionErrorResumeDefault
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.dto.EmailStatusDto
 import com.elta.android.data.features.auth.dto.LoginDto
@@ -61,7 +60,6 @@ class AuthDataRepository @Inject constructor(
                                 .toSingleDefault(email)
                         }
                         .map(EmailStatusDto::isEmailConfirmed)
-                        .onConnectionErrorResumeDefault { Single.just(isConfirmed) }
                         .flatMap {
                             val userInfo = UserInfo(
                                 isUserLoggedIn = tokenStorage.isUserLoggedIn(),
