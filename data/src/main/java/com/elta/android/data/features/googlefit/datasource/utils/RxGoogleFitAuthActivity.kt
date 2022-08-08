@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
@@ -69,6 +70,8 @@ class RxGoogleFitAuthActivity : Activity() {
     companion object {
         private const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 101
         private const val ACTIVITY_RECOGNITION_PERMISSIONS_REQUEST_CODE = 102
+        private const val FIT_PACKAGE_NAME = "com.google.android.apps.fitness"
+        private const val PLAY_MARKET_URI = "market://details?id="
 
         fun newInstance(context: Context): Intent =
             Intent(context, RxGoogleFitAuthActivity::class.java).apply {
@@ -77,12 +80,34 @@ class RxGoogleFitAuthActivity : Activity() {
             }
 
         fun launchForResult(context: Context): Observable<AuthResult> =
-            Observable.fromCallable { newInstance(context).launch(context) }
+            Observable.fromCallable {
+                launchGoogleFitAppAndPermissions(context)
+            }
                 .flatMap {
                     SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)
                         .filter { it is AuthResult }
                         .map { it as AuthResult }
                         .flatMap { Observable.just(it) }
                 }
+
+        private fun launchGoogleFitAppAndPermissions(context: Context) {
+            runCatching {
+                context.packageManager.getPackageInfo(
+                    FIT_PACKAGE_NAME,
+                    PackageManager.GET_ACTIVITIES
+                )
+            }.onFailure {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(PLAY_MARKET_URI + FIT_PACKAGE_NAME)
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }.onSuccess {
+                newInstance(context).launch(context)
+            }
+        }
     }
 }
