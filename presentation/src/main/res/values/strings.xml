@@ -628,5 +628,6 @@
     <string name="events_creation_eating_label_text">Отметка о приёме пищи</string>
     <string name="ok">OK</string>
     <string name="bluetooth_disabled">Bluetooth отключён</string>
+    <string name="no_connection_to_the_internet">Нет подключения к Интернету</string>
 
 </resources>
