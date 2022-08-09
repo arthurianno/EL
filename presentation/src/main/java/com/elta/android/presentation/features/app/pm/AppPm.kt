@@ -134,7 +134,7 @@ class AppPm @Inject constructor(
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
                     is Events.Sync.Server.Error -> {
-                        setStatus(SyncStatus.Server.Success(resources))
+                        setStatus(SyncStatus.Server.Error(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
                     is Events.Sync.Server.Started -> {
@@ -207,6 +207,12 @@ class AppPm @Inject constructor(
                 val resources: ResourceProvider,
                 override val text: String = resources.getString(R.string.sync_with_backend_complete),
                 override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
+            ) : SyncStatus()
+
+            data class Error(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.no_connection_to_the_internet),
+                override val color: Int = resources.getColor(R.color.color_background_sync_error)
             ) : SyncStatus()
         }
     }
