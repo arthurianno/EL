@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.support.pm
 
+import com.elta.android.domain.features.devices.interactor.GetGlucometerVersionUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
@@ -13,7 +14,8 @@ private const val SUPPORT_PHONE = "+79152767676"
 
 class SupportPm @Inject constructor(
     services: ServiceFacade,
-    private val itemsBuilder: SupportItemsBuilder
+    private val itemsBuilder: SupportItemsBuilder,
+    private val getGlucometerVersionUseCase: GetGlucometerVersionUseCase
 ) : BaseListPm(services) {
 
     override fun onCreate() {
@@ -26,7 +28,13 @@ class SupportPm @Inject constructor(
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
-            .map { itemsBuilder.buildItems() }
+            .flatMapSingle {
+                getGlucometerVersionUseCase.execute()
+            }
+            .doOnError {
+                items.consumer.accept(itemsBuilder.buildItems(""))
+            }
+            .map(itemsBuilder::buildItems)
             .doOnNext(items.consumer)
             .subscribe()
             .untilDestroy()
