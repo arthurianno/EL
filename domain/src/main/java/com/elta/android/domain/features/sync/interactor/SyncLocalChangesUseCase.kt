@@ -1,6 +1,8 @@
 package com.elta.android.domain.features.sync.interactor
 
 import com.elta.android.common.errors.InvalidRefreshTokenError
+import com.elta.android.common.errors.NetworkConnectionError
+import com.elta.android.common.errors.ProfileSyncError
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
@@ -22,17 +24,26 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
-    private val predicate = Predicate<Throwable> { error -> error !is InvalidRefreshTokenError }
+    private val predicate = Predicate<Throwable> { error ->
+        error !is InvalidRefreshTokenError && error !is NetworkConnectionError
+    }
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
-        profileRepo.sync().applyScheduler(schedulers)
-            .onErrorComplete(predicate)
-            .andThen(googleFitRepo.sync().applyScheduler(schedulers))
-            .onErrorComplete(predicate)
-            .andThen(eventsRepo.sync().applyScheduler(schedulers))
-            .onErrorComplete(predicate)
-            .andThen(tagsRepository.sync().applyScheduler(schedulers))
-            .onErrorComplete(predicate)
-            .andThen(salePointsRepository.sync().applyScheduler(schedulers))
-            .onErrorComplete(predicate)
+        Completable.concat(
+            listOf(
+                profileRepo.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate)
+                    .onErrorResumeNext {
+                        Completable.error(ProfileSyncError())
+                    },
+                googleFitRepo.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate),
+                eventsRepo.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate),
+                tagsRepository.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate),
+                salePointsRepository.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate)
+            )
+        )
 }
