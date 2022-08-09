@@ -50,19 +50,14 @@ fun webIntent(url: String): Intent {
  * @param subject subject of email (optional)
  * @param body email body (optional)
  */
-fun emailIntent(to: String, subject: String? = null, body: String? = null): Intent {
-    return Intent(Intent.ACTION_SENDTO).apply {
+fun emailIntent(to: String, subject: String? = null, body: String? = null): Intent =
+    Intent(Intent.ACTION_SENDTO).apply {
         data = Uri.parse("mailto:")
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (!subject.isNullOrEmpty()) {
-            putExtra(Intent.EXTRA_SUBJECT, subject)
-        }
-        if (!body.isNullOrEmpty()) {
-            putExtra(Intent.EXTRA_TEXT, body)
-        }
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
+        putExtra(Intent.EXTRA_SUBJECT, subject.orEmpty())
+        putExtra(Intent.EXTRA_TEXT, body.orEmpty())
     }
-}
 
 fun whatsAppIntent(number: String): Intent =
     Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number")).apply {
