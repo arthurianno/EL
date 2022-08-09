@@ -521,6 +521,7 @@
     <string name="profile_support_phone_number">8 800 250 17 50</string>
     <string name="profile_support_phone_number_description">Позвонить</string>
     <string name="profile_support_email">service@eltaltd.ru</string>
+    <string name="profile_restore_email_body">Прошу восстановить мой профиль</string>
     <string name="profile_support_email_description">Написать</string>
     <string name="profile_support_service_centers">Куда обратиться</string>
     <string name="profile_support_service_centers_description">Карта сервисных центров</string>

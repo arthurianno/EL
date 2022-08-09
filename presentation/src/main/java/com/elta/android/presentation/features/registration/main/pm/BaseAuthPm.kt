@@ -70,7 +70,12 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
         profileIsDeletedDialogControl.showForResult(profileIsDeletedDialogData)
             .filter { it == DialogResult.NEGATIVE }
             .subscribe {
-                router.navigateTo(Screens.EmailScreen(resources.getString(R.string.profile_support_email)))
+                router.navigateTo(
+                    Screens.EmailScreen(
+                        email = resources.getString(R.string.profile_support_email),
+                        body = resources.getString(R.string.profile_restore_email_body)
+                    )
+                )
             }
     }
 

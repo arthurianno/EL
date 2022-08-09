@@ -283,9 +283,13 @@ object Screens {
         override fun getFragment() = SupportFragment.newInstance()
     }
 
-    data class EmailScreen(val email: String) : SupportAppScreen() {
+    data class EmailScreen(
+        val email: String,
+        val subject: String? = null,
+        val body: String? = null
+    ) : SupportAppScreen() {
         override fun getActivityIntent(context: Context): Intent =
-            emailIntent(email)
+            emailIntent(to = email, subject = subject, body = body)
     }
 
     data class WhatsAppScreen(val number: String) : SupportAppScreen() {
