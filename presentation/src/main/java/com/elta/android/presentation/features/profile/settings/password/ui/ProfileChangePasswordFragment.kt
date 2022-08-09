@@ -56,7 +56,7 @@ class ProfileChangePasswordFragment :
 
     private infix fun InputControl.bindInputTo(view: AppCompatEditText) {
         bindTo(view)
-        error.observable.distinctUntilChanged().subscribe { view.error() }
+        error.observable.distinctUntilChanged().subscribe(view.error())
     }
 
     companion object {
