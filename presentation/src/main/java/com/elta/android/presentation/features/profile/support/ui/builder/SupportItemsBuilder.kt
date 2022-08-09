@@ -13,76 +13,56 @@ import javax.inject.Inject
 class SupportItemsBuilder @Inject constructor(
     private val resourceProvider: ResourceProvider
 ) {
-    fun buildItems(): List<ListItem> = arrayListOf<ListItem>().apply {
-        add(
-            SupportHeaderItem(
-                text = resourceProvider.getString(R.string.profile_support_actions_header)
-            )
+    fun buildItems(glucometerVersion: String): List<ListItem> = listOf(
+        SupportHeaderItem(
+            text = resourceProvider.getString(R.string.profile_support_actions_header)
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_support_call,
+            title = resourceProvider.getString(R.string.profile_support_phone_number),
+            subTitle = resourceProvider.getString(R.string.profile_support_phone_number_description),
+            action = SupportAction.CallAction(resourceProvider.getString(R.string.profile_support_phone_number))
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_support_mail,
+            title = resourceProvider.getString(R.string.profile_support_email),
+            subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+            action = SupportAction.MailAction(resourceProvider.getString(R.string.profile_support_email))
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_telegram,
+            title = resourceProvider.getString(R.string.telegram),
+            subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+            action = SupportAction.TelegramAction
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_whatsapp,
+            title = resourceProvider.getString(R.string.whatsapp),
+            subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+            action = SupportAction.WhatsAppAction
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_viber,
+            title = resourceProvider.getString(R.string.viber),
+            subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+            action = SupportAction.ViberAction
+        ),
+        SupportActionItem(
+            icon = R.drawable.ic_support_center,
+            title = resourceProvider.getString(R.string.profile_support_service_centers),
+            subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),
+            action = SupportAction.ServiceCentersAction
+        ),
+        SupportHeaderItem(
+            text = resourceProvider.getString(R.string.profile_support_versions_header)
+        ),
+        SupportVersionItem(
+            title = resourceProvider.getString(R.string.profile_support_firmware_version),
+            version = glucometerVersion
+        ),
+        SupportVersionItem(
+            title = resourceProvider.getString(R.string.profile_support_app_version),
+            version = BuildConfig.APP_VERSION
         )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_support_call,
-                title = resourceProvider.getString(R.string.profile_support_phone_number),
-                subTitle = resourceProvider.getString(R.string.profile_support_phone_number_description),
-                action = SupportAction.CallAction(resourceProvider.getString(R.string.profile_support_phone_number))
-            )
-        )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_support_mail,
-                title = resourceProvider.getString(R.string.profile_support_email),
-                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
-                action = SupportAction.MailAction(resourceProvider.getString(R.string.profile_support_email))
-            )
-        )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_telegram,
-                title = resourceProvider.getString(R.string.telegram),
-                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
-                action = SupportAction.TelegramAction
-            )
-        )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_whatsapp,
-                title = resourceProvider.getString(R.string.whatsapp),
-                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
-                action = SupportAction.WhatsAppAction
-            )
-        )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_viber,
-                title = resourceProvider.getString(R.string.viber),
-                subTitle = resourceProvider.getString(R.string.profile_support_email_description),
-                action = SupportAction.ViberAction
-            )
-        )
-        add(
-            SupportActionItem(
-                icon = R.drawable.ic_support_center,
-                title = resourceProvider.getString(R.string.profile_support_service_centers),
-                subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),
-                action = SupportAction.ServiceCentersAction
-            )
-        )
-        add(
-            SupportHeaderItem(
-                text = resourceProvider.getString(R.string.profile_support_versions_header)
-            )
-        )
-        add(
-            SupportVersionItem(
-                title = resourceProvider.getString(R.string.profile_support_firmware_version),
-                version = "2.8" // TODO после подключеня глюкометра реализовать получение номера версии ПО глюкометра через sharedPreference
-            )
-        )
-        add(
-            SupportVersionItem(
-                title = resourceProvider.getString(R.string.profile_support_app_version),
-                version = BuildConfig.APP_VERSION
-            )
-        )
-    }
+    )
 }
