@@ -568,6 +568,7 @@
 
     <string name="statistic_glucose_index_average_unit">ммоль/л</string>
     <string name="statistic_glucose_index_total_unit">за&#160;период</string>
+    <string name="statistic_glucose_index_day_unit">за&#160;день</string>
     <string name="statistic_glucose_index_level_unit">(%s\%% от измерений)</string>
     <string name="statistic_chart_period_dates_mask">%s - %s</string>
     <string name="statistic_daily_glucose_title">Мои показатели</string>
