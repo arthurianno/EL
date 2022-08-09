@@ -41,7 +41,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                     type = type,
                     bg = type.getBg(glucoseStatisticModel),
                     value = type.geValue(glucoseStatisticModel),
-                    unit = type.geUnit(glucoseStatisticModel),
+                    unit = type.geUnit(glucoseStatisticModel, isDay = date != null),
                     description = type.getDescription()
                 )
             )
@@ -100,10 +100,17 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             GlucoseIndexItem.Type.LOW -> glucose?.eventsLowCount.toString()
         }
 
-    private fun GlucoseIndexItem.Type.geUnit(glucose: GlucoseStatisticModel?): String =
+    private fun GlucoseIndexItem.Type.geUnit(
+        glucose: GlucoseStatisticModel?,
+        isDay: Boolean
+    ): String =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> resources.getString(R.string.statistic_glucose_index_average_unit)
-            GlucoseIndexItem.Type.TOTAL -> resources.getString(R.string.statistic_glucose_index_total_unit)
+            GlucoseIndexItem.Type.TOTAL -> if (isDay) {
+                resources.getString(R.string.statistic_glucose_index_day_unit)
+            } else {
+                resources.getString(R.string.statistic_glucose_index_total_unit)
+            }
             GlucoseIndexItem.Type.HIGH -> resources.getString(
                 R.string.statistic_glucose_index_level_unit,
                 glucose?.eventsHighPercent.toString()
