@@ -10,6 +10,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentAuthBaseBinding
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.utils.error
+import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.isKeyboardOpen
 import com.elta.android.presentation.utils.lostFocusOnClickOutside
 import com.elta.android.presentation.utils.toggleSecure
@@ -77,6 +78,7 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
         pm.continueEnabledState.bindTo { binding.continueButtonView.isEnabled = it }
         binding.continueButtonView.clicks().bindTo(pm.continueAction)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.menuAction)
+        pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
         pm.profileIsDeletedDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         bindProgressDialog(pm)
     }

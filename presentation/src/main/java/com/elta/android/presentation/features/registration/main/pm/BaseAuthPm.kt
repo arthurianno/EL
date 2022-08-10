@@ -50,6 +50,7 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     }
 
     override fun handleError(error: Throwable) {
+        hideKeyBoardCommand.consumer.accept(Unit)
         when (error) {
             is ProfileIsDeletedError -> profileIsDeleted()
             is EmailAlreadyRegisteredError,
