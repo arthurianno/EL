@@ -475,8 +475,9 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         if (ViewCompat.isAttachedToWindow(this)) {
             processRanges()
             processItems()
-            invalidate()
         }
+        invalidate()
+        requestLayout()
     }
 
     private fun processRanges() {
