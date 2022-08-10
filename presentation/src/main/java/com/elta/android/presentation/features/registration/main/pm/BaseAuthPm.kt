@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
@@ -50,7 +51,6 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     }
 
     override fun handleError(error: Throwable) {
-        hideKeyBoardCommand.consumer.accept(Unit)
         when (error) {
             is ProfileIsDeletedError -> profileIsDeleted()
             is EmailAlreadyRegisteredError,
@@ -62,6 +62,10 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
                     )
                 )
                 setErrorViewVisibility(true)
+            }
+            is NetworkConnectionError -> {
+                hideKeyBoardCommand.consumer.accept(Unit)
+                super.handleError(error)
             }
             else -> super.handleError(error)
         }
