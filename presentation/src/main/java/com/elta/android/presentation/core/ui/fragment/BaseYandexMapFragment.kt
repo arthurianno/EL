@@ -43,7 +43,7 @@ abstract class BaseYandexMapFragment<T : BasePm, B : ViewBinding>(
     protected abstract val userLocationPinRes: Int
     protected abstract val clusterPinProvider: ClusterPinProvider
 
-    protected var mapView: MapView? = null
+    private val mapView: MapView by lazy { binding.root.findViewById(R.id.yandexMapView) }
     protected var map: Map? = null
 
     private var clusterManager: YandexClusterManager? = null
@@ -73,20 +73,20 @@ abstract class BaseYandexMapFragment<T : BasePm, B : ViewBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapView = view.findViewById(R.id.yandexMapView)
-        map = mapView?.map
-        map?.isRotateGesturesEnabled = false
+        map = mapView.map.apply {
+            isRotateGesturesEnabled = false
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        mapView?.onStart()
+        mapView.onStart()
         MapKitFactory.getInstance().onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView?.onStop()
+        mapView.onStop()
         MapKitFactory.getInstance().onStop()
     }
 
