@@ -3,6 +3,7 @@ package com.elta.android
 import android.content.Context
 import android.content.SharedPreferences
 import com.elta.android.common.di.qualifires.ComputationFacade
+import com.elta.android.common.logger.DebugTree
 import com.elta.android.common.logger.ReleaseTree
 import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.pm.ExceptionParser
@@ -62,7 +63,7 @@ class AppModule(private val enableLog: Boolean) {
 
     @Provides
     @Singleton
-    fun provideLogTree(): Timber.Tree = if (enableLog) Timber.DebugTree() else ReleaseTree()
+    fun provideLogTree(): Timber.Tree = if (enableLog) DebugTree() else ReleaseTree()
 
     @Provides
     @Singleton

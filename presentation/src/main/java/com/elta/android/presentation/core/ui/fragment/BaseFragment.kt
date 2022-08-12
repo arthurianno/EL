@@ -141,7 +141,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
             .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
-            .subscribe(progressDialog.visibility(childFragmentManager))
+            .subscribe(progressDialog.visibility(childFragmentManager)) {}
     }
 
     private fun showSnackbar(data: SnackBarData) {

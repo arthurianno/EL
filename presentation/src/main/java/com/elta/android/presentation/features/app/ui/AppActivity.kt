@@ -1,9 +1,12 @@
 package com.elta.android.presentation.features.app.ui
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
@@ -11,6 +14,7 @@ import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
 import com.elta.android.presentation.widgets.status.StatusView
+import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 
@@ -22,6 +26,8 @@ class AppActivity : BaseActivity<AppPm>() {
     private val statusView by lazy {
         findViewById<StatusView>(R.id.syncStatusView)
     }
+
+    private val rxPermissions by lazy { RxPermissions(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.systemUiVisibility =
@@ -37,6 +43,10 @@ class AppActivity : BaseActivity<AppPm>() {
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
+        if (BuildConfig.BUILD_TYPE == "debug") {
+            rxPermissions.requestStatus(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe()
+        }
     }
 
     override fun onResume() {
