@@ -1,6 +1,7 @@
 package com.elta.android.common.logger
 
 import android.util.Log
+import com.elta.android.common.logger.model.DeviceDetails
 
 class ReleaseTree(deviceDetails: DeviceDetails) : BaseTree(deviceDetails) {
 

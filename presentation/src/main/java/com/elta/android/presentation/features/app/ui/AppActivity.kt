@@ -43,7 +43,7 @@ class AppActivity : BaseActivity<AppPm>() {
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
             .process()
-        if (BuildConfig.BUILD_TYPE == "debug") {
+        if (BuildConfig.DEBUG) {
             rxPermissions.requestStatus(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe()
         }

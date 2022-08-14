@@ -1,8 +1,8 @@
 package com.elta.android.common.logger
 
-import android.os.Build
 import android.os.Environment
 import android.util.Log
+import com.elta.android.common.logger.model.DeviceDetails
 import com.elta.android.common.logger.model.LogRecord
 import com.elta.android.common.logger.model.priorityAsString
 import com.elta.android.common.logger.model.toFirebase
@@ -69,12 +69,3 @@ abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree(
         newLine()
     }
 }
-
-data class DeviceDetails(
-    val deviceId: String,
-    val osVersion: String = Build.VERSION.RELEASE,
-    val manufacturer: String = Build.MANUFACTURER,
-    val brand: String = Build.BRAND,
-    val device: String = Build.DEVICE,
-    val model: String = Build.MODEL
-)

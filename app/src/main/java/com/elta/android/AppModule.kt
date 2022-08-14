@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.provider.Settings
 import com.elta.android.common.di.qualifires.ComputationFacade
 import com.elta.android.common.logger.DebugTree
-import com.elta.android.common.logger.DeviceDetails
 import com.elta.android.common.logger.ReleaseTree
+import com.elta.android.common.logger.model.DeviceDetails
 import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.pm.ExceptionParser
 import com.elta.android.presentation.core.pm.SimpleExceptionParser
