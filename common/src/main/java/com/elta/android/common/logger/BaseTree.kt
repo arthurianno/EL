@@ -15,10 +15,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+internal const val DEFAULT_TAG = "ELTA_LOG_TAG"
+
 abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree() {
-    companion object {
-        const val DEFAULT_TAG = "ELTA_LOG_TAG"
-    }
 
     private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS a zzz", Locale.getDefault())
