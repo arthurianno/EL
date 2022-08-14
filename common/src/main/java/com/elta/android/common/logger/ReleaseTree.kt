@@ -1,12 +1,9 @@
 package com.elta.android.common.logger
 
 import android.util.Log
-import timber.log.Timber
+import com.elta.android.common.logger.model.DeviceDetails
 
-/**
- * A [Timber.Tree] for release builds. Prints messages only with [Log.INFO] priority.
- */
-class ReleaseTree : Timber.DebugTree() {
+class ReleaseTree(deviceDetails: DeviceDetails) : BaseTree(deviceDetails) {
 
     override fun isLoggable(tag: String?, priority: Int): Boolean = priority == Log.INFO
 }

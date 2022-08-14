@@ -67,6 +67,6 @@ abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
             .throttleLast(BaseFragment.DEBOUNCE, TimeUnit.MILLISECONDS)
-            .subscribe(progressDialog.visibility(childFragmentManager))
+            .subscribe(progressDialog.visibility(childFragmentManager)) {}
     }
 }
