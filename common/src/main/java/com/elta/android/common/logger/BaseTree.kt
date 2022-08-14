@@ -1,31 +1,39 @@
 package com.elta.android.common.logger
 
+import android.os.Build
 import android.os.Environment
 import android.util.Log
+import com.elta.android.common.logger.model.LogRecord
+import com.elta.android.common.logger.model.priorityAsString
+import com.elta.android.common.logger.model.toFirebase
+import com.google.firebase.database.FirebaseDatabase
 import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
-abstract class BaseTree : Timber.Tree() {
+abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree() {
     companion object {
         const val DEFAULT_TAG = "ELTA_LOG_TAG"
     }
 
+    private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    private val timeFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS a zzz", Locale.getDefault())
+    private val date = dateFormat.format(Date())
+    private val firebaseRef =
+        FirebaseDatabase.getInstance().getReference("logs/$date/${deviceDetails.deviceId}")
+
     private val logsFile by lazy {
         File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-            "EltaApplicationLog_" + SimpleDateFormat("dd-M-yyyy").format(Date()) + ".txt"
+            "EltaApplicationLog_$date.txt"
         ).apply {
             if (!exists()) {
-                try {
-                    createNewFile()
-                } catch (e: IOException) {
-                    Log.e(DEFAULT_TAG, e.message, e)
-                }
+                runCatching { createNewFile() }
+                    .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
             }
         }
     }
@@ -35,32 +43,38 @@ abstract class BaseTree : Timber.Tree() {
         get() = _logs
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        _logs.add(LogRecord(Date().time, priority, tag, message, t))
+        _logs.add(LogRecord(timeFormat.format(Date()), priority, tag, message, t))
+    }
+
+    protected fun storeToFirebase(logRecord: LogRecord) {
+        val timestamp = System.currentTimeMillis()
+        with(firebaseRef) {
+            updateChildren(mapOf(Pair("-DeviceDetails", deviceDetails)))
+            child(timestamp.toString()).setValue(logRecord.toFirebase())
+        }
     }
 
     protected fun saveLogInFile(logRecord: LogRecord) {
-        var buf: BufferedWriter? = null
-        try {
-            buf = BufferedWriter(FileWriter(logsFile, true))
-            buf writeLog logRecord
-        } catch (e: IOException) {
-            Log.e(DEFAULT_TAG, e.message, e)
-        } finally {
-            buf?.close()
+        BufferedWriter(FileWriter(logsFile, true)).also { file ->
+            runCatching { file writeLog logRecord }
+                .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
+            file.close()
         }
     }
 
     private infix fun BufferedWriter.writeLog(logRecord: LogRecord) {
-        append(" [" + SimpleDateFormat("dd-M-yyyy hh:mm:ss").format(logRecord.time) + "] --> ")
-        when (logRecord.priority) {
-            Log.INFO -> append("I/")
-            Log.ASSERT -> append("A/")
-            Log.DEBUG -> append("D/")
-            Log.VERBOSE -> append("V/")
-            Log.WARN -> append("W/")
-            Log.ERROR -> append("E/")
-        }
+        append("[${logRecord.time}] --> ")
+        append("${priorityAsString(logRecord.priority)}/")
         append("${logRecord.tag ?: DEFAULT_TAG}: ${logRecord.message}")
         newLine()
     }
 }
+
+data class DeviceDetails(
+    val deviceId: String,
+    val osVersion: String = Build.VERSION.RELEASE,
+    val manufacturer: String = Build.MANUFACTURER,
+    val brand: String = Build.BRAND,
+    val device: String = Build.DEVICE,
+    val model: String = Build.MODEL
+)

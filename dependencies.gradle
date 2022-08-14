@@ -164,6 +164,7 @@ ext.commonDependencies = [
         firebaseMessaging     : "com.google.firebase:firebase-messaging",
         firebaseCrashlytics   : "com.google.firebase:firebase-crashlytics",
         firebaseAnalytics     : "com.google.firebase:firebase-analytics",
+        firebaseDatabase      : "com.google.firebase:firebase-database-ktx",
         firebaseInAppMessaging: "com.google.firebase:firebase-inappmessaging-display",
         firebaseDynamicLinks  : "com.google.firebase:firebase-dynamic-links",
 
