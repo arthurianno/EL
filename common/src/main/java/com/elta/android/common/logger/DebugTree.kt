@@ -5,14 +5,14 @@ import com.elta.android.common.logger.model.DeviceDetails
 
 class DebugTree(deviceDetails: DeviceDetails) : BaseTree(deviceDetails) {
 
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        super.log(priority, tag, message, t)
+    override fun log(priority: Int, tag: String?, message: String, error: Throwable?) {
+        super.log(priority, tag, message, error)
         val localTag = tag ?: DEFAULT_TAG
         val logRecord = logs.last()
         saveLogInFile(logRecord)
         storeToFirebase(logRecord)
-        t?.let {
-            Log.e(localTag, message, t)
+        error?.let {
+            Log.e(localTag, message, error)
         } ?: Log.println(priority, localTag, message)
     }
 }

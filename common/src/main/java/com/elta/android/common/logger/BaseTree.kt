@@ -41,8 +41,8 @@ abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree(
     val logs: List<LogRecord>
         get() = _logs
 
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        _logs.add(LogRecord(timeFormat.format(Date()), priority, tag, message, t))
+    override fun log(priority: Int, tag: String?, message: String, error: Throwable?) {
+        _logs.add(LogRecord(timeFormat.format(Date()), priority, tag, message, error))
     }
 
     protected fun storeToFirebase(logRecord: LogRecord) {
