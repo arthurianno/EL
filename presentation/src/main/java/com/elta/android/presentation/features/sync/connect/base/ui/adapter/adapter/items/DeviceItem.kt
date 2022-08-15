@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.sync.connect.base.ui.adapter.items
+package com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.items
 
 import com.nullgr.core.adapter.items.ListItem
 

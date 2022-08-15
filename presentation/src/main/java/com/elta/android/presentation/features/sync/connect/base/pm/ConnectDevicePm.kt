@@ -22,7 +22,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
@@ -276,22 +276,45 @@ abstract class ConnectDevicePm constructor(
 
         bus.clicks<Clicks.DeviceClicked>()
             .doOnNext { click ->
-                glucometer = if (glucometer?.address != click.item.address) {
-                    scanResults.firstOrNull { it.address == click.item.address }
-                } else null
-                val prevItems = items.value
+                glucometer = scanResults.firstOrNull { it.address == click.item.address }
+                val prevItems = items.value as List<DeviceItem>
                 val newItems = prevItems.mapIndexed { index, item ->
-                    (item as DeviceItem).copy(
-                        isSelected = item.address == click.item.address && !item.isSelected,
+                    item.copy(
+                        isSelected = checkForSelection(item, click),
                         isTheLast = index == prevItems.size - 1
                     )
                 }
                 items.consumer.accept(newItems)
-                connectDeviceEnabledState.consumer.accept(glucometer != null)
+                connectDeviceEnabledState.consumer.accept(
+                    isValidDeviceChoice(prevItems, newItems)
+                )
             }
             .subscribe()
             .untilDestroy()
     }
+
+    private fun checkForSelection(
+        item: DeviceItem,
+        click: Clicks.DeviceClicked,
+    ) = if (!item.isSelected) {
+        item.address == click.item.address && !item.isSelected
+    } else {
+        item.isSelected
+    }
+
+    private fun isValidDeviceChoice(
+        prevItems: List<DeviceItem>,
+        newItems: List<DeviceItem>,
+    ) = glucometer != null ||
+            isDevicesTheSane(
+                prevItems,
+                newItems
+            )
+
+    private fun isDevicesTheSane(
+        prevItems: List<DeviceItem>,
+        newItems: List<DeviceItem>,
+    ) = prevItems.map { it.address } == newItems.map { it.address }
 
     private fun navigateToShopsFlow(i: Unit) {
         router.newRootFlow(Screens.ShopsFlow)

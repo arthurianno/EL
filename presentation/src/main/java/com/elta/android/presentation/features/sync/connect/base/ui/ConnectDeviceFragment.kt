@@ -3,28 +3,40 @@ package com.elta.android.presentation.features.sync.connect.base.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
-    BaseListFragment<T, FragmentSyncConnectBinding>(FragmentSyncConnectBinding::inflate) {
+    BaseRecyclerViewFragment<T, FragmentSyncConnectBinding>(FragmentSyncConnectBinding::inflate) {
+
+    @Inject
+    lateinit var deviceAdapter: DeviceAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy {
+        deviceAdapter
+    }
 
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
