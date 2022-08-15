@@ -5,6 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -38,6 +39,7 @@ class ObserversFragment :
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.inviteObserverAction)
+        pm.emptyControl.bind(binding.emptyStateView, compositeUnbind)
     }
 
     companion object {
