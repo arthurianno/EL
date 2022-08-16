@@ -4,6 +4,7 @@ import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
-    services: ServiceFacade
+    private val getProfileUseCase: GetProfileUseCase,
+    services: ServiceFacade,
 ) : BaseEventPm(services) {
 
     private val isFormNotEmptyState = state(false)
@@ -28,6 +30,26 @@ class EventCreationPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+
+        getProfileAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle {
+                getProfileUseCase.execute()
+                    .bindProgress()
+                    .hideErrorContainer()
+                    .doOnSuccess(profileState.consumer)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .subscribe(getProfileAction.consumer)
+            .untilDestroy()
+
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
         observeSaveEventAction()
     }

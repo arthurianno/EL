@@ -25,6 +25,10 @@ abstract class FormInitializer {
         }
     }
 
+    fun setPickerValue(pickerValue: Double?) {
+        binding.formPickerView.setValue(pickerValue ?: DEFAULT_PICKER_VALUE)
+    }
+
     open fun View.initNoteView() {
         binding.formNoteView.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_NOTE_LENGTH))
     }

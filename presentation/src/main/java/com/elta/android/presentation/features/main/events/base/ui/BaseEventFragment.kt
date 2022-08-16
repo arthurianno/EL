@@ -84,6 +84,9 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
+        if (pm.eventTypeState.valueOrNull == EventType.WEIGHT) {
+            pm.profileState.bindTo { initializer.setPickerValue(it.weight) }
+        }
         binding.formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         binding.formSaveButtonView.clicks().bindTo(pm.mainAction)
         pm.updateFormPickerValueCommand.bindTo {
