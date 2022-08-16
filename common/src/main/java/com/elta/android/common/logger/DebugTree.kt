@@ -9,7 +9,7 @@ class DebugTree(deviceDetails: DeviceDetails) : BaseTree(deviceDetails) {
         super.log(priority, tag, message, error)
         val localTag = tag ?: DEFAULT_TAG
         val logRecord = logs.last()
-        saveLogInFile(logRecord)
+//        saveLogInFile(logRecord)
         storeToFirebase(logRecord)
         error?.let {
             Log.e(localTag, message, error)

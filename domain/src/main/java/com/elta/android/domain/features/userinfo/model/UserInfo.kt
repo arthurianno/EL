@@ -11,5 +11,5 @@ data class UserInfo(
     val isFeedbackSent: Boolean = false,
     val isEmailConfirmed: Boolean = false,
     val isOnBoardingPassed: Boolean = false,
-    val isFirstHomeEntrance: Boolean = false
+    val isFirstHomeEntrance: Boolean = true
 )
