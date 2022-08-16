@@ -306,12 +306,12 @@ abstract class ConnectDevicePm constructor(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>,
     ) = glucometer != null ||
-        isDeviceEquals(
+        isDevicesEquals(
             prevItems,
             newItems
         )
 
-    private fun isDeviceEquals(
+    private fun isDevicesEquals(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>,
     ) = prevItems.map { it.address } == newItems.map { it.address }
