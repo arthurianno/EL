@@ -281,12 +281,12 @@ abstract class ConnectDevicePm constructor(
                 val newItems = prevItems.mapIndexed { index, item ->
                     item.copy(
                         isSelected = checkForSelection(item, click),
-                        isTheLast = index == prevItems.size - 1
+                        isLast = index == prevItems.size - 1
                     )
                 }
                 items.consumer.accept(newItems)
                 connectDeviceEnabledState.consumer.accept(
-                    isValidDeviceChoice(prevItems, newItems)
+                    isValidDeviceChoice(prevItems = prevItems, newItems = newItems)
                 )
             }
             .subscribe()
@@ -296,22 +296,22 @@ abstract class ConnectDevicePm constructor(
     private fun checkForSelection(
         item: DeviceItem,
         click: Clicks.DeviceClicked,
-    ) = if (!item.isSelected) {
-        item.address == click.item.address && !item.isSelected
-    } else {
+    ) = if (item.isSelected) {
         item.isSelected
+    } else {
+        item.address == click.item.address && !item.isSelected
     }
 
     private fun isValidDeviceChoice(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>,
     ) = glucometer != null ||
-            isDevicesTheSane(
-                prevItems,
-                newItems
-            )
+        isDeviceEquals(
+            prevItems,
+            newItems
+        )
 
-    private fun isDevicesTheSane(
+    private fun isDeviceEquals(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>,
     ) = prevItems.map { it.address } == newItems.map { it.address }
@@ -340,7 +340,7 @@ abstract class ConnectDevicePm constructor(
             name = meter.name ?: "Unknown device",
             address = meter.address,
             isSelected = meter.address == glucometer?.address,
-            isTheLast = index == size - 1
+            isLast = index == size - 1
         )
 
     private fun bindAnalytics() {

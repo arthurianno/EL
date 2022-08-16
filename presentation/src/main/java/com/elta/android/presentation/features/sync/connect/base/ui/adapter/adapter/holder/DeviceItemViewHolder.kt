@@ -17,7 +17,7 @@ class DeviceItemViewHolder(
             deviceNameView.text = item.name
             deviceAddressView.text = item.address
             deviceChooserView.toggleView(item.isSelected)
-            dividerView.toggleView(!item.isTheLast)
+            dividerView.toggleView(!item.isLast)
 
             root.setOnClickListener {
                 bus.click(Clicks.DeviceClicked(item))
