@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
-import android.util.Log
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -38,10 +37,7 @@ class EventCreationPm @Inject constructor(
                 getProfileUseCase.execute()
                     .bindProgress()
                     .hideErrorContainer()
-                    .doOnSuccess {
-                        Log.e("IgnatTAG", it.toString())
-                        profileState.consumer.accept(it)
-                    }
+                    .doOnSuccess(profileState.consumer)
                     .doOnError(::handleError)
             }
             .retry()
