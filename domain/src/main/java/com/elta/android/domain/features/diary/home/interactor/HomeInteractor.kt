@@ -22,7 +22,6 @@ fun buildHomeModel(
     settings: GlucoseLevelSettings,
     userInfo: UserInfo
 ): HomeModel {
-
     val sortedEvents = events.sortAndFilter()
     sortedEvents.forEach { event ->
         Timber.i("<<<<<<< GetHomeModelUseCase >>>>>>  Event: id = ${event.id} , additionTime = ${event.additionTime} , value = ${event.value} , type = ${event.type}, state = ${event.state}")
@@ -46,7 +45,7 @@ fun buildHomeModel(
     }
 
     return HomeModel(
-        isFirstEntrance = userInfo.isFirstHomeEntrance ?: true,
+        isFirstEntrance = userInfo.isFirstHomeEntrance,
         dayPeriod = getDayPeriod(Date().time),
         lastBreadEvent = lastBreadEvent,
         lastInsulinEvent = lastInsulinEvent,
@@ -79,8 +78,8 @@ fun Event.glucoseLevel(settings: GlucoseLevelSettings): GlucoseLevel =
 fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection =
     when {
         preLastEvent == null -> GlucoseLevelDirection.UP
-        this.value ?: 0.0 > preLastEvent.value ?: 0.0 -> GlucoseLevelDirection.UP
-        this.value ?: 0.0 < preLastEvent.value ?: 0.0 -> GlucoseLevelDirection.DOWN
+        (this.value ?: 0.0) > (preLastEvent.value ?: 0.0) -> GlucoseLevelDirection.UP
+        (this.value ?: 0.0) < (preLastEvent.value ?: 0.0) -> GlucoseLevelDirection.DOWN
         else -> GlucoseLevelDirection.STABLE
     }
 
@@ -101,7 +100,7 @@ fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
             block = mutableListOf()
             blocksMap[tagId] = block
         }
-        if (event.tagId ?: nullTagId == tagId) {
+        if ((event.tagId ?: nullTagId) == tagId) {
             block.add(event)
         }
     }

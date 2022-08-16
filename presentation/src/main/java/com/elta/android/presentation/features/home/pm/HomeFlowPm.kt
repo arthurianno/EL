@@ -345,18 +345,16 @@ class HomeFlowPm @Inject constructor(
             .flatMapObservable { pair ->
                 val info = pair.first
                 val devices = pair.second
-
-                val primary = devices.find { it.isPrimary }
-
-                if (primary != null && info.isFirstHomeEntrance == false)
+                if (devices.find { it.isPrimary } != null && !info.isFirstHomeEntrance) {
                     syncWithGlucometer(auto = true)
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
                         .doOnComplete { startSyncWithBackendAction.consumer.accept(Unit) }
-                else
+                } else {
                     Observable.fromCallable {
                         startSyncWithBackendAction.consumer.accept(Unit)
                     }
+                }
             }
 
     private fun syncWithGlucometer(auto: Boolean): Observable<Int> =
