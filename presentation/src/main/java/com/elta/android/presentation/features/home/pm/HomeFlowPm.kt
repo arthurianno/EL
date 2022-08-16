@@ -345,7 +345,7 @@ class HomeFlowPm @Inject constructor(
             .flatMapObservable { pair ->
                 val info = pair.first
                 val devices = pair.second
-                if (devices.find { it.isPrimary } != null && info.isFirstHomeEntrance == false) {
+                if (devices.find { it.isPrimary } != null && !info.isFirstHomeEntrance) {
                     syncWithGlucometer(auto = true)
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
