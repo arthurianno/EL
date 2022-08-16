@@ -307,8 +307,8 @@ abstract class ConnectDevicePm constructor(
         newItems: List<DeviceItem>,
     ) = glucometer != null ||
         isDevicesEquals(
-            prevItems,
-            newItems
+            prevItems = prevItems,
+            newItems = newItems
         )
 
     private fun isDevicesEquals(
