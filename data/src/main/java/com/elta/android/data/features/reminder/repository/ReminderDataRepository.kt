@@ -42,19 +42,10 @@ class ReminderDataRepository @Inject constructor(
             .toSingleDefault(reminder.id)
     }
 
-    override fun updateReminder(reminder: Reminder): Single<String> {
-        val currentReminder = createSingleRemindersDto(reminder).toObservable()
-        val allRemindersDto = getReminders().map(toDtoMapper::mapFromObjects)
-
-        return Observable.zip(
-            currentReminder,
-            allRemindersDto
-        ) { reminderAsList, allReminders ->
-            checkForExistingReminders(allReminders, reminderAsList)
-        }
+    override fun updateReminder(reminder: Reminder): Single<String> =
+        createSingleRemindersDto(reminder)
             .flatMapCompletable { source.updateReminders(it) }
             .toSingleDefault(reminder.id)
-    }
 
     private fun checkForExistingReminders(
         allReminders: List<ReminderDto>,
