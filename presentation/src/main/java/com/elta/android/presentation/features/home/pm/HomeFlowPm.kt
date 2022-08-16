@@ -348,15 +348,16 @@ class HomeFlowPm @Inject constructor(
 
                 val primary = devices.find { it.isPrimary }
 
-                if (primary != null && info.isFirstHomeEntrance == false)
+                if (primary != null && info.isFirstHomeEntrance == false) {
                     syncWithGlucometer(auto = true)
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
                         .doOnComplete { startSyncWithBackendAction.consumer.accept(Unit) }
-                else
+                } else {
                     Observable.fromCallable {
                         startSyncWithBackendAction.consumer.accept(Unit)
                     }
+                }
             }
 
     private fun syncWithGlucometer(auto: Boolean): Observable<Int> =
