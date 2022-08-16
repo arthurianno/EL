@@ -21,7 +21,7 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.items.DeviceItem
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
@@ -88,7 +88,7 @@ class BluetoothPm @Inject constructor(
                                     name = meter.name ?: "Unknown device",
                                     address = meter.address,
                                     isSelected = meter.address == glucometer?.address,
-                                    isTheLast = false
+                                    isLast = false
                                 )
                             }
                         )

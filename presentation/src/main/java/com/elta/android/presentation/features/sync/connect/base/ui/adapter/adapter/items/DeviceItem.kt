@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.sync.connect.base.ui.adapter.items
+package com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.items
 
 import com.nullgr.core.adapter.items.ListItem
 
@@ -7,7 +7,7 @@ data class DeviceItem(
     val name: String,
     val address: String,
     val isSelected: Boolean,
-    val isTheLast: Boolean
+    val isLast: Boolean
 ) : ListItem {
 
     override fun getUniqueProperty(): Any = id
@@ -16,7 +16,7 @@ data class DeviceItem(
         if (other is DeviceItem) {
             return mutableSetOf<Payload>().apply {
                 if (isSelected != other.isSelected) add(Payload.SELECTION_CHANGED)
-                if (isTheLast != other.isTheLast) add(Payload.POSITION_CHANGED)
+                if (isLast != other.isLast) add(Payload.POSITION_CHANGED)
             }
         }
         return super.getChangePayload(other)
