@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -31,7 +32,7 @@ import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-abstract class BaseEventPm constructor(
+abstract class BaseEventPm(
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -47,6 +48,8 @@ abstract class BaseEventPm constructor(
     val mainActionTitleState = state<String>()
     val mainActionVisibilityState = state(false)
     val mainAction = action<Unit>()
+    val profileState = state<Profile>()
+    val getProfileAction = action<Unit>()
 
     val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
     val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
@@ -57,8 +60,8 @@ abstract class BaseEventPm constructor(
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
 
+    val eventTypeState = state<EventType>()
     protected val formPickerValue = state<Double>()
-    protected val eventTypeState = state<EventType>()
     protected val selectedDateState = state(ZonedDateTime.now())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
