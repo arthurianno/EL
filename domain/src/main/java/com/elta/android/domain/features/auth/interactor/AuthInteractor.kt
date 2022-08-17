@@ -8,9 +8,8 @@ private val emailPattern: Pattern =
         Pattern.CASE_INSENSITIVE
     )
 
-@Suppress("MaxLineLength")
 private val passwordPattern: Pattern =
-    Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!\"#\$%&'()*+,./:;<=>?@^_`{|}~-]{8,32}")
+    Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[\\\\0-9a-zA-Z!\"#\$%&'()*+,./:;<=>?@^_`{|}\\[\\]~-]{8,32}")
 
 fun isEmailValid(email: String): Boolean = emailPattern.matcher(email).matches()
 fun isPasswordValid(password: String): Boolean = passwordPattern.matcher(password).matches()
