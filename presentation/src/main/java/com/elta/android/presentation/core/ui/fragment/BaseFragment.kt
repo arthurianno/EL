@@ -26,6 +26,7 @@ import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
+import com.nullgr.core.ui.extensions.hideKeyboard
 import com.nullgr.core.ui.extensions.setStatusBarColor
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -115,6 +116,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
         homeButtonView?.clicks()?.subscribe { requireActivity().onBackPressed() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
+        pm.hideKeyBoardCommand.bindTo { requireActivity().hideKeyboard() }
     }
 
     override fun providePresentationModel(): T {

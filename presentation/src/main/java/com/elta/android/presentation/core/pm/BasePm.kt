@@ -83,6 +83,10 @@ abstract class BasePm(
         showSnackBarCommand.consumer.accept(data)
     }
 
+    internal fun hideKeyboard() {
+        hideKeyBoardCommand.consumer.accept(Unit)
+    }
+
     internal fun setErrorStateData(data: StateData) {
         errorControl.dataState.consumer.accept(data)
     }

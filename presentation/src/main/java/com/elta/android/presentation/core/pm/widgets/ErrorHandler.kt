@@ -50,6 +50,7 @@ class ErrorHandler(private val pm: BasePm) {
                             val messageData =
                                 SnackBarMessageData.NetworkConnectionMessage(pm.resources)
                             pm.showSnackBar(messageData)
+                            pm.hideKeyboard()
                         }
                         else -> {
                             pm.setErrorViewVisibility(false)
