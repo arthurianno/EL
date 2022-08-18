@@ -352,10 +352,15 @@ class GlucometersManager @Inject constructor(
                     device.establishConnection(false)
                         .onErrorResumeNext { e: Throwable ->
                             Timber.e(javaClass.simpleName, e.message, e)
-                            if (e is BleDisconnectedException) Observable.error(
-                                GlucometerOfflineError
-                            )
-                            else Observable.error(e)
+                            when {
+                                client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
+                                    Observable.error(BluetoothNotEnabledError)
+                                }
+                                e is BleDisconnectedException -> Observable.error(
+                                    GlucometerOfflineError
+                                )
+                                else -> Observable.error(e)
+                            }
                         }
                         .compose(ReplayingShare.instance())
                         .doOnNext { connections[address] = it }
