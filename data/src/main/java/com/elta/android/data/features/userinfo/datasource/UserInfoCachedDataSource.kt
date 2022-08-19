@@ -27,12 +27,12 @@ class UserInfoCachedDataSource @Inject constructor(
                 cache.get(CommonConditions.ById(it))?.let { cachedInfo ->
                     val updatedInfo = cachedInfo.copy(
                         id = userInfo.id,
-                        isEmailConfirmed = userInfo.isEmailConfirmed ?: cachedInfo.isEmailConfirmed,
-                        isFeedbackSent = userInfo.isFeedbackSent ?: cachedInfo.isFeedbackSent,
-                        isUserLoggedIn = userInfo.isUserLoggedIn ?: cachedInfo.isUserLoggedIn,
-                        isOnboardingPassed = userInfo.isOnboardingPassed
-                            ?: cachedInfo.isOnboardingPassed,
-                        isFirstHomeEntrance = userInfo.isFirstHomeEntrance ?: cachedInfo.isFirstHomeEntrance
+                        isEmailConfirmed = userInfo.isEmailConfirmed || cachedInfo.isEmailConfirmed,
+                        isFeedbackSent = userInfo.isFeedbackSent || cachedInfo.isFeedbackSent,
+                        isUserLoggedIn = userInfo.isUserLoggedIn || cachedInfo.isUserLoggedIn,
+                        isOnboardingPassed = userInfo.isOnboardingPassed ||
+                            cachedInfo.isOnboardingPassed,
+                        isFirstHomeEntrance = userInfo.isFirstHomeEntrance || cachedInfo.isFirstHomeEntrance
                     )
                     cache.update(listOf(updatedInfo))
                 } ?: cache.add(listOf(userInfo))

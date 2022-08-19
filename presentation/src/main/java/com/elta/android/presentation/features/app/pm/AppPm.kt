@@ -49,17 +49,11 @@ class AppPm @Inject constructor(
                 getUserInfoUseCase.execute()
                     .doOnSuccess { user ->
                         when {
-                            !(
-                                user.isUserLoggedIn
-                                    ?: false
-                                ) -> router.newRootFlow(Screens.GreetingFlow)
-                            !(user.isEmailConfirmed ?: false) -> router.newRootChain(
+                            !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
+                            !user.isEmailConfirmed -> router.newRootChain(
                                 Screens.GreetingFlow, Screens.ActivateProfile
                             )
-                            !(
-                                user.isOnBoardingPassed
-                                    ?: false
-                                ) -> router.newRootFlow(Screens.OnBoardingFlow)
+                            !user.isOnBoardingPassed -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
