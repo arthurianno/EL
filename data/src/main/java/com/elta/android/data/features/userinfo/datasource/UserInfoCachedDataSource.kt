@@ -30,8 +30,8 @@ class UserInfoCachedDataSource @Inject constructor(
                         isEmailConfirmed = userInfo.isEmailConfirmed || cachedInfo.isEmailConfirmed,
                         isFeedbackSent = userInfo.isFeedbackSent || cachedInfo.isFeedbackSent,
                         isUserLoggedIn = userInfo.isUserLoggedIn || cachedInfo.isUserLoggedIn,
-                        isOnboardingPassed = userInfo.isOnboardingPassed
-                                || cachedInfo.isOnboardingPassed,
+                        isOnboardingPassed = userInfo.isOnboardingPassed ||
+                            cachedInfo.isOnboardingPassed,
                         isFirstHomeEntrance = userInfo.isFirstHomeEntrance || cachedInfo.isFirstHomeEntrance
                     )
                     cache.update(listOf(updatedInfo))
