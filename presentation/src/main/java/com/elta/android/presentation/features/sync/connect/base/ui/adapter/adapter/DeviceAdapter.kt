@@ -10,7 +10,7 @@ import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
 class DeviceAdapter @Inject constructor(
-    private val bus: RxBus,
+    private val bus: RxBus
 ) : BaseListAdapter() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)

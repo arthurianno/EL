@@ -58,20 +58,12 @@ abstract class ConnectDevicePm constructor(
     val retryPinControl = snackBarControl<SnackBarData>()
     val retryConnectControl = snackBarControl<SnackBarData>()
     val retrySyncControl = snackBarControl<SnackBarData>()
-    val retryEnableBluetoothControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
     private val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
-
-    private val bluetoothNotEnabled: SnackBarData by lazy {
-        SnackBarMessageData.WithButton(
-            message = resources.getString(R.string.bluetooth_disabled),
-            button = resources.getString(R.string.sync_connect_button_retry)
-        )
-    }
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -118,6 +110,10 @@ abstract class ConnectDevicePm constructor(
         bindRetryActions()
         bindClicksAndEvents()
         bindAnalytics()
+
+        btControl.bluetoothDeniedAction.observable
+            .subscribe { router.exit() }
+            .untilDestroy()
 
         Observable.merge(
             btControl.bluetoothEnabledAction.observable,
@@ -230,13 +226,6 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindRetryActions() {
-        showRetryEnableBluetoothAction.observable
-            .switchMapMaybe {
-                retryEnableBluetoothControl.showForResult(bluetoothNotEnabled)
-            }
-            .subscribe(startScanAction.consumer)
-            .untilDestroy()
-
         showRetrySearchAction.observable
             .switchMapMaybe {
                 retrySearchControl.showForResult(deviceNotFound)
@@ -277,7 +266,7 @@ abstract class ConnectDevicePm constructor(
         bus.clicks<Clicks.DeviceClicked>()
             .doOnNext { click ->
                 glucometer = scanResults.firstOrNull { it.address == click.item.address }
-                val prevItems = items.value as List<DeviceItem>
+                val prevItems = (items.value as List<*>).map { it as DeviceItem }
                 val newItems = prevItems.mapIndexed { index, item ->
                     item.copy(
                         isSelected = checkForSelection(item, click),
@@ -295,7 +284,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun checkForSelection(
         item: DeviceItem,
-        click: Clicks.DeviceClicked,
+        click: Clicks.DeviceClicked
     ) = if (item.isSelected) {
         item.isSelected
     } else {
@@ -304,7 +293,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun isValidDeviceChoice(
         prevItems: List<DeviceItem>,
-        newItems: List<DeviceItem>,
+        newItems: List<DeviceItem>
     ) = glucometer != null ||
         isDevicesEquals(
             prevItems = prevItems,
@@ -313,7 +302,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun isDevicesEquals(
         prevItems: List<DeviceItem>,
-        newItems: List<DeviceItem>,
+        newItems: List<DeviceItem>
     ) = prevItems.map { it.address } == newItems.map { it.address }
 
     private fun navigateToShopsFlow(i: Unit) {

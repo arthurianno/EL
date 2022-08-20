@@ -24,7 +24,6 @@ class SnackBarControl<T> internal constructor(pm: PresentationModel) {
     }
 
     fun showForResult(data: T): Maybe<Unit> {
-
         dismiss()
 
         return result
@@ -62,7 +61,6 @@ internal inline fun <T> SnackBarControl<T>.bind(
     crossinline createSnackBar: (data: T, dc: SnackBarControl<T>) -> Snackbar,
     compositeDisposable: CompositeDisposable
 ) {
-
     var snackbar: Snackbar? = null
     val callback: BaseTransientBottomBar.BaseCallback<Snackbar> =
         object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
