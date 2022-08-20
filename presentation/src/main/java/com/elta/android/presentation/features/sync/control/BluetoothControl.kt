@@ -30,6 +30,7 @@ class BluetoothControl(pm: PresentationModel) {
     val requestEnableLocationCommand = pm.command<Unit>(bufferSize = 1)
 
     val bluetoothEnabledAction = pm.action<Unit>()
+    val bluetoothDeniedAction = pm.action<Unit>()
     val locationPermissionsGrantedAction = pm.action<Unit>()
     val locationEnabledAction = pm.action<Unit>()
 
@@ -79,8 +80,12 @@ fun BluetoothControl.resolveResults(requestCode: Int, resultCode: Int) {
         locationEnabledAction.consumer.accept(Unit)
     }
 
-    if (requestCode == BluetoothControl.REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
-        bluetoothEnabledAction.consumer.accept(Unit)
+    if (requestCode == BluetoothControl.REQUEST_CODE_ENABLE_BLUETOOTH) {
+        if (resultCode == Activity.RESULT_OK) {
+            bluetoothEnabledAction.consumer.accept(Unit)
+        } else {
+            bluetoothDeniedAction.consumer.accept(Unit)
+        }
     }
 }
 

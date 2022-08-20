@@ -34,9 +34,7 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
     @Inject
     lateinit var deviceAdapter: DeviceAdapter
 
-    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy {
-        deviceAdapter
-    }
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { deviceAdapter }
 
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
@@ -104,15 +102,6 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
                 sc
             )
         }
-
-        pm.retryEnableBluetoothControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
-        }
-
         pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
 
         pm.openPinCodeDialogCommand.bindTo {
