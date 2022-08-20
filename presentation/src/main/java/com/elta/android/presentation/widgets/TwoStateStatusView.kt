@@ -61,13 +61,17 @@ class TwoStateStatusView @JvmOverloads constructor(
     }
 
     fun setState(isChanged: Boolean) {
-        if (isChanged) drawState2()
-        else drawState1()
+        if (isChanged) {
+            drawState2()
+        } else {
+            drawState1()
+        }
     }
 
     private fun drawState1() = with(binding) {
-        if (colorAnimator.isRunning)
+        if (colorAnimator.isRunning) {
             colorAnimator.cancel()
+        }
         removeCallbacks(hideViewCallback)
         statusBackgroundView.setBackgroundColor(state1Color)
         statusTextView.text = state1Text

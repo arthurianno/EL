@@ -51,7 +51,8 @@ class AppPm @Inject constructor(
                         when {
                             !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
                             !user.isEmailConfirmed -> router.newRootChain(
-                                Screens.GreetingFlow, Screens.ActivateProfile
+                                Screens.GreetingFlow,
+                                Screens.ActivateProfile
                             )
                             !user.isOnBoardingPassed -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
@@ -154,11 +155,11 @@ class AppPm @Inject constructor(
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
-        if (pair.second.isUserLoggedIn == true)
+        if (pair.second.isUserLoggedIn) {
             NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
                 router.newRootScreen(it)
             }
-        else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        } else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
     }
 
     private fun setStatus(status: SyncStatus) {
