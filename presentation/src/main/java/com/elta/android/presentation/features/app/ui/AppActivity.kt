@@ -13,6 +13,7 @@ import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
+import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
@@ -25,6 +26,9 @@ class AppActivity : BaseActivity<AppPm>() {
     override val binding by lazy { ActivityAppBinding.inflate(layoutInflater) }
     private val statusView by lazy {
         findViewById<StatusView>(R.id.syncStatusView)
+    }
+    private val connectionStatusView by lazy {
+        findViewById<TwoStateStatusView>(R.id.connectionStatusView)
     }
 
     private val rxPermissions by lazy { RxPermissions(this) }
@@ -56,7 +60,7 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onBindPresentationModel(pm: AppPm) {
         super.onBindPresentationModel(pm)
-        pm.networkStateCommand.bindTo(binding.connectionStatusView.changeState())
+        pm.networkStateCommand.bindTo(connectionStatusView.changeState())
         pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
         pm.syncStatusState.bindTo(statusView.statusChanges())
     }
