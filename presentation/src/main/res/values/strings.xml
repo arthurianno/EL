@@ -35,6 +35,7 @@
     <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
+    <string name="registration_password_the_same">Придумайте новый пароль</string>
     <string name="registration_email_confirmation_title">Аккаунт верифицирован</string>
     <string name="registration_email_confirmation_subtitle">Ваш аккаунт успешно верифицирован. Чтобы использовать этот аккаунт, необходимо войти в систему используя ваш email и пароль.</string>
     <string name="registration_email_confirmation_continue_button">Продолжить работу</string>
