@@ -49,7 +49,9 @@ class ProfileChangePasswordPm @Inject constructor(
         ) { isOldPasswordValid, isNewPasswordValid ->
             isOldPasswordValid && isNewPasswordValid
         }
-            .map { it && isPasswordsFilled() }
+            .map {
+                it && isPasswordsFilled() && !isPasswordSame()
+            }
             .subscribe(changePasswordEnabledState.consumer)
             .untilDestroy()
 
@@ -68,7 +70,10 @@ class ProfileChangePasswordPm @Inject constructor(
     }
 
     private fun isPasswordsFilled() =
-        oldPasswordInput.text.value.isNotEmpty() && newPasswordInput.text.value.isNotEmpty()
+        oldPasswordInput.text.value.isNotBlank() && newPasswordInput.text.value.isNotBlank()
+
+    private fun isPasswordSame() =
+        oldPasswordInput.text.valueOrNull == newPasswordInput.text.valueOrNull
 
     private fun bindHandleBack() {
         exitDialogAction.observable
@@ -117,5 +122,9 @@ class ProfileChangePasswordPm @Inject constructor(
         password.isEmpty() || isPasswordValid(password)
 
     private fun getPasswordError(isPasswordValid: Boolean): String =
-        if (isPasswordValid) "" else resources.getString(R.string.registration_password_pattern)
+        when {
+            !isPasswordValid -> resources.getString(R.string.registration_password_pattern)
+            isPasswordSame() && isPasswordsFilled() -> resources.getString(R.string.registration_password_the_same)
+            else -> String()
+        }
 }
