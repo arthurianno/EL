@@ -16,10 +16,11 @@ class BootReceiver : BroadcastReceiver() {
     lateinit var bus: RxBus
 
     private val bootAction: String =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent.ACTION_LOCKED_BOOT_COMPLETED
-        else
+        } else {
             Intent.ACTION_BOOT_COMPLETED
+        }
 
     override fun onReceive(context: Context?, intent: Intent) {
         AndroidInjection.inject(this, context)

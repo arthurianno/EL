@@ -59,10 +59,11 @@ class RemindersManager @Inject constructor(
 
     fun addReminder(reminder: Reminder) {
         val pi = reminder.getPendingIntent(context)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
-        else
+        } else {
             manager.setExact(AlarmManager.RTC_WAKEUP, reminder.date.toMillis(), pi)
+        }
     }
 
     fun updateReminder(reminder: Reminder) {

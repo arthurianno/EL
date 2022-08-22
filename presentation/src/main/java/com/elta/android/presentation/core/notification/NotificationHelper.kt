@@ -45,7 +45,8 @@ class NotificationHelper @Inject constructor(
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID, title,
+                NOTIFICATION_CHANNEL_ID,
+                title,
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 enableLights(true)
