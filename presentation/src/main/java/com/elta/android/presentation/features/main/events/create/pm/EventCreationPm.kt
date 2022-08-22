@@ -89,14 +89,25 @@ class EventCreationPm @Inject constructor(
     }
 
     private fun checkIsEmpty(eventFormModel: EventFormModel) {
-        isFormNotEmptyState.consumer.accept(
-            eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
-                !eventFormModel.inputValue.isNullOrEmpty() ||
-                eventFormModel.meta != null ||
-                eventFormModel.tag != null ||
-                !eventFormModel.note.isNullOrEmpty() ||
-                eventFormModel.isDateChanged
-        )
+        if (eventTypeState.valueOrNull == EventType.WEIGHT) {
+            isFormNotEmptyState.consumer.accept(
+                eventFormModel.pickerValue != (profileState.valueOrNull?.weight ?: 0.0) ||
+                    !eventFormModel.inputValue.isNullOrEmpty() ||
+                    eventFormModel.meta != null ||
+                    eventFormModel.tag != null ||
+                    !eventFormModel.note.isNullOrEmpty() ||
+                    eventFormModel.isDateChanged
+            )
+        } else {
+            isFormNotEmptyState.consumer.accept(
+                eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
+                    !eventFormModel.inputValue.isNullOrEmpty() ||
+                    eventFormModel.meta != null ||
+                    eventFormModel.tag != null ||
+                    !eventFormModel.note.isNullOrEmpty() ||
+                    eventFormModel.isDateChanged
+            )
+        }
     }
 
     private fun observeSaveEventAction() {
