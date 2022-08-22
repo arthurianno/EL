@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:gravity="center"
-            android:inputType="numberDecimal"
+            android:inputType="number"
             android:lines="1"
             android:maxLength="3"
             android:textCursorDrawable="@drawable/shape_cursor_pin"
