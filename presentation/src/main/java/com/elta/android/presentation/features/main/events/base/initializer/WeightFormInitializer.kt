@@ -10,7 +10,7 @@ import com.nullgr.core.ui.extensions.hide
 object WeightFormInitializer : FormInitializer() {
 
     private const val WEIGHT_FIRST_PICKER_MAX_VALUE = 200
-    private const val WEIGHT_DEFAULT_PICKER_VALUE = 0.0
+    const val WEIGHT_DEFAULT_PICKER_VALUE = 0.0
 
     private val formatterFunction: Resources.(Int, Int) -> String = { left, right ->
         getString(R.string.event_form_weight_format_mask, left, right)

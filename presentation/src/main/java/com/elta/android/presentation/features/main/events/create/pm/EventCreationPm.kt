@@ -12,6 +12,7 @@ import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import io.reactivex.Single
@@ -91,7 +92,9 @@ class EventCreationPm @Inject constructor(
     private fun checkIsEmpty(eventFormModel: EventFormModel) {
         if (eventTypeState.valueOrNull == EventType.WEIGHT) {
             isFormNotEmptyState.consumer.accept(
-                eventFormModel.pickerValue != (profileState.valueOrNull?.weight ?: 0.0) ||
+                eventFormModel.pickerValue != (
+                    profileState.valueOrNull?.weight ?: WeightFormInitializer.WEIGHT_DEFAULT_PICKER_VALUE
+                    ) ||
                     !eventFormModel.inputValue.isNullOrEmpty() ||
                     eventFormModel.meta != null ||
                     eventFormModel.tag != null ||
