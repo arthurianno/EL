@@ -42,7 +42,7 @@ class ItemRecordsHeaderViewHolder(
     private fun String?.formatAsValueOrEmpty(): String =
         when {
             this != null -> this@ItemRecordsHeaderViewHolder.binding.root.context.getString(
-                R.string.main_records_mask_value,
+                R.string.main_records_mask_value_he,
                 this
             )
             else -> this@ItemRecordsHeaderViewHolder.binding.root.context.getString(R.string.main_records_empty_value)

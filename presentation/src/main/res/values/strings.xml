@@ -205,6 +205,7 @@
     <string name="main_records_header_title_insulin">Инсулина</string>
 
     <string name="main_records_mask_value">%s ед</string>
+    <string name="main_records_mask_value_he">%s ХЕ</string>
     <string name="main_records_empty_value">—</string>
     <string name="main_records_daily_glucose_title">Мои показатели сегодня</string>
     <string name="main_records_daily_glucose_subtitle">Последний в %s</string>
