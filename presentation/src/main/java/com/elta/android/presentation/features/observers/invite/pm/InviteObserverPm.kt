@@ -3,7 +3,9 @@ package com.elta.android.presentation.features.observers.invite.pm
 import com.elta.android.common.errors.CantSendInviteToYourselfError
 import com.elta.android.common.errors.EmailAlreadyInvitedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
+import com.elta.android.domain.features.observers.interactor.GetObserverInvitesUseCase
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
+import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
@@ -17,6 +19,7 @@ import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
 class InviteObserverPm @Inject constructor(
+    private val getObserverInvitesUseCase: GetObserverInvitesUseCase,
     private val sendObserverInviteUseCase: SendObserverInviteUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
@@ -25,11 +28,15 @@ class InviteObserverPm @Inject constructor(
     val continueEnabledState = state(false)
     val continueAction = action<Unit>()
 
+    private val loadObserversAction = action<Unit>()
+    private val observersState = state<List<Observer>>()
+
     override fun onCreate() {
         super.onCreate()
 
         emailInput.text.observable
-            .map(::validateEmail)
+            .map { validateEmail(it) && !haveSameObserver() }
+            .doOnNext(continueEnabledState.consumer)
             .map(::getEmailError)
             .subscribe(emailInput.error.consumer)
             .untilDestroy()
@@ -46,6 +53,24 @@ class InviteObserverPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+
+        loadObserversAction.observable
+            .skipWhileInProgress()
+            .flatMap {
+                getObserverInvitesUseCase.execute()
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnNext(observersState.consumer)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .subscribe(loadObserversAction.consumer)
             .untilDestroy()
     }
 
@@ -74,17 +99,16 @@ class InviteObserverPm @Inject constructor(
     }
 
     private fun validateEmail(email: String): Boolean =
-        when (email.isEmpty()) {
-            true -> true
-            else -> isEmailValid(email).also {
-                continueEnabledState.consumer.accept(it)
-            }
-        }
+        email.isNotBlank() && isEmailValid(email)
+
+    private fun haveSameObserver(): Boolean =
+        observersState.valueOrNull?.any { it.email == emailInput.text.valueOrNull } ?: false
 
     private fun getEmailError(isEmailValid: Boolean): String =
-        when (isEmailValid) {
-            true -> ""
-            else -> resources.getString(R.string.registration_error_input_email)
+        when {
+            haveSameObserver() -> resources.getString(R.string.registration_error_same_email)
+            !isEmailValid -> resources.getString(R.string.registration_error_input_email)
+            else -> String()
         }
 
     private fun handleSuccess() {
