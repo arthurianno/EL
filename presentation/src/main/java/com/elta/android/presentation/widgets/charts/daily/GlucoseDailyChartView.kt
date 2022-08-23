@@ -481,53 +481,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun processRanges() {
-        with(dataModel().chartRangesModel) {
-            val fullRange = end - start
-
-            if (highMax != null) {
-                val highRangePercents = (highMax - normalMax) / fullRange
-                val highRangeHeight = clearChartHeight * highRangePercents
-                highRangeRect.set(
-                    0,
-                    0,
-                    fullViewWidth.toInt(),
-                    chartOffset.toInt() + highRangeHeight.toInt()
-                )
-            } else {
-                highRangeRect.set(0, 0, 0, 0)
-            }
-
-            val nonNullLowMax = lowMax ?: start
-            val normalRangePercents = (normalMax - nonNullLowMax) / fullRange
-            val normalRangeHeight = (clearChartHeight * normalRangePercents).toInt()
-
-            val normalRangeBottom = when {
-                needDrawHigh && needDrawLow -> highRangeRect.bottom + normalRangeHeight
-                needDrawHigh && !needDrawLow -> highRangeRect.bottom + normalRangeHeight + chartOffset.toInt()
-                !needDrawHigh && needDrawLow -> normalRangeHeight + chartOffset.toInt()
-                else -> normalRangeHeight + chartOffset.toInt() * 2
-            }
-            normalRangeRect.set(0, highRangeRect.bottom, fullViewWidth.toInt(), normalRangeBottom)
-
-            if (lowMax != null) {
-                val lowRangePercents = (lowMax - start) / fullRange
-                val lowRangeHeight = (clearChartHeight * lowRangePercents).toInt()
-                lowRangeRect.set(
-                    0,
-                    normalRangeRect.bottom,
-                    fullViewWidth.toInt(),
-                    normalRangeRect.bottom + lowRangeHeight + chartOffset.toInt()
-                )
-            } else {
-                lowRangeRect.set(0, 0, 0, 0)
-            }
-
-            glucoseRangesOverlayView?.applyParentRanges(
-                highRangeRect,
-                normalRangeRect,
-                lowRangeRect
-            )
-        }
+        val boxHeight = clearChartHeight / 3
+        highRangeRect.set(0, 0, fullViewWidth.toInt(), boxHeight.toInt())
+        normalRangeRect.set(0, boxHeight.toInt(), fullViewWidth.toInt(), boxHeight.toInt() * 2)
+        lowRangeRect.set(0, boxHeight.toInt() * 2, fullViewWidth.toInt(), clearChartHeight.toInt())
+        glucoseRangesOverlayView?.applyParentRanges(
+            highRangeRect,
+            normalRangeRect,
+            lowRangeRect
+        )
     }
 
     private fun processItems() {
@@ -538,14 +500,18 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun ChartItemModel.toPoint(): PointF {
+        val boxHeight = clearChartHeight / 3.0
         val startX = hoursCoordinatesMap[hourOfEvent]
         val x = startX + singleHourWidth * (minutesOfEvent.toFloat() / MINUTES_IN_HOUR)
-
-        val valuesStart = dataModel().chartRangesModel.start
-        val valuesEnd = dataModel().chartRangesModel.end
-        val y =
-            top + chartOffset.toInt() + clearChartHeight * (1 - (value - valuesStart) / (valuesEnd - valuesStart))
-        return PointF(x, y.toFloat())
+        with(dataModel().chartRangesModel) {
+            val addY = when {
+                highMax != null && value > normalMax -> boxHeight * (highMax - value) / (highMax - normalMax)
+                lowMax != null && value < lowMax -> boxHeight * 2 + boxHeight * (lowMax - value) / (lowMax)
+                else -> boxHeight + boxHeight * (normalMax - value) / (normalMax - start)
+            }
+            val y = top + chartOffset.toInt() + addY
+            return PointF(x, y.toFloat())
+        }
     }
 
     private fun Double.format() = NumberFormatter.numberFormat.format(this)
