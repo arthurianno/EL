@@ -41,17 +41,14 @@ object ChartItemsBuilder {
         }
 
     private fun DailyGlucoseModel.ranges(): ChartRangesModel {
-        val start = when {
-            minEvent != null -> minEvent?.value ?: glucoseLevelSettings.low.start
-            else -> glucoseLevelSettings.normal.start
-        }
+        val start = glucoseLevelSettings.normal.start
         val lowMax = when {
             minEvent != null -> glucoseLevelSettings.low.end
             else -> null
         }
         val normalMax = glucoseLevelSettings.normal.end
         val highMax = maxEvent?.value
-        val end = highMax ?: glucoseLevelSettings.normal.end
+        val end = glucoseLevelSettings.normal.end
         return ChartRangesModel(start, end, normalMax, lowMax, highMax)
     }
 }

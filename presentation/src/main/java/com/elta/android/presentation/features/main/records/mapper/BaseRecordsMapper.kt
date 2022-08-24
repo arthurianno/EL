@@ -74,8 +74,8 @@ open class BaseRecordsMapper(
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     protected fun Event.formatDate(): String {
         return try {
-            val time = additionTime?.toStringWithFormat(CommonFormats.FORMAT_TIME) ?: ""
-            val offset = additionTime?.offset?.toString() ?: ""
+            val time = additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
+            val offset = additionTime.offset?.toString().orEmpty()
             resources.getString(R.string.main_records_event_time_mask, time, offset)
         } catch (e: Exception) {
             ""
@@ -87,8 +87,7 @@ open class BaseRecordsMapper(
             EventType.INSULIN -> resources.getString(checkNotNull(insulinType).toName())
             EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) }
                 ?: resources.getString(R.string.event_type_activity_no_name)
-            EventType.BREAD -> kind?.let { it }
-                ?: resources.getString(R.string.event_type_bread_no_name)
+            EventType.BREAD -> kind ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.MEDICAMENTS -> checkNotNull(name)
             EventType.WEIGHT -> resources.getString(R.string.event_type_weight_no_name)
             EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_no_name)
@@ -96,7 +95,6 @@ open class BaseRecordsMapper(
         }
 
     protected fun Long.asTimeString(resources: ResourceProvider): String {
-
         val days = TimeUnit.SECONDS.toDays(this)
         val hours = TimeUnit.SECONDS.toHours(this) - days * HOURS_IN_DAY
         val minutes =
@@ -126,10 +124,7 @@ open class BaseRecordsMapper(
     }
 
     protected fun Double?.format(): String? =
-        when {
-            this == null -> null
-            else -> NumberFormatter.numberFormat.format(this)
-        }
+        this?.let { NumberFormatter.numberFormat.format(it) }
 
     private companion object {
         const val HOURS_IN_DAY = 24

@@ -70,6 +70,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var chartPointTitleColor = 0
 
     private var clearChartHeight = 0f
+    private val boxHeight
+        get() = clearChartHeight / 3
     private var fullViewHeight = 0f
     private var fullViewWidth = 0f
     private var sectionsDividerWidth = 0f
@@ -183,20 +185,19 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private fun Canvas.drawPoints() {
         chartPoints.entries.forEach {
             if (!it.key.isSelected) {
-                chartItemPaint.color = when {
-                    it.key.valueType == ChartItemValueType.LOW -> lowRangeItemColor
-                    it.key.valueType == ChartItemValueType.NORMAL -> normalRangeItemColor
-                    it.key.valueType == ChartItemValueType.HIGH -> highRangeItemColor
-                    else -> 0
+                chartItemPaint.color = when (it.key.valueType) {
+                    ChartItemValueType.LOW -> lowRangeItemColor
+                    ChartItemValueType.NORMAL -> normalRangeItemColor
+                    ChartItemValueType.HIGH -> highRangeItemColor
                 }
                 drawCircle(it.value.x, it.value.y, chartItemRadius, chartItemPaint)
 
                 if (it.key.isMaxValue && !it.key.isSelected) {
-                    drawPointTitle(it.value, maxTitle, highRangeItemColor)
+                    drawPointTitle(it.value, "$maxTitle ${it.key.value}", highRangeItemColor)
                 }
 
                 if (it.key.isMinValue && !it.key.isSelected) {
-                    drawPointTitle(it.value, minTitle, lowRangeItemColor)
+                    drawPointTitle(it.value, "$minTitle ${it.key.value}", lowRangeItemColor)
                 }
             }
         }
@@ -481,14 +482,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun processRanges() {
-        val boxHeight = clearChartHeight / 3
         highRangeRect.set(0, 0, fullViewWidth.toInt(), boxHeight.toInt())
         normalRangeRect.set(0, boxHeight.toInt(), fullViewWidth.toInt(), boxHeight.toInt() * 2)
         lowRangeRect.set(0, boxHeight.toInt() * 2, fullViewWidth.toInt(), clearChartHeight.toInt())
         glucoseRangesOverlayView?.applyParentRanges(
             highRangeRect,
             normalRangeRect,
-            lowRangeRect
+            lowRangeRect,
+            dataModel().chartRangesModel.start.format(),
+            dataModel().chartRangesModel.end.format()
         )
     }
 
@@ -500,16 +502,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     }
 
     private fun ChartItemModel.toPoint(): PointF {
-        val boxHeight = clearChartHeight / 3.0
         val startX = hoursCoordinatesMap[hourOfEvent]
         val x = startX + singleHourWidth * (minutesOfEvent.toFloat() / MINUTES_IN_HOUR)
         with(dataModel().chartRangesModel) {
             val addY = when {
-                highMax != null && value > normalMax -> boxHeight * (highMax - value) / (highMax - normalMax)
+                highMax != null && value > normalMax -> boxHeight * (highMax - value) / (highMax - normalMax) + chartOffset.toInt()
                 lowMax != null && value < lowMax -> boxHeight * 2 + boxHeight * (lowMax - value) / (lowMax)
                 else -> boxHeight + boxHeight * (normalMax - value) / (normalMax - start)
             }
-            val y = top + chartOffset.toInt() + addY
+            val y = top + addY
             return PointF(x, y.toFloat())
         }
     }
@@ -527,8 +528,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private fun Int.formatHour(): String {
         val stringHour = this.toString()
         return resources.getString(
-            when {
-                stringHour.length == 1 -> R.string.main_records_daily_chart_time_mask
+            when (stringHour.length) {
+                1 -> R.string.main_records_daily_chart_time_mask
                 else -> R.string.main_records_daily_chart_time_two_symbols_mask
             },
             stringHour
@@ -554,7 +555,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         private const val SECTIONS_DIVIDER_WIDTH = 1f // dp
         private const val POINT_TITLE_TEXT_SIZE = 10f // sp
         private const val POINT_TITLE_BACKGROUND_HEIGHT = 16f // dp
-        private const val POINT_TITLE_BACKGROUND_WIDTH = 32f // dp
+        private const val POINT_TITLE_BACKGROUND_WIDTH = 48f // dp
         private const val POINT_TITLE_BACKGROUND_CORNERS = 4f // dp
 
         private const val SELECTED_ITEM_LINE_WIDTH = 1.5f // dp

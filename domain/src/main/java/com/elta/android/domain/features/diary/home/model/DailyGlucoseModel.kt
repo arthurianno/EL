@@ -10,5 +10,5 @@ data class DailyGlucoseModel(
     val lastEvent: Event?
 ) {
     val hasEvents: Boolean
-        get() = !glucoseEvents.isEmpty()
+        get() = glucoseEvents.isNotEmpty()
 }
