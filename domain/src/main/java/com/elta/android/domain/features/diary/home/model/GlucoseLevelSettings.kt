@@ -6,6 +6,9 @@ data class GlucoseLevelSettings(
     val low: DoubleRange = DoubleRange(LOW_START, LOW_END)
 ) {
 
+    override fun toString(): String =
+        "\nhigh - ${high.start} , ${high.end}\nnormal - ${normal.start} , ${normal.end}\nlow - ${low.start} , ${low.end}\n"
+
     companion object {
         const val STEP = 0.1
         const val NORMAL_END = 10.0
