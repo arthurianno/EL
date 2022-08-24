@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
@@ -13,6 +14,7 @@ import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
 import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
+import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -55,6 +57,9 @@ class AppActivity : BaseActivity<AppPm>() {
 
     override fun onResume() {
         super.onResume()
+        KeyboardEventListener(this) { isKeyboardOpen ->
+            connectionStatusView.isVisible = !isKeyboardOpen
+        }
         checkBluetoothPermissions(this)
     }
 

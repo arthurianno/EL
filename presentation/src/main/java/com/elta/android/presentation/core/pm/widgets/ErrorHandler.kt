@@ -46,12 +46,7 @@ class ErrorHandler(private val pm: BasePm) {
                     pm.setErrorViewVisibility(true)
                 } else {
                     when (error) {
-                        is NetworkConnectionError -> {
-                            val messageData =
-                                SnackBarMessageData.NetworkConnectionMessage(pm.resources)
-                            pm.showSnackBar(messageData)
-                            pm.hideKeyboard()
-                        }
+                        is NetworkConnectionError -> pm.hideKeyboard()
                         else -> {
                             pm.setErrorViewVisibility(false)
                             val messageData = if (error.isServerUnavailableError()) {
