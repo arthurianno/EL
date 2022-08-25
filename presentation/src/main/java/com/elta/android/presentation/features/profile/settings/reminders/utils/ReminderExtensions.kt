@@ -10,7 +10,6 @@ import com.elta.android.domain.features.reminder.model.ScheduleType
 import org.threeten.bp.ZonedDateTime
 
 const val ACTION_SPENT = "com.elta.android.reminder.SPENT"
-const val ACTION_CANCEL = "com.elta.android.reminder.CANCEL"
 
 private const val ID = "com.elta.android.reminder_id"
 private const val TIME = "com.elta.android.reminder_time"
@@ -22,16 +21,6 @@ fun Reminder.getPendingIntent(context: Context): PendingIntent =
         context.applicationContext,
         id.hashCode(),
         getIntent(context.applicationContext),
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
-
-fun getCancelPendingIntent(context: Context, id: String): PendingIntent =
-    PendingIntent.getBroadcast(
-        context,
-        id.hashCode(),
-        Intent(context, ReminderCallbackReceiver::class.java).apply {
-            action = "$ACTION_CANCEL$id"
-        },
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 

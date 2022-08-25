@@ -73,15 +73,15 @@ class RemindersManager @Inject constructor(
         } ?: deleteReminderInternal(reminder)
     }
 
-    fun cancelReminder(reminderId: String) {
-        val pi = getCancelPendingIntent(context, reminderId)
+    fun cancelReminder(reminder: Reminder) {
+        val pi = reminder.getPendingIntent(context)
         manager.cancel(pi)
     }
 
     fun cancelAll() {
         val reminders = getRemindersUseCase.execute().blockingFirst()
         reminders.forEach { reminder ->
-            cancelReminder(reminder.id)
+            cancelReminder(reminder)
         }
     }
 
