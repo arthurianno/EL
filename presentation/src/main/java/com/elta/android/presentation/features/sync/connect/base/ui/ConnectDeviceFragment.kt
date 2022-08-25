@@ -109,6 +109,14 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
         }
     }
 
+    override fun handleBack() {
+        if (presentationModel.mstate.valueOrNull == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
+            presentationModel.toAppAction.consumer.accept(Unit)
+        } else {
+            super.handleBack()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presentationModel.btControl.resolveResults(requestCode, resultCode)
