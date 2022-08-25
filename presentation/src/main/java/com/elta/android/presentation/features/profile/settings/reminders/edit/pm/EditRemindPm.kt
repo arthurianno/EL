@@ -57,9 +57,8 @@ class EditRemindPm @Inject constructor(
                 deleteReminderUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess { id ->
-                        remindersManager.cancelReminder(id)
-                    }
+                    .map { params.reminder }
+                    .doOnSuccess(remindersManager::cancelReminder)
                     .map { Unit }
                     .doOnSuccess(::handleDeleted)
                     .doOnError(::handleError)
@@ -75,9 +74,10 @@ class EditRemindPm @Inject constructor(
                 updateReminderUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess { id ->
-                        remindersManager.cancelReminder(id)
-                        remindersManager.addReminder(params.reminder)
+                    .map { params.reminder }
+                    .doOnSuccess { reminder ->
+                        remindersManager.cancelReminder(reminder)
+                        remindersManager.addReminder(reminder)
                     }
                     .map { Unit }
                     .doOnSuccess(::handleSuccess)
