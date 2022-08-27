@@ -58,6 +58,11 @@ class FirmwareFragment :
         presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presentationModel.btControl.clearDisposables(compositeUnbind)
+    }
+
     companion object {
         private const val EXTRA_ADDRESS = "extra_address"
         fun newInstance(address: String): FirmwareFragment =

@@ -21,6 +21,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
 import timber.log.Timber
@@ -35,6 +36,9 @@ class BluetoothControl2 {
 
     internal val locationPermissionsRequestRelay = PublishRelay.create<Unit>()
     internal val locationPermissionsRequestResultRelay = PublishRelay.create<Boolean>()
+
+    internal lateinit var bluetoothDisposable: Disposable
+    internal lateinit var locationDisposable: Disposable
 
     fun requestEnableBluetooth(): Maybe<Boolean> =
         bluetoothRequestResultRelay
@@ -51,6 +55,15 @@ class BluetoothControl2 {
             .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
             .firstElement()
 
+    /**
+     * Call this method in onDestroy or onDestroyView to unsubscribe from relays in bluetoothControl2.
+     * @param compositeDisposable the disposable, not null
+     */
+    fun clearDisposables(compositeDisposable: CompositeDisposable) {
+        compositeDisposable.remove(locationDisposable)
+        compositeDisposable.remove(bluetoothDisposable)
+    }
+
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 147
         const val REQUEST_CODE_ENABLE_BLUETOOTH = 148
@@ -64,7 +77,7 @@ fun BluetoothControl2.bindTo(
     permissions: RxPermissions,
     fragment: Fragment
 ) {
-    bluetoothRequestRelay
+    bluetoothDisposable = bluetoothRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -82,7 +95,7 @@ fun BluetoothControl2.bindTo(
         .subscribe(locationPermissionsRequestResultRelay)
         .addTo(compositeUnbind)
 
-    locationRequestRelay
+    locationDisposable = locationRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
             enableLocation2(fragment)
