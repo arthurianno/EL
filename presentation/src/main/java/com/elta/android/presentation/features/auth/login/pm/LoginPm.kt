@@ -74,8 +74,8 @@ class LoginPm @Inject constructor(
         getUserInfoUseCase.execute()
             .doOnSuccess { info ->
                 when {
-                    !(info.isEmailConfirmed ?: false) -> router.navigateTo(ActivateProfile)
-                    info.isOnBoardingPassed ?: false || info.isEmailConfirmed ?: false -> {
+                    !info.isEmailConfirmed -> router.navigateTo(ActivateProfile)
+                    info.isOnBoardingPassed || info.isEmailConfirmed -> {
                         remindersManager.scheduleReminders()
                         router.newRootFlow(Screens.HomeFlow)
                     }
