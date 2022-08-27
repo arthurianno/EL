@@ -219,6 +219,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="48dp"
+                android:maxLength="120"
+                android:inputType="textCapSentences"
                 android:hint="@string/events_creation_hint_note"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp" />
