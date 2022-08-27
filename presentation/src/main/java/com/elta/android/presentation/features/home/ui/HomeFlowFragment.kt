@@ -119,6 +119,11 @@ class HomeFlowFragment :
         presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presentationModel.btControl.clearDisposables(compositeUnbind)
+    }
+
     private fun initBottomSheetItemsView() {
         binding.homeBottomSheetView.findViewById<RecyclerView>(R.id.bottomSheetItemsView).apply {
             layoutManager = FixedLinearLayoutManager(requireActivity())
