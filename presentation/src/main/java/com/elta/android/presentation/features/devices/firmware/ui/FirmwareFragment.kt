@@ -50,17 +50,12 @@ class FirmwareFragment :
                 actionButtonView.toggleView(updateState.button != null)
             }
         }
-        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+        pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presentationModel.btControl.resolveResults(requestCode, resultCode)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        presentationModel.btControl.clearDisposables(compositeUnbind)
     }
 
     companion object {

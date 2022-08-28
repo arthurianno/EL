@@ -55,15 +55,6 @@ class BluetoothControl2 {
             .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
             .firstElement()
 
-    /**
-     * Call this method in onDestroy or onDestroyView to unsubscribe from relays in bluetoothControl2.
-     * @param compositeDisposable the disposable, not null
-     */
-    fun clearDisposables(compositeDisposable: CompositeDisposable) {
-        compositeDisposable.remove(locationDisposable)
-        compositeDisposable.remove(bluetoothDisposable)
-    }
-
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 147
         const val REQUEST_CODE_ENABLE_BLUETOOTH = 148
