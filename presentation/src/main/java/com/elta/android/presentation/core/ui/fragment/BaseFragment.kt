@@ -51,6 +51,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     protected abstract val screenLayout: Int
 
     protected val compositeUnbind = CompositeDisposable()
+    protected val compositeDestroy = CompositeDisposable()
 
     protected abstract val classToken: Class<T>
 
@@ -84,6 +85,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     override fun onDestroyView() {
         _binding = null
+        compositeDestroy.clear()
         super.onDestroyView()
     }
 
@@ -153,7 +155,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     }
 
     fun <T> SnackBarControl<T>.bindTo(createSnackBar: (data: T, sc: SnackBarControl<T>) -> Snackbar) {
-        bind({ data, sc -> createSnackBar(data, sc) }, compositeUnbind)
+        bind({ data, sc -> createSnackBar(data, sc) }, compositeDestroy)
     }
 
     companion object {

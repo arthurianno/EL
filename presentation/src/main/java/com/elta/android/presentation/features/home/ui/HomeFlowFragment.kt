@@ -101,7 +101,7 @@ class HomeFlowFragment :
                 sc
             )
         }
-        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+        pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
 
         pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
@@ -117,11 +117,6 @@ class HomeFlowFragment :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presentationModel.btControl.resolveResults(requestCode, resultCode)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        presentationModel.btControl.clearDisposables(compositeUnbind)
     }
 
     private fun initBottomSheetItemsView() {
