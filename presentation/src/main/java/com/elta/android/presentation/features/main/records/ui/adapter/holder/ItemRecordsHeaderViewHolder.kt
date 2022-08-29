@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.holder
 
+import androidx.annotation.StringRes
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemRecordsHeaderBinding
@@ -32,19 +33,16 @@ class ItemRecordsHeaderViewHolder(
     }
 
     private fun bindBread(item: RecordsHeaderItem) {
-        binding.breadValueView.text = item.breadLevel.formatAsValueOrEmpty()
+        binding.breadValueView.text =
+            item.breadLevel formatAsValueOrEmpty R.string.main_records_mask_value_he
     }
 
     private fun bindInsulin(item: RecordsHeaderItem) {
-        binding.insulinValueView.text = item.insulinLevel.formatAsValueOrEmpty()
+        binding.insulinValueView.text =
+            item.insulinLevel formatAsValueOrEmpty R.string.main_records_mask_value
     }
 
-    private fun String?.formatAsValueOrEmpty(): String =
-        when {
-            this != null -> this@ItemRecordsHeaderViewHolder.binding.root.context.getString(
-                R.string.main_records_mask_value_he,
-                this
-            )
-            else -> this@ItemRecordsHeaderViewHolder.binding.root.context.getString(R.string.main_records_empty_value)
-        }
+    private infix fun String?.formatAsValueOrEmpty(@StringRes itemId: Int): String =
+        this?.let { binding.root.context.getString(itemId, it) }
+            ?: binding.root.context.getString(R.string.main_records_empty_value)
 }
