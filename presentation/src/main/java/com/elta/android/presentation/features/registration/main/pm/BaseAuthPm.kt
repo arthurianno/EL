@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.registration.main.pm
 import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.NetworkConnectionError
+import com.elta.android.common.errors.NotFoundError
 import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
@@ -53,6 +54,15 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     override fun handleError(error: Throwable) {
         when (error) {
             is ProfileIsDeletedError -> profileIsDeleted()
+            is NotFoundError -> {
+                setErrorStateData(
+                    States.SimpleError(
+                        icon = R.drawable.ic_warning,
+                        description = resources.getString(R.string.user_not_found)
+                    )
+                )
+                setErrorViewVisibility(true)
+            }
             is EmailAlreadyRegisteredError,
             is IncorrectLoginOrPasswordError -> {
                 setErrorStateData(

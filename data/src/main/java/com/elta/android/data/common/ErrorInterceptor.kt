@@ -8,6 +8,7 @@ import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.EmailLinkInvalid
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.InvalidRefreshTokenError
+import com.elta.android.common.errors.NotFoundError
 import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.common.errors.ServerError
 import com.elta.android.common.errors.ServiceUnavailableError
@@ -34,6 +35,7 @@ class ErrorInterceptor @Inject constructor(
                 throw ServiceUnavailableError()
             responseCode == ERROR_CODE_410 -> throw ProfileIsDeletedError(response.message())
             responseCode == ERROR_CODE_403 -> throw UnauthorizedError()
+            responseCode == ERROR_CODE_404 -> throw NotFoundError(response.message())
             responseCode >= ERROR_CODE_600 -> {
                 val message = getStringByCode(context, responseCode)
                 when (responseCode) {
@@ -57,6 +59,7 @@ class ErrorInterceptor @Inject constructor(
     companion object {
         const val ERROR_CODE_400 = 400
         const val ERROR_CODE_403 = 403
+        const val ERROR_CODE_404 = 404
         const val ERROR_CODE_410 = 410
         const val ERROR_CODE_600 = 600
         const val ERROR_CODE_603 = 603
