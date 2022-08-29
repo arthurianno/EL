@@ -1,3 +1,3 @@
 package com.elta.android.common.errors
 
-class NotFoundError(message: String?) : RuntimeException()
+class NotFoundError(message: String) : ServerError(message)
