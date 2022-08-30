@@ -25,9 +25,9 @@ class ValueChangeObservable(
     ) : MainThreadDisposable() {
 
         var valueListener: NumberPicker.OnValueChangeListener? =
-            NumberPicker.OnValueChangeListener { _, _, newValue ->
-                if (!isDisposed) {
-                    observer.onNext(newValue)
+            object : NumberPicker.OnValueChangeListener {
+                override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
+                    observer.onNext(newVal)
                 }
             }
 
