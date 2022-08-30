@@ -2,6 +2,7 @@ package com.elta.android.presentation.widgets.datePicker.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +29,8 @@ class DateViewHolder(private val binding: ItemDatePickerBinding) :
             itemView.isSelected = false
             dayOfWeekTitleView.setText(item.dayOfWeekResId)
             dayOfMonthTitleView.text = item.dayOfMonth.toString()
-            dayOfWeekTitleView.alpha = item.isAvailable.toAlpha()
-            dayOfMonthTitleView.alpha = item.isAvailable.toAlpha()
+            dayOfWeekTitleView.isVisible = item.isAvailable
+            dayOfMonthTitleView.isVisible = item.isAvailable
         }
     }
 
