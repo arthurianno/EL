@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.gender.ui
 
+import androidx.core.view.isVisible
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
@@ -24,6 +25,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfil
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+        pm.progressState.bindTo { binding.radioGroup.isVisible = !it }
         pm.checkNotSpecifiedVisibility.bindTo(binding.notSpecifiedButtonView.visibility())
         pm.checkNotSpecified.bindTo(binding.notSpecifiedButtonView)
         pm.checkMale.bindTo(binding.maleButtonView)
