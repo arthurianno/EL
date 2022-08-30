@@ -119,7 +119,7 @@ class NumberPicker @JvmOverloads constructor(
     /**
      * Flag whether to compute the max width.
      */
-    private val computeMaxWidth: Boolean
+    private var computeMaxWidth: Boolean = true
 
     /**
      * The align of the selected text.
@@ -164,7 +164,7 @@ class NumberPicker @JvmOverloads constructor(
     /**
      * Flag whether the text should strikethroughed.
      */
-    private var textStrikeThru: Boolean = false
+    private var textStrikeThroughed: Boolean = false
 
     /**
      * Flag whether the text should underlined.
@@ -174,7 +174,7 @@ class NumberPicker @JvmOverloads constructor(
     /**
      * The typeface of the text.
      */
-    private var typeface: Typeface?
+    private var typeface: Typeface = Typeface.DEFAULT
 
     /**
      * The width of the gap between text elements if the selector wheel.
@@ -189,7 +189,7 @@ class NumberPicker @JvmOverloads constructor(
     /**
      * The values to be displayed instead the indices.
      */
-    private var mDisplayedValues: List<String>? = null
+    private var mDisplayedValues: List<String> = emptyList()
 
     /**
      * Lower weight of the range of numbers allowed for the NumberPicker
@@ -1321,7 +1321,7 @@ class NumberPicker @JvmOverloads constructor(
                 selectorWheelPaint.textAlign = Paint.Align.values()[textAlign]
                 selectorWheelPaint.textSize = textSize1
                 selectorWheelPaint.color = textColor
-                selectorWheelPaint.isStrikeThruText = textStrikeThru
+                selectorWheelPaint.isStrikeThruText = textStrikeThroughed
                 selectorWheelPaint.isUnderlineText = textUnderline
             }
             val selectorIndex =
@@ -1701,9 +1701,9 @@ class NumberPicker @JvmOverloads constructor(
         scrollSelectorValue = if (selectorIndex < minValue || selectorIndex > maxValue) {
             ""
         } else {
-            if (mDisplayedValues != null) {
+            if (mDisplayedValues.isNotEmpty()) {
                 val displayedValueIndex = selectorIndex - minValue
-                mDisplayedValues!![displayedValueIndex]
+                mDisplayedValues[displayedValueIndex]
             } else {
                 formatNumber(selectorIndex)
             }
@@ -1729,7 +1729,11 @@ class NumberPicker @JvmOverloads constructor(
          * find the correct weight in the displayed values for the current
          * number.
          */
-        val text = mDisplayedValues?.get(mValue - minValue)
+        val text = if (mDisplayedValues.isNotEmpty()) {
+            mDisplayedValues.getOrNull(mValue - minValue)
+        } else {
+            null
+        }
         if (!TextUtils.isEmpty(text)) {
             val beforeText: CharSequence = selectedText.text
             if (text != beforeText.toString()) {
@@ -2158,14 +2162,14 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun setTextStrikeThru(strikeThruText: Boolean) {
-        textStrikeThru = strikeThruText
+        textStrikeThroughed = strikeThruText
     }
 
     fun setTextUnderline(underlineText: Boolean) {
         textUnderline = underlineText
     }
 
-    fun setTypeface(typeface: Typeface?) {
+    fun setTypeface(typeface: Typeface) {
         this.typeface = typeface
         if (this.typeface != null) {
             selectedText.typeface = this.typeface
@@ -2307,7 +2311,7 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun getTextStrikeThru(): Boolean {
-        return textStrikeThru
+        return textStrikeThroughed
     }
 
     fun getTextUnderline(): Boolean {
@@ -2596,7 +2600,6 @@ class NumberPicker @JvmOverloads constructor(
             SIZE_UNSPECIFIED
         ).toFloat()
         setWidthAndHeight()
-        computeMaxWidth = true
         mValue = attributes.getInt(R.styleable.NumberPicker_np_value, mValue)
         maxValue = attributes.getInt(R.styleable.NumberPicker_np_max, maxValue)
         minValue = attributes.getInt(R.styleable.NumberPicker_np_min, minValue)
@@ -2626,9 +2629,9 @@ class NumberPicker @JvmOverloads constructor(
             R.styleable.NumberPicker_np_textSize,
             spToPx(textSize1)
         )
-        textStrikeThru = attributes.getBoolean(
+        textStrikeThroughed = attributes.getBoolean(
             R.styleable.NumberPicker_np_textStrikeThru,
-            textStrikeThru
+            textStrikeThroughed
         )
         textUnderline = attributes.getBoolean(
             R.styleable.NumberPicker_np_textUnderline,
