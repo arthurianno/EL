@@ -1,14 +1,17 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -141,6 +144,15 @@ class AppPm @Inject constructor(
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
                 }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ProfileAdditionalClicked>()
+            .map { it.item.type }
+            .filter { it is ExitFromApp }
+            .doOnNext {
+                syncStatusVisibility.consumer.accept(Visibility.Hide)
             }
             .subscribe()
             .untilDestroy()
