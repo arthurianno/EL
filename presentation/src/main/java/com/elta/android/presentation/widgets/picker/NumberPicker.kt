@@ -34,11 +34,12 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.elta.android.presentation.R
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.text.NumberFormat
 import java.util.Formatter
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A widget that enables the user to select a number from a predefined range.
@@ -81,119 +82,6 @@ class NumberPicker @JvmOverloads constructor(
         }
     }
 
-    /**
-     * The text for showing the current weight.
-     */
-    private var selectedText: EditText = EditText(context)
-
-    /**
-     * The center X position of the selected text.
-     */
-    private var selectedTextCenterX = 0f
-
-    /**
-     * The center Y position of the selected text.
-     */
-    private var selectedTextCenterY = 0f
-
-    /**
-     * The min height of this widget.
-     */
-    private var minHeight = 0
-
-    /**
-     * The max height of this widget.
-     */
-    private var maxHeight = 0
-
-    /**
-     * The max width of this widget.
-     */
-    private var minWidth = 0
-
-    /**
-     * The max width of this widget.
-     */
-    private var maxWidth = 0
-
-    /**
-     * Flag whether to compute the max width.
-     */
-    private var computeMaxWidth: Boolean = true
-
-    /**
-     * The align of the selected text.
-     */
-    private var selectedTextAlign = DEFAULT_TEXT_ALIGN
-
-    /**
-     * The color of the selected text.
-     */
-    private var selectedTextColor = DEFAULT_TEXT_COLOR
-
-    /**
-     * The size of the selected text.
-     */
-    private var selectedTextSize = DEFAULT_TEXT_SIZE
-
-    /**
-     * Flag whether the selected text should strikethroughed.
-     */
-    private var selectedTextStrikeThru: Boolean = false
-
-    /**
-     * Flag whether the selected text should underlined.
-     */
-    private var selectedTextUnderline: Boolean = false
-
-    /**
-     * The align of the text.
-     */
-    private var textAlign = DEFAULT_TEXT_ALIGN
-
-    /**
-     * The color of the text.
-     */
-    private var textColor = DEFAULT_TEXT_COLOR
-
-    /**
-     * The size of the text.
-     */
-    private var textSize1 = DEFAULT_TEXT_SIZE
-
-    /**
-     * Flag whether the text should strikethroughed.
-     */
-    private var textStrikeThroughed: Boolean = false
-
-    /**
-     * Flag whether the text should underlined.
-     */
-    private var textUnderline: Boolean = false
-
-    /**
-     * The typeface of the text.
-     */
-    private var typeface: Typeface = Typeface.DEFAULT
-
-    /**
-     * The width of the gap between text elements if the selector wheel.
-     */
-    private var selectorTextGapWidth = 0
-
-    /**
-     * The height of the gap between text elements if the selector wheel.
-     */
-    private var selectorTextGapHeight = 0
-
-    /**
-     * The values to be displayed instead the indices.
-     */
-    private var mDisplayedValues: List<String> = emptyList()
-
-    /**
-     * Lower weight of the range of numbers allowed for the NumberPicker
-     */
     var minValue = DEFAULT_MIN_VALUE
         set(value) {
             field = value
@@ -208,9 +96,6 @@ class NumberPicker @JvmOverloads constructor(
             invalidate()
         }
 
-    /**
-     * Upper weight of the range of numbers allowed for the NumberPicker
-     */
     var maxValue = DEFAULT_MAX_VALUE
         set(value) {
             require(maxValue >= 0) { "maxValue must be >= 0" }
@@ -224,351 +109,114 @@ class NumberPicker @JvmOverloads constructor(
             tryComputeMaxWidth()
             invalidate()
         }
+    private var selectedText: EditText = EditText(context)
+    private var selectedTextCenterX = 0f
+    private var selectedTextCenterY = 0f
+    private var minHeight = 0
+    private var maxHeight = 0
+    private var minWidth = 0
 
-    /**
-     * Current weight of this NumberPicker
-     */
+    private var maxWidth = 0
+    private var computeMaxWidth: Boolean = true
+
+    @Align
+    private var selectedTextAlign = DEFAULT_TEXT_ALIGN
+    private var selectedTextColor = DEFAULT_TEXT_COLOR
+    private var selectedTextSize = DEFAULT_TEXT_SIZE
+    private var selectedTextStrikeThrough: Boolean = false
+    private var selectedTextUnderline: Boolean = false
+    private var textAlign = DEFAULT_TEXT_ALIGN
+    private var textColor = DEFAULT_TEXT_COLOR
+    private var textSize = DEFAULT_TEXT_SIZE
+    private var textStrikeThrough: Boolean = false
+    private var textUnderline: Boolean = false
+    private var typeface: Typeface = Typeface.DEFAULT
+    private var selectorTextGapWidth = 0
+    private var selectorTextGapHeight = 0
+    private var mDisplayedValues: List<String> = emptyList()
     private var mValue: Int = 0
-
-    /**
-     * Listener to be notified upon current weight click.
-     */
-    private var mOnClickListener: OnClickListener? = null
-
-    /**
-     * Listener to be notified upon current weight change.
-     */
-    private val mOnValueChangeListeners: MutableList<OnValueChangeListener> = ArrayList()
-
-    /**
-     * Listener to be notified upon scroll state change.
-     */
-    private var mOnScrollListener: OnScrollListener? = null
-
-    /**
-     * Formatter for for displaying the current weight.
-     */
+    private var clickListener: OnClickListener? = null
+    private val valueChangeListeners: MutableList<OnValueChangeListener> = ArrayList()
+    private var scrollListener: OnScrollListener? = null
     private var mFormatter: Formatter?
-
-    /**
-     * The speed for updating the weight form long press.
-     */
-    private var mLongPressUpdateInterval = DEFAULT_LONG_PRESS_UPDATE_INTERVAL
-
-    /**
-     * Cache for the string representation of selector indices.
-     */
-    private val mSelectorIndexToStringCache = SparseArray<String?>()
-
-    /**
-     * The number of items show in the selector wheel.
-     */
+    private var longPressUpdateInterval = DEFAULT_LONG_PRESS_UPDATE_INTERVAL
+    private val mSelectorIndexToStringCache = SparseArray<String>()
     private var mWheelItemCount = DEFAULT_WHEEL_ITEM_COUNT
-
-    /**
-     * The real number of items show in the selector wheel.
-     */
     private var mRealWheelItemCount = DEFAULT_WHEEL_ITEM_COUNT
-
-    /**
-     * The index of the middle selector item.
-     */
     private var mWheelMiddleItemIndex = mWheelItemCount / 2
-
-    /**
-     * The selector indices whose weight are show by the selector.
-     */
     private var mSelectorIndices = IntArray(mWheelItemCount)
-
-    /**
-     * The [Paint] for drawing the selector.
-     */
     private var selectorWheelPaint: Paint = Paint()
-
-    /**
-     * The size of a selector element (text + gap).
-     */
     private var mSelectorElementSize = 0
-
-    /**
-     * The initial offset of the scroll selector.
-     */
     private var mInitialScrollOffset = Int.MIN_VALUE
-
-    /**
-     * The current offset of the scroll selector.
-     */
     private var mCurrentScrollOffset = 0
-
-    /**
-     * The [Scroller] responsible for flinging the selector.
-     */
     private val mFlingScroller: Scroller
-
-    /**
-     * The [Scroller] responsible for adjusting the selector.
-     */
     private val mAdjustScroller: Scroller
-
-    /**
-     * The previous X coordinate while scrolling the selector.
-     */
     private var mPreviousScrollerX = 0
-
-    /**
-     * The previous Y coordinate while scrolling the selector.
-     */
     private var mPreviousScrollerY = 0
-
-    /**
-     * Handle to the reusable command for setting the input text selection.
-     */
     private var mSetSelectionCommand: SetSelectionCommand? = null
-
-    /**
-     * Handle to the reusable command for changing the current weight from long press by one.
-     */
     private var mChangeCurrentByOneFromLongPressCommand: ChangeCurrentByOneFromLongPressCommand? =
         null
-
-    /**
-     * The X position of the last down event.
-     */
     private var mLastDownEventX = 0f
-
-    /**
-     * The Y position of the last down event.
-     */
     private var mLastDownEventY = 0f
-
-    /**
-     * The X position of the last down or move event.
-     */
     private var mLastDownOrMoveEventX = 0f
-
-    /**
-     * The Y position of the last down or move event.
-     */
     private var mLastDownOrMoveEventY = 0f
-
-    /**
-     * Determines speed during touch scrolling.
-     */
     private var mVelocityTracker: VelocityTracker? = null
-
-    /**
-     * @see ViewConfiguration.getScaledTouchSlop
-     */
     private val mTouchSlop: Int
-
-    /**
-     * @see ViewConfiguration.getScaledMinimumFlingVelocity
-     */
     private val mMinimumFlingVelocity: Int
-
-    /**
-     * @see ViewConfiguration.getScaledMaximumFlingVelocity
-     */
     private var mMaximumFlingVelocity: Int
-
-    /**
-     * Flag whether the selector should wrap around.
-     */
-    private var mWrapSelectorWheel: Boolean = false
-
-    /**
-     * User choice on whether the selector wheel should be wrapped.
-     */
+    private var mWrapSelectorWheel: Boolean = true
     private var mWrapSelectorWheelPreferred = true
-
-    /**
-     * Divider for showing item to be selected while scrolling
-     */
     private var mDividerDrawable: Drawable? = null
-
-    /**
-     * The color of the divider.
-     */
-    private var mDividerColor = DEFAULT_DIVIDER_COLOR
-
-    /**
-     * The distance between the two dividers.
-     */
+    private var dividerColor = DEFAULT_DIVIDER_COLOR
     private var mDividerDistance: Int
-
-    /**
-     * The thickness of the divider.
-     */
     private var mDividerThickness: Int
-
-    /**
-     * The top of the top divider.
-     */
     private var mTopDividerTop = 0
-
-    /**
-     * The bottom of the bottom divider.
-     */
     private var mBottomDividerBottom = 0
-
-    /**
-     * The left of the top divider.
-     */
     private var mLeftDividerLeft = 0
-
-    /**
-     * The right of the right divider.
-     */
     private var mRightDividerRight = 0
-
-    /**
-     * The current scroll state of the number picker.
-     */
     private var mScrollState = OnScrollListener.SCROLL_STATE_IDLE
-
-    /**
-     * The keycode of the last handled DPAD down event.
-     */
     private var mLastHandledDownDpadKeyCode = -1
-
-    /**
-     * Flag whether the selector wheel should hidden until the picker has focus.
-     */
     private val mHideWheelUntilFocused: Boolean
-
-    /**
-     * The width of this widget.
-     */
     private val mWidth: Float
-
-    /**
-     * The height of this widget.
-     */
     private val mHeight: Float
-
-    /**
-     * The orientation of this widget.
-     */
     private var mOrientation: Int
-
-    /**
-     * The order of this widget.
-     */
-    private var mOrder: Int
-
-    /**
-     * Flag whether the fading edge should enabled.
-     */
-    private var mFadingEdgeEnabled = true
-
-    /**
-     * The strength of fading edge while drawing the selector.
-     */
+    private var order: Int = ASCENDING
+    private var fadingEdgeEnabled = true
     private var mFadingEdgeStrength = DEFAULT_FADING_EDGE_STRENGTH
-
-    /**
-     * Flag whether the scroller should enabled.
-     */
-    private var mScrollerEnabled = true
-
-    /**
-     * The line spacing multiplier of the text.
-     */
+    private var scrollerEnabled = true
     private var mLineSpacingMultiplier = DEFAULT_LINE_SPACING_MULTIPLIER
-
-    /**
-     * The coefficient to adjust (divide) the max fling velocity.
-     */
     private var mMaxFlingVelocityCoefficient = DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT
-
-    /**
-     * The number formatter for current locale.
-     */
     private var mNumberFormatter: NumberFormat
-
-    /**
-     * The view configuration of this widget.
-     */
     private val mViewConfiguration: ViewConfiguration
 
-    /**
-     * Interface to listen for changes of the current weight.
-     */
     interface OnValueChangeListener {
-        /**
-         * Called upon a change of the current weight.
-         *
-         * @param picker The NumberPicker associated with this listener.
-         * @param oldVal The previous weight.
-         * @param newVal The new weight.
-         */
         fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int)
     }
 
-    /**
-     * Interface to listen for the picker scroll state.
-     */
     interface OnScrollListener {
         @IntDef(SCROLL_STATE_IDLE, SCROLL_STATE_TOUCH_SCROLL, SCROLL_STATE_FLING)
-        @Retention(
-            RetentionPolicy.SOURCE
-        )
         annotation class ScrollState
 
-        /**
-         * Callback invoked while the number picker scroll state has changed.
-         *
-         * @param view        The view whose scroll state is being reported.
-         * @param scrollState The current scroll state. One of
-         * [.SCROLL_STATE_IDLE],
-         * [.SCROLL_STATE_TOUCH_SCROLL] or
-         * [.SCROLL_STATE_IDLE].
-         */
         fun onScrollStateChange(view: NumberPicker?, @ScrollState scrollState: Int)
 
         companion object {
-            /**
-             * The view is not scrolling.
-             */
             const val SCROLL_STATE_IDLE = 0
-
-            /**
-             * The user is scrolling using touch, and his finger is still on the screen.
-             */
             const val SCROLL_STATE_TOUCH_SCROLL = 1
-
-            /**
-             * The user had previously been scrolling using touch and performed a fling.
-             */
             const val SCROLL_STATE_FLING = 2
         }
     }
 
-    /**
-     * Interface used to format current weight into a string for presentation.
-     */
     interface Formatter {
-        /**
-         * Formats a string representation of the current weight.
-         *
-         * @param value The currently selected weight.
-         * @return A formatted string representation.
-         */
         fun format(value: Int): String
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val msrdWdth = measuredWidth
-        val msrdHght = measuredHeight
-
         // Input text centered horizontally.
-        val inptTxtMsrdWdth = selectedText.measuredWidth
-        val inptTxtMsrdHght = selectedText.measuredHeight
-        val inptTxtLeft = (msrdWdth - inptTxtMsrdWdth) / 2
-        val inptTxtTop = (msrdHght - inptTxtMsrdHght) / 2
-        val inptTxtRight = inptTxtLeft + inptTxtMsrdWdth
-        val inptTxtBottom = inptTxtTop + inptTxtMsrdHght
-        selectedText.layout(inptTxtLeft, inptTxtTop, inptTxtRight, inptTxtBottom)
+        val inputTextLeft = (measuredWidth - selectedText.measuredWidth) / 2
+        val inputTextTop = (measuredHeight - selectedText.measuredHeight) / 2
+        val inputTextRight = inputTextLeft + selectedText.measuredWidth
+        val inputTextBottom = inputTextTop + selectedText.measuredHeight
+        selectedText.layout(inputTextLeft, inputTextTop, inputTextRight, inputTextBottom)
         selectedTextCenterX = selectedText.x + selectedText.measuredWidth / 2
         selectedTextCenterY = selectedText.y + selectedText.measuredHeight / 2
         if (changed) {
@@ -588,21 +236,23 @@ class NumberPicker @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Try greedily to fit the max width and height.
-        val newWidthMeasureSpec = makeMeasureSpec(widthMeasureSpec, maxWidth)
-        val newHeightMeasureSpec = makeMeasureSpec(heightMeasureSpec, maxHeight)
-        super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
+        super.onMeasure(
+            makeMeasureSpec(widthMeasureSpec, maxWidth),
+            makeMeasureSpec(heightMeasureSpec, maxHeight)
+        )
         // Flag if we are measured with width or height less than the respective min.
-        val widthSize = resolveSizeAndStateRespectingMinSize(
-            minWidth,
-            measuredWidth,
-            widthMeasureSpec
+        setMeasuredDimension(
+            resolveSizeAndStateRespectingMinSize(
+                minWidth,
+                measuredWidth,
+                widthMeasureSpec
+            ),
+            resolveSizeAndStateRespectingMinSize(
+                minHeight,
+                measuredHeight,
+                heightMeasureSpec
+            )
         )
-        val heightSize = resolveSizeAndStateRespectingMinSize(
-            minHeight,
-            measuredHeight,
-            heightMeasureSpec
-        )
-        setMeasuredDimension(widthSize, heightSize)
     }
 
     /**
@@ -655,8 +305,7 @@ class NumberPicker @JvmOverloads constructor(
         if (!isEnabled) {
             return false
         }
-        val action = event.action and MotionEvent.ACTION_MASK
-        when (action) {
+        when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
                 removeAllCallbacks()
                 // Make sure we support flinging inside scrollables.
@@ -664,44 +313,43 @@ class NumberPicker @JvmOverloads constructor(
                 if (isHorizontalMode()) {
                     mLastDownEventX = event.x
                     mLastDownOrMoveEventX = mLastDownEventX
-                    if (!mFlingScroller.isFinished()) {
-                        mFlingScroller.forceFinished(true)
-                        mAdjustScroller.forceFinished(true)
-                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE)
-                    } else if (!mAdjustScroller.isFinished()) {
-                        mFlingScroller.forceFinished(true)
-                        mAdjustScroller.forceFinished(true)
-                    } else if (mLastDownEventX >= mLeftDividerLeft &&
-                        mLastDownEventX <= mRightDividerRight
-                    ) {
-                        if (mOnClickListener != null) {
-                            mOnClickListener!!.onClick(this)
+                    when {
+                        !mFlingScroller.isFinished() -> {
+                            mFlingScroller.forceFinished(true)
+                            mAdjustScroller.forceFinished(true)
+                            onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE)
                         }
-                    } else if (mLastDownEventX < mLeftDividerLeft) {
-                        postChangeCurrentByOneFromLongPress(false)
-                    } else if (mLastDownEventX > mRightDividerRight) {
-                        postChangeCurrentByOneFromLongPress(true)
+                        !mAdjustScroller.isFinished() -> {
+                            mFlingScroller.forceFinished(true)
+                            mAdjustScroller.forceFinished(true)
+                        }
+                        mLastDownEventX >= mLeftDividerLeft &&
+                            mLastDownEventX <= mRightDividerRight -> clickListener?.onClick(this)
+                        mLastDownEventX < mLeftDividerLeft ->
+                            postChangeCurrentByOneFromLongPress(false)
+                        mLastDownEventX > mRightDividerRight ->
+                            postChangeCurrentByOneFromLongPress(true)
                     }
                 } else {
                     mLastDownEventY = event.y
                     mLastDownOrMoveEventY = mLastDownEventY
-                    if (!mFlingScroller.isFinished()) {
-                        mFlingScroller.forceFinished(true)
-                        mAdjustScroller.forceFinished(true)
-                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE)
-                    } else if (!mAdjustScroller.isFinished()) {
-                        mFlingScroller.forceFinished(true)
-                        mAdjustScroller.forceFinished(true)
-                    } else if (mLastDownEventY >= mTopDividerTop &&
-                        mLastDownEventY <= mBottomDividerBottom
-                    ) {
-                        if (mOnClickListener != null) {
-                            mOnClickListener!!.onClick(this)
+                    when {
+                        !mFlingScroller.isFinished() -> {
+                            mFlingScroller.forceFinished(true)
+                            mAdjustScroller.forceFinished(true)
+                            onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE)
                         }
-                    } else if (mLastDownEventY < mTopDividerTop) {
-                        postChangeCurrentByOneFromLongPress(false)
-                    } else if (mLastDownEventY > mBottomDividerBottom) {
-                        postChangeCurrentByOneFromLongPress(true)
+                        !mAdjustScroller.isFinished() -> {
+                            mFlingScroller.forceFinished(true)
+                            mAdjustScroller.forceFinished(true)
+                        }
+                        mLastDownEventY >= mTopDividerTop &&
+                            mLastDownEventY <= mBottomDividerBottom ->
+                            clickListener?.onClick(this)
+                        mLastDownEventY < mTopDividerTop ->
+                            postChangeCurrentByOneFromLongPress(false)
+                        mLastDownEventY > mBottomDividerBottom ->
+                            postChangeCurrentByOneFromLongPress(true)
                     }
                 }
                 return true
@@ -714,20 +362,19 @@ class NumberPicker @JvmOverloads constructor(
         if (!isEnabled) {
             return false
         }
-        if (!isScrollerEnabled()) {
+        if (!scrollerEnabled) {
             return false
         }
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain()
         }
         mVelocityTracker!!.addMovement(event)
-        val action = event.action and MotionEvent.ACTION_MASK
-        when (action) {
+        when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_MOVE -> {
                 if (isHorizontalMode()) {
                     val currentMoveX = event.x
                     if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                        val deltaDownX = Math.abs(currentMoveX - mLastDownEventX).toInt()
+                        val deltaDownX = abs(currentMoveX - mLastDownEventX).toInt()
                         if (deltaDownX > mTouchSlop) {
                             removeAllCallbacks()
                             onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
@@ -741,7 +388,7 @@ class NumberPicker @JvmOverloads constructor(
                 } else {
                     val currentMoveY = event.y
                     if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                        val deltaDownY = Math.abs(currentMoveY - mLastDownEventY).toInt()
+                        val deltaDownY = abs(currentMoveY - mLastDownEventY).toInt()
                         if (deltaDownY > mTouchSlop) {
                             removeAllCallbacks()
                             onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
@@ -760,12 +407,12 @@ class NumberPicker @JvmOverloads constructor(
                 velocityTracker!!.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
                 if (isHorizontalMode()) {
                     val initialVelocity = velocityTracker.xVelocity.toInt()
-                    if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
+                    if (abs(initialVelocity) > mMinimumFlingVelocity) {
                         fling(initialVelocity)
                         onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING)
                     } else {
                         val eventX = event.x.toInt()
-                        val deltaMoveX = Math.abs(eventX - mLastDownEventX).toInt()
+                        val deltaMoveX = abs(eventX - mLastDownEventX).toInt()
                         if (deltaMoveX <= mTouchSlop) {
                             val selectorIndexOffset = (
                                 eventX / mSelectorElementSize -
@@ -785,12 +432,12 @@ class NumberPicker @JvmOverloads constructor(
                     }
                 } else {
                     val initialVelocity = velocityTracker.yVelocity.toInt()
-                    if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
+                    if (abs(initialVelocity) > mMinimumFlingVelocity) {
                         fling(initialVelocity)
                         onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING)
                     } else {
                         val eventY = event.y.toInt()
-                        val deltaMoveY = Math.abs(eventY - mLastDownEventY).toInt()
+                        val deltaMoveY = abs(eventY - mLastDownEventY).toInt()
                         if (deltaMoveY <= mTouchSlop) {
                             val selectorIndexOffset = (
                                 eventY / mSelectorElementSize -
@@ -817,16 +464,14 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        val action = event.action and MotionEvent.ACTION_MASK
-        when (action) {
+        when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> removeAllCallbacks()
         }
         return super.dispatchTouchEvent(event)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val keyCode = event.keyCode
-        when (keyCode) {
+        when (val keyCode = event.keyCode) {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> removeAllCallbacks()
             KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_UP -> when (event.action) {
                 KeyEvent.ACTION_DOWN -> if (mWrapSelectorWheel || (if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) value < maxValue else value > minValue)) {
@@ -848,15 +493,14 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     override fun dispatchTrackballEvent(event: MotionEvent): Boolean {
-        val action = event.action and MotionEvent.ACTION_MASK
-        when (action) {
+        when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> removeAllCallbacks()
         }
         return super.dispatchTrackballEvent(event)
     }
 
     override fun computeScroll() {
-        if (!isScrollerEnabled()) {
+        if (!scrollerEnabled) {
             return
         }
         var scroller = mFlingScroller
@@ -895,7 +539,7 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     override fun scrollBy(x: Int, y: Int) {
-        if (!isScrollerEnabled()) {
+        if (!scrollerEnabled) {
             return
         }
         val selectorIndices = getSelectorIndices()
@@ -1020,39 +664,24 @@ class NumberPicker @JvmOverloads constructor(
         mNumberFormatter = NumberFormat.getInstance()
     }
 
-    /**
-     * Set listener to be notified on click of the current weight.
-     *
-     * @param onClickListener The listener.
-     */
     override fun setOnClickListener(onClickListener: OnClickListener?) {
-        mOnClickListener = onClickListener
+        clickListener = onClickListener
     }
 
-    /**
-     * Add the listener to be notified on change of the current weight.
-     *
-     * @param onValueChangedListener The listener.
-     */
     fun addOnValueChangedListener(onValueChangedListener: OnValueChangeListener?) {
-        onValueChangedListener?.let { mOnValueChangeListeners.add(it) }
+        onValueChangedListener?.let { valueChangeListeners.add(it) }
     }
 
     fun removeOnValueChangedListener(onValueChangedListener: OnValueChangeListener?) {
-        mOnValueChangeListeners.remove(onValueChangedListener)
+        valueChangeListeners.remove(onValueChangedListener)
     }
 
     fun clearOnValueChangedListeners() {
-        mOnValueChangeListeners.clear()
+        valueChangeListeners.clear()
     }
 
-    /**
-     * Set listener to be notified for scroll state changes.
-     *
-     * @param onScrollListener The listener.
-     */
     fun setOnScrollListener(onScrollListener: OnScrollListener?) {
-        mOnScrollListener = onScrollListener
+        scrollListener = onScrollListener
     }
 
     fun updateValue(value: Int) {
@@ -1060,24 +689,18 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     private val maxTextSize: Float
-        get() = Math.max(textSize1, selectedTextSize)
+        get() = max(textSize, selectedTextSize)
 
-    private fun getPaintCenterY(fontMetrics: FontMetrics?): Float {
-        return if (fontMetrics == null) {
-            0f
-        } else Math.abs(fontMetrics.top + fontMetrics.bottom) / 2
-    }
+    private fun getPaintCenterY(fontMetrics: FontMetrics?): Float =
+        fontMetrics?.let { abs(it.top + it.bottom) / 2 } ?: 0f
 
-    /**
-     * Computes the max width if no such specified as an attribute.
-     */
     private fun tryComputeMaxWidth() {
         if (!computeMaxWidth) {
             return
         }
         selectorWheelPaint.textSize = maxTextSize
         var maxTextWidth = 0
-        if (mDisplayedValues == null) {
+        if (mDisplayedValues.isEmpty()) {
             var maxDigitWidth = 0f
             for (i in 0..9) {
                 val digitWidth = selectorWheelPaint.measureText(formatNumber(i))
@@ -1089,13 +712,13 @@ class NumberPicker @JvmOverloads constructor(
             var current = maxValue
             while (current > 0) {
                 numberOfDigits++
-                current = current / 10
+                current /= 10
             }
             maxTextWidth = (numberOfDigits * maxDigitWidth).toInt()
         } else {
-            val valueCount = mDisplayedValues!!.size
+            val valueCount = mDisplayedValues.size
             for (i in 0 until valueCount) {
-                val textWidth = selectorWheelPaint.measureText(mDisplayedValues!![i])
+                val textWidth = selectorWheelPaint.measureText(mDisplayedValues[i])
                 if (textWidth > maxTextWidth) {
                     maxTextWidth = textWidth.toInt()
                 }
@@ -1112,13 +735,6 @@ class NumberPicker @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Gets whether the selector wheel wraps when reaching the min/max weight.
-     *
-     * @return True if the selector wheel wraps.
-     * @see .getMinValue
-     * @see .getMaxValue
-     */
     fun getWrapSelectorWheel(): Boolean {
         return mWrapSelectorWheel
     }
@@ -1159,26 +775,15 @@ class NumberPicker @JvmOverloads constructor(
         mWrapSelectorWheel = wrappingAllowed && mWrapSelectorWheelPreferred
     }
 
-    /**
-     * Sets the speed at which the numbers be incremented and decremented when
-     * the up and down buttons are long pressed respectively.
-     *
-     *
-     * The default weight is 300 ms.
-     *
-     *
-     * @param intervalMillis The speed (in milliseconds) at which the numbers
-     * will be incremented and decremented.
-     */
     fun setOnLongPressUpdateInterval(intervalMillis: Long) {
-        mLongPressUpdateInterval = intervalMillis
+        longPressUpdateInterval = intervalMillis
     }
+
     /**
      * Returns the weight of the picker.
      *
      * @return The weight.
-     */
-    /**
+     *
      * Set the current weight for the number picker.
      *
      *
@@ -1216,21 +821,12 @@ class NumberPicker @JvmOverloads constructor(
             setValueInternal(value, false)
         }
 
-    /**
-     * Sets the values to be displayed.
-     *
-     * @param displayedValues The displayed values.
-     *
-     * **Note:** The length of the displayed values array
-     * must be equal to the range of selectable numbers which is equal to
-     * [.getMaxValue] - [.getMinValue] + 1.
-     */
-    fun setDisplayedValues(displayedValues: Array<String>) {
+    fun setDisplayedValues(displayedValues: List<String>) {
         if (mDisplayedValues == displayedValues) {
             return
         }
         mDisplayedValues = displayedValues.toList()
-        if (mDisplayedValues != null) {
+        if (mDisplayedValues.isNotEmpty()) {
             // Allow text entry rather than strictly numeric entry.
             selectedText.setRawInputType(
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -1244,25 +840,20 @@ class NumberPicker @JvmOverloads constructor(
         tryComputeMaxWidth()
     }
 
-    private fun getFadingEdgeStrength(isHorizontalMode: Boolean): Float {
-        return if (isHorizontalMode && mFadingEdgeEnabled) mFadingEdgeStrength else 0f
-    }
+    private fun getFadingEdgeStrength(isHorizontalMode: Boolean): Float =
+        if (isHorizontalMode && fadingEdgeEnabled) mFadingEdgeStrength else 0f
 
-    override fun getTopFadingEdgeStrength(): Float {
-        return getFadingEdgeStrength(!isHorizontalMode())
-    }
+    override fun getTopFadingEdgeStrength(): Float =
+        getFadingEdgeStrength(!isHorizontalMode())
 
-    override fun getBottomFadingEdgeStrength(): Float {
-        return getFadingEdgeStrength(!isHorizontalMode())
-    }
+    override fun getBottomFadingEdgeStrength(): Float =
+        getFadingEdgeStrength(!isHorizontalMode())
 
-    override fun getLeftFadingEdgeStrength(): Float {
-        return getFadingEdgeStrength(isHorizontalMode())
-    }
+    override fun getLeftFadingEdgeStrength(): Float =
+        getFadingEdgeStrength(isHorizontalMode())
 
-    override fun getRightFadingEdgeStrength(): Float {
-        return getFadingEdgeStrength(isHorizontalMode())
-    }
+    override fun getRightFadingEdgeStrength(): Float =
+        getFadingEdgeStrength(isHorizontalMode())
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
@@ -1283,9 +874,7 @@ class NumberPicker @JvmOverloads constructor(
     @CallSuper
     override fun jumpDrawablesToCurrentState() {
         super.jumpDrawablesToCurrentState()
-        if (mDividerDrawable != null) {
-            mDividerDrawable!!.jumpToCurrentState()
-        }
+        mDividerDrawable?.jumpToCurrentState()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -1315,13 +904,13 @@ class NumberPicker @JvmOverloads constructor(
                 selectorWheelPaint.textAlign = Paint.Align.values()[selectedTextAlign]
                 selectorWheelPaint.textSize = selectedTextSize
                 selectorWheelPaint.color = selectedTextColor
-                selectorWheelPaint.isStrikeThruText = selectedTextStrikeThru
+                selectorWheelPaint.isStrikeThruText = selectedTextStrikeThrough
                 selectorWheelPaint.isUnderlineText = selectedTextUnderline
             } else {
                 selectorWheelPaint.textAlign = Paint.Align.values()[textAlign]
-                selectorWheelPaint.textSize = textSize1
+                selectorWheelPaint.textSize = textSize
                 selectorWheelPaint.color = textColor
-                selectorWheelPaint.isStrikeThruText = textStrikeThroughed
+                selectorWheelPaint.isStrikeThruText = textStrikeThrough
                 selectorWheelPaint.isUnderlineText = textUnderline
             }
             val selectorIndex =
@@ -1385,29 +974,29 @@ class NumberPicker @JvmOverloads constructor(
         }
     }
 
-    private fun drawText(text: String?, x: Float, y: Float, paint: Paint, canvas: Canvas) {
-        var y = y
-        if (text!!.contains("\n")) {
+    private fun drawText(text: String, x: Float, y: Float, paint: Paint, canvas: Canvas) {
+        var localY = y
+        if (text.contains("\n")) {
             val lines = text.split("\n").toTypedArray()
             val height = (
-                Math.abs(paint.descent() + paint.ascent()) *
+                abs(paint.descent() + paint.ascent()) *
                     mLineSpacingMultiplier
                 )
             val diff = (lines.size - 1) * height / 2
-            y -= diff
+            localY -= diff
             for (line in lines) {
-                canvas.drawText(line, x, y, paint)
-                y += height
+                canvas.drawText(line, x, localY, paint)
+                localY += height
             }
         } else {
-            canvas.drawText(text, x, y, paint)
+            canvas.drawText(text, x, localY, paint)
         }
     }
 
     override fun onInitializeAccessibilityEvent(event: AccessibilityEvent) {
         super.onInitializeAccessibilityEvent(event)
         event.className = NumberPicker::class.java.name
-        event.isScrollable = isScrollerEnabled()
+        event.isScrollable = scrollerEnabled
         val scroll = (minValue + mValue) * mSelectorElementSize
         val maxScroll = (maxValue - minValue) * mSelectorElementSize
         if (isHorizontalMode()) {
@@ -1426,22 +1015,18 @@ class NumberPicker @JvmOverloads constructor(
      * @param maxSize     The max weight for the size.
      * @return A measure spec greedily imposing the max size.
      */
-    private fun makeMeasureSpec(measureSpec: Int, maxSize: Int): Int {
+    private fun makeMeasureSpec(measureSpec: Int, maxSize: Int): Int =
         if (maxSize == SIZE_UNSPECIFIED) {
-            return measureSpec
-        }
-        val size = MeasureSpec.getSize(measureSpec)
-        val mode = MeasureSpec.getMode(measureSpec)
-        return when (mode) {
+            measureSpec
+        } else when (val mode = MeasureSpec.getMode(measureSpec)) {
             MeasureSpec.EXACTLY -> measureSpec
             MeasureSpec.AT_MOST -> MeasureSpec.makeMeasureSpec(
-                Math.min(size, maxSize),
+                min(MeasureSpec.getSize(measureSpec), maxSize),
                 MeasureSpec.EXACTLY
             )
             MeasureSpec.UNSPECIFIED -> MeasureSpec.makeMeasureSpec(maxSize, MeasureSpec.EXACTLY)
             else -> throw IllegalArgumentException("Unknown measure mode: $mode")
         }
-    }
 
     /**
      * Utility to reconcile a desired size and state, with constraints imposed
@@ -1457,18 +1042,16 @@ class NumberPicker @JvmOverloads constructor(
         minSize: Int,
         measuredSize: Int,
         measureSpec: Int
-    ): Int {
-        return if (minSize != SIZE_UNSPECIFIED) {
-            val desiredWidth = Math.max(minSize, measuredSize)
+    ): Int =
+        if (minSize != SIZE_UNSPECIFIED) {
             resolveSizeAndState(
-                desiredWidth,
-                measureSpec,
-                0
+                size = max(minSize, measuredSize),
+                measureSpec = measureSpec,
+                childMeasuredState = 0
             )
         } else {
             measuredSize
         }
-    }
 
     /**
      * Resets the selector indices and clear the cached string representation of
@@ -1477,9 +1060,8 @@ class NumberPicker @JvmOverloads constructor(
     private fun initializeSelectorWheelIndices() {
         mSelectorIndexToStringCache.clear()
         val selectorIndices = getSelectorIndices()
-        val current = value
         for (i in mSelectorIndices.indices) {
-            var selectorIndex = current + (i - mWheelMiddleItemIndex)
+            var selectorIndex = value + (i - mWheelMiddleItemIndex)
             if (mWrapSelectorWheel) {
                 selectorIndex = getWrappedSelectorIndex(selectorIndex)
             }
@@ -1495,25 +1077,25 @@ class NumberPicker @JvmOverloads constructor(
      * @param notifyChange Whether to notify if the current weight changed.
      */
     private fun setValueInternal(current: Int, notifyChange: Boolean) {
-        var current = current
-        if (mValue == current) {
+        var localValue = current
+        if (mValue == localValue) {
             return
         }
         // Wrap around the values if we go past the start or end
         if (mWrapSelectorWheel) {
-            current = getWrappedSelectorIndex(current)
+            localValue = getWrappedSelectorIndex(localValue)
         } else {
-            current = Math.max(current, minValue)
-            current = Math.min(current, maxValue)
+            localValue = max(localValue, minValue)
+            localValue = min(localValue, maxValue)
         }
         val previous = mValue
-        mValue = current
+        mValue = localValue
         // If we're flinging, we'll update the text view at the end when it becomes visible
         if (mScrollState != OnScrollListener.SCROLL_STATE_FLING) {
             updateInputTextView()
         }
         if (notifyChange) {
-            notifyChange(previous, current)
+            notifyChange(previous, localValue)
         }
         initializeSelectorWheelIndices()
         updateAccessibilityDescription()
@@ -1561,7 +1143,7 @@ class NumberPicker @JvmOverloads constructor(
         initializeSelectorWheelIndices()
         val selectorIndices = getSelectorIndices()
         val totalTextSize = (
-            (selectorIndices.size - 1) * textSize1.toInt() +
+            (selectorIndices.size - 1) * textSize.toInt() +
                 selectedTextSize.toInt()
             )
         val textGapCount = selectorIndices.size.toFloat()
@@ -1585,16 +1167,13 @@ class NumberPicker @JvmOverloads constructor(
     private fun initializeFadingEdges() {
         if (isHorizontalMode()) {
             isHorizontalFadingEdgeEnabled = true
-            setFadingEdgeLength((right - left - textSize1.toInt()) / 2)
+            setFadingEdgeLength((right - left - textSize.toInt()) / 2)
         } else {
             isVerticalFadingEdgeEnabled = true
-            setFadingEdgeLength((bottom - top - textSize1.toInt()) / 2)
+            setFadingEdgeLength((bottom - top - textSize.toInt()) / 2)
         }
     }
 
-    /**
-     * Callback invoked upon completion of a given `scroller`.
-     */
     private fun onScrollerFinished(scroller: Scroller) {
         if (scroller === mFlingScroller) {
             ensureScrollWheelAdjusted()
@@ -1605,44 +1184,69 @@ class NumberPicker @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Handles transition to a given `scrollState`
-     */
     private fun onScrollStateChange(scrollState: Int) {
         if (mScrollState == scrollState) {
             return
         }
         mScrollState = scrollState
-        if (mOnScrollListener != null) {
-            mOnScrollListener!!.onScrollStateChange(this, scrollState)
-        }
+        scrollListener?.onScrollStateChange(this, scrollState)
     }
 
-    /**
-     * Flings the selector with the given `velocity`.
-     */
     private fun fling(velocity: Int) {
         if (isHorizontalMode()) {
             mPreviousScrollerX = 0
             if (velocity > 0) {
-                mFlingScroller.fling(0, 0, velocity, 0, 0, Int.MAX_VALUE, 0, 0)
+                mFlingScroller.fling(
+                    startX = 0,
+                    startY = 0,
+                    velocityX = velocity,
+                    velocityY = 0,
+                    minX = 0,
+                    maxX = Int.MAX_VALUE,
+                    minY = 0,
+                    maxY = 0
+                )
             } else {
-                mFlingScroller.fling(Int.MAX_VALUE, 0, velocity, 0, 0, Int.MAX_VALUE, 0, 0)
+                mFlingScroller.fling(
+                    startX = Int.MAX_VALUE,
+                    startY = 0,
+                    velocityX = velocity,
+                    velocityY = 0,
+                    minX = 0,
+                    maxX = Int.MAX_VALUE,
+                    minY = 0,
+                    maxY = 0
+                )
             }
         } else {
             mPreviousScrollerY = 0
             if (velocity > 0) {
-                mFlingScroller.fling(0, 0, 0, velocity, 0, 0, 0, Int.MAX_VALUE)
+                mFlingScroller.fling(
+                    startX = 0,
+                    startY = 0,
+                    velocityX = 0,
+                    velocityY = velocity,
+                    minX = 0,
+                    maxX = 0,
+                    minY = 0,
+                    maxY = Int.MAX_VALUE
+                )
             } else {
-                mFlingScroller.fling(0, Int.MAX_VALUE, 0, velocity, 0, 0, 0, Int.MAX_VALUE)
+                mFlingScroller.fling(
+                    startX = 0,
+                    startY = Int.MAX_VALUE,
+                    velocityX = 0,
+                    velocityY = velocity,
+                    minX = 0,
+                    maxX = 0,
+                    minY = 0,
+                    maxY = Int.MAX_VALUE
+                )
             }
         }
         invalidate()
     }
 
-    /**
-     * @return The wrapped index `selectorIndex` weight.
-     */
     private fun getWrappedSelectorIndex(selectorIndex: Int): Int {
         if (selectorIndex > maxValue) {
             return minValue + (selectorIndex - maxValue) % (maxValue - minValue) - 1
@@ -1656,10 +1260,6 @@ class NumberPicker @JvmOverloads constructor(
         return mSelectorIndices
     }
 
-    /**
-     * Increments the `selectorIndices` whose string representations
-     * will be displayed in the selector.
-     */
     private fun incrementSelectorIndices(selectorIndices: IntArray) {
         for (i in 0 until selectorIndices.size - 1) {
             selectorIndices[i] = selectorIndices[i + 1]
@@ -1672,10 +1272,6 @@ class NumberPicker @JvmOverloads constructor(
         ensureCachedScrollSelectorValue(nextScrollSelectorIndex)
     }
 
-    /**
-     * Decrements the `selectorIndices` whose string representations
-     * will be displayed in the selector.
-     */
     private fun decrementSelectorIndices(selectorIndices: IntArray) {
         for (i in selectorIndices.size - 1 downTo 1) {
             selectorIndices[i] = selectorIndices[i - 1]
@@ -1688,10 +1284,6 @@ class NumberPicker @JvmOverloads constructor(
         ensureCachedScrollSelectorValue(nextScrollSelectorIndex)
     }
 
-    /**
-     * Ensures we have a cached string representation of the given `
-     * selectorIndex` to avoid multiple instantiations of the same string.
-     */
     private fun ensureCachedScrollSelectorValue(selectorIndex: Int) {
         val cache = mSelectorIndexToStringCache
         var scrollSelectorValue = cache[selectorIndex]
@@ -1715,14 +1307,6 @@ class NumberPicker @JvmOverloads constructor(
         return if (mFormatter != null) mFormatter!!.format(value) else formatNumberWithLocale(value)
     }
 
-    /**
-     * Updates the view of this NumberPicker. If displayValues were specified in
-     * the string corresponding to the index specified by the current weight will
-     * be returned. Otherwise, the formatter specified in [.setFormatter]
-     * will be used to format the number.
-     *
-     * @return Whether the text was updated.
-     */
     private fun updateInputTextView(): Boolean {
         /*
          * If we don't have displayed values then use the current number else
@@ -1744,25 +1328,12 @@ class NumberPicker @JvmOverloads constructor(
         return false
     }
 
-    /**
-     * Notifies the listener, if registered, of a change of the weight of this
-     * NumberPicker.
-     */
     private fun notifyChange(previous: Int, current: Int) {
-        if (mOnValueChangeListeners.isNotEmpty()) {
-            for (listener in mOnValueChangeListeners) listener.onValueChange(this, previous, mValue)
+        if (valueChangeListeners.isNotEmpty()) {
+            for (listener in valueChangeListeners) listener.onValueChange(this, previous, mValue)
         }
     }
-    /**
-     * Posts a command for changing the current weight by one.
-     *
-     * @param increment Whether to increment or decrement the weight.
-     */
-    /**
-     * Posts a command for changing the current weight by one.
-     *
-     * @param increment Whether to increment or decrement the weight.
-     */
+
     private fun postChangeCurrentByOneFromLongPress(
         increment: Boolean,
         delayMillis: Long = ViewConfiguration.getLongPressTimeout()
@@ -1777,43 +1348,31 @@ class NumberPicker @JvmOverloads constructor(
         postDelayed(mChangeCurrentByOneFromLongPressCommand, delayMillis)
     }
 
-    /**
-     * Removes the command for changing the current weight by one.
-     */
     private fun removeChangeCurrentByOneFromLongPress() {
-        if (mChangeCurrentByOneFromLongPressCommand != null) {
-            removeCallbacks(mChangeCurrentByOneFromLongPressCommand)
-        }
+        mChangeCurrentByOneFromLongPressCommand?.let { removeCallbacks(it) }
     }
 
-    /**
-     * Removes all pending callback from the message queue.
-     */
     private fun removeAllCallbacks() {
-        if (mChangeCurrentByOneFromLongPressCommand != null) {
-            removeCallbacks(mChangeCurrentByOneFromLongPressCommand)
-        }
-        if (mSetSelectionCommand != null) {
-            mSetSelectionCommand!!.cancel()
-        }
+        mChangeCurrentByOneFromLongPressCommand?.let { removeCallbacks(it) }
+        mSetSelectionCommand?.cancel()
     }
 
     /**
      * @return The selected index given its displayed `weight`.
      */
     private fun getSelectedPos(value: String): Int {
-        var value = value
-        if (mDisplayedValues == null) {
+        var localValue = value
+        if (mDisplayedValues.isEmpty()) {
             try {
-                return value.toInt()
+                return localValue.toInt()
             } catch (e: NumberFormatException) {
                 // Ignore as if it's not a number we don't care
             }
         } else {
-            for (i in mDisplayedValues!!.indices) {
+            for (i in mDisplayedValues.indices) {
                 // Don't force the user to type in jan when ja will do
-                value = value.lowercase(Locale.getDefault())
-                if (mDisplayedValues!![i].lowercase(Locale.getDefault()).startsWith(value)) {
+                localValue = localValue.lowercase(Locale.getDefault())
+                if (mDisplayedValues[i].lowercase(Locale.getDefault()).startsWith(localValue)) {
                     return minValue + i
                 }
             }
@@ -1821,19 +1380,13 @@ class NumberPicker @JvmOverloads constructor(
             /*
              * The user might have typed in a number into the month field i.e.
              * 10 instead of OCT so support that too.
-             */try {
-                return value.toInt()
-            } catch (e: NumberFormatException) {
-                // Ignore as if it's not a number we don't care
-            }
+             */
+            runCatching { localValue.toInt() }
+                .onSuccess { return it }
         }
         return minValue
     }
 
-    /**
-     * Posts a [SetSelectionCommand] from the given
-     * `selectionStart` to `selectionEnd`.
-     */
     private fun postSetSelectionCommand(selectionStart: Int, selectionEnd: Int) {
         if (mSetSelectionCommand == null) {
             mSetSelectionCommand = SetSelectionCommand(selectedText)
@@ -1869,7 +1422,7 @@ class NumberPicker @JvmOverloads constructor(
             if (mSetSelectionCommand != null) {
                 mSetSelectionCommand!!.cancel()
             }
-            return if (mDisplayedValues == null) {
+            return if (mDisplayedValues.isEmpty()) {
                 var filtered = super.filter(source, start, end, dest, dstart, dend)
                 if (filtered == null) {
                     filtered = source.subSequence(start, end)
@@ -1881,7 +1434,7 @@ class NumberPicker @JvmOverloads constructor(
                 if ("" == result) {
                     return result
                 }
-                val `val` = getSelectedPos(result)
+                val localValue = getSelectedPos(result)
 
                 /*
                  * Ensure the user can't type in a weight greater than the max
@@ -1889,7 +1442,7 @@ class NumberPicker @JvmOverloads constructor(
                  * want to delete some numbers and then type a new number.
                  * And prevent multiple-"0" that exceeds the length of upper
                  * bound number.
-                 */if (`val` > maxValue || result.length > maxValue.toString().length) {
+                 */if (localValue > maxValue || result.length > maxValue.toString().length) {
                     ""
                 } else {
                     filtered
@@ -1904,11 +1457,10 @@ class NumberPicker @JvmOverloads constructor(
                         dest.subSequence(dend, dest.length)
                     )
                 val str = result.lowercase(Locale.getDefault())
-                for (`val` in mDisplayedValues!!) {
-                    val valLowerCase = `val`.lowercase(Locale.getDefault())
-                    if (valLowerCase.startsWith(str)) {
-                        postSetSelectionCommand(result.length, `val`.length)
-                        return `val`.subSequence(dstart, `val`.length)
+                mDisplayedValues.forEach { displayedValue ->
+                    if (displayedValue.lowercase(Locale.getDefault()).startsWith(str)) {
+                        postSetSelectionCommand(result.length, displayedValue.length)
+                        return displayedValue.subSequence(dstart, displayedValue.length)
                     }
                 }
                 ""
@@ -1916,17 +1468,11 @@ class NumberPicker @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Ensures that the scroll wheel is adjusted i.e. there is no offset and the
-     * middle element is in the middle of the widget.
-     *
-     * @return Whether an adjustment has been made.
-     */
     private fun ensureScrollWheelAdjusted(): Boolean {
         // adjust to the closest weight
         var delta = mInitialScrollOffset - mCurrentScrollOffset
         if (delta != 0) {
-            if (Math.abs(delta) > mSelectorElementSize / 2) {
+            if (abs(delta) > mSelectorElementSize / 2) {
                 delta += if (delta > 0) -mSelectorElementSize else mSelectorElementSize
             }
             if (isHorizontalMode()) {
@@ -1986,7 +1532,7 @@ class NumberPicker @JvmOverloads constructor(
 
         override fun run() {
             changeValueByOne(mIncrement)
-            postDelayed(this, mLongPressUpdateInterval)
+            postDelayed(this, longPressUpdateInterval)
         }
     }
 
@@ -2014,12 +1560,12 @@ class NumberPicker @JvmOverloads constructor(
         return px / resources.displayMetrics.scaledDensity
     }
 
-    private fun stringToFormatter(formatter: String?): Formatter? {
+    private fun stringToFormatter(formatter: String): Formatter? {
         return if (TextUtils.isEmpty(formatter)) {
             null
         } else object : Formatter {
-            override fun format(i: Int): String {
-                return String.format(Locale.getDefault(), formatter!!, i)
+            override fun format(value: Int): String {
+                return String.format(Locale.getDefault(), formatter, value)
             }
         }
     }
@@ -2039,7 +1585,7 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun setDividerColor(@ColorInt color: Int) {
-        mDividerColor = color
+        dividerColor = color
         mDividerDrawable = ColorDrawable(color)
     }
 
@@ -2063,16 +1609,6 @@ class NumberPicker @JvmOverloads constructor(
         setDividerThickness(resources.getDimensionPixelSize(dimenId))
     }
 
-    /**
-     * Should sort numbers in ascending or descending order.
-     *
-     * @param order Pass [.ASCENDING] or [.ASCENDING].
-     * Default weight is [.DESCENDING].
-     */
-    fun setOrder(@Order order: Int) {
-        mOrder = order
-    }
-
     override fun setOrientation(@Orientation orientation: Int) {
         mOrientation = orientation
         setWidthAndHeight()
@@ -2086,7 +1622,7 @@ class NumberPicker @JvmOverloads constructor(
         mSelectorIndices = IntArray(mWheelItemCount)
     }
 
-    fun setFormatter(formatter: String?) {
+    fun setFormatter(formatter: String) {
         if (TextUtils.isEmpty(formatter)) {
             return
         }
@@ -2097,20 +1633,8 @@ class NumberPicker @JvmOverloads constructor(
         setFormatter(resources.getString(stringId))
     }
 
-    fun setFadingEdgeEnabled(fadingEdgeEnabled: Boolean) {
-        mFadingEdgeEnabled = fadingEdgeEnabled
-    }
-
     fun setFadingEdgeStrength(strength: Float) {
         mFadingEdgeStrength = strength
-    }
-
-    fun setScrollerEnabled(scrollerEnabled: Boolean) {
-        mScrollerEnabled = scrollerEnabled
-    }
-
-    fun setSelectedTextAlign(@Align align: Int) {
-        selectedTextAlign = align
     }
 
     fun setSelectedTextColor(@ColorInt color: Int) {
@@ -2132,7 +1656,7 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun setSelectedTextStrikeThru(strikeThruText: Boolean) {
-        selectedTextStrikeThru = strikeThruText
+        selectedTextStrikeThrough = strikeThruText
     }
 
     fun setSelectedTextUnderline(underlineText: Boolean) {
@@ -2153,8 +1677,8 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun setTextSize(textSize: Float) {
-        textSize1 = textSize
-        selectorWheelPaint.textSize = textSize1
+        this.textSize = textSize
+        selectorWheelPaint.textSize = this.textSize
     }
 
     fun setTextSize(@DimenRes dimenId: Int) {
@@ -2162,7 +1686,7 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun setTextStrikeThru(strikeThruText: Boolean) {
-        textStrikeThroughed = strikeThruText
+        textStrikeThrough = strikeThruText
     }
 
     fun setTextUnderline(underlineText: Boolean) {
@@ -2171,13 +1695,8 @@ class NumberPicker @JvmOverloads constructor(
 
     fun setTypeface(typeface: Typeface) {
         this.typeface = typeface
-        if (this.typeface != null) {
-            selectedText.typeface = this.typeface
-            selectorWheelPaint.typeface = this.typeface
-        } else {
-            selectedText.typeface = Typeface.MONOSPACE
-            selectorWheelPaint.typeface = Typeface.MONOSPACE
-        }
+        selectedText.typeface = this.typeface
+        selectorWheelPaint.typeface = this.typeface
     }
 
     fun setTypeface(string: String?, style: Int) {
@@ -2216,31 +1735,11 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     fun isAscendingOrder(): Boolean {
-        return getOrder() == ASCENDING
-    }
-
-    fun getDividerColor(): Int {
-        return mDividerColor
-    }
-
-    fun getDividerDistance(): Float {
-        return pxToDp(mDividerDistance.toFloat())
-    }
-
-    fun getDividerThickness(): Float {
-        return pxToDp(mDividerThickness.toFloat())
-    }
-
-    fun getOrder(): Int {
-        return mOrder
+        return order == ASCENDING
     }
 
     override fun getOrientation(): Int {
         return mOrientation
-    }
-
-    fun getWheelItemCount(): Int {
-        return mWheelItemCount
     }
 
     /**
@@ -2266,70 +1765,6 @@ class NumberPicker @JvmOverloads constructor(
             updateInputTextView()
         }
 
-    fun isFadingEdgeEnabled(): Boolean {
-        return mFadingEdgeEnabled
-    }
-
-    fun getFadingEdgeStrength(): Float {
-        return mFadingEdgeStrength
-    }
-
-    fun isScrollerEnabled(): Boolean {
-        return mScrollerEnabled
-    }
-
-    fun getSelectedTextAlign(): Int {
-        return selectedTextAlign
-    }
-
-    fun getSelectedTextColor(): Int {
-        return selectedTextColor
-    }
-
-    fun getSelectedTextSize(): Float {
-        return selectedTextSize
-    }
-
-    fun getSelectedTextStrikeThru(): Boolean {
-        return selectedTextStrikeThru
-    }
-
-    fun getSelectedTextUnderline(): Boolean {
-        return selectedTextUnderline
-    }
-
-    fun getTextAlign(): Int {
-        return textAlign
-    }
-
-    fun getTextColor(): Int {
-        return textColor
-    }
-
-    fun getTextSize(): Float {
-        return spToPx(textSize1)
-    }
-
-    fun getTextStrikeThru(): Boolean {
-        return textStrikeThroughed
-    }
-
-    fun getTextUnderline(): Boolean {
-        return textUnderline
-    }
-
-    fun getTypeface(): Typeface? {
-        return typeface
-    }
-
-    fun getLineSpacingMultiplier(): Float {
-        return mLineSpacingMultiplier
-    }
-
-    fun getMaxFlingVelocityCoefficient(): Int {
-        return mMaxFlingVelocityCoefficient
-    }
-
     companion object {
         const val VERTICAL = LinearLayout.VERTICAL
         const val HORIZONTAL = LinearLayout.HORIZONTAL
@@ -2339,94 +1774,23 @@ class NumberPicker @JvmOverloads constructor(
         const val CENTER = 1
         const val LEFT = 2
 
-        /**
-         * The default update interval during long press.
-         */
         private const val DEFAULT_LONG_PRESS_UPDATE_INTERVAL: Long = 300
-
-        /**
-         * The default coefficient to adjust (divide) the max fling velocity.
-         */
         private const val DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT = 8
-
-        /**
-         * The the duration for adjusting the selector wheel.
-         */
         private const val SELECTOR_ADJUSTMENT_DURATION_MILLIS = 800
-
-        /**
-         * The duration of scrolling while snapping to a given position.
-         */
         private const val SNAP_SCROLL_DURATION = 300
-
-        /**
-         * The default strength of fading edge while drawing the selector.
-         */
         private const val DEFAULT_FADING_EDGE_STRENGTH = 0.9f
-
-        /**
-         * The default unscaled height of the divider.
-         */
         private const val UNSCALED_DEFAULT_DIVIDER_THICKNESS = 2
-
-        /**
-         * The default unscaled distance between the dividers.
-         */
         private const val UNSCALED_DEFAULT_DIVIDER_DISTANCE = 48
-
-        /**
-         * Constant for unspecified size.
-         */
         private const val SIZE_UNSPECIFIED = -1
-
-        /**
-         * The default color of divider.
-         */
         private const val DEFAULT_DIVIDER_COLOR = -0x1000000
-
-        /**
-         * The default max weight of this widget.
-         */
         private const val DEFAULT_MAX_VALUE = 100
-
-        /**
-         * The default min weight of this widget.
-         */
         private const val DEFAULT_MIN_VALUE = 1
-
-        /**
-         * The default wheel item count of this widget.
-         */
         private const val DEFAULT_WHEEL_ITEM_COUNT = 3
-
-        /**
-         * The default max height of this widget.
-         */
         private const val DEFAULT_MAX_HEIGHT = 180
-
-        /**
-         * The default min width of this widget.
-         */
         private const val DEFAULT_MIN_WIDTH = 64
-
-        /**
-         * The default align of text.
-         */
         private const val DEFAULT_TEXT_ALIGN = CENTER
-
-        /**
-         * The default color of text.
-         */
         private const val DEFAULT_TEXT_COLOR = -0x1000000
-
-        /**
-         * The default size of text.
-         */
         private const val DEFAULT_TEXT_SIZE = 25f
-
-        /**
-         * The default line spacing multiplier of text.
-         */
         private const val DEFAULT_LINE_SPACING_MULTIPLIER = 1f
         private val sTwoDigitFormatter = TwoDigitFormatter()
         val twoDigitFormatter: Formatter
@@ -2446,17 +1810,17 @@ class NumberPicker @JvmOverloads constructor(
          * [.MEASURED_SIZE_MASK] and [.MEASURED_STATE_TOO_SMALL].
          */
         fun resolveSizeAndState(size: Int, measureSpec: Int, childMeasuredState: Int): Int {
-            var result = size
             val specMode = MeasureSpec.getMode(measureSpec)
             val specSize = MeasureSpec.getSize(measureSpec)
-            when (specMode) {
-                MeasureSpec.UNSPECIFIED -> result = size
-                MeasureSpec.AT_MOST -> result = if (specSize < size) {
+            val result = when (specMode) {
+                MeasureSpec.UNSPECIFIED -> size
+                MeasureSpec.AT_MOST -> if (specSize < size) {
                     specSize or MEASURED_STATE_TOO_SMALL
                 } else {
                     size
                 }
-                MeasureSpec.EXACTLY -> result = specSize
+                MeasureSpec.EXACTLY -> specSize
+                else -> size
             }
             return result or (childMeasuredState and MEASURED_STATE_MASK)
         }
@@ -2564,11 +1928,11 @@ class NumberPicker @JvmOverloads constructor(
             }
             mDividerDrawable = selectionDivider
         } else {
-            mDividerColor = attributes.getColor(
+            dividerColor = attributes.getColor(
                 R.styleable.NumberPicker_np_dividerColor,
-                mDividerColor
+                dividerColor
             )
-            setDividerColor(mDividerColor)
+            setDividerColor(dividerColor)
         }
         val displayMetrics = resources.displayMetrics
         val defDividerDistance = TypedValue.applyDimension(
@@ -2589,7 +1953,7 @@ class NumberPicker @JvmOverloads constructor(
             R.styleable.NumberPicker_np_dividerThickness,
             defDividerThickness
         )
-        mOrder = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING)
+        order = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING)
         mOrientation = attributes.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL)
         mWidth = attributes.getDimensionPixelSize(
             R.styleable.NumberPicker_np_width,
@@ -2615,9 +1979,9 @@ class NumberPicker @JvmOverloads constructor(
             R.styleable.NumberPicker_np_selectedTextSize,
             spToPx(selectedTextSize)
         )
-        selectedTextStrikeThru = attributes.getBoolean(
+        selectedTextStrikeThrough = attributes.getBoolean(
             R.styleable.NumberPicker_np_selectedTextStrikeThru,
-            selectedTextStrikeThru
+            selectedTextStrikeThrough
         )
         selectedTextUnderline = attributes.getBoolean(
             R.styleable.NumberPicker_np_selectedTextUnderline,
@@ -2625,13 +1989,13 @@ class NumberPicker @JvmOverloads constructor(
         )
         textAlign = attributes.getInt(R.styleable.NumberPicker_np_textAlign, textAlign)
         textColor = attributes.getColor(R.styleable.NumberPicker_np_textColor, textColor)
-        textSize1 = attributes.getDimension(
+        textSize = attributes.getDimension(
             R.styleable.NumberPicker_np_textSize,
-            spToPx(textSize1)
+            spToPx(textSize)
         )
-        textStrikeThroughed = attributes.getBoolean(
+        textStrikeThrough = attributes.getBoolean(
             R.styleable.NumberPicker_np_textStrikeThru,
-            textStrikeThroughed
+            textStrikeThrough
         )
         textUnderline = attributes.getBoolean(
             R.styleable.NumberPicker_np_textUnderline,
@@ -2641,18 +2005,19 @@ class NumberPicker @JvmOverloads constructor(
             attributes.getString(R.styleable.NumberPicker_np_typeface),
             Typeface.NORMAL
         )
-        mFormatter = stringToFormatter(attributes.getString(R.styleable.NumberPicker_np_formatter))
-        mFadingEdgeEnabled = attributes.getBoolean(
+        mFormatter =
+            stringToFormatter(attributes.getString(R.styleable.NumberPicker_np_formatter).orEmpty())
+        fadingEdgeEnabled = attributes.getBoolean(
             R.styleable.NumberPicker_np_fadingEdgeEnabled,
-            mFadingEdgeEnabled
+            fadingEdgeEnabled
         )
         mFadingEdgeStrength = attributes.getFloat(
             R.styleable.NumberPicker_np_fadingEdgeStrength,
             mFadingEdgeStrength
         )
-        mScrollerEnabled = attributes.getBoolean(
+        scrollerEnabled = attributes.getBoolean(
             R.styleable.NumberPicker_np_scrollerEnabled,
-            mScrollerEnabled
+            scrollerEnabled
         )
         mWheelItemCount = attributes.getInt(
             R.styleable.NumberPicker_np_wheelItemCount,
@@ -2684,9 +2049,9 @@ class NumberPicker @JvmOverloads constructor(
 
         // input text
         selectedText = findViewById(R.id.np__numberpicker_input)
-        selectedText.isEnabled = false
-        selectedText.isFocusable = false
-        selectedText.imeOptions = EditorInfo.IME_ACTION_NONE
+        selectedText.isEnabled = true
+        selectedText.isFocusable = true
+        selectedText.imeOptions = EditorInfo.IME_ACTION_DONE
 
         // create the selector wheel paint
         val paint = Paint()
@@ -2696,7 +2061,7 @@ class NumberPicker @JvmOverloads constructor(
         selectorWheelPaint.isFakeBoldText = true
         setSelectedTextColor(selectedTextColor)
         setTextColor(textColor)
-        setTextSize(textSize1)
+        setTextSize(textSize)
         setSelectedTextSize(selectedTextSize)
         setTypeface(typeface)
         formatter = mFormatter
