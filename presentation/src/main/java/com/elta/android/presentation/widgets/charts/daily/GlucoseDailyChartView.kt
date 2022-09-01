@@ -28,6 +28,7 @@ import com.nullgr.core.ui.extensions.dpToPx
 import com.nullgr.core.ui.extensions.getDisplaySize
 import com.nullgr.core.ui.extensions.spToPx
 import org.threeten.bp.ZonedDateTime
+import kotlin.math.max
 
 @Suppress("LongMethod", "MagicNumber")
 class GlucoseDailyChartView @JvmOverloads constructor(
@@ -506,7 +507,10 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         val x = startX + singleHourWidth * (minutesOfEvent.toFloat() / MINUTES_IN_HOUR)
         with(dataModel().chartRangesModel) {
             val addY = when {
-                highMax != null && value > normalMax -> boxHeight * (highMax - value) / (highMax - normalMax) + chartOffset.toInt()
+                highMax != null && value > normalMax -> max(
+                    boxHeight * (highMax - value) / (highMax - normalMax),
+                    chartOffset.toDouble()
+                )
                 lowMax != null && value < lowMax -> boxHeight * 2 + boxHeight * (lowMax - value) / (lowMax)
                 else -> boxHeight + boxHeight * (normalMax - value) / (normalMax - start)
             }
