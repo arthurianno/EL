@@ -269,7 +269,7 @@ abstract class ConnectDevicePm constructor(
                 val prevItems = (items.value as List<*>).map { it as DeviceItem }
                 val newItems = prevItems.mapIndexed { index, item ->
                     item.copy(
-                        isSelected = checkForSelection(item, click),
+                        isSelected = item.address == click.item.address,
                         isLast = index == prevItems.size - 1
                     )
                 }
@@ -280,15 +280,6 @@ abstract class ConnectDevicePm constructor(
             }
             .subscribe()
             .untilDestroy()
-    }
-
-    private fun checkForSelection(
-        item: DeviceItem,
-        click: Clicks.DeviceClicked
-    ) = if (item.isSelected) {
-        item.isSelected
-    } else {
-        item.address == click.item.address && !item.isSelected
     }
 
     private fun isValidDeviceChoice(
