@@ -106,10 +106,10 @@ class InviteObserverPm @Inject constructor(
 
     private fun getEmailError(isEmailValid: Boolean): String =
         when {
-            emailInput.text.valueOrNull.isNullOrEmpty() -> String()
+            emailInput.text.valueOrNull.isNullOrBlank() -> EMPTY_STRING
             haveSameObserver() -> resources.getString(R.string.registration_error_same_email)
             !isEmailValid -> resources.getString(R.string.registration_error_input_email)
-            else -> String()
+            else -> EMPTY_STRING
         }
 
     private fun handleSuccess() {
@@ -125,4 +125,8 @@ class InviteObserverPm @Inject constructor(
 
     private fun createObserverInviteUseCaseParams(i: Unit) =
         SendObserverInviteUseCase.Params(emailInput.text.value)
+
+    companion object {
+        private const val EMPTY_STRING = ""
+    }
 }
