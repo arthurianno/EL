@@ -63,8 +63,8 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             if (!isTouchingScroll || !isTouchingAppBar) {
                 val isOffsetZero = offset == 0
                 binding.appBarLayoutView.setExpanded(isOffsetZero, true)
-                if (isOffsetZero) requireActivity().findAndClearFocus()
-                if (!isOffsetZero) binding.scrollableView.scrollToBottom()
+//                if (isOffsetZero) requireActivity().findAndClearFocus()
+//                if (!isOffsetZero) binding.scrollableView.scrollToBottom()
             }
         }
         maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0

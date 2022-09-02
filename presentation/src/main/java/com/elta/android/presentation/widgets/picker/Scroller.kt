@@ -15,6 +15,20 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
+private const val INFLEXION = 0.35f // Tension lines cross at (INFLEXION, 1)
+private const val START_TENSION = 0.5f
+private const val END_TENSION = 1.0f
+private const val P1 = START_TENSION * INFLEXION
+private const val P2 = 1.0f - END_TENSION * (1.0f - INFLEXION)
+private const val NB_SAMPLES = 100
+private const val DEFAULT_DURATION = 250
+private const val SCROLL_MODE = 0
+private const val FLING_MODE = 1
+private val DECELERATION_RATE = (ln(0.78) / ln(0.9)).toFloat()
+private val SPLINE_POSITION = FloatArray(NB_SAMPLES + 1)
+private val SPLINE_TIME = FloatArray(NB_SAMPLES + 1)
+private const val VISCOUS_FLUID_SCALE = 8.0f
+
 /**
  *
  * This class encapsulates scrolling. You can use scrollers ([Scroller]
@@ -95,61 +109,50 @@ class Scroller @JvmOverloads constructor(
     // A context-specific coefficient adjusted to physical values.
     private val physicalCoeff: Float = computeDeceleration(0.84f) // look and feel tuning
 
-    companion object {
-        private const val DEFAULT_DURATION = 250
-        private const val SCROLL_MODE = 0
-        private const val FLING_MODE = 1
-        private val DECELERATION_RATE = (ln(0.78) / ln(0.9)).toFloat()
-        private const val INFLEXION = 0.35f // Tension lines cross at (INFLEXION, 1)
-        private const val START_TENSION = 0.5f
-        private const val END_TENSION = 1.0f
-        private const val P1 = START_TENSION * INFLEXION
-        private const val P2 = 1.0f - END_TENSION * (1.0f - INFLEXION)
-        private const val NB_SAMPLES = 100
-        private val SPLINE_POSITION = FloatArray(NB_SAMPLES + 1)
-        private val SPLINE_TIME = FloatArray(NB_SAMPLES + 1)
+    init {
+        setupValues()
+    }
 
-        init {
-            var xMin = 0.0f
-            var yMin = 0.0f
-            for (i in 0 until NB_SAMPLES) {
-                val alpha = i.toFloat() / NB_SAMPLES
-                var xMax = 1.0f
-                var x: Float
-                var tx: Float
-                var coef: Float
-                while (true) {
-                    x = xMin + (xMax - xMin) / 2.0f
-                    coef = 3.0f * x * (1.0f - x)
-                    tx = coef * ((1.0f - x) * P1 + x * P2) + x * x * x
-                    if (abs(tx - alpha) < 1E-5) break
-                    if (tx > alpha) {
-                        xMax = x
-                    } else {
-                        xMin = x
-                    }
+    private fun setupValues() {
+        var xMin = 0.0f
+        var yMin = 0.0f
+        for (i in 0 until NB_SAMPLES) {
+            val alpha = i.toFloat() / NB_SAMPLES
+            var xMax = 1.0f
+            var x: Float
+            var tx: Float
+            var coef: Float
+            while (true) {
+                x = xMin + (xMax - xMin) / 2.0f
+                coef = 3.0f * x * (1.0f - x)
+                tx = coef * ((1.0f - x) * P1 + x * P2) + x * x * x
+                if (abs(tx - alpha) < 1E-5) break
+                if (tx > alpha) {
+                    xMax = x
+                } else {
+                    xMin = x
                 }
-                SPLINE_POSITION[i] =
-                    coef * ((1.0f - x) * START_TENSION + x) + x * x * x
-                var yMax = 1.0f
-                var y: Float
-                var dy: Float
-                while (true) {
-                    y = yMin + (yMax - yMin) / 2.0f
-                    coef = 3.0f * y * (1.0f - y)
-                    dy = coef * ((1.0f - y) * START_TENSION + y) + y * y * y
-                    if (abs(dy - alpha) < 1E-5) break
-                    if (dy > alpha) {
-                        yMax = y
-                    } else {
-                        yMin = y
-                    }
-                }
-                SPLINE_TIME[i] = coef * ((1.0f - y) * P1 + y * P2) + y * y * y
             }
-            SPLINE_TIME[NB_SAMPLES] = 1.0f
-            SPLINE_POSITION[NB_SAMPLES] = SPLINE_TIME[NB_SAMPLES]
+            SPLINE_POSITION[i] =
+                coef * ((1.0f - x) * START_TENSION + x) + x * x * x
+            var yMax = 1.0f
+            var y: Float
+            var dy: Float
+            while (true) {
+                y = yMin + (yMax - yMin) / 2.0f
+                coef = 3.0f * y * (1.0f - y)
+                dy = coef * ((1.0f - y) * START_TENSION + y) + y * y * y
+                if (abs(dy - alpha) < 1E-5) break
+                if (dy > alpha) {
+                    yMax = y
+                } else {
+                    yMin = y
+                }
+            }
+            SPLINE_TIME[i] = coef * ((1.0f - y) * P1 + y * P2) + y * y * y
         }
+        SPLINE_TIME[NB_SAMPLES] = 1.0f
+        SPLINE_POSITION[NB_SAMPLES] = SPLINE_TIME[NB_SAMPLES]
     }
 
     fun setFriction(friction: Float) {
@@ -384,40 +387,25 @@ class Scroller @JvmOverloads constructor(
             sign(yvel) == sign((finalY - startY).toFloat())
 
     internal class ViscousFluidInterpolator : Interpolator {
-        companion object {
-            /**
-             * Controls the viscous fluid effect (how much of it).
-             */
-            private const val VISCOUS_FLUID_SCALE = 8.0f
-            private var VISCOUS_FLUID_NORMALIZE = 0f
-            private var VISCOUS_FLUID_OFFSET = 0f
-            private fun viscousFluid(x: Float): Float {
-                var localX = x
-                localX *= VISCOUS_FLUID_SCALE
-                if (localX < 1.0f) {
-                    localX -= 1.0f - exp(-localX.toDouble()).toFloat()
-                } else {
-                    val start = 0.36787944117f // 1/e == exp(-1)
-                    localX = 1.0f - exp((1.0f - localX).toDouble()).toFloat()
-                    localX = start + localX * (1.0f - start)
-                }
-                return localX
-            }
-
-            init {
-
-                // must be set to 1.0 (used in viscousFluid())
-                VISCOUS_FLUID_NORMALIZE = 1.0f / viscousFluid(1.0f)
-                // account for very small floating-point error
-                VISCOUS_FLUID_OFFSET = 1.0f - VISCOUS_FLUID_NORMALIZE * viscousFluid(1.0f)
-            }
-        }
 
         override fun getInterpolation(input: Float): Float {
-            val interpolated = VISCOUS_FLUID_NORMALIZE * viscousFluid(input)
+            val interpolated = 1.0f / viscousFluid(1.0f) * viscousFluid(input)
             return if (interpolated > 0) {
-                interpolated + VISCOUS_FLUID_OFFSET
+                interpolated + (1.0f - 1.0f / viscousFluid(1.0f) * viscousFluid(1.0f))
             } else interpolated
+        }
+
+        private fun viscousFluid(x: Float): Float {
+            var localX = x
+            localX *= VISCOUS_FLUID_SCALE
+            if (localX < 1.0f) {
+                localX -= 1.0f - exp(-localX.toDouble()).toFloat()
+            } else {
+                val start = 0.36787944117f // 1/e == exp(-1)
+                localX = 1.0f - exp((1.0f - localX).toDouble()).toFloat()
+                localX = start + localX * (1.0f - start)
+            }
+            return localX
         }
     }
 }

@@ -15,7 +15,7 @@ class ValueChangeObservable(
         }
         val listener = Listener(view, observer)
         observer.onSubscribe(listener)
-        listener.valueListener?.onValueChange(view, view.value, view.value)
+        listener.valueListener?.onValueChange(view, view.pickerValue, view.pickerValue)
         view.addOnValueChangedListener(listener.valueListener)
     }
 
