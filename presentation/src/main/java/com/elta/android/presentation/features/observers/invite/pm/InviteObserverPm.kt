@@ -18,6 +18,8 @@ import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
+private const val EMPTY_STRING = ""
+
 class InviteObserverPm @Inject constructor(
     private val getObserverInvitesUseCase: GetObserverInvitesUseCase,
     private val sendObserverInviteUseCase: SendObserverInviteUseCase,
@@ -125,8 +127,4 @@ class InviteObserverPm @Inject constructor(
 
     private fun createObserverInviteUseCaseParams(i: Unit) =
         SendObserverInviteUseCase.Params(emailInput.text.value)
-
-    companion object {
-        private const val EMPTY_STRING = ""
-    }
 }
