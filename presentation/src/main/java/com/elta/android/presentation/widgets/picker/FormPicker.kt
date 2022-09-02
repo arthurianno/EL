@@ -18,6 +18,11 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import java.util.concurrent.TimeUnit
 
+private const val TEN = 10
+private const val EMPTY_STRING = ""
+private const val DEBOUNCE = 100L
+private const val PICKERS_COUNT = 2L
+
 @Suppress("UnnecessaryParentheses")
 class FormPicker @JvmOverloads constructor(
     context: Context,
@@ -112,13 +117,6 @@ class FormPicker @JvmOverloads constructor(
         savedState.leftValue = leftPickerView.pickerValue
         savedState.rightValue = rightPickerView.pickerValue
         return savedState
-    }
-
-    companion object {
-        private const val TEN = 10
-        private const val EMPTY_STRING = ""
-        private const val DEBOUNCE = 100L
-        private const val PICKERS_COUNT = 2L
     }
 
     private class SavedState : View.BaseSavedState {
