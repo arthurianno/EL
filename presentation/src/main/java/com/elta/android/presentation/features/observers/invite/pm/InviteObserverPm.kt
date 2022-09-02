@@ -106,6 +106,7 @@ class InviteObserverPm @Inject constructor(
 
     private fun getEmailError(isEmailValid: Boolean): String =
         when {
+            emailInput.text.valueOrNull.isNullOrEmpty() -> String()
             haveSameObserver() -> resources.getString(R.string.registration_error_same_email)
             !isEmailValid -> resources.getString(R.string.registration_error_input_email)
             else -> String()
