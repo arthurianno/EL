@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.observers.all.pm
 
 import com.elta.android.domain.features.observers.interactor.GetObserverInvitesUseCase
 import com.elta.android.domain.features.observers.model.Observer
+import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
@@ -43,6 +44,9 @@ class ObserversPm @Inject constructor(
                 getObserverInvitesUseCase.execute()
                     .hideErrorContainer()
                     .bindProgress()
+                    .map { observerList ->
+                        observerList.filter { it.status != ObserverStatus.EXPIRED }
+                    }
                     .bindEmpty(emptyControl.visibilityState.consumer)
                     .doOnNext(::handleSuccess)
                     .doOnError(::handleError)
