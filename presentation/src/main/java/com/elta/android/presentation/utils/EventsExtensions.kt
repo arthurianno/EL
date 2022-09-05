@@ -187,6 +187,6 @@ fun MealTag.toIcon(): Int {
     return when (this) {
         MealTag.BEFOREMEAL -> R.drawable.img_red_apple
         MealTag.AFTERMEAL -> R.drawable.img_subtract_apple
-        else -> 0
+        else -> R.drawable.img_red_apple
     }
 }
