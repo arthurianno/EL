@@ -68,7 +68,7 @@ class GlucoseEventPm @Inject constructor(
     val dateSelector = formSelectorControl(false)
     val timeSelector = formSelectorControl(false)
     val noteInput = inputControl()
-    val mealSelector = state<MealTag>()
+    val mealSelector = state(MealTag.NOT_SELECTED)
 
     val mainActionTitleState = state<String>()
     val mainActionVisibilityState = state(false)
@@ -107,13 +107,23 @@ class GlucoseEventPm @Inject constructor(
 
     private fun bindMealTagsSelection() {
         beforeMealAction.observable
-            .doOnNext { mealSelector.consumer.accept(MealTag.BEFOREMEAL) }
+            .doOnNext { switchMealTag(MealTag.BEFOREMEAL) }
             .subscribe()
             .untilDestroy()
         afterMealAction.observable
-            .doOnNext { mealSelector.consumer.accept(MealTag.AFTERMEAL) }
+            .doOnNext { switchMealTag(MealTag.AFTERMEAL) }
             .subscribe()
             .untilDestroy()
+    }
+
+    private fun switchMealTag(mealTag: MealTag) {
+        mealSelector.consumer.accept(
+            if (mealSelector.value == MealTag.NOT_SELECTED) {
+                mealTag
+            } else {
+                MealTag.NOT_SELECTED
+            }
+        )
     }
 
     fun setEventData(id: String) {
@@ -136,7 +146,7 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
 
         mealSelector.observable
-            .map { eventFormHolderState.value.copy(mealTag = it) }
+            .map { eventFormHolderState.value.copy(mealTag = if (it == MealTag.NOT_SELECTED) null else it) }
             .doOnNext { eventFormHolderState.consumer.accept(it) }
             .map(::checkIsChanged)
             .subscribe(mainActionVisibilityState.consumer)
