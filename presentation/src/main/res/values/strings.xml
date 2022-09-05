@@ -398,7 +398,7 @@
     <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
     <string name="profile_settings_dialog_glucose_description">Задайте свой целевой диапазон измерений глюкозы</string>
     <string name="profile_settings_dialog_glucose_action_button">Установить</string>
-    <string name="profile_settings_dialog_glucose_hint">Диапазон целевых значений определяется лечащим врачом.\n\nЦелевой диапазон будет использоваться на графике главного экрана.</string>
+    <string name="profile_settings_dialog_glucose_hint">Диапазон определяется лечащим врачом.\nМы возьмем минимальное и максимальное значения и отобразим усредненный диапазон на графиках.</string>
     <string name="before_eat">До еды</string>
     <string name="after_eat">После еды</string>
 
