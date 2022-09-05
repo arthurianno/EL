@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.core.ui.adapter.BaseListAdapter
+import com.elta.android.presentation.databinding.ItemObserverHeaderBinding
 import com.elta.android.presentation.databinding.ItemProfileAdditionalSettingsBinding
-import com.elta.android.presentation.databinding.ItemProfileSettingsBinding
 import com.elta.android.presentation.features.observers.all.ui.adapter.holder.ObserverHeaderViewHolder
 import com.elta.android.presentation.features.observers.all.ui.adapter.holder.ObserverItemViewHolder
 import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverHeaderItem
@@ -28,7 +28,7 @@ class ObserverAdapter @Inject constructor(
             }
             ObserverHeaderItem::class.java.hashCode() -> {
                 ObserverHeaderViewHolder(
-                    ItemProfileSettingsBinding.inflate(inflater, parent, false)
+                    ItemObserverHeaderBinding.inflate(inflater, parent, false)
                 )
             }
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")

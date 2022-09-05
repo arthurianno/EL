@@ -1,15 +1,13 @@
 package com.elta.android.presentation.features.observers.all.ui.adapter.holder
 
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
-import com.elta.android.presentation.databinding.ItemProfileSettingsBinding
+import com.elta.android.presentation.databinding.ItemObserverHeaderBinding
 import com.elta.android.presentation.features.observers.all.ui.adapter.items.ObserverHeaderItem
-import com.nullgr.core.ui.extensions.hide
 
 class ObserverHeaderViewHolder(
-    private val binding: ItemProfileSettingsBinding
+    private val binding: ItemObserverHeaderBinding
 ) : BaseListItemViewHolder<ObserverHeaderItem>(binding.root) {
     override fun bind(item: ObserverHeaderItem) {
         binding.settingsTitleView.text = item.title
-        binding.nextIconView.hide()
     }
 }
