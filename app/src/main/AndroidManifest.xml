@@ -41,7 +41,7 @@
 
                 <data
                     android:host="@string/app_deep_link_host"
-                    android:scheme="https" />
+                    android:scheme="elta" />
             </intent-filter>
         </activity>
 
