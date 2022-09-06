@@ -13,12 +13,10 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:background="?selectableItemBackground"
         android:paddingStart="16dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="12dp">
+        android:paddingEnd="16dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/recordIconView"
@@ -34,13 +32,15 @@
             android:id="@+id/recordLabelView"
             android:layout_width="26dp"
             android:layout_height="26dp"
+            android:layout_marginStart="16dp"
             android:visibility="gone"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="6dp"
             android:background="@drawable/ic_white_circle"
             android:padding="4dp"
-            app:layout_constraintStart_toStartOf="@+id/recordIconView"
-            app:layout_constraintTop_toTopOf="@+id/recordIconView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_skiing" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -52,6 +52,7 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:lines="1"
+            app:layout_constraintBottom_toTopOf="@+id/recordTypeView"
             app:layout_constraintEnd_toStartOf="@+id/barrierView"
             app:layout_constraintStart_toEndOf="@+id/recordIconView"
             app:layout_constraintTop_toTopOf="parent"
@@ -84,6 +85,7 @@
             style="@style/New.Body2.ShadeGreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/recordDateView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="3 ед" />
