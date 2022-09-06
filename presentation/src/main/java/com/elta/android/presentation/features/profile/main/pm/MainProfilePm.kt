@@ -35,6 +35,8 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 class MainProfilePm @Inject constructor(
     private val remindersManager: RemindersManager,
@@ -198,7 +200,6 @@ class MainProfilePm @Inject constructor(
 
     private fun Single<Profile>.handleProfileUseCase() =
         doOnSuccess(::updateFullNameState)
-            .map { it.copy(glucoseLevelBeforeEatSettings = it.glucoseLevelSettings) } // TODO После подключения сохранения профиля на бэке убрать.
             .map { it.createGlucoseLevels() }
             .map { itemsBuilder.buildItems(it) }
             .doOnSuccess { items.consumer.accept(it) }
@@ -207,11 +208,11 @@ class MainProfilePm @Inject constructor(
     private fun Profile.createGlucoseLevels(): Profile {
         return this.copy(
             glucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
-                normalStart = minOf(
+                normalStart = min(
                     glucoseLevelAfterEatSettings.normal.start,
                     glucoseLevelBeforeEatSettings.normal.start
                 ),
-                normalEnd = maxOf(
+                normalEnd = max(
                     glucoseLevelBeforeEatSettings.normal.end,
                     glucoseLevelAfterEatSettings.normal.end
                 )
