@@ -8,13 +8,16 @@ import android.content.IntentSender
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.common.utils.log
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentBluetoothBinding
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
@@ -24,18 +27,25 @@ import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.location.SettingsClient
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.intents.launchForResult
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 import timber.log.Timber
+import javax.inject.Inject
 
 class BluetoothFragment :
-    BaseListFragment<BluetoothPm, FragmentBluetoothBinding>(FragmentBluetoothBinding::inflate) {
+    BaseRecyclerViewFragment<BluetoothPm, FragmentBluetoothBinding>(FragmentBluetoothBinding::inflate) {
 
+    @Inject
+    lateinit var deviceAdapter: DeviceAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { deviceAdapter }
     override val screenLayout: Int = R.layout.fragment_bluetooth
     override val classToken: Class<BluetoothPm> = BluetoothPm::class.java
+
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     private val rxPermissions by lazy { RxPermissions(this) }
@@ -71,7 +81,14 @@ class BluetoothFragment :
         pm.downloadEnabledState.bindTo { binding.downloadFirmwareButtonView.isEnabled = it }
         pm.pinEnabledState.bindTo { binding.setPinButtonView.isEnabled = it }
         pm.pinInputControl.bindTo(binding.commandInputView)
-        pm.logState.bindTo(binding.logView.text())
+        pm.logState.bindTo {
+            binding.logView.run {
+                text().accept(it)
+                val delta =
+                    this.layout.getLineBottom(this.lineCount - 1) - this.scrollY - this.height
+                if (delta > 0) this.scrollBy(0, delta)
+            }
+        }
     }
 
     private fun observeCommands(pm: BluetoothPm) {
@@ -135,8 +152,8 @@ class BluetoothFragment :
 
     companion object {
         private const val REQUEST_CODE_ENABLE_LOCATION = 145
-        private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
 
+        private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
         fun newInstance(): BluetoothFragment {
             return BluetoothFragment().apply {
                 arguments = Bundle().apply {

@@ -214,12 +214,12 @@ class GlucometersManager @Inject constructor(
             ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
             ?: Observable.error(PrimaryGlucometerNotFoundError)
 
-    fun updateFirmware(address: String, file: FirmwareFile): Completable =
+    fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
         when {
-            !isSupportedByApplication(file) -> Completable.error(FirmwareNotSupportedByAppError(file.version))
+            !isSupportedByApplication(file) -> Observable.error(FirmwareNotSupportedByAppError(file.version))
             else ->
                 checkBluetoothClientState()
-                    .flatMapCompletable {
+                    .flatMap {
                         client.findConnection(address)
                             .checkPinAndSend(address)
                             .switchMap { connection ->
@@ -238,14 +238,14 @@ class GlucometersManager @Inject constructor(
                                     }
                             }
                             .take(1)
-                            .switchMapCompletable { response ->
+                            .switchMap { response ->
                                 when (response.isOk()) {
                                     true -> startFirmwareUpdate(
                                         context,
                                         file.path,
                                         address.toDfuAddress()
                                     )
-                                    else -> Completable.error(GlucometerToDfuModeError)
+                                    else -> Observable.error(GlucometerToDfuModeError)
                                 }
                             }
                             // we can't know when device will completely reboot after update

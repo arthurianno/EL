@@ -57,7 +57,7 @@ class DeviceDataRepository @Inject constructor(
                     .andThen(Observable.just(events.size))
             }
 
-    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
+    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String> =
         source.updateFirmware(address, firmwareFile)
 
     override fun setPrimaryDevice(address: String): Completable =
