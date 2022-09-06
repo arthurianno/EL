@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
+import android.util.Log
 import com.elta.android.domain.features.auth.interactor.DeleteProfileUseCase
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
@@ -29,6 +30,8 @@ import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
+
+private const val ERROR_TAG = "ProfileSettingPmError"
 
 class ProfileSettingsPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
@@ -100,7 +103,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.APP_VERSION -> {} // TODO click by app version
                     Type.EMAIL -> {}
-                    else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
+                    else -> Log.e(ERROR_TAG, "This type:$type haven`t implemented yet...")
                 }
             }
             .doOnError(::handleError)
