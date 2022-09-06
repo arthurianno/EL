@@ -10,6 +10,8 @@ import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.B
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 class GlucoseRangeDialogPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
@@ -67,7 +69,6 @@ class GlucoseRangeDialogPm @Inject constructor(
             .flatMapSingle {
                 getProfileUseCase.execute(Unit)
                     .bindProgress()
-                    .map { it.copy(glucoseLevelBeforeEatSettings = it.glucoseLevelSettings) } // TODO После подключения сохранения профиля на бэке убрать.
                     .doOnSuccess(profileState.consumer)
                     .doOnError(::handleError)
             }
@@ -92,8 +93,14 @@ class GlucoseRangeDialogPm @Inject constructor(
     private fun updateProfile(i: Unit): Profile =
         profileState.value.copy(
             glucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
-                normalStart = beforeEatGlucoseRangeState.value.first,
-                normalEnd = beforeEatGlucoseRangeState.value.second
+                normalStart = min(
+                    beforeEatGlucoseRangeState.value.first,
+                    afterEatGlucoseRangeState.value.first
+                ),
+                normalEnd = max(
+                    beforeEatGlucoseRangeState.value.second,
+                    afterEatGlucoseRangeState.value.second
+                )
             ),
             glucoseLevelBeforeEatSettings = GlucoseLevelSettings.fromNormalValues(
                 normalStart = beforeEatGlucoseRangeState.value.first,
