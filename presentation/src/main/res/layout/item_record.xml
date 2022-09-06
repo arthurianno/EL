@@ -19,7 +19,7 @@
         android:paddingEnd="16dp">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/recordIconView"
+            android:id="@+id/record_icon_view"
             android:layout_width="32dp"
             android:layout_height="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,22 +29,22 @@
 
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/recordLabelView"
+            android:id="@+id/record_label_view"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:visibility="gone"
             android:layout_marginTop="36dp"
             android:layout_marginBottom="6dp"
             android:background="@drawable/ic_white_circle"
             android:padding="4dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_skiing" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recordTitleView"
+            android:id="@+id/record_title_view"
             style="@style/New.Body2.BlackBlue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -52,14 +52,14 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:lines="1"
-            app:layout_constraintBottom_toTopOf="@+id/recordTypeView"
-            app:layout_constraintEnd_toStartOf="@+id/barrierView"
-            app:layout_constraintStart_toEndOf="@+id/recordIconView"
+            app:layout_constraintBottom_toTopOf="@+id/record_type_view"
+            app:layout_constraintEnd_toStartOf="@+id/barrier_view"
+            app:layout_constraintStart_toEndOf="@+id/record_icon_view"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Короткий" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recordTypeView"
+            android:id="@+id/record_type_view"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -68,36 +68,36 @@
             android:ellipsize="end"
             android:lines="1"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/barrierView"
-            app:layout_constraintStart_toEndOf="@+id/recordIconView"
-            app:layout_constraintTop_toBottomOf="@+id/recordTitleView"
+            app:layout_constraintEnd_toStartOf="@+id/barrier_view"
+            app:layout_constraintStart_toEndOf="@+id/record_icon_view"
+            app:layout_constraintTop_toBottomOf="@+id/record_title_view"
             tools:text="Инсулин" />
 
         <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrierView"
+            android:id="@+id/barrier_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="start"
-            app:constraint_referenced_ids="recordCountView,recordDateView" />
+            app:constraint_referenced_ids="record_count_view,record_date_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recordCountView"
+            android:id="@+id/record_count_view"
             style="@style/New.Body2.ShadeGreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/recordDateView"
+            app:layout_constraintBottom_toTopOf="@id/record_date_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="3 ед" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recordDateView"
+            android:id="@+id/record_date_view"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recordCountView"
+            app:layout_constraintTop_toBottomOf="@+id/record_count_view"
             tools:text="в 11:30 (UTC +4)" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
