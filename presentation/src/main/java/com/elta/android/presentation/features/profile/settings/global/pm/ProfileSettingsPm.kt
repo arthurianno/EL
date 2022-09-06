@@ -99,9 +99,11 @@ class ProfileSettingsPm @Inject constructor(
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.APP_VERSION -> {} // TODO click by app version
+                    Type.EMAIL -> {}
                     else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
                 }
             }
+            .doOnError(::handleError)
             .subscribe()
             .untilDestroy()
 
