@@ -36,6 +36,9 @@ import me.dmdev.rxpm.widget.bindTo
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val REQUEST_CODE_ENABLE_LOCATION = 145
+private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
+
 class BluetoothFragment :
     BaseRecyclerViewFragment<BluetoothPm, FragmentBluetoothBinding>(FragmentBluetoothBinding::inflate) {
 
@@ -151,13 +154,9 @@ class BluetoothFragment :
     }
 
     companion object {
-        private const val REQUEST_CODE_ENABLE_LOCATION = 145
-
-        private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
         fun newInstance(): BluetoothFragment {
             return BluetoothFragment().apply {
-                arguments = Bundle().apply {
-                }
+                arguments = Bundle().apply {}
             }
         }
     }
