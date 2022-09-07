@@ -1,5 +1,6 @@
 package com.elta.android.presentation.utils
 
+import android.text.InputFilter
 import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatEditText
@@ -26,4 +27,14 @@ fun <E : AppCompatEditText> E.error(): Consumer<String> = Consumer {
 
 fun MaterialEditText.clearError() {
     error = null
+}
+
+fun EditText.setEmojiFilter() {
+    val emojiFilter = InputFilter { source, start, end, dest, dstart, dend ->
+        source.forEach {
+            if (it.isSurrogate()) return@InputFilter ""
+        }
+        return@InputFilter null
+    }
+    filters += emojiFilter
 }
