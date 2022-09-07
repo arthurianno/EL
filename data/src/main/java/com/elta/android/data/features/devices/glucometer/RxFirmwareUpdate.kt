@@ -3,7 +3,7 @@ package com.elta.android.data.features.devices.glucometer
 import android.content.Context
 import android.os.Build
 import com.elta.android.common.errors.FirmwareUpdateError
-import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import no.nordicsemi.android.dfu.DfuProgressListener
 import no.nordicsemi.android.dfu.DfuServiceInitiator
@@ -14,9 +14,20 @@ fun startFirmwareUpdate(
     context: Context,
     path: String,
     deviceAddress: String
-): Completable = Completable.create { emitter ->
+): Observable<String> = Observable.create { emitter ->
 
     val listener = object : DfuProgressLogger() {
+        override fun onProgressChanged(
+            address: String,
+            percent: Int,
+            speed: Float,
+            avgSpeed: Float,
+            currentPart: Int,
+            partsTotal: Int
+        ) {
+            emitter.onNext("speed=$speed, progress=$percent")
+        }
+
         override fun onDfuCompleted(address: String) {
             super.onDfuCompleted(address)
             if (!emitter.isDisposed && address == deviceAddress) {
@@ -53,7 +64,14 @@ fun startFirmwareUpdate(
 @Suppress("MaxLineLength")
 abstract class DfuProgressLogger : DfuProgressListener {
 
-    override fun onProgressChanged(address: String, percent: Int, speed: Float, avgSpeed: Float, currentPart: Int, partsTotal: Int) {
+    override fun onProgressChanged(
+        address: String,
+        percent: Int,
+        speed: Float,
+        avgSpeed: Float,
+        currentPart: Int,
+        partsTotal: Int
+    ) {
         Timber.i("onProgressChanged, address=$address, percent=$percent, speed=$speed, avgSpeed=$avgSpeed, currentPart=$currentPart, partsTotal=$partsTotal")
     }
 
