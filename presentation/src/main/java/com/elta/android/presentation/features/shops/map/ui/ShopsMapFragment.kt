@@ -27,6 +27,7 @@ import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
+import com.elta.android.presentation.utils.setEmojiFilter
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
@@ -89,6 +90,7 @@ class ShopsMapFragment :
 
             searchItemsView.layoutManager = FixedLinearLayoutManager(requireContext())
             searchItemsView.adapter = searchAdapter
+            searchInputView.setEmojiFilter()
         }
     }
 
