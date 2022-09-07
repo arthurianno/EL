@@ -31,8 +31,6 @@ import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
-private const val ERROR_TAG = "ProfileSettingPmError"
-
 class ProfileSettingsPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
@@ -101,9 +99,8 @@ class ProfileSettingsPm @Inject constructor(
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     Type.DELETE_PROFILE -> deleteProfile()
-                    Type.APP_VERSION -> {} // TODO click by app version
-                    Type.EMAIL -> {}
-                    else -> Log.e(ERROR_TAG, "This type:$type haven`t implemented yet...")
+                    Type.APP_VERSION, Type.EMAIL -> {}
+                    else -> Log.e(javaClass.simpleName, "This type:$type haven`t implemented yet...")
                 }
             }
             .doOnError(::handleError)
