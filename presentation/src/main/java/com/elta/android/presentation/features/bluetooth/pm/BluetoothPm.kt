@@ -8,9 +8,9 @@ import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
-import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerEventsUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometerInfoUseCase
+import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
@@ -38,7 +38,7 @@ class BluetoothPm @Inject constructor(
     private val setPinCodeUseCase: ConnectDeviceUseCase,
     private val getGlucometerEventsUseCase: GetGlucometerEventsUseCase,
     private val getGlucometerInfoUseCase: GetGlucometerInfoUseCase,
-    private val findGlucometersUseCase: FindGlucometersUseCase,
+    private val getGlucometersUseCase: GetGlucometersUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -76,9 +76,9 @@ class BluetoothPm @Inject constructor(
         super.onCreate()
 
         startScanAction.observable
-            .flatMap {
-                findGlucometersUseCase.execute()
-                    .doOnNext { results ->
+            .flatMapSingle {
+                getGlucometersUseCase.execute()
+                    .doOnSuccess { results ->
                         scanResults.clear()
                         scanResults.addAll(results)
                         items.consumer.accept(
@@ -184,10 +184,13 @@ class BluetoothPm @Inject constructor(
         updateFirmwareAction.observable
             .skipWhileInProgress()
             .map(::createUpdateFirmwareUseCaseParams)
-            .flatMapCompletable { params ->
+            .flatMap { params ->
                 updateDeviceFirmwareUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .doOnNext {
+                        writeToLog(it)
+                    }
                     .doOnComplete {
                         writeToLog("Firmware updated")
                     }

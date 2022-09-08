@@ -22,7 +22,6 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.control.bluetoothControl2
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
@@ -146,7 +145,7 @@ class FirmwarePm @Inject constructor(
         startUpdateAction.observable
             .skipWhileInProgress(progressState.observable)
             .map(::createUpdateFirmwareUseCaseParams)
-            .flatMapCompletable(::updateFirmware)
+            .flatMap(::updateFirmware)
             .retry()
             .subscribe()
             .untilDestroy()
@@ -253,47 +252,47 @@ class FirmwarePm @Inject constructor(
             .doOnError { progressConsumer.accept(false) }
     }
 
-    private fun Completable.bindProgressExtended(progressConsumer: Consumer<Boolean>): Completable {
+    private fun <T> Observable<T>.bindProgressExtended(progressConsumer: Consumer<Boolean>): Observable<T> {
         return this
             .doOnSubscribe { progressConsumer.accept(true) }
             .doOnComplete { progressConsumer.accept(false) }
             .doOnError { progressConsumer.accept(false) }
     }
 
-    private fun updateFirmware(params: UpdateDeviceFirmwareUseCase.Params): Completable =
+    private fun updateFirmware(params: UpdateDeviceFirmwareUseCase.Params): Observable<String> =
         updateDeviceFirmwareUseCase.execute(params)
             .bindProgressExtended(progressState.consumer)
             .doOnSubscribe {
                 setState(UpdateState.Updating(resources, getDeviceVersion()))
             }
             .doOnComplete(::handleFirmwareUpdated)
-            .onErrorResumeNext { error ->
+            .doOnError { error ->
                 when (error) {
                     is BluetoothNotEnabledError ->
                         btControl.requestEnableBluetooth()
-                            .flatMapCompletable {
+                            .flatMapObservable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable {
+                                else Observable.fromCallable {
                                     setState(UpdateState.GlucometerOfflineError(resources))
                                 }
                             }
                     is LocationPermissionNotGrantedError ->
                         btControl.requestLocationPermissions()
-                            .flatMapCompletable {
+                            .flatMapObservable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable {
+                                else Observable.fromCallable {
                                     setState(UpdateState.GlucometerOfflineError(resources))
                                 }
                             }
                     is LocationNotEnabledError ->
                         btControl.requestEnableLocation()
-                            .flatMapCompletable {
+                            .flatMapObservable {
                                 if (it) updateFirmware(params)
-                                else Completable.fromCallable {
+                                else Observable.fromCallable {
                                     setState(UpdateState.GlucometerOfflineError(resources))
                                 }
                             }
-                    else -> Completable.error(error)
+                    else -> Observable.error(error)
                 }
             }
             .doOnError(::handleError)

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
+import android.util.Log
 import com.elta.android.domain.features.auth.interactor.DeleteProfileUseCase
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
@@ -98,10 +99,11 @@ class ProfileSettingsPm @Inject constructor(
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     Type.DELETE_PROFILE -> deleteProfile()
-                    Type.APP_VERSION -> {} // TODO click by app version
-                    else -> throw IllegalArgumentException("This type:$type haven`t implemented yet...")
+                    Type.APP_VERSION, Type.EMAIL -> {}
+                    else -> Log.e(javaClass.simpleName, "This type:$type haven`t implemented yet...")
                 }
             }
+            .doOnError(::handleError)
             .subscribe()
             .untilDestroy()
 

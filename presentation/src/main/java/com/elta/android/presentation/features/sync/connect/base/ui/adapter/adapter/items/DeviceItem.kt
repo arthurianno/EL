@@ -8,21 +8,4 @@ data class DeviceItem(
     val address: String,
     val isSelected: Boolean,
     val isLast: Boolean
-) : ListItem {
-
-    override fun getUniqueProperty(): Any = id
-
-    override fun getChangePayload(other: ListItem): Any {
-        if (other is DeviceItem) {
-            return mutableSetOf<Payload>().apply {
-                if (isSelected != other.isSelected) add(Payload.SELECTION_CHANGED)
-                if (isLast != other.isLast) add(Payload.POSITION_CHANGED)
-            }
-        }
-        return super.getChangePayload(other)
-    }
-
-    enum class Payload {
-        SELECTION_CHANGED, POSITION_CHANGED
-    }
-}
+) : ListItem

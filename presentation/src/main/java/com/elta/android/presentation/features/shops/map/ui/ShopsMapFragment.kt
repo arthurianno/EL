@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.domain.features.sale_points.model.Type
@@ -15,25 +16,26 @@ import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.pm.widgets.bindTo
 import com.elta.android.presentation.core.pm.widgets.resolveResults
-import com.elta.android.presentation.core.ui.adapter.bindTo
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentShopsMapBinding
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
+import com.elta.android.presentation.features.shops.map.ui.adapter.MapAdapter
 import com.elta.android.presentation.features.shops.map.ui.widgets.ShopClusterPinProvider
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
+import com.elta.android.presentation.utils.setEmojiFilter
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
-import com.nullgr.core.adapter.DynamicAdapter
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hideKeyboard
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
@@ -45,21 +47,25 @@ class ShopsMapFragment :
     BaseYandexMapFragment<ShopsMapPm, FragmentShopsMapBinding>(FragmentShopsMapBinding::inflate) {
 
     @Inject
-    lateinit var adapter: DynamicAdapter
+    lateinit var mapAdapter: MapAdapter
 
     @Inject
-    lateinit var searchAdapter: DynamicAdapter
+    lateinit var mapSearchAdapter: MapAdapter
 
+    override val searchAdapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { mapSearchAdapter }
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { mapAdapter }
     override val statusBarConfigProvider: StatusBarConfigProvider =
         TransparentStatusBarConfigProvider
     override val screenLayout: Int = R.layout.fragment_shops_map
     override val classToken: Class<ShopsMapPm> = ShopsMapPm::class.java
+
     override val userLocationPinRes = R.drawable.ic_my_loc
     override val clusterPinProvider by lazy(LazyThreadSafetyMode.NONE) {
         ShopClusterPinProvider(requireActivity())
     }
 
     private val snapHelper = PagerSnapHelper()
+
     private val rxPermissions by lazy { RxPermissions(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,6 +95,7 @@ class ShopsMapFragment :
 
             searchItemsView.layoutManager = FixedLinearLayoutManager(requireContext())
             searchItemsView.adapter = searchAdapter
+            searchInputView.setEmojiFilter()
         }
     }
 
@@ -98,7 +105,7 @@ class ShopsMapFragment :
         pm.titleState.bindTo(binding.toolbar.toolbarTitleView.text())
         // due to large data set diff utils works with issues or
         // requires a lot of resources for calculation, so disable it.
-        pm.items.bindTo { adapter.updateData(it, false) }
+        pm.items.bindTo { adapter.submitList(it) }
         pm.addMyLocationPinCommand.bindTo(::showUserLocation)
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
         pm.navigateToLocationCommand.bindTo { moveTo(it.location.toPoint(), zoom = it.zoom) }
@@ -125,7 +132,7 @@ class ShopsMapFragment :
 
         // search
         pm.searchHintState.bindTo(binding.searchInputView::setHint)
-        pm.searchItems.observable.bindTo(searchAdapter, compositeUnbind)
+        pm.searchItems.bindTo { searchAdapter.submitList(it) }
         pm.searchInput.bindTo(binding.searchInputView)
         pm.searchCloseCommand.bindTo {
             binding.searchInputView.hideKeyboard()
@@ -150,6 +157,7 @@ class ShopsMapFragment :
     }
 
     companion object {
+
         fun newInstance(type: Type) = ShopsMapFragment().apply {
             arguments = bundle(EXTRA_TYPE to type)
         }

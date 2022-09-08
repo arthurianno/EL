@@ -11,6 +11,7 @@ import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.nullgr.core.adapter.DynamicAdapter
 import javax.inject.Inject
 
+@Deprecated("Класс не используется. Можно удалить")
 abstract class BaseListFragment<T : BaseListPm, B : ViewBinding>(
     bindingInflater: Inflater<B>
 ) : BaseFragment<T, B>(bindingInflater) {

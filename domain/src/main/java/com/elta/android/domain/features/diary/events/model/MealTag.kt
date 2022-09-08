@@ -2,5 +2,6 @@ package com.elta.android.domain.features.diary.events.model
 
 enum class MealTag {
     BEFOREMEAL,
-    AFTERMEAL
+    AFTERMEAL,
+    NOT_SELECTED
 }

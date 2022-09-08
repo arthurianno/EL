@@ -45,7 +45,7 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> =
         glucometersManager.syncWithDevice(device)
 
-    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable =
+    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String> =
         glucometersManager.updateFirmware(address, firmwareFile)
 
     override fun setPrimaryDevice(address: String): Completable =

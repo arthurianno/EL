@@ -28,7 +28,7 @@ interface DeviceRepository {
 
     fun syncWithDevice(device: Glucometer?): Observable<Int>
 
-    fun updateFirmware(address: String, firmwareFile: FirmwareFile): Completable
+    fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String>
 
     fun setPrimaryDevice(address: String): Completable
 }

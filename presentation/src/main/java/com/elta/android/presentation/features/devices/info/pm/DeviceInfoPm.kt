@@ -64,6 +64,11 @@ class DeviceInfoPm @Inject constructor(
             .map { Unit }
             .subscribe(getDeviceInfoAction.consumer)
             .untilDestroy()
+
+        bus.clicks<Clicks.OpenBlueToothScreen>()
+            .map { Unit }
+            .subscribe { router.navigateTo(Screens.BluetoothScreen) }
+            .untilDestroy()
     }
 
     fun setDeviceData(name: String, address: String) {

@@ -8,6 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.MainThreadDisposable
 import io.reactivex.disposables.Disposables
+import kotlin.math.abs
 
 fun RecyclerView.pageScrolled(): Observable<Int> =
     this.scrollStateChanges()
@@ -69,16 +70,11 @@ fun RecyclerView.firstVisiblePosition() =
     (this.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition() ?: 0
 
 fun RecyclerView.scrollSmooth(position: Int) {
-    when (Math.abs(firstVisiblePosition() - position) > SMOOTH_SCROLL_THRESHOLD) {
-        true -> {
-            val diff = when {
-                firstVisiblePosition() < position -> BEFORE_SMOOTH_DIFF
-                else -> -BEFORE_SMOOTH_DIFF
-            }
-            scrollToPosition(position + diff)
-            smoothScrollToPosition(position)
-        }
-        else -> smoothScrollToPosition(position)
+    if (abs(firstVisiblePosition() - position) > SMOOTH_SCROLL_THRESHOLD) {
+        scrollToPosition(position - BEFORE_SMOOTH_DIFF)
+        smoothScrollToPosition(position)
+    } else {
+        smoothScrollToPosition(position)
     }
 }
 
