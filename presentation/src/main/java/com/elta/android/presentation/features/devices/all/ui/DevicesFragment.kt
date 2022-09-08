@@ -2,18 +2,29 @@ package com.elta.android.presentation.features.devices.all.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentDevicesBinding
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
+import com.elta.android.presentation.features.devices.all.ui.adapter.DevicesAdapter
 import com.jakewharton.rxbinding2.view.clicks
+import com.nullgr.core.adapter.items.ListItem
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 class DevicesFragment :
-    BaseListFragment<DevicesPm, FragmentDevicesBinding>(FragmentDevicesBinding::inflate) {
+    BaseRecyclerViewFragment<DevicesPm, FragmentDevicesBinding>(FragmentDevicesBinding::inflate) {
+
+    @Inject
+    lateinit var devicesAdapter: DevicesAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { devicesAdapter }
     override val screenLayout = R.layout.fragment_devices
     override val classToken = DevicesPm::class.java
+
     override val statusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

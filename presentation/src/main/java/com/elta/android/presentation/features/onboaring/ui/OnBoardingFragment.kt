@@ -5,33 +5,42 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.fragment.BaseListFragment
+import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentOnboardingBinding
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
+import com.elta.android.presentation.features.onboaring.ui.adapter.OnBoardingAdapter
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hide
 import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 @Suppress("LabeledExpression")
 class OnBoardingFragment :
-    BaseListFragment<OnBoardingPm, FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
+    BaseRecyclerViewFragment<OnBoardingPm, FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
 
+    @Inject
+    lateinit var onBoardingAdapter: OnBoardingAdapter
+
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { onBoardingAdapter }
     override val screenLayout: Int = R.layout.fragment_onboarding
     override val classToken: Class<OnBoardingPm> = OnBoardingPm::class.java
-    override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
+    override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
     private val snapHelper = PagerSnapHelper()
+
     private var lastX: Float = 0F
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

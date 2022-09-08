@@ -4,6 +4,8 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.a65apps.clustering.core.Cluster
 import com.a65apps.clustering.core.VisibleRect
@@ -22,6 +24,7 @@ import com.elta.android.presentation.core.ui.cluster.YandexClusterRenderer
 import com.elta.android.presentation.utils.distanceTo
 import com.elta.android.presentation.utils.toPoint
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.asConsumer
 import com.nullgr.core.rx.asObservable
 import com.yandex.mapkit.Animation
@@ -39,6 +42,10 @@ import com.yandex.runtime.image.ImageProvider
 abstract class BaseYandexMapFragment<T : BasePm, B : ViewBinding>(
     bindingInflater: Inflater<B>
 ) : BaseFragment<T, B>(bindingInflater) {
+
+    abstract val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder>
+
+    abstract val searchAdapter: ListAdapter<ListItem, RecyclerView.ViewHolder>
 
     protected abstract val userLocationPinRes: Int
     protected abstract val clusterPinProvider: ClusterPinProvider

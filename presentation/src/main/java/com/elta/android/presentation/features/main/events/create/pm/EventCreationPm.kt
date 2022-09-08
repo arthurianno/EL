@@ -18,12 +18,15 @@ import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.state
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
     private val getProfileUseCase: GetProfileUseCase,
-    services: ServiceFacade,
+    services: ServiceFacade
 ) : BaseEventPm(services) {
 
     private val isFormNotEmptyState = state(false)
@@ -83,6 +86,7 @@ class EventCreationPm @Inject constructor(
                 this.meta = variant.meta
             }
         }
+            .debounce(MAIN_ACTON_BUTTON_DEBOUNCE, TimeUnit.MILLISECONDS)
             .doOnNext(::checkIsEmpty)
             .map(::isFormValid)
             .subscribe(mainActionVisibilityState.consumer)
@@ -93,7 +97,8 @@ class EventCreationPm @Inject constructor(
         if (eventTypeState.valueOrNull == EventType.WEIGHT) {
             isFormNotEmptyState.consumer.accept(
                 eventFormModel.pickerValue != (
-                    profileState.valueOrNull?.weight ?: WeightFormInitializer.WEIGHT_DEFAULT_PICKER_VALUE
+                    profileState.valueOrNull?.weight
+                        ?: WeightFormInitializer.WEIGHT_DEFAULT_PICKER_VALUE
                     ) ||
                     !eventFormModel.inputValue.isNullOrEmpty() ||
                     eventFormModel.meta != null ||
