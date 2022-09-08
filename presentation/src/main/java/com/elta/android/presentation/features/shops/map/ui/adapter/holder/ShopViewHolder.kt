@@ -21,12 +21,13 @@ class ShopViewHolder(
             shopDistanceView.toggleView(!item.distance.isNullOrEmpty())
             shopDistanceView.text = item.distance
             val listener = View.OnClickListener { view ->
-                val click = when (view.id) {
-                    R.id.shopRouteView -> Clicks.ShopMakeRoute(item)
-                    R.id.shopCallView -> Clicks.ShopMakeCall(item)
-                    else -> throw IllegalArgumentException("Unknown view id")
-                }
-                bus.click(click)
+                bus.click(
+                    if (view.id == R.id.shopRouteView) {
+                        Clicks.ShopMakeRoute(item)
+                    } else {
+                        Clicks.ShopMakeCall(item)
+                    }
+                )
             }
             shopRouteView.setOnClickListener(listener)
             shopCallView.setOnClickListener(listener)
