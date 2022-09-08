@@ -60,8 +60,11 @@ class GlucoseEventFragment :
                 if (!isTouchingScroll || !isTouchingAppBar) {
                     val isOffsetZero = offset == 0
                     appBarLayoutView.setExpanded(isOffsetZero, true)
-                    if (isOffsetZero) requireActivity().findAndClearFocus()
-                    if (!isOffsetZero) scrollableView.scrollToBottom()
+
+                    // Это код был от прошлого разработчика. Закоментили при реализации ввода в барабан с клавиатуры.
+                    // Можно удалить после полного цикла тестирования от QA. Возможны проблемы с перекрытием контета клавиатурой
+//                    if (isOffsetZero) requireActivity().findAndClearFocus()
+//                    if (!isOffsetZero) scrollableView.scrollToBottom()
                 }
             }
             maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
