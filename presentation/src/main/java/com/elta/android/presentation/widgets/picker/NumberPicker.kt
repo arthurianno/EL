@@ -518,14 +518,14 @@ class NumberPicker @JvmOverloads constructor(
     }
 
     private fun initInputField() {
-        selectedText = findViewById(R.id.np__numberpicker_input)
+        selectedText = findViewById(R.id.np_numberpicker_input)
         selectedText.setText(formatNumber(pickerValue))
         selectedText.inputType = InputType.TYPE_CLASS_NUMBER
         selectedText.onFocusChangeListener = focusChangeListener
         selectedText.setSelectAllOnFocus(true)
         selectedText.imeOptions = EditorInfo.IME_ACTION_NEXT
         selectedText.filters = arrayOf(
-            InputFilter { source: CharSequence?, start: Int, end: Int, prev: Spanned?, prevStart: Int, prevEnd: Int ->
+            InputFilter { source: CharSequence?, _: Int, _: Int, prev: Spanned?, prevStart: Int, prevEnd: Int ->
                 runCatching {
                     val sourceInt = if (prevStart == prevEnd) {
                         (prev?.toString().orEmpty() + source).toInt()
