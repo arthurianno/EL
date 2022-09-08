@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.text.TextUtils
@@ -459,12 +460,7 @@ class NumberPicker @JvmOverloads constructor(
         inflater.inflate(R.layout.number_picker_material, this, true)
 
         // input text
-        selectedText = findViewById(R.id.np__numberpicker_input)
-        selectedText.setText(formatNumber(pickerValue))
-        selectedText.inputType = InputType.TYPE_CLASS_NUMBER
-        selectedText.onFocusChangeListener = focusChangeListener
-        selectedText.setSelectAllOnFocus(true)
-        selectedText.imeOptions = EditorInfo.IME_ACTION_NEXT
+        initInputField()
 
         // create the selector wheel paint
         val paint = Paint()
@@ -519,6 +515,31 @@ class NumberPicker @JvmOverloads constructor(
             }
         }
         attributes.recycle()
+    }
+
+    private fun initInputField() {
+        selectedText = findViewById(R.id.np_numberpicker_input)
+        selectedText.setText(formatNumber(pickerValue))
+        selectedText.inputType = InputType.TYPE_CLASS_NUMBER
+        selectedText.onFocusChangeListener = focusChangeListener
+        selectedText.setSelectAllOnFocus(true)
+        selectedText.imeOptions = EditorInfo.IME_ACTION_NEXT
+        selectedText.filters = arrayOf(
+            InputFilter { source: CharSequence?, _: Int, _: Int, prev: Spanned?, prevStart: Int, prevEnd: Int ->
+                runCatching {
+                    val sourceInt = if (prevStart == prevEnd) {
+                        (prev?.toString().orEmpty() + source).toInt()
+                    } else {
+                        source?.toString()?.toInt()
+                    }
+                    if (sourceInt in minValue..maxValue) {
+                        source
+                    } else {
+                        ""
+                    }
+                }.getOrNull() ?: ""
+            }
+        )
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
