@@ -15,7 +15,7 @@ class ValueChangeObservable(
         }
         val listener = Listener(view, observer)
         observer.onSubscribe(listener)
-        listener.valueListener?.onValueChange(view, view.value, view.value)
+        listener.valueListener?.onValueChange(view, view.pickerValue, view.pickerValue)
         view.addOnValueChangedListener(listener.valueListener)
     }
 
@@ -25,9 +25,9 @@ class ValueChangeObservable(
     ) : MainThreadDisposable() {
 
         var valueListener: NumberPicker.OnValueChangeListener? =
-            NumberPicker.OnValueChangeListener { _, _, newValue ->
-                if (!isDisposed) {
-                    observer.onNext(newValue)
+            object : NumberPicker.OnValueChangeListener {
+                override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
+                    observer.onNext(newVal)
                 }
             }
 

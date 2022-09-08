@@ -49,8 +49,8 @@ class TwoSectionPicker @JvmOverloads constructor(
     fun setValue(value: Double) = with(binding) {
         val left = value.toInt()
         val right = ((value - left) * TEN).toInt()
-        leftPickerView.value = left
-        rightPickerView.value = right
+        leftPickerView.pickerValue = left
+        rightPickerView.pickerValue = right
     }
 
     fun valueChanges(): Observable<Double> =

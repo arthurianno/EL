@@ -18,6 +18,11 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import java.util.concurrent.TimeUnit
 
+private const val TEN = 10
+private const val EMPTY_STRING = ""
+private const val DEBOUNCE = 100L
+private const val PICKERS_COUNT = 2L
+
 @Suppress("UnnecessaryParentheses")
 class FormPicker @JvmOverloads constructor(
     context: Context,
@@ -61,13 +66,13 @@ class FormPicker @JvmOverloads constructor(
     fun setValue(value: Double) = with(binding) {
         val left = value.toInt()
         val right = ((value - left) * TEN).toInt()
-        leftPickerView.updateValue(left)
-        rightPickerView.updateValue(right)
+        leftPickerView.pickerValue = left
+        rightPickerView.pickerValue = right
     }
 
     fun setValues(firstValue: Int, secondValue: Int) = with(binding) {
-        leftPickerView.updateValue(firstValue)
-        rightPickerView.updateValue(secondValue)
+        leftPickerView.pickerValue = firstValue
+        rightPickerView.pickerValue = secondValue
     }
 
     fun valueChanges(): Observable<Double> =
@@ -109,16 +114,9 @@ class FormPicker @JvmOverloads constructor(
     override fun onSaveInstanceState(): Parcelable = with(binding) {
         val superState = super.onSaveInstanceState()
         val savedState = SavedState(superState)
-        savedState.leftValue = leftPickerView.value
-        savedState.rightValue = rightPickerView.value
+        savedState.leftValue = leftPickerView.pickerValue
+        savedState.rightValue = rightPickerView.pickerValue
         return savedState
-    }
-
-    companion object {
-        private const val TEN = 10
-        private const val EMPTY_STRING = ""
-        private const val DEBOUNCE = 100L
-        private const val PICKERS_COUNT = 2L
     }
 
     private class SavedState : View.BaseSavedState {
