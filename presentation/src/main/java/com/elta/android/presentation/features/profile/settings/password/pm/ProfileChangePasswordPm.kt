@@ -10,17 +10,15 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.rxkotlin.Observables
-import me.dmdev.rxpm.State
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
-import me.dmdev.rxpm.widget.InputControl
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
 class ProfileChangePasswordPm @Inject constructor(
     private val changePasswordUseCase: ChangePasswordUseCase,
-    serviceFacade: ServiceFacade
+    serviceFacade: ServiceFacade,
 ) : BasePm(serviceFacade) {
 
     val oldPasswordInput = inputControl(hideErrorOnUserInput = false)
@@ -30,8 +28,6 @@ class ProfileChangePasswordPm @Inject constructor(
     val continueAction = action<Unit>()
     val backHandleAction = action<Unit>()
 
-    private val isOldPasswordValidState = state(false)
-    private val isNewPasswordValidState = state(false)
     private val exitDialogAction = action<Unit>()
     private val exitDialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
@@ -40,17 +36,15 @@ class ProfileChangePasswordPm @Inject constructor(
 
         bindHandleBack()
 
-        oldPasswordInput bindInputErrorTo isOldPasswordValidState
-        newPasswordInput bindInputErrorTo isNewPasswordValidState
-
         Observables.combineLatest(
-            isOldPasswordValidState.observable,
-            isNewPasswordValidState.observable
-        ) { isOldPasswordValid, isNewPasswordValid ->
-            isOldPasswordValid && isNewPasswordValid
-        }
-            .map {
-                it && isPasswordsFilled() && !isPasswordSame()
+            oldPasswordInput.text.observable,
+            newPasswordInput.text.observable
+        )
+            .doOnNext(::getPasswordsError)
+            .map { oldAndNewPasswords ->
+                oldAndNewPasswords.toList().all { password ->
+                    validatePassword(password) && password.isNotBlank()
+                } && oldAndNewPasswords.first != oldAndNewPasswords.second
             }
             .subscribe(changePasswordEnabledState.consumer)
             .untilDestroy()
@@ -109,22 +103,20 @@ class ProfileChangePasswordPm @Inject constructor(
     private fun createParams(i: Unit): ChangePasswordUseCase.Params =
         ChangePasswordUseCase.Params(oldPasswordInput.text.value, newPasswordInput.text.value)
 
-    private infix fun InputControl.bindInputErrorTo(state: State<Boolean>) {
-        text.observable
-            .map(::validatePassword)
-            .doOnNext(state.consumer)
-            .map(::getPasswordError)
-            .subscribe(error.consumer)
-            .untilDestroy()
-    }
-
     private fun validatePassword(password: String): Boolean =
         password.isEmpty() || isPasswordValid(password)
 
-    private fun getPasswordError(isPasswordValid: Boolean): String =
-        when {
-            !isPasswordValid -> resources.getString(R.string.registration_password_pattern)
-            isPasswordSame() && isPasswordsFilled() -> resources.getString(R.string.registration_password_the_same)
-            else -> String()
-        }
+    private fun getPasswordsError(oldAndNewPasswords: Pair<String, String>) {
+        oldPasswordInput.error.consumer.accept(
+            if (!validatePassword(oldAndNewPasswords.first)) resources.getString(R.string.registration_password_pattern)
+            else ""
+        )
+        newPasswordInput.error.consumer.accept(
+            when {
+                !validatePassword(oldAndNewPasswords.second) -> resources.getString(R.string.registration_password_pattern)
+                isPasswordSame() && isPasswordsFilled() -> resources.getString(R.string.registration_password_the_same)
+                else -> ""
+            }
+        )
+    }
 }
