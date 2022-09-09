@@ -44,7 +44,7 @@ class ProfileChangePasswordPm @Inject constructor(
             .map { oldAndNewPasswords ->
                 oldAndNewPasswords.toList().all { password ->
                     validatePassword(password) && password.isNotBlank()
-                } && (oldAndNewPasswords.first != oldAndNewPasswords.second)
+                } && oldAndNewPasswords.first != oldAndNewPasswords.second
             }
             .subscribe(changePasswordEnabledState.consumer)
             .untilDestroy()
@@ -112,9 +112,11 @@ class ProfileChangePasswordPm @Inject constructor(
             else ""
         )
         newPasswordInput.error.consumer.accept(
-            if (!validatePassword(oldAndNewPasswords.second)) resources.getString(R.string.registration_password_pattern)
-            else if (isPasswordSame() && isPasswordsFilled()) resources.getString(R.string.registration_password_the_same)
-            else ""
+            when {
+                !validatePassword(oldAndNewPasswords.second) -> resources.getString(R.string.registration_password_pattern)
+                isPasswordSame() && isPasswordsFilled() -> resources.getString(R.string.registration_password_the_same)
+                else -> ""
+            }
         )
     }
 }
