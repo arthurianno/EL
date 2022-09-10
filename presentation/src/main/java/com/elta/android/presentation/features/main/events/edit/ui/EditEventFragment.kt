@@ -11,6 +11,9 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.show
 import me.dmdev.rxpm.bindTo
 
+private const val EXTRA_EVENT_TYPE = "extra_event_type"
+private const val EXTRA_EVENT_ID = "extra_event_id"
+
 class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
     override val classToken: Class<EditEventPm> = EditEventPm::class.java
@@ -45,8 +48,5 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
                 )
             }
         }
-
-        private const val EXTRA_EVENT_TYPE = "extra_event_type"
-        private const val EXTRA_EVENT_ID = "extra_event_id"
     }
 }

@@ -38,7 +38,7 @@ fun EditText.applyFilterOnlyLetersOrDigits() {
  * @see [InputFilter.LengthFilter]
  */
 fun EditText.applyLengthFilter(length: Int) {
-    editableText.filters = arrayOf(InputFilter.LengthFilter(length))
+    filters = arrayOf(InputFilter.LengthFilter(length))
 }
 
 /**
@@ -47,7 +47,7 @@ fun EditText.applyLengthFilter(length: Int) {
  * @see [InputFilter.AllCaps]
  */
 fun EditText.applyAllCapsFilter() {
-    editableText.filters = arrayOf(InputFilter.AllCaps())
+    filters = arrayOf(InputFilter.AllCaps())
 }
 
 /**
@@ -61,7 +61,7 @@ fun EditText.clearInputFilters() {
  * Extension that provide ability to add few input filters inside one function
  */
 fun EditText.applyFilters(bindFunction: ArrayList<InputFilter>.() -> Unit) {
-    editableText.filters = arrayListOf<InputFilter>().apply {
+    filters = arrayListOf<InputFilter>().apply {
         bindFunction()
     }.toTypedArray()
 }
