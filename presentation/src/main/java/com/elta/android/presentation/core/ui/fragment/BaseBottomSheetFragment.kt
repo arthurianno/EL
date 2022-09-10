@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.viewbinding.ViewBinding
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.ui.bottom_sheet.BottomSheetDialog
@@ -16,6 +18,7 @@ import com.elta.android.presentation.widgets.dialogs.ProgressDialog
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.base.PmDialogFragment
+import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -65,8 +68,13 @@ abstract class BaseBottomSheetFragment<T : BasePm, B : ViewBinding>(
         BottomSheetDialog(requireContext(), theme)
 
     protected fun bindProgressDialog(pm: T) {
+        pm.showSnackBarCommand.bindTo { showToast(getString(R.string.statistic_error)) }
         pm.progressState.observable
             .throttleLast(BaseFragment.DEBOUNCE, TimeUnit.MILLISECONDS)
             .subscribe(progressDialog.visibility(childFragmentManager)) {}
+    }
+
+    private fun showToast(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }
