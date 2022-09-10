@@ -9,6 +9,10 @@
         android:id="@+id/toolbar"
         layout="@layout/layout_toolbar" />
 
+    <include
+        layout="@layout/view_app_progress_bar"
+        android:id="@+id/progressView"/>
+
     <FrameLayout
         android:id="@+id/syncStateContainerView"
         android:layout_width="match_parent"
