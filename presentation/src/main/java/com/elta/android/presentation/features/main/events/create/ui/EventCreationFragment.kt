@@ -5,7 +5,6 @@ import com.elta.android.presentation.features.main.events.base.ui.BaseEventFragm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.utils.bundle
 
-@Suppress("MagicNumber")
 class EventCreationFragment : BaseEventFragment<EventCreationPm>() {
 
     override val classToken: Class<EventCreationPm> = EventCreationPm::class.java
