@@ -13,7 +13,7 @@
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
-    <string name="greeting_message">Управляйте диабетом вместе с\nСателлит Online</string>
+    <string name="greeting_message">Управляйте диабетом вместе с\nглюкометром Сателлит Online</string>
     <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
 
     <!--REGISTRATION FLOW -->
