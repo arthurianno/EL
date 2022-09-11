@@ -584,6 +584,7 @@
     <string name="statistic_menu_button">Выгрузить отчет</string>
     <string name="statistic_share_pdf_dialog_title">Поделиться с помощью</string>
     <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
+    <string name="statistic_error">Невозможно выгрузить отчет</string>
 
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>
@@ -635,5 +636,6 @@
     <string name="bluetooth_disabled">Bluetooth отключён</string>
     <string name="no_connection_to_the_internet">Нет подключения к Интернету</string>
     <string name="user_not_found">Пользователь с таким email не найден/не зарегистрирован</string>
+    <string name="default_error_message">Произошла ошибка</string>
 
 </resources>

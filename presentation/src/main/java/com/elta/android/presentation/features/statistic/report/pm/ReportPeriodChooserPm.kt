@@ -1,14 +1,17 @@
 package com.elta.android.presentation.features.statistic.report.pm
 
 import android.net.Uri
+import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reports.interactor.GetReportUseCase
 import com.elta.android.domain.features.reports.interactor.buildRange
 import com.elta.android.domain.features.reports.model.Range
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.messages.SnackBarMessageData
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -50,6 +53,19 @@ class ReportPeriodChooserPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error is NetworkConnectionError) {
+            showSnackBar(
+                SnackBarMessageData.SimpleTextMessage(
+                    error.message ?: resources.getString(
+                        R.string.default_error_message
+                    )
+                )
+            )
+        }
+        super.handleError(error)
     }
 
     private fun formatRange(range: Range): String =
