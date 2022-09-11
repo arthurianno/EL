@@ -28,7 +28,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/titleTextView"
-                    style="@style/New.Headline3"
+                    style="@style/New.Headline3.BlackBlue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
