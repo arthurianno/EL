@@ -150,4 +150,8 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="EditTextGrayLine" parent="AppTheme">
+        <item name="colorControlActivated">@color/shade_black0</item>
+    </style>
+
 </resources>
