@@ -7,6 +7,7 @@ import com.elta.android.domain.features.reports.interactor.GetReportUseCase
 import com.elta.android.domain.features.reports.interactor.buildRange
 import com.elta.android.domain.features.reports.model.Range
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -56,7 +57,13 @@ class ReportPeriodChooserPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         if (error is NetworkConnectionError) {
-            showSnackBar(SnackBarMessageData.SimpleTextMessage(error.message.orEmpty()))
+            showSnackBar(
+                SnackBarMessageData.SimpleTextMessage(
+                    error.message ?: resources.getString(
+                        R.string.default_error_message
+                    )
+                )
+            )
         }
         super.handleError(error)
     }
