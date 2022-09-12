@@ -127,6 +127,14 @@ android {
                     file('../BUILD_NOTES.md').absolutePath
             ext.betaDistributionGroupAliases = "QA-Nullgr"
 
+            buildConfigField "String", "ENVIRONMENT", "\"${buildConfigProperties[CONFIG_ENVIRONMENT]}\""
+            buildConfigField "String", "SERVER_URL", "\"${buildConfigProperties[CONFIG_SERVER_URL]}\""
+            buildConfigField "boolean", "IS_LOG_ENABLED", buildConfigProperties[CONFIG_LOG_ENABLED]
+
+            resValue "string", "app_deep_link_host", buildConfigProperties[CONFIG_DEEP_LINK_HOST]
+        }
+
+        debug {
             def appIdSuffix = buildConfigProperties[CONFIG_APP_ID_SUFFIX]
             if (appIdSuffix != null) {
                 applicationIdSuffix ".${appIdSuffix}"
@@ -136,15 +144,6 @@ android {
             if (appNameSuffix != null) {
                 versionNameSuffix "-${appNameSuffix}"
             }
-
-            buildConfigField "String", "ENVIRONMENT", "\"${buildConfigProperties[CONFIG_ENVIRONMENT]}\""
-            buildConfigField "String", "SERVER_URL", "\"${buildConfigProperties[CONFIG_SERVER_URL]}\""
-            buildConfigField "boolean", "IS_LOG_ENABLED", buildConfigProperties[CONFIG_LOG_ENABLED]
-
-            resValue "string", "app_deep_link_host", buildConfigProperties[CONFIG_DEEP_LINK_HOST]
-        }
-
-        debug {
             signingConfig signingConfigs.debug
         }
 
