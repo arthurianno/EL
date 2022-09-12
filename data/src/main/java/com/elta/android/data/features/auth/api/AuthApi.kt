@@ -1,0 +1,52 @@
+package com.elta.android.data.features.auth.api
+
+import com.elta.android.data.features.auth.api.request.AuthRequest
+import com.elta.android.data.features.auth.api.request.ChangePasswordRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordLinkRequest
+import com.elta.android.data.features.auth.api.request.ResetPasswordRequest
+import com.elta.android.data.features.auth.api.request.TokenRequest
+import com.elta.android.data.features.auth.dto.EmailStatusDto
+import com.elta.android.data.features.auth.dto.LoginDto
+import com.elta.android.data.features.auth.dto.TokenOwnerDto
+import com.elta.android.data.features.auth.dto.TokensDto
+import io.reactivex.Completable
+import io.reactivex.Single
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+
+@Suppress("TooManyFunctions", "ComplexInterface")
+interface AuthApi {
+
+    @POST("api/auth/v1/accounts")
+    fun register(@Body request: AuthRequest): Single<TokensDto>
+
+    @POST("api/auth/v1/accounts/login")
+    fun login(@Body request: AuthRequest): Single<LoginDto>
+
+    @GET("api/auth/v1/accounts/email/confirmed")
+    fun isEmailConfirmed(): Single<EmailStatusDto>
+
+    @GET("api/auth/v1/accounts/email/confirm")
+    fun sendConfirmationLink(): Completable
+
+    @PUT("api/auth/v1/accounts/password/reset")
+    fun sendPasswordResetLink(@Body request: ResetPasswordLinkRequest): Completable
+
+    @POST("api/auth/v1/accounts/password/reset")
+    fun resetPassword(@Body request: ResetPasswordRequest): Completable
+
+    @PUT("api/auth/v1/accounts/password")
+    fun changePassword(@Body request: ChangePasswordRequest): Completable
+
+    @PUT("api/auth/v1/accounts/email/confirm/token")
+    fun checkTokenOwner(@Body request: TokenRequest): Single<TokenOwnerDto>
+
+    @POST("api/auth/v1/accounts/email/confirm")
+    fun confirmEmail(@Body request: TokenRequest): Completable
+
+    @DELETE("api/auth/v1/accounts/delete")
+    fun deleteAccount(): Completable
+}

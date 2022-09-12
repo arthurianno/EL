@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- BACKEND ERRORS -->
+    <string name="error_600">Некорректный email или пароль</string>
+    <string name="error_602">Account is locked</string>
+    <string name="error_603">Внимание! Указанный email уже\nсуществует</string>
+    <string name="error_604">Not found user by access token</string>
+    <string name="error_605">Invalid refresh token</string>
+    <string name="error_606">Email уже подтвержден</string>
+    <string name="error_607">Время действия ссылки истекло</string>
+    <string name="error_608">Время действия ссылки истекло</string>
+    <string name="error_609">Пользователь уже привязал эту соц. сеть</string>
+    <string name="error_610">Этот аккаунт соц. сети уже привязан</string>
+    <string name="error_611">Пользователь не привязан к этой соц. сети </string>
+    <string name="error_612">Привязанный аккаунт не найден</string>
+    <string name="error_613">Неверный текущий пароль</string>
+    <string name="error_700">Внимание! Данный пользователь уже\nявляется вашим наблюдателем</string>
+    <string name="error_707">Невозможно отправить на свой email</string>
+
+    <!-- DEFAULT ERRORS -->
+    <string name="error_test_error">Internal error</string>
+    <string name="error_verify_your_email">Верифицируйте email</string>
+
+    <string name="error_general_title">Ошибка</string>
+    <string name="error_general_button">Повторить</string>
+
+    <string name="error_file_not_saved">Произошла ошибка при сохранении файла</string>
+</resources>

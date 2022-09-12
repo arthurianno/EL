@@ -1,0 +1,28 @@
+package com.elta.android.domain.features.auth.interactor
+
+import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.auth.repository.SocialRepository
+import com.elta.android.domain.features.user.model.SocialNetworkType
+import com.nullgr.core.interactor.CompletableUseCase
+import com.nullgr.core.rx.schedulers.SchedulersFacade
+import io.reactivex.Completable
+import io.reactivex.Observable
+import javax.inject.Inject
+
+// TODO Реализован сценарий выхода из аккаунта. По готовности бэка на удаление аккаунта реализовать сценарий удаления.
+class DeleteProfileUseCase @Inject constructor(
+    private val authRepo: AuthRepository,
+    private val socialRepo: SocialRepository,
+    schedulers: SchedulersFacade
+) : CompletableUseCase<Unit>(schedulers) {
+
+    override fun buildUseCaseObservable(params: Unit?): Completable =
+        authRepo.deleteAccount()
+            .andThen(
+                Observable.fromIterable(SocialNetworkType.values().asIterable())
+                    .concatMapCompletable { type ->
+                        socialRepo.logout(type)
+                    }
+            )
+            .andThen(authRepo.logout())
+}

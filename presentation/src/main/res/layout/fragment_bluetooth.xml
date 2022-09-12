@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/getInfoButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Info" />
+
+    <Button
+        android:id="@+id/getEventsButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get events" />
+
+    <Button
+        android:id="@+id/setPinButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set pin code" />
+
+    <Button
+        android:id="@+id/checkFirmwareButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Check new firmware" />
+
+    <Button
+        android:id="@+id/downloadFirmwareButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download firmware" />
+
+    <Button
+        android:id="@+id/updateFirmwareButtonView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update firmware" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/commandInputView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter pin here" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/logView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/itemsView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

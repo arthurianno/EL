@@ -1,0 +1,715 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:6697420626765801241",
+      "lastPropertyId": "13:5607327283194514943",
+      "name": "SalePointCacheDto",
+      "properties": [
+        {
+          "id": "1:392071321748032581",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2740189061387891066",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:6903008663868988168",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:4228641277243866155",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "5:4636704346031725540",
+          "name": "region",
+          "type": 9
+        },
+        {
+          "id": "6:735437868986304645",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "7:9058751639033436457",
+          "name": "address",
+          "type": 9
+        },
+        {
+          "id": "8:551080887049802226",
+          "name": "phone",
+          "type": 9
+        },
+        {
+          "id": "9:3053822631022506412",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "10:3975185315051658766",
+          "name": "longitude",
+          "type": 8
+        },
+        {
+          "id": "11:5877632020839739909",
+          "name": "timeStamp",
+          "type": 5
+        },
+        {
+          "id": "12:5732498039669845223",
+          "name": "modifiedState",
+          "type": 9
+        },
+        {
+          "id": "13:5607327283194514943",
+          "name": "fullAddress",
+          "indexId": "1:5049058603170790455",
+          "type": 9,
+          "flags": 2048
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:5982963766031290345",
+      "lastPropertyId": "18:6594923039236404749",
+      "name": "EventCachedDto",
+      "properties": [
+        {
+          "id": "1:7105984032723577790",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1803987764994271304",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:4547071645338469172",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "4:7098375176323475402",
+          "name": "additionTime",
+          "type": 6
+        },
+        {
+          "id": "5:5561471174870734704",
+          "name": "tagId",
+          "type": 9
+        },
+        {
+          "id": "6:2220357999565801382",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "7:6241854495862624254",
+          "name": "modificationTime",
+          "type": 6
+        },
+        {
+          "id": "8:9157379137866537319",
+          "name": "value",
+          "type": 8
+        },
+        {
+          "id": "9:6583229833092561246",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "10:5886246000041659660",
+          "name": "kind",
+          "type": 9
+        },
+        {
+          "id": "11:8405758619725871361",
+          "name": "duration",
+          "type": 6
+        },
+        {
+          "id": "12:6400976524049145017",
+          "name": "activityType",
+          "type": 9
+        },
+        {
+          "id": "13:4436020323931534475",
+          "name": "mealTag",
+          "type": 9
+        },
+        {
+          "id": "14:4716768788257142137",
+          "name": "insulinType",
+          "type": 9
+        },
+        {
+          "id": "15:8865794857143658417",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "17:8536437484320236218",
+          "name": "additionTimeString",
+          "type": 9
+        },
+        {
+          "id": "18:6594923039236404749",
+          "name": "temperature",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:7269490173938270184",
+      "lastPropertyId": "8:5970261778621166859",
+      "name": "TagCachedDto",
+      "properties": [
+        {
+          "id": "1:5348712621338611844",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2158825089604613816",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "4:8150391136256062536",
+          "name": "image",
+          "type": 9
+        },
+        {
+          "id": "5:2917272193991273202",
+          "name": "isReadOnly",
+          "type": 1
+        },
+        {
+          "id": "6:119621998202467244",
+          "name": "modificationTime",
+          "type": 6
+        },
+        {
+          "id": "7:5946479875638262848",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "8:5970261778621166859",
+          "name": "name",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:7778186585007624272",
+      "lastPropertyId": "17:5757595762673508479",
+      "name": "ProfileCacheDto",
+      "properties": [
+        {
+          "id": "1:1865160032317136918",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:4800922387146183524",
+          "name": "diabetes",
+          "type": 9
+        },
+        {
+          "id": "3:9092619775383579111",
+          "name": "weight",
+          "type": 8
+        },
+        {
+          "id": "4:7362034935937347791",
+          "name": "gender",
+          "type": 9
+        },
+        {
+          "id": "5:1786304790586423578",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "6:4133381220410196660",
+          "name": "timeStamp",
+          "type": 6
+        },
+        {
+          "id": "7:2523905964927448841",
+          "name": "firstName",
+          "type": 9
+        },
+        {
+          "id": "8:856644629161886932",
+          "name": "lastName",
+          "type": 9
+        },
+        {
+          "id": "12:6060621870509397124",
+          "name": "minBeforeEatingValue",
+          "type": 8
+        },
+        {
+          "id": "13:2283823169354255366",
+          "name": "maxBeforeEatingValue",
+          "type": 8
+        },
+        {
+          "id": "14:3341096461402291792",
+          "name": "minAfterEatingValue",
+          "type": 8
+        },
+        {
+          "id": "15:6770558978562778519",
+          "name": "maxAfterEatingValue",
+          "type": 8
+        },
+        {
+          "id": "16:3020035338152572965",
+          "name": "minAverageValue",
+          "type": 8
+        },
+        {
+          "id": "17:5757595762673508479",
+          "name": "maxAverageValue",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:5390790228794287044",
+      "lastPropertyId": "5:7421900256969611969",
+      "name": "SyncInfoDto",
+      "properties": [
+        {
+          "id": "1:2523033500597706414",
+          "name": "lastSalePointsSync",
+          "type": 6
+        },
+        {
+          "id": "2:7455150272527992115",
+          "name": "lastEventsSync",
+          "type": 6
+        },
+        {
+          "id": "3:4784702952835774170",
+          "name": "lastTagsSync",
+          "type": 6
+        },
+        {
+          "id": "4:1157207118847719823",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "5:7421900256969611969",
+          "name": "lastGoogleFitSync",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "8:2517168649469128298",
+      "lastPropertyId": "7:6679018445521461808",
+      "name": "NetworkCacheDto",
+      "properties": [
+        {
+          "id": "1:1894848623894413212",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:363624470685208839",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "3:6234446942258716219",
+          "name": "isLinked",
+          "type": 1
+        },
+        {
+          "id": "7:6679018445521461808",
+          "name": "profileId",
+          "indexId": "5:7982913992379413599",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ProfileCacheDto"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:1358727599450312017",
+      "lastPropertyId": "2:657907652554447407",
+      "name": "GlucometerPinWrapper",
+      "properties": [
+        {
+          "id": "1:6875425958406846896",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:657907652554447407",
+          "name": "pin",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "10:8095044604429020731",
+      "lastPropertyId": "6:1590675622822674901",
+      "name": "ReminderCacheDto",
+      "properties": [
+        {
+          "id": "1:9191512851221276955",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5394495955551797957",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:2223169240129351502",
+          "name": "time",
+          "type": 9
+        },
+        {
+          "id": "5:5736442705211247614",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "6:1590675622822674901",
+          "name": "schedule",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "11:2672464361589836854",
+      "lastPropertyId": "8:1305597996417891010",
+      "name": "ObserverCacheDto",
+      "properties": [
+        {
+          "id": "1:6534346994157213235",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5626098089724851404",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:8432849502964397699",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "4:4247834290607105604",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "5:4281746726435778337",
+          "name": "status",
+          "type": 9
+        },
+        {
+          "id": "6:412025849003372876",
+          "name": "modificationTime",
+          "type": 6
+        },
+        {
+          "id": "7:5486485348885741996",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "8:1305597996417891010",
+          "name": "customName",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "12:2241636644992725676",
+      "lastPropertyId": "5:3490367012322743610",
+      "name": "GlucometerCachedDto",
+      "properties": [
+        {
+          "id": "1:1542682869767898369",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:3895628364884474168",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:4084723739578882284",
+          "name": "address",
+          "type": 9
+        },
+        {
+          "id": "4:6009268326789608252",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "5:3490367012322743610",
+          "name": "isPrimary",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "13:4893127598039866661",
+      "lastPropertyId": "10:6655224264396305099",
+      "name": "GlucometerInfoCachedDto",
+      "properties": [
+        {
+          "id": "1:2148338596001665644",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:4150497300683907468",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:6053460287085527455",
+          "name": "deviceDate",
+          "type": 9
+        },
+        {
+          "id": "4:7890009120523723440",
+          "name": "syncDate",
+          "type": 9
+        },
+        {
+          "id": "5:203315695263249193",
+          "name": "temperature",
+          "type": 5
+        },
+        {
+          "id": "6:3537436629162817320",
+          "name": "batteryLevel",
+          "type": 5
+        },
+        {
+          "id": "7:4399329800404962053",
+          "name": "software",
+          "type": 8
+        },
+        {
+          "id": "8:6212590879586954819",
+          "name": "hardware",
+          "type": 8
+        },
+        {
+          "id": "10:6655224264396305099",
+          "name": "lastSyncedEvent",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "14:2132176121149602466",
+      "lastPropertyId": "5:7347029842216060908",
+      "name": "LocalSyncCachedDto",
+      "properties": [
+        {
+          "id": "1:3528926957512000350",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6056234610708105544",
+          "name": "secondaryId",
+          "type": 9
+        },
+        {
+          "id": "3:4072144334422161834",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "4:7092182216273253898",
+          "name": "className",
+          "type": 9
+        },
+        {
+          "id": "5:7347029842216060908",
+          "name": "meta",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "16:4156337543713803940",
+      "lastPropertyId": "6:3983104656624443690",
+      "name": "UserInfoCacheDto",
+      "properties": [
+        {
+          "id": "1:127007190709599695",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:931611259750674868",
+          "name": "isUserLoggedIn",
+          "type": 1
+        },
+        {
+          "id": "3:259882331440132405",
+          "name": "isFeedbackSent",
+          "type": 1
+        },
+        {
+          "id": "4:3237283968184737773",
+          "name": "isEmailConfirmed",
+          "type": 1
+        },
+        {
+          "id": "5:389016516142161600",
+          "name": "isOnboardingPassed",
+          "type": 1
+        },
+        {
+          "id": "6:3983104656624443690",
+          "name": "isFirstHomeEntrance",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "17:5092861307515122171",
+      "lastPropertyId": "4:2000932439839269344",
+      "name": "HealthAppCacheDto",
+      "properties": [
+        {
+          "id": "1:3102842089124470983",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "2:949995477402119970",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "3:8741562037095094461",
+          "name": "isActive",
+          "type": 1
+        },
+        {
+          "id": "4:2000932439839269344",
+          "name": "profileId",
+          "indexId": "6:8670197050320643670",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ProfileCacheDto"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "17:5092861307515122171",
+  "lastIndexId": "6:8670197050320643670",
+  "lastRelationId": "4:5291358786591636907",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    7986449784983157444,
+    8128370386624572352,
+    3172733917331824673
+  ],
+  "retiredIndexUids": [
+    1727795001970913821,
+    2136829486978844889,
+    6755040171579155032
+  ],
+  "retiredPropertyUids": [
+    5767551688504933683,
+    7024367445299168840,
+    6636600462150201934,
+    540480903123996475,
+    5959798014926884481,
+    291930954876441264,
+    6609609127975389480,
+    2592894846417217715,
+    8171767658026678111,
+    602119885913131796,
+    7302905946498198254,
+    4534211085864672993,
+    8469353903357674267,
+    9124662289593344530,
+    7044315819361407764,
+    3228968487758480072,
+    2138966291569989718,
+    3321837165652814624,
+    359065395504054522,
+    9191798974399625466,
+    5531218653199010959,
+    3684651299712072294,
+    6799483249178145102,
+    78969528808694988,
+    8809417499672134012,
+    1113739526237631879,
+    6237374916312762544,
+    6229958913033243616,
+    8731844995908226622
+  ],
+  "retiredRelationUids": [
+    5224261980992438077,
+    7122687547004908213,
+    2467782336942872369,
+    5291358786591636907
+  ],
+  "version": 1
+}

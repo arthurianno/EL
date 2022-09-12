@@ -1,0 +1,47 @@
+package com.elta.android.data.features.sale_points.datasource
+
+import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.features.common.cache.Cache
+import com.elta.android.data.features.common.cache.CommonConditions
+import com.elta.android.data.features.sale_points.cache.SalePointsConditions
+import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
+import com.elta.android.data.features.sale_points.dto.SalePointDto
+import io.reactivex.Observable
+import javax.inject.Inject
+
+class SalePointsCachedDataSource @Inject constructor(
+    private val fromCacheMapper: Mapper<SalePointCacheDto, SalePointDto>,
+    private val cache: Cache<SalePointCacheDto>
+) : SalePointsDataSource {
+
+    override fun getSalePoints(type: String?): Observable<List<SalePointDto>> =
+        Observable.fromCallable {
+            val condition = when (type == null) {
+                true -> CommonConditions.All
+                else -> SalePointsConditions.Type(type)
+            }
+            cache.getAll(condition)
+        }.map(fromCacheMapper::mapFromObjects)
+
+    override fun getSalePoints(
+        southWestLatitude: Double,
+        southWestLongitude: Double,
+        northEastLatitude: Double,
+        northEastLongitude: Double
+    ): Observable<List<SalePointDto>> =
+        Observable.fromCallable {
+            cache.getAll(
+                SalePointsConditions.Bounds(
+                    southWestLatitude = southWestLatitude,
+                    southWestLongitude = southWestLongitude,
+                    northEastLatitude = northEastLatitude,
+                    northEastLongitude = northEastLongitude
+                )
+            )
+        }.map(fromCacheMapper::mapFromObjects)
+
+    override fun searchSalePoints(query: String, type: String?): Observable<List<SalePointDto>> =
+        Observable.fromCallable {
+            cache.getAll(SalePointsConditions.Query(query, type))
+        }.map(fromCacheMapper::mapFromObjects)
+}

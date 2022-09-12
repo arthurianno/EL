@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.elta.android.presentation.widgets.datePicker.DateItemContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingTop="21dp"
+    android:paddingBottom="21dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dayOfWeekTitleView"
+        style="@style/New.Caption2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:textColor="@color/color_text_day_of_week"
+        tools:text="Чт" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dayOfMonthTitleView"
+        style="@style/New.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/color_text_day_of_month"
+        tools:text="14" />
+</com.elta.android.presentation.widgets.datePicker.DateItemContainerView>

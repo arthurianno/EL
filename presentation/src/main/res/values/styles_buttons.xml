@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Button.Large" parent="Typography.Button.Large.Text.Primary">
+        <item name="android:background">@drawable/selector_button_large</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/large_button_height</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Button.Small.Dark" parent="Typography.Button.Small.Text.Dark">
+        <item name="android:background">@drawable/selector_button_small_dark</item>
+        <item name="android:layout_width">@dimen/small_button_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingBottom">@dimen/small_button_padding</item>
+        <item name="android:paddingTop">@dimen/small_button_padding</item>
+    </style>
+
+    <style name="Button.Small.Light" parent="Typography.Button.Small.Text.Light">
+        <item name="android:background">@drawable/selector_button_small_light</item>
+        <item name="android:layout_width">@dimen/small_button_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingBottom">@dimen/small_button_padding</item>
+        <item name="android:paddingTop">@dimen/small_button_padding</item>
+    </style>
+
+    <style name="Button.Small.Blue" parent="Button.Small.Light">
+        <item name="android:background">@drawable/selector_button_small_blue</item>
+    </style>
+
+    <style name="Button.Small.W" parent="Button.Small.Dark">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">110dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:background">@drawable/selector_button_small_w</item>
+    </style>
+
+    <style name="Button.Small.Blue2" parent="Button.Small.Light">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">110dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:background">@drawable/selector_button_small_blue_2</item>
+        <item name="android:textColor">@color/button_small_blue_text_color_2</item>
+    </style>
+
+    <style name="Button.Small.Blue3" parent="Button.Small.Light">
+        <item name="android:background">@drawable/selector_button_small_blue_3</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <style name="Button.Social" parent="Base.Widget.AppCompat.ImageButton">
+        <item name="android:background">@drawable/selector_button_social</item>
+        <item name="android:layout_width">@dimen/social_button_size</item>
+        <item name="android:layout_height">@dimen/social_button_size</item>
+        <item name="android:padding">@dimen/social_button_content_padding</item>
+    </style>
+
+    <style name="Button.FloatingActionButton" parent="Widget.Design.FloatingActionButton">
+        <item name="backgroundTint">@color/color_floating_action_button</item>
+        <item name="rippleColor">@color/color_floating_action_button_pressed</item>
+        <item name="android:layout_margin">@dimen/padding_base</item>
+        <item name="elevation">@dimen/card_elevation</item>
+    </style>
+
+    <style name="Button.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="EatingAttrButton" parent="Widget.AppCompat.ImageButton">
+        <item name="android:background">@drawable/bg_button_small_blue_2_active</item>
+    </style>
+</resources>

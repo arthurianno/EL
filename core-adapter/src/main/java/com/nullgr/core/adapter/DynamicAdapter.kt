@@ -1,0 +1,101 @@
+package com.nullgr.core.adapter
+
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.nullgr.core.adapter.items.ListItem
+
+/**
+ * Adapter for [ListItem]s based on Hannes Dorfmann AdapterDelegates(https://github.com/sockeqwe/AdapterDelegates)
+ * but without necessity to create all AdapterDelegates with adapter creation.
+ * Delegates creates by necessity via factory depends on set of [ListItem] added to adapter.
+ *
+ * @author vchernyshov
+ * @author a.komarovskyi
+ */
+open class DynamicAdapter constructor(
+    private val manager: AdapterDelegatesManager,
+    private val diffCalculator: DiffCalculator? = null
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    constructor(factory: AdapterDelegatesFactory, calculator: DiffCalculator? = null) :
+        this(HashCodeBasedAdapterDelegatesManager(factory), calculator)
+
+    private val _items = mutableListOf<ListItem>()
+    val items: List<ListItem>
+        get() = _items
+
+    override fun getItemViewType(position: Int): Int {
+        return manager.getItemViewType(_items, position)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        manager.onCreateViewHolder(parent, viewType)
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        manager.onBindViewHolder(_items, position, holder)
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
+        if (payloads.isEmpty()) manager.onBindViewHolder(_items, position, holder)
+        else manager.onBindViewHolder(_items, position, holder, payloads)
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        manager.onViewAttachedToWindow(holder)
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        manager.onViewDetachedFromWindow(holder)
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        manager.onViewRecycled(holder)
+    }
+
+    override fun getItemCount(): Int = _items.size
+
+    fun getItemPosition(listItem: ListItem): Int = _items.indexOf(listItem)
+
+    /**
+     * Updates items of adapter.
+     *
+     * @param newItems New list of items.
+     * @param enableDiffUtils True if you want use [DiffUtil] to calculate DiffResult, false otherwise.
+     * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
+     */
+    fun updateData(
+        newItems: List<ListItem>,
+        enableDiffUtils: Boolean = true,
+        detectMoves: Boolean = true
+    ) {
+        when (enableDiffUtils) {
+            true -> diffCalculator?.calculateDiff(
+                this,
+                _items,
+                newItems,
+                detectMoves
+            )
+            else -> {
+                setData(newItems)
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+    fun setData(newItems: List<ListItem>) {
+        this._items.clear()
+        this._items.addAll(newItems)
+        manager.setDelegates(this._items)
+    }
+
+    fun getItem(position: Int): ListItem? {
+        return when {
+            _items.isNotEmpty() && position >= 0 -> _items[position]
+            else -> null
+        }
+    }
+}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="230dp"
+    android:background="@color/white"
+    android:clipChildren="false"
+    android:orientation="horizontal">
+
+    <HorizontalScrollView
+        android:id="@+id/statisticsScrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:scrollbars="none">
+
+        <com.elta.android.presentation.widgets.charts.statistics.StatisticsChartView
+            android:id="@+id/chartView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </HorizontalScrollView>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="top">
+
+        <LinearLayout
+            android:layout_width="45dp"
+            android:layout_height="194.5dp"
+            android:background="@color/white"
+            android:gravity="top"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/sixValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="6" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fifthValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="5" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fourthValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="4" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/thirdValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="3" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/secondValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="2" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firstValueView"
+                style="@style/New.Overline.ShadeBlack2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                tools:text="1" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:background="@color/shade_black3" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="194dp"
+            android:background="@color/shade_black3" />
+    </FrameLayout>
+</LinearLayout>

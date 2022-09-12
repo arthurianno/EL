@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="font_size_title_1">15sp</dimen>
+    <dimen name="font_size_title_2">15sp</dimen>
+    <dimen name="font_size_title_3">14sp</dimen>
+    <dimen name="font_size_body_1">14sp</dimen>
+    <dimen name="font_size_subtitle_1">15sp</dimen>
+    <dimen name="font_size_subtitle_2">14sp</dimen>
+    <dimen name="font_size_headline_1">24sp</dimen>
+    <dimen name="font_size_headline_2">20sp</dimen>
+    <dimen name="font_size_headline_4">20sp</dimen>
+    <dimen name="font_size_caption_1">12sp</dimen>
+    <dimen name="font_size_snakbar_text">15sp</dimen>
+    <dimen name="font_size_toolbar_button">14sp</dimen>
+    <dimen name="font_size_button_1">15sp</dimen>
+    <dimen name="font_size_button_2">14sp</dimen>
+    <dimen name="font_size_connection_status">12sp</dimen>
+    <dimen name="font_size_input_text">15sp</dimen>
+    <dimen name="font_size_input_error_text">12sp</dimen>
+    <dimen name="font_size_text_style_2">12sp</dimen>
+    <dimen name="font_size_bottom_menu_title">12sp</dimen>
+
+    <dimen name="line_spacing_body_1">0sp</dimen>
+    <dimen name="line_spacing_subtitle_1">0sp</dimen>
+    <dimen name="line_spacing_subtitle_2">6sp</dimen>
+    <dimen name="line_spacing_caption_1">4sp</dimen>
+
+    <dimen name="small_button_corners">8dp</dimen>
+    <dimen name="small_button_border_width">1dp</dimen>
+    <dimen name="large_button_padding_top">18dp</dimen>
+    <dimen name="large_button_padding_bottom">17dp</dimen>
+    <dimen name="large_button_height">52dp</dimen>
+    <dimen name="small_button_padding">14dp</dimen>
+    <dimen name="small_button_width">160dp</dimen>
+    <dimen name="social_button_size">40dp</dimen>
+    <dimen name="social_button_content_padding">9dp</dimen>
+
+    <dimen name="padding_connection_status_text">4dp</dimen>
+    <dimen name="padding_toolbar_layout">16dp</dimen>
+    <dimen name="padding_base">16dp</dimen>
+
+    <dimen name="indicator_shape_radius">3dp</dimen>
+
+    <dimen name="weight_picker_unselected_text">42sp</dimen>
+    <dimen name="weight_picker_selected_text">62sp</dimen>
+
+    <dimen name="shop_margin">16dp</dimen>
+    <dimen name="shop_between">8dp</dimen>
+
+    <dimen name="card_corner">8dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+
+    <dimen name="home_between_margin">10dp</dimen>
+    <dimen name="home_margin_end">16dp</dimen>
+    <dimen name="overlap_first_item_margin">18dp</dimen>
+
+    <dimen name="main_records_height">290dp</dimen>
+    <dimen name="main_records_padding">24dp</dimen>
+    <dimen name="main_records_offset">242dp</dimen>
+    <dimen name="overlap_margin_8dp">-8dp</dimen>
+    <dimen name="toolbar_translation">8dp</dimen>
+
+    <dimen name="settings_top_margin">16dp</dimen>
+    <dimen name="settings_bottom_margin">8dp</dimen>
+
+    <dimen name="calendar_day_padding">2dp</dimen>
+    <dimen name="calendar_day_radius">10dp</dimen>
+</resources>

@@ -15,15 +15,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -46,16 +40,13 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
 }
 
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
-    implementation commonDependencies.appCoreInteractor
+    implementation project(':core-interactor')
 
     implementation commonDependencies.rxKotlin
 
@@ -63,6 +54,10 @@ dependencies {
     implementation commonDependencies.javaxInject
 
     implementation commonDependencies.timber
+    implementation commonDependencies.jsr310
+
+    implementation platform(commonDependencies.firebaseBom)
+    implementation commonDependencies.firebaseDatabase
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

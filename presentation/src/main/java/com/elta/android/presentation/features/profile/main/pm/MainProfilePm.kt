@@ -1,0 +1,231 @@
+package com.elta.android.presentation.features.profile.main.pm
+
+import com.elta.android.domain.features.auth.interactor.LogOutUseCase
+import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
+import com.elta.android.domain.features.user.model.AdditionalFunction
+import com.elta.android.domain.features.user.model.ExitFromApp
+import com.elta.android.domain.features.user.model.MyDevices
+import com.elta.android.domain.features.user.model.MyObservers
+import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.user.model.Support
+import com.elta.android.domain.features.user.model.WhereBuy
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
+import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytics.trackEvent
+import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
+import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
+import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
+import com.elta.android.presentation.utils.createFullName
+import com.nullgr.core.resources.ResourceProvider
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Single
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
+import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
+
+class MainProfilePm @Inject constructor(
+    private val remindersManager: RemindersManager,
+    private val logOutUseCase: LogOutUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val itemsBuilder: MainProfileOptionsItemsBuilder,
+    private val resourceProvider: ResourceProvider,
+    services: ServiceFacade
+) : BaseListPm(services) {
+
+    val userFullNameState = state<String>()
+    val profileSettingsAction = action<Unit>()
+    val openDiabetesTypeDialogCommand = command<Unit>(bufferSize = 1)
+    val openHemoglobinTypeDialogCommand = command<Unit>(bufferSize = 1)
+    val openGlucoseRangeDialogCommand = command<Unit>(bufferSize = 1)
+
+    private val getProfileSettingsAction = action<Unit>()
+    private val updateProfileByEventAction = action<Unit>()
+    private val updateProfileAction = action<Profile>()
+
+    override fun onCreate() {
+        super.onCreate()
+        observeClicks()
+        observeProfileUpdates()
+        bindEventsChangedAction()
+
+        getProfileSettingsAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle {
+                getProfileUseCase.execute()
+                    .bindProgress()
+                    .handleProfileUseCase()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        Observable.merge(
+            lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
+            bus.events<Events.ProfileDataChanged>().map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit }
+        )
+            .subscribe(getProfileSettingsAction.consumer)
+            .untilDestroy()
+
+        bus.events<Events.ShouldUpdateProfile>().map { Unit }
+            .subscribe(updateProfileByEventAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeClicks() {
+        bus.clicks<Clicks.ProfileIndicatorClicked>()
+            .debounceAction()
+            .map { it.item }
+            .doOnNext(::navigateIndicatorScreen)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ProfileAdditionalClicked>()
+            .map { it.item.type }
+            .filter { it !is ExitFromApp }
+            .doOnNext(::navigateAdditionalSettingsScreen)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ProfileAdditionalClicked>()
+            .map { it.item.type }
+            .filter { it is ExitFromApp }
+            .flatMapCompletable {
+                logOutUseCase.execute()
+                    .startWith(Completable.fromCallable { remindersManager.cancelAll() })
+                    .doOnComplete {
+                        analytics.clearStableParams()
+                        router.newRootFlow(Screens.GreetingFlow)
+                    }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        profileSettingsAction.observable
+            .doOnNext { router.startFlow(Screens.ProfileSettings) }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
+        when (type) {
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(
+                Unit
+            )
+            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(
+                Unit
+            )
+            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(
+                Screens.EventsCreationScreen(
+                    EventType.WEIGHT
+                )
+            )
+            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(
+                Unit
+            )
+        }
+
+    private fun bindEventsChangedAction() =
+        updateProfileByEventAction.observable
+            .skipWhileInProgress()
+            .flatMapSingle {
+                getProfileUseCase.execute()
+                    .flatMap {
+                        updateProfileUseCase.execute(
+                            createUpdateProfileUseCaseParams(it)
+                        ).toSingle { it }
+                    }
+                    .bindProgress()
+                    .handleProfileUseCase()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+    private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
+        when (type) {
+            WhereBuy -> {
+                trackEvent(AnalyticsEventType.MAP_OPEN)
+                router.startFlow(Screens.ShopsMap)
+            }
+            MyObservers -> router.startFlow(Screens.Observers)
+            MyDevices -> {
+                trackEvent(AnalyticsEventType.GLUCOMETERS_OPEN)
+                router.startFlow(Screens.Devices)
+            }
+            Support -> router.startFlow(Screens.Support)
+            else -> throw IllegalArgumentException("$type  type doesn't support.")
+        }
+
+    private fun observeProfileUpdates() {
+        bus.events<Events.ProfileChanged>()
+            .map { it.profile }
+            .doOnNext(updateProfileAction.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        updateProfileAction.observable
+            .map(::createUpdateProfileUseCaseParams)
+            .flatMapSingle {
+                updateProfileUseCase.execute(it)
+                    .andThen(
+                        getProfileUseCase.execute(Unit)
+                            .handleProfileUseCase()
+                    )
+                    .bindProgress()
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun Single<Profile>.handleProfileUseCase() =
+        doOnSuccess(::updateFullNameState)
+            .map { it.createGlucoseLevels() }
+            .map { itemsBuilder.buildItems(it) }
+            .doOnSuccess { items.consumer.accept(it) }
+            .doOnSuccess { bus.event(Events.ProfileUpdated) }
+
+    private fun Profile.createGlucoseLevels(): Profile {
+        return this.copy(
+            glucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
+                normalStart = min(
+                    glucoseLevelAfterEatSettings.normal.start,
+                    glucoseLevelBeforeEatSettings.normal.start
+                ),
+                normalEnd = max(
+                    glucoseLevelBeforeEatSettings.normal.end,
+                    glucoseLevelAfterEatSettings.normal.end
+                )
+            )
+        )
+    }
+
+    private fun updateFullNameState(profile: Profile) {
+        userFullNameState.consumer.accept(
+            profile.createFullName(resourceProvider.getString(R.string.profile_name_placeholder))
+        )
+    }
+
+    private fun createUpdateProfileUseCaseParams(profile: Profile) =
+        UpdateProfileUseCase.Params(profile)
+}

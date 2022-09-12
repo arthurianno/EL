@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-// TODO: add it for real project
-//apply plugin: 'io.fabric'
+apply plugin: "io.objectbox"
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 
 def CREDENTIALS_DEBUG = '../keystore/credentials-debug.properties'
 def CREDENTIALS_RELEASE = '../keystore/credentials-release.properties'
@@ -16,11 +17,16 @@ def KEY_PASSWORD = 'key.password'
 def GLOBAL_CONFIGURATION_PROPERTIES = "../configuration.properties"
 def GLOBAL_CONFIGURATION_APPLICATION_ID = "application.id"
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
+def CI = 'CI'
+def LOCAL_PROPERTIES = '../local.properties'
+def LOCAL_BUILD_FILE = 'build.file'
+def DEFAULT_BUILD_CONFIG_FILE = '../configuration-build-test.properties'
+def CONFIG_ENVIRONMENT = 'environment'
+def CONFIG_SERVER_URL = 'server.url'
+def CONFIG_DEEP_LINK_HOST = 'deep.link.host'
+def CONFIG_APP_ID_SUFFIX = 'app.id.suffix'
+def CONFIG_APP_NAME_SUFFIX = 'app.name.suffix'
+def CONFIG_LOG_ENABLED = 'log.enabled'
 
 android {
 
@@ -29,13 +35,48 @@ android {
         globalConfigProperties.load(it)
     }
 
+    def appId = globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
+
+    def buildConfigFile
+
+    def ci = System.getenv(CI)
+    if (ci != null) {
+        println("Build runned on ${ci} CI server.")
+        def configFilePropertyName = "${appId}.config.file".toUpperCase().replace(".", "_")
+        buildConfigFile = System.getenv(configFilePropertyName)
+
+        if (buildConfigFile == null) {
+            println("There is not environment variable ${configFilePropertyName}, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
+    } else {
+        println("Build runned on local machine.")
+        def localProperties = new Properties()
+        file(LOCAL_PROPERTIES).withInputStream {
+            localProperties.load(it)
+        }
+        buildConfigFile = localProperties[LOCAL_BUILD_FILE]
+
+        if (buildConfigFile == null) {
+            println("There is property ${LOCAL_BUILD_FILE} at ${LOCAL_PROPERTIES}, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
+    }
+
+    println("Build config will be loaded from: ${buildConfigFile}.")
+
+    def buildConfigProperties = new Properties()
+    file(buildConfigFile).withInputStream {
+        buildConfigProperties.load(it)
+    }
+
     def androidConfigurationVersion = rootProject.ext.androidVersions
 
     compileSdkVersion androidConfigurationVersion.androidCompileSdkVersion
     buildToolsVersion androidConfigurationVersion.androidBuildToolsVersion
 
     defaultConfig {
-        applicationId globalConfigProperties[GLOBAL_CONFIGURATION_APPLICATION_ID]
+        applicationId appId
         minSdkVersion androidConfigurationVersion.androidMinSdkVersion
         targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
 
@@ -81,17 +122,30 @@ android {
 
     buildTypes {
 
-        // TODO: add it for real project
-        //all {
-        //    ext.betaDistributionReleaseNotesFilePath =
-        //            file('../CHANGELOG.md').absolutePath
-        //}
+        all {
+            ext.betaDistributionReleaseNotesFilePath =
+                    file('../BUILD_NOTES.md').absolutePath
+            ext.betaDistributionGroupAliases = "QA-Nullgr"
+
+            def appIdSuffix = buildConfigProperties[CONFIG_APP_ID_SUFFIX]
+            if (appIdSuffix != null) {
+                applicationIdSuffix ".${appIdSuffix}"
+            }
+
+            def appNameSuffix = buildConfigProperties[CONFIG_APP_NAME_SUFFIX]
+            if (appNameSuffix != null) {
+                versionNameSuffix "-${appNameSuffix}"
+            }
+
+            buildConfigField "String", "ENVIRONMENT", "\"${buildConfigProperties[CONFIG_ENVIRONMENT]}\""
+            buildConfigField "String", "SERVER_URL", "\"${buildConfigProperties[CONFIG_SERVER_URL]}\""
+            buildConfigField "boolean", "IS_LOG_ENABLED", buildConfigProperties[CONFIG_LOG_ENABLED]
+
+            resValue "string", "app_deep_link_host", buildConfigProperties[CONFIG_DEEP_LINK_HOST]
+        }
 
         debug {
             signingConfig signingConfigs.debug
-            buildConfigField "boolean", "IS_LOG_ENABLED", "true"
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
         }
 
         release {
@@ -99,19 +153,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             proguardFiles fileTree('proguard').asList().toArray()
-            buildConfigField "boolean", "IS_LOG_ENABLED", "false"
         }
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -126,10 +173,26 @@ android {
             jvmArgs '-noverify'
         }
     }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+            universalApk true
+        }
+    }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 kapt {
     correctErrorTypes = true
+    javacOptions {
+        option("-source", "8")
+        option("-target", "8")
+    }
 }
 
 configurations {
@@ -138,37 +201,54 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
 }
-androidExtensions {
-    experimental = true
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        // Filter is null for universal APKs.
+        def filter = output.getFilter(com.android.build.OutputFile.ABI)
+
+        if (filter == null) {
+            tasks.findAll {
+                it.name.startsWith("crashlyticsUploadDistribution${variant.name.capitalize()}")
+            }.each {
+                it.doFirst {
+                    ext.betaDistributionApkFilePath = output.outputFile.absolutePath
+                }
+            }
+        }
+    }
 }
+
 
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
+    implementation project(':core-all')
+    implementation project(':core-security')
+    implementation project(':core-rx')
+    implementation project(':core-resources')
+    implementation project(':core-adapter')
+    implementation project(':core-hardware')
+    implementation project(':core-preferences')
+    implementation project(':core-interactor')
     implementation project(':common')
     api project(':presentation')
     api project(':data')
 
     implementation commonDependencies.libs
-    implementation commonDependencies.appCore
 
-    implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
+    implementation commonDependencies.materialDesign
+
+    implementation commonDependencies.androidxMultidex
+
+    implementation commonDependencies.googleFit
+    implementation commonDependencies.googleAuth
     implementation commonDependencies.materialDialogs
+    implementation commonDependencies.yandexMapKit
+    implementation commonDependencies.cardView
+    implementation commonDependencies.pulseView
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxAndroid
@@ -185,7 +265,7 @@ dependencies {
 
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
-    implementation commonDependencies.barcodeScanner
+    implementation commonDependencies.rxBluetooth
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
@@ -195,12 +275,9 @@ dependencies {
     implementation commonDependencies.daggerAndroidSupport
 
     implementation commonDependencies.timber
+    implementation commonDependencies.jsr310
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
-    implementation (commonDependencies.glide) {
-        exclude group: "com.android.support"
-    }
-    kapt commonDependencies.glideProcessor
 
     implementation commonDependencies.retrofit
     implementation commonDependencies.retrofitConverter
@@ -208,43 +285,18 @@ dependencies {
     implementation commonDependencies.okHttp
     implementation commonDependencies.okHttpLogger
     implementation commonDependencies.gson
-    implementation(commonDependencies.crashlytics) {
-        transitive = true
-    }
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
-    implementation commonDependencies.exoPlayer
+    implementation commonDependencies.firebaseCrashlytics
+    implementation commonDependencies.firebaseAnalytics
+    implementation commonDependencies.location
     implementation commonDependencies.datePicker
+
+    implementation commonDependencies.nordicScanner
+
+    implementation commonDependencies.guavaConflictLost
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito
 }
-
-
-task ktlint(type: JavaExec, group: "verification") {
-    description = "Check Kotlin code style."
-    main = "com.github.shyiko.ktlint.Main"
-    classpath = configurations.ktlint
-    args "src/**/*.kt"
-}
-check.dependsOn ktlint
-
-task ktlintFormat(type: JavaExec, group: "formatting") {
-    description = "Fix Kotlin code style deviations."
-    main = "com.github.shyiko.ktlint.Main"
-    classpath = configurations.ktlint
-    args "-F", "src/**/*.kt"
-}
-
-detekt {
-    profile("main") {
-        input = "$project.projectDir/../app/src/main/java"
-        config = "$project.projectDir/../detekt-config/config.yml"
-        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
-        baseline = "$project.projectDir/../detekt-config/baseline.xml"
-        parallel = true
-    }
-}
-// TODO: add it for real project
-//apply plugin: 'com.google.gms.google-services'

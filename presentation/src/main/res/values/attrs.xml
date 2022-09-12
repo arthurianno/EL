@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="IndicatorsView">
+        <attr name="selectedDrawable" format="reference" />
+        <attr name="unSelectedDrawable" format="reference" />
+        <attr name="indicatorWidth" format="dimension" />
+        <attr name="indicatorHeight" format="dimension" />
+        <attr name="paddingBetweenIndicators" format="dimension" />
+        <attr name="numberOfIndicators" format="integer" />
+        <attr name="selectedIndicator" format="integer" />
+        <attr name="indicatorMode">
+            <enum name="single" value="0" />
+            <enum name="fill" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="BottomNavigationMenuItem">
+        <attr name="bnm_icon" format="reference" />
+        <attr name="bnm_title" format="reference" />
+        <attr name="bnm_selected_color" format="reference" />
+        <attr name="bnm_normal_color" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="FormSelectorView">
+        <attr name="fsv_icon" format="reference" />
+        <attr name="fsv_hint" format="reference|string" />
+        <attr name="fsv_title" format="reference|string" />
+        <attr name="fsv_draw_arrow" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="RangeBarView">
+        <attr name="rbv_height" format="dimension" />
+        <attr name="rbv_corners" format="dimension" />
+        <attr name="rbv_text_color" format="reference|color" />
+        <attr name="rbv_indicators_color" format="reference|color" />
+        <attr name="rbv_background_color" format="reference|color" />
+        <attr name="rbv_color" format="reference|color" />
+        <attr name="rbv_range_start" format="float" />
+        <attr name="rbv_range_end" format="float" />
+        <attr name="rbv_fraction_digits_count" format="integer" />
+        <attr name="rbv_min_range" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="SpinnerView">
+        <attr name="showArrow" format="boolean" />
+        <attr name="topicDrawable" format="reference|color" />
+    </declare-styleable>
+</resources>

@@ -6,4 +6,6 @@
     <item name="itemsView" type="id" />
     <item name="containerView" type="id" />
     <item name="fadeAnimationTag" type="id" />
+    <item name="homeButtonView" type="id" />
+    <item name="yandexMapView" type="id" />
 </resources>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="InputStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textSize">@dimen/font_size_input_text</item>
+        <item name="met_baseColor">@color/color_input_not_active</item>
+        <item name="met_underlineColor">@color/color_input_not_active</item>
+        <item name="met_floatingLabel">none</item>
+        <item name="met_primaryColor">@color/color_input_base</item>
+        <item name="met_textColorHint">@color/color_input_hint_color</item>
+        <item name="met_errorColor">@color/color_input_error</item>
+        <item name="met_textColor">@color/color_input_text_color</item>
+        <item name="met_bottomTextSize">@dimen/font_size_input_error_text</item>
+        <item name="met_accentTypeface">@string/input_font_name</item>
+        <item name="met_typeface">@string/input_font_name</item>
+        <item name="met_autoValidate">true</item>
+        <item name="met_helperTextColor">@color/color_input_hint_color</item>
+        <item name="met_helperTextAlwaysShown">true</item>
+        <item name="met_helperText">@string/space</item>
+        <item name="android:textCursorDrawable">@drawable/shape_cursor</item>
+    </style>
+
+    <style name="InputStyle.Text" parent="InputStyle">
+        <item name="android:inputType">text</item>
+    </style>
+
+    <style name="InputStyle.Text.CapSentences" parent="InputStyle">
+        <item name="android:inputType">textCapSentences</item>
+    </style>
+
+    <style name="InputStyle.Digits" parent="InputStyle">
+        <item name="android:inputType">numberDecimal</item>
+    </style>
+
+    <style name="InputStyle.Password" parent="InputStyle">
+        <item name="android:inputType">textPassword</item>
+    </style>
+
+    <style name="InputStyle.Email" parent="InputStyle">
+        <item name="android:inputType">textEmailAddress</item>
+    </style>
+
+    <style name="Search" parent="Widget.AppCompat.EditText">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textColorHint">@color/color_input_hint_color_2</item>
+        <item name="android:textColor">@color/color_input_text_color</item>
+        <item name="android:textSize">@dimen/font_size_input_text</item>
+        <item name="android:background">@null</item>
+        <item name="android:textCursorDrawable">@drawable/shape_cursor_search</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:inputType">text</item>
+        <item name="android:lines">1</item>
+        <item name="android:imeOptions">actionDone</item>
+    </style>
+
+    <style name="EventFormInputStyle" parent="InputStyle.Text">
+        <item name="met_helperText">@null</item>
+        <item name="android:inputType">textCapSentences</item>
+    </style>
+
+    <style name="EventFormInputStyle.Note" parent="EventFormInputStyle">
+        <item name="met_helperText">@null</item>
+        <item name="met_baseColor">@color/white</item>
+        <item name="android:maxLength">120</item>
+        <item name="android:inputType">textMultiLine|textCapSentences</item>
+    </style>
+
+</resources>

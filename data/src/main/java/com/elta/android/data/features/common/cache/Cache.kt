@@ -1,0 +1,18 @@
+package com.elta.android.data.features.common.cache
+
+interface Cache<T> {
+
+    fun add(objects: List<T>)
+
+    fun update(objects: List<T>)
+
+    fun delete(condition: Condition)
+
+    fun get(condition: Condition): T?
+
+    fun getAll(condition: Condition): List<T>
+
+    fun contains(condition: Condition): Boolean
+
+    fun count(condition: Condition): Long
+}

@@ -4,12 +4,154 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/color_window_background</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetTransparentStyle</item>
+        <item name="actionMenuTextAppearance">@style/New.Button3.White</item>
+        <item name="actionMenuTextColor">@color/white</item>
     </style>
 
-    <style name="AppTheme.Splash">
-        <item name="android:windowBackground">@drawable/bg_splash</item>
+    <style name="AppTheme.Transparent" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="BottomSheetTransparentStyle" parent="Theme.Design.BottomSheetDialog">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="TooltipStyle"></style>
+
+    <style name="AppProgressBar" parent="Base.Widget.AppCompat.ProgressBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:indeterminateTint">@color/colorPrimary</item>
+        <item name="android:indeterminate">true</item>
+    </style>
+
+    <style name="AppProgressBar.Accent">
+        <item name="android:indeterminateTint">@color/colorAccent</item>
+    </style>
+
+    <style name="NumberPicker">
+        <item name="android:layout_height">300dp</item>
+        <item name="np_dividerThickness">0dp</item>
+        <item name="np_fadingEdgeEnabled">true</item>
+        <item name="np_fadingEdgeStrength">0.3</item>
+        <item name="np_order">descending</item>
+        <item name="np_typeface">roboto_bold.ttf</item>
+        <item name="np_wheelItemCount">3</item>
+        <item name="np_max_fling_velocity_coefficient">6</item>
+
+        <item name="np_selectedTextAlign">selectedTextAlignCenter</item>
+        <item name="np_selectedTextColor">@color/color_picker_weight_selected_text</item>
+        <item name="np_selectedTextSize">@dimen/weight_picker_selected_text</item>
+
+        <item name="np_textAlign">textAlignCenter</item>
+        <item name="np_textColor">@color/color_picker_weight_unselected_text</item>
+        <item name="np_textSize">@dimen/weight_picker_unselected_text</item>
+    </style>
+
+    <style name="NumberPicker.WeightLeft">
+        <item name="android:layout_width">120dp</item>
+        <item name="np_value">70</item>
+        <item name="np_max">200</item>
+        <item name="np_min">1</item>
+    </style>
+
+    <style name="NumberPicker.Сoma">
+        <item name="android:textColor">@color/color_picker_weight_selected_text</item>
+        <item name="android:textSize">@dimen/weight_picker_selected_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="NumberPicker.WeightRight">
+        <item name="android:layout_width">40dp</item>
+        <item name="np_value">0</item>
+        <item name="np_max">9</item>
+        <item name="np_min">0</item>
+    </style>
+
+    <style name="NumberPicker.Form" parent="NumberPicker">
+        <item name="np_value">0</item>
+        <item name="np_max">0</item>
+        <item name="np_min">0</item>
+        <item name="np_textColor">@color/color_picker_form_unselected_text</item>
+        <item name="np_selectedTextColor">@color/color_picker_form_selected_text</item>
+    </style>
+
+    <style name="NumberPicker.Form.MeasurementText">
+        <item name="android:textColor">@color/color_picker_form_selected_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingTop">30sp</item>
+        <item name="fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="NumberPicker.Form.Coma">
+        <item name="android:textColor">@color/color_picker_form_selected_text</item>
+        <item name="android:textSize">@dimen/weight_picker_selected_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="BottomNavigationMenuItem">
+        <item name="bnm_selected_color">@color/color_bottom_menu_selected_state</item>
+        <item name="bnm_normal_color">@color/color_bottom_menu_normal_state</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="PulseStyle">
+        <item name="pulse_color">@color/white</item>
+        <item name="pulse_count">3</item>
+        <item name="pulse_duration">3600</item>
+        <item name="pulse_interpolator">Decelerate</item>
+        <item name="pulse_repeat">0</item>
+        <item name="pulse_startFromScratch">true</item>
+    </style>
+
+    <style name="CollapsingToolbarLayoutExpandedTextStyle" parent="AppTheme">
+        <item name="android:textColor">@android:color/transparent</item>
+        <item name="android:textSize">0sp</item>
+    </style>
+
+    <style name="FakeToolbar">
+        <item name="android:contentInsetStart">0dp</item>
+        <item name="contentInsetStart">0dp</item>
+        <item name="android:contentInsetEnd">0dp</item>
+        <item name="contentInsetEnd">0dp</item>
+    </style>
+
+    <style name="IndicatorCardView" parent="CardView">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="cardCornerRadius">@dimen/card_corner</item>
+        <item name="cardElevation">4dp</item>
+        <item name="android:stateListAnimator">@drawable/selector_profile_indicator_card_animator
+        </item>
+    </style>
+
+    <style name="PeriodView" parent="New.Body2">
+        <item name="android:textColor">@color/color_text_period</item>
+        <item name="android:background">@drawable/selector_period_view</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="EditTextGrayLine" parent="AppTheme">
+        <item name="colorControlActivated">@color/shade_black0</item>
+    </style>
 
 </resources>

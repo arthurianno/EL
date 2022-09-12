@@ -1,3 +1,641 @@
 <resources>
-    <string name="app_name">ELTA</string>
+    <string name="app_name">Сателлит Online</string>
+    <string name="input_font_name">roboto_regular.ttf</string>
+    <string name="title_connection_lost">Нет подключения к Интернету</string>
+    <string name="title_connection_found">Соединение восстановлено</string>
+    <string name="space"> </string>
+
+    <!-- ERROR VIEW ERRORS -->
+    <string name="error_server_not_responding_title">Сервер недоступен</string>
+    <string name="error_server_not_responding_subtitle">Приносим свои извинения за принесенные неудобства</string>
+    <string name="error_server_not_responding_retry_button">Повторить</string>
+    <string name="error_server_not_responding_snackbar_message">Сервер временно недоступен</string>
+
+    <string name="greeting_registration">Зарегистрироваться</string>
+    <string name="greeting_title">Добро пожаловать</string>
+    <string name="greeting_message">Управляйте диабетом вместе с\nглюкометром Сателлит Online</string>
+    <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
+
+    <!--REGISTRATION FLOW -->
+    <string name="registration_main_toolbar_button_text">У вас уже есть аккаунт?</string>
+    <string name="registration_main_title_new_user">Новый пользователь</string>
+    <string name="registration_main_subtitle">Пожалуйста, введите email и пароль для вашего будущего аккаунта</string>
+    <string name="registration_main_email_hint">Ваш email</string>
+    <string name="registration_main_password_hint">Пароль</string>
+    <string name="registration_main_description_privacy_policy">Я ознакомлен и согласен с условиями\nлицензионного договора и политики\nобработки персональных данных, а также\nдаю согласие на обработку персональных\nданных</string>
+    <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики\nобработки персональных данных</string>
+    <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных\nданных</string>
+    <string name="registration_main_button_continue">Продолжить</string>
+    <string name="registration_privacy_policy">https://stage2.vdiabete.com/privacy_policy.html</string>
+    <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
+    <string name="registration_privacy_policy_toolbar_title">Privacy policy terms of use</string>
+    <string name="registration_activate_title">Активируйте ваш профиль</string>
+    <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
+    <string name="registration_send_again">Отправить письмо повторно</string>
+    <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
+    <string name="registration_error_same_email">Данному пользователю уже отправлено приглашение</string>
+    <string name="registration_error_input_password">Некорректный пароль</string>
+    <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
+    <string name="registration_password_the_same">Придумайте новый пароль</string>
+    <string name="registration_email_confirmation_title">Аккаунт верифицирован</string>
+    <string name="registration_email_confirmation_subtitle">Ваш аккаунт успешно верифицирован. Чтобы использовать этот аккаунт, необходимо войти в систему используя ваш email и пароль.</string>
+    <string name="registration_email_confirmation_continue_button">Продолжить работу</string>
+    <string name="registration_email_confirmation_login_button">Войти</string>
+    <string name="registration_email_sent">Письмо отправлено</string>
+
+    <string name="registration_social_title">Приветствуем, %s</string>
+    <string name="registration_social_title_no_name">Приветствуем</string>
+    <string name="registration_social_subtitle">Осталось ввести email и пароль для вашего\nбудущего аккаунта</string>
+
+    <!-- AUTH FLOW -->
+    <string name="auth_toolbar_button_text">Забыли пароль?</string>
+    <string name="auth_title">С возвращением!</string>
+    <string name="auth_subtitle">Чтобы продолжить, введите ваш email\nи пароль от аккаунта</string>
+    <string name="auth_button_continue">Войти</string>
+
+    <string name="auth_password_recovery_title">Восстановление пароля</string>
+    <string name="auth_password_recovery_subtitle">Введите email, указанный при регистрации аккаунта в нашем приложении</string>
+    <string name="auth_password_recovery_email_hint">Ваш email</string>
+    <string name="auth_password_recovery_email_description">После отправки запроса на вашу почту будет выслана инструкция для восстановления пароля</string>
+    <string name="auth_password_recovery_button_text">Отправить запрос на email</string>
+    <string name="auth_password_recover_error_input_email">Некорректный email</string>
+
+    <string name="auth_password_create_title">Новый пароль</string>
+    <string name="auth_password_create_subtitle">Придумайте новый пароль для входа в приложение</string>
+    <string name="auth_password_create_password_hint">Пароль</string>
+    <string name="auth_password_create_login_button_title">Сохранить и войти</string>
+    <string name="auth_password_create_error_input_password">Некорректный пароль</string>
+    <string name="auth_password_create_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
+    <string name="auth_password_create_message_changed_success">Пароль успешно изменен</string>
+
+    <!-- ON BOARDING FLOW -->
+    <string name="on_boarding_toolbar_menu_button">Пропустить этот шаг</string>
+    <string name="on_boarding_subtitle">Давайте знакомиться</string>
+    <string name="on_boarding_header_user_sex">Укажите ваш пол</string>
+    <string name="on_boarding_header_user_weight">Какой у вас вес?</string>
+    <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
+    <string name="on_boarding_prev_button_title">Назад</string>
+    <string name="on_boarding_next_button_title">Далее</string>
+    <string name="on_boarding_gender_male">Мужской</string>
+    <string name="on_boarding_gender_female">Женский</string>
+
+    <string name="diabetes_type_first">Первый тип</string>
+    <string name="diabetes_type_second">Второй тип</string>
+    <string name="diabetes_type_lada">LADA</string>
+    <string name="diabetes_type_gestational">Гестационный</string>
+    <string name="diabetes_type_prediabetes">Предиабет</string>
+    <string name="diabetes_type_other">Другой</string>
+    <string name="coma">,</string>
+
+    <!-- SHOPS FLOW -->
+    <string name="shops_start_title">У вас нет глюкометра?</string>
+    <string name="shops_start_subtitle">Это не проблема! Мы подскажем, где его можно приобрести! </string>
+    <string name="shops_start_menu_button_text">Продолжить без глюкометра</string>
+    <string name="shops_start_find_action_button">Найти точки продаж на карте</string>
+    <string name="shops_map_toolbar_title">Приобрести продукцию</string>
+    <string name="shops_map_toolbar_title_services">Получить заботу</string>
+    <string name="shops_map_route">Как доехать</string>
+    <string name="shops_map_call">Позвонить</string>
+    <string name="shops_map_distance_km_pattern">%d км</string>
+    <string name="shops_map_distance_m_pattern">%d м</string>
+    <string name="shops_search_hint">Найти точку продаж</string>
+    <string name="shops_search_hint_services">Найти сервисный центр</string>
+    <string name="shops_search_header">Результат поиска</string>
+
+    <!-- HOME FLOW -->
+    <string name="bottom_navigation_menu_main_title">Главная</string>
+    <string name="bottom_navigation_menu_notes_title">Дневник</string>
+    <string name="bottom_navigation_menu_stats_title">Статистика</string>
+    <string name="bottom_navigation_menu_profile_title">Профиль</string>
+    <string name="home_bottom_sheet_title">Что бы вы хотели записать?</string>
+
+    <!-- EVENT TYPES -->
+    <string name="event_type_bread">Хлебные единицы</string>
+    <string name="event_type_insulin">Инсулин</string>
+    <string name="event_type_medicaments">Медикаменты</string>
+    <string name="event_type_weight">Вес</string>
+    <string name="event_type_activity">Активность</string>
+    <string name="event_type_glucose">Запись с глюкометра</string>
+    <string name="event_type_hba1c">HbA1c</string>
+    <string name="event_type_sync">Синхронизация с устройством</string>
+
+    <string name="event_type_bread_pattern">%s ХЕ</string>
+    <string name="event_type_insulin_pattern">%s ед</string>
+    <string name="event_type_weight_pattern">%s кг</string>
+    <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
+    <string name="event_type_activity_pattern_short">%1$s мин</string>
+    <string name="event_type_glucose_pattern">%s ммоль/л</string>
+    <string name="event_type_glucose_measurement_value">ммоль/л</string>
+
+    <string name="event_type_bread_no_name">Приём пищи</string>
+    <string name="event_type_activity_no_name">Физическая активность</string>
+    <string name="event_type_glucose_no_name">Измерение глюкозы</string>
+    <string name="tag_name_no_tag">Без метки</string>
+    <string name="event_type_weight_no_name">Взвешивание</string>
+
+    <!-- INSULIN TYPES -->
+    <string name="insulin_type_ultrafast">Сверхбыстрый</string>
+    <string name="insulin_type_ultrashort">Ультракороткий</string>
+    <string name="insulin_type_short">Короткий</string>
+    <string name="insulin_type_intermidiate">Средний</string>
+    <string name="insulin_type_long">Длинный</string>
+    <string name="insulin_type_ultralong">Сверхдлинный</string>
+    <string name="insulin_type_mixed">Смешанный</string>
+
+    <!-- ACTIVITY TYPES -->
+    <string name="activity_type_running">Бег</string>
+    <string name="activity_type_walking">Ходьба</string>
+    <string name="activity_type_swimming">Плавание</string>
+    <string name="activity_type_fitness">Фитнес</string>
+    <string name="activity_type_cycling">Велоспорт</string>
+    <string name="activity_type_badminton">Бадминтон</string>
+    <string name="activity_type_basketball">Баскетбол</string>
+    <string name="activity_type_crosscountryskiing">Беговые лыжи</string>
+    <string name="activity_type_sportcombats">Спортивные единоборства</string>
+    <string name="activity_type_box">Бокс</string>
+    <string name="activity_type_wrestling">Борьба</string>
+    <string name="activity_type_waterpolo">Водное поло</string>
+    <string name="activity_type_volleyball">Волейбол</string>
+    <string name="activity_type_handball">Гандбол</string>
+    <string name="activity_type_gymnastics">Гимнастика</string>
+    <string name="activity_type_golf">Гольф</string>
+    <string name="activity_type_skiing">Горные лыжи</string>
+    <string name="activity_type_skating">Катание на коньках</string>
+    <string name="activity_type_rollerskating">Катание на роликовых коньках</string>
+    <string name="activity_type_pingpong">Настольный теннис</string>
+    <string name="activity_type_beachvolleyball">Пляжный волейбол</string>
+    <string name="activity_type_trampolining">Прыжки на батуте</string>
+    <string name="activity_type_snowboarding">Сноубординг</string>
+    <string name="activity_type_pedestrianism">Спортивная ходьба</string>
+    <string name="activity_type_tennis">Теннис</string>
+    <string name="activity_type_triathlon">Триатлон</string>
+    <string name="activity_type_weightlifting">Тяжелая атлетика</string>
+    <string name="activity_type_Fencing">Фехтование</string>
+    <string name="activity_type_football">Футбол</string>
+    <string name="activity_type_yoga">Йога</string>
+    <string name="activity_type_hockey">Хоккей</string>
+    <string name="activity_type_wheelchairriding">Езда на коляске</string>
+    <string name="activity_type_hiking">Хайкинг</string>
+    <string name="activity_type_nordicwalking">Скандинавская ходьба</string>
+    <string name="activity_type_rowing">Гребля</string>
+    <string name="activity_type_housekeeping">Работа по дому/в саду</string>
+    <string name="activity_type_dancing">Танцы</string>
+    <string name="activity_type_horsebackriding">Конный спорт</string>
+    <string name="activity_type_shooting">Стрельба</string>
+    <string name="activity_type_skateboarding">Скейтбординг</string>
+    <string name="activity_type_surfing">Серфинг</string>
+    <string name="activity_type_martialarts">Боевые искусства</string>
+    <string name="activity_type_another">Другое</string>
+
+    <string name="activity_duration_day">%d&#160;д</string>
+    <string name="activity_duration_hour">%d&#160;ч</string>
+    <string name="activity_duration_min">%d&#160;мин</string>
+    <string name="activity_duration_sec">%d&#160;сек</string>
+
+    <!-- MAIN RECORDS -->
+    <string name="main_records_firs_launch_title">Добро пожаловать</string>
+    <string name="main_records_firs_launch_subtitle">Чтобы добавить новую запись в дневник,\nвоспользуйтесь кнопкой \"плюс\" и выберите\nнужный показатель\n\nДля добавления записи об уровне глюкозы\nпроведите измерение с помощью\nглюкометра</string>
+
+    <string name="main_records_new_day_title_morning">Доброе утро</string>
+    <string name="main_records_new_day_title_afternoon">Добрый день</string>
+    <string name="main_records_new_day_title_evening">Добрый вечер</string>
+    <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте\nсинхронизироваться с глюкометром\nи внести первую запись в свой дневник</string>
+
+    <string name="main_records_header_title_bread">Хлебных ед</string>
+    <string name="main_records_header_title_glucose">Уровень глюкозы</string>
+    <string name="main_records_header_title_insulin">Инсулина</string>
+
+    <string name="main_records_mask_value">%s ед</string>
+    <string name="main_records_mask_value_he">%s ХЕ</string>
+    <string name="main_records_empty_value">—</string>
+    <string name="main_records_daily_glucose_title">Мои показатели сегодня</string>
+    <string name="main_records_daily_glucose_subtitle">Последний в %s</string>
+    <string name="main_records_daily_chart_time_mask">0%s:00</string>
+    <string name="main_records_daily_chart_time_two_symbols_mask">%s:00</string>
+    <string name="main_records_daily_chart_min_title">min</string>
+    <string name="main_records_daily_chart_max_title">max</string>
+    <string name="main_records_event_time_mask">в %s (UTC %s)</string>
+
+    <!-- EVENTS -->
+    <string name="events_options_chooser_title_tags">Метка для группировки</string>
+    <string name="events_options_chooser_title_activities">Вид активности</string>
+    <string name="events_options_chooser_title_insulin">Тип инсулина</string>
+
+    <string name="events_options_chooser_header_tags">Доступные метки</string>
+    <string name="events_options_chooser_header_variants_insulin">Доступные варианты</string>
+    <string name="events_options_chooser_header_variants_activity">Доступные виды</string>
+    <string name="events_options_chooser_button_confirm">Подтвердить</string>
+
+
+    <string name="events_creation_hint_tags">Метка для группировки</string>
+    <string name="events_creation_hint_activities">Вид активности</string>
+    <string name="events_creation_hint_insulin">Тип инсулина *</string>
+    <string name="events_creation_hint_note">Добавить заметку</string>
+    <string name="events_creation_save_button">Сохранить запись</string>
+    <string name="events_creation_hint_bread">Название блюда или продукта</string>
+    <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
+    <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
+    <string name="events_helper_text_weight">На сколько изменился ваш вес</string>
+    <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
+
+    <string name="events_form_screen_title_bread">Хлебные единицы</string>
+    <string name="events_form_screen_title_insulin">Инсулин</string>
+    <string name="events_form_screen_title_weight">Вес</string>
+    <string name="events_form_screen_title_activity">Активность</string>
+    <string name="events_form_screen_title_medicaments">Медикаменты</string>
+
+    <string name="event_form_measure_unit_bread">ХЕ</string>
+    <string name="event_form_measure_unit_insulin">Ед.</string>
+    <string name="event_form_measure_unit_weight">кг</string>
+    <string name="event_form_measure_unit_hours">ч</string>
+    <string name="event_form_measure_unit_minutes">мин</string>
+
+    <string name="event_form_bread_format_mask">%d,%d XE</string>
+    <string name="event_form_insulin_format_mask">%d,%d Ед.</string>
+    <string name="event_form_weight_format_mask">%d,%d кг</string>
+    <string name="event_form_activity_format_mask">%d ч %d мин</string>
+
+    <string name="event_time_in_mask">%s в %s</string>
+    <string name="event_time_mask">в %s</string>
+    <string name="event_date_today">Сегодня</string>
+    <string name="event_date_yesterday">Вчера</string>
+
+    <string name="event_form_dialog_title">Внимание</string>
+    <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены</string>
+    <string name="event_form_dialog_cancel_button">Отменить</string>
+    <string name="event_form_exit_dialog_confirm_button">Выйти</string>
+    <string name="event_form_delete_dialog_confirm_button">Удалить</string>
+    <string name="event_form_delete_dialog_body">Вы уверены, что хотите удалить запись?</string>
+    <string name="event_form_glucose_share_button_title">Поделиться</string>
+    <string name="event_form_glucose_info_mask_title">Измерение выполнено при температуре %s °С</string>
+    <string name="event_form_glucose_measure_unit">ммоль/л</string>
+    <string name="event_form_glucose_toolbar_title">Уровень глюкозы</string>
+    <string name="event_form_date_in_future">Вы выбрали дату в будущем</string>
+
+    <string name="google_play_rate_dialog_title">Внимание</string>
+    <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
+    <string name="google_play_rate_dialog_negative_button">Нет</string>
+    <string name="google_play_rate_dialog_positive_button">Да, конечно</string>
+
+    <string name="like_app_dialog_title">Вы добавили %d записей!</string>
+    <string name="like_app_dialog_body">Понравилось ли Вам пользоваться нашим приложением?</string>
+    <string name="like_app_dialog_negative_button">Не очень</string>
+    <string name="like_app_dialog_positive_button">Да, конечно</string>
+
+    <string name="feedback_dialog_title">Внимание</string>
+    <string name="feedback_dialog_body">Хотели бы вы оставить обратную связь?</string>
+    <string name="feedback_dialog_negative_button">Нет</string>
+    <string name="feedback_dialog_positive_button">Да, конечно</string>
+
+    <string name="event_form_save_new_entry_title">Сохранить запись</string>
+    <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
+    <string name="event_menu_remove">Удалить</string>
+    <string name="event_share_dialog_title">Поделиться с помощью</string>
+
+    <!-- SYNC -->
+    <string name="sync_start_title">Подключение</string>
+    <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
+    <string name="sync_start_other_subtitle">Чтобы подключить новое устройство, вам\nнеобходимо пройти несколько шагов</string>
+    <string name="sync_start_menu_button_text">Пропустить этот этап</string>
+    <string name="sync_start_action_button">Начать</string>
+    <string name="sync_with_glucometer_in_progress">Идет процесс синхронизации с глюкометром…</string>
+    <string name="sync_with_glucometer_completed">Синхронизация с глюкометром завершена</string>
+    <string name="sync_with_glucometer_error">Синхронизация с глюкометром не выполнена</string>
+
+    <string name="sync_state_title_how_to_connect">Как подключить?</string>
+    <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из глюкометра держатель с батарейкой и установите обратно. Глюкометр отобразит ПИН-код, необходимый для подключения устройства.</string>
+    <string name="sync_state_title_progress_connect">Идет процесс поиска устройства…</string>
+
+    <string name="sync_state_title_connected">Подключено!</string>
+    <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
+    <string name="sync_state_title_progress_connected">Идет процесс синхронизации…</string>
+
+    <string name="sync_state_pin_dialog_title">Устройство найдено</string>
+    <string name="sync_state_pin_dialog_description">Чтобы продолжить, введите ПИН-код,\nкоторый отобразился на экране глюкометра</string>
+    <string name="sync_state_pin_dialog_device_pattern">Подключаемое устройство %s</string>
+    <string name="sync_state_pin_dialog_button">Подключить</string>
+
+    <string name="sync_state_title_device_found">Устройство найдено</string>
+    <string name="sync_state_subtitle_device_found">Отлично! Теперь вы можете продолжить\nпроцесс подключения</string>
+    <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
+
+    <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
+    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
+    <string name="sync_state_action_sync_completed">Перейти к приложению</string>
+
+    <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
+
+    <string name="sync_connect_device_not_found">Устройство не найдено</string>
+    <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
+    <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
+    <string name="sync_connect_sync_error">Ошибка синхронизации с устройством</string>
+    <string name="sync_connect_button_retry">Повторить</string>
+
+    <!-- DIARY FLOR -->
+    <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
+    <string name="diary_screen_title">Дневник событий</string>
+    <string name="diary_button_today">Сегодня</string>
+
+    <string name="date_picker_day_of_week_1">Пн</string>
+    <string name="date_picker_day_of_week_2">Вт</string>
+    <string name="date_picker_day_of_week_3">Ср</string>
+    <string name="date_picker_day_of_week_4">Чт</string>
+    <string name="date_picker_day_of_week_5">Пт</string>
+    <string name="date_picker_day_of_week_6">Сб</string>
+    <string name="date_picker_day_of_week_7">Вс</string>
+
+    <!--PROFILE FLOW-->
+    <string name="profile_settings">Настройки профиля</string>
+    <string name="profile_my_indicators">Мои медицинские показатели</string>
+    <string name="profile_additional_functions">Дополнительные функции</string>
+    <string name="profile_my_watchers">Мои наблюдатели</string>
+    <string name="profile_management_and_settings">Управление и настройки</string>
+    <string name="profile_where_purchase_products">Где приобрести продукцию</string>
+    <string name="profile_map_of_stores">Карта точек продаж</string>
+    <string name="profile_hba1c">HbA1c</string>
+    <string name="profile_hba1c_value">%s %%</string>
+    <string name="profile_range">Целевой диапазон</string>
+    <string name="profile_glucose_level">Уровень глюкозы</string>
+    <string name="profile_weight">Вес</string>
+    <string name="profile_weight_value">%s кг</string>
+    <string name="profile_diabetes">Диабет</string>
+    <string name="profile_diabetes_empty_value">Не выбран</string>
+    <string name="profile_main_empty_value">—</string>
+    <string name="profile_name_placeholder">Профиль</string>
+    <string name="profile_personal_information">Персональные данные</string>
+    <string name="profile_security">Безопасность</string>
+    <string name="profile_linked_social_networks">Привязанные соцсети</string>
+    <string name="profile_additional_settings">Дополнительно</string>
+    <string name="profile_full_name_placeholder">Имя и фамилия</string>
+    <string name="profile_gender_placeholder">Пол не указан</string>
+    <string name="profile_my_devices">Мои устройства</string>
+    <string name="profile_manage_glucometer">Управление глюкометром</string>
+    <string name="profile_change_password">Изменить пароль</string>
+    <string name="profile_notification">Напоминания</string>
+    <string name="profile_legal_information">Юридическая информация</string>
+    <string name="facebook">Facebook</string>
+    <string name="vkontakte">VK</string>
+    <string name="odnoklasniki">OK</string>
+    <string name="profile_app_version">Версия приложения: %s</string>
+    <string name="profile_exit_from_app">Выйти из учетной записи</string>
+    <string name="profile_delete">Удалить профиль</string>
+    <string name="profile_delete_title">Удалить профиль?</string>
+    <string name="profile_delete_button_confirm">Да</string>
+    <string name="profile_delete_button_dissmit">Нет</string>
+    <string name="profile_delete_text">После удаления профиля все ранее внесенные данные будут так же удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
+    <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
+    <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
+    <string name="profile_is_deleted_body">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
+
+
+    <string name="profile_settings_dialog_diabetes_title">Диабет</string>
+    <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
+    <string name="profile_settings_dialog_diabetes_description">Если вам нужно изменить тип диабета, выберите нужный тип из списка</string>
+    <string name="profile_settings_dialog_diabetes_action_button">Выбрать</string>
+
+    <string name="profile_settings_dialog_glucose_title">Целевой диапазон</string>
+    <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
+    <string name="profile_settings_dialog_glucose_description">Задайте свой целевой диапазон измерений глюкозы</string>
+    <string name="profile_settings_dialog_glucose_action_button">Установить</string>
+    <string name="profile_settings_dialog_glucose_hint">Диапазон определяется лечащим врачом.\nМы возьмем минимальное и максимальное значения и отобразим усредненный диапазон на графиках.</string>
+    <string name="before_eat">До еды</string>
+    <string name="after_eat">После еды</string>
+
+    <string name="profile_settings_dialog_hba1c_title">HbA1c</string>
+    <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
+    <string name="profile_settings_dialog_hba1c_description">В данном разделе отображается последний результат анализа HbA1c</string>
+    <string name="profile_settings_dialog_hba1c_action_button">Добавить новую запись</string>
+    <string name="profile_settings_hemoglobin_description">Гликированный гемоглобин (HbA1c) —\nбиохимический показатель крови, отражающий\nсреднее содержание глюкозы в крови за\nдлительный период (3–4 месяца)</string>
+    <string name="profile_settings_hemoglobin_percent_mask">%s \%%</string>
+    <string name="profile_settings_hemoglobin_date_mask">- %s</string>
+    <string name="profile_settings_hemoglobin_header">Последние анализы</string>
+
+    <string name="profile_settings_change_name_title">Имя и Фамилия</string>
+    <string name="profile_settings_change_name_description">Изменение персональных данных</string>
+    <string name="profile_settings_change_name_first_hint">Имя</string>
+    <string name="profile_settings_change_name_second_hint">Фамилия</string>
+    <string name="profile_settings_apply_changes">Изменить</string>
+    <string name="profile_settings_save_changes">Сохранить</string>
+
+    <string name="profile_settings_change_gender_title">Пол</string>
+    <string name="profile_settings_change_gender_description">Изменение персональных данных</string>
+    <string name="profile_settings_change_gender_button_not_specified">Не указан</string>
+    <string name="profile_settings_change_gender_button_male">Мужской</string>
+    <string name="profile_settings_change_gender_button_female">Женский</string>
+
+    <string name="profile_settings_change_password_title">Новый пароль</string>
+    <string name="profile_settings_change_password_description">Придумайте новый пароль для входа в приложение</string>
+    <string name="profile_settings_change_password_old_hint">Старый пароль</string>
+    <string name="profile_settings_change_password_new_hint">Новый пароль</string>
+    <string name="profile_settings_change_password_changed">Пароль изменен</string>
+
+    <string name="profile_unlink_network_dialog_title">Внимание</string>
+    <string name="profile_unlink_network_dialog_body">Вы уверены, что хотите удалить привязанную соц.сеть?</string>
+    <string name="profile_unlink_network_cancel_button">Отменить</string>
+    <string name="profile_unlink_network_dialog_confirm_button">Удалить</string>
+
+    <string name="profile_google_fit_activated_title">Внимание</string>
+    <string name="profile_google_fit_activated_message">Теперь ваши тренировки из Google Fit будут подгружаться в Сателлит Online</string>
+    <string name="profile_google_fit_activated_positive_button">Ок</string>
+
+    <!--REMINDERS-->
+    <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
+    <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
+    <string name="profile_reminders_create_new">Создать новое</string>
+    <string name="profile_reminders_create_new_title">Новое напоминание</string>
+    <string name="profile_reminders_header_text">Мои напоминания</string>
+    <string name="profile_reminders_create">Создать напоминание</string>
+    <string name="profile_reminders_reminder_name_hint">Название</string>
+    <string name="profile_reminders_edit_title">Напоминание</string>
+    <string name="profile_reminders_notification_title">Напоминание</string>
+    <string name="profile_reminders_delete">Удалить</string>
+    <string name="profile_reminders_save_changes">Сохранить изменение</string>
+    <string name="profile_reminders_message_deleted">Напоминание удалено</string>
+    <string name="profile_reminders_wrong_time">Вы выбрали время в прошлом. Пожалуйста, выберите время в будущем.</string>
+
+    <string name="profile_reminders_schedule_not_repeat">Не повторять</string>
+    <string name="profile_reminders_schedule_day">Ежедневно</string>
+    <string name="profile_reminders_schedule_week">Еженедельно</string>
+    <string name="profile_reminders_schedule_month">Ежемесячно</string>
+    <string name="profile_reminders_schedule_year">Ежегодно</string>
+
+    <string name="profile_delete_reminder_dialog_title">Внимание</string>
+    <string name="profile_delete_reminder_dialog_body">Вы уверены, что хотите удалить напоминание?</string>
+    <string name="profile_delete_reminder_cancel_button">Отменить</string>
+    <string name="profile_delete_reminder_dialog_confirm_button">Удалить</string>
+
+    <!--DEVICE-->
+    <string name="profile_devices_monitor_and_manage_your_glucometers">Управляйте своими глюкометрами</string>
+    <string name="profile_devices_empty_state_title">У вас нет подключенных устройств</string>
+    <string name="profile_devices_primary_device">Основное устройство</string>
+    <string name="profile_devices_other_devices">Другие</string>
+    <string name="profile_devices_new_device">Новое устройство</string>
+
+    <string name="profile_device_info_title">СателлитOnline</string>
+    <string name="profile_device_info_description">Адрес устройства: %s</string>
+    <string name="profile_device_info_check_update_button">Проверить обновления ПО глюкометра</string>
+    <string name="profile_device_info_delete">Удалить устройство</string>
+    <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
+    <string name="profile_device_info_firmware_version_title_field">Версия ПО глюкометра:</string>
+    <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
+    <string name="profile_device_info_charge_level_field">%d/3</string>
+    <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
+
+    <string name="profile_delete_device_dialog_title">Внимание</string>
+    <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_primary_device_dialog_body">Вы действительно хотите удалить основной глюкометр?\nДанные будут сохранены</string>
+    <string name="profile_delete_device_cancel_button">Отменить</string>
+    <string name="profile_delete_device_dialog_confirm_button">Удалить</string>
+
+    <!--OBSERVERS FLOW-->
+    <string name="profile_observers_empty_state_title">У вас нет ни одного наблюдателя</string>
+    <string name="profile_observers_header_active">Активные</string>
+    <string name="profile_observers_header_pending">Ожидают</string>
+    <string name="profile_observers_description">Держите в курсе друзей и близких о состоянии своего здоровья</string>
+    <string name="profile_observers_title">Мои наблюдатели</string>
+    <string name="profile_observers_invite">Добавить</string>
+    <string name="profile_observers_user_name_placeholder">Пользователь</string>
+    <string name="profile_observers_delete_with_success">Наблюдатель удален</string>
+
+    <string name="profile_observer_invite_new_title">Новый наблюдатель</string>
+    <string name="profile_observer_invite_new_description">Чтобы пригласить наблюдателя,\nвведите его email</string>
+    <string name="profile_observer_invite_new_send_invite">Отправить</string>
+    <string name="profile_observer_invite_new_invite_description">После отправки запроса на email пользователь должен принять ваше приглашение. После этого он будет отображаться в списке доступных наблюдателей</string>
+    <string name="profile_observer_invite_new_email_hint">Email наблюдателя</string>
+    <string name="profile_observer_invite_with_success">Приглашение отправлено</string>
+
+    <string name="profile_observer_edit_title">Наблюдатель</string>
+    <string name="profile_observer_edit_subtitle">Вы можете назвать наблюдателя или удалить его из списка</string>
+    <string name="profile_observer_edit_name_hint">Имя наблюдателя</string>
+    <string name="profile_observer_edit_save_button">Сохранить</string>
+    <string name="profile_observer_edit_delete_button">Удалить</string>
+
+    <string name="profile_delete_observer_dialog_title">Внимание</string>
+    <string name="profile_delete_observer_dialog_body">Вы уверены, что хотите удалить наблюдателя?</string>
+    <string name="profile_delete_observer_cancel_button">Отменить</string>
+    <string name="profile_delete_observer_dialog_confirm_button">Удалить</string>
+
+    <!-- SUPPORT FLOW -->
+    <string name="profile_support_title">Поддержка</string>
+    <string name="profile_support_subtitle">Служба заботы о пользователях</string>
+    <string name="profile_support_actions_header">Доступные действия</string>
+    <string name="profile_support_versions_header">Информация об устройствах</string>
+    <string name="profile_support_phone_number">8 800 250 17 50</string>
+    <string name="profile_support_phone_number_description">Позвонить</string>
+    <string name="profile_support_email">service@eltaltd.ru</string>
+    <string name="profile_restore_email_body">Прошу восстановить мой профиль</string>
+    <string name="profile_support_email_description">Написать</string>
+    <string name="profile_support_service_centers">Куда обратиться</string>
+    <string name="profile_support_service_centers_description">Карта сервисных центров</string>
+    <string name="telegram">Telegram</string>
+    <string name="whatsapp">WhatsApp</string>
+    <string name="viber">Viber</string>
+    <string name="profile_support_firmware_version">Версия ПО глюкометра:</string>
+    <string name="profile_support_app_version">Версия приложения:</string>
+
+
+    <!-- STATISTICS -->
+    <string name="statistic_title">Статистика</string>
+    <string name="statistic_period_seven_days">7 дней</string>
+    <string name="statistic_period_fourteen_days">14 дней</string>
+    <string name="statistic_period_thirty_days">30 дней</string>
+    <string name="statistic_period_ninety_days">90 дней</string>
+
+    <string name="statistic_glucose_index_description_average">Средний уровень глюкозы</string>
+    <string name="statistic_glucose_index_description_total">Количество измерений</string>
+    <string name="statistic_glucose_index_description_high">Измерения выше целевого диапазона</string>
+    <string name="statistic_glucose_index_description_normal">Измерения в целевом диапазоне</string>
+    <string name="statistic_glucose_index_description_low">Измерения ниже целевого диапазона</string>
+
+    <string name="statistic_general_index_title_bread">Количество ХЕ</string>
+    <string name="statistic_general_index_title_insulin">Количество инсулина</string>
+    <string name="statistic_general_index_title_bolus_insulin">Болюсный инсулин</string>
+    <string name="statistic_general_index_title_basal_insulin">Базальный инсулин</string>
+    <string name="statistic_general_index_title_activity">Физическая активность</string>
+
+    <string name="statistic_general_index_description_by_day_bread">Количество хлебных единиц в этот день: %s</string>
+    <string name="statistic_general_index_description_by_period_bread">Среднесуточное количество хлебных единиц\nза период: %s</string>
+    <string name="statistic_general_index_description_value_by_period_bread">%s&#160;ХЕ.</string>
+
+    <string name="statistic_general_index_description_by_day_insulin">Общее количество инсулина\n(кроме смешанного) в этот день: %s</string>
+    <string name="statistic_general_index_description_by_period_insulin">Общее среднесуточное количество инсулина\n(кроме смешанного) за период: %s</string>
+    <string name="statistic_general_index_description_by_day_bolus_insulin">Количество болюсного инсулина\n(ультракороткий + короткий) в этот день: %s</string>
+    <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного\nинсулина (ультракороткий + короткий): %s</string>
+    <string name="statistic_general_index_description_by_day_basal_insulin">Количество базального инсулина\n(средний + длинный + сверхдлинный)\nв этот день: %s</string>
+    <string name="statistic_general_index_description_by_period_basal_insulin">Среднесуточное количество базального\nинсулина (средний + длинный + сверхдлинный): %s</string>
+
+    <string name="statistic_general_index_description_value_by_period_insulin">%s&#160;ед.</string>
+
+    <string name="statistic_general_index_description_by_day_activity">Количество тренировок в этот день: %1$s.\nСредняя продолжительность тренировки: %2$s</string>
+    <string name="statistic_general_index_description_by_period_activity">Количество тренировок за период: %1$s.\nСредняя продолжительность тренировки: %2$s</string>
+
+    <string name="statistic_glucose_index_average_unit">ммоль/л</string>
+    <string name="statistic_glucose_index_total_unit">за&#160;период</string>
+    <string name="statistic_glucose_index_day_unit">за&#160;день</string>
+    <string name="statistic_glucose_index_level_unit">(%s\%% от измерений)</string>
+    <string name="statistic_chart_period_dates_mask">%s - %s</string>
+    <string name="statistic_daily_glucose_title">Мои показатели</string>
+
+    <string name="statistic_report_title">Выгрузка отчета</string>
+    <string name="statistic_report_sub_title">Диапазон данных 14 дней</string>
+    <string name="statistic_report_description">Выберите дату начала диапазона для\nгенерации данных в отчете</string>
+    <string name="statistic_report_action_button">Подтвердить и выгрузить</string>
+    <string name="statistic_menu_button">Выгрузить отчет</string>
+    <string name="statistic_share_pdf_dialog_title">Поделиться с помощью</string>
+    <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
+    <string name="statistic_error">Невозможно выгрузить отчет</string>
+
+    <!--FEEDBACK-->
+    <string name="feedback_title">Оставить отзыв</string>
+    <string name="feedback_input_name_hint">Ваше имя *</string>
+    <string name="feedback_input_feedback_hint">Ваш email *</string>
+    <string name="feedback_description_text">Что вам не понравилось в приложении? *</string>
+    <string name="feedback_send">Отправить</string>
+
+    <!-- SYNC WITH BACKEND -->
+    <string name="sync_with_backend_in_progress">Идет процесс синхронизации с сервером…</string>
+    <string name="sync_with_backend_complete">Синхронизация с сервером завершена</string>
+
+    <!-- FIRMWARE -->
+    <string name="firmware_title_updates_not_found">Обновления не найдены</string>
+    <string name="firmware_title_checking_updates">Проверка обновлений…</string>
+    <string name="firmware_title_updates_found">Найдена новая версия\nПО глюкометра: %s</string>
+    <string name="firmware_title_downloading">Загрузка обновлений…</string>
+    <string name="firmware_title_updating">Обновление ПО…</string>
+    <string name="firmware_title_updated">Обновление ПО завершено</string>
+    <string name="firmware_title_low_level">Низкий уровень заряда\nбатареи глюкометра</string>
+    <string name="firmware_description_low_level">Для обновления необходимо заменить\nэлемент питания</string>
+    <string name="firmware_version_current">Текущая версия: %s</string>
+    <string name="firmware_version_new">Новая версия: %s</string>
+    <string name="firmware_button_update">Обновить</string>
+    <string name="firmware_button_check_updates">Проверить обновления ПО глюкометра</string>
+    <string name="firmware_button_close">Закрыть</string>
+    <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка ПО глюкометра, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
+    <string name="firmware_dialog_button">Закрыть</string>
+
+    <string name="firmware_unsupported_version_title">Версия приложения устарела</string>
+    <string name="firmware_unsupported_version_description">Для обновления версии ПО\nглюкометра, необходимо обновить\nприложение</string>
+    <string name="firmware_unsupported_version_button">Обновить в Google Play</string>
+
+    <string name="firmware_downloading_error_title">Ошибка загрузки</string>
+    <string name="firmware_downloading_error_description">Во время загрузки обновления на\nустройство произошла ошибка. Чтобы\nпродолжить, необходимо повторить\nпроцесс</string>
+    <string name="firmware_downloading_error_button">Повторить</string>
+
+    <string name="firmware_update_error_title">Ошибка обновления</string>
+    <string name="firmware_update_error_description">Во время обновления ПО глюкометра\nпроизошла ошибка</string>
+    <string name="firmware_update_error_button">Повторить</string>
+
+    <string name="firmware_offline_error_title">Ошибка подключения</string>
+    <string name="firmware_offline_error_description">Во время обновления ПО глюкометра\nпроизошла ошибка подключения\nк глюкоментру</string>
+    <string name="firmware_offline_error_button">Повторить</string>
+    <string name="error_no_connection">Нет подключения</string>
+    <string name="reminder_is_exists">Напоминание не может быть создано на одинаковые время и дату с уже ранее созданным</string>
+    <string name="events_creation_eating_label_text">Отметка о приёме пищи</string>
+    <string name="ok">OK</string>
+    <string name="bluetooth_disabled">Bluetooth отключён</string>
+    <string name="no_connection_to_the_internet">Нет подключения к Интернету</string>
+    <string name="user_not_found">Пользователь с таким email не найден/не зарегистрирован</string>
+    <string name="default_error_message">Произошла ошибка</string>
+
 </resources>

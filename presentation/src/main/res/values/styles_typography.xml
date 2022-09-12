@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- BASE TYPOGRAPHY -->
+    <style name="Typography.Base.Roboto.Medium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="Typography.Base.Roboto.Regular" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Typography.Base.Roboto.Bold" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="Typography.Base.Roboto.Light" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/roboto_light</item>
+    </style>
+
+    <!-- TITLE 1 -->
+    <style name="Typography.Title1" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">@dimen/font_size_title_1</item>
+    </style>
+
+    <style name="Typography.Title1.Primary" parent="Typography.Title1">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <style name="Typography.Title2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_title_1</item>
+    </style>
+
+    <style name="Typography.Title2.Primary" parent="Typography.Title2">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <style name="Typography.Title3" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_title_3</item>
+    </style>
+
+    <style name="Typography.Title3.Primary" parent="Typography.Title3">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <!-- BODY 1-->
+    <style name="Typography.Body1" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_body_1</item>
+        <item name="android:lineSpacingExtra">@dimen/line_spacing_body_1</item>
+    </style>
+
+    <style name="Typography.Body1.Primary" parent="Typography.Body1">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <style name="Typography.Body1.ShadeBlack2" parent="Typography.Body1">
+        <item name="android:textColor">@color/shade_black2</item>
+    </style>
+
+    <style name="Typography.Body2.Primary" parent="Typography.Body1.Primary">
+        <item name="android:textSize">@dimen/font_size_title_2</item>
+    </style>
+
+    <!--SUBTITLE 1 -->
+    <style name="Typography.SubTitle1" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_subtitle_1</item>
+        <item name="android:lineSpacingExtra">@dimen/line_spacing_subtitle_1</item>
+    </style>
+
+    <style name="Typography.Subtitle1.Primary" parent="Typography.SubTitle1">
+        <item name="android:textColor">@color/color_text_subtitle</item>
+    </style>
+
+    <!-- HEADLINE 1 -->
+    <style name="Typography.Headline1" parent="Typography.Base.Roboto.Bold">
+        <item name="android:textSize">@dimen/font_size_headline_1</item>
+    </style>
+
+    <style name="Typography.Headline1.Primary" parent="Typography.Headline1">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <!-- HEADLINE 2 -->
+    <style name="Typography.Headline2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_headline_2</item>
+    </style>
+
+    <style name="Typography.Headline2.Primary" parent="Typography.Headline2">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <!-- CAPTION 1 -->
+    <style name="Typography.Caption1" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_caption_1</item>
+    </style>
+
+    <style name="Typography.Caption1.Primary" parent="Typography.Caption1">
+        <item name="android:textColor">@color/color_text_caption</item>
+    </style>
+
+    <!-- CAPTION 2 -->
+    <style name="Typography.Caption2" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_caption_1</item>
+    </style>
+
+    <style name="Typography.Caption2.Primary" parent="Typography.Caption1">
+        <item name="android:textColor">@color/color_text_caption</item>
+    </style>
+
+    <!-- SNAKBAR TEXT -->
+    <style name="Typography.Snackbar.Text" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_snakbar_text</item>
+    </style>
+
+    <style name="Typography.Snackbar.Text.Primary" parent="Typography.Snackbar.Text">
+        <item name="android:textColor">@color/color_text_white</item>
+    </style>
+
+    <!-- SNAKBAR BUTTON -->
+    <style name="Typography.Snackbar.Button" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_snakbar_text</item>
+    </style>
+
+    <style name="Typography.Snackbar.Button.Primary" parent="Typography.Snackbar.Button">
+        <item name="android:textColor">@color/color_snackbar_button</item>
+    </style>
+
+    <!-- TOOLBAR BUTTON -->
+    <style name="Typography.Toolbar.Button" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_toolbar_button</item>
+    </style>
+
+    <style name="Typography.Toolbar.Button.Primary" parent="Typography.Toolbar.Button">
+        <item name="android:textColor">@color/color_toolbar_button</item>
+    </style>
+
+    <!-- BUTTON LARGE TEXT STYLE -->
+    <style name="Typography.Button.Large.Text" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_button_1</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Typography.Button.Large.Text.Primary" parent="Typography.Button.Large.Text">
+        <item name="android:textColor">@color/button_large_text_color</item>
+    </style>
+
+    <!-- BUTTON SMALL TEXT STYLES -->
+    <style name="Typography.Button.Small.Text" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_button_2</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Typography.Button.Small.Text.Dark" parent="Typography.Button.Small.Text">
+        <item name="android:textColor">@color/button_small_dark_text_color</item>
+    </style>
+
+    <style name="Typography.Button.Small.Text.Light" parent="Typography.Button.Small.Text">
+        <item name="android:textColor">@color/button_small_light_text_color</item>
+    </style>
+
+    <style name="Typography.Body1.BackendError" parent="Typography.Body1">
+        <item name="android:textColor">@color/color_backend_error</item>
+    </style>
+
+    <!-- TEXT STYLE 2 -->
+    <style name="Typography.TextStyle2" parent="Typography.Base.Roboto.Medium">
+        <item name="android:textSize">@dimen/font_size_text_style_2</item>
+        <item name="android:textColor">@color/color_text_style_2</item>
+    </style>
+
+    <!-- BOTTOM MENU TEXT -->
+
+    <style name="Typography.BottomMenu" parent="Typography.Base.Roboto.Regular">
+        <item name="android:textSize">@dimen/font_size_bottom_menu_title</item>
+    </style>
+
+</resources>

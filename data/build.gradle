@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.objectbox'
 
 android {
 
@@ -16,15 +17,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -47,19 +42,29 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
+}
+
+kapt {
+    javacOptions {
+        option("-source", "8")
+        option("-target", "8")
+    }
 }
 
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
+    implementation project(':core-rx')
+    implementation project(':core-security')
+    implementation project(':core-hardware')
+    implementation project(':core-intents')
+    implementation project(':core-preferences')
     implementation project(':common')
     api project(':domain')
 
-    implementation commonDependencies.appCoreRx
+    implementation commonDependencies.googleFit
+    implementation commonDependencies.googleAuth
 
     implementation commonDependencies.rxKotlin
     implementation commonDependencies.rxNetwork
@@ -82,6 +87,20 @@ dependencies {
     implementation commonDependencies.okHttp
     implementation commonDependencies.okHttpLogger
     implementation commonDependencies.gson
+
+    implementation commonDependencies.fb
+    implementation commonDependencies.vk
+    implementation commonDependencies.ok
+
+    implementation commonDependencies.objectbox
+    implementation commonDependencies.jsr310
+
+    implementation commonDependencies.nordicScanner
+    implementation commonDependencies.nordicDfu
+    implementation commonDependencies.rxBluetooth
+    implementation commonDependencies.rxReplaying
+
+    implementation 'org.greenrobot:essentials:3.1.0'
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

@@ -1,0 +1,59 @@
+package com.elta.android.data.features.diary.events.api
+
+import com.elta.android.common.utils.toIsoString
+import com.elta.android.data.features.common.dto.StateDto
+import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
+import com.elta.android.data.features.diary.events.dto.EventDataDto
+import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
+import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
+import com.elta.android.data.features.diary.events.dto.MealTagDto
+import org.threeten.bp.ZonedDateTime
+import java.util.Date
+
+@Suppress("MagicNumber", "ForEachOnRange", "LongParameterList")
+object EventMockedFactory {
+
+    private val ids = arrayListOf<String>().apply {
+        (0..40).forEach {
+            add("ID_TEST_$it")
+        }
+    }
+
+    private var index = 0
+    private val id: String
+        get() = ids[index++ % ids.size]
+
+    fun create(
+        type: EventTypeDto,
+        value: Double? = null,
+        activityType: ActivityTypeDto? = null,
+        mealTag: MealTagDto? = null,
+        insulinType: InsulinTypeDto? = null,
+        medicament: String? = null,
+        tagId: String? = null,
+        note: String? = null,
+        state: StateDto = StateDto.CREATED
+    ): EventDto =
+        EventDto(
+            id = id,
+            additionTime = ZonedDateTime.now().toIsoString(),
+            tagId = tagId,
+            note = note,
+            modificationTime = Date().time,
+            state = state,
+            data = EventDataDto(
+                temperature = 0.0,
+                value = value,
+                name = "Test name",
+                kind = "Test kind",
+                duration = 2 * 60 * 60 + 30 * 60, // 2h 30m
+                activityType = activityType,
+                mealTag = mealTag,
+                insulinType = insulinType,
+                insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
+                type = type
+            )
+        )
+}

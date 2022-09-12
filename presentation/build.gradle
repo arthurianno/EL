@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
@@ -15,17 +15,16 @@ android {
         targetSdkVersion androidConfigurationVersion.androidTargetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
+        vectorDrawables.useSupportLibrary = true
 
-    dexOptions {
-        preDexLibraries = false
-        dexInProcess = false
-        javaMaxHeapSize "4g"
+        versionCode rootProject.ext.applicationVersionCode
+        versionName rootProject.ext.applicationVersionName
+        buildConfigField("String", "APP_VERSION", "\"${versionName}\"")
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     lintOptions {
@@ -40,10 +39,17 @@ android {
             jvmArgs '-noverify'
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 kapt {
     correctErrorTypes = true
+        javacOptions {
+            option("-source", "8")
+            option("-target", "8")
+        }
 }
 
 configurations {
@@ -52,37 +58,37 @@ configurations {
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
-    ktlint
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {
     def commonDependencies = rootProject.ext.commonDependencies
     def commonTestDependencies = rootProject.ext.commonTestDependencies
 
-    ktlint commonDependencies.ktlint
-
+    implementation project(':core-all')
+    implementation project(':core-resources')
+    implementation project(':core-rx')
+    implementation project(':core-ui')
+    implementation project(':core-adapter')
+    implementation project(':core-adapter-ktx')
+    implementation project(':core-hardware')
+    implementation project(':core-rx-location')
+    implementation project(':core-collections')
+    implementation project(':core-intents')
+    implementation project(':core-interactor')
+    implementation project(':core-font')
+    implementation project(':core-date')
     implementation project(':common')
     api project(':domain')
 
-    implementation commonDependencies.libs
-    implementation commonDependencies.appCore
-    implementation commonDependencies.appCoreAdapterKtx
+    implementation commonDependencies.coroutines
+    implementation commonDependencies.androidxFragmentKtx
 
-    implementation commonDependencies.supportAnnotations
-    implementation commonDependencies.supportV4
-    implementation commonDependencies.supportV13
-    implementation commonDependencies.supportCompatV7
-    implementation commonDependencies.supportRecyclerView
-    implementation commonDependencies.supportCardView
-    implementation commonDependencies.supportDesign
-    implementation commonDependencies.supportvectorDrawable
-    implementation commonDependencies.supportConstraint
-    implementation commonDependencies.supportCustomTabs
-    implementation commonDependencies.multiDex
+    implementation commonDependencies.libs
+
+    implementation commonDependencies.materialDesign
+
+    implementation commonDependencies.googleFit
+    implementation commonDependencies.googleAuth
     implementation commonDependencies.materialDialogs
 
     implementation commonDependencies.rxKotlin
@@ -91,6 +97,7 @@ dependencies {
     implementation commonDependencies.rxBinding
     implementation commonDependencies.rxNetwork
     implementation commonDependencies.rxPermissions
+    implementation commonDependencies.rxLocation
 
     implementation commonDependencies.javaxAnnotation
     implementation commonDependencies.javaxInject
@@ -100,7 +107,12 @@ dependencies {
 
     implementation commonDependencies.expandableLayout
     implementation commonDependencies.tooltipLibrary
-    implementation commonDependencies.barcodeScanner
+    implementation commonDependencies.materialEditText
+    implementation commonDependencies.yandexMapKit
+    implementation commonDependencies.yandexMapKitClustering
+    implementation commonDependencies.cardView
+    implementation commonDependencies.pulseView
+    implementation commonDependencies.datePicker
 
     // Dagger2
     kapt commonDependencies.daggerCompiler
@@ -110,15 +122,16 @@ dependencies {
     implementation commonDependencies.daggerAndroidSupport
 
     implementation commonDependencies.timber
+    implementation commonDependencies.jsr310
     implementation commonDependencies.maps
     implementation commonDependencies.inputMask
-    implementation (commonDependencies.glide) {
-        exclude group: "com.android.support"
-    }
-    kapt commonDependencies.glideProcessor
 
-    implementation commonDependencies.firebaseCore
+    implementation platform(commonDependencies.firebaseBom)
     implementation commonDependencies.firebaseMessaging
+    implementation commonDependencies.firebaseAnalytics
+    implementation commonDependencies.firebaseInAppMessaging
+    implementation commonDependencies.firebaseDynamicLinks
+    implementation commonDependencies.location
 
     testImplementation commonTestDependencies.junit
     testImplementation commonTestDependencies.mockito

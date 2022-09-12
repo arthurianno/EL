@@ -1,0 +1,42 @@
+package com.elta.android.presentation.features.observers.invite.ui
+
+import android.os.Bundle
+import android.view.View
+import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
+import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
+import com.elta.android.presentation.databinding.FregmentInviteObserverBinding
+import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
+import com.jakewharton.rxbinding2.view.clicks
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
+
+class InviteObserverFragment :
+    BaseFragment<InviteObserverPm, FregmentInviteObserverBinding>(FregmentInviteObserverBinding::inflate) {
+
+    override val screenLayout: Int = R.layout.fregment_invite_observer
+    override val classToken: Class<InviteObserverPm> = InviteObserverPm::class.java
+    override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_dialog_close)
+    }
+
+    override fun onBindPresentationModel(pm: InviteObserverPm) {
+        super.onBindPresentationModel(pm)
+        bindProgressDialog(pm)
+
+        pm.emailInput.bindTo(binding.emailInputView)
+        pm.emailInput.error.observable
+            .distinctUntilChanged()
+            .subscribe { binding.emailInputView.error = it }
+        pm.continueEnabledState.bindTo { binding.continueButtonView.isEnabled = it }
+        binding.continueButtonView.clicks().bindTo(pm.continueAction)
+    }
+
+    companion object {
+        fun newInstance() = InviteObserverFragment()
+    }
+}
