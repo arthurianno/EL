@@ -35,6 +35,10 @@ Properties readVersion() {
     if (!version['patch']) version['patch'] = 0
     if (!version['build']) version['build'] = 0
     if (!version['local-build']) version['local-build'] = 1
+
+    if (!version['release_major']) version['release_major'] = 1
+    if (!version['release_minor']) version['release_minor'] = 0
+    if (!version['release_patch']) version['release_patch'] = 0
     return version
 }
 
@@ -47,7 +51,14 @@ String readVersionName() {
 
 String formatVersionName(def version) {
     def sufix = getVersionSufix(version)
-    return "${version['major']}.${version['minor']}.${version['patch']}-${sufix}"
+    def branch = readCurrentBranch() as String
+    def versionName
+    if (branch.contains("master")){
+        versionName = "${version['release_major']}.${version['release_minor']}.${version['release_patch']}"
+    } else {
+        versionName = "${version['major']}.${version['minor']}.${version['patch']}-${sufix}"
+    }
+        return versionName
 }
 
 Integer readBuildVersion() {
@@ -162,11 +173,9 @@ String buildVersionSufix(def branch, def build, def localBuild) {
             sufix = "rc${localBuild}.${build}"
         } else if (branchName.contains('hotfix')) {
             sufix = "rc${localBuild}.${build}"
-        }
-        else if (branchName.contains('uat')) {
+        } else if (branchName.contains('uat')) {
             sufix = "uat${localBuild}.${build}"
-        }
-        else {
+        } else {
             sufix = "alpha.${build}"
         }
     } else {
