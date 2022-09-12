@@ -43,35 +43,39 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_skiing" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/record_title_view"
-            style="@style/New.Body2.BlackBlue"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:lines="1"
-            app:layout_constraintBottom_toTopOf="@+id/record_type_view"
-            app:layout_constraintEnd_toStartOf="@+id/barrier_view"
-            app:layout_constraintStart_toEndOf="@+id/record_icon_view"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Короткий" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/record_type_view"
-            style="@style/New.Caption1.ShadeBlack2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:lines="1"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/barrier_view"
             app:layout_constraintStart_toEndOf="@+id/record_icon_view"
-            app:layout_constraintTop_toBottomOf="@+id/record_title_view"
-            tools:text="Инсулин" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+
+                android:id="@+id/record_title_view"
+                style="@style/New.Body2.BlackBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:lines="1"
+                app:layout_constraintBottom_toTopOf="@+id/record_type_view"
+                tools:text="Короткий" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+
+                android:id="@+id/record_type_view"
+                style="@style/New.Caption1.ShadeBlack2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:lines="1"
+                tools:text="Инсулин" />
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier_view"
