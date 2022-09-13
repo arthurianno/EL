@@ -4,7 +4,7 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
-import com.elta.android.domain.features.diary.insulin.InsulinDrugNameRepository
+import com.elta.android.domain.features.diary.insulin.DrugNameRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.nullgr.core.interactor.ObservableListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class GetChooserOptionsUseCase @Inject constructor(
     private val tagsRepo: TagsRepository,
-    private val insulinRepo: InsulinDrugNameRepository,
+    private val insulinRepo: DrugNameRepository,
     schedulers: SchedulersFacade
 ) : ObservableListUseCase<ChooserOptionModel, GetChooserOptionsUseCase.Params>(schedulers) {
 
