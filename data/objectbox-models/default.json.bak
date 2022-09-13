@@ -81,7 +81,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "18:6594923039236404749",
+      "lastPropertyId": "19:6583631272062989855",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -169,6 +169,11 @@
           "id": "18:6594923039236404749",
           "name": "temperature",
           "type": 8
+        },
+        {
+          "id": "19:6583631272062989855",
+          "name": "medicament",
+          "type": 9
         }
       ],
       "relations": []

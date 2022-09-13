@@ -25,6 +25,10 @@ import com.elta.android.data.features.diary.events.mapper.EventToCacheMapper
 import com.elta.android.data.features.diary.events.mapper.EventToDomainMapper
 import com.elta.android.data.features.diary.events.mapper.EventToDtoMapper
 import com.elta.android.data.features.diary.events.mapper.EventToSimpleMapper
+import com.elta.android.data.features.diary.insulin.cache.DrugCachedDto
+import com.elta.android.data.features.diary.insulin.dto.DrugDto
+import com.elta.android.data.features.diary.insulin.mapper.DrugFromCacheMapper
+import com.elta.android.data.features.diary.insulin.mapper.DrugToCacheMapper
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.mapper.TagFromCacheMapper
@@ -169,6 +173,16 @@ abstract class MappersModule {
     abstract fun bindTagFromCacheMapper(
         mapper: TagFromCacheMapper
     ): Mapper<TagCachedDto, TagDto>
+
+    @Binds
+    abstract fun bindDrugToCacheMapper(
+        mapper: DrugToCacheMapper
+    ): Mapper<DrugDto, DrugCachedDto>
+
+    @Binds
+    abstract fun bindDrugFromCacheMapper(
+        mapper: DrugFromCacheMapper
+    ): Mapper<DrugCachedDto, DrugDto>
 
     @Binds
     abstract fun bindObserverToCacheMapper(

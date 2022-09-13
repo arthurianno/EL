@@ -7,8 +7,8 @@ import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
-import com.elta.android.data.features.diary.insulin.api.InsulinDrugNameApi
-import com.elta.android.data.features.diary.insulin.api.MockedInsulinDrugNameApi
+import com.elta.android.data.features.diary.insulin.api.DragNameApi
+import com.elta.android.data.features.diary.insulin.api.MockedDragNameApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.feedback.api.FeedbackApi
@@ -107,11 +107,11 @@ class ApiModule {
     @Singleton
     fun provideInsulinApi(
         retrofit: Retrofit
-    ): InsulinDrugNameApi =
+    ): DragNameApi =
         if (ApiConfig.USE_MOCKED_INSULIN_DRUG_API) {
-            MockedInsulinDrugNameApi()
+            MockedDragNameApi()
         } else {
-            retrofit.create()
+            retrofit.create(DragNameApi::class.java)
         }
 
     @Provides
