@@ -105,7 +105,14 @@ class ApiModule {
 
     @Provides
     @Singleton
-    fun provideInsulinApy(): InsulinDrugNameApi = MockedInsulinDrugNameApi()
+    fun provideInsulinApi(
+        retrofit: Retrofit
+    ): InsulinDrugNameApi =
+        if (ApiConfig.USE_MOCKED_INSULIN_DRUG_API) {
+            MockedInsulinDrugNameApi()
+        } else {
+            retrofit.create()
+        }
 
     @Provides
     @Singleton
@@ -148,5 +155,6 @@ class ApiModule {
         const val USE_MOCKED_FIRMWARE_API = false
         const val USE_MOCKED_FEEDBACK_API = false
         const val USE_MOCKED_REPORTS_API = false
+        const val USE_MOCKED_INSULIN_DRUG_API = true
     }
 }
