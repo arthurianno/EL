@@ -21,7 +21,8 @@ class MockedInsulinDrugNameApi : InsulinDrugNameApi {
 private val insulinDrugNamesUF = listOf(
     "Фиасп",
     "Люмжев",
-    "Люмжев 200"
+    "Люмжев 200",
+    "Другое"
 )
 private val insulinDrugNamesUS = listOf(
     "Хумалог",
@@ -31,7 +32,8 @@ private val insulinDrugNamesUS = listOf(
     "НовоРапид",
     "РинФаст",
     "Росинсулин аспарт Р",
-    "Апидра"
+    "Апидра",
+    "Другое"
 )
 private val insulinDrugNamesS = listOf(
     "Актрапид НМ",
@@ -42,7 +44,8 @@ private val insulinDrugNamesS = listOf(
     "Ринсулин Р",
     "Росинсулин Р",
     "Возулим-Р",
-    "Моноинсулин ЧР"
+    "Моноинсулин ЧР",
+    "Другое"
 )
 private val insulinDrugNamesI = listOf(
     "Протафан HM",
@@ -53,7 +56,8 @@ private val insulinDrugNamesI = listOf(
     "Ринсулин НПХ",
     "Росинсулин С",
     "Возулим-Н",
-    "Протамин-инсулин ЧС"
+    "Протамин-инсулин ЧС",
+    "Другое"
 )
 private val insulinDrugNamesL = listOf(
     "Лантус",
@@ -61,10 +65,12 @@ private val insulinDrugNamesL = listOf(
     "РинГлар",
     "Базаглар",
     "Туджео",
-    "Левемир"
+    "Левемир",
+    "Другое"
 )
 private val insulinDrugNamesUL = listOf(
-    "Тресиба"
+    "Тресиба",
+    "Другое"
 )
 private val insulinDrugNamesM = listOf(
     "Хумулин М3",
@@ -79,5 +85,6 @@ private val insulinDrugNamesM = listOf(
     "РинЛиз Микс 25",
     "НовоМикс 30",
     "РинФаст Микс 30",
-    "Райзодег"
+    "Райзодег",
+    "Другое"
 )
