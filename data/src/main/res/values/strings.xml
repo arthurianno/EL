@@ -1,3 +1,4 @@
 <resources>
     <string name="report_name_template">SatelliteOnline Отчёт %s %s %s</string>
+    <string name="app_name">Сателлит Online</string>
 </resources>
