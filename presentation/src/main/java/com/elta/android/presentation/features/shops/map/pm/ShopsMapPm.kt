@@ -383,9 +383,13 @@ class ShopsMapPm @Inject constructor(
 
     private fun findGeoPointByShopItem(item: ListItem?): GeoPoint {
         (item as? ShopItem)?.let { shopItem ->
-            return geoPoints.valueOrNull?.first?.find { it.id == shopItem.id }
-                ?.also { it.selected = true }
-                ?: emptyGeoPoint
+            val geoPoint = geoPoints.valueOrNull?.first
+                ?.find { it.id == shopItem.id }
+                ?.apply {
+                    meta = "${item.address}, ${item.name}"
+                    selected = true
+                } ?: emptyGeoPoint
+            return geoPoint
         }
         return emptyGeoPoint
     }
