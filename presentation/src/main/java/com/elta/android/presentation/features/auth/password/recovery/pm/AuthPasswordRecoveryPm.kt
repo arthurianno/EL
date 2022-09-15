@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.auth.password.recovery.pm
 
+import com.elta.android.common.errors.NotFoundError
 import com.elta.android.domain.features.auth.interactor.SendPasswordResetLinkUseCase
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -45,5 +46,13 @@ class AuthPasswordRecoveryPm @Inject constructor(
         )
 
         router.navigateTo(Screens.Login)
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error is NotFoundError) {
+            emailInput.error.consumer.accept(resources.getString(R.string.user_not_found))
+        } else {
+            super.handleError(error)
+        }
     }
 }
