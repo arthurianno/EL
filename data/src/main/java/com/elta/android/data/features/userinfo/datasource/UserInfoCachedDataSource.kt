@@ -32,7 +32,7 @@ class UserInfoCachedDataSource @Inject constructor(
                         isUserLoggedIn = userInfo.isUserLoggedIn || cachedInfo.isUserLoggedIn,
                         isOnboardingPassed = userInfo.isOnboardingPassed ||
                             cachedInfo.isOnboardingPassed,
-                        isFirstHomeEntrance = userInfo.isFirstHomeEntrance || cachedInfo.isFirstHomeEntrance
+                        isFirstHomeEntrance = userInfo.isFirstHomeEntrance && cachedInfo.isFirstHomeEntrance
                     )
                     cache.update(listOf(updatedInfo))
                 } ?: cache.add(listOf(userInfo))
