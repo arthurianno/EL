@@ -9,12 +9,7 @@ import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseM
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildStatisticModel
 import com.elta.android.domain.features.statistics.interactor.percent
-import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
-import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
-import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
-import com.elta.android.domain.features.statistics.model.InsulinStatisticModelByPeriod
-import com.elta.android.domain.features.statistics.model.Periods
-import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
+import com.elta.android.domain.features.statistics.model.*
 import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
@@ -57,7 +52,7 @@ class BuildStatisticModelTest {
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMIDIATE),
+                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(

@@ -4,13 +4,7 @@ import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
-import com.elta.android.domain.features.statistics.interactor.average
-import com.elta.android.domain.features.statistics.interactor.checkMax
-import com.elta.android.domain.features.statistics.interactor.checkMin
-import com.elta.android.domain.features.statistics.interactor.isBasalInsulin
-import com.elta.android.domain.features.statistics.interactor.isBolusInsulin
-import com.elta.android.domain.features.statistics.interactor.isNotMixedInsulin
-import com.elta.android.domain.features.statistics.interactor.percent
+import com.elta.android.domain.features.statistics.interactor.*
 import org.junit.Test
 
 class StatisticExtensionFunctionsTest {
@@ -105,10 +99,10 @@ class StatisticExtensionFunctionsTest {
     }
 
     @Test
-    fun eventIsBasalInsulin_intermidiate_true() {
+    fun eventIsBasalInsulin_intermediate_true() {
         val event = EventTestFactory.create(
             type = EventType.INSULIN,
-            insulin = Insulin("", "", InsulinType.INTERMIDIATE)
+            insulin = Insulin("", "", InsulinType.INTERMEDIATE)
         )
         assert(event.isBasalInsulin())
     }
