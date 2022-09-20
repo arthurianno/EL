@@ -80,7 +80,7 @@ fun InsulinType.toName(): Int =
         InsulinType.ULTRAFAST -> R.string.insulin_type_ultrafast
         InsulinType.ULTRASHORT -> R.string.insulin_type_ultrashort
         InsulinType.SHORT -> R.string.insulin_type_short
-        InsulinType.INTERMIDIATE -> R.string.insulin_type_intermidiate
+        InsulinType.INTERMEDIATE -> R.string.insulin_type_intermidiate
         InsulinType.LONG -> R.string.insulin_type_long
         InsulinType.ULTRALONG -> R.string.insulin_type_ultralong
         InsulinType.MIXED -> R.string.insulin_type_mixed

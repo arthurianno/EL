@@ -4,7 +4,7 @@ enum class InsulinType {
     ULTRAFAST,
     ULTRASHORT,
     SHORT,
-    INTERMIDIATE,
+    INTERMEDIATE,
     LONG,
     ULTRALONG,
     MIXED

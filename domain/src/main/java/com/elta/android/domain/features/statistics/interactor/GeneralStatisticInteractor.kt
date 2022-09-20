@@ -19,7 +19,7 @@ internal fun Event.isBolusInsulin(): Boolean =
     insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
 
 internal fun Event.isBasalInsulin(): Boolean =
-    insulinType == InsulinType.INTERMIDIATE ||
+    insulinType == InsulinType.INTERMEDIATE ||
         insulinType == InsulinType.LONG ||
         insulinType == InsulinType.ULTRALONG
 

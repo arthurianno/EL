@@ -19,7 +19,7 @@ class MockedDrugNameApi : DrugNameApi {
                 InsulinType.ULTRAFAST -> insulinDrugNamesUF
                 InsulinType.ULTRASHORT -> insulinDrugNamesUS
                 InsulinType.SHORT -> insulinDrugNamesS
-                InsulinType.INTERMIDIATE -> insulinDrugNamesI
+                InsulinType.INTERMEDIATE -> insulinDrugNamesI
                 InsulinType.LONG -> insulinDrugNamesL
                 InsulinType.ULTRALONG -> insulinDrugNamesUL
                 InsulinType.MIXED -> insulinDrugNamesM
