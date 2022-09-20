@@ -14,7 +14,8 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_OneGlucoseEvent_HasGlucoseEvent() {
         val event = EventTestFactory.create(type = EventType.GLUCOSE)
-        val model = buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model =
+            buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -27,7 +28,8 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_OneGlucoseEvent_DirectionUp() {
         val event = EventTestFactory.create(type = EventType.GLUCOSE)
-        val model = buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model =
+            buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -41,7 +43,8 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_OneBreadEvent_HasBreadEvent() {
         val event = EventTestFactory.create(type = EventType.BREAD)
-        val model = buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model =
+            buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -54,7 +57,8 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_OneInsulinEvent_HasInsulinEvent() {
         val event = EventTestFactory.create(type = EventType.INSULIN)
-        val model = buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model =
+            buildHomeModel(arrayListOf(event), emptyList(), GlucoseLevelSettings(), UserInfo())
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -69,7 +73,12 @@ class BuildHomeModelTest {
         val event1 = EventTestFactory.create(type = EventType.BREAD)
         val event2 = EventTestFactory.create(type = EventType.GLUCOSE)
         val event3 = EventTestFactory.create(type = EventType.INSULIN)
-        val model = buildHomeModel(arrayListOf(event1, event2, event3), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model = buildHomeModel(
+            arrayListOf(event1, event2, event3),
+            emptyList(),
+            GlucoseLevelSettings(),
+            UserInfo()
+        )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -89,7 +98,12 @@ class BuildHomeModelTest {
         val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
         Thread.sleep(50)
         val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 5.0)
-        val model = buildHomeModel(arrayListOf(event1, event2), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model = buildHomeModel(
+            arrayListOf(event1, event2),
+            emptyList(),
+            GlucoseLevelSettings(),
+            UserInfo()
+        )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -108,7 +122,12 @@ class BuildHomeModelTest {
         val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
         Thread.sleep(50)
         val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 3.0)
-        val model = buildHomeModel(arrayListOf(event1, event2), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model = buildHomeModel(
+            arrayListOf(event1, event2),
+            emptyList(),
+            GlucoseLevelSettings(),
+            UserInfo()
+        )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -127,7 +146,12 @@ class BuildHomeModelTest {
         val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
         Thread.sleep(50)
         val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
-        val model = buildHomeModel(arrayListOf(event1, event2), emptyList(), GlucoseLevelSettings(), UserInfo())
+        val model = buildHomeModel(
+            arrayListOf(event1, event2),
+            emptyList(),
+            GlucoseLevelSettings(),
+            UserInfo()
+        )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
@@ -150,7 +174,12 @@ class BuildHomeModelTest {
         Thread.sleep(50)
 
         val event2 = EventTestFactory.create(type = EventType.GLUCOSE)
-        val model = buildHomeModel(arrayListOf(event1, event2).shuffled(), arrayListOf(tag1), GlucoseLevelSettings(), UserInfo())
+        val model = buildHomeModel(
+            arrayListOf(event1, event2).shuffled(),
+            arrayListOf(tag1),
+            GlucoseLevelSettings(),
+            UserInfo()
+        )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
