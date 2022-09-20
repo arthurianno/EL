@@ -137,7 +137,7 @@
     <string name="insulin_type_ultrafast">Сверхбыстрый</string>
     <string name="insulin_type_ultrashort">Ультракороткий</string>
     <string name="insulin_type_short">Короткий</string>
-    <string name="insulin_type_intermidiate">Средний</string>
+    <string name="insulin_type_intermediate">Средний</string>
     <string name="insulin_type_long">Длинный</string>
     <string name="insulin_type_ultralong">Сверхдлинный</string>
     <string name="insulin_type_mixed">Смешанный</string>

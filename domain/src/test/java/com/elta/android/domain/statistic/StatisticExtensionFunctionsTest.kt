@@ -105,10 +105,10 @@ class StatisticExtensionFunctionsTest {
     }
 
     @Test
-    fun eventIsBasalInsulin_intermidiate_true() {
+    fun eventIsBasalInsulin_intermediate_true() {
         val event = EventTestFactory.create(
             type = EventType.INSULIN,
-            insulin = Insulin("", "", InsulinType.INTERMIDIATE)
+            insulin = Insulin("", "", InsulinType.INTERMEDIATE)
         )
         assert(event.isBasalInsulin())
     }
