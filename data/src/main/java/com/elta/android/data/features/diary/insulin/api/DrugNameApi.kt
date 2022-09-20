@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface DragNameApi {
+interface DrugNameApi {
 
     @GET("api/diary/v1/events/medicaments")
     fun getDrugNames(

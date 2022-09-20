@@ -4,7 +4,7 @@ import com.elta.android.data.features.diary.insulin.dto.DrugDto
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import io.reactivex.Observable
 
-class MockedDragNameApi : DragNameApi {
+class MockedDrugNameApi : DrugNameApi {
 
     private fun InsulinType.toDto() = DrugDto.InsulinTypeDto(
         id = ordinal,

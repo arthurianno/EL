@@ -7,8 +7,8 @@ import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
-import com.elta.android.data.features.diary.insulin.api.DragNameApi
-import com.elta.android.data.features.diary.insulin.api.MockedDragNameApi
+import com.elta.android.data.features.diary.insulin.api.DrugNameApi
+import com.elta.android.data.features.diary.insulin.api.MockedDrugNameApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.feedback.api.FeedbackApi
@@ -107,11 +107,11 @@ class ApiModule {
     @Singleton
     fun provideInsulinApi(
         retrofit: Retrofit
-    ): DragNameApi =
+    ): DrugNameApi =
         if (ApiConfig.USE_MOCKED_INSULIN_DRUG_API) {
-            MockedDragNameApi()
+            MockedDrugNameApi()
         } else {
-            retrofit.create(DragNameApi::class.java)
+            retrofit.create<DrugNameApi>(DrugNameApi::class.java)
         }
 
     @Provides
@@ -155,6 +155,6 @@ class ApiModule {
         const val USE_MOCKED_FIRMWARE_API = false
         const val USE_MOCKED_FEEDBACK_API = false
         const val USE_MOCKED_REPORTS_API = false
-        const val USE_MOCKED_INSULIN_DRUG_API = true
+        const val USE_MOCKED_INSULIN_DRUG_API = false
     }
 }

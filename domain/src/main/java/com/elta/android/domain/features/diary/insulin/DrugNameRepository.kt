@@ -6,5 +6,5 @@ import io.reactivex.Observable
 
 interface DrugNameRepository {
     fun getDrugNames(type: InsulinType): Observable<List<String>>
-    fun sync(type: InsulinType? = null): Completable
+    fun sync(): Completable
 }

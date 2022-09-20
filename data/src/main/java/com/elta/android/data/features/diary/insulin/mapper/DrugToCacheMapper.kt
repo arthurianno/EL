@@ -11,6 +11,6 @@ class DrugToCacheMapper @Inject constructor() : Mapper<DrugDto, DrugCachedDto> {
         DrugCachedDto(
             id = source.id.toLong(),
             drug = source.name,
-            insulinType = source.insulinType.name
+            insulinType = source.insulinType.code.lowercase()
         )
 }

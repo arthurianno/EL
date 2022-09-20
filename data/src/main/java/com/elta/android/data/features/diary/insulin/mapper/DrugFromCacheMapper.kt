@@ -11,7 +11,7 @@ class DrugFromCacheMapper @Inject constructor() : Mapper<DrugCachedDto, DrugDto>
         DrugDto(
             id = source.id.toInt(),
             name = source.drug,
-            insulinType = InsulinType.valueOf(source.insulinType).toDto()
+            insulinType = InsulinType.valueOf(source.insulinType.uppercase()).toDto()
         )
 
     private fun InsulinType.toDto() = DrugDto.InsulinTypeDto(
