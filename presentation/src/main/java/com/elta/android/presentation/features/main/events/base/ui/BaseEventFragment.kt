@@ -149,7 +149,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         super.onDetach()
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
-    
+
     abstract fun getEventType(): EventType
 
     private fun T.bindDateSelection() {
