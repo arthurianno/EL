@@ -141,15 +141,15 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-    }
-
     override fun handleBack() {
         view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
+    
     abstract fun getEventType(): EventType
 
     private fun T.bindDateSelection() {
