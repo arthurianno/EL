@@ -50,7 +50,7 @@ class AuthPasswordRecoveryPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         if (error is NotFoundError) {
-            emailInput.error.consumer.accept(resources.getString(R.string.user_not_found))
+            emailInput.error.consumer.accept(resources.getString(R.string.user_not_registered))
         } else {
             super.handleError(error)
         }
