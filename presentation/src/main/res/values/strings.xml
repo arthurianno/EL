@@ -636,6 +636,7 @@
     <string name="bluetooth_disabled">Bluetooth отключён</string>
     <string name="no_connection_to_the_internet">Нет подключения к Интернету</string>
     <string name="user_not_found">Пользователь с таким email не найден/не зарегистрирован</string>
+    <string name="user_not_registered">Пользователь с таким email не зарегистрирован</string>
     <string name="default_error_message">Произошла ошибка</string>
 
 </resources>
