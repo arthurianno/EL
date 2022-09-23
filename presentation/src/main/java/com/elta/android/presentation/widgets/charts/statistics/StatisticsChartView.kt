@@ -427,7 +427,7 @@ class StatisticsChartView @JvmOverloads constructor(
 
         val max = dataModel().maxValue
         val min = dataModel().minValue
-        val fullRange = max - min
+        val fullRange = (max - min).takeIf { it != 0.0 } ?: 1.0
         val availableChartHeight = clearChartHeight - 2 * chartOffset
 
         dataModel().statisticsPerDate.entries.forEach { entry ->
