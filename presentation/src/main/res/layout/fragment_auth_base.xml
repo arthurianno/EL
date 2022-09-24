@@ -104,7 +104,7 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
+                    android:paddingBottom="24dp">
 
                     <CheckBox
                         android:id="@+id/policyConfirmationCheckBoxView"
@@ -124,11 +124,7 @@
                         android:text="@string/registration_main_description_privacy_policy" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="28dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="32dp" />
+
             </LinearLayout>
         </ScrollView>
     </FrameLayout>
