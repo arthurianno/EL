@@ -5,5 +5,5 @@
     <corners android:radius="@dimen/small_button_corners" />
     <stroke
         android:width="@dimen/small_button_border_width"
-        android:color="@color/color_button_small_border" />
+        android:color="@color/shade_black3" />
 </shape>
