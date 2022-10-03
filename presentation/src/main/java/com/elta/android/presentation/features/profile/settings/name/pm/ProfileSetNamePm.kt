@@ -38,8 +38,8 @@ class ProfileSetNamePm @Inject constructor(
     private val getProfileAction = action<Unit>()
     private val isNameNotEmptyState = state(false)
     private val isNameChangedState = state(false)
-    private val changedFullNameSate = state(PersonNameModel())
-    private val originalFullNameState = state(PersonNameModel())
+    private val changedFullNameSate = state(PersonNameModel(firstName = "", secondName = ""))
+    private val originalFullNameState = state(PersonNameModel(firstName = "", secondName = ""))
     private val profileState = state<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
