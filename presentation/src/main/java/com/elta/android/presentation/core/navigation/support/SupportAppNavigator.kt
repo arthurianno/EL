@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.navigation.support
 
-import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -25,23 +25,16 @@ private const val MARKET_AUTHORITY = "details"
 private const val MARKET_ID = "id"
 
 open class SupportAppNavigator(
-    activity: FragmentActivity,
-    fragmentManager: FragmentManager,
-    containerId: Int
-) : Navigator {
-    private val activity: Activity
-    private val fragmentManager: FragmentManager
+    private val activity: FragmentActivity,
+    private val fragmentManager: FragmentManager,
     private val containerId: Int
+) : Navigator {
     private val localStackCopy = mutableListOf<String>()
 
     override fun applyCommands(commands: Array<out Command>) {
         fragmentManager.executePendingTransactions()
-
-        // copy stack before apply commands
         copyStackToLocal()
-        for (command in commands) {
-            applyCommand(command)
-        }
+        commands.forEach { applyCommand(it) }
     }
 
     private fun copyStackToLocal() {
@@ -52,44 +45,27 @@ open class SupportAppNavigator(
         }
     }
 
-    /**
-     * Perform transition described by the navigation command
-     *
-     * @param command the navigation command to apply
-     */
     protected fun applyCommand(command: Command) {
         when (command) {
-            is Forward -> {
-                activityForward(command as Forward)
-            }
-            is Replace -> {
-                activityReplace(command)
-            }
-            is BackTo -> {
-                backTo(command)
-            }
-            is Back -> {
-                fragmentBack()
-            }
+            is Forward -> activityForward(command)
+            is Replace -> activityReplace(command)
+            is BackTo -> backTo(command)
+            is Back -> fragmentBack()
         }
     }
 
     protected fun activityForward(command: Forward) {
         val screen = command.screen as SupportAppScreen
-        val activityIntent: Intent? = screen.getActivityIntent(activity)
-
-        // Start activity
-        if (activityIntent != null) {
+        screen.getActivityIntent(activity)?.let { activityIntent ->
             val options: Bundle? = createStartActivityOptions(command, activityIntent)
             checkAndStartActivity(screen, activityIntent, options)
-        } else {
-            fragmentForward(command)
         }
+            ?: fragmentForward(command)
     }
 
     protected fun fragmentForward(command: Forward) {
         val screen = command.screen as SupportAppScreen
-        val fragment: Fragment? = createFragment(screen)
+        val fragment: Fragment = createFragment(screen)
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         setupFragmentTransaction(
             command,
@@ -97,12 +73,10 @@ open class SupportAppNavigator(
             fragment,
             fragmentTransaction
         )
-        fragment?.let {
-            fragmentTransaction
-                .replace(containerId, it)
-                .addToBackStack(screen.screenKey)
-                .commit()
-        }
+        fragmentTransaction
+            .replace(containerId, fragment)
+            .addToBackStack(screen.screenKey)
+            .commit()
         localStackCopy.add(screen.screenKey)
     }
 
@@ -121,21 +95,17 @@ open class SupportAppNavigator(
 
     protected fun activityReplace(command: Replace) {
         val screen = command.screen as SupportAppScreen
-        val activityIntent: Intent? = screen.getActivityIntent(activity)
-
-        // Replace activity
-        if (activityIntent != null) {
+        screen.getActivityIntent(activity)?.let { activityIntent ->
             val options: Bundle? = createStartActivityOptions(command, activityIntent)
             checkAndStartActivity(screen, activityIntent, options)
             activity.finish()
-        } else {
-            fragmentReplace(command)
         }
+            ?: fragmentReplace(command)
     }
 
     protected fun fragmentReplace(command: Replace) {
         val screen = command.screen as SupportAppScreen
-        val fragment: Fragment? = createFragment(screen)
+        val fragment: Fragment = createFragment(screen)
         if (localStackCopy.isNotEmpty()) {
             fragmentManager.popBackStack()
             localStackCopy.removeLast()
@@ -146,12 +116,10 @@ open class SupportAppNavigator(
                 fragment,
                 fragmentTransaction
             )
-            fragment?.let {
-                fragmentTransaction
-                    .replace(containerId, it)
-                    .addToBackStack(screen.screenKey)
-                    .commit()
-            }
+            fragmentTransaction
+                .replace(containerId, fragment)
+                .addToBackStack(screen.screenKey)
+                .commit()
             localStackCopy.add(screen.screenKey)
         } else {
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -161,17 +129,12 @@ open class SupportAppNavigator(
                 fragment,
                 fragmentTransaction
             )
-            fragment?.let {
-                fragmentTransaction
-                    .replace(containerId, it)
-                    .commit()
-            }
+            fragmentTransaction
+                .replace(containerId, fragment)
+                .commit()
         }
     }
 
-    /**
-     * Performs [BackTo] command transition
-     */
     protected fun backTo(command: BackTo) {
         if (command.screen == null) {
             backToRoot()
@@ -185,7 +148,7 @@ open class SupportAppNavigator(
                 }
                 fragmentManager.popBackStack(key, 0)
             } else {
-                backToUnexisting(command.screen as SupportAppScreen)
+                backToUnExisting(command.screen as SupportAppScreen)
             }
         }
     }
@@ -213,37 +176,25 @@ open class SupportAppNavigator(
     ) {
     }
 
-    /**
-     * Override this method to create option for start activity
-     *
-     * @param command        current navigation command. Will be only [Forward] or [Replace]
-     * @param activityIntent activity intent
-     * @return transition options
-     */
     protected fun createStartActivityOptions(command: Command?, activityIntent: Intent?): Bundle? {
         return null
     }
 
-    private fun checkAndStartActivity(
+    protected fun checkAndStartActivity(
         screen: SupportAppScreen,
         activityIntent: Intent?,
         options: Bundle?
     ) {
-        // Check if we can start activity
-        if (activityIntent?.resolveActivity(activity.packageManager) != null) {
+        runCatching {
             activity.startActivity(activityIntent, options)
-        } else {
-            unexistingActivity(screen, activityIntent)
+        }.onFailure {
+            if (it is ActivityNotFoundException) {
+                unExistingActivity(screen, activityIntent)
+            }
         }
     }
 
-    /**
-     * Called when there is no activity to open `screenKey`.
-     *
-     * @param screen         screen
-     * @param activityIntent intent passed to start Activity for the `screenKey`
-     */
-    protected fun unexistingActivity(screen: SupportAppScreen?, activityIntent: Intent?) {
+    protected fun unExistingActivity(screen: SupportAppScreen?, activityIntent: Intent?) {
         activity.startActivity(
             Intent(
                 Intent.ACTION_VIEW,
@@ -256,37 +207,10 @@ open class SupportAppNavigator(
         )
     }
 
-    /**
-     * Creates Fragment matching `screenKey`.
-     *
-     * @param screen screen
-     * @return instantiated fragment for the passed screen
-     */
-    protected fun createFragment(screen: SupportAppScreen): Fragment? {
-        val fragment: Fragment? = screen.getFragment()
-        if (fragment == null) {
-            errorWhileCreatingScreen(screen)
-        }
-        return fragment
-    }
+    protected fun createFragment(screen: SupportAppScreen): Fragment =
+        screen.getFragment() ?: throw RuntimeException("Can't create a screen: " + screen.screenKey)
 
-    /**
-     * Called when we tried to fragmentBack to some specific screen (via [BackTo] command),
-     * but didn't found it.
-     *
-     * @param screen screen
-     */
-    protected fun backToUnexisting(screen: SupportAppScreen?) {
+    protected fun backToUnExisting(screen: SupportAppScreen?) {
         backToRoot()
-    }
-
-    protected fun errorWhileCreatingScreen(screen: SupportAppScreen) {
-        throw RuntimeException("Can't create a screen: " + screen.screenKey)
-    }
-
-    init {
-        this.activity = activity
-        this.fragmentManager = fragmentManager
-        this.containerId = containerId
     }
 }
