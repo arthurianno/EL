@@ -21,7 +21,7 @@ fun Reminder.getPendingIntent(context: Context): PendingIntent =
         context.applicationContext,
         id.hashCode(),
         getIntent(context.applicationContext),
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
     )
 
 fun Reminder.getIntent(context: Context) =
