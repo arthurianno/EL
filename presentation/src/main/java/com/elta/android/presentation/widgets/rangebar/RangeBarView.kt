@@ -24,6 +24,23 @@ import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 import kotlin.math.roundToInt
 
+private const val DEFAULT_RANGE_BAR_HEIGHT_DP = 48f
+private const val DEFAULT_CORNER_RADIUS_DP = 8f
+private const val INDICATOR_HEIGHT_PERCENTS = 0.4f
+private const val INDICATOR_WIDTH_DP = 2f
+private const val INDICATOR_SHIFT_DP = 2f
+private const val INDICATOR_ALPHA = 128
+private const val TOUCH_BOUNDS_DP = 20f
+private const val FRACTION_DIGITS_COUNT = 1
+private const val DEFAULT_START_VALUE = 0.0
+private const val DEFAULT_END_VALUE = 100.0
+private const val TRIANGLE_PADDING_DP = 3f
+private const val TEXT_PADDING_DP = 5f
+private const val DEFAULT_TEXT_SIZE = 13f
+private const val TYPEFACE = "roboto_medium.ttf"
+private const val STUB_TEXT = "#"
+private const val TEXT_PADDING_ON_HIGH_VALUES = 4f
+
 @Suppress("MagicNumbers", "TooManyFunctions")
 class RangeBarView @JvmOverloads constructor(
     context: Context,
@@ -199,7 +216,8 @@ class RangeBarView @JvmOverloads constructor(
     }
 
     private fun Canvas.drawStartValueText() {
-        val left = rangeBarRect.left + trianglesPadding / 2 + trianglesWidth / 2
+        var left = rangeBarRect.left + trianglesPadding / 2 + trianglesWidth / 2
+        if (values.start >= 10) left -= TEXT_PADDING_ON_HIGH_VALUES.spToPx(context)
         drawText(values.start.format(), left, titleHeight, valueTextPaint)
     }
 
@@ -459,24 +477,6 @@ class RangeBarView @JvmOverloads constructor(
 
     private fun disableParentTouch() {
         parent.requestDisallowInterceptTouchEvent(true)
-    }
-
-    companion object {
-        private const val DEFAULT_RANGE_BAR_HEIGHT_DP = 48f
-        private const val DEFAULT_CORNER_RADIUS_DP = 8f
-        private const val INDICATOR_HEIGHT_PERCENTS = 0.4f
-        private const val INDICATOR_WIDTH_DP = 2f
-        private const val INDICATOR_SHIFT_DP = 2f
-        private const val INDICATOR_ALPHA = 128
-        private const val TOUCH_BOUNDS_DP = 20f
-        private const val FRACTION_DIGITS_COUNT = 1
-        private const val DEFAULT_START_VALUE = 0.0
-        private const val DEFAULT_END_VALUE = 100.0
-        private const val TRIANGLE_PADDING_DP = 3f
-        private const val TEXT_PADDING_DP = 5f
-        private const val DEFAULT_TEXT_SIZE = 13f
-        private const val TYPEFACE = "roboto_medium.ttf"
-        private const val STUB_TEXT = "#"
     }
 
     private enum class MovementState {

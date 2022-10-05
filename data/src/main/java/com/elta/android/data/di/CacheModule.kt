@@ -7,6 +7,8 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.diary.events.cache.DbEventsCache
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
+import com.elta.android.data.features.diary.insulin.cache.DbDrugsCache
+import com.elta.android.data.features.diary.insulin.cache.DrugCachedDto
 import com.elta.android.data.features.diary.tags.cache.DbTagsCache
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.observers.cache.DbObserverCache
@@ -42,6 +44,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindTagsCache(cache: DbTagsCache): Cache<TagCachedDto>
+
+        @Binds
+        @Singleton
+        fun bindDrugsCache(cache: DbDrugsCache): Cache<DrugCachedDto>
 
         @Binds
         @Singleton

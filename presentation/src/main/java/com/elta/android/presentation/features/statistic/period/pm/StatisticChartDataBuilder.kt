@@ -91,14 +91,14 @@ private fun StatisticPeriod.datesStep() = when {
 
 private fun GlucoseStatisticModel?.minLevel(): Double {
     this?.let {
-        return if (it.eventsCount > 0) minLevel else DEFAULT_MIN_LEVEL
+        return if (it.eventsCount > 0 && minLevel != maxLevel) minLevel else DEFAULT_MIN_LEVEL
     }
     return DEFAULT_MIN_LEVEL
 }
 
 private fun GlucoseStatisticModel?.maxLevel(): Double {
     this?.let {
-        return if (it.eventsCount > 0) maxLevel else DEFAULT_MAX_LEVEL
+        return if (it.eventsCount > 0 && minLevel != maxLevel) maxLevel else DEFAULT_MAX_LEVEL
     }
     return DEFAULT_MAX_LEVEL
 }

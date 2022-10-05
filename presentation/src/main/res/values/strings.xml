@@ -13,7 +13,7 @@
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
-    <string name="greeting_message">Управляйте диабетом вместе с\nглюкометром Сателлит Online</string>
+    <string name="greeting_message">Управляйте диабетом вместе с глюкометром Сателлит Online</string>
     <string name="greeting_menu_action">У вас уже есть аккаунт?</string>
 
     <!--REGISTRATION FLOW -->
@@ -137,7 +137,7 @@
     <string name="insulin_type_ultrafast">Сверхбыстрый</string>
     <string name="insulin_type_ultrashort">Ультракороткий</string>
     <string name="insulin_type_short">Короткий</string>
-    <string name="insulin_type_intermidiate">Средний</string>
+    <string name="insulin_type_intermediate">Средний</string>
     <string name="insulin_type_long">Длинный</string>
     <string name="insulin_type_ultralong">Сверхдлинный</string>
     <string name="insulin_type_mixed">Смешанный</string>
@@ -236,7 +236,7 @@
     <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
-    <string name="events_helper_text_weight">На сколько изменился ваш вес</string>
+    <string name="events_helper_text_weight">Укажите ваш текущий вес</string>
     <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
 
     <string name="events_form_screen_title_bread">Хлебные единицы</string>
@@ -297,7 +297,7 @@
     <string name="sync_start_title">Подключение</string>
     <string name="sync_start_subtitle">Теперь необходимо синхронизировать\nВаш глюкометр с телефоном</string>
     <string name="sync_start_other_subtitle">Чтобы подключить новое устройство, вам\nнеобходимо пройти несколько шагов</string>
-    <string name="sync_start_menu_button_text">Пропустить этот этап</string>
+    <string name="sync_start_menu_button_text">Пропустить этот шаг</string>
     <string name="sync_start_action_button">Начать</string>
     <string name="sync_with_glucometer_in_progress">Идет процесс синхронизации с глюкометром…</string>
     <string name="sync_with_glucometer_completed">Синхронизация с глюкометром завершена</string>
@@ -324,7 +324,7 @@
     <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
     <string name="sync_state_action_sync_completed">Перейти к приложению</string>
 
-    <string name="sync_connect_menu_button_text">Пропустить этот этап</string>
+    <string name="sync_connect_menu_button_text">Пропустить этот шаг</string>
 
     <string name="sync_connect_device_not_found">Устройство не найдено</string>
     <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
@@ -554,12 +554,12 @@
     <string name="statistic_general_index_title_basal_insulin">Базальный инсулин</string>
     <string name="statistic_general_index_title_activity">Физическая активность</string>
 
-    <string name="statistic_general_index_description_by_day_bread">Количество хлебных единиц в этот день: %s</string>
-    <string name="statistic_general_index_description_by_period_bread">Среднесуточное количество хлебных единиц\nза период: %s</string>
-    <string name="statistic_general_index_description_value_by_period_bread">%s&#160;ХЕ.</string>
+    <string name="statistic_general_index_description_by_day_bread">По результатам записей вы потребляете %s за день.</string>
+    <string name="statistic_general_index_description_by_period_bread">По результатам записей вы потребляете в среднем %s в день.</string>
+    <string name="statistic_general_index_description_value_by_period_bread">%s&#160;ХЕ</string>
 
-    <string name="statistic_general_index_description_by_day_insulin">Общее количество инсулина\n(кроме смешанного) в этот день: %s</string>
-    <string name="statistic_general_index_description_by_period_insulin">Общее среднесуточное количество инсулина\n(кроме смешанного) за период: %s</string>
+    <string name="statistic_general_index_description_by_day_insulin">Количество общего инсулина\n(кроме смешанного): %s</string>
+    <string name="statistic_general_index_description_by_period_insulin">Среднесуточное количество общего инсулина\n(кроме смешанного): %s</string>
     <string name="statistic_general_index_description_by_day_bolus_insulin">Количество болюсного инсулина\n(ультракороткий + короткий) в этот день: %s</string>
     <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного\nинсулина (ультракороткий + короткий): %s</string>
     <string name="statistic_general_index_description_by_day_basal_insulin">Количество базального инсулина\n(средний + длинный + сверхдлинный)\nв этот день: %s</string>
@@ -636,6 +636,7 @@
     <string name="bluetooth_disabled">Bluetooth отключён</string>
     <string name="no_connection_to_the_internet">Нет подключения к Интернету</string>
     <string name="user_not_found">Пользователь с таким email не найден/не зарегистрирован</string>
+    <string name="user_not_registered">Пользователь с таким email не зарегистрирован</string>
     <string name="default_error_message">Произошла ошибка</string>
 
 </resources>

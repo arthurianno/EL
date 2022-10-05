@@ -23,7 +23,10 @@ class TwoSectionPicker @JvmOverloads constructor(
     private val disposable = CompositeDisposable()
 
     private val binding: LayoutTwoSectionPickerBinding by lazy {
-        LayoutTwoSectionPickerBinding.bind(this)
+        LayoutTwoSectionPickerBinding.bind(this).apply {
+            rightPickerView.setOnClickListener(null)
+            leftPickerView.setOnClickListener(null)
+        }
     }
 
     init {

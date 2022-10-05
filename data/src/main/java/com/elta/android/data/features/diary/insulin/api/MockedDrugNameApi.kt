@@ -1,21 +1,36 @@
 package com.elta.android.data.features.diary.insulin.api
 
+import com.elta.android.data.features.diary.insulin.dto.DrugDto
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import io.reactivex.Observable
 
-class MockedInsulinDrugNameApi : InsulinDrugNameApi {
-    override fun getDrugNamesByInsulinType(type: InsulinType): Observable<List<String>> =
-        Observable.just(
+class MockedDrugNameApi : DrugNameApi {
+
+    private fun InsulinType.toDto() = DrugDto.InsulinTypeDto(
+        id = ordinal,
+        code = name,
+        name = name
+    )
+
+    override fun getDrugNames(insulinType: String): Observable<List<DrugDto>> =
+        Observable.fromCallable {
+            val type = InsulinType.valueOf(insulinType)
             when (type) {
                 InsulinType.ULTRAFAST -> insulinDrugNamesUF
                 InsulinType.ULTRASHORT -> insulinDrugNamesUS
                 InsulinType.SHORT -> insulinDrugNamesS
-                InsulinType.INTERMIDIATE -> insulinDrugNamesI
+                InsulinType.INTERMEDIATE -> insulinDrugNamesI
                 InsulinType.LONG -> insulinDrugNamesL
                 InsulinType.ULTRALONG -> insulinDrugNamesUL
                 InsulinType.MIXED -> insulinDrugNamesM
+            }.mapIndexed { index, item ->
+                DrugDto(
+                    id = index,
+                    insulinType = type.toDto(),
+                    name = item
+                )
             }
-        )
+        }
 }
 
 private val insulinDrugNamesUF = listOf(

@@ -661,9 +661,33 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "18:3112945798377619629",
+      "lastPropertyId": "3:3690420022137743030",
+      "name": "DrugCachedDto",
+      "properties": [
+        {
+          "id": "1:2841035726035728889",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:8767816429107199539",
+          "name": "drug",
+          "type": 9
+        },
+        {
+          "id": "3:3690420022137743030",
+          "name": "insulinType",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "17:5092861307515122171",
+  "lastEntityId": "18:3112945798377619629",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

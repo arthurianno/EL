@@ -16,10 +16,12 @@ internal fun Int.percent(total: Int): Int =
 internal fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal fun Double.checkMin(min: Double): Double = if (min > this) this else min
 internal fun Event.isBolusInsulin(): Boolean =
-    insulinType == InsulinType.ULTRASHORT || insulinType == InsulinType.SHORT
+    insulinType == InsulinType.ULTRASHORT ||
+        insulinType == InsulinType.SHORT ||
+        insulinType == InsulinType.ULTRAFAST
 
 internal fun Event.isBasalInsulin(): Boolean =
-    insulinType == InsulinType.INTERMIDIATE ||
+    insulinType == InsulinType.INTERMEDIATE ||
         insulinType == InsulinType.LONG ||
         insulinType == InsulinType.ULTRALONG
 

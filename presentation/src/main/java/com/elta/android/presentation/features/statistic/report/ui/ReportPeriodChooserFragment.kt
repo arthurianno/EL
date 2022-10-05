@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
 import com.elta.android.presentation.databinding.FragmentStatisticReportPeriodChooserBinding
@@ -102,6 +103,7 @@ class ReportPeriodChooserFragment :
         )
 
         binding.calendarView.apply {
+            setTitleMonths(MONTH_NAMES)
             addDecorator(
                 BackgroundDecorator(
                     drawable(

@@ -13,6 +13,9 @@ import com.elta.android.data.features.diary.tags.dto.TagsDto
 import io.reactivex.Observable
 import javax.inject.Inject
 
+private const val PAGE = 1
+private const val PAGE_SIZE = 150
+
 class TagsRemoteDataSource @Inject constructor(
     private val toCacheMapper: Mapper<TagDto, TagCachedDto>,
     private val cache: Cache<TagCachedDto>,
@@ -43,9 +46,4 @@ class TagsRemoteDataSource @Inject constructor(
                 TagsDto(allData, lastMeta)
             }
             .toObservable()
-
-    private companion object {
-        const val PAGE = 1
-        const val PAGE_SIZE = 150
-    }
 }

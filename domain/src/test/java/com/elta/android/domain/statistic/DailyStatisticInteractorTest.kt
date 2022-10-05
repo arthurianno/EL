@@ -57,7 +57,7 @@ class DailyStatisticInteractorTest {
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMIDIATE),
+                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(
@@ -125,7 +125,7 @@ class DailyStatisticInteractorTest {
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMIDIATE),
+                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(

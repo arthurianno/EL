@@ -38,8 +38,8 @@ class ProfileSetNamePm @Inject constructor(
     private val getProfileAction = action<Unit>()
     private val isNameNotEmptyState = state(false)
     private val isNameChangedState = state(false)
-    private val changedFullNameSate = state(PersonNameModel())
-    private val originalFullNameState = state(PersonNameModel())
+    private val changedFullNameSate = state(PersonNameModel(firstName = "", secondName = ""))
+    private val originalFullNameState = state(PersonNameModel(firstName = "", secondName = ""))
     private val profileState = state<Profile>()
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
@@ -71,7 +71,12 @@ class ProfileSetNamePm @Inject constructor(
             .doOnNext(changedFullNameSate.consumer)
             .doOnNext(::checkIsEmpty)
             .doOnNext(::checkIsChanged)
-            .map { isNameValid(it.firstName, it.secondName) && isNameChangedState.value }
+            .map { personalName ->
+                isNameValid(
+                    personalName.firstName,
+                    personalName.secondName
+                ) && isNameChangedState.value
+            }
             .subscribe(saveChangesEnableState.consumer)
             .untilDestroy()
 
@@ -128,14 +133,16 @@ class ProfileSetNamePm @Inject constructor(
     )
 
     private fun handleProfile(profile: Profile) {
+        val firstName = profile.firstName.orEmpty()
+        val secondName = profile.secondName.orEmpty()
         originalFullNameState.consumer.accept(
             PersonNameModel(
-                firstName = profile.firstName,
-                secondName = profile.secondName
+                firstName = firstName,
+                secondName = secondName
             )
         )
-        firstNameInput.text.consumer.accept(profile.firstName ?: "")
-        secondNameInput.text.consumer.accept(profile.secondName ?: "")
+        firstNameInput.text.consumer.accept(firstName)
+        secondNameInput.text.consumer.accept(secondName)
     }
 
     private fun handleSuccess() {
@@ -146,8 +153,8 @@ class ProfileSetNamePm @Inject constructor(
 
     private fun checkIsEmpty(name: PersonNameModel) {
         isNameNotEmptyState.consumer.accept(
-            !name.firstName.isNullOrEmpty() ||
-                !name.secondName.isNullOrEmpty()
+            name.firstName.isNotEmpty() ||
+                name.secondName.isNotEmpty()
         )
     }
 

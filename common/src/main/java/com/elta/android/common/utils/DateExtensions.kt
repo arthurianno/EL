@@ -3,6 +3,20 @@ package com.elta.android.common.utils
 import org.threeten.bp.ZonedDateTime
 
 const val MILLIS_IN_SECOND = 1000L
+val MONTH_NAMES = arrayOf(
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь"
+)
 
 fun timestamp(): Long = currentMillisUtc() / MILLIS_IN_SECOND
 

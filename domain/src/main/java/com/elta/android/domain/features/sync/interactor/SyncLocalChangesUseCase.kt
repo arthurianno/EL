@@ -4,6 +4,7 @@ import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.ProfileSyncError
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.insulin.DrugNameRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
@@ -21,6 +22,7 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val googleFitRepo: GoogleFitRepository,
     private val tagsRepository: TagsRepository,
     private val salePointsRepository: SalePointsRepository,
+    private val drugNameRepository: DrugNameRepository,
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
@@ -43,6 +45,8 @@ class SyncLocalChangesUseCase @Inject constructor(
                 tagsRepository.sync().applyScheduler(schedulers)
                     .onErrorComplete(predicate),
                 salePointsRepository.sync().applyScheduler(schedulers)
+                    .onErrorComplete(predicate),
+                drugNameRepository.sync().applyScheduler(schedulers)
                     .onErrorComplete(predicate)
             )
         )

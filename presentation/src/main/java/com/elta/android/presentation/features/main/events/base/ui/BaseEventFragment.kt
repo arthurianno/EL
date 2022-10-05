@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.base.ui
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -55,6 +56,9 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         val eventType = getEventType()
         initializer = eventType.makeFormInitializer()
         presentationModel.setEventType(eventType)
+        if (eventType != EventType.MEDICAMENTS) {
+            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -139,6 +143,11 @@ abstract class BaseEventFragment<T : BaseEventPm> :
 
     override fun handleBack() {
         view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     abstract fun getEventType(): EventType

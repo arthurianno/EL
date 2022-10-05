@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.diary.main.pm
 
+import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.common.utils.isToday
-import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.Clicks
@@ -21,6 +21,8 @@ import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
+
+private const val FORMAT_MONTH_NAME_AND_YEAR = "LLLL yyyy"
 
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
@@ -99,7 +101,7 @@ class MainDiaryPm @Inject constructor(
         selectedDateState.observable
             .map {
                 todayButtonVisibilityState.consumer.accept(!it.isToday())
-                it.toStringWithFormat(FORMAT_MONTH_NAME_AND_YEAR)
+                "${MONTH_NAMES[it.monthValue.minus(1)]} ${it.year}"
             }
             .subscribe(monthTitleState.consumer)
             .untilDestroy()
@@ -130,8 +132,4 @@ class MainDiaryPm @Inject constructor(
 
     private fun createUseCaseParams(date: LocalDate) =
         GetEventsByDateUseCase.Params(date.atStartOfDay())
-
-    companion object {
-        const val FORMAT_MONTH_NAME_AND_YEAR = "LLL yyyy"
-    }
 }
