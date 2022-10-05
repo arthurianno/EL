@@ -99,6 +99,16 @@ class StatisticExtensionFunctionsTest {
     }
 
     @Test
+    fun eventIsBolusInsulin_ultra_fast_true() {
+        val event =
+            EventTestFactory.create(
+                type = EventType.INSULIN,
+                insulin = Insulin("", "", InsulinType.ULTRAFAST)
+            )
+        assert(event.isBolusInsulin())
+    }
+
+    @Test
     fun eventIsBolusInsulin_notInsulinEvent_false() {
         val event = EventTestFactory.create(type = EventType.ACTIVITY)
         assert(!event.isBolusInsulin())
