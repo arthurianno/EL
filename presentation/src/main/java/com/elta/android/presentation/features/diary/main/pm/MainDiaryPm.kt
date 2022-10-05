@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.diary.main.pm
 
+import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.common.utils.isToday
 import com.elta.android.domain.features.diary.events.interactor.GetEventsByDateUseCase
 import com.elta.android.domain.features.diary.home.model.EventsBlock
@@ -22,21 +23,6 @@ import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 private const val FORMAT_MONTH_NAME_AND_YEAR = "LLLL yyyy"
-private val MONTH_NAMES = arrayOf(
-    "",
-    "Январь",
-    "Февраль",
-    "Март",
-    "Апрель",
-    "Май",
-    "Июнь",
-    "Июль",
-    "Август",
-    "Сентябрь",
-    "Октябрь",
-    "Ноябрь",
-    "Декабрь"
-)
 
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
@@ -115,7 +101,7 @@ class MainDiaryPm @Inject constructor(
         selectedDateState.observable
             .map {
                 todayButtonVisibilityState.consumer.accept(!it.isToday())
-                "${MONTH_NAMES[it.monthValue]} ${it.year}"
+                "${MONTH_NAMES[it.monthValue.minus(1)]} ${it.year}"
             }
             .subscribe(monthTitleState.consumer)
             .untilDestroy()
