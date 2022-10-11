@@ -14,7 +14,7 @@ private const val DATA = "data"
 private const val CHANNEL_ID = "ELTA_MAIN_CHANNEL"
 private const val CHANNEL_NAME = "Main Message Channel"
 private const val CHANNEL_DESCRIPTION = "Главный канал уведомлений"
-private const val NOTIFICATION_ID = 33
+private const val NOTIFICATION_ID = 37
 
 class EltaMessageService : FirebaseMessagingService() {
 
@@ -24,6 +24,7 @@ class EltaMessageService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setContentTitle(title)
             setContentText(body)
+            setSmallIcon(R.drawable.ic_firmware_logo)
             setStyle(
                 NotificationCompat.BigTextStyle()
                     .setBigContentTitle(title)
