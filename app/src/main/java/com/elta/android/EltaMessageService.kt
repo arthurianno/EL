@@ -1,0 +1,50 @@
+package com.elta.android
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+
+private const val TITLE = "title"
+private const val BODY = "body"
+private const val DATA = "data"
+private const val CHANNEL_ID = "ELTA_MAIN_CHANNEL"
+private const val CHANNEL_NAME = "Main Message Channel"
+private const val CHANNEL_DESCRIPTION = "Главный канал уведомлений"
+private const val NOTIFICATION_ID = 33
+
+class EltaMessageService : FirebaseMessagingService() {
+
+    override fun onMessageReceived(message: RemoteMessage) {
+        val title = message.data[TITLE]
+        val body = message.data[BODY]
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID).apply {
+            setContentTitle(title)
+            setContentText(body)
+            setStyle(
+                NotificationCompat.BigTextStyle()
+                    .setBigContentTitle(title)
+                    .bigText(body)
+            )
+            setAutoCancel(true)
+            priority = NotificationCompat.PRIORITY_DEFAULT
+        }.build()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(
+                    NotificationChannel(
+                        CHANNEL_ID,
+                        CHANNEL_NAME,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                )
+            }
+        }
+            .notify(NOTIFICATION_ID, notification)
+    }
+}
