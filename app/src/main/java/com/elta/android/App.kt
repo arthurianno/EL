@@ -4,16 +4,13 @@ import android.app.Activity
 import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.util.Log
 import androidx.multidex.MultiDex
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.FirebaseMessaging
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
@@ -41,7 +38,6 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     override fun onCreate() {
         super.onCreate()
-        getFirebaseToken()
         FirebaseApp.initializeApp(this)
         initializeInjector()
         initializeLogger()
@@ -49,19 +45,6 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
         initializeSocialNetworks()
         initalizeYandexMapKit()
         RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
-    }
-
-    private fun getFirebaseToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(
-            OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("MYTAG", "Fetching FCM registration token failed", task.exception)
-                    return@OnCompleteListener
-                }
-                val token = task.result
-                Log.d("MYTAG", "TOKEN -----> $token")
-            }
-        )
     }
 
     override fun attachBaseContext(base: Context) {
