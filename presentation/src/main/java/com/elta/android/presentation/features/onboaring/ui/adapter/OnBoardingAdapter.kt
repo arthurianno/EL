@@ -29,7 +29,8 @@ class OnBoardingAdapter @Inject constructor(
                 bus = bus
             )
             OnBoardingWeightItem::class.java.hashCode() -> OnBoardingWeightViewHolder(
-                binding = ItemOnboardingWeightBinding.inflate(inflater, parent, false)
+                binding = ItemOnboardingWeightBinding.inflate(inflater, parent, false),
+                bus = bus
             )
             OnBoardingDiabetesItem::class.java.hashCode() -> OnBoardingDiabetesViewHolder(
                 binding = ItemOnboardingDiabetesTypesBinding.inflate(inflater, parent, false),

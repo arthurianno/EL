@@ -1,8 +1,6 @@
 package com.elta.android.domain.features.sync.interactor
 
 import com.elta.android.common.errors.InvalidRefreshTokenError
-import com.elta.android.common.errors.NetworkConnectionError
-import com.elta.android.common.errors.ProfileSyncError
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.insulin.DrugNameRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
@@ -26,18 +24,13 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
-    private val predicate = Predicate<Throwable> { error ->
-        error !is InvalidRefreshTokenError && error !is NetworkConnectionError
-    }
+    private val predicate = Predicate<Throwable> { error -> error !is InvalidRefreshTokenError }
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
         Completable.concat(
             listOf(
                 profileRepo.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate)
-                    .onErrorResumeNext {
-                        Completable.error(ProfileSyncError())
-                    },
+                    .onErrorComplete(predicate),
                 googleFitRepo.sync().applyScheduler(schedulers)
                     .onErrorComplete(predicate),
                 eventsRepo.sync().applyScheduler(schedulers)
