@@ -12,8 +12,6 @@ private const val TITLE = "title"
 private const val BODY = "body"
 private const val DATA = "data"
 private const val CHANNEL_ID = "ELTA_MAIN_CHANNEL"
-private const val CHANNEL_NAME = "Main Message Channel"
-private const val CHANNEL_DESCRIPTION = "Главный канал уведомлений"
 private const val NOTIFICATION_ID = 37
 
 class EltaMessageService : FirebaseMessagingService() {
@@ -24,7 +22,7 @@ class EltaMessageService : FirebaseMessagingService() {
                 createNotificationChannel(
                     NotificationChannel(
                         CHANNEL_ID,
-                        CHANNEL_NAME,
+                        getString(R.string.push_channel_name),
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
                 )
