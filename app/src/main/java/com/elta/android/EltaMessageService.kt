@@ -16,7 +16,21 @@ private const val CHANNEL_NAME = "Main Message Channel"
 private const val CHANNEL_DESCRIPTION = "Главный канал уведомлений"
 private const val NOTIFICATION_ID = 37
 
-class EltaMessageService : FirebaseMessagingService() {
+object EltaMessageService : FirebaseMessagingService() {
+
+    private val notificationManager: NotificationManager by lazy {
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(
+                    NotificationChannel(
+                        CHANNEL_ID,
+                        CHANNEL_NAME,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                )
+            }
+        }
+    }
 
     override fun onMessageReceived(message: RemoteMessage) {
         val title = message.data[TITLE]
@@ -33,19 +47,6 @@ class EltaMessageService : FirebaseMessagingService() {
             setAutoCancel(true)
             priority = NotificationCompat.PRIORITY_DEFAULT
         }.build()
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel(
-                    NotificationChannel(
-                        CHANNEL_ID,
-                        CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    )
-                )
-            }
-        }
-            .notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 }
