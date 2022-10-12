@@ -639,4 +639,6 @@
     <string name="user_not_registered">Пользователь с таким email не зарегистрирован</string>
     <string name="default_error_message">Произошла ошибка</string>
 
+    <string name="push_channel_name">Main Message Channel</string>
+    <string name="push_channel_description">Главный канал уведомлений</string>
 </resources>

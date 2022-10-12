@@ -2,7 +2,6 @@ package com.elta.android.presentation.core.pm.widgets
 
 import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.NetworkConnectionError
-import com.elta.android.common.errors.ProfileSyncError
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.common.errors.SocialAuthError
 import com.elta.android.presentation.R
@@ -28,7 +27,6 @@ class ErrorHandler(private val pm: BasePm) {
         when (error) {
             is InvalidRefreshTokenError -> pm.router.newRootFlow(Screens.AuthFlow)
             is SocialAuthError -> handleSocialAuthError(error)
-            is ProfileSyncError -> Unit
             else ->
                 if (pm.isEmptyScreen) {
                     if (error.isServerUnavailableError()) {
