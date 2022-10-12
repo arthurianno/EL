@@ -16,7 +16,7 @@ private const val CHANNEL_NAME = "Main Message Channel"
 private const val CHANNEL_DESCRIPTION = "Главный канал уведомлений"
 private const val NOTIFICATION_ID = 37
 
-object EltaMessageService : FirebaseMessagingService() {
+class EltaMessageService : FirebaseMessagingService() {
 
     private val notificationManager: NotificationManager by lazy {
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
