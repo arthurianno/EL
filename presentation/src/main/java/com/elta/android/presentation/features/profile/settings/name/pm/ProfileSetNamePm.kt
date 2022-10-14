@@ -174,14 +174,9 @@ class ProfileSetNamePm @Inject constructor(
         secondNameInput.error.consumer.accept(getNameErrorString(name.secondName))
     }
 
-    private fun getNameErrorString(name: String) =
-        if (!isNameValid(name)) {
-            when {
-                name.length < MIN_NAME_LENGTH -> services.resources.getString(R.string.profile_name_min_length_error)
-                name.length > MAX_NAME_LENGTH -> services.resources.getString(R.string.profile_name_max_length_error)
-                else -> ""
-            }
-        } else {
-            ""
-        }
+    private fun getNameErrorString(name: String) = when {
+        name.length < MIN_NAME_LENGTH -> services.resources.getString(R.string.profile_name_min_length_error)
+        name.length > MAX_NAME_LENGTH -> services.resources.getString(R.string.profile_name_max_length_error)
+        else -> ""
+    }
 }
