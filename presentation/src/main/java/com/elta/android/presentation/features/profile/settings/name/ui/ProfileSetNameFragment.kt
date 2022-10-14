@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileSetNameBinding
 import com.elta.android.presentation.features.profile.settings.name.pm.ProfileSetNamePm
+import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
@@ -24,8 +25,18 @@ class ProfileSetNameFragment :
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
 
-        pm.firstNameInput.bindTo(binding.nameInputView)
-        pm.secondNameInput.bindTo(binding.surnameInputView)
+        with(pm.firstNameInput) {
+            bindTo(binding.nameInputView)
+            error.observable
+                .distinctUntilChanged()
+                .subscribe(binding.nameInputView.error())
+        }
+        with(pm.secondNameInput) {
+            error.observable
+                .distinctUntilChanged()
+                .subscribe(binding.surnameInputView.error())
+            bindTo(binding.surnameInputView)
+        }
         pm.saveChangesEnableState.bindTo { binding.continueButtonView.isEnabled = it }
         binding.continueButtonView.clicks().bindTo(pm.continueAction)
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }

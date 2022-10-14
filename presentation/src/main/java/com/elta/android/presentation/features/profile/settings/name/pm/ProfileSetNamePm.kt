@@ -1,11 +1,14 @@
 package com.elta.android.presentation.features.profile.settings.name.pm
 
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.MAX_NAME_LENGTH
+import com.elta.android.domain.features.user.interactor.MIN_NAME_LENGTH
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.interactor.isNameValid
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -71,11 +74,11 @@ class ProfileSetNamePm @Inject constructor(
             .doOnNext(changedFullNameSate.consumer)
             .doOnNext(::checkIsEmpty)
             .doOnNext(::checkIsChanged)
+            .doOnNext(::checkIsValid)
             .map { personalName ->
-                isNameValid(
-                    personalName.firstName,
-                    personalName.secondName
-                ) && isNameChangedState.value
+                isNameValid(personalName.firstName) &&
+                    isNameValid(personalName.secondName) &&
+                    isNameChangedState.value
             }
             .subscribe(saveChangesEnableState.consumer)
             .untilDestroy()
@@ -165,4 +168,20 @@ class ProfileSetNamePm @Inject constructor(
                 profileName.secondName != name.secondName
         )
     }
+
+    private fun checkIsValid(name: PersonNameModel) {
+        firstNameInput.error.consumer.accept(getNameErrorString(name.firstName))
+        secondNameInput.error.consumer.accept(getNameErrorString(name.secondName))
+    }
+
+    private fun getNameErrorString(name: String) =
+        if (!isNameValid(name)) {
+            when {
+                name.length < MIN_NAME_LENGTH -> services.resources.getString(R.string.profile_name_min_length_error)
+                name.length > MAX_NAME_LENGTH -> services.resources.getString(R.string.profile_name_max_length_error)
+                else -> ""
+            }
+        } else {
+            ""
+        }
 }

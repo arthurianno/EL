@@ -7,30 +7,29 @@ class UserNameTest {
 
     @Test
     fun minFirstNameLengthFailed() {
-        assert(!isNameValid(firstName = "a", secondName = "second"))
+        assert(!isNameValid(name = "a"))
     }
 
     @Test
     fun minSecondNameLengthFailed() {
-        assert(!isNameValid(firstName = "first", secondName = "s"))
+        assert(!isNameValid(name = "first"))
     }
 
     @Test
     fun minNameLengthSuccess() {
-        assert(isNameValid(firstName = "fi", secondName = "se"))
+        assert(isNameValid(name = "fi"))
     }
 
     @Test
     fun emptyNameFailed() {
-        assert(!isNameValid(firstName = "", secondName = ""))
+        assert(!isNameValid(name = ""))
     }
 
     @Test
     fun maxFirstNameLengthFailed() {
         assert(
             !isNameValid(
-                firstName = "aaaaaaaaaassssssssssaaaaaaaaaassssssssssddddddddddq",
-                secondName = "se"
+                name = "se"
             )
         )
     }
@@ -39,8 +38,7 @@ class UserNameTest {
     fun maxSecondNameLengthFailed() {
         assert(
             !isNameValid(
-                firstName = "sa",
-                secondName = "aaaaaaaaaassssssssssaaaaaaaaaassssssssssddddddddddq"
+                name = "aaaaaaaaaassssssssssaaaaaaaaaassssssssssddddddddddq"
             )
         )
     }

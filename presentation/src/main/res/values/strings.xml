@@ -439,6 +439,9 @@
     <string name="profile_google_fit_activated_message">Теперь ваши тренировки из Google Fit будут подгружаться в Сателлит Online</string>
     <string name="profile_google_fit_activated_positive_button">Ок</string>
 
+    <string name="profile_name_min_length_error">Мин. количество символов - 2</string>
+    <string name="profile_name_max_length_error">Макс. количество символов - 50</string>
+
     <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
     <string name="profile_reminders_empty_state_title">У вас нет напоминаний</string>
