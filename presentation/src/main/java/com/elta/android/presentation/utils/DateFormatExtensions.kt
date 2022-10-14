@@ -11,18 +11,19 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
 
 const val DATE_FORMAT_WITHOUT_ZERO = "d LLLL yyyy"
+const val EVENT_DATE_FORMAT = "dd.MM.yyyy"
 
-inline fun ZonedDateTime.toEventTime(r: ResourceProvider) =
+fun ZonedDateTime.toEventTime(r: ResourceProvider) =
     r.getString(R.string.event_time_mask, toStringWithFormat(CommonFormats.FORMAT_TIME))
 
-inline fun ZonedDateTime.toEventDate(r: ResourceProvider) =
+fun ZonedDateTime.toEventDate(r: ResourceProvider) =
     when {
         toLocalDate().isToday() -> r.getString(R.string.event_date_today)
         toLocalDate().isYesterday() -> r.getString(R.string.event_date_yesterday)
-        else -> toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO)
+        else -> toStringWithFormat(EVENT_DATE_FORMAT)
     }
 
-inline fun ZonedDateTime.toSyncDate(r: ResourceProvider) =
+fun ZonedDateTime.toSyncDate(r: ResourceProvider) =
     when {
         toLocalDate().isToday() -> "${r.getString(R.string.event_date_today)} ${toEventTime(r)}"
         toLocalDate().isYesterday() -> "${r.getString(R.string.event_date_yesterday)} ${
