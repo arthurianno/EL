@@ -2,8 +2,8 @@ import org.gradle.api.JavaVersion
 
 object AppConfig {
     const val applicationId = "ru.marslab.pocketwordtranslator"
-    const val minSdk = 26
-    const val completeSdk = 32
+    const val minSdk = 24
+    const val completeSdk = 31
     const val targetSdk = 32
     const val jvmTarget = "11"
     val javaVersion = JavaVersion.VERSION_11
