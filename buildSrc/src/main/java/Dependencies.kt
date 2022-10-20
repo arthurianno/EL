@@ -165,7 +165,7 @@ object Dependencies {
             const val crashlytics = "com.google.firebase:firebase-crashlytics-ktx"
         }
 
-        object Map {
+        object GoogleMap {
             private object Version {
                 const val map = "18.0.2"
                 const val mapKtx = "3.3.0"
