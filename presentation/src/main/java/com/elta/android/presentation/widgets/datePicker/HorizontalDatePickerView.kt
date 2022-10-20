@@ -51,8 +51,9 @@ class HorizontalDatePickerView @JvmOverloads constructor(
                 SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
                 object : OnSnapPositionChangeListener {
                     override fun onSnapPositionChange(position: Int) {
-                        if (needToPerformHapticFeedBack)
+                        if (needToPerformHapticFeedBack) {
                             performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        }
                         onPickerItemScrolled(position)
                     }
                 }

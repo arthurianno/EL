@@ -6,41 +6,25 @@ import org.junit.Test
 class UserNameTest {
 
     @Test
-    fun minFirstNameLengthFailed() {
-        assert(!isNameValid(firstName = "a", secondName = "second"))
-    }
-
-    @Test
-    fun minSecondNameLengthFailed() {
-        assert(!isNameValid(firstName = "first", secondName = "s"))
+    fun minNameLengthFailed() {
+        assert(!isNameValid(name = "a"))
     }
 
     @Test
     fun minNameLengthSuccess() {
-        assert(isNameValid(firstName = "fi", secondName = "se"))
+        assert(isNameValid(name = "fi"))
     }
 
     @Test
     fun emptyNameFailed() {
-        assert(!isNameValid(firstName = "", secondName = ""))
+        assert(!isNameValid(name = ""))
     }
 
     @Test
-    fun maxFirstNameLengthFailed() {
+    fun maxNameLengthFailed() {
         assert(
             !isNameValid(
-                firstName = "aaaaaaaaaassssssssssaaaaaaaaaassssssssssddddddddddq",
-                secondName = "se"
-            )
-        )
-    }
-
-    @Test
-    fun maxSecondNameLengthFailed() {
-        assert(
-            !isNameValid(
-                firstName = "sa",
-                secondName = "aaaaaaaaaassssssssssaaaaaaaaaassssssssssddddddddddq"
+                name = "qqqqqqqqqqwwwwwwwwwweeeeeeeeeerrrrrrrrrrtttttttttty"
             )
         )
     }
