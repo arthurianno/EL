@@ -4,6 +4,9 @@
     <string name="title_connection_lost">Нет подключения к Интернету</string>
     <string name="title_connection_found">Соединение восстановлено</string>
     <string name="space"> </string>
+    <string name="gender_male">Мужской</string>
+    <string name="gender_female">Женский</string>
+    <string name="gender_not_specified">Пол не указан</string>
 
     <!-- ERROR VIEW ERRORS -->
     <string name="error_server_not_responding_title">Сервер недоступен</string>
@@ -76,8 +79,6 @@
     <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
     <string name="on_boarding_prev_button_title">Назад</string>
     <string name="on_boarding_next_button_title">Далее</string>
-    <string name="on_boarding_gender_male">Мужской</string>
-    <string name="on_boarding_gender_female">Женский</string>
 
     <string name="diabetes_type_first">Первый тип</string>
     <string name="diabetes_type_second">Второй тип</string>
@@ -368,7 +369,6 @@
     <string name="profile_linked_social_networks">Привязанные соцсети</string>
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
-    <string name="profile_gender_placeholder">Пол не указан</string>
     <string name="profile_my_devices">Мои устройства</string>
     <string name="profile_manage_glucometer">Управление глюкометром</string>
     <string name="profile_change_password">Изменить пароль</string>
