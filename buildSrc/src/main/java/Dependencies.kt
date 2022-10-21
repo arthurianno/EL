@@ -26,7 +26,7 @@ object Dependencies {
 
         object Compose {
             const val version = "1.2.1"
-            const val compilerVersion = "1.3.1"
+            const val compilerVersion = "1.3.2"
 
             private object Version {
                 const val activity = "1.5.1"
@@ -193,6 +193,10 @@ object Dependencies {
         const val composeUi = "androidx.compose.ui:ui-test-junit4:${Jetpack.Compose.version}"
         const val composeUiTestManifest =
             "androidx.compose.ui:ui-test-manifest:${Jetpack.Compose.version}"
+    }
+
+    object ObjectBox {
+        const val version = "3.1.3"
     }
 
     object Dagger {
