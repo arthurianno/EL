@@ -5,7 +5,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 data class Profile(
     val firstName: String? = null,
     val secondName: String? = null,
-    val gender: Gender? = null,
+    val gender: Gender = Gender.NOT_SPECIFIED,
     val email: String? = null,
     val glucoseLevelSettings: GlucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
         GlucoseLevelSettings.NORMAL_START,

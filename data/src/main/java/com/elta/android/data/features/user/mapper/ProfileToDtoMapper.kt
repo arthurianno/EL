@@ -7,6 +7,7 @@ import com.elta.android.data.features.user.dto.GlucoseLevelDto
 import com.elta.android.data.features.user.dto.HealthAppDto
 import com.elta.android.data.features.user.dto.PersonDto
 import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.Profile
 import javax.inject.Inject
@@ -20,7 +21,7 @@ class ProfileToDtoMapper @Inject constructor(
             ProfileDto(
                 diabetes = diabetes?.let { DiabetTypeDto.valueOf(it.name) },
                 weight = weight,
-                gender = gender?.let { GenderTypeDto.valueOf(it.name) },
+                gender = gender.toDto(),
                 person = if (firstName == null && secondName == null) null else {
                     PersonDto(
                         firstName = firstName,
@@ -44,5 +45,12 @@ class ProfileToDtoMapper @Inject constructor(
                 healthApps = healthApps?.let { healthAppsMapper.mapFromObjects(it) },
                 timeStamp = timeStamp
             )
+        }
+
+    private fun Gender.toDto(): GenderTypeDto? =
+        when (this) {
+            Gender.MALE -> GenderTypeDto.MALE
+            Gender.FEMALE -> GenderTypeDto.FEMALE
+            Gender.NOT_SPECIFIED -> null
         }
 }

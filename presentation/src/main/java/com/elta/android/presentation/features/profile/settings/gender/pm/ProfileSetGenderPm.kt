@@ -127,10 +127,8 @@ class ProfileSetGenderPm @Inject constructor(
             Gender.NOT_SPECIFIED -> checkNotSpecified.checked.consumer.accept(true)
             else -> throw NullPointerException()
         }
-        checkNotSpecifiedVisibility.consumer.accept(profile.gender == null || profile.gender == Gender.NOT_SPECIFIED)
-        profileGenderState.consumer.accept(
-            profile.gender?.let { GenderModel.valueOf(it.name) } ?: GenderModel.NOT_SPECIFIED
-        )
+        checkNotSpecifiedVisibility.consumer.accept(profile.gender == Gender.NOT_SPECIFIED)
+        profileGenderState.consumer.accept(GenderModel.valueOf(profile.gender.name))
     }
 
     private fun createUpdateProfileUseCase(i: Unit): UpdateProfileUseCase.Params {
