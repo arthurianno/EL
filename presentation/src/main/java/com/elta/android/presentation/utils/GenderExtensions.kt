@@ -7,15 +7,15 @@ import com.nullgr.core.resources.ResourceProvider
 
 fun Gender.toString(resource: ResourceProvider): String =
     when (this) {
-        Gender.MALE -> resource.getString(R.string.on_boarding_gender_male)
-        Gender.FEMALE -> resource.getString(R.string.on_boarding_gender_female)
-        Gender.NOT_SPECIFIED -> resource.getString(R.string.profile_settings_change_gender_button_not_specified)
+        Gender.MALE -> resource.getString(R.string.gender_male)
+        Gender.FEMALE -> resource.getString(R.string.gender_female)
+        Gender.NOT_SPECIFIED -> resource.getString(R.string.gender_not_specified)
     }
 
 @StringRes
 fun Gender.toStringRes(): Int =
     when (this) {
-        Gender.MALE -> R.string.on_boarding_gender_male
-        Gender.FEMALE -> R.string.on_boarding_gender_female
-        Gender.NOT_SPECIFIED -> R.string.profile_settings_change_gender_button_not_specified
+        Gender.MALE -> R.string.gender_male
+        Gender.FEMALE -> R.string.gender_female
+        Gender.NOT_SPECIFIED -> R.string.gender_not_specified
     }
