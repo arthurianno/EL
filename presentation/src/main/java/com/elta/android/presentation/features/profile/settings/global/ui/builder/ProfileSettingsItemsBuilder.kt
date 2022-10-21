@@ -30,8 +30,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
             add(
                 ProfileSettingsItem(
                     icon = R.drawable.ic_settings_gender,
-                    title = this.gender?.toString(resources)
-                        ?: resources.getString(R.string.profile_gender_placeholder),
+                    title = this.gender.toString(resources),
                     type = ProfileSettingsItem.Type.GENDER
                 )
             )
