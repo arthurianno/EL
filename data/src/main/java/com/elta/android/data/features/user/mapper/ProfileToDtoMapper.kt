@@ -49,9 +49,8 @@ class ProfileToDtoMapper @Inject constructor(
 
     private fun Gender.toDto(): GenderTypeDto? =
         when (this) {
-            Gender.MALE,
-            Gender.FEMALE -> GenderTypeDto.valueOf(name)
-
+            Gender.MALE -> GenderTypeDto.MALE
+            Gender.FEMALE -> GenderTypeDto.FEMALE
             Gender.NOT_SPECIFIED -> null
         }
 }
