@@ -30,7 +30,7 @@ import javax.inject.Inject
 class OnBoardingPm @Inject constructor(
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    services: ServiceFacade,
+    services: ServiceFacade
 ) : BaseListPm(services) {
 
     val pageChangedAction = action<Int>()
@@ -221,7 +221,7 @@ class OnBoardingPm @Inject constructor(
         val weight = params[OnBoardingWeightItem::class.java] as? Double
         val diabetes = params[OnBoardingDiabetesItem::class.java] as? Diabetes
         val profile = Profile(
-            gender = gender,
+            gender = gender ?: Gender.NOT_SPECIFIED,
             weight = weight,
             diabetes = diabetes,
             timeStamp = Date().toTimestamp()
