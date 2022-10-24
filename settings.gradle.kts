@@ -1,0 +1,33 @@
+@Suppress("UnstableApiUsage")
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+        maven(url = "https://maven.google.com")
+        maven(url = "https://jitpack.io")
+        maven(url = "https://plugins.gradle.org/m2/")
+    }
+}
+rootProject.name = "Сателлит Online"
+
+include(":core-hardware")
+include(":core-all")
+include(":core-rx-location")
+include(":core-adapter")
+include(":core-adapter-ktx")
+include(":core-rx-contacts")
+include(":core-rx")
+include(":core-collections")
+include(":core-preferences")
+include(":core-common")
+include(":core-interactor")
+include(":core-security")
+include(":core-intents")
+include(":core-date")
+include(":core-resources")
+include(":core-ui")
+include(":core-font")
+include(":app")
+include(":presentation", ":domain", ":data", ":common")
