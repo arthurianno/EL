@@ -6,6 +6,10 @@ buildscript {
     repositories {
         google()
         gradlePluginPortal()
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        maven { url "https://jitpack.io" }
+        maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         maven { url "https://oss.sonatype.org/content/repositories/releases" }
     }
@@ -30,17 +34,6 @@ plugins {
 
 apply from: 'dependencies.gradle'
 apply from: 'version.gradle'
-
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url "https://maven.google.com" }
-        maven { url "https://jitpack.io" }
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-}
 
 task clean(type: Delete) {
     delete rootProject.buildDir
