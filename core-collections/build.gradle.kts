@@ -37,7 +37,7 @@ android {
 }
 
 configurations.all {
-    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.Kotlin.version}")
+    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.kotlinVersion}")
 }
 
 kapt {

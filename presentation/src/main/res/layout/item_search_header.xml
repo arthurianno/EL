@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.captain_miao.optroundcardview.OptRoundCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:optRoundCardBackgroundColor="@color/white"
-    app:optRoundCardCornerRadius="@dimen/card_corner"
-    app:optRoundCardElevation="@dimen/card_elevation">
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/card_corner"
+    app:cardElevation="@dimen/card_elevation">
 
     <androidx.appcompat.widget.AppCompatTextView
         style="@style/Caption1"
@@ -15,4 +14,4 @@
         android:padding="16dp"
         android:text="@string/shops_search_header" />
 
-</com.github.captain_miao.optroundcardview.OptRoundCardView>
+</androidx.cardview.widget.CardView>

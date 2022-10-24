@@ -1,9 +1,3 @@
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
 ext.androidVersions = [
         androidBuildToolsVersion: '30.0.3',
         androidMinSdkVersion    : 24,
@@ -50,7 +44,6 @@ def libraryVersions = [
         timberVersion              : '4.7.1',
         expandableLayoutVersion    : '2.9.2',
         tooltipVersion             : '0.1.9',
-        crashlyticsVersion         : '2.9.8@aar',
         inputMaskVersion           : '6.1.0',
         pinViewVersion             : '1.4.4',
         exoPlayer                  : '2.9.0',
