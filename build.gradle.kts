@@ -24,6 +24,7 @@ buildscript {
 
 plugins {
     id("io.gitlab.arturbosch.detekt") version "1.21.0-RC1"
+    id("org.jlleitschuh.gradle.ktlint") version Dependencies.ktLintVersion
 }
 
 tasks.register("clean", Delete::class) {
