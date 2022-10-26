@@ -50,18 +50,18 @@ android {
 //            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
 //        }
 //    } else {
-    println("Build runned on local machine.")
-    val localProperties = getPropertiesFromFile(LOCAL_PROPERTIES)
+//    println("Build runned on local machine.")
+//    val localProperties = getPropertiesFromFile(LOCAL_PROPERTIES)
 
-    buildConfigFile = localProperties[LOCAL_BUILD_FILE]?.toString() ?: DEFAULT_BUILD_CONFIG_FILE
-
-    if (buildConfigFile.isEmpty()) {
-        println("There is property $LOCAL_BUILD_FILE at $LOCAL_PROPERTIES, default value will be used.")
-        buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
-    }
+//    buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+//
+//    if (buildConfigFile.isEmpty()) {
+//        println("There is property $LOCAL_BUILD_FILE at $LOCAL_PROPERTIES, default value will be used.")
+//        buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
 //    }
-    println("Build config will be loaded from: $buildConfigFile.")
-    val buildConfigProperties = getPropertiesFromFile(buildConfigFile)
+//    }
+//    println("Build config will be loaded from: $buildConfigFile.")
+    val buildConfigProperties = getPropertiesFromFile(DEFAULT_BUILD_CONFIG_FILE)
 
     compileSdk = AppConfig.completeSdk
 
