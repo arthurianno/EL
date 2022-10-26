@@ -3,6 +3,7 @@ object Dependencies {
     const val kotlinVersion = "1.7.20"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
+    const val detektGradlePluginVersion = "1.22.0-RC2"
 
     object Jetpack {
         private const val coreVersion = "1.8.0"
@@ -138,6 +139,7 @@ object Dependencies {
             "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
 
         object Services {
+            const val servicesVersion = "4.3.14"
             private const val fitnessVersion = "21.1.0"
             private const val authVersion = "20.2.0"
 
@@ -146,6 +148,8 @@ object Dependencies {
         }
 
         object FireBase {
+            const val pluginVersion = "2.0.0"
+            const val crashliticsGradleVersion = "2.9.0"
             private const val bomVersion = "31.0.1"
 
             const val bom = "com.google.firebase:firebase-bom:$bomVersion"
