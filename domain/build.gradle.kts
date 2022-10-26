@@ -44,4 +44,7 @@ dependencies {
     implementation(Dependencies.Utils.jsr310)
 
     testBaseDependencies()
+    testImplementation(Dependencies.Test.jsr310) {
+        exclude(module = Dependencies.Utils.jsr310)
+    }
 }
