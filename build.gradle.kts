@@ -12,12 +12,13 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:${Dependencies.gradleVersion}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlinVersion}")
-        classpath("com.google.gms:google-services:4.3.14")
-        classpath("com.google.firebase:firebase-plugins:2.0.0")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
+        classpath("com.google.gms:google-services:${Dependencies.Google.Services.servicesVersion}")
+        classpath("com.google.firebase:firebase-plugins:${Dependencies.Google.FireBase.pluginVersion}")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:${Dependencies.Google.FireBase.crashliticsGradleVersion}")
         classpath("io.objectbox:objectbox-gradle-plugin:${Dependencies.ObjectBox.version}")
         classpath("org.jlleitschuh.gradle:ktlint-gradle:${Dependencies.ktLintVersion}")
-        classpath("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.21.0-RC1")
+        classpath("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Dependencies.detektGradlePluginVersion}")
+//        classpath("com.github.ben-manes:gradle-versions-plugin:${Dependencies.dependenciesUpdateVersion}")
     }
 }
 
