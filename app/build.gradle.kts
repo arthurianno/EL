@@ -10,16 +10,16 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
-val CREDENTIALS_DEBUG = "keystore/credentials-debug.properties"
-val CREDENTIALS_RELEASE = "keystore/credentials-release.properties"
+val CREDENTIALS_DEBUG = "../keystore/credentials-debug.properties"
+val CREDENTIALS_RELEASE = "../keystore/credentials-release.properties"
 val STORE_FILE = "keystore.file"
 val STORE_PASSWORD = "keystore.password"
 val KEY_ALIAS = "key.alias"
 val KEY_PASSWORD = "key.password"
 val CI = "CI"
-val LOCAL_PROPERTIES = "local.properties"
+val LOCAL_PROPERTIES = "../local.properties"
 val LOCAL_BUILD_FILE = "build.file"
-val DEFAULT_BUILD_CONFIG_FILE = "configuration-build-test.properties"
+val DEFAULT_BUILD_CONFIG_FILE = "../configuration-build-test.properties"
 val CONFIG_ENVIRONMENT = "environment"
 val CONFIG_SERVER_URL = "server.url"
 val CONFIG_DEEP_LINK_HOST = "deep.link.host"
@@ -29,11 +29,8 @@ val CONFIG_LOG_ENABLED = "log.enabled"
 
 fun getPropertiesFromFile(filename: String): Properties =
     Properties().apply {
-        load(FileInputStream(rootProject.file(filename)))
+        load(FileInputStream(file(filename)))
     }
-
-fun getProjectFile(fileName: String): File =
-    file(rootProject.file(fileName))
 
 android {
 
@@ -91,7 +88,7 @@ android {
 
         create("release") {
             var credentialsRelease = Properties()
-            val credentialsReleaseFile = getProjectFile(CREDENTIALS_RELEASE)
+            val credentialsReleaseFile = file(CREDENTIALS_RELEASE)
             if (credentialsReleaseFile.exists()) {
                 credentialsRelease.load(FileInputStream(credentialsReleaseFile))
                 println("credentials-release.properties is exist")
