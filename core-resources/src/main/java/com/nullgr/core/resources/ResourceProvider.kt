@@ -81,9 +81,9 @@ class ResourceProvider(private val context: Context) {
      * @return [Int] identifier of [Drawable] or **0** if something went wrong
      */
     fun getDrawableId(name: String?): Int {
-        return if (name != null && !TextUtils.isEmpty(name))
+        return if (name != null && !TextUtils.isEmpty(name)) {
             context.resources.getIdentifier(name, "drawable", context.packageName)
-        else 0
+        } else 0
     }
 
     /**

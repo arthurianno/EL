@@ -1,7 +1,7 @@
 package com.nullgr.core.security.crypto
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,22 +42,18 @@ class CryptoKeysFactoryTest {
 
     @Test
     fun createPKS12_correctKey_Success() {
-        val secreteKey = CryptoKeysFactory.createPKCS12Key(CryptoKeysFactory.generateSalt(), "AnyPassword")
+        val secreteKey =
+            CryptoKeysFactory.createPKCS12Key(CryptoKeysFactory.generateSalt(), "AnyPassword")
         Assert.assertNotNull(secreteKey)
         Assert.assertEquals("PBEWithSHA256And256BitAES-CBC-BC", secreteKey.algorithm)
     }
 
     @Test
     fun createRSAKeyPair_correctKey_Success() {
-        val rsaPair = CryptoKeysFactory.createRSAKeyPair(InstrumentationRegistry.getTargetContext(), "TestKeyAlias")
-        Assert.assertNotNull(rsaPair)
-        Assert.assertEquals("RSA", rsaPair.public.algorithm)
-        Assert.assertEquals("RSA", rsaPair.private.algorithm)
-    }
-
-    @Test
-    fun createRSAKeyPairUserAuthRequired_correctKey_Success() {
-        val rsaPair = CryptoKeysFactory.createRSAKeyPairUserAuthRequired("UserAuthKey")
+        val rsaPair = CryptoKeysFactory.createRSAKeyPair(
+            ApplicationProvider.getApplicationContext(),
+            "TestKeyAlias"
+        )
         Assert.assertNotNull(rsaPair)
         Assert.assertEquals("RSA", rsaPair.public.algorithm)
         Assert.assertEquals("RSA", rsaPair.private.algorithm)
@@ -73,28 +69,12 @@ class CryptoKeysFactoryTest {
     @Test
     fun findOrCreateRSAKeyPair_sameAlias_Success() {
         val newRsaPair = CryptoKeysFactory.createRSAKeyPair(
-            InstrumentationRegistry.getTargetContext(),
+            ApplicationProvider.getApplicationContext(),
             "OneMore_RSA_Key"
         )
         val rsaPairFromKeyStore = CryptoKeysFactory.findOrCreateRSAKeyPair(
-            InstrumentationRegistry.getTargetContext(),
+            ApplicationProvider.getApplicationContext(),
             "OneMore_RSA_Key"
-        )
-        Assert.assertNotNull(newRsaPair)
-        Assert.assertNotNull(rsaPairFromKeyStore)
-        Assert.assertEquals(
-            newRsaPair.public.encoded.toHexDecimalString(),
-            rsaPairFromKeyStore.public.encoded.toHexDecimalString()
-        )
-    }
-
-    @Test
-    fun createRSAKeyPairUserAuthRequired_sameAlias_Success() {
-        val newRsaPair = CryptoKeysFactory.createRSAKeyPairUserAuthRequired(
-            "UserAuthBased_RSA_Key"
-        )
-        val rsaPairFromKeyStore = CryptoKeysFactory.findOrCreateRSAKeyPairUserAuthRequired(
-            "UserAuthBased_RSA_Key"
         )
         Assert.assertNotNull(newRsaPair)
         Assert.assertNotNull(rsaPairFromKeyStore)

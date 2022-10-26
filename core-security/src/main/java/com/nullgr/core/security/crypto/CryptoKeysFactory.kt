@@ -5,7 +5,6 @@ import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import androidx.annotation.RequiresApi
 import java.math.BigInteger
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidParameterException
@@ -83,7 +82,6 @@ object CryptoKeysFactory {
      *
      * @return RSA [KeyPair]
      */
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Throws(
         IllegalArgumentException::class,
         InvalidAlgorithmParameterException::class,
@@ -123,7 +121,6 @@ object CryptoKeysFactory {
      *
      * @return RSA [KeyPair]
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     fun createRSAKeyPairUserAuthRequired(keyAlias: String): KeyPair {
         val keyPairGenerator =
             KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
@@ -148,7 +145,6 @@ object CryptoKeysFactory {
      *
      * @return AES [SecretKey]
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     fun createAESKeyInAndroidKeystore(keyAlias: String): SecretKey {
         val keyGenerator =
             KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
@@ -173,7 +169,6 @@ object CryptoKeysFactory {
      *
      * @return RSA [KeyPair]
      */
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     fun findOrCreateRSAKeyPair(ctx: Context, keyAlias: String): KeyPair {
         val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
         keyStore.load(null)
@@ -192,7 +187,6 @@ object CryptoKeysFactory {
      *
      * @return RSA [KeyPair]
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     fun findOrCreateRSAKeyPairUserAuthRequired(keyAlias: String): KeyPair {
         val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
         keyStore.load(null)
@@ -210,7 +204,6 @@ object CryptoKeysFactory {
      *
      * @return AES [SecretKey]
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     fun findOrCreateAESKey(keyAlias: String): SecretKey {
         val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
         keyStore.load(null)

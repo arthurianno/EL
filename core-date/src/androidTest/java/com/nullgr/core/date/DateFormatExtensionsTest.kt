@@ -1,6 +1,6 @@
 package com.nullgr.core.date
 
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotSame
@@ -50,7 +50,8 @@ class DateFormatExtensionsTest {
         )
         assertSame(
             "getOrCreateFormatter function, must return equals formatter for equal format and time zone",
-            dateFormat1, dateFormat2
+            dateFormat1,
+            dateFormat2
         )
         assertEquals(dateFormat1, dateFormat2)
     }
@@ -69,7 +70,8 @@ class DateFormatExtensionsTest {
         )
         assertNotSame(
             "getOrCreateFormatter function, must return different formatter for equal format and diff time zone",
-            dateFormat1, dateFormat2
+            dateFormat1,
+            dateFormat2
         )
         assertNotEquals(dateFormat1, dateFormat2)
     }
@@ -88,7 +90,8 @@ class DateFormatExtensionsTest {
         )
         assertNotSame(
             "getOrCreateFormatter function, must return different formatter for diff format and equal time zone",
-            dateFormat1, dateFormat2
+            dateFormat1,
+            dateFormat2
         )
         assertNotEquals(dateFormat1, dateFormat2)
     }
@@ -107,7 +110,8 @@ class DateFormatExtensionsTest {
         )
         assertSame(
             "getOrCreateFormatter function, must return equal formatter for equal format and null time zone",
-            dateFormat1, dateFormat2
+            dateFormat1,
+            dateFormat2
         )
         assertEquals(dateFormat1, dateFormat2)
     }
@@ -126,7 +130,8 @@ class DateFormatExtensionsTest {
         )
         assertNotEquals(
             "getOrCreateFormatter function, must return different formatter for different locale",
-            dateFormat1, dateFormat2
+            dateFormat1,
+            dateFormat2
         )
     }
 }

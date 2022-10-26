@@ -22,4 +22,6 @@ android {
 }
 
 dependencies {
+
+    implementation(Dependencies.Jetpack.annotations)
 }

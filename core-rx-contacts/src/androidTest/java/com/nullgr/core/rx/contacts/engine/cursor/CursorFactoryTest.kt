@@ -2,9 +2,10 @@ package com.nullgr.core.rx.contacts.engine.cursor
 
 import android.Manifest
 import android.content.ContentResolver
+import android.content.Context
 import android.provider.ContactsContract
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.nullgr.core.rx.contacts.domain.ContactEmail
 import com.nullgr.core.rx.contacts.domain.ContactPhone
@@ -29,7 +30,7 @@ class CursorFactoryTest {
         @BeforeClass
         @JvmStatic
         fun init() {
-            contentResolver = InstrumentationRegistry.getContext().contentResolver
+            contentResolver = ApplicationProvider.getApplicationContext<Context>().contentResolver
         }
     }
 
