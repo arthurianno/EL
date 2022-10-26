@@ -1,7 +1,6 @@
 object Dependencies {
     const val gradleVersion = "7.3.0"
     const val kotlinVersion = "1.7.20"
-    const val secretGradlePluginVersion = "2.0.1"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
 
@@ -148,34 +147,16 @@ object Dependencies {
 
         object FireBase {
             private const val bomVersion = "31.0.1"
-//            private const val messagingVersion = "23.1.0"
-//            private const val storageVersion = "20.1.0"
-//            private const val firestoreVersion = "24.4.0"
-//            private const val databaseVersion = "20.1.0"
-//            private const val analiticsVersion = "21.2.0"
-//            private const val crashlyticsVersion = "18.3.1"
 
             const val bom = "com.google.firebase:firebase-bom:$bomVersion"
             const val messagingBom = "com.google.firebase:firebase-messaging-ktx"
-
-            //            const val messaging = "com.google.firebase:firebase-messaging-ktx:$messagingVersion"
             const val storageBom = "com.google.firebase:firebase-storage-ktx"
-
-            //            const val storage = "com.google.firebase:firebase-storage-ktx:$storageVersion"
             const val firestoreBom = "com.google.firebase:firebase-firestore-ktx"
-
-            //            const val firestore = "com.google.firebase:firebase-firestore-ktx:$firestoreVersion"
             const val databaseBom = "com.google.firebase:firebase-database-ktx"
-
-            //            const val database = "com.google.firebase:firebase-database-ktx:$databaseVersion"
             const val analyticsBom = "com.google.firebase:firebase-analytics-ktx"
-
-            //            const val analytics = "com.google.firebase:firebase-analytics-ktx:$analiticsVersion"
             const val crashlyticsBom = "com.google.firebase:firebase-crashlytics-ktx"
             const val appMessagingBom = "com.google.firebase:firebase-inappmessaging-display"
             const val dynamicLinksBom = "com.google.firebase:firebase-dynamic-links"
-//            const val crashlytics =
-//                "com.google.firebase:firebase-crashlytics-ktx$crashlyticsVersion"
         }
 
         object GoogleMap {
@@ -336,13 +317,6 @@ object Dependencies {
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"
     }
 
-    object Glide {
-        private const val version = "4.12.0"
-
-        const val core = "com.github.bumptech.glide:glide:$version"
-        const val compiler = "com.github.bumptech.glide:compiler:$version"
-    }
-
     object Coil {
         private const val version = "2.1.0"
 
@@ -350,64 +324,10 @@ object Dependencies {
         const val compose = "io.coil-kt:coil-compose:$version"
     }
 
-    object Room {
-        private const val version = "2.4.2"
-
-        const val core = "androidx.room:room-runtime:$version"
-        const val compiler = "androidx.room:room-compiler:$version"
-    }
-
     object DataStore {
         private const val version = "1.0.0"
 
         const val proto = "androidx.datastore:datastore:$version"
         const val preferences = "androidx.datastore:datastore-preferences:$version"
-    }
-
-    object Ktor {
-        private const val version = "2.0.2"
-
-        const val core = "io.ktor:ktor-client-core:$version"
-        const val cio = "io.ktor:ktor-client-cio:$version"
-        const val logging = "io.ktor:ktor-client-logging:$version"
-        const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:$version"
-        const val serializationJson = "io.ktor:ktor-serialization-kotlinx-json:$version"
-        const val android = "io.ktor:ktor-client-android:$version"
-        const val okhttp = "io.ktor:ktor-client-okhttp:$version"
-        const val ios = "io.ktor:ktor-client-ios:$version"
-    }
-
-    object SqlDelight {
-        const val version = "1.5.3"
-
-        const val core = "com.squareup.sqldelight:runtime:$version"
-        const val coroutines = "com.squareup.sqldelight:coroutines-extensions:$version"
-        const val androidDriver = "com.squareup.sqldelight:android-driver:$version"
-        const val nativeDriver = "com.squareup.sqldelight:native-driver:$version"
-        const val paging3 = "com.squareup.sqldelight:android-paging3-extensions:$version"
-    }
-
-    object Decompose {
-        private const val version = "1.0.0-alpha-02"
-
-        const val core = "com.arkivanov.decompose:decompose:$version"
-        const val jetpack = "com.arkivanov.decompose:extensions-compose-jetpack:$version"
-        const val jetbrains = "com.arkivanov.decompose:extensions-compose-jetbrains:$version"
-        const val android = "com.arkivanov.decompose:extensions-android:$version"
-    }
-
-    object KoDeIn {
-        private const val version = "7.14.0"
-        private const val versionCompose = "7.14.0"
-
-        const val core = "org.kodein.di:kodein-di:$version"
-        const val androidCore = "org.kodein.di:kodein-di-framework-android-core:$version"
-        const val androidSupport = "org.kodein.di:kodein-di-framework-android-support:$version"
-        const val androidJetpack = "org.kodein.di:kodein-di-framework-android-x:$version"
-        const val androidViewModel =
-            "org.kodein.di:kodein-di-framework-android-x-viewmodel:$version"
-        const val androidViewModelWithState =
-            "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
-        const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
     }
 }

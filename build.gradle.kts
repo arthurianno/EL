@@ -16,7 +16,7 @@ buildscript {
         classpath("com.google.firebase:firebase-plugins:2.0.0")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
         classpath("io.objectbox:objectbox-gradle-plugin:${Dependencies.ObjectBox.version}")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:${Dependencies.ktLintVersion}")
         classpath("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.21.0-RC1")
     }
 }
