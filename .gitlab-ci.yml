@@ -3,32 +3,32 @@ image: jangrewe/gitlab-ci-android
 cache:
   key: ${CI_PROJECT_ID}
   paths:
-  - .gradle/
+    - .gradle/
 
 before_script:
-- export CI=GitLab
-- export GRADLE_USER_HOME=$(pwd)/.gradle
-- chmod +x ./gradlew
+  - export CI=GitLab
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
 
 stages:
-- check
-- beta
-- uat
-- rc
+  - check
+  - beta
+  - uat
+  - rc
 
 complexCheck:
   stage: check
   script:
-  # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
-  - ./gradlew ktlintCheck testDebugUnitTest -x lint
+    # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
+    - ./gradlew ktlintCheck testDebugUnitTest -x lint
   only:
-  - merge_requests
-  - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
+    - merge_requests
+    - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
+    - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
+    - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
   variables:
     COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-test.properties"
-  
+
 # For tag v0.0.0-beta
 beta:
   stage: beta
@@ -58,11 +58,11 @@ uat:
 rc:
   stage: rc
   only:
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
+    - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
   when: on_success
   script:
-  - ./gradlew clean build crashlyticsUploadDistributionRelease -x lint
+    - ./gradlew clean build crashlyticsUploadDistributionRelease -x lint
   artifacts:
     expire_in: 1 week
     paths:
-    - app/build/outputs/
+      - app/build/outputs/
