@@ -13,6 +13,9 @@ object Dependencies {
         private const val constraintLayoutVersion = "2.1.4"
         private const val appcompatVersion = "1.4.2"
         private const val mutlidexVersion = "2.0.1"
+        private const val recyclerViewVersion = "1.2.1"
+        private const val annotationsVersion = "1.5.0"
+        private const val browserVersion = "1.4.0"
 
         const val core = "androidx.core:core-ktx:$coreVersion"
         const val fragment = "androidx.fragment:fragment-ktx:$fragmentVersion"
@@ -23,6 +26,9 @@ object Dependencies {
         const val constraintLayout =
             "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
         const val multiDex = "androidx.multidex:multidex:$mutlidexVersion"
+        const val reciclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+        const val annotations = "androidx.annotation:annotation:$annotationsVersion"
+        const val browser = "androidx.browser:browser:$browserVersion"
 
         object Compose {
             const val composeVersion = "1.2.1"
@@ -88,6 +94,27 @@ object Dependencies {
         const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion"
     }
 
+    object Utils {
+        private const val jodaTimeVersion = "2.9.9.2" // 2.12.0
+        private const val essentialsVersion = "3.1.0"
+        private const val android310Version = "1.2.0"
+
+        const val jodaTime = "net.danlew:android.joda:$jodaTimeVersion"
+        const val essentials = "org.greenrobot:essentials:$essentialsVersion"
+        const val jsr310 = "com.jakewharton.threetenabp:threetenabp:$android310Version"
+
+    }
+
+    object SocialNetworks {
+        private const val fbVersion = "4.29.0"
+        private const val vkVersion = "1.6.9"
+        private const val okVersion = "2.1.6"
+
+        const val fb = "com.facebook.android:facebook-login:$fbVersion"
+        const val vk = "com.vk:androidsdk:$vkVersion"
+        const val ok = "ru.ok:odnoklassniki-android-sdk:$okVersion"
+    }
+
     object Yandex {
         private const val liteVersion = "4.0.0-lite"
         private const val fullVersion = "4.0.0-full"
@@ -119,15 +146,33 @@ object Dependencies {
         }
 
         object FireBase {
-            private const val bomVersion = "30.1.0"
+            private const val bomVersion = "31.0.1"
+//            private const val messagingVersion = "23.1.0"
+//            private const val storageVersion = "20.1.0"
+//            private const val firestoreVersion = "24.4.0"
+//            private const val databaseVersion = "20.1.0"
+//            private const val analiticsVersion = "21.2.0"
+//            private const val crashlyticsVersion = "18.3.1"
 
-            const val bom = "com.google.firebase:firebase-bom:$bomVersion}"
-            const val messaging = "com.google.firebase:firebase-messaging-ktx"
-            const val storage = "com.google.firebase:firebase-storage-ktx"
-            const val firestore = "com.google.firebase:firebase-firestore-ktx"
-            const val database = "com.google.firebase:firebase-database-ktx"
-            const val analytics = "com.google.firebase:firebase-analytics-ktx"
-            const val crashlytics = "com.google.firebase:firebase-crashlytics-ktx"
+            const val bom = "com.google.firebase:firebase-bom:$bomVersion"
+            const val messagingBom = "com.google.firebase:firebase-messaging-ktx"
+
+            //            const val messaging = "com.google.firebase:firebase-messaging-ktx:$messagingVersion"
+            const val storageBom = "com.google.firebase:firebase-storage-ktx"
+
+            //            const val storage = "com.google.firebase:firebase-storage-ktx:$storageVersion"
+            const val firestoreBom = "com.google.firebase:firebase-firestore-ktx"
+
+            //            const val firestore = "com.google.firebase:firebase-firestore-ktx:$firestoreVersion"
+            const val databaseBom = "com.google.firebase:firebase-database-ktx"
+
+            //            const val database = "com.google.firebase:firebase-database-ktx:$databaseVersion"
+            const val analyticsBom = "com.google.firebase:firebase-analytics-ktx"
+
+            //            const val analytics = "com.google.firebase:firebase-analytics-ktx:$analiticsVersion"
+            const val crashlyticsBom = "com.google.firebase:firebase-crashlytics-ktx"
+//            const val crashlytics =
+//                "com.google.firebase:firebase-crashlytics-ktx$crashlyticsVersion"
         }
 
         object GoogleMap {
@@ -148,43 +193,30 @@ object Dependencies {
         private const val junitExtVersion = "1.1.3"
         private const val espressoVersion = "3.4.0"
         private const val java310Version = "1.3.1" // 1.6.3
+        private const val androidxVersion = "1.4.0"
         private const val robolectricVersion = "4.8"
-        private const val jUnitVersion = "4.13.2"
-        private const val assertJVersion = "3.8.0"
-        private const val dexmakerVersion = "1.0"
-        private const val testingSupportLibVersion = "0.1"
         private const val mockitoKotlinVersion = "2.0.0-RC1"
         private const val mockitoAndroidVersion = "2.8.47"
-        private const val androidSupportRunnerVersion = "1.0.0"
-        private const val androidSupportRulesVersion = "1.0.0"
-        private const val dexmakerMockitoversion = "2.2.0"
-        private const val runnerVersion = "0.5"
-        private const val workVersion = "1.0.1"
 
         const val junit = "junit:junit:$junitVersion"
-        const val junitExt = "androidx.test.ext:junit:$junitExtVersion"
+        const val junitExt = "androidx.test.ext:junit-ktx:$junitExtVersion"
         const val espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
         const val composeUi = "androidx.compose.ui:ui-test-junit4:${Jetpack.Compose.composeVersion}"
         const val composeUiTestManifest =
             "androidx.compose.ui:ui-test-manifest:${Jetpack.Compose.composeVersion}"
+
+        const val rules = "androidx.test:rules:$androidxVersion"
+        const val runner = "androidx.test:runner:$androidxVersion"
+        const val core = "androidx.test:core:$androidxVersion"
+        const val coreKtx = "androidx.test:core-ktx$androidxVersion"
+
         const val jsr310 = "org.threeten:threetenbp:$java310Version"
 
         const val kotlinJUnit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
-        const val assertj = "org.assertj:assertj-core:$assertJVersion"
         const val mockito =
             "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
         const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
-        const val supportRunner = "com.android.support.test:runner:$androidSupportRunnerVersion"
-        const val supportRules = "com.android.support.test:rules:$androidSupportRulesVersion"
         const val mockitoAndroid = "org.mockito:mockito-android:$mockitoAndroidVersion"
-        const val espressoCore = "com.android.support.test.espresso:espresso-core:$espressoVersion"
-        const val espressoIntents =
-            "com.android.support.test.espresso:espresso-intents:$espressoVersion"
-        const val espressoContrib =
-            "com.android.support.test.espresso:espresso-contrib:$espressoVersion"
-        const val androidRunner = "com.android.support.test:runner:$runnerVersion"
-        const val androidRules = "com.android.support.test:rules:$runnerVersion"
-        const val workMagerTest = "android.arch.work:work-testing:$workVersion"
     }
 
     object CustomView {
@@ -241,6 +273,9 @@ object Dependencies {
 
     object ObjectBox {
         const val version = "3.1.3"
+
+        const val core = "io.objectbox:objectbox-kotlin:$version"
+        const val browser = "io.objectbox:objectbox-android-objectbrowser:$version"
     }
 
     object Cicerone {
