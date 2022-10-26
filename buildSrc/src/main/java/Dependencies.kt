@@ -238,7 +238,7 @@ object Dependencies {
         const val expandableLayout = "com.github.cachapa:ExpandableLayout:$expandableLayoutVersion"
         const val tooltip = "com.github.vihtarb:tooltip:$tooltipVersion"
         const val inputMask = "com.github.RedMadRobot:input-mask-android:$inputMaskVersion"
-        const val materislDialogs = "com.afollestad.material-dialogs:core:$materialDialogsVersion"
+        const val materialDialogs = "com.afollestad.material-dialogs:core:$materialDialogsVersion"
         const val datePicker =
             "com.github.prolificinteractive:material-calendarview:$datePickerVersion"
         const val materialEditText =
@@ -259,6 +259,7 @@ object Dependencies {
         private const val rxReplayingVersion = "2.1.1"
         private const val rxBluetoothVersion = "1.8.2"
 
+        const val rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
         const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
         const val rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
         const val rxPm = "me.dmdev.rxpm:rxpm:$rxPmVersion"
