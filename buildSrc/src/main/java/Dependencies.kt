@@ -43,6 +43,7 @@ object Dependencies {
             const val runtime = "androidx.compose.runtime:runtime:$composeVersion"
             const val activity = "androidx.activity:activity-compose:$activityVersion"
             const val material = "androidx.compose.material:material:$composeVersion"
+            const val foundation = "androidx.compose.foundation:foundation:$composeVersion"
             const val animation = "androidx.compose.animation:animation:$composeVersion"
             const val uiTooling = "androidx.compose.ui:ui-tooling:$composeVersion"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview:$composeVersion"
@@ -52,6 +53,7 @@ object Dependencies {
             const val paging = "androidx.paging:paging-compose:$pagingVersion"
             const val MaterialThemeAdapter =
                 "com.google.android.material:compose-theme-adapter:$materialThemeAdapterVersion"
+            const val rxJava2 = "androidx.compose.runtime:runtime-rxjava2:$composeVersion"
 
             object Voyager {
                 private const val version = "1.0.0-rc02"
@@ -102,7 +104,6 @@ object Dependencies {
         const val jodaTime = "net.danlew:android.joda:$jodaTimeVersion"
         const val essentials = "org.greenrobot:essentials:$essentialsVersion"
         const val jsr310 = "com.jakewharton.threetenabp:threetenabp:$android310Version"
-
     }
 
     object SocialNetworks {
@@ -171,6 +172,8 @@ object Dependencies {
 
             //            const val analytics = "com.google.firebase:firebase-analytics-ktx:$analiticsVersion"
             const val crashlyticsBom = "com.google.firebase:firebase-crashlytics-ktx"
+            const val appMessagingBom = "com.google.firebase:firebase-inappmessaging-display"
+            const val dynamicLinksBom = "com.google.firebase:firebase-dynamic-links"
 //            const val crashlytics =
 //                "com.google.firebase:firebase-crashlytics-ktx$crashlyticsVersion"
         }
@@ -227,6 +230,8 @@ object Dependencies {
         private const val inputMaskVersion = "6.1.0"
         private const val materialDialogsVersion = "0.9.4.4" // Верхняя версия 3.3.0
         private const val datePickerVersion = "2.0.0"
+        private const val materialEditTextVersion = "2.1.4"
+        private const val cardViewVersion = "1.0.0"
 
         const val pulseView = "pl.bclogic:pulsator4droid:$pulseViewVersion"
         const val pinView = "io.github.chaosleung:pinview:$pinViewVersion"
@@ -236,6 +241,9 @@ object Dependencies {
         const val materislDialogs = "com.afollestad.material-dialogs:core:$materialDialogsVersion"
         const val datePicker =
             "com.github.prolificinteractive:material-calendarview:$datePickerVersion"
+        const val materialEditText =
+            "com.rengwuxian.materialedittext:library:$materialEditTextVersion"
+        const val cardView = "com.github.captain-miao:optroundcardview:$cardViewVersion"
     }
 
     object RxJava2 {
