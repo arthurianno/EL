@@ -89,7 +89,7 @@ dependencies {
     implementation(Dependencies.Google.materialDesign)
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)
-    implementation(Dependencies.CustomView.materislDialogs)
+    implementation(Dependencies.CustomView.materialDialogs)
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.RxJava2.rxAndroid)
     implementation(Dependencies.RxJava2.rxPm)
