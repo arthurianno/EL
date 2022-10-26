@@ -10,8 +10,8 @@ object AppConfig {
 }
 
 object Releases {
-    const val versionCode = 2
-    const val versionName = "2.0.0"
+    const val versionCode = 252
+    const val versionName = "1.3.0"
 }
 
 object Module {
