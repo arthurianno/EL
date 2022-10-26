@@ -38,28 +38,28 @@ fun getProjectFile(fileName: String): File =
 android {
 
     var buildConfigFile: String
-//    val ci = System.getenv(CI)
-//    if (ci != null) {
-//        println("Build runned on $ci CI server.")
-//        val configFilePropertyName =
-//            "${AppConfig.applicationId}.config.file".toUpperCase().replace(".", "_")
-//        buildConfigFile = System.getenv(configFilePropertyName)
-//
-//        if (buildConfigFile.isNullOrEmpty()) {
-//            println("There is not environment variable $configFilePropertyName, default value will be used.")
-//            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
-//        }
-//    } else {
-    println("Build runned on local machine.")
-    val localProperties = getPropertiesFromFile(LOCAL_PROPERTIES)
+    val ci = System.getenv(CI)
+    if (ci != null) {
+        println("Build runned on $ci CI server.")
+        val configFilePropertyName =
+            "${AppConfig.applicationId}.config.file".toUpperCase().replace(".", "_")
+        buildConfigFile = System.getenv(configFilePropertyName)
 
-    buildConfigFile = localProperties[LOCAL_BUILD_FILE]?.toString() ?: DEFAULT_BUILD_CONFIG_FILE
+        if (buildConfigFile.isNullOrEmpty()) {
+            println("There is not environment variable $configFilePropertyName, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
+    } else {
+        println("Build runned on local machine.")
+        val localProperties = getPropertiesFromFile(LOCAL_PROPERTIES)
 
-    if (buildConfigFile.isEmpty()) {
-        println("There is property $LOCAL_BUILD_FILE at $LOCAL_PROPERTIES, default value will be used.")
-        buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        buildConfigFile = localProperties[LOCAL_BUILD_FILE]?.toString() ?: DEFAULT_BUILD_CONFIG_FILE
+
+        if (buildConfigFile.isEmpty()) {
+            println("There is property $LOCAL_BUILD_FILE at $LOCAL_PROPERTIES, default value will be used.")
+            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
+        }
     }
-//    }
     println("Build config will be loaded from: $buildConfigFile.")
     val buildConfigProperties = getPropertiesFromFile(buildConfigFile)
 
