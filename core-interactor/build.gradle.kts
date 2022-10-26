@@ -22,4 +22,7 @@ android {
 }
 
 dependencies {
+
+    implementation(project(Module.core_rx))
+    implementation(Dependencies.RxJava2.rxKotlin)
 }

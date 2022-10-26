@@ -22,4 +22,11 @@ android {
 }
 
 dependencies {
+
+    implementation(project(Module.core_rx))
+
+    implementation(Dependencies.Jetpack.annotations)
+    implementation(Dependencies.Jetpack.browser)
+    implementation(Dependencies.Jetpack.appCompat)
+    implementation(Dependencies.RxJava2.rxKotlin)
 }

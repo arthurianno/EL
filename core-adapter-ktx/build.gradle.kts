@@ -19,7 +19,18 @@ android {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
+    implementation(project(Module.core_rx))
+    implementation(project(Module.core_adapter))
+
+    compileOnly(Dependencies.Jetpack.reciclerView)
+
+    implementation(Dependencies.RxJava2.rxKotlin)
+    implementation(Dependencies.RxJava2.rxAndroid)
 }

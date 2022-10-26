@@ -22,4 +22,7 @@ android {
 }
 
 dependencies {
+    implementation(Dependencies.Utils.jodaTime)
+
+    testBaseDependencies()
 }

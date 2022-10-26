@@ -22,4 +22,8 @@ android {
 }
 
 dependencies {
+
+    implementation(Dependencies.RxJava2.rxKotlin)
+    implementation(Dependencies.RxJava2.rxAndroid)
+    implementation(Dependencies.RxJava2.rxRelay)
 }

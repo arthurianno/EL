@@ -22,4 +22,9 @@ android {
 }
 
 dependencies {
+    implementation(project(Module.core_common))
+    implementation(project(Module.core_font))
+
+    compileOnly(Dependencies.Jetpack.appCompat)
+    compileOnly(Dependencies.Jetpack.reciclerView)
 }

@@ -22,4 +22,5 @@ android {
 }
 
 dependencies {
+    compileOnly(Dependencies.Jetpack.core)
 }
