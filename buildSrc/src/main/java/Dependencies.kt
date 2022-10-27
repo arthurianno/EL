@@ -32,7 +32,7 @@ object Dependencies {
 
         object Compose {
             const val composeVersion = "1.2.1" // 1.2.1
-            const val compilerVersion = "1.3.1" // 1.3.2
+            const val compilerVersion = "1.3.0" // 1.3.2
 
             private const val activityVersion = "1.5.1"
             private const val constraintLayoutVersion = "1.0.1"
