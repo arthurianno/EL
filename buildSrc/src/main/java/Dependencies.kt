@@ -1,6 +1,6 @@
 object Dependencies {
     const val gradleVersion = "7.3.0"
-    const val kotlinVersion = "1.7.0"
+    const val kotlinVersion = "1.6.21"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"
@@ -31,8 +31,8 @@ object Dependencies {
         const val browser = "androidx.browser:browser:$browserVersion"
 
         object Compose {
-            const val composeVersion = "1.2.1" // 1.2.1
-            const val compilerVersion = "1.2.0" // 1.3.2
+            const val composeVersion = "1.2.0-rc02"
+            const val compilerVersion = "1.2.0-rc02"
 
             private const val activityVersion = "1.5.1"
             private const val constraintLayoutVersion = "1.0.1"
