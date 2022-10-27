@@ -1,9 +1,11 @@
 package com.nullgr.core.security.crypto
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
 import android.util.Log
-import junit.framework.Assert
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.security.GeneralSecurityException
@@ -26,8 +28,8 @@ class CryptonTest {
         val encryptedText = Crypton.passwordBasedEncryption().encrypt(originalText, PASSWORD)
         val encryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Encryption takes $encryptionTime ms.")
-        Assert.assertNotNull(encryptedText)
-        Assert.assertFalse(originalText == encryptedText)
+        assertNotNull(encryptedText)
+        assertFalse(originalText == encryptedText)
     }
 
     @Test
@@ -36,13 +38,14 @@ class CryptonTest {
         val encryptedText = Crypton.passwordBasedEncryption().encrypt(originalText, PASSWORD)
 
         val startTime = System.currentTimeMillis()
-        val decryptedText = Crypton.passwordBasedEncryption().decryptAsString(encryptedText, PASSWORD)
+        val decryptedText =
+            Crypton.passwordBasedEncryption().decryptAsString(encryptedText, PASSWORD)
         val decryptionTime = System.currentTimeMillis() - startTime
 
         Log.d("CryptonTest", "Decryption takes $decryptionTime ms.")
 
-        Assert.assertNotNull(decryptedText)
-        Assert.assertEquals(originalText, decryptedText)
+        assertNotNull(decryptedText)
+        assertEquals(originalText, decryptedText)
     }
 
     @Test(expected = GeneralSecurityException::class)
@@ -75,8 +78,8 @@ class CryptonTest {
         val encryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Encryption takes $encryptionTime ms.")
 
-        Assert.assertNotNull(encryptedText)
-        Assert.assertFalse(originalText == encryptedText)
+        assertNotNull(encryptedText)
+        assertFalse(originalText == encryptedText)
     }
 
     @Test
@@ -89,8 +92,8 @@ class CryptonTest {
         val encryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Encryption takes $encryptionTime ms.")
 
-        Assert.assertNotNull(encryptedText)
-        Assert.assertFalse(originalText == encryptedText)
+        assertNotNull(encryptedText)
+        assertFalse(originalText == encryptedText)
     }
 
     @Test
@@ -105,8 +108,8 @@ class CryptonTest {
 
         Log.d("CryptonTest", "Decryption takes $decryptionTime ms.")
 
-        Assert.assertNotNull(decryptedText)
-        Assert.assertEquals(originalText, decryptedText)
+        assertNotNull(decryptedText)
+        assertEquals(originalText, decryptedText)
     }
 
     @Test
@@ -121,14 +124,15 @@ class CryptonTest {
 
         Log.d("CryptonTest", "Decryption takes $decryptionTime ms.")
 
-        Assert.assertNotNull(decryptedText)
-        Assert.assertEquals(originalText, decryptedText)
+        assertNotNull(decryptedText)
+        assertEquals(originalText, decryptedText)
     }
 
     @Test(expected = GeneralSecurityException::class)
     fun decrypt_afterEncryptionByTheDifferentSecretKeys_Fails() {
         val originalText = this::class.java.simpleName
-        val encryptedText = Crypton.aesCbcEncryption().encrypt(originalText, CryptoKeysFactory.createAESKey())
+        val encryptedText =
+            Crypton.aesCbcEncryption().encrypt(originalText, CryptoKeysFactory.createAESKey())
         Crypton.aesCbcEncryption().decrypt(encryptedText, CryptoKeysFactory.createAESKey())
     }
 
@@ -158,7 +162,10 @@ class CryptonTest {
 
     @Test
     fun encrypt_rsaKeyPair_Success() {
-        val rsaKeyPair = CryptoKeysFactory.findOrCreateRSAKeyPair(InstrumentationRegistry.getTargetContext(), "TEST_CORE_RSA_KEY")
+        val rsaKeyPair = CryptoKeysFactory.findOrCreateRSAKeyPair(
+            ApplicationProvider.getApplicationContext(),
+            "TEST_CORE_RSA_KEY"
+        )
         val originalText = this::class.java.simpleName
 
         val startTime = System.currentTimeMillis()
@@ -167,13 +174,16 @@ class CryptonTest {
         val encryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Encryption takes $encryptionTime ms.")
 
-        Assert.assertNotNull(encrypted)
-        Assert.assertFalse(encrypted == originalText)
+        assertNotNull(encrypted)
+        assertFalse(encrypted == originalText)
     }
 
     @Test
     fun decrypt_afterEncryptWithRsaKeyPair_Success() {
-        val rsaKeyPair = CryptoKeysFactory.findOrCreateRSAKeyPair(InstrumentationRegistry.getTargetContext(), "TEST_CORE_RSA_KEY")
+        val rsaKeyPair = CryptoKeysFactory.findOrCreateRSAKeyPair(
+            ApplicationProvider.getApplicationContext(),
+            "TEST_CORE_RSA_KEY"
+        )
         val originalText = this::class.java.simpleName
         val encrypted = Crypton.rsaEncryption().encrypt(originalText, rsaKeyPair)
 
@@ -182,29 +192,48 @@ class CryptonTest {
         val decryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Decryption takes $decryptionTime ms.")
 
-        Assert.assertNotNull(decryptedText)
-        Assert.assertEquals(originalText, decryptedText)
+        assertNotNull(decryptedText)
+        assertEquals(originalText, decryptedText)
     }
 
     @Test
     fun decrypt_afterEncryptWithRsaKeyPairByAlias_Success() {
-
         val originalText = this::class.java.simpleName
-        val encrypted = Crypton.rsaEncryption().encrypt(InstrumentationRegistry.getTargetContext(), originalText, "SOME_KEY_RSA")
+        val encrypted = Crypton.rsaEncryption()
+            .encrypt(
+                ApplicationProvider.getApplicationContext(),
+                originalText,
+                "SOME_KEY_RSA"
+            )
 
         val startTime = System.currentTimeMillis()
-        val decryptedText = Crypton.rsaEncryption().decryptAsString(InstrumentationRegistry.getTargetContext(), encrypted, "SOME_KEY_RSA")
+        val decryptedText = Crypton.rsaEncryption()
+            .decryptAsString(
+                ApplicationProvider.getApplicationContext(),
+                encrypted,
+                "SOME_KEY_RSA"
+            )
         val decryptionTime = System.currentTimeMillis() - startTime
         Log.d("CryptonTest", "Decryption takes $decryptionTime ms.")
 
-        Assert.assertNotNull(decryptedText)
-        Assert.assertEquals(originalText, decryptedText)
+        assertNotNull(decryptedText)
+        assertEquals(originalText, decryptedText)
     }
 
     @Test(expected = GeneralSecurityException::class)
     fun decrypt_afterEncryptWithRsaKeyPairByDifferentAlias_Fails() {
         val originalText = this::class.java.simpleName
-        val encrypted = Crypton.rsaEncryption().encrypt(InstrumentationRegistry.getTargetContext(), originalText, "SOME_KEY_RSA")
-        Crypton.rsaEncryption().decrypt(InstrumentationRegistry.getTargetContext(), encrypted, "SOME_KEY_RSA_2")
+        val encrypted = Crypton.rsaEncryption()
+            .encrypt(
+                ApplicationProvider.getApplicationContext(),
+                originalText,
+                "SOME_KEY_RSA"
+            )
+        Crypton.rsaEncryption()
+            .decrypt(
+                ApplicationProvider.getApplicationContext(),
+                encrypted,
+                "SOME_KEY_RSA_2"
+            )
     }
 }

@@ -1,7 +1,7 @@
 package com.nullgr.core.prefs
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nullgr.core.security.prefs.CryptoPreferences
 import org.junit.Assert
 import org.junit.Test
@@ -19,13 +19,19 @@ class CryptoPreferencesTest {
 
     @Test
     fun setString_SameAlias_Success() {
-        val cryptoPreferences = CryptoPreferences(InstrumentationRegistry.getTargetContext(), ALIAS)
+        val cryptoPreferences = CryptoPreferences(
+            ApplicationProvider.getApplicationContext(),
+            ALIAS
+        )
         cryptoPreferences.setString("prefs_key_string", VALUE_TO_SAVE)
     }
 
     @Test
     fun getString_afterSetString_SameAlias_Success() {
-        val cryptoPreferences = CryptoPreferences(InstrumentationRegistry.getTargetContext(), ALIAS)
+        val cryptoPreferences = CryptoPreferences(
+            ApplicationProvider.getApplicationContext(),
+            ALIAS
+        )
         cryptoPreferences.setString("prefs_key_string", VALUE_TO_SAVE)
         val value = cryptoPreferences.getString("prefs_key_string", null)
         Assert.assertEquals(VALUE_TO_SAVE, value)
@@ -33,11 +39,20 @@ class CryptoPreferencesTest {
 
     @Test
     fun getString_afterSetString_DifferentAlias_Fails() {
-        val cryptoPreferences = CryptoPreferences(InstrumentationRegistry.getTargetContext(), ALIAS, "prefs-file-name")
+        val cryptoPreferences =
+            CryptoPreferences(
+                ApplicationProvider.getApplicationContext(),
+                ALIAS,
+                "prefs-file-name"
+            )
 
         cryptoPreferences.setString("prefs_key_string", VALUE_TO_SAVE)
 
-        val cryptoPreferences2 = CryptoPreferences(InstrumentationRegistry.getTargetContext(), ALIAS + "OTHER", "prefs-file-name")
+        val cryptoPreferences2 = CryptoPreferences(
+            ApplicationProvider.getApplicationContext(),
+            ALIAS + "OTHER",
+            "prefs-file-name"
+        )
         val value = cryptoPreferences2.getString("prefs_key_string", null)
 
         Assert.assertNotEquals(VALUE_TO_SAVE, value)
