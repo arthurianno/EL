@@ -88,7 +88,8 @@ object Dependencies {
         private const val dateTimeVersion = "0.3.1"
 
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
         const val serialization =
             "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
         const val serializationJson =
@@ -279,20 +280,22 @@ object Dependencies {
     }
 
     object Dagger {
-        const val version = "2.22.1" // 2.42
+        const val daggerVersion = "2.22.1" // 2.42
+        const val hiltVersion = "2.42"
 
         private const val javaxAnnotationVersion = "1.3.2"
         private const val javaxInjectVersion = "1"
         private const val glassFishVersion = "10.0-b28"
 
-        const val hilt = "com.google.dagger:hilt-android:$version"
-        const val hiltCompiler = "com.google.dagger:hilt-android-compiler:$version"
-        const val dagger = "com.google.dagger:dagger:$version"
-        const val daggerCompiler = "com.google.dagger:dagger-compiler:$version"
-        const val daggerAndroid = "com.google.dagger:dagger-android:$version"
+        const val hiltPlugin = "com.google.dagger.hilt.android"
+        const val hilt = "com.google.dagger:hilt-android:$hiltVersion"
+        const val hiltCompiler = "com.google.dagger:hilt-android-compiler:$hiltVersion"
+        const val dagger = "com.google.dagger:dagger:$daggerVersion"
+        const val daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+        const val daggerAndroid = "com.google.dagger:dagger-android:$daggerVersion"
         const val daggerAndroidProcessor =
-            "com.google.dagger:dagger-android-processor:$version"
-        const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:$version"
+            "com.google.dagger:dagger-android-processor:$daggerVersion"
+        const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:$daggerVersion"
         const val javaxAnnotation =
             "javax.annotation:javax.annotation-api:$javaxAnnotationVersion"
         const val javaxInject = "javax.inject:javax.inject:$javaxInjectVersion"

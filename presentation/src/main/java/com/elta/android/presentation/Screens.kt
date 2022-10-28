@@ -12,6 +12,7 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
+import com.elta.android.presentation.features.calcutator.CalculatorFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
@@ -330,5 +331,9 @@ object Screens {
     object PlayMarketScreen : SupportAppScreen() {
         override fun getActivityIntent(context: Context) =
             webIntent("market://details?id=com.elta.android")
+    }
+
+    data class CalculatorScreen(val config: ChooserConfiguration) : SupportAppScreen() {
+        override fun getFragment() = CalculatorFragment(config)
     }
 }
