@@ -5,9 +5,7 @@ import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
-import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hide
-import com.nullgr.core.ui.extensions.show
 
 object BreadFormInitializer : FormInitializer() {
 
@@ -38,10 +36,11 @@ object BreadFormInitializer : FormInitializer() {
     }
 
     override fun View.initFormView() = with(binding) {
-        formVariantSelectorView.hide()
-        formInputView.show()
-        formInputView.setHint(R.string.events_creation_hint_bread)
-        formInputView.applyLengthFilter(INPUT_LENGTH)
+        formInputView.hide()
+        with(formVariantSelectorView) {
+            hint = context.getString(R.string.events_creation_hint_bread)
+            icon = context.getDrawable(R.drawable.ic_tag_def)
+        }
         eventInfoTextView.setText(R.string.events_helper_text_bread)
     }
 }
