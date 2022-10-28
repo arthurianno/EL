@@ -1,9 +1,10 @@
-package com.elta.android.presentation.core.compose
+package com.elta.android.presentation.core.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elta.android.presentation.core.compose.BaseWidgetModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,6 +27,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
     initState: ST,
     eventBufferCapacity: Int = 1
 ) : ViewModel() {
+
     protected open val widgets: List<BaseWidgetModel<*>> = emptyList()
     private val _state = MutableStateFlow(initState)
     val state: StateFlow<ST>
@@ -83,5 +85,9 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
                 (action as? AC)?.let { this@BaseViewModel sendAction action }
             }
             .shareIn(viewModelScope, SharingStarted.Eagerly)
+    }
+
+    companion object {
+        val clazz = this::class.java
     }
 }

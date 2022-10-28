@@ -20,6 +20,7 @@ import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
 import com.elta.android.presentation.di.ReceiverBuilder
+import com.elta.android.presentation.di.ViewModelModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -47,6 +48,7 @@ import javax.inject.Singleton
         RepoModule::class,
         // presentation
         PmModule::class,
+        ViewModelModule::class,
         ActivityBuilder::class,
         FragmentBuilder::class,
         NotificationModule::class,

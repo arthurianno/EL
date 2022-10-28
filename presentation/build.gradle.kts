@@ -76,6 +76,9 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.domain))
 
+    implementation(Dependencies.Kotlin.coroutinesCore)
+    implementation(Dependencies.Kotlin.coroutinesRx2)
+
     implementation(Dependencies.Jetpack.Compose.material)
     implementation(Dependencies.Jetpack.Compose.foundation)
     implementation(Dependencies.Jetpack.Compose.ui)
