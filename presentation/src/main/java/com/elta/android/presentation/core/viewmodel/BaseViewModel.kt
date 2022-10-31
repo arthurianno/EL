@@ -86,8 +86,4 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
             }
             .shareIn(viewModelScope, SharingStarted.Eagerly)
     }
-
-    companion object {
-        val clazz = this::class.java
-    }
 }
