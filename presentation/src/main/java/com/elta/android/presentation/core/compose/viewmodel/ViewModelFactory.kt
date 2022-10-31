@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.viewmodel
+package com.elta.android.presentation.core.compose.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -644,4 +644,8 @@
 
     <string name="push_channel_name">Main Message Channel</string>
     <string name="push_channel_description">Главный канал уведомлений</string>
+
+    <!-- CALCULATOR -->
+    <string name="calculator_appbar_title">Добавить</string>
+    <string name="calculator_empty_list_text">Вы еще не внесли ни одно блюдо.\nВоспользуйтесь поиском, чтобы найти необходимый продукт.</string>
 </resources>

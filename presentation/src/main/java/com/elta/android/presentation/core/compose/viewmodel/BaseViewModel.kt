@@ -1,10 +1,13 @@
-package com.elta.android.presentation.core.viewmodel
+package com.elta.android.presentation.core.compose.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elta.android.presentation.core.compose.BaseWidgetModel
+import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.common.Event
+import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,6 +30,14 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
     initState: ST,
     eventBufferCapacity: Int = 1
 ) : ViewModel() {
+
+    private var _router: Router? = null
+    protected val router: Router
+        get() = checkNotNull(_router)
+
+    fun setRouter(router: Router) {
+        _router = router
+    }
 
     protected open val widgets: List<BaseWidgetModel<*>> = emptyList()
     private val _state = MutableStateFlow(initState)
