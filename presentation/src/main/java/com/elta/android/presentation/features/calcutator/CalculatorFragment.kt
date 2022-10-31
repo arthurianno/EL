@@ -14,7 +14,7 @@ class CalculatorFragment(
     private val dishesConfig: ChooserConfiguration
 ) : BaseComposeFragment<CalculatorViewModel>() {
 
-    override val viewModel: CalculatorViewModel by viewModels()
+    override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
 
     @Composable
     override fun Content(viewModel: CalculatorViewModel) {

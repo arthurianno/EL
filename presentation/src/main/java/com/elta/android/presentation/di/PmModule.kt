@@ -68,7 +68,7 @@ import me.dmdev.rxpm.PresentationModel
 abstract class PmModule {
 
     @Binds
-    abstract fun viewModelFactory(factory: GeneralPmFactory): PmFactory
+    abstract fun bindPmFactory(factory: GeneralPmFactory): PmFactory
 
     @Binds
     @IntoMap
