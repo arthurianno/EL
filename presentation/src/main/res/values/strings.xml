@@ -648,4 +648,9 @@
     <!-- CALCULATOR -->
     <string name="calculator_appbar_title">Добавить</string>
     <string name="calculator_empty_list_text">Вы еще не внесли ни одно блюдо.\nВоспользуйтесь поиском, чтобы найти необходимый продукт.</string>
+    <string name="calculator_search_hint">Найти блюдо/продукт</string>
+    <string name="calculator_help_text_add_dishes">Добавленное блюдо/продукт</string>
+    <string name="calculator_help_text_recent_search">Недавние поиски</string>
+    <string name="calculator_help_text_serach_result">Результаты поиска</string>
+    <string name="calculator_save_text">Сохранить</string>
 </resources>

@@ -1,0 +1,74 @@
+package com.elta.android.presentation.core.compose.widgets
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.theme.GetLocalProperties
+
+object DownButtonClick : Action
+
+data class DownButtonState(
+    val text: String = "",
+    val isEnable: Boolean = true
+)
+
+class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>(DownButtonState()) {
+
+    fun setText(text: String) {
+        setState { state.value.copy(text = text) }
+    }
+
+    fun enable() {
+        setState { state.value.copy(isEnable = true) }
+    }
+
+    fun disable() {
+        setState { state.value.copy(isEnable = false) }
+    }
+
+    fun onClick() {
+        sendAction(DownButtonClick)
+    }
+}
+
+@Composable
+fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    GetLocalProperties { dimens, brash, colors, shapes, types ->
+        val isEnable = state.value.isEnable
+        val textColor = if (isEnable) {
+            colors.white
+        } else {
+            colors.shadeBlack1
+        }
+        val backgroundModifier = if (isEnable) {
+            Modifier.background(brush = brash.downButton)
+        } else {
+            Modifier.background(color = colors.shadeBlack3)
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimens.downButtonHeight)
+                .then(backgroundModifier)
+                .clickable(enabled = isEnable, role = Role.Button, onClick = widgetModel::onClick)
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+        ) {
+            Text(text = state.value.text, color = textColor)
+        }
+    }
+}

@@ -36,9 +36,11 @@ abstract class BaseComposeFragment<VM : ViewModel> : Fragment(R.layout.fragment_
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
-        (viewModel as? BaseViewModel<*, *, *>)?.setRouter(
-            ((parentFragment ?: requireActivity()) as RouterProvider).router
-        )
+        (viewModel as? BaseViewModel<*, *, *>)?.run {
+            if (routerIsNotSet()) {
+                setRouter(((parentFragment ?: requireActivity()) as RouterProvider).router)
+            }
+        }
         super.onAttach(context)
     }
 }

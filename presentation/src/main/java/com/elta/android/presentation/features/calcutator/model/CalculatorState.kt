@@ -4,5 +4,6 @@ import com.elta.android.domain.features.user.model.Profile
 
 data class CalculatorState(
     val profile: Profile = Profile(),
-    val dishes: List<DishUi> = emptyList()
+    val dishes: List<DishUi> = emptyList(),
+    val helpText: String = ""
 )
