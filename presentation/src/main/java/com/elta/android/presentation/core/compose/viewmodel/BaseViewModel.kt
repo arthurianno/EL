@@ -32,21 +32,18 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
 ) : ViewModel() {
 
     private var _router: Router? = null
-    protected val router: Router
+    val router: Router
         get() = checkNotNull(_router)
 
-    fun setRouter(router: Router) {
-        _router = router
-    }
-
     protected open val widgets: List<BaseWidgetModel<*>> = emptyList()
+
     private val _state = MutableStateFlow(initState)
     val state: StateFlow<ST>
         get() = _state.asStateFlow()
-
     private val action = MutableSharedFlow<AC>()
 
     private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = eventBufferCapacity)
+
     val event: SharedFlow<EV?>
         get() = _event.asSharedFlow()
 
@@ -55,6 +52,12 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
             .onEach { _state.tryEmit(reduceStateByAction(state.value, it)) }
             .stateIn(viewModelScope, SharingStarted.Eagerly, initState)
     }
+
+    fun setRouter(router: Router) {
+        _router = router
+    }
+
+    fun routerIsNotSet(): Boolean = _router == null
 
     infix fun sendAction(action: AC) {
         launch {

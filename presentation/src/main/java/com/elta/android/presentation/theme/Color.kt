@@ -29,7 +29,7 @@ internal val shadeBlack0 = Color(0xFF626a7c)
 internal val white = Color(0xFFffffff)
 internal val shadeGGreen2A = Color(0xFF3ea48d)
 internal val shadeGGreen2B = Color(0xFF3b919a)
-internal val paleGray = Color(0xFFf7f7f8)
+internal val paleGray = Color(0xFFf7f7f7)
 
 internal val materialThemeColors = lightColors(
     primary = white,

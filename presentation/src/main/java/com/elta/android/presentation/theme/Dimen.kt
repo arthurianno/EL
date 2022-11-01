@@ -4,9 +4,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 data class EltaDimens(
-    val contentPadding: Dp
+    val contentPadding: Dp,
+    val downButtonHeight: Dp
 )
 
 internal val eltaDimens = EltaDimens(
-    contentPadding = 16.dp
+    contentPadding = 16.dp,
+    downButtonHeight = 52.dp
 )
