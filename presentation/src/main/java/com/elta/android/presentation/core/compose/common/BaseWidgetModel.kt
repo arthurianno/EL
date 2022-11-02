@@ -8,15 +8,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+@Suppress("LeakingThis")
 @Stable
-abstract class BaseWidgetModel<D>(initValue: D) {
-    private val _state = MutableStateFlow(initValue)
+abstract class BaseWidgetModel<D>() {
+    private val _state = MutableStateFlow(createInitState())
     val state: StateFlow<D> = _state.asStateFlow()
 
     private val _action = MutableSharedFlow<Action>(extraBufferCapacity = 1)
     val action: SharedFlow<Action>
         get() = _action.asSharedFlow()
 
+    protected abstract fun createInitState(): D
     infix fun sendAction(action: Action) {
         _action.tryEmit(action)
     }
