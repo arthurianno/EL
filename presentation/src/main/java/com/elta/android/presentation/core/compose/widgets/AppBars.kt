@@ -1,12 +1,9 @@
 package com.elta.android.presentation.core.compose.widgets
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -15,7 +12,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 
@@ -57,8 +53,7 @@ fun BaseAppTopBar(
     @DrawableRes startIcon: Int? = null,
     startIconColor: Color = textColor,
     @DrawableRes endIcon: Int? = null,
-    endIconColor: Color = textColor,
-    paddingValues: PaddingValues = WindowInsets.systemBars.asPaddingValues()
+    endIconColor: Color = textColor
 ) {
     val state = widgetModel.state.collectAsState()
     TopAppBar(
@@ -69,7 +64,6 @@ fun BaseAppTopBar(
             )
         },
         backgroundColor = backgroundColor,
-//        modifier = Modifier.padding(paddingValues),
         navigationIcon = {
             startIcon?.let {
                 BarIconButton(
@@ -88,7 +82,7 @@ fun BaseAppTopBar(
                 )
             }
         },
-        elevation = 0.dp
+        elevation = LocalAbsoluteElevation.current
     )
 }
 

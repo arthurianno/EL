@@ -233,7 +233,7 @@
     <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
-    <string name="events_creation_hint_bread">Добавить блюда или продукта</string>
+    <string name="events_creation_hint_bread">Добавить блюдо/продукт</string>
     <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
