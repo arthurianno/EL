@@ -21,13 +21,13 @@ import com.elta.android.presentation.theme.GetLocalProperties
 data class SearchFocusChange(val focusState: FocusState) : Action
 
 data class SearchFieldState(
-    val hint: String = "",
-    val text: String = "",
-    @DrawableRes val icon: Int? = R.drawable.ic_search,
-    val isFocused: Boolean = false
+    val hint: String,
+    val text: String,
+    @DrawableRes val icon: Int?,
+    val isFocused: Boolean
 )
 
-class SearchFieldWidgetModel() : BaseWidgetModel<SearchFieldState>(SearchFieldState()) {
+class SearchFieldWidgetModel() : BaseWidgetModel<SearchFieldState>() {
     fun setHint(hint: String) {
         setState { state.value.copy(hint = hint) }
     }
@@ -43,12 +43,20 @@ class SearchFieldWidgetModel() : BaseWidgetModel<SearchFieldState>(SearchFieldSt
     fun setIsFocused(focusState: Boolean) {
         setState { state.value.copy(isFocused = focusState) }
     }
+
+    override fun createInitState(): SearchFieldState =
+        SearchFieldState(
+            text = "",
+            hint = "",
+            isFocused = false,
+            icon = R.drawable.ic_search
+        )
 }
 
 @Composable
 fun SearchField(widgetModel: SearchFieldWidgetModel) {
     val state = widgetModel.state.collectAsState()
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { _, _, colors, shapes, _ ->
         TextField(
             value = state.value.text,
             onValueChange = widgetModel::setText,

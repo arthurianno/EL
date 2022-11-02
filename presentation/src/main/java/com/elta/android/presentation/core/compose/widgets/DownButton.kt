@@ -20,11 +20,11 @@ import com.elta.android.presentation.theme.GetLocalProperties
 object DownButtonClick : Action
 
 data class DownButtonState(
-    val text: String = "",
-    val isEnable: Boolean = true
+    val text: String,
+    val isEnable: Boolean
 )
 
-class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>(DownButtonState()) {
+class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>() {
 
     fun setText(text: String) {
         setState { state.value.copy(text = text) }
@@ -41,12 +41,18 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>(DownButtonState()
     fun onClick() {
         sendAction(DownButtonClick)
     }
+
+    override fun createInitState(): DownButtonState =
+        DownButtonState(
+            text = "",
+            isEnable = false
+        )
 }
 
 @Composable
 fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
     val state = widgetModel.state.collectAsState()
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, brash, colors, _, _ ->
         val isEnable = state.value.isEnable
         val textColor = if (isEnable) {
             colors.white

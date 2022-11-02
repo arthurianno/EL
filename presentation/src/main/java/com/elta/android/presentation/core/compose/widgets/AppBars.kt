@@ -16,10 +16,10 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 
 data class BaseTopAppBarState(
-    val title: String = ""
+    val title: String
 )
 
-class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarState>(BaseTopAppBarState()) {
+class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarState>() {
     private var startIconAction: Action? = null
     private var endIconAction: Action? = null
 
@@ -42,6 +42,11 @@ class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarState>(BaseTopAppB
     fun endIconClick() {
         endIconAction?.let { sendAction(it) }
     }
+
+    override fun createInitState(): BaseTopAppBarState =
+        BaseTopAppBarState(
+            title = ""
+        )
 }
 
 @Composable
