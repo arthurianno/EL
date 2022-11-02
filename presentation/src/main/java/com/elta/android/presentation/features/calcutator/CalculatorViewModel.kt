@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator
 
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -15,10 +16,17 @@ import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import javax.inject.Inject
 
 class CalculatorViewModel @Inject constructor() :
-    BaseViewModel<CalculatorState, Event, CalculatorAction>(CalculatorState()) {
+    BaseViewModel<CalculatorState, Event, CalculatorAction>() {
+    override fun createInitState(): CalculatorState =
+        CalculatorState(
+            profile = Profile(),
+            dishes = emptyList(),
+            helpText = ""
+        )
 
     val appTopBarWidgetModel = BaseAppTopBarWidgetModel()
     val searchFieldWidgetModel = SearchFieldWidgetModel()
+
     val downButtonWidgetModel = DownButtonWidgetModel()
 
     fun setHelpText(text: String) {

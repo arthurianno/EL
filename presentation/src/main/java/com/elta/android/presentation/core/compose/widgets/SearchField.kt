@@ -27,7 +27,7 @@ data class SearchFieldState(
     val isFocused: Boolean
 )
 
-class SearchFieldWidgetModel() : BaseWidgetModel<SearchFieldState>() {
+class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
     fun setHint(hint: String) {
         setState { state.value.copy(hint = hint) }
     }
