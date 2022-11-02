@@ -26,10 +26,11 @@ import kotlinx.coroutines.launch
 private const val ERROR_LOG_TAG = "ViewModel Error"
 
 @Stable
-abstract class BaseViewModel<ST, EV : Event, AC : Action>(
-    initState: ST,
-    eventBufferCapacity: Int = 1
-) : ViewModel() {
+abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
+    private val initState: ST
+        get() = createInitState()
+
+    protected abstract fun createInitState(): ST
 
     private var _router: Router? = null
     val router: Router
@@ -42,7 +43,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
         get() = _state.asStateFlow()
     private val action = MutableSharedFlow<AC>()
 
-    private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = eventBufferCapacity)
+    private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = 1)
 
     val event: SharedFlow<EV?>
         get() = _event.asSharedFlow()
