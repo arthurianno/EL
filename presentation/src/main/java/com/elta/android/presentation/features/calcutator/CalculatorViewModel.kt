@@ -10,27 +10,58 @@ import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetMod
 import com.elta.android.presentation.core.compose.widgets.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.SearchFieldWidgetModel
-import com.elta.android.presentation.core.compose.widgets.SearchFocusChange
+import com.elta.android.presentation.core.compose.widgets.SearchFocusChanged
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
+import com.elta.android.presentation.features.calcutator.model.DishUi
 import javax.inject.Inject
+import kotlin.random.Random
+
+// TODO Убрать в дальнейшем. Моковые данные для проверки верстки
+private val dishes = (0..50).map {
+    DishUi(
+        id = it.toString(),
+        name = "name ".repeat(Random.nextInt(10)) + it,
+        ration = "ration $it",
+        rationCount = it.toDouble(),
+        isVerification = Random.nextBoolean(),
+        calories = it * 12,
+        proteins = it * 3,
+        fats = it * 4,
+        carbs = it * 5,
+        xe = it * 3
+    )
+}
 
 class CalculatorViewModel @Inject constructor() :
     BaseViewModel<CalculatorState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorState =
         CalculatorState(
             profile = Profile(),
-            dishes = emptyList(),
-            helpText = ""
+            dishes = dishes,
+            helpText = "",
+            searchInFocus = false,
+            lastWords = listOf(
+                "Test",
+                "Word"
+            ),
+            findingDishes = dishes
         )
 
     val appTopBarWidgetModel = BaseAppTopBarWidgetModel()
     val searchFieldWidgetModel = SearchFieldWidgetModel()
-
     val downButtonWidgetModel = DownButtonWidgetModel()
 
     fun setHelpText(text: String) {
         reduceState { state.value.copy(helpText = text) }
+    }
+
+    fun lastWordOnClick(word: String) {
+        sendAction(CalculatorAction.LastWordClick(word))
+    }
+
+    fun dishOnClick(dish: DishUi) {
+        sendAction(CalculatorAction.DishClick(dish))
     }
 
     override val widgets: List<BaseWidgetModel<*>> = listOf(
@@ -49,13 +80,17 @@ class CalculatorViewModel @Inject constructor() :
                 currentState
             }
 
-            // TODO Обработка изменения фокуса поля ввода.
-            is SearchFocusChange -> {
-                currentState
+            is SearchFocusChanged -> {
+                currentState.copy(searchInFocus = action.focusState.isFocused)
             }
 
             // TODO Обработка клика по кнопке Сохранить.
             DownButtonClick -> {
+                currentState
+            }
+
+            is CalculatorAction.LastWordClick -> {
+                searchFieldWidgetModel.setText(action.word)
                 currentState
             }
 
