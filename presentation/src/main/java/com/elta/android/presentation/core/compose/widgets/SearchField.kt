@@ -24,7 +24,7 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.theme.GetLocalProperties
 
-data class SearchFocusChange(val focusState: FocusState) : Action
+data class SearchFocusChanged(val focusState: FocusState) : Action
 
 data class SearchFieldState(
     val hint: String,
@@ -46,9 +46,10 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
         setState { state.value.copy(icon = icon) }
     }
 
-    fun setIsFocused(focusState: Boolean) {
-        if (!focusState) setText(null)
-        setState { state.value.copy(isFocused = focusState) }
+    fun focusChanged(focusState: FocusState) {
+        if (!focusState.isFocused) setText(null)
+        setState { state.value.copy(isFocused = focusState.isFocused) }
+        sendAction(SearchFocusChanged(focusState))
     }
 
     override fun createInitState(): SearchFieldState =
@@ -105,10 +106,7 @@ fun SearchField(widgetModel: SearchFieldWidgetModel, searchInFocus: Boolean) {
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged {
-                        widgetModel.setIsFocused(it.isFocused)
-                        widgetModel.sendAction(SearchFocusChange(it))
-                    }
+                    .onFocusChanged(widgetModel::focusChanged)
             )
         }
     }

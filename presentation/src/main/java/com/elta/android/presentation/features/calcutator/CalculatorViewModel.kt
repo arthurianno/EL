@@ -10,7 +10,7 @@ import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetMod
 import com.elta.android.presentation.core.compose.widgets.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.SearchFieldWidgetModel
-import com.elta.android.presentation.core.compose.widgets.SearchFocusChange
+import com.elta.android.presentation.core.compose.widgets.SearchFocusChanged
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
@@ -80,7 +80,7 @@ class CalculatorViewModel @Inject constructor() :
                 currentState
             }
 
-            is SearchFocusChange -> {
+            is SearchFocusChanged -> {
                 currentState.copy(searchInFocus = action.focusState.isFocused)
             }
 
