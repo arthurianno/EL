@@ -34,12 +34,12 @@ data class SearchFieldState(
 )
 
 class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
-    fun setHint(hint: String) {
-        setState { state.value.copy(hint = hint) }
+    fun setHint(hint: String?) {
+        setState { state.value.copy(hint = hint.orEmpty()) }
     }
 
-    fun setText(text: String) {
-        setState { state.value.copy(text = text) }
+    fun setText(text: String?) {
+        setState { state.value.copy(text = text.orEmpty()) }
     }
 
     fun setIcon(@DrawableRes icon: Int?) {
@@ -47,7 +47,7 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
     }
 
     fun setIsFocused(focusState: Boolean) {
-        if (!focusState) setText("")
+        if (!focusState) setText(null)
         setState { state.value.copy(isFocused = focusState) }
     }
 
