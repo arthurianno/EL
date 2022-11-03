@@ -233,7 +233,7 @@
     <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
-    <string name="events_creation_hint_bread">Название блюда или продукта</string>
+    <string name="events_creation_hint_bread">Добавить блюдо/продукт</string>
     <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
@@ -644,4 +644,13 @@
 
     <string name="push_channel_name">Main Message Channel</string>
     <string name="push_channel_description">Главный канал уведомлений</string>
+
+    <!-- CALCULATOR -->
+    <string name="calculator_appbar_title">Добавить</string>
+    <string name="calculator_empty_list_text">Вы еще не внесли ни одно блюдо.\nВоспользуйтесь поиском, чтобы найти необходимый продукт.</string>
+    <string name="calculator_search_hint">Найти блюдо/продукт</string>
+    <string name="calculator_help_text_add_dishes">Добавленное блюдо/продукт</string>
+    <string name="calculator_help_text_recent_search">Недавние поиски</string>
+    <string name="calculator_help_text_serach_result">Результаты поиска</string>
+    <string name="calculator_save_text">Сохранить</string>
 </resources>

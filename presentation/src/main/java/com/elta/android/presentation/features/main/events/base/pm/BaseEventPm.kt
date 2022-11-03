@@ -134,7 +134,10 @@ abstract class BaseEventPm(
             .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
             .subscribe {
-                router.navigateTo(Screens.EventsChooserScreen(it))
+                when (it.eventType) {
+                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(it))
+                    else -> router.navigateTo(Screens.EventsChooserScreen(it))
+                }
             }
             .untilDestroy()
 
@@ -144,19 +147,27 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun createChooserConfiguration() = if (eventTypeState.value == EventType.INSULIN) {
-        ChooserConfiguration(
-            ChooserType.VARIANTS_WITH_SUBTYPE,
-            eventTypeState.value,
-            generateChooserId()
-        )
-    } else {
-        ChooserConfiguration(
-            ChooserType.VARIANTS,
-            eventTypeState.value,
-            generateChooserId()
-        )
-    }
+    private fun createChooserConfiguration() =
+        when (eventTypeState.value) {
+            EventType.INSULIN -> ChooserConfiguration(
+                ChooserType.VARIANTS_WITH_SUBTYPE,
+                eventTypeState.value,
+                generateChooserId()
+            )
+
+            EventType.BREAD -> ChooserConfiguration(
+                ChooserType.VARIANTS_WITH_SUBTYPE,
+                eventTypeState.value,
+                generateChooserId()
+            )
+
+            else ->
+                ChooserConfiguration(
+                    ChooserType.VARIANTS,
+                    eventTypeState.value,
+                    generateChooserId()
+                )
+        }
 
     private fun bindFormTagSelection() {
         tagSelector.clickAction.observable

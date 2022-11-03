@@ -1,9 +1,13 @@
-package com.elta.android.presentation.core.compose
+package com.elta.android.presentation.core.compose.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.common.Event
+import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,18 +26,25 @@ import kotlinx.coroutines.launch
 private const val ERROR_LOG_TAG = "ViewModel Error"
 
 @Stable
-abstract class BaseViewModel<ST, EV : Event, AC : Action>(
-    initState: ST,
-    eventBufferCapacity: Int = 1
-) : ViewModel() {
+abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
+    private val initState: ST
+        get() = createInitState()
+
+    protected abstract fun createInitState(): ST
+
+    private var _router: Router? = null
+    val router: Router
+        get() = checkNotNull(_router)
+
     protected open val widgets: List<BaseWidgetModel<*>> = emptyList()
+
     private val _state = MutableStateFlow(initState)
     val state: StateFlow<ST>
         get() = _state.asStateFlow()
-
     private val action = MutableSharedFlow<AC>()
 
-    private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = eventBufferCapacity)
+    private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = 1)
+
     val event: SharedFlow<EV?>
         get() = _event.asSharedFlow()
 
@@ -42,6 +53,12 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action>(
             .onEach { _state.tryEmit(reduceStateByAction(state.value, it)) }
             .stateIn(viewModelScope, SharingStarted.Eagerly, initState)
     }
+
+    fun setRouter(router: Router) {
+        _router = router
+    }
+
+    fun routerIsNotSet(): Boolean = _router == null
 
     infix fun sendAction(action: AC) {
         launch {
