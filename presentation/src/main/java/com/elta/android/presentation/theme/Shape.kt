@@ -12,16 +12,20 @@ val materialThemeShapes = Shapes(
 )
 
 data class EltaShapes(
+    val round: Shape,
     val sheet: Shape,
-    val textField: Shape
+    val textField: Shape,
+    val dishCard: Shape
 )
 
 internal val eltaShapes = EltaShapes(
+    round = RoundedCornerShape(50),
     sheet = RoundedCornerShape(
         topStart = 8.dp,
         topEnd = 8.dp,
         bottomEnd = 0.dp,
         bottomStart = 0.dp
     ),
-    textField = RoundedCornerShape(8.dp)
+    textField = RoundedCornerShape(8.dp),
+    dishCard = RoundedCornerShape(8.dp)
 )
