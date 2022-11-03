@@ -50,7 +50,6 @@ class CalculatorViewModel @Inject constructor() :
 
     val appTopBarWidgetModel = BaseAppTopBarWidgetModel()
     val searchFieldWidgetModel = SearchFieldWidgetModel()
-
     val downButtonWidgetModel = DownButtonWidgetModel()
 
     fun setHelpText(text: String) {

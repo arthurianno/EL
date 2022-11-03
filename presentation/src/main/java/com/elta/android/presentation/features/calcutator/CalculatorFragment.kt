@@ -21,6 +21,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import com.elta.android.presentation.core.compose.widgets.ButtonPlus
 import com.elta.android.presentation.core.compose.widgets.DownButton
 import com.elta.android.presentation.core.compose.widgets.SearchField
 import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
+import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.theme.GetLocalProperties
@@ -73,8 +75,10 @@ class CalculatorFragment(
 
     @Composable
     override fun Content(viewModel: CalculatorViewModel) {
+        val state = viewModel.state.collectAsState()
+        val dishes = state.value.dishes
+        val searchInFocus = viewModel.state.collectAsState().value.searchInFocus
         GetLocalProperties { dimens, _, colors, shapes, _ ->
-            val searchInFocus = viewModel.state.collectAsState().value.searchInFocus
             val systemBarColor = animateColorAsState(
                 targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB
             )
@@ -103,7 +107,11 @@ class CalculatorFragment(
                         VSpacerMedium()
                         HelpText(viewModel, searchInFocus)
                         VSpacerSmall()
-                        MainContent(viewModel, searchInFocus)
+                        if (searchInFocus) {
+                            showSearchView(viewModel, state)
+                        } else {
+                            showMainContent(viewModel, dishes)
+                        }
                     }
                 }
                 DownButton(widgetModel = viewModel.downButtonWidgetModel)
@@ -113,33 +121,35 @@ class CalculatorFragment(
 }
 
 @Composable
-private fun MainContent(
+private fun showMainContent(
     viewModel: CalculatorViewModel,
-    searchInFocus: Boolean
+    dishes: List<DishUi>
 ) {
-    val state = viewModel.state.collectAsState()
-    val searchFieldState = viewModel.searchFieldWidgetModel.state.collectAsState()
-    val dishes = state.value.dishes
-    if (searchInFocus) {
-        if (searchFieldState.value.text.isEmpty()) {
-            LastWords(
-                lastWords = state.value.lastWords,
-                onClick = viewModel::lastWordOnClick
-            )
-        } else {
-            FindingDishes(
-                findingDishes = state.value.findingDishes,
-                onClick = viewModel::dishOnClick
-            )
-        }
+    if (dishes.isEmpty()) {
+        viewModel.downButtonWidgetModel.disable()
+        EmptyContent()
     } else {
-        if (dishes.isEmpty()) {
-            viewModel.downButtonWidgetModel.disable()
-            EmptyContent()
-        } else {
-            viewModel.downButtonWidgetModel.enable()
-            CalculateDishes(dishes)
-        }
+        viewModel.downButtonWidgetModel.enable()
+        CalculateDishes(dishes)
+    }
+}
+
+@Composable
+private fun showSearchView(
+    viewModel: CalculatorViewModel,
+    state: State<CalculatorState>
+) {
+    val searchFieldState = viewModel.searchFieldWidgetModel.state.collectAsState()
+    if (searchFieldState.value.text.isEmpty()) {
+        LastWords(
+            lastWords = state.value.lastWords,
+            onClick = viewModel::lastWordOnClick
+        )
+    } else {
+        FindingDishes(
+            findingDishes = state.value.findingDishes,
+            onClick = viewModel::dishOnClick
+        )
     }
 }
 
