@@ -92,7 +92,7 @@ class AddDishFragment(
                     onClick = onBackClick
                 )
                 HeaderTitle(dish)
-                XeValue(dish)
+                BreadUnitsValue(dish)
             }
         }
     }
@@ -105,20 +105,20 @@ class AddDishFragment(
                     .align(Alignment.BottomStart)
                     .padding(dimens.dishHeaderTitle)
             ) {
-                Box {
-                    Text(
-                        text = dish.name,
-                        style = types.h1,
-                        color = colors.white,
-                        modifier = Modifier.padding(end = dimens.bigDim)
-                    )
+                Row {
                     if (dish.isVerification) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_verify_dish),
                             contentDescription = null,
-                            modifier = Modifier.align(Alignment.CenterEnd)
+                            modifier = Modifier.padding(top = dimens.smallDim)
                         )
                     }
+                    Text(
+                        text = dish.name,
+                        style = types.h1,
+                        color = colors.white,
+                        modifier = Modifier.padding(start = dimens.verySmallDim)
+                    )
                 }
                 VSpacer(height = dimens.halfMediumDim)
                 Text(
@@ -130,7 +130,7 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun BoxScope.XeValue(dish: DishUi) {
+    private fun BoxScope.BreadUnitsValue(dish: DishUi) {
         GetLocalProperties { dimens, _, colors, shapes, types ->
             Box(
                 modifier = Modifier
@@ -158,11 +158,10 @@ class AddDishFragment(
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .height(dimens.dishCardHeight)
                     .clip(shape = shapes.sheet)
                     .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(dimens.dishCardHeight)
                     .background(color = colors.white)
             ) {
                 Column {
@@ -260,7 +259,7 @@ class AddDishFragment(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = dimens.contentPadding),
+                    .padding(start = dimens.contentPadding, top = dimens.smallDim),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
