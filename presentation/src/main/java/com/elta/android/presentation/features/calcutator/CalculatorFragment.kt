@@ -188,20 +188,19 @@ class CalculatorFragment(
                     .padding(end = dimens.contentPadding)
                     .weight(1f)
             ) {
-                Box {
+                Row {
+                    if (dish.isVerification) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_verify_dish),
+                            contentDescription = null
+                        )
+                    }
                     Text(
                         text = dish.name,
                         style = types.title3,
                         color = colors.blackBlue,
-                        modifier = Modifier.padding(end = dimens.bigDim)
+                        modifier = Modifier.padding(start = dimens.verySmallDim)
                     )
-                    if (dish.isVerification) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_verify_dish),
-                            contentDescription = null,
-                            modifier = Modifier.align(Alignment.TopEnd)
-                        )
-                    }
                 }
                 VSpacerVerySmall()
                 Text(
