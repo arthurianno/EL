@@ -32,7 +32,8 @@ internal val shadeGGreen2B = Color(0xFF3b919a)
 internal val paleGray = Color(0xFFf7f7f7)
 
 internal val materialThemeColors = lightColors(
-    primary = white,
+    primary = gGreenA,
+    onPrimary = blackBlue,
     secondary = shadeGGreenA
 )
 

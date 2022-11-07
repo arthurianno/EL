@@ -1,6 +1,6 @@
-package com.elta.android.presentation.features.calcutator.model
+package com.elta.android.domain.features.calculator.model
 
-data class DishUi(
+data class Dish(
     val id: String,
     val name: String,
     val portionDescription: String,
@@ -10,5 +10,5 @@ data class DishUi(
     val proteins: Int,
     val fats: Int,
     val carbs: Int,
-    val breadUnits: Double
+    val breadUnits: Int
 )

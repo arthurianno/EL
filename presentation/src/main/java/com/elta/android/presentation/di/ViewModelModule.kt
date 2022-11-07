@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
-import com.elta.android.presentation.features.calcutator.CalculatorViewModel
+import com.elta.android.presentation.features.calcutator.viewmodel.AddDishViewModel
+import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -19,4 +20,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(CalculatorViewModel::class)
     abstract fun bindCalculatorViewModel(calculatorViewModel: CalculatorViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AddDishViewModel::class)
+    abstract fun bindDishViewModel(addDishViewModel: AddDishViewModel): ViewModel
 }
