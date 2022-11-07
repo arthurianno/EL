@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.calcutator
 
-import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +13,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
@@ -24,9 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,12 +37,13 @@ import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.ButtonPlus
-import com.elta.android.presentation.core.compose.widgets.DownButton
-import com.elta.android.presentation.core.compose.widgets.SearchField
 import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
+import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
+import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
@@ -54,12 +56,7 @@ class CalculatorFragment(
 
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initView()
-    }
-
-    private fun initView() {
+    override fun initView() {
         with(viewModel.appTopBarWidgetModel) {
             setTitle(getString(R.string.calculator_appbar_title))
             setStartIconAction(AppAction.BackPressure)
@@ -78,6 +75,7 @@ class CalculatorFragment(
         val state = viewModel.state.collectAsState()
         val dishes = state.value.dishes
         val searchInFocus = viewModel.state.collectAsState().value.searchInFocus
+        viewModel.downButtonWidgetModel.visibilityState(!searchInFocus)
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
                 targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB
@@ -91,7 +89,7 @@ class CalculatorFragment(
                     scaffoldState = rememberScaffoldState(),
                     topBar = { CalculatorTopBar(viewModel.appTopBarWidgetModel, searchInFocus) },
                     backgroundColor = colors.gOrangeB,
-                    modifier = Modifier.systemBarsPadding()
+                    modifier = Modifier.statusBarsPadding()
                 ) {
                     Column(
                         modifier = Modifier
@@ -108,9 +106,9 @@ class CalculatorFragment(
                         HelpText(viewModel, searchInFocus)
                         VSpacerSmall()
                         if (searchInFocus) {
-                            showSearchView(viewModel, state)
+                            SearchView(viewModel, state)
                         } else {
-                            showMainContent(viewModel, dishes)
+                            MainContent(viewModel, dishes)
                         }
                     }
                 }
@@ -120,7 +118,7 @@ class CalculatorFragment(
     }
 
     @Composable
-    private fun showMainContent(
+    private fun MainContent(
         viewModel: CalculatorViewModel,
         dishes: List<DishUi>
     ) {
@@ -133,16 +131,21 @@ class CalculatorFragment(
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    private fun showSearchView(
+    private fun SearchView(
         viewModel: CalculatorViewModel,
         state: State<CalculatorState>
     ) {
         val searchFieldState = viewModel.searchFieldWidgetModel.state.collectAsState()
+        val keyboardController = LocalSoftwareKeyboardController.current
         if (searchFieldState.value.text.isEmpty()) {
             LastWords(
                 lastWords = state.value.lastWords,
-                onClick = viewModel::lastWordOnClick
+                onClick = {
+                    viewModel.lastWordOnClick(it)
+                    keyboardController?.hide()
+                }
             )
         } else {
             FindingDishes(
@@ -167,7 +170,10 @@ class CalculatorFragment(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         CardBody(dish)
-                        ButtonPlus(onClick = { onClick(dish) })
+                        ButtonCircle(
+                            icon = R.drawable.btn_plus,
+                            onClick = { onClick(dish) }
+                        )
                     }
                 }
             }
@@ -189,15 +195,17 @@ class CalculatorFragment(
                         color = colors.blackBlue,
                         modifier = Modifier.padding(end = dimens.bigDim)
                     )
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_verify_dish),
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    )
+                    if (dish.isVerification) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_verify_dish),
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        )
+                    }
                 }
                 VSpacerVerySmall()
                 Text(
-                    text = "${dish.rationCount} ${dish.ration}",
+                    text = "${dish.portionCount} ${dish.portionDescription}",
                     color = colors.shadeBlack1
                 )
             }

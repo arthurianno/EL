@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.compose.widgets
+package com.elta.android.presentation.core.compose.widgets.textfields
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.widgets.HorizontallyAnimation
 import com.elta.android.presentation.theme.GetLocalProperties
 
 data class SearchFocusChanged(val focusState: FocusState) : Action
