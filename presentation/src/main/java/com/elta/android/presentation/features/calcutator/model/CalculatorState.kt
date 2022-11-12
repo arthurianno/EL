@@ -8,5 +8,6 @@ data class CalculatorState(
     val helpText: String,
     val searchInFocus: Boolean,
     val lastWords: List<String>,
-    val findingDishes: List<DishUi>
+    val findingDishes: List<DishUi>,
+    val isFindDishes: Boolean
 )

@@ -4,7 +4,9 @@ import android.content.Context
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.ApiModule
 import com.elta.android.data.di.CacheModule
+import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
+import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
@@ -44,6 +46,7 @@ import javax.inject.Singleton
         StorageModule::class,
         GlucometerModule::class,
         LocalSyncModule::class,
+        FatSecretModule::class,
         // domain
         RepoModule::class,
         // presentation
@@ -56,7 +59,9 @@ import javax.inject.Singleton
         // navigation
         NavigationModule::class,
         // analytics
-        AnalyticsModule::class
+        AnalyticsModule::class,
+        // Coroutines
+        CoroutineModule::class
     ]
 )
 interface AppComponent {

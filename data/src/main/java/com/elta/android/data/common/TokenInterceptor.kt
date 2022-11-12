@@ -6,6 +6,9 @@ import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
+internal const val PREFIX = "Bearer"
+internal const val AUTH_HEADER = "Authorization"
+
 @Singleton
 class TokenInterceptor @Inject constructor(
     private val storage: TokenStorage
@@ -20,10 +23,5 @@ class TokenInterceptor @Inject constructor(
         }
 
         return chain.proceed(builder.build())
-    }
-
-    companion object {
-        private const val PREFIX = "Bearer"
-        private const val AUTH_HEADER = "Authorization"
     }
 }

@@ -14,7 +14,6 @@ import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPass
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.calcutator.AddDishFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
-import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
@@ -339,7 +338,7 @@ object Screens {
         override fun getFragment() = CalculatorFragment(config)
     }
 
-    data class AddDishScreen(val dish: DishUi) : SupportAppScreen() {
-        override fun getFragment() = AddDishFragment(dish)
+    data class AddDishScreen(val dishId: String) : SupportAppScreen() {
+        override fun getFragment() = AddDishFragment(dishId)
     }
 }
