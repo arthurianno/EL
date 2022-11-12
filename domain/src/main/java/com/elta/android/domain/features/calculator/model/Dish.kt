@@ -3,12 +3,7 @@ package com.elta.android.domain.features.calculator.model
 data class Dish(
     val id: String,
     val name: String,
-    val portionDescription: String,
-    val portionCount: Double,
+    val portions: List<Portion>,
     val isVerification: Boolean,
-    val calories: Int,
-    val proteins: Int,
-    val fats: Int,
-    val carbs: Int,
-    val breadUnits: Int
+    val breadUnits: Double
 )

@@ -59,5 +59,6 @@ class NetworkModule {
         callAdapterFactory: CallAdapter.Factory,
         converterFactory: Converter.Factory,
         @ServerUrl baseUrl: String
-    ): Retrofit = RetrofitFactory.create(okHttpClient, callAdapterFactory, converterFactory, baseUrl)
+    ): Retrofit =
+        RetrofitFactory.create(okHttpClient, callAdapterFactory, converterFactory, baseUrl)
 }

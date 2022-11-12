@@ -1,6 +1,5 @@
 package com.elta.android.presentation.core.compose.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val ERROR_LOG_TAG = "ViewModel Error"
 
@@ -73,7 +73,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
     }
 
     protected open fun handleError(error: Throwable, message: String? = null) {
-        Log.d(ERROR_LOG_TAG, message ?: error.message.orEmpty(), error)
+        Timber.e(error, message ?: error.message.orEmpty())
     }
 
     protected fun sendEvent(event: EV, dismissDelay: Long? = null) {

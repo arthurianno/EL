@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +31,9 @@ import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
+import com.elta.android.presentation.features.calcutator.model.DishState
 import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.PortionUi
 import com.elta.android.presentation.features.calcutator.viewmodel.AddDishViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
@@ -41,12 +44,11 @@ import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 private const val PORTION_INIT_TEXT = "1"
 
 class AddDishFragment(
-    private val dish: DishUi
+    private val dishId: String
 ) : BaseComposeFragment<AddDishViewModel>() {
     override val viewModel: AddDishViewModel by viewModels { viewModelFactory }
 
     override fun initView() {
-        viewModel.setDish(dish)
         with(viewModel.downButtonWidgetModel) {
             setText(getString(R.string.calculator_add_text))
         }
@@ -56,9 +58,8 @@ class AddDishFragment(
         }
         with(viewModel.portionDescriptionTextField) {
             setIcon(R.drawable.ic_list)
-            // TODO Убрать после реализации получения данных из сети
-            setDropDownList(viewModel.state.value.dishPortionDescriptions)
         }
+        viewModel.setDish(dishId)
     }
 
     @Composable
@@ -69,7 +70,7 @@ class AddDishFragment(
                 dish = state.value.dish,
                 onBackClick = { viewModel.sendAction(AppAction.BackPressure) }
             )
-            MainContent(viewModel)
+            MainContent(viewModel, state)
         }
     }
 
@@ -154,7 +155,7 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun BoxScope.MainContent(viewModel: AddDishViewModel) {
+    private fun BoxScope.MainContent(viewModel: AddDishViewModel, state: State<DishState>) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
                 modifier = Modifier
@@ -176,7 +177,7 @@ class AddDishFragment(
                         paddingValues = PaddingValues(horizontal = dimens.contentPadding)
                     )
                     VSpacerLarge()
-                    Footer(dish)
+                    Footer(state)
                 }
                 DownButton(widgetModel = viewModel.downButtonWidgetModel)
             }
@@ -184,8 +185,10 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun Footer(dish: DishUi) {
+    private fun Footer(state: State<DishState>) {
         GetLocalProperties { dimens, _, colors, _, _ ->
+            val dish = state.value.dish
+            val portion = state.value.portion
             Text(
                 text = stringResource(id = R.string.calculator_additional_information),
                 color = colors.shadeBlack2,
@@ -195,12 +198,12 @@ class AddDishFragment(
                 VSpacerMedium()
                 VerifyProduct()
             }
-            DishChars(dish)
+            DishChars(portion)
         }
     }
 
     @Composable
-    private fun DishChars(dish: DishUi) {
+    private fun DishChars(portion: PortionUi) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Row(
                 modifier = Modifier
@@ -212,16 +215,16 @@ class AddDishFragment(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                DishChar(R.string.calculator_dish_calories, dish.calories)
-                DishChar(R.string.calculator_dish_proteins, dish.proteins)
-                DishChar(R.string.calculator_dish_fats, dish.fats)
-                DishChar(R.string.calculator_dish_carbs, dish.carbs)
+                DishChar(R.string.calculator_dish_calories, portion.calories)
+                DishChar(R.string.calculator_dish_proteins, portion.proteins)
+                DishChar(R.string.calculator_dish_fats, portion.fats)
+                DishChar(R.string.calculator_dish_carbs, portion.carbs)
             }
         }
     }
 
     @Composable
-    private fun DishChar(@StringRes charName: Int, charCount: Int) {
+    private fun DishChar(@StringRes charName: Int, charCount: Double) {
         GetLocalProperties { _, _, colors, _, types ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(

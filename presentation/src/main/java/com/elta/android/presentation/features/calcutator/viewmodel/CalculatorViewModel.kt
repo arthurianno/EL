@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
+import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
@@ -15,43 +16,54 @@ import com.elta.android.presentation.core.compose.widgets.textfields.SearchFocus
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.toUi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
-import kotlin.random.Random
 
-// TODO Убрать в дальнейшем. Моковые данные для проверки верстки
-private val dishes = (0..50).map {
-    DishUi(
-        id = it.toString(),
-        name = "name ".repeat(Random.nextInt(10)) + it,
-        portionDescription = "ration $it",
-        portionCount = it.toDouble(),
-        isVerification = Random.nextBoolean(),
-        calories = it * 12,
-        proteins = it * 3,
-        fats = it * 4,
-        carbs = it * 5,
-        breadUnits = it * 3.2
-    )
-}
-
-class CalculatorViewModel @Inject constructor() :
+class CalculatorViewModel @Inject constructor(
+    private val getDishes: GetDishesUseCase
+) :
     BaseViewModel<CalculatorState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorState =
         CalculatorState(
             profile = Profile(),
-            dishes = dishes,
+            dishes = emptyList(),
             helpText = "",
             searchInFocus = false,
+            // TODO ("Очистить лист после реализации сохранения истории поиска")
             lastWords = listOf(
-                "Test",
-                "Word"
+                "Банан",
+                "Хлеб"
             ),
-            findingDishes = dishes
+            findingDishes = emptyList(),
+            isFindDishes = false
         )
 
     val appTopBarWidgetModel = BaseAppTopBarWidgetModel()
-    val searchFieldWidgetModel = SearchFieldWidgetModel()
+    val searchFieldWidgetModel = SearchFieldWidgetModel().also {
+        launch {
+            it.state
+                .map { it.text }
+                .collectLatest {
+                    if (it.isNotEmpty()) {
+                        findDishes(it)
+                    } else {
+                        clearFindingDishes()
+                    }
+                }
+        }
+    }
     val downButtonWidgetModel = DownButtonWidgetModel()
+
+    override val widgets: List<BaseWidgetModel<*>> = listOf(
+        appTopBarWidgetModel,
+        searchFieldWidgetModel,
+        downButtonWidgetModel
+    ).actionObserve()
 
     fun setHelpText(text: String) {
         reduceState { state.value.copy(helpText = text) }
@@ -65,20 +77,12 @@ class CalculatorViewModel @Inject constructor() :
         sendAction(CalculatorAction.DishClick(dish))
     }
 
-    override val widgets: List<BaseWidgetModel<*>> = listOf(
-        appTopBarWidgetModel,
-        searchFieldWidgetModel,
-        downButtonWidgetModel
-    ).actionObserve()
-
     override fun reduceStateByAction(
         currentState: CalculatorState,
         action: Action
     ): CalculatorState =
         when (action) {
-            is SearchFocusChanged -> {
-                currentState.copy(searchInFocus = action.focusState.isFocused)
-            }
+            is SearchFocusChanged -> currentState.copy(searchInFocus = action.focusState.isFocused)
 
             else -> {
                 when (action) {
@@ -86,7 +90,7 @@ class CalculatorViewModel @Inject constructor() :
                         searchFieldWidgetModel.setText(action.word)
 
                     is CalculatorAction.DishClick ->
-                        router.navigateTo(Screens.AddDishScreen(action.dish))
+                        router.navigateTo(Screens.AddDishScreen(action.dish.id))
 
                     AppAction.BackPressure -> router.exit()
 
@@ -96,4 +100,26 @@ class CalculatorViewModel @Inject constructor() :
                 currentState
             }
         }
+
+    private fun clearFindingDishes() {
+        reduceState { state.value.copy(findingDishes = emptyList()) }
+    }
+
+    private fun findDishes(name: String) {
+        launch {
+            getDishes(name)
+                .catch { handleError(it) }
+                .onStart { reduceState { state.value.copy(isFindDishes = true) } }
+                .onCompletion { reduceState { state.value.copy(isFindDishes = false) } }
+                .map { it.toUi() }
+                .collectLatest { dishes ->
+                    reduceState {
+                        state.value.copy(
+                            findingDishes = dishes,
+                            isFindDishes = false
+                        )
+                    }
+                }
+        }
+    }
 }
