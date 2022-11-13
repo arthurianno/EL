@@ -6,9 +6,6 @@ import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val ACCEPT_ENCODING = "Accept-Encoding"
-private const val ACCEPT_ENCODING_VALUE = "identity"
-
 @Singleton
 class FatSecretInterceptor @Inject constructor(
     private val storage: FatSecretStorage
@@ -18,7 +15,6 @@ class FatSecretInterceptor @Inject constructor(
             chain.request()
                 .newBuilder()
                 .addHeader(AUTH_HEADER, "$PREFIX ${storage.token}")
-                .addHeader(ACCEPT_ENCODING, ACCEPT_ENCODING_VALUE)
                 .build()
         )
 }
