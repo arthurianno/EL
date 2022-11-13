@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
+import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
+import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
@@ -25,7 +27,9 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class CalculatorViewModel @Inject constructor(
-    private val getDishes: GetDishesUseCase
+    private val getDishes: GetDishesUseCase,
+    private val getHistoryList: GetHistoryListUseCase,
+    private val saveWordToHistory: SaveWordToHistoryUseCase
 ) :
     BaseViewModel<CalculatorState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorState =
@@ -34,11 +38,7 @@ class CalculatorViewModel @Inject constructor(
             dishes = emptyList(),
             helpText = "",
             searchInFocus = false,
-            // TODO ("Очистить лист после реализации сохранения истории поиска")
-            lastWords = listOf(
-                "Банан",
-                "Хлеб"
-            ),
+            lastWords = emptyList(),
             findingDishes = emptyList(),
             isFindDishes = false
         )
@@ -86,20 +86,30 @@ class CalculatorViewModel @Inject constructor(
 
             else -> {
                 when (action) {
-                    is CalculatorAction.LastWordClick ->
-                        searchFieldWidgetModel.setText(action.word)
-
-                    is CalculatorAction.DishClick ->
-                        router.navigateTo(Screens.AddDishScreen(action.dish.id))
-
+                    is CalculatorAction.LastWordClick -> searchFieldWidgetModel.setText(action.word)
+                    is CalculatorAction.DishClick -> dishClick(action.dish)
                     AppAction.BackPressure -> router.exit()
-
                     // TODO Обработка клика по кнопке Сохранить.
                     DownButtonClick -> {}
                 }
                 currentState
             }
         }
+
+    private fun dishClick(dish: DishUi) {
+        launch {
+            saveWordToHistory(dish.name)
+                .catch { handleError(it) }
+                .collect {
+                    getHistoryList()
+                        .catch { handleError(it) }
+                        .collectLatest {
+                            reduceState { state.value.copy(lastWords = it) }
+                            router.navigateTo(Screens.AddDishScreen(dish))
+                        }
+                }
+        }
+    }
 
     private fun clearFindingDishes() {
         reduceState { state.value.copy(findingDishes = emptyList()) }

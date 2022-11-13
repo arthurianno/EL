@@ -9,6 +9,7 @@ import com.elta.android.data.features.calculator.mapper.compactFoodsToDomain
 import com.elta.android.data.features.calculator.mapper.toDomain
 import com.elta.android.data.features.calculator.storage.FatSecretStorage
 import com.elta.android.domain.features.calculator.model.Dish
+import com.elta.android.domain.features.calculator.model.DishType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
@@ -28,11 +29,16 @@ class FatSecretDataSource @Inject constructor(
     private val tokenApi: FatSecretTokenApi
 ) {
 
-    fun getFood(id: String): Flow<Dish> =
-        runFlowWithCatchToken {
-            api.getFood(foodId = id)
-                .asFlow()
-        }.map { it.food.toDomain() }
+    fun getFood(dish: Dish): Flow<Dish> =
+        when (dish.type) {
+            DishType.Generic -> runFlowWithCatchToken {
+                api.getFoodGeneric(foodId = dish.id).asFlow()
+            }.map { it.food.toDomain() }
+
+            DishType.Brand -> runFlowWithCatchToken {
+                api.getFoodBrand(foodId = dish.id).asFlow()
+            }.map { it.food.toDomain() }
+        }
 
     fun getFoods(name: String): Flow<List<Dish>> =
         runFlowWithCatchToken {

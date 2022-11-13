@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
+import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -11,12 +12,15 @@ import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFie
 import com.elta.android.presentation.features.calcutator.model.DishState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.calcutator.model.PortionUi
+import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+
+private const val START_PORTION = 1.0
 
 class AddDishViewModel @Inject constructor(
     private val getDish: GetDishUseCase
@@ -26,6 +30,7 @@ class AddDishViewModel @Inject constructor(
             dish = DishUi(
                 id = "",
                 name = "",
+                type = DishType.Brand,
                 isVerification = false,
                 portions = emptyList(),
                 breadUnits = 0.0
@@ -43,7 +48,20 @@ class AddDishViewModel @Inject constructor(
         )
 
     val downButtonWidgetModel = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel()
+    val portionCountTextField = IconTextFieldWidgetModel().also { portionCount ->
+        launch {
+            portionCount.state
+                .map { it.text }
+                .filter { it.isNotEmpty() }
+                .map { it.toDouble() }
+                .collectLatest {
+                    reduceState {
+                        state.value.copy(dish = state.value.dish calculateBreadUnits it)
+                    }
+                }
+        }
+    }
+
     val portionDescriptionTextField = IconTextFieldWidgetModel().also { portionField ->
         launch {
             portionField.state
@@ -54,6 +72,14 @@ class AddDishViewModel @Inject constructor(
                 }
                 .collectLatest {
                     reduceState { state.value.copy(portion = it) }
+                    reduceState {
+                        state.value.copy(
+                            dish = state.value.dish calculateBreadUnits (
+                                portionCountTextField.state.value.text.toDoubleOrNull()
+                                    ?: START_PORTION
+                                )
+                        )
+                    }
                 }
         }
     }
@@ -72,9 +98,9 @@ class AddDishViewModel @Inject constructor(
         currentState
     }
 
-    fun setDish(dishId: String) {
+    fun setDish(dishUi: DishUi) {
         launch {
-            getDish(dishId)
+            getDish(dishUi.toDomain())
                 .catch { handleError(it) }
                 .map { it.toUi() }
                 .collect { dish ->
@@ -85,8 +111,10 @@ class AddDishViewModel @Inject constructor(
                         )
                     }
                     portionDescriptionTextField.setDropDownList(dish.portions.map { it.description })
-//                    portionCountTextField.setText(dish.portions.first().metricAmount.toString())
                 }
         }
     }
+
+    private infix fun DishUi.calculateBreadUnits(portionCount: Double): DishUi =
+        copy(breadUnits = state.value.portion.carbs * portionCount / 10)
 }

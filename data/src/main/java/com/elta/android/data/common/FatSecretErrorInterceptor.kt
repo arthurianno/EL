@@ -18,6 +18,7 @@ import javax.inject.Singleton
 
 private const val ACCEPT_ENCODING = "Accept-Encoding"
 private const val ACCEPT_ENCODING_VALUE = "gzip"
+private const val ERROR_BODY_LENGTH = 2048L
 private const val ERROR_INVALID_TOKEN = 13
 private const val ERROR_MISSING_SCOPE = 14
 
@@ -26,7 +27,7 @@ class FatSecretErrorInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val response = chain.proceed(request)
-        val error = getErrorBody(request, response.peekBody(2048))
+        val error = getErrorBody(request, response.peekBody(ERROR_BODY_LENGTH))
         handleError(response, error)
         return response
     }
