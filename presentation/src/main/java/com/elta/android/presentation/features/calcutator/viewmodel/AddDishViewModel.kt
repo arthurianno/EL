@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
+import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -38,8 +39,6 @@ class AddDishViewModel @Inject constructor(
             portion = PortionUi(
                 id = "",
                 description = "",
-                metricUnit = "",
-                metricAmount = 0.0,
                 calories = 0.0,
                 carbs = 0.0,
                 fats = 0.0,
@@ -116,5 +115,5 @@ class AddDishViewModel @Inject constructor(
     }
 
     private infix fun DishUi.calculateBreadUnits(portionCount: Double): DishUi =
-        copy(breadUnits = state.value.portion.carbs * portionCount / 10)
+        copy(breadUnits = (state.value.portion.carbs * portionCount / 10).round(1))
 }

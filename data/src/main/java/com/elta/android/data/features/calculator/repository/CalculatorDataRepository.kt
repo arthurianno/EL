@@ -17,7 +17,7 @@ class CalculatorDataRepository @Inject constructor(
     override val dispatcher: CoroutineDispatcher
 ) : CalculatorRepository {
 
-    // TODO ("Тестовая реализация хранения списка История Поиска. Убрать после полноценной реализации")
+    // TODO("Тестовая реализация хранения списка История Поиска. Убрать после полноценной реализации")
     private val historyWords: MutableMap<String, Long> = mutableMapOf()
     override fun getFood(dish: Dish): Flow<Dish> =
         fatSecretDataSource.getFood(dish)

@@ -19,6 +19,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.nullgr.core.collections.isNotNullOrEmpty
 
+@Immutable
 data class IconTextFieldState(
     val text: String,
     @DrawableRes val leadIcon: Int?,

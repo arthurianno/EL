@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 
 data class SearchFocusChanged(val focusState: FocusState) : Action
 
+@Immutable
 data class SearchFieldState(
     val hint: String,
     val text: String,
