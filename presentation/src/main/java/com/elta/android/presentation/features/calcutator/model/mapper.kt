@@ -30,8 +30,6 @@ internal fun Portion.toUi(): PortionUi =
     PortionUi(
         id = id,
         description = description,
-        metricUnit = metricUnit,
-        metricAmount = metricAmount,
         calories = calories,
         proteins = proteins,
         fats = fats,
@@ -42,8 +40,6 @@ internal fun PortionUi.toDomain(): Portion =
     Portion(
         id = id,
         description = description,
-        metricUnit = metricUnit,
-        metricAmount = metricAmount,
         calories = calories,
         proteins = proteins,
         fats = fats,

@@ -215,12 +215,6 @@ class CalculatorFragment(
                     )
                 }
                 VSpacerVerySmall()
-                // TODO ("Оставлен закомменченный код ввиду того, что этот блок нужен на дизайне, но отстутствет в АПИ.")
-//                val portion = dish.portions.first()
-//                Text(
-//                    text = "${portion.metricAmount} ${portion.metricUnit}",
-//                    color = colors.shadeBlack1
-//                )
             }
         }
     }

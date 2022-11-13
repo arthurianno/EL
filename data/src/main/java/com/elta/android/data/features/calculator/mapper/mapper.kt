@@ -32,8 +32,6 @@ internal fun ServingDto.toDomain(): Portion =
     Portion(
         id = servingId,
         description = servingDescription,
-        metricUnit = metricServingUnit,
-        metricAmount = metricServingAmount.toDouble(),
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
         fats = fat.toDouble(),
