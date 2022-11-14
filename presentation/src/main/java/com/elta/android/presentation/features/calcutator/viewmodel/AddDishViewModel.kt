@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
+import com.elta.android.domain.features.calculator.interactor.GetDataStoreInteractor
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.user.interactor.round
@@ -8,11 +9,12 @@ import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
+import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
-import com.elta.android.presentation.features.calcutator.model.DishState
+import com.elta.android.presentation.features.calcutator.model.AddDishState
 import com.elta.android.presentation.features.calcutator.model.DishUi
-import com.elta.android.presentation.features.calcutator.model.PortionUi
+import com.elta.android.presentation.features.calcutator.model.servingUiEmpty
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
@@ -21,28 +23,23 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-private const val START_PORTION = 1.0
+private const val START_AMOUNT = 1.0
 
 class AddDishViewModel @Inject constructor(
-    private val getDish: GetDishUseCase
-) : BaseViewModel<DishState, Event, Action>() {
-    override fun createInitState(): DishState =
-        DishState(
+    private val getDish: GetDishUseCase,
+    private val dataStore: GetDataStoreInteractor
+) : BaseViewModel<AddDishState, Event, Action>() {
+    override fun createInitState(): AddDishState =
+        AddDishState(
             dish = DishUi(
                 id = "",
                 name = "",
                 type = DishType.Brand,
                 isVerification = false,
-                portions = emptyList(),
+                servings = emptyList(),
+                servingSelect = servingUiEmpty(),
+                servingAmount = START_AMOUNT,
                 breadUnits = 0.0
-            ),
-            portion = PortionUi(
-                id = "",
-                description = "",
-                calories = 0.0,
-                carbs = 0.0,
-                fats = 0.0,
-                proteins = 0.0
             )
         )
 
@@ -55,7 +52,12 @@ class AddDishViewModel @Inject constructor(
                 .map { it.toDouble() }
                 .collectLatest {
                     reduceState {
-                        state.value.copy(dish = state.value.dish calculateBreadUnits it)
+                        state.value.copy(
+                            dish = state.value.dish.copy(
+                                servingAmount = it,
+                                breadUnits = getBreadUnits(amount = it)
+                            )
+                        )
                     }
                 }
         }
@@ -67,18 +69,17 @@ class AddDishViewModel @Inject constructor(
                 .map { it.text }
                 .filter { it.isNotEmpty() }
                 .map {
-                    state.value.dish.portions.first { portionUi -> portionUi.description == it }
+                    state.value.dish.servings.first { servingUi -> servingUi.measurementDescription == it }
                 }
                 .collectLatest {
                     reduceState {
-                        state.value
-                            .copy(portion = it)
-                            .copy(
-                                dish = state.value.dish calculateBreadUnits (
-                                    portionCountTextField.state.value.text.toDoubleOrNull()
-                                        ?: START_PORTION
-                                    )
+                        state.value.copy(
+                            dish = state.value.dish.copy(
+                                servingSelect = it,
+                                breadUnits = getBreadUnits(carbs = it.carbs),
+                                servingAmount = it.numberOfUnits
                             )
+                        )
                     }
                 }
         }
@@ -91,12 +92,20 @@ class AddDishViewModel @Inject constructor(
             portionDescriptionTextField
         ).actionObserve()
 
-    override fun reduceStateByAction(currentState: DishState, action: Action): DishState = run {
-        when (action) {
-            AppAction.BackPressure -> router.exit()
+    override fun reduceStateByAction(currentState: AddDishState, action: Action): AddDishState =
+        run {
+            when (action) {
+                AppAction.BackPressure -> router.exit()
+                DownButtonClick -> {
+                    launch {
+                        dataStore.sendData(state.value.dish.toDomain())
+                            .catch { handleError(it) }
+                            .collect { router.exit() }
+                    }
+                }
+            }
+            currentState
         }
-        currentState
-    }
 
     fun setDish(dishUi: DishUi) {
         launch {
@@ -104,17 +113,17 @@ class AddDishViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .map { it.toUi() }
                 .collect { dish ->
-                    reduceState {
-                        state.value.copy(
-                            dish = dish,
-                            portion = dish.portions.first()
-                        )
-                    }
-                    portionDescriptionTextField.setDropDownList(dish.portions.map { it.description })
+                    reduceState { state.value.copy(dish = dish) }
+                    portionDescriptionTextField.setDropDownList(dish.servings.map { it.measurementDescription })
                 }
         }
     }
 
-    private infix fun DishUi.calculateBreadUnits(portionCount: Double): DishUi =
-        copy(breadUnits = (state.value.portion.carbs * portionCount / 10).round(1))
+    private fun getBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
+        val newCarbs = carbs ?: state.value.dish.servingSelect.carbs
+        val newAmount =
+            amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
+        val portion = state.value.dish.servingSelect.numberOfUnits.takeIf { it > 0.0 } ?: 1.0
+        return (newCarbs * newAmount / (10 * portion)).round(1)
+    }
 }

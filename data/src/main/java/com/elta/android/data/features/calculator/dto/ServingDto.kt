@@ -9,7 +9,7 @@ data class ServingDto(
     @SerializedName("fat") val fat: String,
     @SerializedName("fiber") val fiber: String,
     @SerializedName("measurement_description") val measurementDescription: String,
-    @SerializedName("metric_serving_amount") val metricServingAmount: String,
+    @SerializedName("metric_serving_amount") val metricServingAmount: String?,
     @SerializedName("metric_serving_unit") val metricServingUnit: String?,
     @SerializedName("monounsaturated_fat") val monounsaturatedFat: String,
     @SerializedName("number_of_units") val numberOfUnits: String,
