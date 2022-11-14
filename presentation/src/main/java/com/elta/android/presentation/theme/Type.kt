@@ -87,6 +87,12 @@ private val textStyle2 = TextStyle(
     fontSize = 12.sp
 )
 
+private val breadUnits = TextStyle(
+    fontFamily = appBaseFontMedium,
+    fontSize = 14.sp,
+    color = gOrangeB
+)
+
 data class EltaTypes(
     val title1: TextStyle,
     val title2: TextStyle,
@@ -103,7 +109,8 @@ data class EltaTypes(
     val buttonLargeText: TextStyle,
     val buttonSmallText: TextStyle,
     val buttonMenuText: TextStyle,
-    val textStyle2: TextStyle
+    val textStyle2: TextStyle,
+    val breadUnits: TextStyle
 )
 
 internal val eltaTypes = EltaTypes(
@@ -122,7 +129,8 @@ internal val eltaTypes = EltaTypes(
     buttonLargeText = buttonMenuText,
     buttonSmallText = buttonMenuText,
     buttonMenuText = buttonLargeText,
-    textStyle2 = textStyle2
+    textStyle2 = textStyle2,
+    breadUnits = breadUnits
 )
 
 val materialThemeTypography = Typography(

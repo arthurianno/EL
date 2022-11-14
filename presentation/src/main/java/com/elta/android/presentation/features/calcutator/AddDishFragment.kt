@@ -31,9 +31,9 @@ import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
-import com.elta.android.presentation.features.calcutator.model.DishState
+import com.elta.android.presentation.features.calcutator.model.AddDishState
 import com.elta.android.presentation.features.calcutator.model.DishUi
-import com.elta.android.presentation.features.calcutator.model.PortionUi
+import com.elta.android.presentation.features.calcutator.model.ServingUi
 import com.elta.android.presentation.features.calcutator.viewmodel.AddDishViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
@@ -123,7 +123,7 @@ class AddDishFragment(
                 }
                 VSpacer(height = dimens.halfMediumDim)
                 Text(
-                    text = stringResource(id = R.string.calculator_xe_count),
+                    text = stringResource(id = R.string.calculator_bread_units_count),
                     color = colors.white
                 )
             }
@@ -143,7 +143,7 @@ class AddDishFragment(
             ) {
                 Text(
                     text = stringResource(
-                        id = R.string.calculator_xe_count_label,
+                        id = R.string.calculator_bread_units_count_label,
                         dish.breadUnits.toString()
                     ),
                     modifier = Modifier.align(Alignment.Center),
@@ -155,7 +155,7 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun BoxScope.MainContent(viewModel: AddDishViewModel, state: State<DishState>) {
+    private fun BoxScope.MainContent(viewModel: AddDishViewModel, state: State<AddDishState>) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
                 modifier = Modifier
@@ -185,10 +185,10 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun Footer(state: State<DishState>) {
+    private fun Footer(state: State<AddDishState>) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             val dish = state.value.dish
-            val portion = state.value.portion
+            val serving = state.value.dish.servingSelect
             Text(
                 text = stringResource(id = R.string.calculator_additional_information),
                 color = colors.shadeBlack2,
@@ -198,12 +198,12 @@ class AddDishFragment(
                 VSpacerMedium()
                 VerifyProduct()
             }
-            DishChars(portion)
+            DishChars(serving)
         }
     }
 
     @Composable
-    private fun DishChars(portion: PortionUi) {
+    private fun DishChars(serving: ServingUi) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Row(
                 modifier = Modifier
@@ -215,10 +215,10 @@ class AddDishFragment(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                DishChar(R.string.calculator_dish_calories, portion.calories)
-                DishChar(R.string.calculator_dish_proteins, portion.proteins)
-                DishChar(R.string.calculator_dish_fats, portion.fats)
-                DishChar(R.string.calculator_dish_carbs, portion.carbs)
+                DishChar(R.string.calculator_dish_calories, serving.calories)
+                DishChar(R.string.calculator_dish_proteins, serving.proteins)
+                DishChar(R.string.calculator_dish_fats, serving.fats)
+                DishChar(R.string.calculator_dish_carbs, serving.carbs)
             }
         }
     }

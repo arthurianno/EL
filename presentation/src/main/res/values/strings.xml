@@ -658,8 +658,8 @@
     <string name="calculator_last_search">Недавние поиски</string>
     <string name="calculator_search_result">Результаты поиска</string>
     <string name="calculator_dish_card_in_port">В порции:</string>
-    <string name="calculator_xe_count">Количество хлебных единиц:</string>
-    <string name="calculator_xe_count_label">%s XE</string>
+    <string name="calculator_bread_units_count">Количество хлебных единиц:</string>
+    <string name="calculator_bread_units_count_label">%s XE</string>
     <string name="calculator_product_portion">Порция продукта</string>
     <string name="calculator_additional_information">Дополнительная информация</string>
     <string name="calculator_verify_product">Верифицированный продукт</string>
@@ -667,4 +667,5 @@
     <string name="calculator_dish_proteins">Белки</string>
     <string name="calculator_dish_fats">Жиры</string>
     <string name="calculator_dish_carbs">Углеводы</string>
+    <string name="calculator_total_bread_units">Общее количество ХЕ:</string>
 </resources>

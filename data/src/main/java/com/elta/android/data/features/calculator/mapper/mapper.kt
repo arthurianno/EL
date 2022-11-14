@@ -6,14 +6,16 @@ import com.elta.android.data.features.calculator.dto.FoodGenericDto
 import com.elta.android.data.features.calculator.dto.ServingDto
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
-import com.elta.android.domain.features.calculator.model.Portion
+import com.elta.android.domain.features.calculator.model.Serving
 
 internal fun FoodGenericDto.Food.toDomain(): Dish =
     Dish(
         id = foodId,
         name = foodName,
         type = DishType.Generic,
-        portions = servingsGeneric.servings.foodsToDomain(),
+        servings = servingsGeneric.servings.foodsToDomain(),
+        servingSelect = servingsGeneric.servings.first().toDomain(),
+        servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
@@ -23,22 +25,26 @@ internal fun FoodBrandDto.Food.toDomain(): Dish =
         id = foodId,
         name = foodName,
         type = DishType.Brand,
-        portions = listOf(servingsBrand.serving.toDomain()),
+        servings = listOf(servingsBrand.serving.toDomain()),
+        servingSelect = servingsBrand.serving.toDomain(),
+        servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
 
-internal fun ServingDto.toDomain(): Portion =
-    Portion(
+internal fun ServingDto.toDomain(): Serving =
+    Serving(
         id = servingId,
-        description = servingDescription,
+        servingDescription = servingDescription,
+        measurementDescription = measurementDescription,
+        numberOfUnits = numberOfUnits.toDouble(),
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
         fats = fat.toDouble(),
         carbs = carbohydrate.toDouble()
     )
 
-internal fun List<ServingDto>.foodsToDomain(): List<Portion> =
+internal fun List<ServingDto>.foodsToDomain(): List<Serving> =
     map { it.toDomain() }
 
 internal fun CompactFoodDto.toDomain(): Dish =
@@ -46,7 +52,9 @@ internal fun CompactFoodDto.toDomain(): Dish =
         id = foodId,
         name = foodName,
         type = DishType.valueOf(foodType),
-        portions = emptyList(),
+        servings = emptyList(),
+        servingSelect = Serving.empty(),
+        servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
