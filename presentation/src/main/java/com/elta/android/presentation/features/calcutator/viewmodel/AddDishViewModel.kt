@@ -70,14 +70,15 @@ class AddDishViewModel @Inject constructor(
                     state.value.dish.portions.first { portionUi -> portionUi.description == it }
                 }
                 .collectLatest {
-                    reduceState { state.value.copy(portion = it) }
                     reduceState {
-                        state.value.copy(
-                            dish = state.value.dish calculateBreadUnits (
-                                portionCountTextField.state.value.text.toDoubleOrNull()
-                                    ?: START_PORTION
-                                )
-                        )
+                        state.value
+                            .copy(portion = it)
+                            .copy(
+                                dish = state.value.dish calculateBreadUnits (
+                                    portionCountTextField.state.value.text.toDoubleOrNull()
+                                        ?: START_PORTION
+                                    )
+                            )
                     }
                 }
         }
