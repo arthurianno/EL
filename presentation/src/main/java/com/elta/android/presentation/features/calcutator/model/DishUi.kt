@@ -6,7 +6,9 @@ data class DishUi(
     val id: String,
     val name: String,
     val type: DishType,
-    val portions: List<PortionUi>,
+    val servings: List<ServingUi>,
+    val servingSelect: ServingUi,
+    val servingAmount: Double,
     val isVerification: Boolean,
     val breadUnits: Double
 )

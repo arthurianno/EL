@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
+import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -41,6 +43,7 @@ import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetMod
 import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
@@ -90,7 +93,9 @@ class CalculatorFragment(
                     scaffoldState = rememberScaffoldState(),
                     topBar = { CalculatorTopBar(viewModel.appTopBarWidgetModel, searchInFocus) },
                     backgroundColor = colors.gOrangeB,
-                    modifier = Modifier.statusBarsPadding()
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(bottom = dimens.downButtonHeight)
                 ) {
                     Column(
                         modifier = Modifier
@@ -128,7 +133,7 @@ class CalculatorFragment(
             EmptyContent()
         } else {
             viewModel.downButtonWidgetModel.enable()
-            CalculateDishes(dishes)
+            CalculateDishes(dishes, viewModel)
         }
     }
 
@@ -152,7 +157,7 @@ class CalculatorFragment(
             FindingDishes(
                 findingDishes = state.value.findingDishes,
                 isFindDishes = state.value.isFindDishes,
-                onClick = viewModel::dishOnClick
+                onClick = viewModel::addDishOnClick
             )
         }
     }
@@ -237,7 +242,112 @@ class CalculatorFragment(
     }
 
     @Composable
-    private fun CalculateDishes(dishes: List<DishUi>) {
+    private fun CalculateDishes(
+        dishes: List<DishUi>,
+        viewModel: CalculatorViewModel
+    ) {
+        val totalCountBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
+        TotalCountBreadUnits(totalCountBreadUnits)
+        VSpacerSmall()
+        SelectedDishes(
+            dishes,
+            onCardClick = viewModel::dishCardOnClick,
+            onCloseClick = viewModel::dishCloseOnClick
+        )
+    }
+
+    @Composable
+    private fun SelectedDishes(
+        dishes: List<DishUi>,
+        onCardClick: (dish: DishUi) -> Unit,
+        onCloseClick: (dish: DishUi) -> Unit
+    ) {
+        GetLocalProperties { dimens, _, colors, shapes, _ ->
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.smallDim)) {
+                items(items = dishes) { dish ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(shape = shapes.dishCard)
+                            .clickable { onCardClick(dish) }
+                            .border(
+                                width = dimens.borderWidth,
+                                color = colors.shadeBlack3,
+                                shape = shapes.dishCard
+                            )
+                            .padding(dimens.contentPadding)
+                    ) {
+                        DishInfoBlock(dish)
+                        CloseButton(dish, onCloseClick)
+                        BreadUnitLabel(dish)
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun BoxScope.DishInfoBlock(
+        dish: DishUi
+    ) {
+        GetLocalProperties { dimens, _, colors, _, types ->
+            Column(
+                modifier = Modifier
+                    .padding(end = dimens.dishCardTextEndPadding)
+                    .align(Alignment.CenterStart),
+                verticalArrangement = Arrangement.spacedBy(dimens.verySmallDim)
+            ) {
+                Text(text = dish.name, style = types.title3)
+                Text(
+                    text = "${dish.servingAmount.toInt()} ${dish.servingSelect.measurementDescription}",
+                    color = colors.shadeBlack1
+                )
+                Text(
+                    text = stringResource(id = R.string.calculator_dish_card_in_port),
+                    color = colors.shadeBlack1
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BoxScope.BreadUnitLabel(dish: DishUi) {
+        Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
+            BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
+        }
+    }
+
+    @Composable
+    private fun BoxScope.CloseButton(
+        dish: DishUi,
+        onCloseClick: (dish: DishUi) -> Unit
+    ) {
+        Box(modifier = Modifier.Companion.align(Alignment.TopEnd)) {
+            ButtonCircle(
+                icon = R.drawable.btn_close,
+                onClick = { onCloseClick(dish) }
+            )
+        }
+    }
+
+    @Composable
+    private fun TotalCountBreadUnits(totalCountBreadUnits: Double) {
+        GetLocalProperties { dimens, _, colors, shapes, _ ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = dimens.borderWidth,
+                        color = colors.shadeBlack3,
+                        shape = shapes.dishCard
+                    )
+                    .padding(dimens.halfMediumDim),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = stringResource(id = R.string.calculator_total_bread_units))
+                BreadUnitsLabel(totalCountBreadUnits)
+            }
+        }
     }
 
     @Composable

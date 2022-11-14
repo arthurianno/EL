@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.calcutator.model // ktlint-disable filename
 
 import com.elta.android.domain.features.calculator.model.Dish
-import com.elta.android.domain.features.calculator.model.Portion
+import com.elta.android.domain.features.calculator.model.Serving
 
 internal fun Dish.toUi(): DishUi =
     DishUi(
@@ -9,7 +9,9 @@ internal fun Dish.toUi(): DishUi =
         name = name,
         type = type,
         isVerification = isVerification,
-        portions = portions.map { it.toUi() },
+        servings = servings.map { it.toUi() },
+        servingSelect = servingSelect.toUi(),
+        servingAmount = servingAmount,
         breadUnits = breadUnits
     )
 
@@ -18,7 +20,9 @@ internal fun DishUi.toDomain(): Dish =
         id = id,
         name = name,
         type = type,
-        portions = portions.map { it.toDomain() },
+        servings = servings.map { it.toDomain() },
+        servingSelect = servingSelect.toDomain(),
+        servingAmount = servingAmount,
         isVerification = isVerification,
         breadUnits = breadUnits
     )
@@ -26,22 +30,28 @@ internal fun DishUi.toDomain(): Dish =
 internal fun List<Dish>.toUi(): List<DishUi> =
     map { it.toUi() }
 
-internal fun Portion.toUi(): PortionUi =
-    PortionUi(
+internal fun Serving.toUi(): ServingUi =
+    ServingUi(
         id = id,
-        description = description,
+        servingDescription = servingDescription,
+        measurementDescription = measurementDescription,
+        numberOfUnits = numberOfUnits,
         calories = calories,
         proteins = proteins,
         fats = fats,
         carbs = carbs
     )
 
-internal fun PortionUi.toDomain(): Portion =
-    Portion(
+internal fun ServingUi.toDomain(): Serving =
+    Serving(
         id = id,
-        description = description,
+        measurementDescription = measurementDescription,
+        servingDescription = servingDescription,
+        numberOfUnits = numberOfUnits,
         calories = calories,
         proteins = proteins,
         fats = fats,
         carbs = carbs
     )
+
+internal fun servingUiEmpty() = Serving.empty().toUi()
