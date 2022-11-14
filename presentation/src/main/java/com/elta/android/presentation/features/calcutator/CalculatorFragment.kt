@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -150,30 +151,41 @@ class CalculatorFragment(
         } else {
             FindingDishes(
                 findingDishes = state.value.findingDishes,
+                isFindDishes = state.value.isFindDishes,
                 onClick = viewModel::dishOnClick
             )
         }
     }
 
     @Composable
-    private fun FindingDishes(findingDishes: List<DishUi>, onClick: (dish: DishUi) -> Unit) {
+    private fun FindingDishes(
+        findingDishes: List<DishUi>,
+        isFindDishes: Boolean,
+        onClick: (dish: DishUi) -> Unit
+    ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
-                items(items = findingDishes) { dish ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(shapes.dishCard)
-                            .border(dimens.borderWidth, colors.shadeBlack3, shapes.dishCard)
-                            .padding(dimens.contentPadding),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CardBody(dish)
-                        ButtonCircle(
-                            icon = R.drawable.btn_plus,
-                            onClick = { onClick(dish) }
-                        )
+            if (isFindDishes) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
+                    items(items = findingDishes) { dish ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(shapes.dishCard)
+                                .border(dimens.borderWidth, colors.shadeBlack3, shapes.dishCard)
+                                .padding(dimens.contentPadding),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CardBody(dish)
+                            ButtonCircle(
+                                icon = R.drawable.btn_plus,
+                                onClick = { onClick(dish) }
+                            )
+                        }
                     }
                 }
             }
@@ -188,26 +200,21 @@ class CalculatorFragment(
                     .padding(end = dimens.contentPadding)
                     .weight(1f)
             ) {
-                Box {
+                Row {
+                    if (dish.isVerification) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_verify_dish),
+                            contentDescription = null
+                        )
+                    }
                     Text(
                         text = dish.name,
                         style = types.title3,
                         color = colors.blackBlue,
-                        modifier = Modifier.padding(end = dimens.bigDim)
+                        modifier = Modifier.padding(start = dimens.verySmallDim)
                     )
-                    if (dish.isVerification) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_verify_dish),
-                            contentDescription = null,
-                            modifier = Modifier.align(Alignment.TopEnd)
-                        )
-                    }
                 }
                 VSpacerVerySmall()
-                Text(
-                    text = "${dish.portionCount} ${dish.portionDescription}",
-                    color = colors.shadeBlack1
-                )
             }
         }
     }

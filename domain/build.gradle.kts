@@ -30,6 +30,7 @@ dependencies {
     implementation(project(Module.core_rx))
     implementation(project(Module.common))
 
+    implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.RxJava2.rxKotlin)
 
     implementation(Dependencies.Dagger.javaxAnnotation)

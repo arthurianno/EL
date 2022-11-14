@@ -1,14 +1,12 @@
 package com.elta.android.presentation.features.calcutator.model
 
+import com.elta.android.domain.features.calculator.model.DishType
+
 data class DishUi(
     val id: String,
     val name: String,
-    val portionDescription: String,
-    val portionCount: Double,
+    val type: DishType,
+    val portions: List<PortionUi>,
     val isVerification: Boolean,
-    val calories: Int,
-    val proteins: Int,
-    val fats: Int,
-    val carbs: Int,
     val breadUnits: Double
 )

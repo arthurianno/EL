@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.compose
+package com.elta.android.common.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 

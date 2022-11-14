@@ -88,7 +88,8 @@ object Dependencies {
         private const val dateTimeVersion = "0.3.1"
 
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesCore =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
         const val serialization =
             "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
@@ -309,7 +310,7 @@ object Dependencies {
     }
 
     object Retrofit {
-        private const val version = "2.5.0" // 2.9.0
+        private const val version = "2.9.0" // 2.9.0
 
         const val core = "com.squareup.retrofit2:retrofit:$version"
         const val gsonConverter = "com.squareup.retrofit2:converter-gson:$version"
@@ -318,7 +319,7 @@ object Dependencies {
     }
 
     object OkHttp {
-        private const val version = "3.12.1" // 4.10.0
+        private const val version = "3.14.9" // 4.10.0
 
         const val core = "com.squareup.okhttp3:okhttp:$version"
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"
@@ -337,6 +338,7 @@ object Dependencies {
         const val proto = "androidx.datastore:datastore:$version"
         const val preferences = "androidx.datastore:datastore-preferences:$version"
     }
+
     object KoDeIn {
         private const val version = "7.12.0"
         private const val versionCompose = "7.12.0"
