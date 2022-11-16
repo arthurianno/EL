@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
-import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultInteractor
+import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.user.interactor.round
@@ -27,7 +27,7 @@ private const val START_AMOUNT = 1.0
 
 class AddDishViewModel @Inject constructor(
     private val getDish: GetDishUseCase,
-    private val addDishFragmentResult: AddDishFragmentResultInteractor
+    private val addDishFragmentResult: AddDishFragmentResultHandler
 ) : BaseViewModel<AddDishState, Event, Action>() {
     override fun createInitState(): AddDishState =
         AddDishState(
@@ -104,7 +104,7 @@ class AddDishViewModel @Inject constructor(
 
     private fun saveDish() {
         launch {
-            addDishFragmentResult.sendData(state.value.dish.toDomain())
+            addDishFragmentResult.returnResult(state.value.dish.toDomain())
                 .catch { handleError(it) }
                 .collect { router.exit() }
         }
