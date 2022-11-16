@@ -7,10 +7,12 @@ import com.elta.android.data.features.calculator.dto.ServingDto
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
+import java.util.UUID
 
 internal fun FoodGenericDto.Food.toDomain(): Dish =
     Dish(
-        id = foodId,
+        id = UUID.randomUUID().toString(),
+        dishId = foodId,
         name = foodName,
         type = DishType.Generic,
         servings = servingsGeneric.servings.foodsToDomain(),
@@ -22,7 +24,8 @@ internal fun FoodGenericDto.Food.toDomain(): Dish =
 
 internal fun FoodBrandDto.Food.toDomain(): Dish =
     Dish(
-        id = foodId,
+        id = UUID.randomUUID().toString(),
+        dishId = foodId,
         name = foodName,
         type = DishType.Brand,
         servings = listOf(servingsBrand.serving.toDomain()),
@@ -49,7 +52,8 @@ internal fun List<ServingDto>.foodsToDomain(): List<Serving> =
 
 internal fun CompactFoodDto.toDomain(): Dish =
     Dish(
-        id = foodId,
+        id = "",
+        dishId = foodId,
         name = foodName,
         type = DishType.valueOf(foodType),
         servings = emptyList(),

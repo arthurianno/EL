@@ -339,7 +339,7 @@ object Screens {
         override fun getFragment() = CalculatorFragment(config)
     }
 
-    data class AddDishScreen(val dish: DishUi) : SupportAppScreen() {
-        override fun getFragment() = AddDishFragment(dish)
+    data class AddDishScreen(val dish: DishUi, val isNewDish: Boolean) : SupportAppScreen() {
+        override fun getFragment() = AddDishFragment(dish, isNewDish)
     }
 }

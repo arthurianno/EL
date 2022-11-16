@@ -7,6 +7,8 @@ import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
+import com.elta.android.data.features.calculator.api.CalculatorApi
+import com.elta.android.data.features.calculator.api.CalculatorMockedApi
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
 import com.elta.android.data.features.diary.events.api.EventsApi
@@ -41,6 +43,7 @@ private const val USE_MOCKED_FIRMWARE_API = false
 private const val USE_MOCKED_FEEDBACK_API = false
 private const val USE_MOCKED_REPORTS_API = false
 private const val USE_MOCKED_INSULIN_DRUG_API = false
+private const val USE_MOCKED_CALCULATOR_API = true
 
 @Module
 @Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
@@ -158,6 +161,17 @@ class ApiModule {
         when (USE_MOCKED_REPORTS_API) {
             true -> MockedReportsApi(context)
             else -> retrofit.create(ReportsApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideCalculatorApi(
+        context: Context,
+        retrofit: Retrofit
+    ): CalculatorApi =
+        when (USE_MOCKED_CALCULATOR_API) {
+            true -> CalculatorMockedApi(context)
+            else -> retrofit.create(CalculatorApi::class.java)
         }
 
     @Provides

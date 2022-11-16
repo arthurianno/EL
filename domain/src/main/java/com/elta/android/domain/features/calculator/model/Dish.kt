@@ -2,6 +2,7 @@ package com.elta.android.domain.features.calculator.model
 
 data class Dish(
     val id: String,
+    val dishId: String,
     val name: String,
     val type: DishType,
     val servings: List<Serving>,

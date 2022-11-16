@@ -44,22 +44,25 @@ import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 private const val PORTION_INIT_TEXT = "1"
 
 class AddDishFragment(
-    private val dish: DishUi
+    private val dish: DishUi,
+    private val isNewDish: Boolean
 ) : BaseComposeFragment<AddDishViewModel>() {
     override val viewModel: AddDishViewModel by viewModels { viewModelFactory }
 
     override fun initView() {
-        viewModel.setDish(dish)
         with(viewModel.downButtonWidgetModel) {
             setText(getString(R.string.calculator_add_text))
         }
         with(viewModel.portionCountTextField) {
             setIcon(R.drawable.ic_plus_minus)
-            setText(PORTION_INIT_TEXT)
+            if (state.value.text.isEmpty()) {
+                setText(PORTION_INIT_TEXT)
+            }
         }
         with(viewModel.portionDescriptionTextField) {
             setIcon(R.drawable.ic_list)
         }
+        viewModel.setDish(dish, isNewDish)
     }
 
     @Composable
