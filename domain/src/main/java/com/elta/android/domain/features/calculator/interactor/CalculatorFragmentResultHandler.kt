@@ -1,8 +1,8 @@
 package com.elta.android.domain.features.calculator.interactor
 
+import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
-import com.elta.android.domain.features.common.ReturnDataHandler
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

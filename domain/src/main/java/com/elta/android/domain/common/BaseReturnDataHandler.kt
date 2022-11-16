@@ -1,4 +1,4 @@
-package com.elta.android.domain.features.common
+package com.elta.android.domain.common
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
