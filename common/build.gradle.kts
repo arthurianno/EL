@@ -24,6 +24,7 @@ android {
 dependencies {
     implementation(project(Module.core_interactor))
 
+    implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.Dagger.javaxAnnotation)
     implementation(Dependencies.Dagger.javaxInject)

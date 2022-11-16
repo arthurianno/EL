@@ -4,10 +4,9 @@ import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
 import com.elta.android.data.features.calculator.storage.FatSecretDataStorage
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
+import com.elta.android.domain.features.common.BaseFragmentResultManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import java.util.Date
@@ -19,13 +18,8 @@ class CalculatorDataRepository @Inject constructor(
     override val dispatcher: CoroutineDispatcher
 ) : CalculatorRepository {
 
-    private var _fragmentResult: MutableStateFlow<Dish?> = MutableStateFlow(null)
-    override val fragmentResult: Flow<Dish> =
-        _fragmentResult.filterNotNull()
-
-    override fun sendFragmentResult(data: Dish): Flow<Unit> = flow {
-        emit(_fragmentResult.emit(data))
-    }
+    override val addDishFragmentResult = BaseFragmentResultManager<Dish>()
+    override val calculatorFragmentResult = BaseFragmentResultManager<List<Dish>>()
 
     // TODO("Тестовая реализация хранения списка История Поиска. Убрать после полноценной реализации")
     private val historyWords: MutableMap<String, Long> = mutableMapOf()

@@ -1,4 +1,4 @@
-package com.elta.android.common.repository
+package com.elta.android.domain.features.common
 
 import kotlinx.coroutines.flow.Flow
 

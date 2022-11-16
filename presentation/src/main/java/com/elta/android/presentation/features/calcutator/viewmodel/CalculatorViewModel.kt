@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
-import com.elta.android.domain.features.calculator.interactor.GetDataStoreInteractor
+import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultInteractor
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultInteractor
 import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
@@ -20,6 +21,7 @@ import com.elta.android.presentation.core.compose.widgets.textfields.SearchFocus
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -32,7 +34,8 @@ class CalculatorViewModel @Inject constructor(
     private val getDishes: GetDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
-    private val dataStore: GetDataStoreInteractor
+    private val addDishFragmentResult: AddDishFragmentResultInteractor,
+    private val calculatorFragmentResult: CalculatorFragmentResultInteractor
 ) :
     BaseViewModel<CalculatorState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorState =
@@ -65,7 +68,7 @@ class CalculatorViewModel @Inject constructor(
 
     init {
         launch {
-            dataStore.dataFlow()
+            addDishFragmentResult.dataFlow()
                 .catch { handleError(it) }
                 .collect { editDishes(it.toUi()) }
         }
@@ -73,8 +76,14 @@ class CalculatorViewModel @Inject constructor(
 
     private fun editDishes(dish: DishUi) {
         val newDishes = state.value.dishes
-            .toMutableSet()
-            .apply { add(dish) }
+            .toMutableList()
+            .apply {
+                find { it.id == dish.id }?.let {
+                    val indexDish = indexOf(it)
+                    remove(it)
+                    add(indexDish, dish)
+                } ?: add(dish)
+            }
             .toList()
         reduceState {
             state.value.copy(
@@ -104,10 +113,18 @@ class CalculatorViewModel @Inject constructor(
 
     // TODO Реализовать клик в списке по карточке (открывается на редактирование)
     fun dishCardOnClick(dishUi: DishUi) {
+        dishClick(dish = dishUi, isNewDish = false)
     }
 
     // TODO Реализовать клик в списке по крестику (удаление блюда из списка)
     fun dishCloseOnClick(dishUi: DishUi) {
+        reduceState {
+            state.value.copy(
+                dishes = state.value.dishes
+                    .toMutableList()
+                    .apply { remove(dishUi) }
+            )
+        }
     }
 
     override fun reduceStateByAction(
@@ -122,14 +139,21 @@ class CalculatorViewModel @Inject constructor(
                     is CalculatorAction.LastWordClick -> searchFieldWidgetModel.setText(action.word)
                     is CalculatorAction.AddDishClick -> dishClick(action.dish)
                     AppAction.BackPressure -> router.exit()
-                    // TODO Обработка клика по кнопке Сохранить.
-                    DownButtonClick -> {}
+                    DownButtonClick -> saveDishes()
                 }
                 currentState
             }
         }
 
-    private fun dishClick(dish: DishUi) {
+    private fun saveDishes() {
+        launch {
+            calculatorFragmentResult.sendData(state.value.dishes.toDomain())
+                .catch { handleError(it) }
+                .collect { router.exit() }
+        }
+    }
+
+    private fun dishClick(dish: DishUi, isNewDish: Boolean = true) {
         launch {
             saveWordToHistory(dish.name)
                 .catch { handleError(it) }
@@ -138,7 +162,7 @@ class CalculatorViewModel @Inject constructor(
                         .catch { handleError(it) }
                         .collectLatest {
                             reduceState { state.value.copy(lastWords = it) }
-                            router.navigateTo(Screens.AddDishScreen(dish))
+                            router.navigateTo(Screens.AddDishScreen(dish, isNewDish))
                         }
                 }
         }
