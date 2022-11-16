@@ -2,13 +2,13 @@ package com.elta.android.domain.features.calculator.repository
 
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.domain.features.calculator.model.Dish
-import com.elta.android.domain.features.common.FragmentResultManager
+import com.elta.android.domain.features.common.ReturnDataHandler
 import kotlinx.coroutines.flow.Flow
 
 interface CalculatorRepository : BaseRepository {
 
-    val addDishFragmentResult: FragmentResultManager<Dish>
-    val calculatorFragmentResult: FragmentResultManager<List<Dish>>
+    val addDishFragmentResult: ReturnDataHandler<Dish>
+    val calculatorFragmentResult: ReturnDataHandler<List<Dish>>
 
     fun getFood(dish: Dish): Flow<Dish>
     fun getFoods(name: String): Flow<List<Dish>>

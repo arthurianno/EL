@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
-import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultInteractor
-import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultInteractor
+import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
@@ -34,8 +34,8 @@ class CalculatorViewModel @Inject constructor(
     private val getDishes: GetDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
-    private val addDishFragmentResult: AddDishFragmentResultInteractor,
-    private val calculatorFragmentResult: CalculatorFragmentResultInteractor
+    private val addDishFragmentResult: AddDishFragmentResultHandler,
+    private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
     BaseViewModel<CalculatorState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorState =
@@ -68,7 +68,7 @@ class CalculatorViewModel @Inject constructor(
 
     init {
         launch {
-            addDishFragmentResult.dataFlow()
+            addDishFragmentResult.asFlow()
                 .catch { handleError(it) }
                 .collect { editDishes(it.toUi()) }
         }
@@ -147,7 +147,7 @@ class CalculatorViewModel @Inject constructor(
 
     private fun saveDishes() {
         launch {
-            calculatorFragmentResult.sendData(state.value.dishes.toDomain())
+            calculatorFragmentResult.returnResult(state.value.dishes.toDomain())
                 .catch { handleError(it) }
                 .collect { router.exit() }
         }
