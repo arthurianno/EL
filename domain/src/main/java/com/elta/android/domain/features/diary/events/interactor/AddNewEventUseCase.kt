@@ -59,6 +59,6 @@ class AddNewEventUseCase @Inject constructor(
         val activity: ActivityType? = null,
         val note: String? = null,
         val eventType: EventType,
-        val dishes: List<Dish>? = null
+        val dishes: List<Dish> = emptyList()
     )
 }

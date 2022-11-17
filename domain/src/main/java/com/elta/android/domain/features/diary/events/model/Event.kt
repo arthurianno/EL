@@ -6,9 +6,9 @@ import org.threeten.bp.ZonedDateTime
 
 data class Event(
     val id: String,
-    var additionTime: ZonedDateTime,
+    val additionTime: ZonedDateTime,
     val tagId: String?,
-    var tag: Tag?,
+    val tag: Tag?,
     val note: String?,
     val modificationTime: Long?,
     val value: Double?,
@@ -22,5 +22,5 @@ data class Event(
     val medicament: String?,
     val type: EventType,
     val state: State,
-    val dishes: List<Dish>?
+    val dishes: List<Dish>
 )

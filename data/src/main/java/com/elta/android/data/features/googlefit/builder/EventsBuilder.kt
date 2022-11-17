@@ -35,6 +35,6 @@ class EventsBuilder @Inject constructor(
             type = EventType.ACTIVITY,
             mealTag = null,
             state = State.CREATED,
-            dishes = null
+            dishes = emptyList()
         )
 }
