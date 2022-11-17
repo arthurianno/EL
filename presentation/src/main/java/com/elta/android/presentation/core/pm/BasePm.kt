@@ -18,6 +18,11 @@ import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
@@ -30,6 +35,8 @@ import java.util.concurrent.TimeUnit
 abstract class BasePm(
     protected val services: ServiceFacade
 ) : PresentationModel() {
+
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     lateinit var router: FlowRouter
 
@@ -151,6 +158,17 @@ abstract class BasePm(
         crossinline event: () -> AnalyticsEvent?
     ): Completable =
         this.doOnComplete { this@BasePm.trackEvent(event()) }
+
+    protected fun launch(block: suspend CoroutineScope.() -> Unit) {
+        coroutineScope.launch {
+            block(this)
+        }
+    }
+
+    override fun onDestroy() {
+        coroutineScope.cancel()
+        super.onDestroy()
+    }
 
     companion object {
         const val ACTION_DEBOUNCE_MILLIS = 500L

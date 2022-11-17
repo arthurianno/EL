@@ -67,11 +67,6 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             if (!isTouchingScroll || !isTouchingAppBar) {
                 val isOffsetZero = offset == 0
                 binding.appBarLayoutView.setExpanded(isOffsetZero, true)
-
-                // Это код был от прошлого разработчика. Закоментили при реализации ввода в барабан с клавиатуры.
-                // Можно удалить после полного цикла тестирования от QA. Возможны проблемы с перекрытием контета клавиатурой
-//                if (isOffsetZero) requireActivity().findAndClearFocus()
-//                if (!isOffsetZero) binding.scrollableView.scrollToBottom()
             }
         }
         maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
@@ -91,6 +86,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
+        observeBreadUnitsChanges(pm)
         if (pm.eventTypeState.valueOrNull == EventType.WEIGHT) {
             pm.profileState.observable.subscribe { initializer.setPickerValue(it.weight) }
         }
@@ -161,6 +157,24 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         showTimePickerDialog.bindTo { originalDate ->
             activity.showTimePickerDialog(originalDate) {
                 dateTimeSelectedAction.consumer.accept(it)
+            }
+        }
+    }
+
+    private fun observeBreadUnitsChanges(pm: T) {
+        if (pm.eventTypeState.valueOrNull == EventType.BREAD) {
+            pm.dishes.observable.subscribe {
+                with(binding.formVariantSelectorView) {
+                    if (it.isEmpty()) {
+                        hint = context.getString(R.string.events_creation_hint_bread)
+                        icon = context.getDrawable(R.drawable.ic_tag_def)
+                        iconText = null
+                    } else {
+                        hint = context.getString(R.string.events_creation_text_bread)
+                        icon = context.getDrawable(R.drawable.ic_record_label)
+                        iconText = it.count().toString()
+                    }
+                }
             }
         }
     }

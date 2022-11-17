@@ -34,6 +34,7 @@ class EventsBuilder @Inject constructor(
             medicament = null,
             type = EventType.ACTIVITY,
             mealTag = null,
-            state = State.CREATED
+            state = State.CREATED,
+            dishes = null
         )
 }

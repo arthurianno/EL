@@ -14,12 +14,26 @@
         android:paddingTop="16dp"
         android:paddingBottom="14dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/selectorIconView"
+        <FrameLayout
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginEnd="32dp"
-            app:srcCompat="@drawable/ic_tag_def" />
+            android:layout_gravity="center"
+            android:layout_marginEnd="32dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/selectorIconView"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:srcCompat="@drawable/ic_tag_def" />
+
+            <TextView
+                android:id="@+id/icon_text"
+                style="@style/New.Caption1.White"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                tools:text="33" />
+        </FrameLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/selectorTitleView"
