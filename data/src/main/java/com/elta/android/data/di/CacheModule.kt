@@ -1,5 +1,7 @@
 package com.elta.android.data.di
 
+import com.elta.android.data.features.calculator.cache.DbSearchHistoryCache
+import com.elta.android.data.features.calculator.cache.dto.SearchHistoryDto
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.devices.cache.DbGlucometersCache
 import com.elta.android.data.features.devices.cache.DbGlucometersInfoCache
@@ -76,5 +78,9 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindUserInfoCache(cached: DbUserInfoCache): Cache<UserInfoCacheDto>
+
+        @Binds
+        @Singleton
+        fun bindSearchHistoryCache(cached: DbSearchHistoryCache): Cache<SearchHistoryDto>
     }
 }
