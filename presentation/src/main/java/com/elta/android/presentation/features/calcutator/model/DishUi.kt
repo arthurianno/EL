@@ -4,6 +4,7 @@ import com.elta.android.domain.features.calculator.model.DishType
 
 data class DishUi(
     val id: String,
+    val localId: String,
     val name: String,
     val type: DishType,
     val servings: List<ServingUi>,

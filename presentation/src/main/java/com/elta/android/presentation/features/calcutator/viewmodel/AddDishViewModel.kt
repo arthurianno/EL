@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
-import com.elta.android.domain.features.calculator.interactor.GetDataStoreInteractor
+import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.user.interactor.round
@@ -27,12 +27,13 @@ private const val START_AMOUNT = 1.0
 
 class AddDishViewModel @Inject constructor(
     private val getDish: GetDishUseCase,
-    private val dataStore: GetDataStoreInteractor
+    private val addDishFragmentResult: AddDishFragmentResultHandler
 ) : BaseViewModel<AddDishState, Event, Action>() {
     override fun createInitState(): AddDishState =
         AddDishState(
             dish = DishUi(
                 id = "",
+                localId = "",
                 name = "",
                 type = DishType.Brand,
                 isVerification = false,
@@ -96,26 +97,37 @@ class AddDishViewModel @Inject constructor(
         run {
             when (action) {
                 AppAction.BackPressure -> router.exit()
-                DownButtonClick -> {
-                    launch {
-                        dataStore.sendData(state.value.dish.toDomain())
-                            .catch { handleError(it) }
-                            .collect { router.exit() }
-                    }
-                }
+                DownButtonClick -> saveDish()
             }
             currentState
         }
 
-    fun setDish(dishUi: DishUi) {
+    private fun saveDish() {
         launch {
-            getDish(dishUi.toDomain())
+            addDishFragmentResult.onNext(state.value.dish.toDomain())
                 .catch { handleError(it) }
-                .map { it.toUi() }
-                .collect { dish ->
-                    reduceState { state.value.copy(dish = dish) }
-                    portionDescriptionTextField.setDropDownList(dish.servings.map { it.measurementDescription })
+                .collect { router.exit() }
+        }
+    }
+
+    fun setDish(dishUi: DishUi, isNewDish: Boolean) {
+        launch {
+            if (isNewDish) {
+                getDish(dishUi.toDomain())
+                    .catch { handleError(it) }
+                    .map { it.toUi() }
+                    .collect { dish ->
+                        reduceState { state.value.copy(dish = dish) }
+                        portionDescriptionTextField.setDropDownList(dish.servings.map { it.measurementDescription })
+                    }
+            } else {
+                reduceState { state.value.copy(dish = dishUi) }
+                with(portionDescriptionTextField) {
+                    setDropDownList(dishUi.servings.map { it.measurementDescription })
+                    setText(dishUi.servingSelect.measurementDescription)
                 }
+                portionCountTextField.setText(dishUi.servingAmount.toInt().toString())
+            }
         }
     }
 
