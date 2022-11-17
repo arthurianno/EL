@@ -32,11 +32,11 @@ class FatSecretDataSource @Inject constructor(
     fun getFood(dish: Dish): Flow<Dish> =
         when (dish.type) {
             DishType.Generic -> runFlowWithCatchToken {
-                api.getFoodGeneric(foodId = dish.dishId).asFlow()
+                api.getFoodGeneric(foodId = dish.id).asFlow()
             }.map { it.food.toDomain() }
 
             DishType.Brand -> runFlowWithCatchToken {
-                api.getFoodBrand(foodId = dish.dishId).asFlow()
+                api.getFoodBrand(foodId = dish.id).asFlow()
             }.map { it.food.toDomain() }
         }
 

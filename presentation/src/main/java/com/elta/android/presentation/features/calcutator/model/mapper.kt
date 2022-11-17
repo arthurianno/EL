@@ -6,7 +6,7 @@ import com.elta.android.domain.features.calculator.model.Serving
 internal fun Dish.toUi(): DishUi =
     DishUi(
         id = id,
-        dishId = dishId,
+        localId = localId,
         name = name,
         type = type,
         isVerification = isVerification,
@@ -19,7 +19,7 @@ internal fun Dish.toUi(): DishUi =
 internal fun DishUi.toDomain(): Dish =
     Dish(
         id = id,
-        dishId = dishId,
+        localId = localId,
         name = name,
         type = type,
         servings = servings.map { it.toDomain() },

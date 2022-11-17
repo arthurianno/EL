@@ -33,7 +33,7 @@ class AddDishViewModel @Inject constructor(
         AddDishState(
             dish = DishUi(
                 id = "",
-                dishId = "",
+                localId = "",
                 name = "",
                 type = DishType.Brand,
                 isVerification = false,
@@ -104,7 +104,7 @@ class AddDishViewModel @Inject constructor(
 
     private fun saveDish() {
         launch {
-            addDishFragmentResult.returnResult(state.value.dish.toDomain())
+            addDishFragmentResult.onNext(state.value.dish.toDomain())
                 .catch { handleError(it) }
                 .collect { router.exit() }
         }

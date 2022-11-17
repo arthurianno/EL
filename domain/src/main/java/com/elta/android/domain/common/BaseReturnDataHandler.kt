@@ -10,7 +10,7 @@ class BaseReturnDataHandler<T> : ReturnDataHandler<T> {
     override fun asFlow(): Flow<T> =
         _resultListener.filterNotNull()
 
-    override fun returnResult(data: T): Flow<Unit> = flow {
+    override fun onNext(data: T): Flow<Unit> = flow {
         emit(_resultListener.emit(data))
     }
 }
