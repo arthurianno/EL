@@ -171,7 +171,7 @@ class EventCreationPm @Inject constructor(
             note = form.note,
             eventType = checkNotNull(form.eventType),
             glucometerSerialNumber = null,
-            dishes = dishes.valueOrNull
+            dishes = dishes.valueOrNull ?: emptyList()
         )
     }
 

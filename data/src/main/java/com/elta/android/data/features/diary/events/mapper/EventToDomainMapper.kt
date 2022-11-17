@@ -34,7 +34,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 medicament = data.insulinMedicament?.medicament,
                 state = State.valueOf(state.name),
                 glucometerSerialNumber = data.glucometerSerialNumber.
-                dishes = null // TODO После реалзиации бэкэнда исправить.
+                dishes = emptyList() // TODO После реалзиации бэкэнда исправить.
             )
         }
 }

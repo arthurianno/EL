@@ -45,7 +45,5 @@ fun Event.isChanged(
         this.activityType != activity ||
         this.note != note
 
-fun Event.addTag(tags: List<Tag>): Event {
-    tag = tags.firstOrNull { tagId == it.id }
-    return this
-}
+fun Event.addTag(tags: List<Tag>): Event =
+    this.copy(tag = tags.firstOrNull { tagId == it.id })

@@ -40,6 +40,6 @@ object EventTestFactory {
             type = type,
             state = State.CREATED,
             glucometerSerialNumber = null,
-            dishes = null
+            dishes = emptyList()
         )
 }
