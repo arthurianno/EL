@@ -72,6 +72,11 @@ class CalculatorViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .collect { editDishes(it.toUi()) }
         }
+        launch {
+            getHistoryList()
+                .catch { handleError(it) }
+                .collectLatest { reduceState { state.value.copy(lastWords = it) } }
+        }
     }
 
     private fun editDishes(dish: DishUi) {
@@ -111,12 +116,10 @@ class CalculatorViewModel @Inject constructor(
         sendAction(CalculatorAction.AddDishClick(dish))
     }
 
-    // TODO Реализовать клик в списке по карточке (открывается на редактирование)
     fun dishCardOnClick(dishUi: DishUi) {
         dishClick(dish = dishUi, isNewDish = false)
     }
 
-    // TODO Реализовать клик в списке по крестику (удаление блюда из списка)
     fun dishCloseOnClick(dishUi: DishUi) {
         reduceState {
             state.value.copy(
