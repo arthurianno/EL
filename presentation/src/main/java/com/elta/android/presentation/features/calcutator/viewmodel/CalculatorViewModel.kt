@@ -78,7 +78,7 @@ class CalculatorViewModel @Inject constructor(
         val newDishes = state.value.dishes
             .toMutableList()
             .apply {
-                find { it.id == dish.id }?.let {
+                find { it.localId == dish.localId }?.let {
                     val indexDish = indexOf(it)
                     remove(it)
                     add(indexDish, dish)
@@ -147,7 +147,7 @@ class CalculatorViewModel @Inject constructor(
 
     private fun saveDishes() {
         launch {
-            calculatorFragmentResult.returnResult(state.value.dishes.toDomain())
+            calculatorFragmentResult.onNext(state.value.dishes.toDomain())
                 .catch { handleError(it) }
                 .collect { router.exit() }
         }

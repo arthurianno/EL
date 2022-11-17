@@ -11,8 +11,8 @@ import java.util.UUID
 
 internal fun FoodGenericDto.Food.toDomain(): Dish =
     Dish(
-        id = UUID.randomUUID().toString(),
-        dishId = foodId,
+        id = foodId,
+        localId = UUID.randomUUID().toString(),
         name = foodName,
         type = DishType.Generic,
         servings = servingsGeneric.servings.foodsToDomain(),
@@ -24,8 +24,8 @@ internal fun FoodGenericDto.Food.toDomain(): Dish =
 
 internal fun FoodBrandDto.Food.toDomain(): Dish =
     Dish(
-        id = UUID.randomUUID().toString(),
-        dishId = foodId,
+        id = foodId,
+        localId = UUID.randomUUID().toString(),
         name = foodName,
         type = DishType.Brand,
         servings = listOf(servingsBrand.serving.toDomain()),
@@ -52,8 +52,8 @@ internal fun List<ServingDto>.foodsToDomain(): List<Serving> =
 
 internal fun CompactFoodDto.toDomain(): Dish =
     Dish(
-        id = "",
-        dishId = foodId,
+        id = foodId,
+        localId = "",
         name = foodName,
         type = DishType.valueOf(foodType),
         servings = emptyList(),

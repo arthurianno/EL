@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReturnDataHandler<T> {
     fun asFlow(): Flow<T>
-    fun returnResult(data: T): Flow<Unit>
+    fun onNext(data: T): Flow<Unit>
 }

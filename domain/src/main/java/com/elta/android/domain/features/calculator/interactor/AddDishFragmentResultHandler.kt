@@ -12,6 +12,6 @@ class AddDishFragmentResultHandler @Inject constructor(
     override fun asFlow(): Flow<Dish> =
         repository.addDishFragmentResult.asFlow()
 
-    override fun returnResult(data: Dish): Flow<Unit> =
-        repository.addDishFragmentResult.returnResult(data)
+    override fun onNext(data: Dish): Flow<Unit> =
+        repository.addDishFragmentResult.onNext(data)
 }

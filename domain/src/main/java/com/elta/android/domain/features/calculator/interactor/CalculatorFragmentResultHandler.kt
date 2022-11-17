@@ -12,6 +12,6 @@ class CalculatorFragmentResultHandler @Inject constructor(
     override fun asFlow(): Flow<List<Dish>> =
         repository.calculatorFragmentResult.asFlow()
 
-    override fun returnResult(data: List<Dish>): Flow<Unit> =
-        repository.calculatorFragmentResult.returnResult(data)
+    override fun onNext(data: List<Dish>): Flow<Unit> =
+        repository.calculatorFragmentResult.onNext(data)
 }
