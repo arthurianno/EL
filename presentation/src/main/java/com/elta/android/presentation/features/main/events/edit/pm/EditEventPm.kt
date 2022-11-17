@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.edit.pm
 
 import com.elta.android.common.utils.isDateChanged
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
@@ -18,8 +19,10 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getForm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getPickerValues
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
+import com.elta.android.presentation.features.main.events.mapper.toPickerValues
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.flow.catch
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import javax.inject.Inject
@@ -28,6 +31,7 @@ class EditEventPm @Inject constructor(
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
+    private val calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
 ) : BaseEventPm(services) {
 
@@ -46,6 +50,7 @@ class EditEventPm @Inject constructor(
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
         observeSaveEventAction()
         observeDeleteEventAction()
+        observeDishesResult()
         loadEvent()
     }
 
@@ -85,6 +90,20 @@ class EditEventPm @Inject constructor(
 
     fun setEventId(id: String) {
         eventIdState.consumer.accept(id)
+    }
+
+    private fun observeDishesResult() {
+        launch {
+            calculatorFragmentResult.resultAsFlow()
+                .catch { handleError(it) }
+                .collect {
+                    dishes.consumer.accept(it)
+                    updateFormPickerValueCommand.consumer.accept(
+                        it.sumOf { dish -> dish.breadUnits }
+                            .toPickerValues()
+                    )
+                }
+        }
     }
 
     private fun loadEvent() {
