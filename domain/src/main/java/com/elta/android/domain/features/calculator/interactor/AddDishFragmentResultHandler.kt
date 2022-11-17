@@ -9,8 +9,8 @@ import javax.inject.Inject
 class AddDishFragmentResultHandler @Inject constructor(
     private val repository: CalculatorRepository
 ) : ReturnDataHandler<Dish> {
-    override fun asFlow(): Flow<Dish> =
-        repository.addDishFragmentResult.asFlow()
+    override fun resultAsFlow(): Flow<Dish> =
+        repository.addDishFragmentResult.resultAsFlow()
 
     override fun onNext(data: Dish): Flow<Unit> =
         repository.addDishFragmentResult.onNext(data)

@@ -68,7 +68,7 @@ class CalculatorViewModel @Inject constructor(
 
     init {
         launch {
-            addDishFragmentResult.asFlow()
+            addDishFragmentResult.resultAsFlow()
                 .catch { handleError(it) }
                 .collect { editDishes(it.toUi()) }
         }
