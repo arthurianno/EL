@@ -5,6 +5,7 @@ import com.elta.android.domain.features.calculator.interactor.CalculatorFragment
 import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
@@ -79,25 +80,6 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    private fun editDishes(dish: DishUi) {
-        val newDishes = state.value.dishes
-            .toMutableList()
-            .apply {
-                find { it.localId == dish.localId }?.let {
-                    val indexDish = indexOf(it)
-                    remove(it)
-                    add(indexDish, dish)
-                } ?: add(dish)
-            }
-            .toList()
-        reduceState {
-            state.value.copy(
-                dishes = newDishes,
-                totalBreadUnits = newDishes.sumOf { it.breadUnits }.round(1)
-            )
-        }
-    }
-
     override val widgets: List<BaseWidgetModel<*>> = listOf(
         appTopBarWidgetModel,
         searchFieldWidgetModel,
@@ -130,6 +112,10 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun setDishes(dishes: List<Dish>) {
+        reduceState { state.value.copy(dishes = dishes.toUi()) }
+    }
+
     override fun reduceStateByAction(
         currentState: CalculatorState,
         action: Action
@@ -147,6 +133,25 @@ class CalculatorViewModel @Inject constructor(
                 currentState
             }
         }
+
+    private fun editDishes(dish: DishUi) {
+        val newDishes = state.value.dishes
+            .toMutableList()
+            .apply {
+                find { it.localId == dish.localId }?.let {
+                    val indexDish = indexOf(it)
+                    remove(it)
+                    add(indexDish, dish)
+                } ?: add(dish)
+            }
+            .toList()
+        reduceState {
+            state.value.copy(
+                dishes = newDishes,
+                totalBreadUnits = newDishes.sumOf { it.breadUnits }.round(1)
+            )
+        }
+    }
 
     private fun saveDishes() {
         launch {

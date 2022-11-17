@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.common.utils.atEndOfDay
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.getValidator
@@ -69,6 +70,8 @@ abstract class BaseEventPm(
         SnackBarMessageData.SimpleTextMessage(resources.getString(R.string.event_form_date_in_future))
     }
 
+    val dishes = state<List<Dish>>(null)
+
     abstract fun handleBack(i: Unit)
 
     abstract fun observeEventChanges()
@@ -135,7 +138,7 @@ abstract class BaseEventPm(
             .map { createChooserConfiguration() }
             .subscribe {
                 when (it.eventType) {
-                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(it))
+                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(dishes.valueOrNull.orEmpty()))
                     else -> router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }

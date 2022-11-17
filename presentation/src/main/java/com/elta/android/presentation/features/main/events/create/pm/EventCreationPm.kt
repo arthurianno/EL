@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
 import com.elta.android.common.utils.isDateChanged
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -15,8 +16,10 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.features.main.events.mapper.toPickerValues
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.flow.catch
 import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -26,6 +29,7 @@ private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
 ) : BaseEventPm(services) {
 
@@ -56,6 +60,7 @@ class EventCreationPm @Inject constructor(
 
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
         observeSaveEventAction()
+        observeDishesResult()
     }
 
     override fun handleBack(i: Unit) {
@@ -91,6 +96,20 @@ class EventCreationPm @Inject constructor(
             .map(::isFormValid)
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
+    }
+
+    private fun observeDishesResult() {
+        launch {
+            calculatorFragmentResult.resultAsFlow()
+                .catch { handleError(it) }
+                .collect {
+                    dishes.consumer.accept(it)
+                    updateFormPickerValueCommand.consumer.accept(
+                        it.sumOf { dish -> dish.breadUnits }
+                            .toPickerValues()
+                    )
+                }
+        }
     }
 
     private fun checkIsEmpty(eventFormModel: EventFormModel) {
@@ -151,7 +170,8 @@ class EventCreationPm @Inject constructor(
             medicament = form.insulin?.drug,
             note = form.note,
             eventType = checkNotNull(form.eventType),
-            glucometerSerialNumber = null
+            glucometerSerialNumber = null,
+            dishes = dishes.valueOrNull
         )
     }
 
@@ -165,10 +185,12 @@ class EventCreationPm @Inject constructor(
                 params.activity?.let { data[AnalyticsEventParam.TYPE] = it.name }
                 AnalyticsEventType.EVENT_ACTIVITY_ADD
             }
+
             EventType.INSULIN -> {
                 data[AnalyticsEventParam.TYPE] = checkNotNull(params.insulin).name
                 AnalyticsEventType.EVENT_INSULIN_ADD
             }
+
             else -> null
         }
         return if (name == null) null else AnalyticsEvent(name, data)

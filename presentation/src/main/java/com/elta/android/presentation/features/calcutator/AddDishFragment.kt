@@ -49,7 +49,7 @@ class AddDishFragment(
 ) : BaseComposeFragment<AddDishViewModel>() {
     override val viewModel: AddDishViewModel by viewModels { viewModelFactory }
 
-    override fun initView() {
+    override fun initViewState() {
         with(viewModel.downButtonWidgetModel) {
             setText(getString(R.string.calculator_add_text))
         }

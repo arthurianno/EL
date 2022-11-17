@@ -24,6 +24,11 @@ class FormSelectorView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    var iconText: String? = null
+        set(value) {
+            field = value
+            bindIconText()
+        }
     var icon: Drawable? = null
         set(value) {
             field = value
@@ -91,6 +96,7 @@ class FormSelectorView @JvmOverloads constructor(
                 selectorTitleView.text = hint
                 selectorTitleView.setTextColor(hintColor)
             }
+
             else -> {
                 selectorTitleView.text = value
                 selectorTitleView.setTextColor(textColor)
@@ -101,6 +107,13 @@ class FormSelectorView @JvmOverloads constructor(
     private fun bindIcon() = with(binding) {
         selectorIconView.toggleView(icon != null)
         icon?.let { selectorIconView.setImageDrawable(it) }
+    }
+
+    private fun bindIconText() {
+        binding.iconText.text = iconText
+        iconText?.let {
+            binding.selectorTitleView.setTextColor(context.getColor(R.color.black_blue))
+        }
     }
 
     private class SelectorClickObservable(

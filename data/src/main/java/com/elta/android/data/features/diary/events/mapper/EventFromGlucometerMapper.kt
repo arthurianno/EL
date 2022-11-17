@@ -30,7 +30,8 @@ class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDt
                 insulinType = null,
                 medicament = null,
                 state = State.CREATED,
-                glucometerSerialNumber = glucometerSerialNumber
+                glucometerSerialNumber = glucometerSerialNumber,
+                dishes = null
             )
         }
 }

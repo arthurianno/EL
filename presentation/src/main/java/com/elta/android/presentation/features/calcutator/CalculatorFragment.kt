@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -48,19 +49,18 @@ import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
-import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
 class CalculatorFragment(
-    private val dishesConfig: ChooserConfiguration
+    private val dishes: List<Dish>
 ) : BaseComposeFragment<CalculatorViewModel>() {
 
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
 
-    override fun initView() {
+    override fun initViewState() {
         with(viewModel.appTopBarWidgetModel) {
             setTitle(getString(R.string.calculator_appbar_title))
             setStartIconAction(AppAction.BackPressure)
@@ -72,6 +72,7 @@ class CalculatorFragment(
             setText(getString(R.string.calculator_save_text))
         }
         viewModel.setHelpText(getString(R.string.calculator_help_text_add_dishes))
+        viewModel.setDishes(dishes)
     }
 
     @Composable
@@ -93,9 +94,7 @@ class CalculatorFragment(
                     scaffoldState = rememberScaffoldState(),
                     topBar = { CalculatorTopBar(viewModel.appTopBarWidgetModel, searchInFocus) },
                     backgroundColor = colors.gOrangeB,
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(bottom = dimens.downButtonHeight)
+                    modifier = Modifier.statusBarsPadding()
                 ) {
                     Column(
                         modifier = Modifier
@@ -105,6 +104,7 @@ class CalculatorFragment(
                                 color = colors.white,
                                 shape = if (searchInFocus) RectangleShape else shapes.sheet
                             )
+                            .padding(bottom = dimens.downButtonHeight)
                             .padding(dimens.contentPadding)
                     ) {
                         SearchField(viewModel.searchFieldWidgetModel, searchInFocus)
