@@ -4,4 +4,6 @@ interface Action
 
 sealed class AppAction : Action {
     object BackPressure : AppAction()
+    object PositivePressure : AppAction()
+    object NegativePressure : AppAction()
 }
