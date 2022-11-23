@@ -33,9 +33,14 @@ abstract class BaseComposeFragment<VM : ViewModel> : Fragment(R.layout.fragment_
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<ComposeView>(R.id.main_view).setContent {
             EltaTheme {
+                Dialogs()
                 Content(viewModel = viewModel)
             }
         }
+    }
+
+    @Composable
+    open fun Dialogs() {
     }
 
     @Composable

@@ -44,10 +44,12 @@ import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetMod
 import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.toUi
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
@@ -61,18 +63,28 @@ class CalculatorFragment(
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
 
     override fun initViewState() {
-        with(viewModel.appTopBarWidgetModel) {
+        with(viewModel.appTopBar) {
             setTitle(getString(R.string.calculator_appbar_title))
             setStartIconAction(AppAction.BackPressure)
         }
-        with(viewModel.searchFieldWidgetModel) {
+        with(viewModel.searchField) {
             setHint(getString(R.string.calculator_search_hint))
         }
-        with(viewModel.downButtonWidgetModel) {
+        with(viewModel.downButton) {
             setText(getString(R.string.calculator_save_text))
         }
+        viewModel.dishDeleteConfirmDialog.initDialog(
+            message = getString(R.string.calculator_dish_delete_request),
+            positiveButtonText = getString(R.string.yes_text),
+            negativeButtonText = getString(R.string.no_text)
+        )
         viewModel.setHelpText(getString(R.string.calculator_help_text_add_dishes))
-        viewModel.setDishes(dishes)
+        viewModel.setDishes(dishes.toUi())
+    }
+
+    @Composable
+    override fun Dialogs() {
+        BaseDialog(widgetModel = viewModel.dishDeleteConfirmDialog)
     }
 
     @Composable
@@ -80,7 +92,6 @@ class CalculatorFragment(
         val state = viewModel.state.collectAsState()
         val dishes = state.value.dishes
         val searchInFocus = viewModel.state.collectAsState().value.searchInFocus
-        viewModel.downButtonWidgetModel.visibilityState(!searchInFocus)
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
                 targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB
@@ -92,7 +103,7 @@ class CalculatorFragment(
             ) {
                 Scaffold(
                     scaffoldState = rememberScaffoldState(),
-                    topBar = { CalculatorTopBar(viewModel.appTopBarWidgetModel, searchInFocus) },
+                    topBar = { CalculatorTopBar(viewModel.appTopBar, searchInFocus) },
                     backgroundColor = colors.gOrangeB,
                     modifier = Modifier.statusBarsPadding()
                 ) {
@@ -107,7 +118,7 @@ class CalculatorFragment(
                             .padding(bottom = dimens.downButtonHeight)
                             .padding(dimens.contentPadding)
                     ) {
-                        SearchField(viewModel.searchFieldWidgetModel, searchInFocus)
+                        SearchField(viewModel.searchField, searchInFocus)
                         VSpacerMedium()
                         HelpText(viewModel, searchInFocus)
                         VSpacerSmall()
@@ -118,7 +129,7 @@ class CalculatorFragment(
                         }
                     }
                 }
-                DownButton(widgetModel = viewModel.downButtonWidgetModel)
+                DownButton(widgetModel = viewModel.downButton)
             }
         }
     }
@@ -129,10 +140,10 @@ class CalculatorFragment(
         dishes: List<DishUi>
     ) {
         if (dishes.isEmpty()) {
-            viewModel.downButtonWidgetModel.disable()
+            viewModel.downButton.disable()
             EmptyContent()
         } else {
-            viewModel.downButtonWidgetModel.enable()
+            viewModel.downButton.enable()
             CalculateDishes(dishes, viewModel)
         }
     }
@@ -143,7 +154,7 @@ class CalculatorFragment(
         viewModel: CalculatorViewModel,
         state: State<CalculatorState>
     ) {
-        val searchFieldState = viewModel.searchFieldWidgetModel.state.collectAsState()
+        val searchFieldState = viewModel.searchField.state.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
         if (searchFieldState.value.text.isEmpty()) {
             LastWords(
@@ -252,7 +263,7 @@ class CalculatorFragment(
         SelectedDishes(
             dishes,
             onCardClick = viewModel::dishCardOnClick,
-            onCloseClick = viewModel::dishCloseOnClick
+            onCloseClick = viewModel::dishDeleteOnClick
         )
     }
 
@@ -375,7 +386,7 @@ class CalculatorFragment(
     ) {
         GetLocalProperties { _, _, colors, _, _ ->
             val state = viewModel.state.collectAsState()
-            val searchFieldState = viewModel.searchFieldWidgetModel.state.collectAsState()
+            val searchFieldState = viewModel.searchField.state.collectAsState()
             Text(
                 text = if (!searchInFocus) {
                     state.value.helpText
