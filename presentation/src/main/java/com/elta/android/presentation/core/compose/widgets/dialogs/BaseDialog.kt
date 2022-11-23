@@ -16,27 +16,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import ru.marslab.pocketwordtranslator.presentation.widget.HSpacerSmall
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
 
-data class BaseDialogState(
+data class BaseDialogState<D>(
     val title: String?,
     val message: String,
+    val data: D?,
     val positiveButtonText: String?,
     val negativeButtonText: String?,
     val isOpen: Boolean,
     val isOverSizeClose: Boolean
 )
 
-class BaseDialogWidgetModel : BaseWidgetModel<BaseDialogState>() {
-    override fun createInitState(): BaseDialogState =
+class BaseDialogWidgetModel<D>(
+    private val positiveOnCLick: (data: D?) -> Unit = {},
+    private val negativeOnCLick: (data: D?) -> Unit = {}
+) : BaseWidgetModel<BaseDialogState<D>>() {
+    override fun createInitState(): BaseDialogState<D> =
         BaseDialogState(
             title = null,
             message = "",
+            data = null,
             positiveButtonText = null,
             negativeButtonText = null,
             isOpen = false,
@@ -45,43 +49,45 @@ class BaseDialogWidgetModel : BaseWidgetModel<BaseDialogState>() {
 
     fun positiveClick() {
         dialogClose()
-        sendAction(AppAction.PositivePressure)
+        positiveOnCLick(state.value.data)
     }
 
     fun negativeClick() {
         dialogClose()
-        sendAction(AppAction.PositivePressure)
+        negativeOnCLick(state.value.data)
     }
 
     fun dialogClose() {
         setState { state.value.copy(isOpen = false) }
     }
 
-    fun dialogOpen() {
-        setState { state.value.copy(isOpen = true) }
+    fun dialogOpen(data: D? = null) {
+        setState { state.value.copy(isOpen = true, data = data) }
     }
 
     fun initDialog(
         title: String? = null,
         message: String,
         positiveButtonText: String? = null,
-        negativeButtonText: String? = null
+        negativeButtonText: String? = null,
+        isOverSizeClose: Boolean = false
     ) {
         setState {
             state.value.copy(
                 title = title,
                 message = message,
                 positiveButtonText = positiveButtonText,
-                negativeButtonText = negativeButtonText
+                negativeButtonText = negativeButtonText,
+                isOverSizeClose = isOverSizeClose
             )
         }
     }
 }
 
 @Composable
-fun BaseDialog(widgetModel: BaseDialogWidgetModel) {
+fun BaseDialog(widgetModel: BaseDialogWidgetModel<*>) {
     val state = widgetModel.state.collectAsState()
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, _, colors, shapes, types ->
         if (state.value.isOpen) {
             Dialog(
                 onDismissRequest = { widgetModel.dialogClose() },
@@ -137,7 +143,7 @@ private fun DialogButton(
 @Preview
 @Composable
 fun PreviewDialog() {
-    val widgetModel = BaseDialogWidgetModel().apply {
+    val widgetModel = BaseDialogWidgetModel<Nothing>().apply {
         initDialog(
             title = "Внимание",
             message = "Значение ХЕ превышает 99,9. Проверьте и измените добавленные продукты/блюда.",

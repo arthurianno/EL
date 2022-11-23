@@ -5,7 +5,6 @@ import com.elta.android.domain.features.calculator.interactor.CalculatorFragment
 import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
-import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
@@ -17,6 +16,7 @@ import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFocusChanged
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
@@ -51,8 +51,8 @@ class CalculatorViewModel @Inject constructor(
             isFindDishes = false
         )
 
-    val appTopBarWidgetModel = BaseAppTopBarWidgetModel()
-    val searchFieldWidgetModel = SearchFieldWidgetModel().also {
+    val appTopBar = BaseAppTopBarWidgetModel()
+    val searchField = SearchFieldWidgetModel().also {
         launch {
             it.state
                 .map { it.text }
@@ -65,7 +65,10 @@ class CalculatorViewModel @Inject constructor(
                 }
         }
     }
-    val downButtonWidgetModel = DownButtonWidgetModel()
+    val downButton = DownButtonWidgetModel()
+    val dishDeleteConfirmDialog = BaseDialogWidgetModel<DishUi>(
+        positiveOnCLick = { deletedDish -> deletedDish?.let { deleteDish(it) } }
+    )
 
     init {
         launch {
@@ -81,9 +84,9 @@ class CalculatorViewModel @Inject constructor(
     }
 
     override val widgets: List<BaseWidgetModel<*>> = listOf(
-        appTopBarWidgetModel,
-        searchFieldWidgetModel,
-        downButtonWidgetModel
+        appTopBar,
+        searchField,
+        downButton
     ).actionObserve()
 
     fun setHelpText(text: String) {
@@ -102,18 +105,17 @@ class CalculatorViewModel @Inject constructor(
         dishClick(dish = dishUi, isNewDish = false)
     }
 
-    fun dishCloseOnClick(dishUi: DishUi) {
-        reduceState {
-            state.value.copy(
-                dishes = state.value.dishes
-                    .toMutableList()
-                    .apply { remove(dishUi) }
-            )
-        }
+    fun dishDeleteOnClick(dishUi: DishUi) {
+        dishDeleteConfirmDialog.dialogOpen(dishUi)
     }
 
-    fun setDishes(dishes: List<Dish>) {
-        reduceState { state.value.copy(dishes = dishes.toUi()) }
+    fun setDishes(dishes: List<DishUi>) {
+        reduceState {
+            state.value.copy(
+                dishes = dishes,
+                totalBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
+            )
+        }
     }
 
     override fun reduceStateByAction(
@@ -121,11 +123,15 @@ class CalculatorViewModel @Inject constructor(
         action: Action
     ): CalculatorState =
         when (action) {
-            is SearchFocusChanged -> currentState.copy(searchInFocus = action.focusState.isFocused)
+            is SearchFocusChanged -> {
+                val visibilityState = action.focusState.isFocused
+                downButton.visibilityState(visibilityState)
+                currentState.copy(searchInFocus = visibilityState)
+            }
 
             else -> {
                 when (action) {
-                    is CalculatorAction.LastWordClick -> searchFieldWidgetModel.setText(action.word)
+                    is CalculatorAction.LastWordClick -> searchField.setText(action.word)
                     is CalculatorAction.AddDishClick -> dishClick(action.dish)
                     AppAction.BackPressure -> router.exit()
                     DownButtonClick -> saveDishes()
@@ -133,6 +139,13 @@ class CalculatorViewModel @Inject constructor(
                 currentState
             }
         }
+
+    private fun deleteDish(dish: DishUi) {
+        val newDishes = state.value.dishes
+            .toMutableList()
+            .apply { remove(dish) }
+        reduceState { state.value.copy(dishes = newDishes) }
+    }
 
     private fun editDishes(dish: DishUi) {
         val newDishes = state.value.dishes
@@ -145,12 +158,7 @@ class CalculatorViewModel @Inject constructor(
                 } ?: add(dish)
             }
             .toList()
-        reduceState {
-            state.value.copy(
-                dishes = newDishes,
-                totalBreadUnits = newDishes.sumOf { it.breadUnits }.round(1)
-            )
-        }
+        setDishes(newDishes)
     }
 
     private fun saveDishes() {
