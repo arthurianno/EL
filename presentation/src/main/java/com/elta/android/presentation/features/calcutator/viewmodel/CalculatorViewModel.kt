@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
+import com.elta.android.domain.features.calculator.interactor.GetEventProductsUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
@@ -35,6 +36,7 @@ class CalculatorViewModel @Inject constructor(
     private val searchDishes: SearchDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
+    private val getEventProducts: GetEventProductsUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
@@ -110,7 +112,15 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun loadDishes(eventId: String) {
-        // TODO реализовать получение продуктов с нашего АПИ
+        if (eventId.isNotEmpty()) {
+            launch {
+                getEventProducts(eventId)
+                    .catch { handleError(it) }
+                    .collect {
+                        reduceState { state.value.copy(dishes = it.toUi()) }
+                    }
+            }
+        }
     }
 
     override fun reduceStateByAction(
@@ -119,9 +129,9 @@ class CalculatorViewModel @Inject constructor(
     ): CalculatorState =
         when (action) {
             is SearchFocusChanged -> {
-                val visibilityState = action.focusState.isFocused
-                downButton.visibilityState(visibilityState)
-                currentState.copy(searchInFocus = visibilityState)
+                val inFocusState = action.focusState.isFocused
+                downButton.visibilityState(!inFocusState)
+                currentState.copy(searchInFocus = inFocusState)
             }
 
             else -> {

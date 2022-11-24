@@ -1,7 +1,10 @@
 package com.elta.android.presentation.features.calcutator.model
 
+import android.os.Parcelable
 import com.elta.android.domain.features.calculator.model.DishType
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class DishUi(
     val id: String,
     val localId: String,
@@ -12,4 +15,4 @@ data class DishUi(
     val servingAmount: Double,
     val isVerification: Boolean,
     val breadUnits: Double
-)
+) : Parcelable

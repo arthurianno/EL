@@ -22,7 +22,7 @@ class EditEventFragment : BaseEventFragment<EditEventPm>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationModel.setEventId(arguments?.getString(EXTRA_EVENT_ID).orEmpty())
+        presentationModel.setEventIdState(arguments?.getString(EXTRA_EVENT_ID).orEmpty())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

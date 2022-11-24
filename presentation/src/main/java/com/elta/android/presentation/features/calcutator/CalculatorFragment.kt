@@ -61,9 +61,9 @@ private const val EXTRA_EVENT_ID = "extra_event_id"
 class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     companion object {
-        fun newInstance(eventId: String): CalculatorFragment =
+        fun newInstance(eventId: String?): CalculatorFragment =
             CalculatorFragment().apply {
-                arguments = bundle(EXTRA_EVENT_ID to eventId)
+                arguments = bundle(EXTRA_EVENT_ID to eventId.orEmpty())
             }
     }
 
@@ -93,7 +93,6 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             negativeButtonText = getString(R.string.no_text)
         )
         viewModel.setHelpText(getString(R.string.calculator_help_text_add_dishes))
-//        viewModel.setDishes(dishes.toUi())
     }
 
     @Composable

@@ -88,7 +88,8 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    fun setEventId(id: String) {
+    fun setEventIdState(id: String) {
+        eventId = id
         eventIdState.consumer.accept(id)
     }
 
