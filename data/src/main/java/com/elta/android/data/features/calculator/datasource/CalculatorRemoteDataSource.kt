@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
-class CalculatorRemoveDataSource @Inject constructor(
+class CalculatorRemoteDataSource @Inject constructor(
     private val api: CalculatorApi
 ) {
 

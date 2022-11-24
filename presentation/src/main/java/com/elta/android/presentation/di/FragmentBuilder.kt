@@ -6,8 +6,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
-import com.elta.android.presentation.features.calcutator.AddDishFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
+import com.elta.android.presentation.features.calcutator.DishDetailFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
@@ -299,5 +299,5 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindAddDishFragment(): AddDishFragment
+    abstract fun bindAddDishFragment(): DishDetailFragment
 }

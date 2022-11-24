@@ -1,7 +1,7 @@
 package com.elta.android.data.features.calculator.repository
 
 import com.elta.android.data.features.calculator.datasource.CalculatorCacheDataSource
-import com.elta.android.data.features.calculator.datasource.CalculatorRemoveDataSource
+import com.elta.android.data.features.calculator.datasource.CalculatorRemoteDataSource
 import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class CalculatorDataRepository @Inject constructor(
     private val fatSecretDataSource: FatSecretDataSource,
-    private val calculatorRemoveDataSource: CalculatorRemoveDataSource,
+    private val calculatorRemoteDataSource: CalculatorRemoteDataSource,
     private val cache: CalculatorCacheDataSource,
     override val dispatcher: CoroutineDispatcher
 ) : CalculatorRepository {
@@ -39,6 +39,6 @@ class CalculatorDataRepository @Inject constructor(
             .flowOn(dispatcher)
 
     override fun getEventProducts(eventId: String): Flow<List<Dish>> =
-        calculatorRemoveDataSource.getProducts(eventId)
+        calculatorRemoteDataSource.getProducts(eventId)
             .flowOn(dispatcher)
 }

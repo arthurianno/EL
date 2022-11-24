@@ -12,8 +12,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
-import com.elta.android.presentation.features.calcutator.AddDishFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
+import com.elta.android.presentation.features.calcutator.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
@@ -335,11 +335,11 @@ object Screens {
             webIntent("market://details?id=com.elta.android")
     }
 
-    data class CalculatorScreen(val eventId: String) : SupportAppScreen() {
+    data class CalculatorScreen(val eventId: String?) : SupportAppScreen() {
         override fun getFragment() = CalculatorFragment.newInstance(eventId)
     }
 
     data class AddDishScreen(val dish: DishUi, val isNewDish: Boolean) : SupportAppScreen() {
-        override fun getFragment() = AddDishFragment(dish, isNewDish)
+        override fun getFragment() = DishDetailFragment.newInstance(dish, isNewDish)
     }
 }
