@@ -2,9 +2,9 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
-import com.elta.android.domain.features.calculator.interactor.GetDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
+import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class CalculatorViewModel @Inject constructor(
-    private val getDishes: GetDishesUseCase,
+    private val searchDishes: SearchDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
@@ -109,13 +109,8 @@ class CalculatorViewModel @Inject constructor(
         dishDeleteConfirmDialog.dialogOpen(dishUi)
     }
 
-    fun setDishes(dishes: List<DishUi>) {
-        reduceState {
-            state.value.copy(
-                dishes = dishes,
-                totalBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
-            )
-        }
+    fun loadDishes(eventId: String) {
+        // TODO реализовать получение продуктов с нашего АПИ
     }
 
     override fun reduceStateByAction(
@@ -139,6 +134,15 @@ class CalculatorViewModel @Inject constructor(
                 currentState
             }
         }
+
+    private fun setDishes(dishes: List<DishUi>) {
+        reduceState {
+            state.value.copy(
+                dishes = dishes,
+                totalBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
+            )
+        }
+    }
 
     private fun deleteDish(dish: DishUi) {
         val newDishes = state.value.dishes
@@ -190,7 +194,7 @@ class CalculatorViewModel @Inject constructor(
 
     private fun findDishes(name: String) {
         launch {
-            getDishes(name)
+            searchDishes(name)
                 .catch { handleError(it) }
                 .onStart { reduceState { state.value.copy(isFindDishes = true) } }
                 .onCompletion { reduceState { state.value.copy(isFindDishes = false) } }

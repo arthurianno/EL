@@ -29,14 +29,14 @@ class FatSecretDataSource @Inject constructor(
     private val tokenApi: FatSecretTokenApi
 ) {
 
-    fun getFood(dish: Dish): Flow<Dish> =
-        when (dish.type) {
+    fun getFood(id: String, type: DishType): Flow<Dish> =
+        when (type) {
             DishType.Generic -> runFlowWithCatchToken {
-                api.getFoodGeneric(foodId = dish.id).asFlow()
+                api.getFoodGeneric(foodId = id).asFlow()
             }.map { it.food.toDomain() }
 
             DishType.Brand -> runFlowWithCatchToken {
-                api.getFoodBrand(foodId = dish.id).asFlow()
+                api.getFoodBrand(foodId = id).asFlow()
             }.map { it.food.toDomain() }
         }
 

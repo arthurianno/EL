@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
@@ -336,8 +335,8 @@ object Screens {
             webIntent("market://details?id=com.elta.android")
     }
 
-    data class CalculatorScreen(val dishes: List<Dish>) : SupportAppScreen() {
-        override fun getFragment() = CalculatorFragment(dishes)
+    data class CalculatorScreen(val eventId: String) : SupportAppScreen() {
+        override fun getFragment() = CalculatorFragment.newInstance(eventId)
     }
 
     data class AddDishScreen(val dish: DishUi, val isNewDish: Boolean) : SupportAppScreen() {

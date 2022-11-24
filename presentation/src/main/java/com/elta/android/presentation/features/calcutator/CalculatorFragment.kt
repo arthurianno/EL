@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator
 
+import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
-import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -49,18 +49,32 @@ import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
-import com.elta.android.presentation.features.calcutator.model.toUi
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
+import com.elta.android.presentation.utils.bundle
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
-class CalculatorFragment(
-    private val dishes: List<Dish>
-) : BaseComposeFragment<CalculatorViewModel>() {
+private const val EXTRA_EVENT_ID = "extra_event_id"
+
+class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
+
+    companion object {
+        fun newInstance(eventId: String): CalculatorFragment =
+            CalculatorFragment().apply {
+                arguments = bundle(EXTRA_EVENT_ID to eventId)
+            }
+    }
 
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getString(EXTRA_EVENT_ID)?.let {
+            viewModel.loadDishes(it)
+        }
+    }
 
     override fun initViewState() {
         with(viewModel.appTopBar) {
@@ -79,7 +93,7 @@ class CalculatorFragment(
             negativeButtonText = getString(R.string.no_text)
         )
         viewModel.setHelpText(getString(R.string.calculator_help_text_add_dishes))
-        viewModel.setDishes(dishes.toUi())
+//        viewModel.setDishes(dishes.toUi())
     }
 
     @Composable
