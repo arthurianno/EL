@@ -392,9 +392,8 @@ class GlucometersManager @Inject constructor(
     // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compotable
     private fun isSupported(compatible: String): Boolean = true
 
-    // TODO Временно выключена проверка заряда батареи.
-    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean = true
-//        (batteryLevel ?: 0) >= MIN_LEVEL
+    private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
+        (batteryLevel ?: 0) >= MIN_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
