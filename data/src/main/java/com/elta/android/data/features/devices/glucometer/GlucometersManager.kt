@@ -233,6 +233,7 @@ class GlucometersManager @Inject constructor(
                                                     required = MIN_LEVEL
                                                 )
                                             )
+
                                             else -> connection.request(address, Commands.ToDfuMode)
                                         }
                                     }
@@ -245,6 +246,7 @@ class GlucometersManager @Inject constructor(
                                         file.path,
                                         address.toDfuAddress()
                                     )
+
                                     else -> Observable.error(GlucometerToDfuModeError)
                                 }
                             }
@@ -313,6 +315,7 @@ class GlucometersManager @Inject constructor(
                             pinStorage.setPin(address, "")
                             Observable.error(GlucometerPinIncorrectOrNotFoundError)
                         }
+
                         response.isPinError() -> Observable.error(GlucometerPinRequireError)
                         else -> Observable.just(response)
                     }
@@ -356,9 +359,11 @@ class GlucometersManager @Inject constructor(
                                 client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
                                     Observable.error(BluetoothNotEnabledError)
                                 }
+
                                 e is BleDisconnectedException -> Observable.error(
                                     GlucometerOfflineError
                                 )
+
                                 else -> Observable.error(e)
                             }
                         }
@@ -383,11 +388,9 @@ class GlucometersManager @Inject constructor(
     private fun String.isOk(): Boolean = endsWith("ok")
     private fun String.isError(): Boolean = contains("error")
     private fun String.isEvent(): Boolean = startsWith("rd")
-    private fun isSupported(compatible: String): Boolean {
-        val appVersionCode = FIRMWARE_VERSION.replace(".", "").toInt()
-        val compatibleVersionCode = compatible.replace(".", "").toInt()
-        return appVersionCode >= compatibleVersionCode
-    }
+
+    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compotable
+    private fun isSupported(compatible: String): Boolean = true
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
         (batteryLevel ?: 0) >= MIN_LEVEL
