@@ -9,5 +9,5 @@ class GetDishUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
     operator fun invoke(dish: Dish): Flow<Dish> =
-        repository.getFood(dish)
+        repository.getFatSecretDish(dish.id, dish.type)
 }

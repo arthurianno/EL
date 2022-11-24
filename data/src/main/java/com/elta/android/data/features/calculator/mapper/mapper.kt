@@ -3,6 +3,7 @@ package com.elta.android.data.features.calculator.mapper // ktlint-disable filen
 import com.elta.android.data.features.calculator.dto.CompactFoodDto
 import com.elta.android.data.features.calculator.dto.FoodBrandDto
 import com.elta.android.data.features.calculator.dto.FoodGenericDto
+import com.elta.android.data.features.calculator.dto.ProductDto
 import com.elta.android.data.features.calculator.dto.ServingDto
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
@@ -12,7 +13,7 @@ import java.util.UUID
 internal fun FoodGenericDto.Food.toDomain(): Dish =
     Dish(
         id = foodId,
-        localId = UUID.randomUUID().toString(),
+        localId = getLocalId(),
         name = foodName,
         type = DishType.Generic,
         servings = servingsGeneric.servings.foodsToDomain(),
@@ -25,7 +26,7 @@ internal fun FoodGenericDto.Food.toDomain(): Dish =
 internal fun FoodBrandDto.Food.toDomain(): Dish =
     Dish(
         id = foodId,
-        localId = UUID.randomUUID().toString(),
+        localId = getLocalId(),
         name = foodName,
         type = DishType.Brand,
         servings = listOf(servingsBrand.serving.toDomain()),
@@ -65,3 +66,30 @@ internal fun CompactFoodDto.toDomain(): Dish =
 
 internal fun List<CompactFoodDto>.compactFoodsToDomain(): List<Dish> =
     map { it.toDomain() }
+
+internal fun ProductDto.toDomain(): Dish =
+    Dish(
+        id = id,
+        localId = getLocalId(),
+        name = name,
+        type = DishType.valueOf(type),
+        servings = emptyList(),
+        servingAmount = servingAmount,
+        servingSelect = Serving(
+            id = servingId,
+            servingDescription = servingName,
+            measurementDescription = servingName,
+            numberOfUnits = servingAmount,
+            calories = 0.0,
+            proteins = 0.0,
+            fats = 0.0,
+            carbs = 0.0
+        ),
+        isVerification = false,
+        breadUnits = breadUnits
+    )
+
+internal fun List<ProductDto>.toDomain(): List<Dish> =
+    map { it.toDomain() }
+
+private fun getLocalId(): String = UUID.randomUUID().toString()
