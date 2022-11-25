@@ -130,6 +130,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     .align(Alignment.BottomStart)
                     .padding(dimens.dishHeaderTitle)
             ) {
+                Text(text = dish.brandName, style = types.body1, color = colors.white)
                 Row {
                     if (dish.isVerification) {
                         Image(

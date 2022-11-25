@@ -10,6 +10,7 @@ data class DishUi(
     val localId: String,
     val name: String,
     val type: DishType,
+    val brandName: String,
     val servings: List<ServingUi>,
     val servingSelect: ServingUi,
     val servingAmount: Double,

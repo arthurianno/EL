@@ -36,6 +36,7 @@ class DishDetailViewModel @Inject constructor(
                 localId = "",
                 name = "",
                 type = DishType.Brand,
+                brandName = "",
                 isVerification = false,
                 servings = emptyList(),
                 servingSelect = servingUiEmpty(),

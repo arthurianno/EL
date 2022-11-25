@@ -5,6 +5,7 @@ data class Dish(
     val localId: String,
     val name: String,
     val type: DishType,
+    val brandName: String,
     val servings: List<Serving>,
     val servingSelect: Serving,
     val servingAmount: Double,
