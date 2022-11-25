@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -31,7 +33,7 @@ data class SearchFocusChanged(val focusState: FocusState) : Action
 @Immutable
 data class SearchFieldState(
     val hint: String,
-    val text: String,
+    val textField: TextFieldValue,
     @DrawableRes val icon: Int?,
     val isFocused: Boolean
 )
@@ -41,8 +43,19 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
         setState { state.value.copy(hint = hint.orEmpty()) }
     }
 
-    fun setText(text: String?) {
-        setState { state.value.copy(text = text.orEmpty()) }
+    fun setText(fieldValue: TextFieldValue) {
+        setState { state.value.copy(textField = fieldValue) }
+    }
+
+    fun setTextAndCursorToEnd(text: String) {
+        setState {
+            state.value.copy(
+                textField = TextFieldValue(
+                    text = text,
+                    selection = TextRange(text.length)
+                )
+            )
+        }
     }
 
     fun setIcon(@DrawableRes icon: Int?) {
@@ -50,14 +63,14 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
     }
 
     fun focusChanged(focusState: FocusState) {
-        if (!focusState.isFocused) setText(null)
+        if (!focusState.isFocused) setText(TextFieldValue(""))
         setState { state.value.copy(isFocused = focusState.isFocused) }
         sendAction(SearchFocusChanged(focusState))
     }
 
     override fun createInitState(): SearchFieldState =
         SearchFieldState(
-            text = "",
+            textField = TextFieldValue(""),
             hint = "",
             isFocused = false,
             icon = R.drawable.ic_search
@@ -82,7 +95,7 @@ fun SearchField(widgetModel: SearchFieldWidgetModel, searchInFocus: Boolean) {
                 }
             }
             TextField(
-                value = state.value.text,
+                value = state.value.textField,
                 onValueChange = widgetModel::setText,
                 singleLine = true,
                 shape = shapes.textField,
