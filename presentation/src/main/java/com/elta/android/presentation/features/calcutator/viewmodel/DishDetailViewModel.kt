@@ -46,9 +46,12 @@ class DishDetailViewModel @Inject constructor(
         )
 
     val downButtonWidgetModel = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel().also { portionCount ->
+    val portionCountTextField = IconTextFieldWidgetModel()
+    val portionDescriptionTextField = IconTextFieldWidgetModel()
+
+    init {
         launch {
-            portionCount.state
+            portionCountTextField.state
                 .map { it.text }
                 .filter { it.isNotEmpty() }
                 .map { it.toDouble() }
@@ -63,11 +66,8 @@ class DishDetailViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    val portionDescriptionTextField = IconTextFieldWidgetModel().also { portionField ->
         launch {
-            portionField.state
+            portionDescriptionTextField.state
                 .map { it.text }
                 .filter { it.isNotEmpty() }
                 .map {

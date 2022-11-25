@@ -71,19 +71,13 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         }
     }
 
-    override fun initViewState() {
-        with(viewModel.downButtonWidgetModel) {
-            setText(getString(R.string.calculator_add_text))
+    override fun DishDetailViewModel.init() {
+        downButtonWidgetModel.setText(getString(R.string.calculator_add_text))
+        portionCountTextField.setIcon(R.drawable.ic_plus_minus)
+        if (portionCountTextField.state.value.text.isEmpty()) {
+            portionCountTextField.setText(PORTION_INIT_TEXT)
         }
-        with(viewModel.portionCountTextField) {
-            setIcon(R.drawable.ic_plus_minus)
-            if (state.value.text.isEmpty()) {
-                setText(PORTION_INIT_TEXT)
-            }
-        }
-        with(viewModel.portionDescriptionTextField) {
-            setIcon(R.drawable.ic_list)
-        }
+        portionDescriptionTextField.setIcon(R.drawable.ic_list)
     }
 
     @Composable

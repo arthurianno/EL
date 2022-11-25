@@ -54,19 +54,7 @@ class CalculatorViewModel @Inject constructor(
         )
 
     val appTopBar = BaseAppTopBarWidgetModel()
-    val searchField = SearchFieldWidgetModel().also {
-        launch {
-            it.state
-                .map { it.text }
-                .collectLatest {
-                    if (it.isNotEmpty()) {
-                        findDishes(it)
-                    } else {
-                        clearFindingDishes()
-                    }
-                }
-        }
-    }
+    val searchField = SearchFieldWidgetModel()
     val downButton = DownButtonWidgetModel()
     val dishDeleteConfirmDialog = BaseDialogWidgetModel<DishUi>(
         positiveOnCLick = { deletedDish -> deletedDish?.let { deleteDish(it) } }
@@ -82,6 +70,17 @@ class CalculatorViewModel @Inject constructor(
             getHistoryList()
                 .catch { handleError(it) }
                 .collectLatest { reduceState { state.value.copy(lastWords = it) } }
+        }
+        launch {
+            searchField.state
+                .map { it.text }
+                .collectLatest {
+                    if (it.isNotEmpty()) {
+                        findDishes(it)
+                    } else {
+                        clearFindingDishes()
+                    }
+                }
         }
     }
 
