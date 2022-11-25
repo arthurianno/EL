@@ -1,6 +1,6 @@
 package com.elta.android.data.features.calculator.api
 
-import com.elta.android.data.features.calculator.dto.TokenDto
+import com.elta.android.data.features.calculator.model.TokenResponse
 import io.reactivex.Observable
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -14,5 +14,5 @@ interface FatSecretTokenApi {
         @Field("client_id") clientId: String,
         @Field("client_secret") clientSecret: String,
         @Field("scope") scope: String
-    ): Observable<TokenDto>
+    ): Observable<TokenResponse>
 }

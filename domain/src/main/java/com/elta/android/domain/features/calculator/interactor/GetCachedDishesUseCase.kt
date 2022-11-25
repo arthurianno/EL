@@ -1,13 +1,14 @@
 package com.elta.android.domain.features.calculator.interactor
 
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SaveWordToHistoryUseCase @Inject constructor(
+class GetCachedDishesUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
 
-    suspend operator fun invoke(word: String) {
-        repository.saveWordToHistory(word)
-    }
+    operator fun invoke(): Flow<List<Dish>> =
+        repository.getLocalDishes()
 }

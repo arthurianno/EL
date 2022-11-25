@@ -102,5 +102,5 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindFatSecretRepository(repo: CalculatorDataRepository): CalculatorRepository
+    abstract fun bindCalculatorRepository(repo: CalculatorDataRepository): CalculatorRepository
 }

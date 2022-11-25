@@ -1,8 +1,8 @@
-package com.elta.android.data.features.calculator.dto
+package com.elta.android.data.features.calculator.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ServingDto(
+data class ServingNetworkEntity(
     @SerializedName("calories") val calories: String,
     @SerializedName("carbohydrate") val carbohydrate: String,
     @SerializedName("cholesterol") val cholesterol: String,

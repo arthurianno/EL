@@ -335,11 +335,11 @@ object Screens {
             webIntent("market://details?id=com.elta.android")
     }
 
-    data class CalculatorScreen(val eventId: String?) : SupportAppScreen() {
-        override fun getFragment() = CalculatorFragment.newInstance(eventId)
+    object CalculatorScreen : SupportAppScreen() {
+        override fun getFragment() = CalculatorFragment()
     }
 
-    data class AddDishScreen(val dish: DishUi, val isNewDish: Boolean) : SupportAppScreen() {
-        override fun getFragment() = DishDetailFragment.newInstance(dish, isNewDish)
+    data class AddDishScreen(val dish: DishUi) : SupportAppScreen() {
+        override fun getFragment() = DishDetailFragment.newInstance(dish)
     }
 }
