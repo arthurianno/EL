@@ -76,23 +76,17 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         }
     }
 
-    override fun initViewState() {
-        with(viewModel.appTopBar) {
-            setTitle(getString(R.string.calculator_appbar_title))
-            setStartIconAction(AppAction.BackPressure)
-        }
-        with(viewModel.searchField) {
-            setHint(getString(R.string.calculator_search_hint))
-        }
-        with(viewModel.downButton) {
-            setText(getString(R.string.calculator_save_text))
-        }
-        viewModel.dishDeleteConfirmDialog.initDialog(
+    override fun CalculatorViewModel.init() {
+        appTopBar.setTitle(getString(R.string.calculator_appbar_title))
+        appTopBar.setStartIconAction(AppAction.BackPressure)
+        searchField.setHint(getString(R.string.calculator_search_hint))
+        downButton.setText(getString(R.string.calculator_save_text))
+        setHelpText(getString(R.string.calculator_help_text_add_dishes))
+        dishDeleteConfirmDialog.initDialog(
             message = getString(R.string.calculator_dish_delete_request),
             positiveButtonText = getString(R.string.yes_text),
             negativeButtonText = getString(R.string.no_text)
         )
-        viewModel.setHelpText(getString(R.string.calculator_help_text_add_dishes))
     }
 
     @Composable
