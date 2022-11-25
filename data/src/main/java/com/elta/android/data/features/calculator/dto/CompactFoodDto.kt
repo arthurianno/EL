@@ -8,5 +8,5 @@ data class CompactFoodDto(
     @SerializedName("food_name") val foodName: String,
     @SerializedName("food_type") val foodType: String,
     @SerializedName("food_url") val foodUrl: String,
-    @SerializedName("brand_name") val brandName: String
+    @SerializedName("brand_name") val brandName: String?
 )

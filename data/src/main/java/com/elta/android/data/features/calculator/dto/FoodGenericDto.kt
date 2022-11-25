@@ -9,6 +9,7 @@ data class FoodGenericDto(
         @SerializedName("food_id") val foodId: String,
         @SerializedName("food_name") val foodName: String,
         @SerializedName("food_type") val foodType: String,
+        @SerializedName("brand_name") val brandName: String?,
         @SerializedName("food_url") val foodUrl: String,
         @SerializedName("servings") val servingsGeneric: ServingGenericDto
     )
