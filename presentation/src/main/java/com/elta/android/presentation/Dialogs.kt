@@ -109,4 +109,12 @@ sealed class Dialogs : DialogData {
         override val negative: String? = resources.getString(R.string.profile_support_email_description),
         override val positive: String? = resources.getString(R.string.ok)
     ) : Dialogs()
+
+    data class UserHadChangesBreadUnitsData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.calculator_user_had_changed_data_title),
+        override val message: String = resourceProvider.getString(R.string.calculator_user_had_changed_data_message),
+        override val negative: String? = null,
+        override val positive: String? = resourceProvider.getString(R.string.ok)
+    ) : Dialogs()
 }

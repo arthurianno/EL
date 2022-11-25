@@ -71,6 +71,7 @@ abstract class BaseEventPm(
     }
 
     val dishes = state<List<Dish>>(null)
+    protected var eventId: String? = null
 
     abstract fun handleBack(i: Unit)
 
@@ -138,7 +139,7 @@ abstract class BaseEventPm(
             .map { createChooserConfiguration() }
             .subscribe {
                 when (it.eventType) {
-                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(dishes.valueOrNull.orEmpty()))
+                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(eventId))
                     else -> router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }

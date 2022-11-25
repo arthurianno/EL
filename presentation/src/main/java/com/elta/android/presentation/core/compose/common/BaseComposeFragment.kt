@@ -22,20 +22,25 @@ abstract class BaseComposeFragment<VM : ViewModel> : Fragment(R.layout.fragment_
 
     abstract val viewModel: VM
 
-    protected open fun initViewState() {}
+    protected open fun VM.init() {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initViewState()
+        viewModel.init()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<ComposeView>(R.id.main_view).setContent {
             EltaTheme {
+                Dialogs()
                 Content(viewModel = viewModel)
             }
         }
+    }
+
+    @Composable
+    open fun Dialogs() {
     }
 
     @Composable

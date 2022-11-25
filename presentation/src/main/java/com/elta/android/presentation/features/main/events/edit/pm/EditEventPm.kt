@@ -88,7 +88,8 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    fun setEventId(id: String) {
+    fun setEventIdState(id: String) {
+        eventId = id
         eventIdState.consumer.accept(id)
     }
 
@@ -140,6 +141,7 @@ class EditEventPm @Inject constructor(
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
         dateTimeSelectedAction.consumer.accept(event.additionTime)
         event.note?.let { noteInput.text.consumer.accept(it) }
+        dishes.consumer.accept(event.dishes)
     }
 
     private fun createGetEventUseCaseParams(i: Unit) =
@@ -160,7 +162,8 @@ class EditEventPm @Inject constructor(
                 insulinType = form.insulin?.type,
                 medicament = form.insulin?.drug,
                 note = form.note,
-                type = checkNotNull(form.eventType)
+                type = checkNotNull(form.eventType),
+                dishes = dishes.valueOrNull.orEmpty()
             )
         )
     }

@@ -17,6 +17,7 @@ data class EltaDimens(
     val downButtonHeight: Dp,
     val textFieldPopupOffset: DpOffset,
     val borderWidth: Dp,
+    val dialogPaddings: PaddingValues,
     // Calculator Dims
     val lastWordVertical: Dp,
     val dishCardVerticalSpace: Dp,
@@ -43,6 +44,7 @@ internal val eltaDimens = EltaDimens(
     downButtonHeight = 52.dp,
     textFieldPopupOffset = DpOffset(16.dp, 0.dp),
     borderWidth = 1.dp,
+    dialogPaddings = PaddingValues(top = 24.dp, start = 24.dp, end = 8.dp, bottom = 8.dp),
     lastWordVertical = 12.dp,
     dishCardVerticalSpace = 8.dp,
     dishNameSpace = 12.dp,

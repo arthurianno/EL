@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
@@ -13,8 +12,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
-import com.elta.android.presentation.features.calcutator.AddDishFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
+import com.elta.android.presentation.features.calcutator.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
@@ -336,11 +335,11 @@ object Screens {
             webIntent("market://details?id=com.elta.android")
     }
 
-    data class CalculatorScreen(val dishes: List<Dish>) : SupportAppScreen() {
-        override fun getFragment() = CalculatorFragment(dishes)
+    data class CalculatorScreen(val eventId: String?) : SupportAppScreen() {
+        override fun getFragment() = CalculatorFragment.newInstance(eventId)
     }
 
     data class AddDishScreen(val dish: DishUi, val isNewDish: Boolean) : SupportAppScreen() {
-        override fun getFragment() = AddDishFragment(dish, isNewDish)
+        override fun getFragment() = DishDetailFragment.newInstance(dish, isNewDish)
     }
 }

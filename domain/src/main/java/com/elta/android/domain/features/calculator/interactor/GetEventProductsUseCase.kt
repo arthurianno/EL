@@ -5,9 +5,10 @@ import com.elta.android.domain.features.calculator.repository.CalculatorReposito
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetDishUseCase @Inject constructor(
+class GetEventProductsUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
-    operator fun invoke(dish: Dish): Flow<Dish> =
-        repository.getFood(dish)
+
+    operator fun invoke(eventId: String): Flow<List<Dish>> =
+        repository.getEventProducts(eventId)
 }

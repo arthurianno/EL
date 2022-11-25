@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
-import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
+import com.elta.android.domain.features.calculator.interactor.GetFatSecretDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.core.compose.common.Action
@@ -12,7 +12,7 @@ import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
-import com.elta.android.presentation.features.calcutator.model.AddDishState
+import com.elta.android.presentation.features.calcutator.model.DishDetailState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.calcutator.model.servingUiEmpty
 import com.elta.android.presentation.features.calcutator.model.toDomain
@@ -25,17 +25,18 @@ import javax.inject.Inject
 
 private const val START_AMOUNT = 1.0
 
-class AddDishViewModel @Inject constructor(
-    private val getDish: GetDishUseCase,
+class DishDetailViewModel @Inject constructor(
+    private val getFatSecretDish: GetFatSecretDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
-) : BaseViewModel<AddDishState, Event, Action>() {
-    override fun createInitState(): AddDishState =
-        AddDishState(
+) : BaseViewModel<DishDetailState, Event, Action>() {
+    override fun createInitState(): DishDetailState =
+        DishDetailState(
             dish = DishUi(
                 id = "",
                 localId = "",
                 name = "",
                 type = DishType.Brand,
+                brandName = "",
                 isVerification = false,
                 servings = emptyList(),
                 servingSelect = servingUiEmpty(),
@@ -45,9 +46,12 @@ class AddDishViewModel @Inject constructor(
         )
 
     val downButtonWidgetModel = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel().also { portionCount ->
+    val portionCountTextField = IconTextFieldWidgetModel()
+    val portionDescriptionTextField = IconTextFieldWidgetModel()
+
+    init {
         launch {
-            portionCount.state
+            portionCountTextField.state
                 .map { it.text }
                 .filter { it.isNotEmpty() }
                 .map { it.toDouble() }
@@ -62,11 +66,8 @@ class AddDishViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    val portionDescriptionTextField = IconTextFieldWidgetModel().also { portionField ->
         launch {
-            portionField.state
+            portionDescriptionTextField.state
                 .map { it.text }
                 .filter { it.isNotEmpty() }
                 .map {
@@ -93,7 +94,10 @@ class AddDishViewModel @Inject constructor(
             portionDescriptionTextField
         ).actionObserve()
 
-    override fun reduceStateByAction(currentState: AddDishState, action: Action): AddDishState =
+    override fun reduceStateByAction(
+        currentState: DishDetailState,
+        action: Action
+    ): DishDetailState =
         run {
             when (action) {
                 AppAction.BackPressure -> router.exit()
@@ -110,10 +114,10 @@ class AddDishViewModel @Inject constructor(
         }
     }
 
-    fun setDish(dishUi: DishUi, isNewDish: Boolean) {
+    fun setDish(dish: DishUi, isNewDish: Boolean) {
         launch {
             if (isNewDish) {
-                getDish(dishUi.toDomain())
+                getFatSecretDish(dish.id, dish.type)
                     .catch { handleError(it) }
                     .map { it.toUi() }
                     .collect { dish ->
@@ -121,12 +125,12 @@ class AddDishViewModel @Inject constructor(
                         portionDescriptionTextField.setDropDownList(dish.servings.map { it.measurementDescription })
                     }
             } else {
-                reduceState { state.value.copy(dish = dishUi) }
+                reduceState { state.value.copy(dish = dish) }
                 with(portionDescriptionTextField) {
-                    setDropDownList(dishUi.servings.map { it.measurementDescription })
-                    setText(dishUi.servingSelect.measurementDescription)
+                    setDropDownList(dish.servings.map { it.measurementDescription })
+                    setText(dish.servingSelect.measurementDescription)
                 }
-                portionCountTextField.setText(dishUi.servingAmount.toInt().toString())
+                portionCountTextField.setText(dish.servingAmount.toInt().toString())
             }
         }
     }

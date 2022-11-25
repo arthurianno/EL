@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator
 
+import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,42 +32,56 @@ import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
-import com.elta.android.presentation.features.calcutator.model.AddDishState
+import com.elta.android.presentation.features.calcutator.model.DishDetailState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.calcutator.model.ServingUi
-import com.elta.android.presentation.features.calcutator.viewmodel.AddDishViewModel
+import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
+import com.elta.android.presentation.utils.bundle
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerLarge
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
 private const val PORTION_INIT_TEXT = "1"
+private const val EXTRA_DISH = "extra_dish"
+private const val EXTRA_IS_NEW_DISH = "extra_is_new_dish"
 
-class AddDishFragment(
-    private val dish: DishUi,
-    private val isNewDish: Boolean
-) : BaseComposeFragment<AddDishViewModel>() {
-    override val viewModel: AddDishViewModel by viewModels { viewModelFactory }
-
-    override fun initViewState() {
-        with(viewModel.downButtonWidgetModel) {
-            setText(getString(R.string.calculator_add_text))
-        }
-        with(viewModel.portionCountTextField) {
-            setIcon(R.drawable.ic_plus_minus)
-            if (state.value.text.isEmpty()) {
-                setText(PORTION_INIT_TEXT)
+class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
+    companion object {
+        fun newInstance(
+            dish: DishUi,
+            isNewDish: Boolean
+        ): DishDetailFragment =
+            DishDetailFragment().apply {
+                arguments = bundle(
+                    EXTRA_DISH to dish,
+                    EXTRA_IS_NEW_DISH to isNewDish
+                )
             }
+    }
+
+    override val viewModel: DishDetailViewModel by viewModels { viewModelFactory }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val isNewDish = arguments?.getBoolean(EXTRA_IS_NEW_DISH) ?: true
+        arguments?.getParcelable<DishUi>(EXTRA_DISH)?.let { dish ->
+            viewModel.setDish(dish, isNewDish)
         }
-        with(viewModel.portionDescriptionTextField) {
-            setIcon(R.drawable.ic_list)
+    }
+
+    override fun DishDetailViewModel.init() {
+        downButtonWidgetModel.setText(getString(R.string.calculator_add_text))
+        portionCountTextField.setIcon(R.drawable.ic_plus_minus)
+        if (portionCountTextField.state.value.text.isEmpty()) {
+            portionCountTextField.setText(PORTION_INIT_TEXT)
         }
-        viewModel.setDish(dish, isNewDish)
+        portionDescriptionTextField.setIcon(R.drawable.ic_list)
     }
 
     @Composable
-    override fun Content(viewModel: AddDishViewModel) {
+    override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
@@ -109,6 +124,7 @@ class AddDishFragment(
                     .align(Alignment.BottomStart)
                     .padding(dimens.dishHeaderTitle)
             ) {
+                Text(text = dish.brandName, style = types.body1, color = colors.white)
                 Row {
                     if (dish.isVerification) {
                         Image(
@@ -158,7 +174,10 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun BoxScope.MainContent(viewModel: AddDishViewModel, state: State<AddDishState>) {
+    private fun BoxScope.MainContent(
+        viewModel: DishDetailViewModel,
+        state: State<DishDetailState>
+    ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
                 modifier = Modifier
@@ -188,7 +207,7 @@ class AddDishFragment(
     }
 
     @Composable
-    private fun Footer(state: State<AddDishState>) {
+    private fun Footer(state: State<DishDetailState>) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             val dish = state.value.dish
             val serving = state.value.dish.servingSelect
