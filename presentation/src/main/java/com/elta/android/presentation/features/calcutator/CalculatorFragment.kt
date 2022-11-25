@@ -145,7 +145,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     ) {
         val searchFieldState = viewModel.searchField.state.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
-        if (searchFieldState.value.text.isEmpty()) {
+        if (searchFieldState.value.textField.text.isEmpty()) {
             LastWords(
                 lastWords = state.value.lastWords,
                 onClick = {
@@ -381,7 +381,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     state.value.helpText
                 } else {
                     stringResource(
-                        id = if (searchFieldState.value.text.isEmpty()) {
+                        id = if (searchFieldState.value.textField.text.isEmpty()) {
                             R.string.calculator_last_search
                         } else {
                             R.string.calculator_search_result

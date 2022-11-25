@@ -75,7 +75,7 @@ class CalculatorViewModel @Inject constructor(
         }
         launch {
             searchField.state
-                .map { it.text }
+                .map { it.textField.text }
                 .collectLatest {
                     if (it.isNotEmpty()) {
                         findDishes(it)
@@ -138,7 +138,7 @@ class CalculatorViewModel @Inject constructor(
 
             else -> {
                 when (action) {
-                    is CalculatorAction.LastWordClick -> searchField.setText(action.word)
+                    is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
                     is CalculatorAction.AddDishClick -> dishClick(action.dish)
                     AppAction.BackPressure -> router.exit()
                     DownButtonClick -> saveDishes()
