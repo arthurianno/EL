@@ -1,13 +1,14 @@
 package com.elta.android.domain.features.calculator.interactor
 
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
 import javax.inject.Inject
 
-class SaveWordToHistoryUseCase @Inject constructor(
+class CachedDishesUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
 
-    suspend operator fun invoke(word: String) {
-        repository.saveWordToHistory(word)
+    suspend operator fun invoke(dishes: List<Dish>) {
+        repository.saveLocalDishes(dishes)
     }
 }

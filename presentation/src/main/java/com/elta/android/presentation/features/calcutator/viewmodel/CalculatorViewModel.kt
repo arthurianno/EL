@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
+import com.elta.android.domain.features.calculator.interactor.GetCachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.GetEventProductsUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
@@ -37,6 +38,7 @@ class CalculatorViewModel @Inject constructor(
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
     private val getEventProducts: GetEventProductsUseCase,
+    private val getCachedDishes: GetCachedDishesUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
@@ -73,7 +75,7 @@ class CalculatorViewModel @Inject constructor(
         }
         launch {
             searchField.state
-                .map { it.text }
+                .map { it.textField.text }
                 .collectLatest {
                     if (it.isNotEmpty()) {
                         findDishes(it)
@@ -81,6 +83,11 @@ class CalculatorViewModel @Inject constructor(
                         clearFindingDishes()
                     }
                 }
+        }
+        launch {
+            getCachedDishes()
+                .catch { handleError(it) }
+                .collect { reduceState { state.value.copy(dishes = it.toUi()) } }
         }
     }
 
@@ -98,12 +105,8 @@ class CalculatorViewModel @Inject constructor(
         sendAction(CalculatorAction.LastWordClick(word))
     }
 
-    fun addDishOnClick(dish: DishUi) {
+    fun dishOnClick(dish: DishUi) {
         sendAction(CalculatorAction.AddDishClick(dish))
-    }
-
-    fun dishCardOnClick(dishUi: DishUi) {
-        dishClick(dish = dishUi, isNewDish = false)
     }
 
     fun dishDeleteOnClick(dishUi: DishUi) {
@@ -135,7 +138,7 @@ class CalculatorViewModel @Inject constructor(
 
             else -> {
                 when (action) {
-                    is CalculatorAction.LastWordClick -> searchField.setText(action.word)
+                    is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
                     is CalculatorAction.AddDishClick -> dishClick(action.dish)
                     AppAction.BackPressure -> router.exit()
                     DownButtonClick -> saveDishes()
@@ -182,17 +185,14 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    private fun dishClick(dish: DishUi, isNewDish: Boolean = true) {
+    private fun dishClick(dish: DishUi) {
         launch {
             saveWordToHistory(dish.name)
+            getHistoryList()
                 .catch { handleError(it) }
-                .collect {
-                    getHistoryList()
-                        .catch { handleError(it) }
-                        .collectLatest {
-                            reduceState { state.value.copy(lastWords = it) }
-                            router.navigateTo(Screens.AddDishScreen(dish, isNewDish))
-                        }
+                .collectLatest {
+                    reduceState { state.value.copy(lastWords = it) }
+                    router.navigateTo(Screens.AddDishScreen(dish))
                 }
         }
     }

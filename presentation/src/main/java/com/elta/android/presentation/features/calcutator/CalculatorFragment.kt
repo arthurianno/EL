@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.calcutator
 
-import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,30 +50,13 @@ import com.elta.android.presentation.features.calcutator.model.CalculatorState
 import com.elta.android.presentation.features.calcutator.model.DishUi
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
-import com.elta.android.presentation.utils.bundle
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
 import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
-private const val EXTRA_EVENT_ID = "extra_event_id"
-
 class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
-    companion object {
-        fun newInstance(eventId: String?): CalculatorFragment =
-            CalculatorFragment().apply {
-                arguments = bundle(EXTRA_EVENT_ID to eventId.orEmpty())
-            }
-    }
-
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.getString(EXTRA_EVENT_ID)?.let {
-            viewModel.loadDishes(it)
-        }
-    }
 
     override fun CalculatorViewModel.init() {
         appTopBar.setTitle(getString(R.string.calculator_appbar_title))
@@ -163,7 +145,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     ) {
         val searchFieldState = viewModel.searchField.state.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
-        if (searchFieldState.value.text.isEmpty()) {
+        if (searchFieldState.value.textField.text.isEmpty()) {
             LastWords(
                 lastWords = state.value.lastWords,
                 onClick = {
@@ -175,7 +157,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             FindingDishes(
                 findingDishes = state.value.findingDishes,
                 isFindDishes = state.value.isFindDishes,
-                onClick = viewModel::addDishOnClick
+                onClick = viewModel::dishOnClick
             )
         }
     }
@@ -269,7 +251,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         VSpacerSmall()
         SelectedDishes(
             dishes,
-            onCardClick = viewModel::dishCardOnClick,
+            onCardClick = viewModel::dishOnClick,
             onCloseClick = viewModel::dishDeleteOnClick
         )
     }
@@ -399,7 +381,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     state.value.helpText
                 } else {
                     stringResource(
-                        id = if (searchFieldState.value.text.isEmpty()) {
+                        id = if (searchFieldState.value.textField.text.isEmpty()) {
                             R.string.calculator_last_search
                         } else {
                             R.string.calculator_search_result

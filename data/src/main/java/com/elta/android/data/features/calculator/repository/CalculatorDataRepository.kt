@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class CalculatorDataRepository @Inject constructor(
     private val fatSecretDataSource: FatSecretDataSource,
-    private val calculatorRemoteDataSource: CalculatorRemoteDataSource,
+    private val remote: CalculatorRemoteDataSource,
     private val cache: CalculatorCacheDataSource,
     override val dispatcher: CoroutineDispatcher
 ) : CalculatorRepository {
@@ -34,11 +34,23 @@ class CalculatorDataRepository @Inject constructor(
         cache.getHistoryWords()
             .flowOn(dispatcher)
 
-    override fun saveWordToHistory(word: String): Flow<Unit> =
+    override suspend fun saveWordToHistory(word: String) {
         cache.saveWordToHistory(word)
-            .flowOn(dispatcher)
+    }
 
     override fun getEventProducts(eventId: String): Flow<List<Dish>> =
-        calculatorRemoteDataSource.getProducts(eventId)
+        remote.getProducts(eventId)
             .flowOn(dispatcher)
+
+    override fun getLocalDishes(): Flow<List<Dish>> =
+        cache.getDishesFromCache()
+            .flowOn(dispatcher)
+
+    override suspend fun saveLocalDishes(dishes: List<Dish>) {
+        cache.cachedDishes(dishes)
+    }
+
+    override suspend fun clearLocalDishes() {
+        cache.clearDishesCache()
+    }
 }

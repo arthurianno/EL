@@ -1,6 +1,8 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.common.utils.atEndOfDay
+import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -21,10 +23,12 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
+import com.elta.android.presentation.features.main.events.mapper.toPickerValues
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import kotlinx.coroutines.flow.catch
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -34,12 +38,13 @@ import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 abstract class BaseEventPm(
-    services: ServiceFacade
+    services: ServiceFacade,
+    private val calculatorFragmentResultHandler: CalculatorFragmentResultHandler,
+    private val cachedDishes: CachedDishesUseCase
 ) : BasePm(services) {
 
     val formPickerValueChangedAction = action<Double>()
     val updateFormPickerValueCommand = command<Pair<Int, Int>>()
-
     val formInput = inputControl()
     val formSelector = formSelectorControl()
     val tagSelector = formSelectorControl()
@@ -51,17 +56,15 @@ abstract class BaseEventPm(
     val mainAction = action<Unit>()
     val profileState = state<Profile>()
     val getProfileAction = action<Unit>()
-
     val showDatePickerDialog = command<ZonedDateTime>(bufferSize = 1)
     val showTimePickerDialog = command<ZonedDateTime>(bufferSize = 1)
     val dateTimeSelectedAction = action<ZonedDateTime>()
-
     val backHandleAction = action<Unit>()
     val exitDialogAction = action<Unit>()
-
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
-
     val eventTypeState = state<EventType>()
+    val dishes = state<List<Dish>>(emptyList())
+
     protected val formPickerValue = state<Double>()
     protected val selectedDateState = state(ZonedDateTime.now())
 
@@ -69,9 +72,6 @@ abstract class BaseEventPm(
     private val dateInFutureSnackBarData by lazy {
         SnackBarMessageData.SimpleTextMessage(resources.getString(R.string.event_form_date_in_future))
     }
-
-    val dishes = state<List<Dish>>(null)
-    protected var eventId: String? = null
 
     abstract fun handleBack(i: Unit)
 
@@ -85,6 +85,7 @@ abstract class BaseEventPm(
         bindDateSelectors()
         bindHandleBack()
         observeEventChanges()
+        observeDishesResult()
     }
 
     fun setEventType(eventType: EventType) {
@@ -107,6 +108,21 @@ abstract class BaseEventPm(
     protected fun handleSuccess(isCreate: Boolean) {
         bus.event(Events.EventsChanged(isCreate))
         router.exit()
+    }
+
+    private fun observeDishesResult() {
+        launch {
+            calculatorFragmentResultHandler.resultAsFlow()
+                .catch { handleError(it) }
+                .collect {
+                    dishes.consumer.accept(it)
+                    cachedDishes(it)
+                    updateFormPickerValueCommand.consumer.accept(
+                        it.sumOf { dish -> dish.breadUnits }
+                            .toPickerValues()
+                    )
+                }
+        }
     }
 
     private fun bindHandleBack() {
@@ -139,7 +155,7 @@ abstract class BaseEventPm(
             .map { createChooserConfiguration() }
             .subscribe {
                 when (it.eventType) {
-                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen(eventId))
+                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen)
                     else -> router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }

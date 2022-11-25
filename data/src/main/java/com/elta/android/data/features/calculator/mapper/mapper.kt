@@ -1,30 +1,31 @@
 package com.elta.android.data.features.calculator.mapper // ktlint-disable filename
 
-import com.elta.android.data.features.calculator.dto.CompactFoodDto
-import com.elta.android.data.features.calculator.dto.FoodBrandDto
-import com.elta.android.data.features.calculator.dto.FoodGenericDto
-import com.elta.android.data.features.calculator.dto.ProductDto
-import com.elta.android.data.features.calculator.dto.ServingDto
+import com.elta.android.data.features.calculator.cache.model.DishDbEntity
+import com.elta.android.data.features.calculator.model.CompactFoodNetworkEntity
+import com.elta.android.data.features.calculator.model.FoodBrandResponse
+import com.elta.android.data.features.calculator.model.FoodGenericResponse
+import com.elta.android.data.features.calculator.model.ProductResponse
+import com.elta.android.data.features.calculator.model.ServingNetworkEntity
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
 import java.util.UUID
 
-internal fun FoodGenericDto.Food.toDomain(): Dish =
+internal fun FoodGenericResponse.Food.toDomain(): Dish =
     Dish(
         id = foodId,
         localId = getLocalId(),
         name = foodName,
         type = DishType.Generic,
         brandName = brandName.orEmpty(),
-        servings = servingsGeneric.servings.foodsToDomain(),
+        servings = servingsGeneric.servings.servingToDomain(),
         servingSelect = servingsGeneric.servings.first().toDomain(),
         servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
 
-internal fun FoodBrandDto.Food.toDomain(): Dish =
+internal fun FoodBrandResponse.Food.toDomain(): Dish =
     Dish(
         id = foodId,
         localId = getLocalId(),
@@ -38,7 +39,7 @@ internal fun FoodBrandDto.Food.toDomain(): Dish =
         breadUnits = 0.0
     )
 
-internal fun ServingDto.toDomain(): Serving =
+internal fun ServingNetworkEntity.toDomain(): Serving =
     Serving(
         id = servingId,
         servingDescription = servingDescription,
@@ -50,10 +51,10 @@ internal fun ServingDto.toDomain(): Serving =
         carbs = carbohydrate.toDouble()
     )
 
-internal fun List<ServingDto>.foodsToDomain(): List<Serving> =
+internal fun List<ServingNetworkEntity>.servingToDomain(): List<Serving> =
     map { it.toDomain() }
 
-internal fun CompactFoodDto.toDomain(): Dish =
+internal fun CompactFoodNetworkEntity.toDomain(): Dish =
     Dish(
         id = foodId,
         localId = "",
@@ -67,10 +68,10 @@ internal fun CompactFoodDto.toDomain(): Dish =
         breadUnits = 0.0
     )
 
-internal fun List<CompactFoodDto>.compactFoodsToDomain(): List<Dish> =
+internal fun List<CompactFoodNetworkEntity>.compactFoodsToDomain(): List<Dish> =
     map { it.toDomain() }
 
-internal fun ProductDto.toDomain(): Dish =
+internal fun ProductResponse.toDomain(): Dish =
     Dish(
         id = id,
         localId = getLocalId(),
@@ -79,21 +80,58 @@ internal fun ProductDto.toDomain(): Dish =
         brandName = "",
         servings = emptyList(),
         servingAmount = servingAmount,
-        servingSelect = Serving(
-            id = servingId,
-            servingDescription = servingName,
-            measurementDescription = servingName,
-            numberOfUnits = servingAmount,
-            calories = 0.0,
-            proteins = 0.0,
-            fats = 0.0,
-            carbs = 0.0
-        ),
+        servingSelect = getServing(servingId, servingName),
         isVerification = false,
         breadUnits = breadUnits
     )
 
-internal fun List<ProductDto>.toDomain(): List<Dish> =
+@JvmName("toDomainProductResponse")
+internal fun List<ProductResponse>.toDomain(): List<Dish> =
     map { it.toDomain() }
+
+internal fun DishDbEntity.toDomain(): Dish =
+    Dish(
+        id = dishId,
+        localId = getLocalId(),
+        name = name,
+        type = DishType.valueOf(type),
+        brandName = "",
+        servings = emptyList(),
+        servingSelect = getServing(servingId, servingName),
+        servingAmount = servingAmount,
+        isVerification = false,
+        breadUnits = breadUnits
+    )
+
+internal fun Dish.toDb(): DishDbEntity =
+    DishDbEntity(
+        id = localId.hashCode().toLong(),
+        dishId = id,
+        name = name,
+        type = type.name,
+        servingId = servingSelect.id,
+        servingName = servingSelect.measurementDescription,
+        servingAmount = servingAmount,
+        breadUnits = breadUnits
+    )
+
+internal fun List<Dish>.toDb(): List<DishDbEntity> =
+    map { it.toDb() }
+
+@JvmName("toDomainDishDbEntity")
+internal fun List<DishDbEntity>.toDomain(): List<Dish> =
+    map { it.toDomain() }
+
+private fun getServing(id: String, name: String) =
+    Serving(
+        id = id,
+        servingDescription = name,
+        measurementDescription = name,
+        numberOfUnits = 1.0,
+        calories = 0.0,
+        proteins = 0.0,
+        fats = 0.0,
+        carbs = 0.0
+    )
 
 private fun getLocalId(): String = UUID.randomUUID().toString()
