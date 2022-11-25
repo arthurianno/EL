@@ -14,6 +14,9 @@ interface CalculatorRepository : BaseRepository {
     fun getFatSecretDish(id: String, type: DishType): Flow<Dish>
     fun getFatSecretDishes(name: String): Flow<List<Dish>>
     fun getHistoryList(): Flow<List<String>>
-    fun saveWordToHistory(word: String): Flow<Unit>
+    suspend fun saveWordToHistory(word: String)
     fun getEventProducts(eventId: String): Flow<List<Dish>>
+    fun getLocalDishes(): Flow<List<Dish>>
+    suspend fun saveLocalDishes(dishes: List<Dish>)
+    suspend fun clearLocalDishes()
 }

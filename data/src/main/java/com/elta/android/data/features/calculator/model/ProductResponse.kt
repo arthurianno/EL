@@ -1,8 +1,8 @@
-package com.elta.android.data.features.calculator.dto
+package com.elta.android.data.features.calculator.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ProductDto(
+data class ProductResponse(
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
     @SerializedName("type") val type: String,

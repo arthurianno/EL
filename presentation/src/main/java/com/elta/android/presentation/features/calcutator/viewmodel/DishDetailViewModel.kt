@@ -114,24 +114,29 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
-    fun setDish(dish: DishUi, isNewDish: Boolean) {
+    fun setDish(dish: DishUi) {
         launch {
-            if (isNewDish) {
-                getFatSecretDish(dish.id, dish.type)
-                    .catch { handleError(it) }
-                    .map { it.toUi() }
-                    .collect { dish ->
-                        reduceState { state.value.copy(dish = dish) }
-                        portionDescriptionTextField.setDropDownList(dish.servings.map { it.measurementDescription })
-                    }
-            } else {
-                reduceState { state.value.copy(dish = dish) }
-                with(portionDescriptionTextField) {
-                    setDropDownList(dish.servings.map { it.measurementDescription })
-                    setText(dish.servingSelect.measurementDescription)
+            getFatSecretDish(dish.id, dish.type)
+                .catch { handleError(it) }
+                .map { it.toUi() }
+                .map {
+                    it.takeIf { dish.localId.isEmpty() }
+                        ?: it.copy(
+                            localId = dish.localId,
+                            servingSelect = dish.servingSelect,
+                            servingAmount = dish.servingAmount,
+                            breadUnits = dish.breadUnits
+                        )
                 }
-                portionCountTextField.setText(dish.servingAmount.toInt().toString())
-            }
+                .collect { newDish ->
+                    reduceState { state.value.copy(dish = newDish) }
+                    with(portionDescriptionTextField) {
+                        setDropDownList(newDish.servings.map { it.measurementDescription })
+                        newDish.servingSelect.measurementDescription.takeIf { it.isNotEmpty() }
+                            ?.let { setText(it) }
+                    }
+                    portionCountTextField.setText(newDish.servingAmount.toInt().toString())
+                }
         }
     }
 

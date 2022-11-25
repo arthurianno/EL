@@ -45,19 +45,12 @@ import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
 private const val PORTION_INIT_TEXT = "1"
 private const val EXTRA_DISH = "extra_dish"
-private const val EXTRA_IS_NEW_DISH = "extra_is_new_dish"
 
 class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     companion object {
-        fun newInstance(
-            dish: DishUi,
-            isNewDish: Boolean
-        ): DishDetailFragment =
+        fun newInstance(dish: DishUi): DishDetailFragment =
             DishDetailFragment().apply {
-                arguments = bundle(
-                    EXTRA_DISH to dish,
-                    EXTRA_IS_NEW_DISH to isNewDish
-                )
+                arguments = bundle(EXTRA_DISH to dish)
             }
     }
 
@@ -65,9 +58,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val isNewDish = arguments?.getBoolean(EXTRA_IS_NEW_DISH) ?: true
         arguments?.getParcelable<DishUi>(EXTRA_DISH)?.let { dish ->
-            viewModel.setDish(dish, isNewDish)
+            viewModel.setDish(dish)
         }
     }
 

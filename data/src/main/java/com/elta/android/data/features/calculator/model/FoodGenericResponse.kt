@@ -1,8 +1,8 @@
-package com.elta.android.data.features.calculator.dto
+package com.elta.android.data.features.calculator.model
 
 import com.google.gson.annotations.SerializedName
 
-data class FoodGenericDto(
+data class FoodGenericResponse(
     @SerializedName("food") val food: Food
 ) {
     data class Food(
@@ -11,6 +11,10 @@ data class FoodGenericDto(
         @SerializedName("food_type") val foodType: String,
         @SerializedName("brand_name") val brandName: String?,
         @SerializedName("food_url") val foodUrl: String,
-        @SerializedName("servings") val servingsGeneric: ServingGenericDto
-    )
+        @SerializedName("servings") val servingsGeneric: ServingsGeneric
+    ) {
+        data class ServingsGeneric(
+            @SerializedName("serving") val servings: List<ServingNetworkEntity>
+        )
+    }
 }
