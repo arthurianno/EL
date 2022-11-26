@@ -12,9 +12,9 @@ import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
-import com.elta.android.presentation.features.calcutator.model.DishDetailState
-import com.elta.android.presentation.features.calcutator.model.DishUi
-import com.elta.android.presentation.features.calcutator.model.servingUiEmpty
+import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
+import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.calcutator.model.emptyServing
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
@@ -28,10 +28,10 @@ private const val START_AMOUNT = 1.0
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
-) : BaseViewModel<DishDetailState, Event, Action>() {
-    override fun createInitState(): DishDetailState =
-        DishDetailState(
-            dish = DishUi(
+) : BaseViewModel<DishDetailViewState, Event, Action>() {
+    override fun createInitState(): DishDetailViewState =
+        DishDetailViewState(
+            dish = DishUiEntity(
                 id = "",
                 localId = "",
                 name = "",
@@ -39,7 +39,7 @@ class DishDetailViewModel @Inject constructor(
                 brandName = "",
                 isVerification = false,
                 servings = emptyList(),
-                servingSelect = servingUiEmpty(),
+                servingSelect = emptyServing(),
                 servingAmount = START_AMOUNT,
                 breadUnits = 0.0
             )
@@ -95,9 +95,9 @@ class DishDetailViewModel @Inject constructor(
         ).actionObserve()
 
     override fun reduceStateByAction(
-        currentState: DishDetailState,
+        currentState: DishDetailViewState,
         action: Action
-    ): DishDetailState =
+    ): DishDetailViewState =
         run {
             when (action) {
                 AppAction.BackPressure -> router.exit()
@@ -114,7 +114,7 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
-    fun setDish(dish: DishUi) {
+    fun setDish(dish: DishUiEntity) {
         launch {
             getFatSecretDish(dish.id, dish.type)
                 .catch { handleError(it) }

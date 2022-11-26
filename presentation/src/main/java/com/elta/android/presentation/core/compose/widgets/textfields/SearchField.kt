@@ -25,20 +25,20 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.widgets.HorizontallyAnimation
+import com.elta.android.presentation.core.compose.widgets.animation.HorizontallyAnimation
 import com.elta.android.presentation.theme.GetLocalProperties
 
 data class SearchFocusChanged(val focusState: FocusState) : Action
 
 @Immutable
-data class SearchFieldState(
+data class SearchFieldWidgetState(
     val hint: String,
     val textField: TextFieldValue,
     @DrawableRes val icon: Int?,
     val isFocused: Boolean
 )
 
-class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
+class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
     fun setHint(hint: String?) {
         setState { state.value.copy(hint = hint.orEmpty()) }
     }
@@ -68,8 +68,8 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldState>() {
         sendAction(SearchFocusChanged(focusState))
     }
 
-    override fun createInitState(): SearchFieldState =
-        SearchFieldState(
+    override fun createInitState(): SearchFieldWidgetState =
+        SearchFieldWidgetState(
             textField = TextFieldValue(""),
             hint = "",
             isFocused = false,
