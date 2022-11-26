@@ -3,8 +3,8 @@ package com.elta.android.presentation.features.calcutator.model // ktlint-disabl
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.Serving
 
-internal fun Dish.toUi(): DishUi =
-    DishUi(
+internal fun Dish.toUi(): DishUiEntity =
+    DishUiEntity(
         id = id,
         localId = localId,
         name = name,
@@ -17,7 +17,7 @@ internal fun Dish.toUi(): DishUi =
         breadUnits = breadUnits
     )
 
-internal fun DishUi.toDomain(): Dish =
+internal fun DishUiEntity.toDomain(): Dish =
     Dish(
         id = id,
         localId = localId,
@@ -31,11 +31,11 @@ internal fun DishUi.toDomain(): Dish =
         breadUnits = breadUnits
     )
 
-internal fun List<Dish>.toUi(): List<DishUi> =
+internal fun List<Dish>.toUi(): List<DishUiEntity> =
     map { it.toUi() }
 
-internal fun Serving.toUi(): ServingUi =
-    ServingUi(
+internal fun Serving.toUi(): ServingUiEntity =
+    ServingUiEntity(
         id = id,
         servingDescription = servingDescription,
         measurementDescription = measurementDescription,
@@ -46,7 +46,7 @@ internal fun Serving.toUi(): ServingUi =
         carbs = carbs
     )
 
-internal fun ServingUi.toDomain(): Serving =
+internal fun ServingUiEntity.toDomain(): Serving =
     Serving(
         id = id,
         measurementDescription = measurementDescription,
@@ -58,7 +58,7 @@ internal fun ServingUi.toDomain(): Serving =
         carbs = carbs
     )
 
-internal fun List<DishUi>.toDomain(): List<Dish> =
+internal fun List<DishUiEntity>.toDomain(): List<Dish> =
     map { it.toDomain() }
 
-internal fun servingUiEmpty() = Serving.empty().toUi()
+internal fun emptyServing() = Serving.empty().toUi()

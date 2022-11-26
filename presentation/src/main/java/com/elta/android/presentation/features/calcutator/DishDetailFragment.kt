@@ -28,27 +28,27 @@ import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
+import com.elta.android.presentation.core.compose.widgets.VSpacer
+import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
+import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
+import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
-import com.elta.android.presentation.features.calcutator.model.DishDetailState
-import com.elta.android.presentation.features.calcutator.model.DishUi
-import com.elta.android.presentation.features.calcutator.model.ServingUi
+import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
+import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
 import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerLarge
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
 private const val PORTION_INIT_TEXT = "1"
 private const val EXTRA_DISH = "extra_dish"
 
 class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     companion object {
-        fun newInstance(dish: DishUi): DishDetailFragment =
+        fun newInstance(dish: DishUiEntity): DishDetailFragment =
             DishDetailFragment().apply {
                 arguments = bundle(EXTRA_DISH to dish)
             }
@@ -58,7 +58,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getParcelable<DishUi>(EXTRA_DISH)?.let { dish ->
+        arguments?.getParcelable<DishUiEntity>(EXTRA_DISH)?.let { dish ->
             viewModel.setDish(dish)
         }
     }
@@ -85,7 +85,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun BoxScope.Header(dish: DishUi, onBackClick: () -> Unit) {
+    private fun BoxScope.Header(dish: DishUiEntity, onBackClick: () -> Unit) {
         GetLocalProperties { dimens, brash, colors, _, _ ->
             Box(
                 modifier = Modifier
@@ -109,7 +109,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun BoxScope.HeaderTitle(dish: DishUi) {
+    private fun BoxScope.HeaderTitle(dish: DishUiEntity) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(
                 modifier = Modifier
@@ -142,7 +142,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun BoxScope.BreadUnitsValue(dish: DishUi) {
+    private fun BoxScope.BreadUnitsValue(dish: DishUiEntity) {
         GetLocalProperties { dimens, _, colors, shapes, types ->
             Box(
                 modifier = Modifier
@@ -168,7 +168,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     private fun BoxScope.MainContent(
         viewModel: DishDetailViewModel,
-        state: State<DishDetailState>
+        state: State<DishDetailViewState>
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
@@ -199,7 +199,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun Footer(state: State<DishDetailState>) {
+    private fun Footer(state: State<DishDetailViewState>) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             val dish = state.value.dish
             val serving = state.value.dish.servingSelect
@@ -217,7 +217,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun DishChars(serving: ServingUi) {
+    private fun DishChars(serving: ServingUiEntity) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Row(
                 modifier = Modifier

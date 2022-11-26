@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ServingUi(
+data class ServingUiEntity(
     val id: String,
     val servingDescription: String,
     val measurementDescription: String,

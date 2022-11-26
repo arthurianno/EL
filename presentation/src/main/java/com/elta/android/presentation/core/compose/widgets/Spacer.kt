@@ -1,4 +1,4 @@
-package ru.marslab.pocketwordtranslator.presentation.widget
+package com.elta.android.presentation.core.compose.widgets
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height

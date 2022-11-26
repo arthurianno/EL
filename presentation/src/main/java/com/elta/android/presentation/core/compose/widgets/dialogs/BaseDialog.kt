@@ -17,12 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
+import com.elta.android.presentation.core.compose.widgets.VSpacer
+import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.theme.GetLocalProperties
-import ru.marslab.pocketwordtranslator.presentation.widget.HSpacerSmall
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacer
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
 
-data class BaseDialogState<D>(
+data class BaseDialogWidgetState<D>(
     val title: String?,
     val message: String,
     val data: D?,
@@ -35,9 +35,9 @@ data class BaseDialogState<D>(
 class BaseDialogWidgetModel<D>(
     private val positiveOnCLick: (data: D?) -> Unit = {},
     private val negativeOnCLick: (data: D?) -> Unit = {}
-) : BaseWidgetModel<BaseDialogState<D>>() {
-    override fun createInitState(): BaseDialogState<D> =
-        BaseDialogState(
+) : BaseWidgetModel<BaseDialogWidgetState<D>>() {
+    override fun createInitState(): BaseDialogWidgetState<D> =
+        BaseDialogWidgetState(
             title = null,
             message = "",
             data = null,

@@ -15,19 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
+import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.theme.GetLocalProperties
 
 object DownButtonClick : Action
 
 @Immutable
-data class DownButtonState(
+data class DownButtonWidgetState(
     val text: String,
     val enable: Boolean,
     val visible: Boolean
 )
 
-class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>() {
+class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
 
     fun setText(text: String) {
         setState { state.value.copy(text = text) }
@@ -49,8 +49,8 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonState>() {
         setState { state.value.copy(visible = visibilityState) }
     }
 
-    override fun createInitState(): DownButtonState =
-        DownButtonState(
+    override fun createInitState(): DownButtonWidgetState =
+        DownButtonWidgetState(
             text = "",
             enable = true,
             visible = true

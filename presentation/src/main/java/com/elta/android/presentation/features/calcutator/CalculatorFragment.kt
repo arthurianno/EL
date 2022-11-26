@@ -38,21 +38,21 @@ import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.widgets.BaseAppTopBar
-import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetModel
-import com.elta.android.presentation.core.compose.widgets.VerticallyAnimation
+import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
+import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
+import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
+import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
+import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
+import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
-import com.elta.android.presentation.features.calcutator.model.CalculatorState
-import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
+import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerMedium
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerSmall
-import ru.marslab.pocketwordtranslator.presentation.widget.VSpacerVerySmall
 
 class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
@@ -126,7 +126,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun MainContent(
         viewModel: CalculatorViewModel,
-        dishes: List<DishUi>
+        dishes: List<DishUiEntity>
     ) {
         if (dishes.isEmpty()) {
             viewModel.downButton.disable()
@@ -141,7 +141,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun SearchView(
         viewModel: CalculatorViewModel,
-        state: State<CalculatorState>
+        state: State<CalculatorViewState>
     ) {
         val searchFieldState = viewModel.searchField.state.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -164,9 +164,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun FindingDishes(
-        findingDishes: List<DishUi>,
+        findingDishes: List<DishUiEntity>,
         isFindDishes: Boolean,
-        onClick: (dish: DishUi) -> Unit
+        onClick: (dish: DishUiEntity) -> Unit
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             if (isFindDishes) {
@@ -198,7 +198,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 
     @Composable
-    private fun RowScope.CardBody(dish: DishUi) {
+    private fun RowScope.CardBody(dish: DishUiEntity) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(
                 modifier = Modifier
@@ -243,7 +243,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun CalculateDishes(
-        dishes: List<DishUi>,
+        dishes: List<DishUiEntity>,
         viewModel: CalculatorViewModel
     ) {
         val totalCountBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
@@ -258,9 +258,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun SelectedDishes(
-        dishes: List<DishUi>,
-        onCardClick: (dish: DishUi) -> Unit,
-        onCloseClick: (dish: DishUi) -> Unit
+        dishes: List<DishUiEntity>,
+        onCardClick: (dish: DishUiEntity) -> Unit,
+        onCloseClick: (dish: DishUiEntity) -> Unit
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.smallDim)) {
@@ -288,7 +288,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun BoxScope.DishInfoBlock(
-        dish: DishUi
+        dish: DishUiEntity
     ) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(
@@ -311,7 +311,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 
     @Composable
-    private fun BoxScope.BreadUnitLabel(dish: DishUi) {
+    private fun BoxScope.BreadUnitLabel(dish: DishUiEntity) {
         Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
             BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
         }
@@ -319,8 +319,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun BoxScope.CloseButton(
-        dish: DishUi,
-        onCloseClick: (dish: DishUi) -> Unit
+        dish: DishUiEntity,
+        onCloseClick: (dish: DishUiEntity) -> Unit
     ) {
         Box(modifier = Modifier.Companion.align(Alignment.TopEnd)) {
             ButtonCircle(

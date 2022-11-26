@@ -36,7 +36,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 import com.nullgr.core.collections.isNotNullOrEmpty
 
 @Immutable
-data class IconTextFieldState(
+data class IconTextFieldWidgetState(
     val text: String,
     @DrawableRes val leadIcon: Int?,
     val dropDownList: List<String>?,
@@ -45,9 +45,9 @@ data class IconTextFieldState(
     val isExpanded: Boolean
 )
 
-class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldState>() {
-    override fun createInitState(): IconTextFieldState =
-        IconTextFieldState(
+class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
+    override fun createInitState(): IconTextFieldWidgetState =
+        IconTextFieldWidgetState(
             text = "",
             leadIcon = null,
             dropDownList = null,
