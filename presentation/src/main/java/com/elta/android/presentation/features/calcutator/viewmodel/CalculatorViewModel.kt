@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetCachedDishesUseCase
-import com.elta.android.domain.features.calculator.interactor.GetEventProductsUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
@@ -37,7 +36,6 @@ class CalculatorViewModel @Inject constructor(
     private val searchDishes: SearchDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
-    private val getEventProducts: GetEventProductsUseCase,
     private val getCachedDishes: GetCachedDishesUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
@@ -61,6 +59,7 @@ class CalculatorViewModel @Inject constructor(
     val dishDeleteConfirmDialog = BaseDialogWidgetModel<DishUiEntity>(
         positiveOnCLick = { deletedDish -> deletedDish?.let { deleteDish(it) } }
     )
+    val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
     init {
         launch {
@@ -148,7 +147,7 @@ class CalculatorViewModel @Inject constructor(
         val newDishes = state.value.dishes
             .toMutableList()
             .apply { remove(dish) }
-        reduceState { state.value.copy(dishes = newDishes) }
+        setDishes(newDishes)
     }
 
     private fun editDishes(dish: DishUiEntity) {
@@ -166,10 +165,14 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun saveDishes() {
-        launch {
-            calculatorFragmentResult.onNext(state.value.dishes.toDomain())
-                .catch { handleError(it) }
-                .collect { router.exit() }
+        if (state.value.totalBreadUnits > MAX_BREAD_UNITS) {
+            warningMaxBreadUnitsDialog.dialogOpen()
+        } else {
+            launch {
+                calculatorFragmentResult.onNext(state.value.dishes.toDomain())
+                    .catch { handleError(it) }
+                    .collect { router.exit() }
+            }
         }
     }
 

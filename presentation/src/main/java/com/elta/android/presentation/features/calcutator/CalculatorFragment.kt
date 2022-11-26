@@ -69,11 +69,17 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             positiveButtonText = getString(R.string.yes_text),
             negativeButtonText = getString(R.string.no_text)
         )
+        warningMaxBreadUnitsDialog.initDialog(
+            title = getString(R.string.calculator_dialog_title_warning),
+            message = getString(R.string.calculator_max_bread_units_message),
+            positiveButtonText = getString(R.string.ok)
+        )
     }
 
     @Composable
     override fun Dialogs() {
         BaseDialog(widgetModel = viewModel.dishDeleteConfirmDialog)
+        BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
     }
 
     @Composable
