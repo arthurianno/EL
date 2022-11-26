@@ -35,6 +35,7 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -64,17 +65,23 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     override fun DishDetailViewModel.init() {
-        downButtonWidgetModel.setText(getString(R.string.calculator_add_text))
+        downButton.setText(getString(R.string.calculator_add_text))
         portionCountTextField.setIcon(R.drawable.ic_plus_minus)
         if (portionCountTextField.state.value.text.isEmpty()) {
             portionCountTextField.setText(PORTION_INIT_TEXT)
         }
         portionDescriptionTextField.setIcon(R.drawable.ic_list)
+        warningMaxBreadUnitsDialog.initDialog(
+            title = getString(R.string.calculator_dialog_title_warning),
+            message = getString(R.string.calculator_max_bread_units_message),
+            positiveButtonText = getString(R.string.ok)
+        )
     }
 
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
+        BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
                 dish = state.value.dish,
@@ -193,7 +200,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     VSpacerLarge()
                     Footer(state)
                 }
-                DownButton(widgetModel = viewModel.downButtonWidgetModel)
+                DownButton(widgetModel = viewModel.downButton)
             }
         }
     }

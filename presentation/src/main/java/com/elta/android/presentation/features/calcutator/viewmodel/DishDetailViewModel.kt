@@ -11,6 +11,7 @@ import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val START_AMOUNT = 1.0
+private const val MAX_BREAD_UNITS = 99.9
 
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
@@ -45,9 +47,10 @@ class DishDetailViewModel @Inject constructor(
             )
         )
 
-    val downButtonWidgetModel = DownButtonWidgetModel()
+    val downButton = DownButtonWidgetModel()
     val portionCountTextField = IconTextFieldWidgetModel()
     val portionDescriptionTextField = IconTextFieldWidgetModel()
+    val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
     init {
         launch {
@@ -89,7 +92,7 @@ class DishDetailViewModel @Inject constructor(
 
     override val widgets: List<BaseWidgetModel<*>> =
         listOf(
-            downButtonWidgetModel,
+            downButton,
             portionCountTextField,
             portionDescriptionTextField
         ).actionObserve()
@@ -108,9 +111,13 @@ class DishDetailViewModel @Inject constructor(
 
     private fun saveDish() {
         launch {
-            addDishFragmentResult.onNext(state.value.dish.toDomain())
-                .catch { handleError(it) }
-                .collect { router.exit() }
+            if (state.value.dish.breadUnits > MAX_BREAD_UNITS) {
+                warningMaxBreadUnitsDialog.dialogOpen()
+            } else {
+                addDishFragmentResult.onNext(state.value.dish.toDomain())
+                    .catch { handleError(it) }
+                    .collect { router.exit() }
+            }
         }
     }
 
