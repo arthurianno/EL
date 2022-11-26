@@ -79,9 +79,13 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
+    override fun Dialogs() {
+        BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
+    }
+
+    @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
-        BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
                 dish = state.value.dish,
