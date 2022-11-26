@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.compose.widgets
+package com.elta.android.presentation.core.compose.widgets.appbar
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material.Icon
@@ -17,11 +17,11 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 
 @Immutable
-data class BaseTopAppBarState(
+data class BaseTopAppBarWidgetState(
     val title: String
 )
 
-class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarState>() {
+class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarWidgetState>() {
     private var startIconAction: Action? = null
     private var endIconAction: Action? = null
 
@@ -45,8 +45,8 @@ class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarState>() {
         endIconAction?.let { sendAction(it) }
     }
 
-    override fun createInitState(): BaseTopAppBarState =
-        BaseTopAppBarState(
+    override fun createInitState(): BaseTopAppBarWidgetState =
+        BaseTopAppBarWidgetState(
             title = ""
         )
 }

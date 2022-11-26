@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetCachedDishesUseCase
-import com.elta.android.domain.features.calculator.interactor.GetEventProductsUseCase
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
@@ -15,15 +14,15 @@ import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
-import com.elta.android.presentation.core.compose.widgets.BaseAppTopBarWidgetModel
+import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFocusChanged
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
-import com.elta.android.presentation.features.calcutator.model.CalculatorState
-import com.elta.android.presentation.features.calcutator.model.DishUi
+import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
+import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
@@ -37,14 +36,13 @@ class CalculatorViewModel @Inject constructor(
     private val searchDishes: SearchDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
-    private val getEventProducts: GetEventProductsUseCase,
     private val getCachedDishes: GetCachedDishesUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
-    BaseViewModel<CalculatorState, Event, CalculatorAction>() {
-    override fun createInitState(): CalculatorState =
-        CalculatorState(
+    BaseViewModel<CalculatorViewState, Event, CalculatorAction>() {
+    override fun createInitState(): CalculatorViewState =
+        CalculatorViewState(
             profile = Profile(),
             dishes = emptyList(),
             totalBreadUnits = 0.0,
@@ -58,9 +56,10 @@ class CalculatorViewModel @Inject constructor(
     val appTopBar = BaseAppTopBarWidgetModel()
     val searchField = SearchFieldWidgetModel()
     val downButton = DownButtonWidgetModel()
-    val dishDeleteConfirmDialog = BaseDialogWidgetModel<DishUi>(
+    val dishDeleteConfirmDialog = BaseDialogWidgetModel<DishUiEntity>(
         positiveOnCLick = { deletedDish -> deletedDish?.let { deleteDish(it) } }
     )
+    val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
     init {
         launch {
@@ -105,30 +104,18 @@ class CalculatorViewModel @Inject constructor(
         sendAction(CalculatorAction.LastWordClick(word))
     }
 
-    fun dishOnClick(dish: DishUi) {
+    fun dishOnClick(dish: DishUiEntity) {
         sendAction(CalculatorAction.AddDishClick(dish))
     }
 
-    fun dishDeleteOnClick(dishUi: DishUi) {
-        dishDeleteConfirmDialog.dialogOpen(dishUi)
-    }
-
-    fun loadDishes(eventId: String) {
-        if (eventId.isNotEmpty()) {
-            launch {
-                getEventProducts(eventId)
-                    .catch { handleError(it) }
-                    .collect {
-                        reduceState { state.value.copy(dishes = it.toUi()) }
-                    }
-            }
-        }
+    fun dishDeleteOnClick(dish: DishUiEntity) {
+        dishDeleteConfirmDialog.dialogOpen(dish)
     }
 
     override fun reduceStateByAction(
-        currentState: CalculatorState,
+        currentState: CalculatorViewState,
         action: Action
-    ): CalculatorState =
+    ): CalculatorViewState =
         when (action) {
             is SearchFocusChanged -> {
                 val inFocusState = action.focusState.isFocused
@@ -147,7 +134,7 @@ class CalculatorViewModel @Inject constructor(
             }
         }
 
-    private fun setDishes(dishes: List<DishUi>) {
+    private fun setDishes(dishes: List<DishUiEntity>) {
         reduceState {
             state.value.copy(
                 dishes = dishes,
@@ -156,14 +143,14 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    private fun deleteDish(dish: DishUi) {
+    private fun deleteDish(dish: DishUiEntity) {
         val newDishes = state.value.dishes
             .toMutableList()
             .apply { remove(dish) }
-        reduceState { state.value.copy(dishes = newDishes) }
+        setDishes(newDishes)
     }
 
-    private fun editDishes(dish: DishUi) {
+    private fun editDishes(dish: DishUiEntity) {
         val newDishes = state.value.dishes
             .toMutableList()
             .apply {
@@ -178,14 +165,18 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun saveDishes() {
-        launch {
-            calculatorFragmentResult.onNext(state.value.dishes.toDomain())
-                .catch { handleError(it) }
-                .collect { router.exit() }
+        if (state.value.totalBreadUnits > MAX_BREAD_UNITS) {
+            warningMaxBreadUnitsDialog.dialogOpen()
+        } else {
+            launch {
+                calculatorFragmentResult.onNext(state.value.dishes.toDomain())
+                    .catch { handleError(it) }
+                    .collect { router.exit() }
+            }
         }
     }
 
-    private fun dishClick(dish: DishUi) {
+    private fun dishClick(dish: DishUiEntity) {
         launch {
             saveWordToHistory(dish.name)
             getHistoryList()

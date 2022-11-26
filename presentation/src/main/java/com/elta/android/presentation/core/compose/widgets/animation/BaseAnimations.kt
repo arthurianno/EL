@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.compose.widgets
+package com.elta.android.presentation.core.compose.widgets.animation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
