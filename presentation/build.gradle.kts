@@ -16,7 +16,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
 
-        buildConfigField("String", "APP_VERSION", "\"${Releases.versionName}\"")
+        buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
     }
 
     compileOptions {
