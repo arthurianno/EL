@@ -7,11 +7,27 @@ object AppConfig {
     const val targetSdk = 32
     const val jvmTarget = "11"
     val javaVersion = JavaVersion.VERSION_11
-}
 
-object Releases {
-    const val versionCode = 252
-    const val versionName = "1.3.0"
+    object AppIdSufix {
+        const val stage = "stage"
+        const val dev = "dev"
+    }
+
+    object DeppLink {
+        const val host = "stage2.vdiabete.com"
+        const val schema = "elta"
+    }
+
+    object ServerUrl {
+        const val prod = "https://vdiabete.com"
+        const val stage = "https://stage2.vdiabete.com"
+        const val dev = "https://stage2.vdiabete.com"
+    }
+
+    object LogEnabled {
+        const val debug = true
+        const val release = false
+    }
 }
 
 object Module {
