@@ -1,4 +1,4 @@
-package com.elta.android.presentation.utils.dynamic_links
+package com.elta.android.presentation.utils.dynamiclinks
 
 import android.content.Intent
 import android.net.Uri
@@ -51,8 +51,9 @@ class DynamicLinkProcessor private constructor(
     }
 
     private fun processColdStartIfNeed() {
-        if (!ignoreColdStart && savedState == null)
+        if (!ignoreColdStart && savedState == null) {
             coldStartAction?.consumer?.accept(Unit)
+        }
     }
 
     companion object {

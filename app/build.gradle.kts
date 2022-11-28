@@ -16,16 +16,6 @@ val STORE_FILE = "keystore.file"
 val STORE_PASSWORD = "keystore.password"
 val KEY_ALIAS = "key.alias"
 val KEY_PASSWORD = "key.password"
-val CI = "CI"
-val LOCAL_PROPERTIES = "../local.properties"
-val LOCAL_BUILD_FILE = "build.file"
-val DEFAULT_BUILD_CONFIG_FILE = "../configuration-build-test.properties"
-val CONFIG_ENVIRONMENT = "environment"
-val CONFIG_SERVER_URL = "server.url"
-val CONFIG_DEEP_LINK_HOST = "deep.link.host"
-val CONFIG_APP_ID_SUFFIX = "app.id.suffix"
-val CONFIG_APP_NAME_SUFFIX = "app.name.suffix"
-val CONFIG_LOG_ENABLED = "log.enabled"
 
 fun getPropertiesFromFile(filename: String): Properties =
     Properties().apply {
@@ -33,33 +23,6 @@ fun getPropertiesFromFile(filename: String): Properties =
     }
 
 android {
-
-    var buildConfigFile: String
-    val ci = System.getenv(CI)
-    if (ci != null) {
-        println("Build runned on $ci CI server.")
-        val configFilePropertyName =
-            "${AppConfig.applicationId}.config.file".toUpperCase().replace(".", "_")
-        buildConfigFile = System.getenv(configFilePropertyName)
-
-        if (buildConfigFile.isNullOrEmpty()) {
-            println("There is not environment variable $configFilePropertyName, default value will be used.")
-            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
-        }
-    } else {
-        println("Build runned on local machine.")
-        val localProperties = getPropertiesFromFile(LOCAL_PROPERTIES)
-
-        buildConfigFile = localProperties[LOCAL_BUILD_FILE]?.toString() ?: DEFAULT_BUILD_CONFIG_FILE
-
-        if (buildConfigFile.isEmpty()) {
-            println("There is property $LOCAL_BUILD_FILE at $LOCAL_PROPERTIES, default value will be used.")
-            buildConfigFile = DEFAULT_BUILD_CONFIG_FILE
-        }
-    }
-    println("Build config will be loaded from: $buildConfigFile.")
-    val buildConfigProperties = getPropertiesFromFile(buildConfigFile)
-
     compileSdk = AppConfig.completeSdk
 
     defaultConfig {
@@ -67,9 +30,8 @@ android {
         minSdk = AppConfig.minSdk
         targetSdk = AppConfig.targetSdk
 
-        versionCode = Releases.versionCode
-        versionName = Releases.versionName
-
+        versionCode = Version.versionCode
+        versionName = Version.versionName
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -107,41 +69,17 @@ android {
     buildTypes {
 
         all {
-            buildConfigField(
-                "String",
-                "ENVIRONMENT",
-                "\"${buildConfigProperties[CONFIG_ENVIRONMENT]}\""
-            )
-            buildConfigField(
-                "String",
-                "SERVER_URL",
-                "\"${buildConfigProperties[CONFIG_SERVER_URL]}\""
-            )
-            buildConfigField(
-                "boolean",
-                "IS_LOG_ENABLED",
-                buildConfigProperties[CONFIG_LOG_ENABLED].toString()
-            )
-
-            resValue(
-                "string",
-                "app_deep_link_host",
-                buildConfigProperties[CONFIG_DEEP_LINK_HOST].toString()
-            )
+            resValue("string", "app_deep_link_host", AppConfig.DeppLink.host)
+            resValue("string", "app_deep_link_schema", AppConfig.DeppLink.schema)
         }
 
         debug {
-            buildConfigProperties[CONFIG_APP_ID_SUFFIX]?.let {
-                applicationIdSuffix = it.toString()
-            }
-
-            buildConfigProperties[CONFIG_APP_NAME_SUFFIX]?.let {
-                versionNameSuffix = it.toString()
-            }
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             signingConfig = signingConfigs["debug"]
         }
 
         release {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -172,6 +110,23 @@ android {
         reset()
         include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         isUniversalApk = true
+    }
+    flavorDimensions += listOf("buildVariant")
+    productFlavors {
+        create("prod") {
+            dimension = "buildVariant"
+            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.prod}\"")
+        }
+        create("stage") {
+            dimension = "buildVariant"
+            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.stage}\"")
+            versionNameSuffix = Version.NameSufix.stage
+        }
+        create("dev") {
+            dimension = "buildVariant"
+            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.dev}\"")
+            versionNameSuffix = Version.NameSufix.dev
+        }
     }
 }
 

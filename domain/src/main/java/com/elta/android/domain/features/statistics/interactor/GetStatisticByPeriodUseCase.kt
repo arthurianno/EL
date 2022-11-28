@@ -1,7 +1,6 @@
 package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -27,7 +26,7 @@ class GetStatisticByPeriodUseCase @Inject constructor(
                 buildStatisticModel(
                     period = p.period,
                     events = pair.first,
-                    settings = pair.second.glucoseLevelSettings ?: GlucoseLevelSettings()
+                    settings = pair.second.glucoseLevelSettings
                 )
             }
     }

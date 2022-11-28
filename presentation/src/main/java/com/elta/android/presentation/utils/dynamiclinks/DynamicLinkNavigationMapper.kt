@@ -1,4 +1,4 @@
-package com.elta.android.presentation.utils.dynamic_links
+package com.elta.android.presentation.utils.dynamiclinks
 
 import android.net.Uri
 import com.elta.android.presentation.Screens

@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.notification
 
-import com.elta.android.presentation.utils.dynamic_links.HOME_SCREEN
+import com.elta.android.presentation.utils.dynamiclinks.HOME_SCREEN
 
 interface NotificationSource {
 

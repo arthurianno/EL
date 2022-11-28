@@ -13,7 +13,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
-import com.elta.android.presentation.utils.dynamic_links.DynamicLinkProcessor
+import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView

@@ -11,8 +11,8 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.app.ui.AppActivity
-import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_AUTHORITY
-import com.elta.android.presentation.utils.dynamic_links.NOTIFICATION_URI_SCHEME
+import com.elta.android.presentation.utils.dynamiclinks.NOTIFICATION_URI_AUTHORITY
+import com.elta.android.presentation.utils.dynamiclinks.NOTIFICATION_URI_SCHEME
 import javax.inject.Inject
 
 class NotificationHelper @Inject constructor(

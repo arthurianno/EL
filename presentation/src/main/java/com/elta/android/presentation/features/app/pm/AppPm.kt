@@ -16,8 +16,8 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
-import com.elta.android.presentation.utils.dynamic_links.DynamicLinkNavigationMapper
-import com.elta.android.presentation.utils.dynamic_links.NotificationNavigationMapper
+import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkNavigationMapper
+import com.elta.android.presentation.utils.dynamiclinks.NotificationNavigationMapper
 import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
@@ -27,6 +27,9 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+private const val EMPTY_STATUS_DELAY = 400L // millis
+private const val STATUS_DELAY = 2000L // millis
 
 class AppPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -57,6 +60,7 @@ class AppPm @Inject constructor(
                                 Screens.GreetingFlow,
                                 Screens.ActivateProfile
                             )
+
                             !user.isOnBoardingPassed -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
@@ -123,22 +127,27 @@ class AppPm @Inject constructor(
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Glucometer.Started -> {
                         setStatus(SyncStatus.Glucometer.Started(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Glucometer.Success -> {
                         setStatus(SyncStatus.Glucometer.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
+
                     is Events.Sync.Server.Error -> {
                         setStatus(SyncStatus.Server.Error(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
+
                     is Events.Sync.Server.Started -> {
                         setStatus(SyncStatus.Server.Started(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Server.Success -> {
                         setStatus(SyncStatus.Server.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
@@ -222,10 +231,5 @@ class AppPm @Inject constructor(
                 override val color: Int = resources.getColor(R.color.color_background_sync_error)
             ) : SyncStatus()
         }
-    }
-
-    private companion object {
-        const val EMPTY_STATUS_DELAY = 400L // millis
-        const val STATUS_DELAY = 2000L // millis
     }
 }
