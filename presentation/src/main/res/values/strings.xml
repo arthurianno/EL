@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
     <string name="app_name">Сателлит Online</string>
     <string name="input_font_name">roboto_regular.ttf</string>
     <string name="title_connection_lost">Нет подключения к Интернету</string>
@@ -7,6 +8,8 @@
     <string name="gender_male">Мужской</string>
     <string name="gender_female">Женский</string>
     <string name="gender_not_specified">Пол не указан</string>
+    <string name="yes_text">Да</string>
+    <string name="no_text">Нет</string>
 
     <!-- ERROR VIEW ERRORS -->
     <string name="error_server_not_responding_title">Сервер недоступен</string>
@@ -233,7 +236,8 @@
     <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
     <string name="events_creation_save_button">Сохранить запись</string>
-    <string name="events_creation_hint_bread">Название блюда или продукта</string>
+    <string name="events_creation_hint_bread">Добавить блюдо/продукт</string>
+    <string name="events_creation_text_bread">Блюдо/продукт</string>
     <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
@@ -644,4 +648,31 @@
 
     <string name="push_channel_name">Main Message Channel</string>
     <string name="push_channel_description">Главный канал уведомлений</string>
+
+    <!-- CALCULATOR -->
+    <string name="calculator_appbar_title">Добавить блюдо/продукт</string>
+    <string name="calculator_empty_list_text">Вы еще не внесли ни одно блюдо.\nВоспользуйтесь поиском, чтобы найти необходимый продукт.</string>
+    <string name="calculator_search_hint">Найти блюдо/продукт</string>
+    <string name="calculator_help_text_add_dishes">Добавленное блюдо/продукт</string>
+    <string name="calculator_help_text_recent_search">Недавние поиски</string>
+    <string name="calculator_help_text_serach_result">Результаты поиска</string>
+    <string name="calculator_save_text">Сохранить</string>
+    <string name="calculator_add_text">Добавить</string>
+    <string name="calculator_last_search">Недавние поиски</string>
+    <string name="calculator_search_result">Результаты поиска</string>
+    <string name="calculator_dish_card_in_port">В порции:</string>
+    <string name="calculator_bread_units_count">Количество хлебных единиц:</string>
+    <string name="calculator_bread_units_count_label">%s XE</string>
+    <string name="calculator_product_portion">Порция продукта</string>
+    <string name="calculator_additional_information">Дополнительная информация</string>
+    <string name="calculator_verify_product">Верифицированный продукт</string>
+    <string name="calculator_dish_calories">Калории</string>
+    <string name="calculator_dish_proteins">Белки</string>
+    <string name="calculator_dish_fats">Жиры</string>
+    <string name="calculator_dish_carbs">Углеводы</string>
+    <string name="calculator_total_bread_units">Общее количество ХЕ:</string>
+    <string name="calculator_dialog_title_warning">Внимание</string>
+    <string name="calculator_user_had_changed_data_message">При изменении значений ХЕ данные могут быть не точными</string>
+    <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
+    <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
 </resources>

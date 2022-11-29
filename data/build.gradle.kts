@@ -36,6 +36,9 @@ dependencies {
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)
 
+    implementation(Dependencies.Kotlin.coroutinesCore)
+    implementation(Dependencies.Kotlin.coroutinesRx2)
+
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.RxJava2.rxNetwork)
     implementation(Dependencies.RxJava2.rxBluetooth)

@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.diary.events.interactor
 
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -40,7 +41,8 @@ class AddNewEventUseCase @Inject constructor(
                 medicament = p.medicament,
                 type = p.eventType,
                 mealTag = null,
-                state = State.CREATED
+                state = State.CREATED,
+                dishes = p.dishes
             )
         )
     }
@@ -56,6 +58,7 @@ class AddNewEventUseCase @Inject constructor(
         val medicament: String? = null,
         val activity: ActivityType? = null,
         val note: String? = null,
-        val eventType: EventType
+        val eventType: EventType,
+        val dishes: List<Dish> = emptyList()
     )
 }

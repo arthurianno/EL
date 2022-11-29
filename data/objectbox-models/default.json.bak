@@ -685,9 +685,33 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "19:1144109115481642934",
+      "lastPropertyId": "3:8176573044326170340",
+      "name": "SearchHistoryDto",
+      "properties": [
+        {
+          "id": "1:4164565140879723594",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:3525021443103785509",
+          "name": "word",
+          "type": 9
+        },
+        {
+          "id": "3:8176573044326170340",
+          "name": "time",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "18:3112945798377619629",
+  "lastEntityId": "19:1144109115481642934",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

@@ -88,7 +88,9 @@ object Dependencies {
         private const val dateTimeVersion = "0.3.1"
 
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesCore =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
         const val serialization =
             "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
         const val serializationJson =
@@ -279,20 +281,22 @@ object Dependencies {
     }
 
     object Dagger {
-        const val version = "2.22.1" // 2.42
+        const val daggerVersion = "2.22.1" // 2.42
+        const val hiltVersion = "2.42"
 
         private const val javaxAnnotationVersion = "1.3.2"
         private const val javaxInjectVersion = "1"
         private const val glassFishVersion = "10.0-b28"
 
-        const val hilt = "com.google.dagger:hilt-android:$version"
-        const val hiltCompiler = "com.google.dagger:hilt-android-compiler:$version"
-        const val dagger = "com.google.dagger:dagger:$version"
-        const val daggerCompiler = "com.google.dagger:dagger-compiler:$version"
-        const val daggerAndroid = "com.google.dagger:dagger-android:$version"
+        const val hiltPlugin = "com.google.dagger.hilt.android"
+        const val hilt = "com.google.dagger:hilt-android:$hiltVersion"
+        const val hiltCompiler = "com.google.dagger:hilt-android-compiler:$hiltVersion"
+        const val dagger = "com.google.dagger:dagger:$daggerVersion"
+        const val daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+        const val daggerAndroid = "com.google.dagger:dagger-android:$daggerVersion"
         const val daggerAndroidProcessor =
-            "com.google.dagger:dagger-android-processor:$version"
-        const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:$version"
+            "com.google.dagger:dagger-android-processor:$daggerVersion"
+        const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:$daggerVersion"
         const val javaxAnnotation =
             "javax.annotation:javax.annotation-api:$javaxAnnotationVersion"
         const val javaxInject = "javax.inject:javax.inject:$javaxInjectVersion"
@@ -306,7 +310,7 @@ object Dependencies {
     }
 
     object Retrofit {
-        private const val version = "2.5.0" // 2.9.0
+        private const val version = "2.9.0" // 2.9.0
 
         const val core = "com.squareup.retrofit2:retrofit:$version"
         const val gsonConverter = "com.squareup.retrofit2:converter-gson:$version"
@@ -315,7 +319,7 @@ object Dependencies {
     }
 
     object OkHttp {
-        private const val version = "3.12.1" // 4.10.0
+        private const val version = "3.14.9" // 4.10.0
 
         const val core = "com.squareup.okhttp3:okhttp:$version"
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"
@@ -333,5 +337,20 @@ object Dependencies {
 
         const val proto = "androidx.datastore:datastore:$version"
         const val preferences = "androidx.datastore:datastore-preferences:$version"
+    }
+
+    object KoDeIn {
+        private const val version = "7.12.0"
+        private const val versionCompose = "7.12.0"
+
+        const val core = "org.kodein.di:kodein-di:$version"
+        const val androidCore = "org.kodein.di:kodein-di-framework-android-core:$version"
+        const val androidSupport = "org.kodein.di:kodein-di-framework-android-support:$version"
+        const val androidJetpack = "org.kodein.di:kodein-di-framework-android-x:$version"
+        const val androidViewModel =
+            "org.kodein.di:kodein-di-framework-android-x-viewmodel:$version"
+        const val androidViewModelWithState =
+            "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
+        const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
     }
 }

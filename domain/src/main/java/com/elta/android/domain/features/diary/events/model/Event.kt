@@ -1,13 +1,14 @@
 package com.elta.android.domain.features.diary.events.model
 
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.tags.model.Tag
 import org.threeten.bp.ZonedDateTime
 
 data class Event(
     val id: String,
-    var additionTime: ZonedDateTime,
+    val additionTime: ZonedDateTime,
     val tagId: String?,
-    var tag: Tag?,
+    val tag: Tag?,
     val note: String?,
     val modificationTime: Long?,
     val value: Double?,
@@ -20,5 +21,6 @@ data class Event(
     val insulinType: InsulinType?,
     val medicament: String?,
     val type: EventType,
-    val state: State
+    val state: State,
+    val dishes: List<Dish>
 )

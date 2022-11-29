@@ -6,6 +6,9 @@ import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.auth.api.request.RefreshRequest
 import com.nullgr.core.security.prefs.CryptoPreferences
 
+private const val ACCESS_TOKEN = "access_token"
+private const val REFRESH_TOKEN = "refresh_token"
+
 class LocalTokenStorage(
     private val pref: CryptoPreferences,
     private val api: TokenRefreshApi
@@ -37,9 +40,4 @@ class LocalTokenStorage(
 
     override fun isUserLoggedIn(): Boolean =
         !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
-
-    private companion object {
-        const val ACCESS_TOKEN = "access_token"
-        const val REFRESH_TOKEN = "refresh_token"
-    }
 }

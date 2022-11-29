@@ -27,9 +27,4 @@ class TokenAuthenticator(
             return builder.build()
         }
     }
-
-    companion object {
-        private const val PREFIX = "Bearer"
-        private const val AUTH_HEADER = "Authorization"
-    }
 }

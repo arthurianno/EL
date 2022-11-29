@@ -1,6 +1,9 @@
 package com.elta.android.presentation.features.main.events.create.pm
 
 import com.elta.android.common.utils.isDateChanged
+import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
+import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
+import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -26,8 +29,11 @@ private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val clearCachedDishes: ClearCachedDishesUseCase,
+    cachedDishes: CachedDishesUseCase,
+    calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
-) : BaseEventPm(services) {
+) : BaseEventPm(services, calculatorFragmentResult, cachedDishes) {
 
     private val isFormNotEmptyState = state(false)
     private val eventFormHolderState = state(EventFormModel())
@@ -56,6 +62,9 @@ class EventCreationPm @Inject constructor(
 
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
         observeSaveEventAction()
+        launch {
+            clearCachedDishes()
+        }
     }
 
     override fun handleBack(i: Unit) {
@@ -150,7 +159,8 @@ class EventCreationPm @Inject constructor(
             insulin = form.insulin?.type,
             medicament = form.insulin?.drug,
             note = form.note,
-            eventType = checkNotNull(form.eventType)
+            eventType = checkNotNull(form.eventType),
+            dishes = dishes.value
         )
     }
 
@@ -164,10 +174,12 @@ class EventCreationPm @Inject constructor(
                 params.activity?.let { data[AnalyticsEventParam.TYPE] = it.name }
                 AnalyticsEventType.EVENT_ACTIVITY_ADD
             }
+
             EventType.INSULIN -> {
                 data[AnalyticsEventParam.TYPE] = checkNotNull(params.insulin).name
                 AnalyticsEventType.EVENT_INSULIN_ADD
             }
+
             else -> null
         }
         return if (name == null) null else AnalyticsEvent(name, data)

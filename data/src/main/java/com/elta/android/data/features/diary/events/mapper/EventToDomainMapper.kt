@@ -32,7 +32,8 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
                 mealTag = data.mealTag?.let { MealTag.valueOf(it.name) },
                 insulinType = data.insulinType?.let { InsulinType.valueOf(it.name) },
                 medicament = data.insulinMedicament?.medicament,
-                state = State.valueOf(state.name)
+                state = State.valueOf(state.name),
+                dishes = emptyList() // TODO После реалзиации бэкэнда исправить.
             )
         }
 }

@@ -1,10 +1,16 @@
 package com.elta.android.data.di
 
 import android.content.Context
+import com.elta.android.common.di.qualifires.FatSecret
+import com.elta.android.common.di.qualifires.FeatSecretAnnotationType
 import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
+import com.elta.android.data.features.calculator.api.CalculatorApi
+import com.elta.android.data.features.calculator.api.CalculatorMockedApi
+import com.elta.android.data.features.calculator.api.FatSecretApi
+import com.elta.android.data.features.calculator.api.FatSecretTokenApi
 import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
 import com.elta.android.data.features.diary.insulin.api.DrugNameApi
@@ -28,6 +34,17 @@ import dagger.Provides
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+private const val USE_MOCKED_SALE_POINTS_API = false
+private const val USE_MOCKED_EVENTS_API = false
+private const val USE_MOCKED_TAGS_API = false
+private const val USE_MOCKED_SETTINGS_API = false
+private const val USE_MOCKED_OBSERVER_API = false
+private const val USE_MOCKED_FIRMWARE_API = false
+private const val USE_MOCKED_FEEDBACK_API = false
+private const val USE_MOCKED_REPORTS_API = false
+private const val USE_MOCKED_INSULIN_DRUG_API = false
+private const val USE_MOCKED_CALCULATOR_API = true
+
 @Module
 @Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
 class ApiModule {
@@ -36,28 +53,28 @@ class ApiModule {
     @Singleton
     fun provideAuthApi(
         retrofit: Retrofit
-    ): AuthApi = retrofit.create<AuthApi>(AuthApi::class.java)
+    ): AuthApi = retrofit.create(AuthApi::class.java)
 
     @Provides
     @Singleton
     fun provideAuthRefreshApi(
         @Token retrofit: Retrofit
-    ): TokenRefreshApi = retrofit.create<TokenRefreshApi>(TokenRefreshApi::class.java)
+    ): TokenRefreshApi = retrofit.create(TokenRefreshApi::class.java)
 
     @Provides
     @Singleton
     fun provideAuthSocialApi(
         retrofit: Retrofit
-    ): SocialApi = retrofit.create<SocialApi>(SocialApi::class.java)
+    ): SocialApi = retrofit.create(SocialApi::class.java)
 
     @Provides
     @Singleton
     fun provideSettingsApi(
         retrofit: Retrofit
     ): ProfileApi =
-        when (ApiConfig.USE_MOCKED_SETTINGS_API) {
+        when (USE_MOCKED_SETTINGS_API) {
             true -> MockedProfileApi()
-            else -> retrofit.create<ProfileApi>(ProfileApi::class.java)
+            else -> retrofit.create(ProfileApi::class.java)
         }
 
     @Provides
@@ -65,9 +82,9 @@ class ApiModule {
     fun provideObserverApi(
         retrofit: Retrofit
     ): ObserverApi =
-        when (ApiConfig.USE_MOCKED_OBSERVER_API) {
+        when (USE_MOCKED_OBSERVER_API) {
             true -> MockedObserverApi()
-            else -> retrofit.create<ObserverApi>(ObserverApi::class.java)
+            else -> retrofit.create(ObserverApi::class.java)
         }
 
     @Provides
@@ -76,9 +93,9 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): SalePointsApi =
-        when (ApiConfig.USE_MOCKED_SALE_POINTS_API) {
+        when (USE_MOCKED_SALE_POINTS_API) {
             true -> MockedSalePointsApi(context)
-            else -> retrofit.create<SalePointsApi>(SalePointsApi::class.java)
+            else -> retrofit.create(SalePointsApi::class.java)
         }
 
     @Provides
@@ -87,9 +104,9 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): EventsApi =
-        when (ApiConfig.USE_MOCKED_EVENTS_API) {
+        when (USE_MOCKED_EVENTS_API) {
             true -> MockedEventsApi(context)
-            else -> retrofit.create<EventsApi>(EventsApi::class.java)
+            else -> retrofit.create(EventsApi::class.java)
         }
 
     @Provides
@@ -98,9 +115,9 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): TagsApi =
-        when (ApiConfig.USE_MOCKED_TAGS_API) {
+        when (USE_MOCKED_TAGS_API) {
             true -> MockedTagsApi(context)
-            else -> retrofit.create<TagsApi>(TagsApi::class.java)
+            else -> retrofit.create(TagsApi::class.java)
         }
 
     @Provides
@@ -108,10 +125,10 @@ class ApiModule {
     fun provideInsulinApi(
         retrofit: Retrofit
     ): DrugNameApi =
-        if (ApiConfig.USE_MOCKED_INSULIN_DRUG_API) {
+        if (USE_MOCKED_INSULIN_DRUG_API) {
             MockedDrugNameApi()
         } else {
-            retrofit.create<DrugNameApi>(DrugNameApi::class.java)
+            retrofit.create(DrugNameApi::class.java)
         }
 
     @Provides
@@ -120,9 +137,9 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): FirmwareApi =
-        when (ApiConfig.USE_MOCKED_FIRMWARE_API) {
+        when (USE_MOCKED_FIRMWARE_API) {
             true -> MockedFirmwareApi(context)
-            else -> retrofit.create<FirmwareApi>(FirmwareApi::class.java)
+            else -> retrofit.create(FirmwareApi::class.java)
         }
 
     @Provides
@@ -130,9 +147,9 @@ class ApiModule {
     fun provideFeedbackApi(
         retrofit: Retrofit
     ): FeedbackApi =
-        when (ApiConfig.USE_MOCKED_FEEDBACK_API) {
+        when (USE_MOCKED_FEEDBACK_API) {
             true -> MockedFeedbackApi()
-            else -> retrofit.create<FeedbackApi>(FeedbackApi::class.java)
+            else -> retrofit.create(FeedbackApi::class.java)
         }
 
     @Provides
@@ -141,20 +158,31 @@ class ApiModule {
         context: Context,
         retrofit: Retrofit
     ): ReportsApi =
-        when (ApiConfig.USE_MOCKED_REPORTS_API) {
+        when (USE_MOCKED_REPORTS_API) {
             true -> MockedReportsApi(context)
-            else -> retrofit.create<ReportsApi>(ReportsApi::class.java)
+            else -> retrofit.create(ReportsApi::class.java)
         }
 
-    object ApiConfig {
-        const val USE_MOCKED_SALE_POINTS_API = false
-        const val USE_MOCKED_EVENTS_API = false
-        const val USE_MOCKED_TAGS_API = false
-        const val USE_MOCKED_SETTINGS_API = false
-        const val USE_MOCKED_OBSERVER_API = false
-        const val USE_MOCKED_FIRMWARE_API = false
-        const val USE_MOCKED_FEEDBACK_API = false
-        const val USE_MOCKED_REPORTS_API = false
-        const val USE_MOCKED_INSULIN_DRUG_API = false
-    }
+    @Provides
+    @Singleton
+    fun provideCalculatorApi(
+        context: Context,
+        retrofit: Retrofit
+    ): CalculatorApi =
+        when (USE_MOCKED_CALCULATOR_API) {
+            true -> CalculatorMockedApi(context)
+            else -> retrofit.create(CalculatorApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideFatSecretApi(
+        @FatSecret(FeatSecretAnnotationType.Retrofit) retrofit: Retrofit
+    ): FatSecretApi = retrofit.create(FatSecretApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFatSecretTokenApi(
+        @FatSecret(FeatSecretAnnotationType.Token) retrofit: Retrofit
+    ): FatSecretTokenApi = retrofit.create(FatSecretTokenApi::class.java)
 }

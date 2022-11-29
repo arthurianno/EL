@@ -4,7 +4,9 @@ import android.content.Context
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.ApiModule
 import com.elta.android.data.di.CacheModule
+import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
+import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
@@ -20,6 +22,7 @@ import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
 import com.elta.android.presentation.di.ReceiverBuilder
+import com.elta.android.presentation.di.ViewModelModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -43,10 +46,12 @@ import javax.inject.Singleton
         StorageModule::class,
         GlucometerModule::class,
         LocalSyncModule::class,
+        FatSecretModule::class,
         // domain
         RepoModule::class,
         // presentation
         PmModule::class,
+        ViewModelModule::class,
         ActivityBuilder::class,
         FragmentBuilder::class,
         NotificationModule::class,
@@ -54,7 +59,9 @@ import javax.inject.Singleton
         // navigation
         NavigationModule::class,
         // analytics
-        AnalyticsModule::class
+        AnalyticsModule::class,
+        // Coroutines
+        CoroutineModule::class
     ]
 )
 interface AppComponent {
