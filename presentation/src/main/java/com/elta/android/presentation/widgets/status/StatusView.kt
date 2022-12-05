@@ -9,6 +9,9 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.ViewConnectionStatusBinding
 import io.reactivex.functions.Consumer
 
+private const val HIDE_VIEW_DELAY_MILLIS = 3000L
+private const val COLOR_ANIMATION_DURATION_MILLIS = 700L
+
 class StatusView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -20,11 +23,11 @@ class StatusView @JvmOverloads constructor(
         prevStatus = null
         animator = null
     }
-
     private var animator: ObjectAnimator? = null
-    private val evaluator = ArgbEvaluator()
 
+    private val evaluator = ArgbEvaluator()
     private var prevStatus: Status? = null
+
     private val binding: ViewConnectionStatusBinding by lazy {
         ViewConnectionStatusBinding.bind(this)
     }
@@ -69,7 +72,7 @@ class StatusView @JvmOverloads constructor(
     private fun hide(delay: Boolean) {
         if (delay) {
             removeCallbacks(hideViewCallback)
-            postDelayed(hideViewCallback, HIDE_VIEW_DELAY)
+            postDelayed(hideViewCallback, HIDE_VIEW_DELAY_MILLIS)
         } else {
             removeCallbacks(hideViewCallback)
             hideViewCallback.run()
@@ -80,11 +83,6 @@ class StatusView @JvmOverloads constructor(
         ObjectAnimator.ofInt(binding.statusBackgroundView, "backgroundColor", prev.color, new.color)
             .apply {
                 setEvaluator(evaluator)
-                duration = COLOR_ANIMATION_DURATION
+                duration = COLOR_ANIMATION_DURATION_MILLIS
             }
-
-    companion object {
-        private const val HIDE_VIEW_DELAY = 3000L // millis
-        private const val COLOR_ANIMATION_DURATION = 700L // millis
-    }
 }

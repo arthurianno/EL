@@ -1,6 +1,7 @@
 package com.elta.android.data.features.diary.events.api
 
 import com.elta.android.common.utils.toIsoString
+import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventDataDto
@@ -9,6 +10,7 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
+import com.elta.android.data.features.diary.events.extensions.countOrZero
 import org.threeten.bp.ZonedDateTime
 import java.util.Date
 
@@ -34,7 +36,8 @@ object EventMockedFactory {
         medicament: String? = null,
         tagId: String? = null,
         note: String? = null,
-        state: StateDto = StateDto.CREATED
+        state: StateDto = StateDto.CREATED,
+        products: List<ProductResponse>? = null
     ): EventDto =
         EventDto(
             id = id,
@@ -53,7 +56,9 @@ object EventMockedFactory {
                 mealTag = mealTag,
                 insulinType = insulinType,
                 insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
-                type = type
+                type = type,
+                products = products,
+                productsCount = products.countOrZero()
             )
         )
 }

@@ -11,6 +11,9 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.ViewConnectionStatusBinding
 import io.reactivex.functions.Consumer
 
+private const val HIDE_VIEW_DELAY_MILLIS = 3000L
+private const val COLOR_ANIMATION_DURATION_MILLIS = 700L
+
 class TwoStateStatusView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -22,12 +25,12 @@ class TwoStateStatusView @JvmOverloads constructor(
     }
 
     private var colorAnimator: ValueAnimator
-
     private var state1Text: String? = null
-    private var state2Text: String? = null
 
+    private var state2Text: String? = null
     private var state1Color: Int = Color.BLUE
     private var state2Color: Int = Color.GREEN
+
     private val binding: ViewConnectionStatusBinding by lazy {
         ViewConnectionStatusBinding.bind(this)
     }
@@ -52,7 +55,7 @@ class TwoStateStatusView @JvmOverloads constructor(
             state2Color
         ).apply {
             setEvaluator(ArgbEvaluator())
-            duration = COLOR_ANIMATION_DURATION
+            duration = COLOR_ANIMATION_DURATION_MILLIS
         }
     }
 
@@ -81,11 +84,6 @@ class TwoStateStatusView @JvmOverloads constructor(
     private fun drawState2() = with(binding) {
         statusTextView.text = state2Text
         colorAnimator.start()
-        postDelayed(hideViewCallback, HIDE_VIEW_DELAY)
-    }
-
-    companion object {
-        private const val HIDE_VIEW_DELAY = 3000L // millis
-        private const val COLOR_ANIMATION_DURATION = 700L // millis
+        postDelayed(hideViewCallback, HIDE_VIEW_DELAY_MILLIS)
     }
 }

@@ -15,7 +15,7 @@ class DateItemContainerView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthSpec = MeasureSpec.makeMeasureSpec(
-            screenWidth / HorizontalDatePickerView.ITEMS_ON_SCREEN_COUNT,
+            screenWidth / ITEMS_ON_SCREEN_COUNT_MILLIS,
             MeasureSpec.EXACTLY
         )
         super.onMeasure(widthSpec, heightMeasureSpec)

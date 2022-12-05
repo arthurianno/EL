@@ -60,12 +60,22 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getParcelable<DishUiEntity>(EXTRA_DISH)?.let { dish ->
-            viewModel.setDish(dish)
+            with(viewModel) {
+                setDish(dish)
+                downButton.setText(
+                    getString(
+                        if (dish.localId.isEmpty()) {
+                            R.string.calculator_add_text
+                        } else {
+                            R.string.calculator_save_text
+                        }
+                    )
+                )
+            }
         }
     }
 
     override fun DishDetailViewModel.init() {
-        downButton.setText(getString(R.string.calculator_add_text))
         portionCountTextField.setIcon(R.drawable.ic_plus_minus)
         if (portionCountTextField.state.value.text.isEmpty()) {
             portionCountTextField.setText(PORTION_INIT_TEXT)
@@ -86,6 +96,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
+        viewModel.downButton.setEnableState(state.value.dish.breadUnits > 0.0)
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
                 dish = state.value.dish,

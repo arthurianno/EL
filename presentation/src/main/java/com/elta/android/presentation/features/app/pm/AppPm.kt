@@ -28,8 +28,8 @@ import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-private const val EMPTY_STATUS_DELAY = 400L // millis
-private const val STATUS_DELAY = 2000L // millis
+private const val EMPTY_STATUS_DELAY_MILLIS = 400L
+private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -113,10 +113,10 @@ class AppPm @Inject constructor(
         bus.events<Events.Sync>()
             .concatMap { event ->
                 val delay = when {
-                    !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY // first start add delay to make smoooth
+                    !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth
                     event is Events.Sync.Glucometer.Error -> 0L
                     event is Events.Sync.Glucometer.Started -> 0L
-                    else -> STATUS_DELAY
+                    else -> STATUS_DELAY_MILLIS
                 }
                 Observable.just(event).delay(delay, TimeUnit.MILLISECONDS)
             }

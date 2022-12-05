@@ -74,12 +74,19 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             message = getString(R.string.calculator_max_bread_units_message),
             positiveButtonText = getString(R.string.ok)
         )
+        exitDialog.initDialog(
+            title = getString(R.string.event_form_dialog_title),
+            message = getString(R.string.event_form_exit_dialog_body),
+            positiveButtonText = getString(R.string.event_form_exit_dialog_confirm_button),
+            negativeButtonText = getString(R.string.event_form_dialog_cancel_button)
+        )
     }
 
     @Composable
     override fun Dialogs() {
         BaseDialog(widgetModel = viewModel.dishDeleteConfirmDialog)
         BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
+        BaseDialog(widgetModel = viewModel.exitDialog)
     }
 
     @Composable
@@ -135,10 +142,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         dishes: List<DishUiEntity>
     ) {
         if (dishes.isEmpty()) {
-            viewModel.downButton.disable()
             EmptyContent()
         } else {
-            viewModel.downButton.enable()
             CalculateDishes(dishes, viewModel)
         }
     }

@@ -267,7 +267,7 @@
     <string name="event_date_yesterday">Вчера</string>
 
     <string name="event_form_dialog_title">Внимание</string>
-    <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены</string>
+    <string name="event_form_exit_dialog_body">Введённые данные не будут сохранены!</string>
     <string name="event_form_dialog_cancel_button">Отменить</string>
     <string name="event_form_exit_dialog_confirm_button">Выйти</string>
     <string name="event_form_delete_dialog_confirm_button">Удалить</string>
@@ -673,6 +673,7 @@
     <string name="calculator_total_bread_units">Общее количество ХЕ:</string>
     <string name="calculator_dialog_title_warning">Внимание</string>
     <string name="calculator_user_had_changed_data_message">При изменении значений ХЕ данные могут быть не точными</string>
+    <string name="calculator_user_change_bread_units_message">Значение ХЕ было изменено, исходя из добавленных вами продуктов/блюд</string>
     <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
 </resources>

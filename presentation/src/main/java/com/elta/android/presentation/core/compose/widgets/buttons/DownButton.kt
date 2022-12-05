@@ -33,12 +33,8 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
         setState { state.value.copy(text = text) }
     }
 
-    fun enable() {
-        setState { state.value.copy(enable = true) }
-    }
-
-    fun disable() {
-        setState { state.value.copy(enable = false) }
+    fun setEnableState(enableState: Boolean) {
+        setState { state.value.copy(enable = enableState) }
     }
 
     fun onClick() {

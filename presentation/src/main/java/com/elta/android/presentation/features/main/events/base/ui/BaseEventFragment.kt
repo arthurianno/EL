@@ -108,6 +108,8 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         pm.noteInput.bindTo(binding.formNoteView)
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.breadUnitsChangeDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.userHadChangesBreadUnitsDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
         binding.formNoteView.textChanges().subscribe(
             { binding.scrollableView.scrollToBottom() },
