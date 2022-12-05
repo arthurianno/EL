@@ -10,12 +10,14 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
+import com.elta.android.data.features.diary.events.extensions.countOrZero
 import javax.inject.Inject
 
 class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventDto> {
 
     override fun mapFromObject(source: EventCachedDto): EventDto =
         with(source) {
+            val productsList = products.toProductsList()
             EventDto(
                 id = secondaryId,
                 data = EventDataDto(
@@ -28,7 +30,9 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                     mealTag = mealTag?.let { MealTagDto.valueOf(it) },
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it) },
                     type = EventTypeDto.valueOf(type),
-                    insulinMedicament = InsulinMedicamentDataDto(medicament = medicament)
+                    insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
+                    products = productsList,
+                    productsCount = productsList.countOrZero()
                 ),
                 additionTime = additionTimeString,
                 tagId = tagId,

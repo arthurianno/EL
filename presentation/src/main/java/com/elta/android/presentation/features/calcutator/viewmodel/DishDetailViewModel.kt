@@ -63,7 +63,7 @@ class DishDetailViewModel @Inject constructor(
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingAmount = it,
-                                breadUnits = getBreadUnits(amount = it)
+                                breadUnits = calculateBreadUnits(amount = it)
                             )
                         )
                     }
@@ -81,7 +81,7 @@ class DishDetailViewModel @Inject constructor(
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingSelect = it,
-                                breadUnits = getBreadUnits(carbs = it.carbs),
+                                breadUnits = calculateBreadUnits(carbs = it.carbs),
                                 servingAmount = it.numberOfUnits
                             )
                         )
@@ -147,7 +147,7 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
-    private fun getBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
+    private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
         val newCarbs = carbs ?: state.value.dish.servingSelect.carbs
         val newAmount =
             amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT

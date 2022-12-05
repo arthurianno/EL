@@ -1,5 +1,6 @@
 package com.elta.android.data.features.diary.events.dto
 
+import com.elta.android.data.features.calculator.model.ProductResponse
 import com.google.gson.annotations.SerializedName
 
 data class EventDataDto(
@@ -12,5 +13,7 @@ data class EventDataDto(
     @SerializedName("mealTagging") val mealTag: MealTagDto?,
     @SerializedName("insulinType") val insulinType: InsulinTypeDto?,
     @SerializedName("insulinMedicament") val insulinMedicament: InsulinMedicamentDataDto?,
-    @SerializedName("eventType") val type: EventTypeDto
+    @SerializedName("eventType") val type: EventTypeDto,
+    @SerializedName("products") val products: List<ProductResponse>?,
+    @SerializedName("productsCount") val productsCount: Long
 )

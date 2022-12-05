@@ -71,7 +71,7 @@ internal fun CompactFoodNetworkEntity.toDomain(): Dish =
 internal fun List<CompactFoodNetworkEntity>.compactFoodsToDomain(): List<Dish> =
     map { it.toDomain() }
 
-internal fun ProductResponse.toDomain(): Dish =
+fun ProductResponse.toDomain(): Dish =
     Dish(
         id = id,
         localId = getLocalId(),
@@ -86,8 +86,22 @@ internal fun ProductResponse.toDomain(): Dish =
     )
 
 @JvmName("toDomainProductResponse")
-internal fun List<ProductResponse>.toDomain(): List<Dish> =
+fun List<ProductResponse>.toDomain(): List<Dish> =
     map { it.toDomain() }
+
+fun Dish.toNetwork(): ProductResponse =
+    ProductResponse(
+        id = id,
+        name = name,
+        type = type.name,
+        servingId = servingSelect.id,
+        servingName = servingSelect.measurementDescription,
+        servingAmount = servingAmount,
+        breadUnits = breadUnits
+    )
+
+fun List<Dish>.toNetwork(): List<ProductResponse> =
+    map { it.toNetwork() }
 
 internal fun DishDbEntity.toDomain(): Dish =
     Dish(

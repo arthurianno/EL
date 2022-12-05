@@ -7,7 +7,6 @@ import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseC
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
 import com.elta.android.domain.features.user.interactor.round
-import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -43,8 +42,8 @@ class CalculatorViewModel @Inject constructor(
     BaseViewModel<CalculatorViewState, Event, CalculatorAction>() {
     override fun createInitState(): CalculatorViewState =
         CalculatorViewState(
-            profile = Profile(),
             dishes = emptyList(),
+            startDishes = emptyList(),
             totalBreadUnits = 0.0,
             helpText = "",
             searchInFocus = false,
@@ -60,6 +59,9 @@ class CalculatorViewModel @Inject constructor(
         positiveOnCLick = { deletedDish -> deletedDish?.let { deleteDish(it) } }
     )
     val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
+    val exitDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { router.exit() }
+    )
 
     init {
         launch {
@@ -86,7 +88,13 @@ class CalculatorViewModel @Inject constructor(
         launch {
             getCachedDishes()
                 .catch { handleError(it) }
-                .collect { reduceState { state.value.copy(dishes = it.toUi()) } }
+                .map { it.toUi() }
+                .collect {
+                    reduceState {
+                        state.value.copy(dishes = it, startDishes = it)
+                    }
+                    setDownButtonVisibility()
+                }
         }
     }
 
@@ -127,12 +135,20 @@ class CalculatorViewModel @Inject constructor(
                 when (action) {
                     is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
                     is CalculatorAction.AddDishClick -> dishClick(action.dish)
-                    AppAction.BackPressure -> router.exit()
+                    AppAction.BackPressure -> backPressure()
                     DownButtonClick -> saveDishes()
                 }
                 currentState
             }
         }
+
+    private fun backPressure() {
+        if (state.value.isChanging()) {
+            exitDialog.dialogOpen()
+        } else {
+            router.exit()
+        }
+    }
 
     private fun setDishes(dishes: List<DishUiEntity>) {
         reduceState {
@@ -141,6 +157,11 @@ class CalculatorViewModel @Inject constructor(
                 totalBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
             )
         }
+        setDownButtonVisibility()
+    }
+
+    private fun setDownButtonVisibility() {
+        downButton.setEnableState(state.value.isChanging() && state.value.dishes.isNotEmpty())
     }
 
     private fun deleteDish(dish: DishUiEntity) {

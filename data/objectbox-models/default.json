@@ -81,7 +81,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "19:6583631272062989855",
+      "lastPropertyId": "20:4405644930558636300",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -173,6 +173,11 @@
         {
           "id": "19:6583631272062989855",
           "name": "medicament",
+          "type": 9
+        },
+        {
+          "id": "20:4405644930558636300",
+          "name": "products",
           "type": 9
         }
       ],

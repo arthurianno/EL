@@ -49,6 +49,8 @@ import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val OPEN_SCREEN_DELAY_MILLIS = 300L
+
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
@@ -59,37 +61,37 @@ class GlucoseEventPm @Inject constructor(
     private val shareImageBuilder: ShareImageBuilder,
     services: ServiceFacade
 ) : BasePm(services) {
-
     val glucoseValueState = state<String>()
     val glucoseInfoState = state<String>()
-    val glucoseLevelBackgroundState = state<Int>()
 
+    val glucoseLevelBackgroundState = state<Int>()
     val tagSelector = formSelectorControl()
     val dateSelector = formSelectorControl(false)
     val timeSelector = formSelectorControl(false)
     val noteInput = inputControl()
-    val mealSelector = state(MealTag.NOT_SELECTED)
 
+    val mealSelector = state(MealTag.NOT_SELECTED)
     val mainActionTitleState = state<String>()
     val mainActionVisibilityState = state(false)
-    val mainAction = action<Unit>()
 
+    val mainAction = action<Unit>()
     val backHandleAction = action<Unit>()
     val exitDialogAction = action<Unit>()
     val shareAction = action<Unit>()
     val beforeMealAction = action<Unit>()
+
     val afterMealAction = action<Unit>()
 
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
-
     private val selectedDateState = state<ZonedDateTime>()
     private val eventIdState = state<String>()
     private val glucoseLevelSettingsState = state<GlucoseLevelSettings>()
+
     private val eventState = state<Event>()
 
     private val eventFormHolderState = state(GlucoseFormModel())
-
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
+
     private val loadScreenAction = action<Unit>()
 
     override fun onCreate() {
@@ -209,7 +211,7 @@ class GlucoseEventPm @Inject constructor(
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
@@ -366,8 +368,4 @@ class GlucoseEventPm @Inject constructor(
             this == GlucoseLevel.LOW -> R.drawable.bg_gradient_blue
             else -> R.drawable.bg_gradient_green
         }
-
-    companion object {
-        private const val OPEN_SCREEN_DELAY = 300L // millis
-    }
 }

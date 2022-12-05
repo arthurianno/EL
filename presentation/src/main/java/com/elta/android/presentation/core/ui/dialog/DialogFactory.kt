@@ -20,7 +20,9 @@ fun createDialog(
 ): Dialog =
     MaterialDialog.Builder(activity)
         .cancelable(false)
-        .title(data.title)
+        .apply {
+            data.title?.let { title(it) }
+        }
         .content(data.message)
         .buttons(dc, data)
         .build()

@@ -25,21 +25,25 @@ import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val NONE_ID = "none_id"
+private const val CLICK_DELAY_MILLIS = 100L
+private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
+
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
 class EventsOptionsChooserPm @Inject constructor(
     private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
     private val itemsBuilder: ChooserOptionsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
-
     val toolbarTitleCommand = state<String>()
     val appBarBackgroundCommand = state<Int>()
     val confirmButtonVisibilityCommand = command<Boolean>(bufferSize = 1)
-    val selectionConfirmedAction = action<Unit>()
 
+    val selectionConfirmedAction = action<Unit>()
     private val selectedItemIdState = state(NONE_ID)
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
+
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
     override fun onCreate() {
@@ -88,13 +92,13 @@ class EventsOptionsChooserPm @Inject constructor(
                 if (it.item.id == selectedItemIdState.value) NONE_ID
                 else it.item.id
             }
-            .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
+            .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
             .subscribe()
             .untilDestroy()
 
         bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
-            .throttleLatest(CLICK_DELAY, TimeUnit.MILLISECONDS)
+            .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.title)
             }
@@ -198,15 +202,18 @@ class EventsOptionsChooserPm @Inject constructor(
                     configuration.eventType == EventType.INSULIN -> {
                     resources.getString(R.string.events_options_chooser_title_insulin)
                 }
+
                 configuration.chooserType == ChooserType.VARIANTS &&
                     configuration.eventType == EventType.ACTIVITY -> {
                     resources.getString(R.string.events_options_chooser_title_activities)
                 }
+
                 configuration.chooserType == ChooserType.VARIANTS &&
                     configuration.eventType == EventType.INSULIN -> {
                     previousSelectionState.valueOrNull
                         ?: resources.getString(R.string.events_options_chooser_title_tags)
                 }
+
                 else ->
                     resources.getString(R.string.events_options_chooser_title_tags)
             }
@@ -246,11 +253,5 @@ class EventsOptionsChooserPm @Inject constructor(
                 NONE_ID
             }
         )
-    }
-
-    companion object {
-        private const val NONE_ID = "none_id"
-        private const val CLICK_DELAY = 100L // millis
-        private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
     }
 }
