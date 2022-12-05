@@ -21,11 +21,7 @@ class GetEventByIdUseCase @Inject constructor(
         Singles.zip(
             eventsRepo.getEventById(checkNotNull(params).id).applyScheduler(schedulers),
             tagsRepo.getTags().singleOrError().applyScheduler(schedulers)
-        ).map {
-            val event = it.first
-            event.addTag(it.second)
-            event
-        }
+        ).map { it.first.addTag(it.second) }
 
     data class Params(val id: String)
 }

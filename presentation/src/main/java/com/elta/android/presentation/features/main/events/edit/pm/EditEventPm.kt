@@ -30,7 +30,7 @@ class EditEventPm @Inject constructor(
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
-    cachedDishes: CachedDishesUseCase,
+    private val cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
 ) : BaseEventPm(services, calculatorFragmentResult, cachedDishes) {
@@ -54,9 +54,10 @@ class EditEventPm @Inject constructor(
     }
 
     override fun handleBack(i: Unit) {
-        when (isFormChangedState.value) {
-            true -> exitDialogAction.consumer.accept(Unit)
-            else -> router.exit()
+        if (isFormChangedState.value) {
+            exitDialogAction.consumer.accept(Unit)
+        } else {
+            router.exit()
         }
     }
 
@@ -99,7 +100,12 @@ class EditEventPm @Inject constructor(
                 getEventByIdUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
-                    .doOnSuccess(eventState.consumer)
+                    .doOnSuccess { event ->
+                        launch {
+                            cachedDishes(event.dishes)
+                        }
+                        eventState.consumer.accept(event)
+                    }
                     .doOnError(::handleError)
             }
             .retry()

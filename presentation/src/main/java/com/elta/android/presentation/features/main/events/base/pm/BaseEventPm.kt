@@ -28,6 +28,7 @@ import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
@@ -37,12 +38,13 @@ import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
+private const val OPEN_SCREEN_DELAY_MILLIS = 300L
+private const val LOCKED_FORM_PICKER_DELAY_MILLIS = 500L
 abstract class BaseEventPm(
     services: ServiceFacade,
     private val calculatorFragmentResultHandler: CalculatorFragmentResultHandler,
     private val cachedDishes: CachedDishesUseCase
 ) : BasePm(services) {
-
     val formPickerValueChangedAction = action<Double>()
     val updateFormPickerValueCommand = command<Pair<Int, Int>>()
     val formInput = inputControl()
@@ -62,16 +64,24 @@ abstract class BaseEventPm(
     val backHandleAction = action<Unit>()
     val exitDialogAction = action<Unit>()
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
+    val breadUnitsChangeDialogControl = dialogControl<DialogData, DialogResult>()
+    val userHadChangesBreadUnitsDialogControl = dialogControl<DialogData, DialogResult>()
     val eventTypeState = state<EventType>()
     val dishes = state<List<Dish>>(emptyList())
-
     protected val formPickerValue = state<Double>()
     protected val selectedDateState = state(ZonedDateTime.now())
-
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
+    private val breadUnitsChangeNotifyDialogData: DialogData by lazy {
+        Dialogs.ChangeBreadUnitsData(resources)
+    }
+    private val userHadChangesBreadUnitsDialogData: DialogData by lazy {
+        Dialogs.UserHadChangesBreadUnitsData(resources)
+    }
+
     private val dateInFutureSnackBarData by lazy {
         SnackBarMessageData.SimpleTextMessage(resources.getString(R.string.event_form_date_in_future))
     }
+    private var lockedChangeFormPicker: Boolean = false
 
     abstract fun handleBack(i: Unit)
 
@@ -117,10 +127,13 @@ abstract class BaseEventPm(
                 .collect {
                     dishes.consumer.accept(it)
                     cachedDishes(it)
-                    updateFormPickerValueCommand.consumer.accept(
-                        it.sumOf { dish -> dish.breadUnits }
-                            .toPickerValues()
-                    )
+                    val breadUnits = it.sumOf { dish -> dish.breadUnits }
+                    if (formPickerValue.valueOrNull != breadUnits) {
+                        breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
+                        updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
+                        delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
+                        lockedChangeFormPicker = true
+                    }
                 }
         }
     }
@@ -143,7 +156,13 @@ abstract class BaseEventPm(
 
     private fun bindFormPicker() {
         formPickerValueChangedAction.observable
-            .subscribe(formPickerValue.consumer)
+            .subscribe {
+                formPickerValue.consumer.accept(it)
+                if (lockedChangeFormPicker) {
+                    userHadChangesBreadUnitsDialogControl.show(userHadChangesBreadUnitsDialogData)
+                    lockedChangeFormPicker = false
+                }
+            }
             .untilDestroy()
     }
 
@@ -151,7 +170,7 @@ abstract class BaseEventPm(
         formSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
             .subscribe {
                 when (it.eventType) {
@@ -193,7 +212,7 @@ abstract class BaseEventPm(
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     chooserType = ChooserType.GROUP_TAGS,
@@ -256,8 +275,4 @@ abstract class BaseEventPm(
         !date.isAfter(ZonedDateTime.now().atEndOfDay()).also {
             if (it) showSnackBar(dateInFutureSnackBarData)
         }
-
-    companion object {
-        private const val OPEN_SCREEN_DELAY = 300L // millis
-    }
 }

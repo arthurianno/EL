@@ -19,6 +19,13 @@ import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 import org.threeten.bp.LocalDate
 
+internal const val ITEMS_ON_SCREEN_COUNT_MILLIS = 7
+private const val SELECTOR_WIDTH_MULTIPLIER = 0.8
+private const val SCROLL_OFFSET = 0
+private const val CENTER_OFFSET = 3
+private const val INVALIDATE_RECYCLER_VIEW_DELAY_MILLIS = 50L
+private const val ENABLE_HAPTIC_FEEDBACK_DELAY_MILLIS = 150L
+
 class HorizontalDatePickerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -26,12 +33,12 @@ class HorizontalDatePickerView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private var date: LocalDate? = null
-
     private var selectedPosition: Int = 0
-    private var needToPerformHapticFeedBack = false
 
+    private var needToPerformHapticFeedBack = false
     private val items = mutableListOf<DatePickerItem>()
     private val adapter: DateAdapter by lazy { DateAdapter() }
+
     private val snapHelper by lazy { LinearSnapHelper() }
 
     private val binding: LayoutHorizontalDatePickerBinding by lazy {
@@ -83,8 +90,8 @@ class HorizontalDatePickerView @JvmOverloads constructor(
             adapter.submitList(items)
             adapter.notifyDataSetChanged()
         }
-        postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY)
-        postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY)
+        postDelayed({ scrollToDate(date) }, INVALIDATE_RECYCLER_VIEW_DELAY_MILLIS)
+        postDelayed({ needToPerformHapticFeedBack = true }, ENABLE_HAPTIC_FEEDBACK_DELAY_MILLIS)
     }
 
     private fun onPickerItemScrolled(position: Int) = with(binding) {
@@ -107,20 +114,11 @@ class HorizontalDatePickerView @JvmOverloads constructor(
     }
 
     private fun getSelectorWidth() =
-        (getDisplaySize(context).first / ITEMS_ON_SCREEN_COUNT * SELECTOR_WIDTH_MULTIPLIER).toInt()
+        (getDisplaySize(context).first / ITEMS_ON_SCREEN_COUNT_MILLIS * SELECTOR_WIDTH_MULTIPLIER).toInt()
 
     private val RecyclerView.linearLayoutManager: LinearLayoutManager?
         get() = layoutManager as? LinearLayoutManager
 
     operator fun List<DatePickerItem>.contains(date: LocalDate) =
         this.any { it.date == date && it.isAvailable }
-
-    companion object {
-        const val ITEMS_ON_SCREEN_COUNT = 7
-        private const val SELECTOR_WIDTH_MULTIPLIER = 0.8
-        private const val SCROLL_OFFSET = 0
-        private const val CENTER_OFFSET = 3
-        private const val INVALIDATE_RECYCLER_VIEW_DELAY = 50L // millis
-        private const val ENABLE_HAPTIC_FEEDBACK_DELAY = 150L // millis
-    }
 }

@@ -13,6 +13,7 @@ data class EventCachedDto(
     val tagId: String?,
     val note: String?,
     val modificationTime: Long?,
+    val products: String?,
 
     // represents EventDataDto
     val temperature: Double?,

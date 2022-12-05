@@ -21,7 +21,7 @@ object AppConfig {
     object ServerUrl {
         const val prod = "https://vdiabete.com"
         const val stage = "https://stage2.vdiabete.com"
-        const val dev = "https://stage2.vdiabete.com"
+        const val dev = "https://dev.vdiabete.com"
     }
 
     object LogEnabled {
