@@ -7,28 +7,44 @@ import io.reactivex.Observable
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-private const val FORMAT_RESPONSE = "json"
-
 interface FatSecretApi {
 
-    @POST(".")
+    @POST("server.api")
     fun getFoodGeneric(
         @Query("food_id") foodId: String,
-        @Query("method") method: String = "food.get.v2",
-        @Query("format") format: String = FORMAT_RESPONSE
+        @Query("method") method: String,
+        @Query("format") format: String,
+        @Query("oauth_consumer_key") oauthConsumerKey: String?,
+        @Query("oauth_signature_method") oauthSignatureMethod: String?,
+        @Query("oauth_timestamp") oauthTimestamp: String?,
+        @Query("oauth_nonce") oauthNonce: String?,
+        @Query("oauth_version") oauthVersion: String?,
+        @Query("oauth_signature") oauthSignature: String?
     ): Observable<FoodGenericResponse>
 
-    @POST(".")
+    @POST("server.api")
     fun getFoodBrand(
         @Query("food_id") foodId: String,
-        @Query("method") method: String = "food.get.v2",
-        @Query("format") format: String = FORMAT_RESPONSE
+        @Query("method") method: String,
+        @Query("format") format: String,
+        @Query("oauth_consumer_key") oauthConsumerKey: String?,
+        @Query("oauth_signature_method") oauthSignatureMethod: String?,
+        @Query("oauth_timestamp") oauthTimestamp: String?,
+        @Query("oauth_nonce") oauthNonce: String?,
+        @Query("oauth_version") oauthVersion: String?,
+        @Query("oauth_signature") oauthSignature: String?
     ): Observable<FoodBrandResponse>
 
-    @POST(".")
+    @POST("server.api")
     fun getFoods(
+        @Query("format") format: String,
+        @Query("method") method: String,
+        @Query("oauth_consumer_key") oauthConsumerKey: String? = null,
+        @Query("oauth_nonce") oauthNonce: String? = null,
+        @Query("oauth_signature_method") oauthSignatureMethod: String? = null,
+        @Query("oauth_timestamp") oauthTimestamp: String? = null,
+        @Query("oauth_version") oauthVersion: String? = null,
         @Query("search_expression") searchWord: String,
-        @Query("method") method: String = "foods.search",
-        @Query("format") format: String = FORMAT_RESPONSE
+        @Query("oauth_signature") oauthSignature: String?
     ): Observable<FoodsSearchResponse>
 }

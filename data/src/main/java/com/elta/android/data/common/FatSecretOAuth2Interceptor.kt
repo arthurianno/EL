@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FatSecretInterceptor @Inject constructor(
+class FatSecretOAuth2Interceptor @Inject constructor(
     private val storage: FatSecretStorage
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response =

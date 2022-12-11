@@ -2,7 +2,7 @@ package com.elta.android.data.di
 
 import android.content.Context
 import com.elta.android.common.di.qualifires.FatSecret
-import com.elta.android.common.di.qualifires.FeatSecretAnnotationType
+import com.elta.android.common.di.qualifires.FatSecretAnnotationType
 import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
@@ -177,12 +177,12 @@ class ApiModule {
     @Provides
     @Singleton
     fun provideFatSecretApi(
-        @FatSecret(FeatSecretAnnotationType.Retrofit) retrofit: Retrofit
+        @FatSecret(FatSecretAnnotationType.Retrofit) retrofit: Retrofit
     ): FatSecretApi = retrofit.create(FatSecretApi::class.java)
 
     @Provides
     @Singleton
     fun provideFatSecretTokenApi(
-        @FatSecret(FeatSecretAnnotationType.Token) retrofit: Retrofit
+        @FatSecret(FatSecretAnnotationType.Token) retrofit: Retrofit
     ): FatSecretTokenApi = retrofit.create(FatSecretTokenApi::class.java)
 }
