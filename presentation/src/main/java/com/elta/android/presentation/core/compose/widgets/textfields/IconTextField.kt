@@ -56,6 +56,12 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
             isExpanded = false
         )
 
+    private var textFilter: (String) -> String? = { it }
+
+    fun setTextFilter(filter: (String) -> String?) {
+        textFilter = filter
+    }
+
     fun switchExpanded() {
         setState { state.value.copy(isExpanded = !state.value.isExpanded) }
     }
@@ -65,7 +71,9 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
     }
 
     fun setText(text: String?) {
-        setState { state.value.copy(text = text.orEmpty()) }
+        textFilter(text.orEmpty())?.let {
+            setState { state.value.copy(text = it) }
+        }
     }
 
     fun setIcon(@DrawableRes icon: Int?) {

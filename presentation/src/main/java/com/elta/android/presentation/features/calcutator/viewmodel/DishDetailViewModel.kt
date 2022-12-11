@@ -88,6 +88,16 @@ class DishDetailViewModel @Inject constructor(
                     }
                 }
         }
+        portionCountTextField.setTextFilter {
+            if (it.isEmpty()) {
+                it
+            } else {
+                runCatching {
+                    it.toDouble()
+                    it
+                }.getOrNull()
+            }
+        }
     }
 
     override val widgets: List<BaseWidgetModel<*>> =
