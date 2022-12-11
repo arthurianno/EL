@@ -1,10 +1,10 @@
 package com.elta.android.data.di
 
 import com.elta.android.common.di.qualifires.FatSecret
-import com.elta.android.common.di.qualifires.FeatSecretAnnotationType
+import com.elta.android.common.di.qualifires.FatSecretAnnotationType
 import com.elta.android.data.common.ConnectivityInterceptor
 import com.elta.android.data.common.FatSecretErrorInterceptor
-import com.elta.android.data.common.FatSecretInterceptor
+import com.elta.android.data.common.FatSecretOAuth2Interceptor
 import com.elta.android.data.core.network.OkHttpClientFactory
 import com.elta.android.data.core.network.RetrofitFactory
 import com.elta.android.data.features.calculator.storage.FatSecretDataStorage
@@ -21,30 +21,44 @@ import retrofit2.Retrofit
 import java.io.File
 import javax.inject.Singleton
 
+private const val CLIENT_ID = "6893a669c38f4b3c97154f721f405c9f"
+private const val CLIENT_SECRET = "f8bce065b49b42c89dc0a8af8041b790"
+private const val CONSUMER_KEY = "6893a669c38f4b3c97154f721f405c9f"
+private const val CONSUMER_SECRET = "b0876f15ad364783a1c0d721f80456e9"
+private const val BASE_URL = "https://platform.fatsecret.com/rest/"
+private const val TOKEN_URL = "https://oauth.fatsecret.com/connect/"
+private const val USE_OAUTH2 = false
+
 @Module
 class FatSecretModule {
-    private val clientId = "6893a669c38f4b3c97154f721f405c9f"
-    private val clientSecret = "f8bce065b49b42c89dc0a8af8041b790"
-    private val consumerKey = "6893a669c38f4b3c97154f721f405c9f"
-    private val consumerSecret = "b0876f15ad364783a1c0d721f80456e9"
-    private val baseUrl = "https://platform.fatsecret.com/rest/server.api/"
-    private val tokenUrl = "https://oauth.fatsecret.com/connect/"
 
     @Provides
-    @FatSecret(FeatSecretAnnotationType.ClientId)
-    fun provideFatSecretClientId(): String = clientId
+    @FatSecret(FatSecretAnnotationType.ClientId)
+    fun provideFatSecretClientId(): String = CLIENT_ID
 
     @Provides
-    @FatSecret(FeatSecretAnnotationType.ClientSecret)
-    fun provideFatSecretClientSecret(): String = clientSecret
+    @FatSecret(FatSecretAnnotationType.ClientSecret)
+    fun provideFatSecretClientSecret(): String = CLIENT_SECRET
 
     @Provides
-    @FatSecret(FeatSecretAnnotationType.BaseUrl)
-    fun provideFatSecretBaseUrl(): String = baseUrl
+    @FatSecret(FatSecretAnnotationType.ConsumerKey)
+    fun provideFatSecretConsumerKey(): String = CONSUMER_KEY
 
     @Provides
-    @FatSecret(FeatSecretAnnotationType.TokenUrl)
-    fun provideFatSecretTokenUrl(): String = tokenUrl
+    @FatSecret(FatSecretAnnotationType.ConsumerSecret)
+    fun provideFatSecretConsumerSecret(): String = CONSUMER_SECRET
+
+    @Provides
+    @FatSecret(FatSecretAnnotationType.BaseUrl)
+    fun provideFatSecretBaseUrl(): String = BASE_URL
+
+    @Provides
+    @FatSecret(FatSecretAnnotationType.TokenUrl)
+    fun provideFatSecretTokenUrl(): String = TOKEN_URL
+
+    @Provides
+    @FatSecret(FatSecretAnnotationType.IsOAuth2)
+    fun provideFatSecretIsOAuth2(): Boolean = USE_OAUTH2
 
     @Provides
     @Singleton
@@ -52,11 +66,11 @@ class FatSecretModule {
         FatSecretDataStorage(preferences)
 
     @Provides
-    @FatSecret(FeatSecretAnnotationType.OkHttpClient)
+    @FatSecret(FatSecretAnnotationType.OkHttpClient)
     fun provideFatSecretOkHttpClient(
         cacheFolder: File,
-        @FatSecret(FeatSecretAnnotationType.Interceptors) interceptors: List<Interceptor>,
-        @FatSecret(FeatSecretAnnotationType.NetworkInterceptors) networkInterceptors: List<Interceptor>
+        @FatSecret(FatSecretAnnotationType.Interceptors) interceptors: List<Interceptor>,
+        @FatSecret(FatSecretAnnotationType.NetworkInterceptors) networkInterceptors: List<Interceptor>
     ): OkHttpClient = OkHttpClientFactory.create(
         cacheFolder,
         interceptors,
@@ -65,31 +79,31 @@ class FatSecretModule {
 
     @Provides
     @Singleton
-    @FatSecret(FeatSecretAnnotationType.Token)
+    @FatSecret(FatSecretAnnotationType.Token)
     fun provideTokenOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        @FatSecret(FeatSecretAnnotationType.NetworkInterceptors) networkInterceptors: List<Interceptor>
+        @FatSecret(FatSecretAnnotationType.NetworkInterceptors) networkInterceptors: List<Interceptor>
     ): OkHttpClient = OkHttpClientFactory.create(listOf(loggingInterceptor), networkInterceptors)
 
     @Provides
     @Singleton
-    @FatSecret(FeatSecretAnnotationType.Retrofit)
+    @FatSecret(FatSecretAnnotationType.Retrofit)
     fun provideFatSecretRetrofit(
-        @FatSecret(FeatSecretAnnotationType.OkHttpClient) okHttpClient: OkHttpClient,
+        @FatSecret(FatSecretAnnotationType.OkHttpClient) okHttpClient: OkHttpClient,
         callAdapterFactory: CallAdapter.Factory,
         converterFactory: Factory,
-        @FatSecret(FeatSecretAnnotationType.BaseUrl) baseUrl: String
+        @FatSecret(FatSecretAnnotationType.BaseUrl) baseUrl: String
     ): Retrofit =
         RetrofitFactory.create(okHttpClient, callAdapterFactory, converterFactory, baseUrl)
 
     @Provides
     @Singleton
-    @FatSecret(FeatSecretAnnotationType.Token)
+    @FatSecret(FatSecretAnnotationType.Token)
     fun provideTokenRetrofit(
-        @FatSecret(FeatSecretAnnotationType.Token) okHttpClient: OkHttpClient,
+        @FatSecret(FatSecretAnnotationType.Token) okHttpClient: OkHttpClient,
         callAdapterFactory: CallAdapter.Factory,
         converterFactory: Factory,
-        @FatSecret(FeatSecretAnnotationType.TokenUrl) baseUrl: String
+        @FatSecret(FatSecretAnnotationType.TokenUrl) baseUrl: String
     ): Retrofit =
         RetrofitFactory.create(
             okHttpClient = okHttpClient,
@@ -100,7 +114,7 @@ class FatSecretModule {
 
     @Provides
     @Singleton
-    @FatSecret(FeatSecretAnnotationType.NetworkInterceptors)
+    @FatSecret(FatSecretAnnotationType.NetworkInterceptors)
     fun provideFatSecretNetworkInterceptors(
         errorInterceptor: FatSecretErrorInterceptor
     ): List<@JvmWildcard Interceptor> = listOf(
@@ -109,14 +123,22 @@ class FatSecretModule {
 
     @Provides
     @Singleton
-    @FatSecret(FeatSecretAnnotationType.Interceptors)
+    @FatSecret(FatSecretAnnotationType.Interceptors)
     fun provideFatSecretInterceptors(
         connectivityInterceptor: ConnectivityInterceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        interceptor: FatSecretInterceptor
-    ): List<@JvmWildcard Interceptor> = listOf(
-        connectivityInterceptor,
-        httpLoggingInterceptor,
-        interceptor
-    )
+        interceptor: FatSecretOAuth2Interceptor
+    ): List<@JvmWildcard Interceptor> =
+        if (USE_OAUTH2) {
+            listOf(
+                connectivityInterceptor,
+                httpLoggingInterceptor,
+                interceptor
+            )
+        } else {
+            listOf(
+                connectivityInterceptor,
+                httpLoggingInterceptor
+            )
+        }
 }

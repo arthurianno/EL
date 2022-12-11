@@ -5,16 +5,19 @@ import javax.inject.Qualifier
 @MustBeDocumented
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class FatSecret(val type: FeatSecretAnnotationType)
+annotation class FatSecret(val type: FatSecretAnnotationType)
 
-enum class FeatSecretAnnotationType {
+enum class FatSecretAnnotationType {
     Retrofit,
     BaseUrl,
     TokenUrl,
     Token,
     ClientId,
     ClientSecret,
+    ConsumerKey,
+    ConsumerSecret,
     OkHttpClient,
     Interceptors,
-    NetworkInterceptors
+    NetworkInterceptors,
+    IsOAuth2
 }
