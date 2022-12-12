@@ -96,7 +96,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
-        viewModel.downButton.setEnableState(state.value.dish.breadUnits > 0.0)
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
                 dish = state.value.dish,

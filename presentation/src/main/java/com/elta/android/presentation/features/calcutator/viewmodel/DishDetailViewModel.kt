@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
+import com.elta.android.presentation.core.compose.mapDistinct
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val START_AMOUNT = 1.0
+private const val ZERO_COUNT = 0.0
 internal const val MAX_BREAD_UNITS = 99.9
 
 class DishDetailViewModel @Inject constructor(
@@ -42,8 +44,8 @@ class DishDetailViewModel @Inject constructor(
                 isVerification = false,
                 servings = emptyList(),
                 servingSelect = emptyServing(),
-                servingAmount = START_AMOUNT,
-                breadUnits = 0.0
+                servingAmount = ZERO_COUNT,
+                breadUnits = ZERO_COUNT
             )
         )
 
@@ -55,10 +57,11 @@ class DishDetailViewModel @Inject constructor(
     init {
         launch {
             portionCountTextField.state
-                .map { it.text }
-                .filter { it.isNotEmpty() }
-                .map { it.toDouble() }
-                .collectLatest {
+                .mapDistinct { it.text }
+                .map { it.takeIf { it.isNotEmpty() } }
+                .map { it?.toDouble() ?: ZERO_COUNT }
+                .catch { emit(ZERO_COUNT) }
+                .collect {
                     reduceState {
                         state.value.copy(
                             dish = state.value.dish.copy(
@@ -71,7 +74,7 @@ class DishDetailViewModel @Inject constructor(
         }
         launch {
             portionDescriptionTextField.state
-                .map { it.text }
+                .mapDistinct { it.text }
                 .filter { it.isNotEmpty() }
                 .map {
                     state.value.dish.servings.first { servingUi -> servingUi.measurementDescription == it }
@@ -87,6 +90,12 @@ class DishDetailViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+        portionCountTextField.textFilter = { text ->
+            runCatching {
+                text.takeIf { it.isEmpty() }
+                    ?: text.also { it.toDouble() }
+            }.getOrNull()?.trim()
         }
     }
 
@@ -151,7 +160,10 @@ class DishDetailViewModel @Inject constructor(
         val newCarbs = carbs ?: state.value.dish.servingSelect.carbs
         val newAmount =
             amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
-        val portion = state.value.dish.servingSelect.numberOfUnits.takeIf { it > 0.0 } ?: 1.0
-        return (newCarbs * newAmount / (10 * portion)).round(1)
+        val portion =
+            state.value.dish.servingSelect.numberOfUnits.takeIf { it > ZERO_COUNT } ?: START_AMOUNT
+        val breadUnits = (newCarbs * newAmount / (10 * portion)).round(1)
+        downButton.setEnableState(breadUnits > ZERO_COUNT)
+        return breadUnits
     }
 }
