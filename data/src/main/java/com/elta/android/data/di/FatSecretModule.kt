@@ -127,18 +127,10 @@ class FatSecretModule {
     fun provideFatSecretInterceptors(
         connectivityInterceptor: ConnectivityInterceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        interceptor: FatSecretOAuth2Interceptor
-    ): List<@JvmWildcard Interceptor> =
-        if (USE_OAUTH2) {
-            listOf(
-                connectivityInterceptor,
-                httpLoggingInterceptor,
-                interceptor
-            )
-        } else {
-            listOf(
-                connectivityInterceptor,
-                httpLoggingInterceptor
-            )
-        }
+        oAuth2Interceptor: FatSecretOAuth2Interceptor
+    ): List<@JvmWildcard Interceptor> = listOfNotNull(
+        connectivityInterceptor,
+        httpLoggingInterceptor,
+        oAuth2Interceptor.takeIf { USE_OAUTH2 }
+    )
 }
