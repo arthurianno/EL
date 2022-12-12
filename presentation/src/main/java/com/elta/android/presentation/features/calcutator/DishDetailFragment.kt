@@ -96,10 +96,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
-        val downButtonVisibleState =
-            state.value.dish.breadUnits > 0.0 &&
-                viewModel.portionCountTextField.state.collectAsState().value.text.isNotEmpty()
-        viewModel.downButton.setEnableState(downButtonVisibleState)
         Box(modifier = Modifier.fillMaxSize()) {
             Header(
                 dish = state.value.dish,

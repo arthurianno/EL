@@ -56,11 +56,7 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
             isExpanded = false
         )
 
-    private var textFilter: (String) -> String? = { it }
-
-    fun setTextFilter(filter: (String) -> String?) {
-        textFilter = filter
-    }
+    var textFilter: (String) -> String? = { it }
 
     fun switchExpanded() {
         setState { state.value.copy(isExpanded = !state.value.isExpanded) }
