@@ -73,19 +73,18 @@ class FatSecretDataSource @Inject constructor(
             OAUTH_NONCE_PARAMETER to nonce
         ).createBaseString()
             .hmacSha1Signature()
-            .takeIf { !isOAuth2 }
         return when (type) {
             DishType.Generic -> runFlowWithCatchToken {
                 api.getFoodGeneric(
                     foodId = id,
                     method = METHOD_GET_FOOD,
                     format = FORMAT_RESPONSE,
-                    oauthSignature = oauthSignature,
-                    oauthConsumerKey = consumerKey.takeIf { !isOAuth2 },
-                    oauthSignatureMethod = SIGNATURE_METHOD.takeIf { !isOAuth2 },
-                    oauthTimestamp = timeStamp.takeIf { !isOAuth2 },
-                    oauthNonce = nonce.takeIf { !isOAuth2 },
-                    oauthVersion = OAUTH_VERSION.takeIf { !isOAuth2 }
+                    oauthSignature = oauthSignature.takeIsAuth1(),
+                    oauthConsumerKey = consumerKey.takeIsAuth1(),
+                    oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
+                    oauthTimestamp = timeStamp.takeIsAuth1(),
+                    oauthNonce = nonce.takeIsAuth1(),
+                    oauthVersion = OAUTH_VERSION.takeIsAuth1()
                 ).asFlow()
             }.map { it.food.toDomain() }
 
@@ -95,11 +94,11 @@ class FatSecretDataSource @Inject constructor(
                     method = METHOD_GET_FOOD,
                     format = FORMAT_RESPONSE,
                     oauthSignature = oauthSignature,
-                    oauthConsumerKey = consumerKey.takeIf { !isOAuth2 },
-                    oauthSignatureMethod = SIGNATURE_METHOD.takeIf { !isOAuth2 },
-                    oauthTimestamp = timeStamp.takeIf { !isOAuth2 },
-                    oauthNonce = nonce.takeIf { !isOAuth2 },
-                    oauthVersion = OAUTH_VERSION.takeIf { !isOAuth2 }
+                    oauthConsumerKey = consumerKey.takeIsAuth1(),
+                    oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
+                    oauthTimestamp = timeStamp.takeIsAuth1(),
+                    oauthNonce = nonce.takeIsAuth1(),
+                    oauthVersion = OAUTH_VERSION.takeIsAuth1()
                 ).asFlow()
             }.map { it.food.toDomain() }
         }
@@ -117,18 +116,17 @@ class FatSecretDataSource @Inject constructor(
         )
             .createBaseString()
             .hmacSha1Signature()
-            .takeIf { !isOAuth2 }
         return runFlowWithCatchToken {
             api.getFoods(
                 searchWord = name,
                 method = METHOD_SEARCH_FOOD,
                 format = FORMAT_RESPONSE,
-                oauthSignature = oauthSignature,
-                oauthConsumerKey = consumerKey.takeIf { !isOAuth2 },
-                oauthSignatureMethod = SIGNATURE_METHOD.takeIf { !isOAuth2 },
-                oauthTimestamp = timeStamp.takeIf { !isOAuth2 },
-                oauthNonce = nonce.takeIf { !isOAuth2 },
-                oauthVersion = OAUTH_VERSION.takeIf { !isOAuth2 }
+                oauthSignature = oauthSignature.takeIsAuth1(),
+                oauthConsumerKey = consumerKey.takeIsAuth1(),
+                oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
+                oauthTimestamp = timeStamp.takeIsAuth1(),
+                oauthNonce = nonce.takeIsAuth1(),
+                oauthVersion = OAUTH_VERSION.takeIsAuth1()
             )
                 .asFlow()
         }.map { it.foods.food?.compactFoodsToDomain() ?: emptyList() }
@@ -187,4 +185,7 @@ class FatSecretDataSource @Inject constructor(
             .replace(")", "%29")
 
     private fun getTimeStamp(): String = Date().time.div(1000).toString()
+
+    private fun <T> T.takeIsAuth1(): T? =
+        this.takeIf { !isOAuth2 }
 }
