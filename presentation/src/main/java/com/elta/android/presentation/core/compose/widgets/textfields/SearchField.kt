@@ -79,7 +79,11 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchField(widgetModel: SearchFieldWidgetModel, searchInFocus: Boolean) {
+fun SearchField(
+    widgetModel: SearchFieldWidgetModel,
+    searchInFocus: Boolean,
+    networkAvailable: Boolean
+) {
     val state = widgetModel.state.collectAsState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -97,6 +101,7 @@ fun SearchField(widgetModel: SearchFieldWidgetModel, searchInFocus: Boolean) {
             TextField(
                 value = state.value.textField,
                 onValueChange = widgetModel::setText,
+                enabled = networkAvailable,
                 singleLine = true,
                 shape = shapes.textField,
                 placeholder = {
