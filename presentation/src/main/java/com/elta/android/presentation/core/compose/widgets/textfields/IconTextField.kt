@@ -49,7 +49,7 @@ data class IconTextFieldWidgetState(
 )
 
 class IconTextFieldWidgetModel(
-    private val iconOnClick: () -> Unit = {}
+    private val iconClick: () -> Unit = {}
 ) : BaseWidgetModel<IconTextFieldWidgetState>() {
     override fun createInitState(): IconTextFieldWidgetState =
         IconTextFieldWidgetState(
@@ -82,7 +82,7 @@ class IconTextFieldWidgetModel(
     }
 
     fun iconOnClick() {
-        iconOnClick.invoke()
+        iconClick()
     }
 
     fun setDropDownList(list: List<String>?) {
