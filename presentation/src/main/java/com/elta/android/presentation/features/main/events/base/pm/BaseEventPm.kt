@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit
 
 private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 private const val LOCKED_FORM_PICKER_DELAY_MILLIS = 500L
+
 abstract class BaseEventPm(
     services: ServiceFacade,
     private val calculatorFragmentResultHandler: CalculatorFragmentResultHandler,
@@ -128,8 +129,11 @@ abstract class BaseEventPm(
                     dishes.consumer.accept(it)
                     cachedDishes(it)
                     val breadUnits = it.sumOf { dish -> dish.breadUnits }
-                    if (formPickerValue.valueOrNull != breadUnits) {
-                        breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
+                    val currentBreadUnits = formPickerValue.valueOrNull
+                    if (currentBreadUnits != breadUnits) {
+                        if (currentBreadUnits != 0.0) {
+                            breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
+                        }
                         updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
                         delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
                         lockedChangeFormPicker = true
@@ -174,7 +178,11 @@ abstract class BaseEventPm(
             .map { createChooserConfiguration() }
             .subscribe {
                 when (it.eventType) {
-                    EventType.BREAD -> router.navigateTo(Screens.CalculatorScreen)
+                    EventType.BREAD -> {
+                        lockedChangeFormPicker = false
+                        router.navigateTo(Screens.CalculatorScreen)
+                    }
+
                     else -> router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }
