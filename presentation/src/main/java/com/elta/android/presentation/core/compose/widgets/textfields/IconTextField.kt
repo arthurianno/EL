@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Text
@@ -23,6 +24,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -45,7 +48,9 @@ data class IconTextFieldWidgetState(
     val isExpanded: Boolean
 )
 
-class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
+class IconTextFieldWidgetModel(
+    private val iconOnClick: () -> Unit = {}
+) : BaseWidgetModel<IconTextFieldWidgetState>() {
     override fun createInitState(): IconTextFieldWidgetState =
         IconTextFieldWidgetState(
             text = "",
@@ -76,6 +81,10 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
         setState { state.value.copy(leadIcon = icon) }
     }
 
+    fun iconOnClick() {
+        iconOnClick.invoke()
+    }
+
     fun setDropDownList(list: List<String>?) {
         setState {
             state.value.copy(
@@ -100,6 +109,7 @@ fun IconTextField(
     imeAction: ImeAction = ImeAction.Go
 ) {
     val state = widgetModel.state.collectAsState()
+    val focusRequester = FocusRequester()
     val localMaterialShapes = Shapes(
         large = RoundedCornerShape(0.dp),
         medium = RoundedCornerShape(0.dp),
@@ -117,7 +127,17 @@ fun IconTextField(
                     onValueChange = widgetModel::setText,
                     isError = state.value.isError,
                     leadingIcon = state.value.leadIcon?.let {
-                        { Icon(painter = painterResource(id = it), contentDescription = null) }
+                        {
+                            IconButton(onClick = {
+                                focusRequester.requestFocus()
+                                widgetModel.iconOnClick()
+                            }) {
+                                Icon(
+                                    painter = painterResource(id = it),
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     },
                     trailingIcon = state.value.dropDownList?.let {
                         {
@@ -130,7 +150,8 @@ fun IconTextField(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(paddingValues),
+                        .padding(paddingValues)
+                        .focusRequester(focusRequester),
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = colors.blackBlue,
                         backgroundColor = colors.white,
