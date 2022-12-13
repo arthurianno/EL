@@ -51,7 +51,7 @@ class DishDetailViewModel @Inject constructor(
         )
 
     val downButton = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel(iconOnClick = ::plusMinusOnClick)
+    val portionCountTextField = IconTextFieldWidgetModel(iconClick = ::plusMinusOnClick)
     val portionDescriptionTextField = IconTextFieldWidgetModel()
     val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
@@ -117,7 +117,7 @@ class DishDetailViewModel @Inject constructor(
         }
 
     private fun plusMinusOnClick() {
-        portionCountTextField.setText("")
+        portionCountTextField.setText(null)
     }
 
     private fun saveDish() {
