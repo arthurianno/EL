@@ -28,6 +28,7 @@ import javax.inject.Inject
 private const val START_AMOUNT = 1.0
 private const val ZERO_COUNT = 0.0
 internal const val MAX_BREAD_UNITS = 99.9
+private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:\\.\\d{0,2})?"
 
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
@@ -50,7 +51,7 @@ class DishDetailViewModel @Inject constructor(
         )
 
     val downButton = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel()
+    val portionCountTextField = IconTextFieldWidgetModel(iconOnClick = ::plusMinusOnClick)
     val portionDescriptionTextField = IconTextFieldWidgetModel()
     val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
@@ -92,10 +93,7 @@ class DishDetailViewModel @Inject constructor(
                 }
         }
         portionCountTextField.textFilter = { text ->
-            runCatching {
-                text.takeIf { it.isEmpty() }
-                    ?: text.also { it.toDouble() }
-            }.getOrNull()?.trim()
+            text.takeIf { text.matches(Regex(PORTION_COUNT_REGEX)) || text.isEmpty() }
         }
     }
 
@@ -117,6 +115,10 @@ class DishDetailViewModel @Inject constructor(
             }
             currentState
         }
+
+    private fun plusMinusOnClick() {
+        portionCountTextField.setText("")
+    }
 
     private fun saveDish() {
         launch {
