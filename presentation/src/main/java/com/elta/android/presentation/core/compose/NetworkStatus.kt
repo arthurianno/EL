@@ -9,13 +9,6 @@ import com.elta.android.presentation.core.compose.common.NetworkState
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-val Context.currentNetworkState: NetworkState
-    get() {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return getCurrentConnectivityState(connectivityManager)
-    }
-
 fun Context.networkStateAsFlow() = callbackFlow {
     val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val callback = networkCallback { connectionState -> trySend(connectionState) }
