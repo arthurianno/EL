@@ -14,6 +14,7 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClic
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
+import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.emptyServing
@@ -25,10 +26,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+internal const val MAX_BREAD_UNITS = 99.9
 private const val START_AMOUNT = 1.0
 private const val ZERO_COUNT = 0.0
-internal const val MAX_BREAD_UNITS = 99.9
-private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:\\.\\d{0,2})?"
+private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
+private const val DIGIT_DOT_ALLOWED_CHAR = ','
+private const val DIGIT_DOT = '.'
 
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
@@ -47,7 +50,8 @@ class DishDetailViewModel @Inject constructor(
                 servingSelect = emptyServing(),
                 servingAmount = ZERO_COUNT,
                 breadUnits = ZERO_COUNT
-            )
+            ),
+            isShowCountHelpSnack = false
         )
 
     val downButton = DownButtonWidgetModel()
@@ -58,7 +62,7 @@ class DishDetailViewModel @Inject constructor(
     init {
         launch {
             portionCountTextField.state
-                .mapDistinct { it.text }
+                .mapDistinct { it.text.replace(DIGIT_DOT_ALLOWED_CHAR, DIGIT_DOT) }
                 .map { it.takeIf { it.isNotEmpty() } }
                 .map { it?.toDouble() ?: ZERO_COUNT }
                 .catch { emit(ZERO_COUNT) }
@@ -82,12 +86,14 @@ class DishDetailViewModel @Inject constructor(
                 }
                 .collectLatest {
                     reduceState {
+                        portionCountTextField.setText(it.numberOfUnits.toString())
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingSelect = it,
                                 breadUnits = calculateBreadUnits(carbs = it.carbs),
                                 servingAmount = it.numberOfUnits
-                            )
+                            ),
+                            isShowCountHelpSnack = false
                         )
                     }
                 }
@@ -103,34 +109,6 @@ class DishDetailViewModel @Inject constructor(
             portionCountTextField,
             portionDescriptionTextField
         ).actionObserve()
-
-    override fun reduceStateByAction(
-        currentState: DishDetailViewState,
-        action: Action
-    ): DishDetailViewState =
-        run {
-            when (action) {
-                AppAction.BackPressure -> router.exit()
-                DownButtonClick -> saveDish()
-            }
-            currentState
-        }
-
-    private fun clearPortion() {
-        portionCountTextField.setText(null)
-    }
-
-    private fun saveDish() {
-        launch {
-            if (state.value.dish.breadUnits > MAX_BREAD_UNITS) {
-                warningMaxBreadUnitsDialog.dialogOpen()
-            } else {
-                addDishFragmentResult.onNext(state.value.dish.toDomain())
-                    .catch { handleError(it) }
-                    .collect { router.exit() }
-            }
-        }
-    }
 
     fun setDish(dish: DishUiEntity) {
         launch {
@@ -155,6 +133,39 @@ class DishDetailViewModel @Inject constructor(
                     }
                     portionCountTextField.setText(newDish.servingAmount.toInt().toString())
                 }
+        }
+    }
+
+    override fun reduceStateByAction(
+        currentState: DishDetailViewState,
+        action: Action
+    ): DishDetailViewState =
+        run {
+            when (action) {
+                CalculatorAction.PortionHelpClick -> currentState.copy(isShowCountHelpSnack = true)
+                else -> {
+                    when (action) {
+                        AppAction.BackPressure -> router.exit()
+                        DownButtonClick -> saveDish()
+                    }
+                    currentState
+                }
+            }
+        }
+
+    private fun clearPortion() {
+        portionCountTextField.setText(null)
+    }
+
+    private fun saveDish() {
+        launch {
+            if (state.value.dish.breadUnits > MAX_BREAD_UNITS) {
+                warningMaxBreadUnitsDialog.dialogOpen()
+            } else {
+                addDishFragmentResult.onNext(state.value.dish.toDomain())
+                    .catch { handleError(it) }
+                    .collect { router.exit() }
+            }
         }
     }
 
