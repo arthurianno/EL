@@ -32,11 +32,13 @@ import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
+import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
+import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
@@ -201,7 +203,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     .background(color = colors.white)
             ) {
                 Column {
-                    Header()
+                    Header(viewModel)
                     VSpacerVerySmall()
                     IconTextField(
                         widgetModel = viewModel.portionCountTextField,
@@ -211,7 +213,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         widgetModel = viewModel.portionDescriptionTextField,
                         paddingValues = PaddingValues(horizontal = dimens.contentPadding)
                     )
-                    VSpacerLarge()
                     Footer(state)
                 }
                 DownButton(widgetModel = viewModel.downButton)
@@ -224,16 +225,30 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         GetLocalProperties { dimens, _, colors, _, _ ->
             val dish = state.value.dish
             val serving = state.value.dish.servingSelect
-            Text(
-                text = stringResource(id = R.string.calculator_additional_information),
-                color = colors.shadeBlack2,
-                modifier = Modifier.padding(start = dimens.contentPadding)
-            )
-            if (dish.isVerification) {
-                VSpacerMedium()
-                VerifyProduct()
+            Box(Modifier.fillMaxWidth()) {
+                Column {
+                    VSpacerLarge()
+                    Text(
+                        text = stringResource(id = R.string.calculator_additional_information),
+                        color = colors.shadeBlack2,
+                        modifier = Modifier.padding(start = dimens.contentPadding)
+                    )
+                    if (dish.isVerification) {
+                        VSpacerMedium()
+                        VerifyProduct()
+                    }
+                    DishChars(serving)
+                }
+                Box(modifier = Modifier.align(Alignment.TopCenter)) {
+                    VerticallyAnimation(visualState = state.value.isShowCountHelpSnack) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_portion_count_help_snack),
+                            contentDescription = null,
+                            modifier = Modifier.padding(dimens.portionCountHelpPadding)
+                        )
+                    }
+                }
             }
-            DishChars(serving)
         }
     }
 
@@ -292,7 +307,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun Header() {
+    private fun Header(viewModel: DishDetailViewModel) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             Row(
                 modifier = Modifier
@@ -307,7 +322,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 )
                 ButtonCircle(
                     icon = R.drawable.btn_query_in_circle,
-                    onClick = { /*TODO обработка клика по знаку Вопрос*/ }
+                    onClick = { viewModel.sendAction(CalculatorAction.PortionHelpClick) }
                 )
             }
         }
