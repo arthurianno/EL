@@ -1,5 +1,6 @@
 package com.elta.android.data.features.calculator.repository
 
+import com.elta.android.common.utils.takeFirst
 import com.elta.android.data.features.calculator.datasource.CalculatorCacheDataSource
 import com.elta.android.data.features.calculator.datasource.CalculatorRemoteDataSource
 import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
@@ -10,7 +11,10 @@ import com.elta.android.domain.features.calculator.repository.CalculatorReposito
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+
+private const val HISTORY_LIST_LENGTH = 5
 
 class CalculatorDataRepository @Inject constructor(
     private val fatSecretDataSource: FatSecretDataSource,
@@ -32,6 +36,7 @@ class CalculatorDataRepository @Inject constructor(
 
     override fun getHistoryList(): Flow<List<String>> =
         cache.getHistoryWords()
+            .map { it.takeFirst(HISTORY_LIST_LENGTH) }
             .flowOn(dispatcher)
 
     override suspend fun saveWordToHistory(word: String) {

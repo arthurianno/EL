@@ -196,27 +196,39 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         onClick: (dish: DishUiEntity) -> Unit
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
-            if (isFindDishes) {
-                Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (isFindDishes) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
-                    items(items = findingDishes) { dish ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(shapes.dishCard)
-                                .border(dimens.borderWidth, colors.shadeBlack3, shapes.dishCard)
-                                .padding(dimens.contentPadding),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CardBody(dish)
-                            ButtonCircle(
-                                icon = R.drawable.btn_plus,
-                                onClick = { onClick(dish) }
-                            )
+                } else {
+                    if (findingDishes.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.calculator_search_no_result),
+                            color = colors.shadeBlack2,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
+                            items(items = findingDishes) { dish ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(shapes.dishCard)
+                                        .border(
+                                            dimens.borderWidth,
+                                            colors.shadeBlack3,
+                                            shapes.dishCard
+                                        )
+                                        .padding(dimens.contentPadding),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CardBody(dish)
+                                    ButtonCircle(
+                                        icon = R.drawable.btn_plus,
+                                        onClick = { onClick(dish) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
