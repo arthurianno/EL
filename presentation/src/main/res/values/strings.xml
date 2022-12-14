@@ -660,6 +660,7 @@
     <string name="calculator_add_text">Добавить</string>
     <string name="calculator_last_search">Недавние поиски</string>
     <string name="calculator_search_result">Результаты поиска</string>
+    <string name="calculator_search_no_result">Этот поиск не дал результатов</string>
     <string name="calculator_dish_card_in_port">В порции:</string>
     <string name="calculator_bread_units_count">Количество хлебных единиц:</string>
     <string name="calculator_bread_units_count_label">%s XE</string>
