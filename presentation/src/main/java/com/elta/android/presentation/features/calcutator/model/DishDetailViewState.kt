@@ -4,5 +4,6 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class DishDetailViewState(
-    val dish: DishUiEntity
+    val dish: DishUiEntity,
+    val isShowCountHelpSnack: Boolean
 )

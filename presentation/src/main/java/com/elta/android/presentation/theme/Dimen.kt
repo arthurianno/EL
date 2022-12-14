@@ -30,7 +30,8 @@ data class EltaDimens(
     val xeValueCard: PaddingValues,
     val xeValue: PaddingValues,
     val verifyIconSize: Dp,
-    val dishChars: PaddingValues
+    val dishChars: PaddingValues,
+    val portionCountHelpPadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -55,5 +56,6 @@ internal val eltaDimens = EltaDimens(
     xeValueCard = PaddingValues(bottom = 52.dp, end = 16.dp),
     xeValue = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
     verifyIconSize = 20.dp,
-    dishChars = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+    dishChars = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+    portionCountHelpPadding = PaddingValues(horizontal = 76.dp)
 )
