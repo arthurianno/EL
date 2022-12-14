@@ -7,8 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 
 @Composable
-fun ButtonCircle(@DrawableRes icon: Int, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+fun ButtonCircle(
+    @DrawableRes icon: Int,
+    enable: Boolean = true,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = enable
+    ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = null
