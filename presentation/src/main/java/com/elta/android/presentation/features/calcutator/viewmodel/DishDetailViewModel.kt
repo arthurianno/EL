@@ -142,7 +142,7 @@ class DishDetailViewModel @Inject constructor(
         run {
             when (action) {
                 CalculatorAction.PortionHelpClick -> showPortionHelp(true)
-                CalculatorAction.AnotherScreenTap -> showPortionHelp(false)
+                AppAction.FreeScreenTap -> showPortionHelp(false)
                 else -> {
                     when (action) {
                         AppAction.BackPressure -> router.exit()
