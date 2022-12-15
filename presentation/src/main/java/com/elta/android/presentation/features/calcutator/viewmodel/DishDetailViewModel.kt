@@ -85,15 +85,14 @@ class DishDetailViewModel @Inject constructor(
                     state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
                 .collectLatest {
+                    portionCountTextField.setText(it.numberOfUnits.toString())
                     reduceState {
-                        portionCountTextField.setText(it.numberOfUnits.toString())
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingSelect = it,
                                 breadUnits = calculateBreadUnits(carbs = it.carbs),
                                 servingAmount = it.numberOfUnits
-                            ),
-                            isShowCountHelpSnack = false
+                            )
                         )
                     }
                 }
@@ -142,7 +141,8 @@ class DishDetailViewModel @Inject constructor(
     ): DishDetailViewState =
         run {
             when (action) {
-                CalculatorAction.PortionHelpClick -> currentState.copy(isShowCountHelpSnack = true)
+                CalculatorAction.PortionHelpClick -> showPortionHelp(true)
+                CalculatorAction.AnotherScreenTap -> showPortionHelp(false)
                 else -> {
                     when (action) {
                         AppAction.BackPressure -> router.exit()
@@ -152,6 +152,12 @@ class DishDetailViewModel @Inject constructor(
                 }
             }
         }
+
+    private fun showPortionHelp(visibilityState: Boolean): DishDetailViewState = run {
+        portionCountTextField.setError(visibilityState)
+        portionDescriptionTextField.setError(visibilityState)
+        state.value.copy(isShowCountHelpSnack = visibilityState)
+    }
 
     private fun clearPortion() {
         portionCountTextField.setText(null)
