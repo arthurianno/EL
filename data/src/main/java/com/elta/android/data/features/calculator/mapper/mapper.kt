@@ -95,7 +95,7 @@ fun Dish.toNetwork(): ProductResponse =
         name = name,
         type = type.name,
         servingId = servingSelect.id,
-        servingName = servingSelect.measurementDescription,
+        servingName = servingSelect.servingDescription,
         servingAmount = servingAmount,
         breadUnits = breadUnits
     )
@@ -124,7 +124,7 @@ internal fun Dish.toDb(): DishDbEntity =
         name = name,
         type = type.name,
         servingId = servingSelect.id,
-        servingName = servingSelect.measurementDescription,
+        servingName = servingSelect.servingDescription,
         servingAmount = servingAmount,
         breadUnits = breadUnits
     )
