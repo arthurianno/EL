@@ -26,9 +26,13 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.widgets.animation.HorizontallyAnimation
+import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.theme.GetLocalProperties
 
-data class SearchFocusChanged(val focusState: FocusState) : Action
+sealed class SearchFiledAction : Action {
+    data class FocusChanged(val focusState: FocusState) : SearchFiledAction()
+    object Clear : SearchFiledAction()
+}
 
 @Immutable
 data class SearchFieldWidgetState(
@@ -47,12 +51,12 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
         setState { state.value.copy(textField = fieldValue) }
     }
 
-    fun setTextAndCursorToEnd(text: String) {
+    fun setTextAndCursorToEnd(text: String?) {
         setState {
             state.value.copy(
                 textField = TextFieldValue(
-                    text = text,
-                    selection = TextRange(text.length)
+                    text = text.orEmpty(),
+                    selection = TextRange(text.orEmpty().length)
                 )
             )
         }
@@ -65,7 +69,11 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
     fun focusChanged(focusState: FocusState) {
         if (!focusState.isFocused) setText(TextFieldValue(""))
         setState { state.value.copy(isFocused = focusState.isFocused) }
-        sendAction(SearchFocusChanged(focusState))
+        sendAction(SearchFiledAction.FocusChanged(focusState))
+    }
+
+    fun clear() {
+        setTextAndCursorToEnd(null)
     }
 
     override fun createInitState(): SearchFieldWidgetState =
@@ -81,8 +89,7 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
 @Composable
 fun SearchField(
     widgetModel: SearchFieldWidgetModel,
-    searchInFocus: Boolean,
-    networkAvailable: Boolean
+    searchInFocus: Boolean
 ) {
     val state = widgetModel.state.collectAsState()
     val focusManager = LocalFocusManager.current
@@ -101,7 +108,6 @@ fun SearchField(
             TextField(
                 value = state.value.textField,
                 onValueChange = widgetModel::setText,
-                enabled = networkAvailable,
                 singleLine = true,
                 shape = shapes.textField,
                 placeholder = {
@@ -122,6 +128,14 @@ fun SearchField(
                 } else {
                     state.value.icon?.let<Int, @Composable () -> Unit> { icon ->
                         searchIcon(icon, colors.shadeBlack2)
+                    }
+                },
+                trailingIcon = {
+                    HorizontallyAnimation(visualState = searchInFocus, toLeft = false) {
+                        ButtonCircle(
+                            icon = R.drawable.ic_search_clean,
+                            onClick = widgetModel::clear
+                        )
                     }
                 },
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),

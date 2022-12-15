@@ -82,7 +82,7 @@ class DishDetailViewModel @Inject constructor(
                 .mapDistinct { it.text }
                 .filter { it.isNotEmpty() }
                 .map {
-                    state.value.dish.servings.first { servingUi -> servingUi.measurementDescription == it }
+                    state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
                 .collectLatest {
                     reduceState {
@@ -127,8 +127,8 @@ class DishDetailViewModel @Inject constructor(
                 .collect { newDish ->
                     reduceState { state.value.copy(dish = newDish) }
                     with(portionDescriptionTextField) {
-                        setDropDownList(newDish.servings.map { it.measurementDescription })
-                        newDish.servingSelect.measurementDescription.takeIf { it.isNotEmpty() }
+                        setDropDownList(newDish.servings.map { it.servingDescription })
+                        newDish.servingSelect.servingDescription.takeIf { it.isNotEmpty() }
                             ?.let { setText(it) }
                     }
                     portionCountTextField.setText(newDish.servingAmount.toInt().toString())

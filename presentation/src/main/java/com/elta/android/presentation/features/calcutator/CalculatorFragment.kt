@@ -123,11 +123,12 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             .padding(bottom = dimens.downButtonHeight)
                             .padding(dimens.contentPadding)
                     ) {
-                        SearchField(
-                            widgetModel = viewModel.searchField,
-                            searchInFocus = searchInFocus,
-                            networkAvailable = networkAvailable
-                        )
+                        if (networkAvailable) {
+                            SearchField(
+                                widgetModel = viewModel.searchField,
+                                searchInFocus = searchInFocus
+                            )
+                        }
                         VSpacerMedium()
                         HelpText(viewModel, searchInFocus)
                         VSpacerSmall()
@@ -213,6 +214,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(shapes.dishCard)
+                                        .clickable { onClick(dish) }
                                         .border(
                                             dimens.borderWidth,
                                             colors.shadeBlack3,
@@ -223,9 +225,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     CardBody(dish)
-                                    ButtonCircle(
-                                        icon = R.drawable.btn_plus,
-                                        onClick = { onClick(dish) }
+                                    Image(
+                                        painter = painterResource(id = R.drawable.btn_plus),
+                                        contentDescription = null
                                     )
                                 }
                             }
@@ -320,11 +322,12 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             .padding(dimens.contentPadding)
                     ) {
                         DishInfoBlock(dish)
-                        CloseButton(
-                            dish = dish,
-                            onCloseClick = onCloseClick,
-                            networkAvailable = networkAvailable
-                        )
+                        if (networkAvailable) {
+                            CloseButton(
+                                dish = dish,
+                                onCloseClick = onCloseClick
+                            )
+                        }
                         BreadUnitLabel(dish)
                     }
                 }
@@ -345,7 +348,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             ) {
                 Text(text = dish.name, style = types.title3)
                 Text(
-                    text = "${dish.servingAmount.toInt()} ${dish.servingSelect.measurementDescription}",
+                    text = "${dish.servingAmount.toInt()} ${dish.servingSelect.servingDescription}",
                     color = colors.shadeBlack1
                 )
                 Text(
@@ -366,13 +369,11 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun BoxScope.CloseButton(
         dish: DishUiEntity,
-        onCloseClick: (dish: DishUiEntity) -> Unit,
-        networkAvailable: Boolean
+        onCloseClick: (dish: DishUiEntity) -> Unit
     ) {
         Box(modifier = Modifier.align(Alignment.TopEnd)) {
             ButtonCircle(
                 icon = R.drawable.btn_close,
-                enable = networkAvailable,
                 onClick = { onCloseClick(dish) }
             )
         }

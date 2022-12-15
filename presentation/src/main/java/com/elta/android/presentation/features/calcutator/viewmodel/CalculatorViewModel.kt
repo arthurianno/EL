@@ -18,7 +18,7 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClic
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
-import com.elta.android.presentation.core.compose.widgets.textfields.SearchFocusChanged
+import com.elta.android.presentation.core.compose.widgets.textfields.SearchFiledAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -125,7 +125,7 @@ class CalculatorViewModel @Inject constructor(
         action: Action
     ): CalculatorViewState =
         when (action) {
-            is SearchFocusChanged -> {
+            is SearchFiledAction.FocusChanged -> {
                 val inFocusState = action.focusState.isFocused
                 downButton.visibilityState(!inFocusState)
                 currentState.copy(searchInFocus = inFocusState)
