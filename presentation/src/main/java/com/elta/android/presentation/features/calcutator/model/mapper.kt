@@ -38,7 +38,6 @@ internal fun Serving.toUi(): ServingUiEntity =
     ServingUiEntity(
         id = id,
         servingDescription = servingDescription,
-        measurementDescription = measurementDescription,
         numberOfUnits = numberOfUnits,
         calories = calories,
         proteins = proteins,
@@ -49,7 +48,6 @@ internal fun Serving.toUi(): ServingUiEntity =
 internal fun ServingUiEntity.toDomain(): Serving =
     Serving(
         id = id,
-        measurementDescription = measurementDescription,
         servingDescription = servingDescription,
         numberOfUnits = numberOfUnits,
         calories = calories,
