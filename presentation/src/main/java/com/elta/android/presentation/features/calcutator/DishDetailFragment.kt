@@ -108,7 +108,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 .fillMaxSize()
                 .clickableWithNoRipple {
                     keyboardController?.hide()
-                    viewModel.sendAction(CalculatorAction.AnotherScreenTap)
+                    viewModel.sendAction(AppAction.FreeScreenTap)
                 }
         ) {
             Header(
