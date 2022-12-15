@@ -20,12 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.VSpacer
@@ -95,10 +98,19 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
-        Box(modifier = Modifier.fillMaxSize()) {
+        val keyboardController = LocalSoftwareKeyboardController.current
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickableWithNoRipple {
+                    keyboardController?.hide()
+                    viewModel.sendAction(CalculatorAction.AnotherScreenTap)
+                }
+        ) {
             Header(
                 dish = state.value.dish,
                 onBackClick = { viewModel.sendAction(AppAction.BackPressure) }

@@ -18,8 +18,8 @@ internal fun FoodGenericResponse.Food.toDomain(): Dish =
         name = foodName,
         type = DishType.Generic,
         brandName = brandName.orEmpty(),
-        servings = servingsGeneric.servings.servingToDomain(),
-        servingSelect = servingsGeneric.servings.first().toDomain(),
+        servings = servingsGeneric.servings.servingToDomain(foodType.getDishType()),
+        servingSelect = servingsGeneric.servings.first().toDomain(foodType.getDishType()),
         servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
@@ -32,18 +32,20 @@ internal fun FoodBrandResponse.Food.toDomain(): Dish =
         name = foodName,
         type = DishType.Brand,
         brandName = brandName.orEmpty(),
-        servings = listOf(servingsBrand.serving.toDomain()),
-        servingSelect = servingsBrand.serving.toDomain(),
+        servings = listOf(servingsBrand.serving.toDomain(foodType.getDishType())),
+        servingSelect = servingsBrand.serving.toDomain(foodType.getDishType()),
         servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
 
-internal fun ServingNetworkEntity.toDomain(): Serving =
+internal fun ServingNetworkEntity.toDomain(type: DishType): Serving =
     Serving(
         id = servingId,
-        servingDescription = servingDescription,
-        measurementDescription = measurementDescription,
+        servingDescription = when (type) {
+            DishType.Generic -> measurementDescription
+            DishType.Brand -> servingDescription
+        },
         numberOfUnits = numberOfUnits.toDouble(),
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
@@ -51,15 +53,15 @@ internal fun ServingNetworkEntity.toDomain(): Serving =
         carbs = carbohydrate.toDouble()
     )
 
-internal fun List<ServingNetworkEntity>.servingToDomain(): List<Serving> =
-    map { it.toDomain() }
+internal fun List<ServingNetworkEntity>.servingToDomain(type: DishType): List<Serving> =
+    map { it.toDomain(type) }
 
 internal fun CompactFoodNetworkEntity.toDomain(): Dish =
     Dish(
         id = foodId,
         localId = "",
         name = foodName,
-        type = DishType.valueOf(foodType),
+        type = foodType.getDishType(),
         brandName = brandName.orEmpty(),
         servings = emptyList(),
         servingSelect = Serving.empty(),
@@ -76,7 +78,7 @@ fun ProductResponse.toDomain(): Dish =
         id = id,
         localId = getLocalId(),
         name = name,
-        type = DishType.valueOf(type),
+        type = type.getDishType(),
         brandName = "",
         servings = emptyList(),
         servingAmount = servingAmount,
@@ -108,7 +110,7 @@ internal fun DishDbEntity.toDomain(): Dish =
         id = dishId,
         localId = getLocalId(),
         name = name,
-        type = DishType.valueOf(type),
+        type = type.getDishType(),
         brandName = "",
         servings = emptyList(),
         servingSelect = getServing(servingId, servingName),
@@ -140,7 +142,6 @@ private fun getServing(id: String, name: String) =
     Serving(
         id = id,
         servingDescription = name,
-        measurementDescription = name,
         numberOfUnits = 1.0,
         calories = 0.0,
         proteins = 0.0,
@@ -149,3 +150,6 @@ private fun getServing(id: String, name: String) =
     )
 
 private fun getLocalId(): String = UUID.randomUUID().toString()
+
+private fun String.getDishType(): DishType =
+    runCatching { DishType.valueOf(this) }.getOrNull() ?: DishType.Brand

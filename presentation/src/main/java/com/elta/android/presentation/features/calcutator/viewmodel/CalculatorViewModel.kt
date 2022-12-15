@@ -161,7 +161,7 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun setDownButtonVisibility() {
-        downButton.setEnableState(state.value.isChanging() && state.value.dishes.isNotEmpty())
+        downButton.setEnableState(state.value.isChanging())
     }
 
     private fun deleteDish(dish: DishUiEntity) {

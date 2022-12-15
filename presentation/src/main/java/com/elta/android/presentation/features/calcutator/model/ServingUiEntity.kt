@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class ServingUiEntity(
     val id: String,
     val servingDescription: String,
-    val measurementDescription: String,
     val numberOfUnits: Double,
     val calories: Double,
     val proteins: Double,
