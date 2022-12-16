@@ -31,7 +31,6 @@ import com.elta.android.presentation.features.observers.all.di.ObserversModule
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
-import com.elta.android.presentation.features.onboaring.di.OnBoardingModule
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.di.MainProfileModule
@@ -80,7 +79,7 @@ import dagger.android.ContributesAndroidInjector
 abstract class FragmentBuilder {
 
     @FragmentScope
-    @ContributesAndroidInjector(modules = [OnBoardingModule::class])
+    @ContributesAndroidInjector
     abstract fun bindOnBoardingFragment(): OnBoardingFragment
 
     @FragmentScope

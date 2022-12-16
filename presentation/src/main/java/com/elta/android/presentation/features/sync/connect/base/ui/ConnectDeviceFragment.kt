@@ -22,6 +22,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -61,15 +62,10 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
         pm.mstate.bindTo { state ->
             binding.syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
-                if (state == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
-                    binding.toolbar.homeButtonView.apply {
-                        setImageResource(R.drawable.ic_dialog_close)
-                        setOnClickListener {
-                            pm.toAppAction.consumer.accept(Unit)
-                        }
-                    }
+                if (state == ConnectDevicePm.ViewState.SYNC_COMPLETED || state == ConnectDevicePm.ViewState.CONNECTED) {
+                    binding.toolbar.menuButtonView.hide()
                 } else {
-                    binding.toolbar.homeButtonView.setImageResource(R.drawable.ic_back)
+                    binding.toolbar.menuButtonView.show()
                 }
             }
         }
