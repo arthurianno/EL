@@ -13,7 +13,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.DeviceAdapter
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment

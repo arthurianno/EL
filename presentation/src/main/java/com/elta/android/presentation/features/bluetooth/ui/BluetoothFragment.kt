@@ -17,7 +17,7 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentBluetoothBinding
 import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.DeviceAdapter
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
