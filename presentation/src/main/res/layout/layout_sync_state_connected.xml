@@ -30,13 +30,13 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@+id/titleView"
         app:layout_constraintTop_toTopOf="@+id/titleView"
-        app:srcCompat="@drawable/ic_congrats" />
+        app:srcCompat="@drawable/ic_how_to_connect" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/messageView"
