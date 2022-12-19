@@ -27,6 +27,8 @@ import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
+private const val DISABLE_DELAY = 300L
+
 @Suppress("LabeledExpression")
 class OnBoardingFragment :
     BaseRecyclerViewFragment<OnBoardingPm, FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
@@ -94,6 +96,5 @@ class OnBoardingFragment :
 
     companion object {
         fun newInstance(): OnBoardingFragment = OnBoardingFragment()
-        private const val DISABLE_DELAY = 300L
     }
 }

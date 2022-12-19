@@ -1,11 +1,11 @@
-package com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter
+package com.elta.android.presentation.features.sync.connect.base.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.core.ui.adapter.BaseListAdapter
 import com.elta.android.presentation.databinding.ItemDeviceBinding
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.holder.DeviceItemViewHolder
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.holder.DeviceItemViewHolder
 import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 

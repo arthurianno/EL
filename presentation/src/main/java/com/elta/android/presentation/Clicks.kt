@@ -14,7 +14,7 @@ import com.elta.android.presentation.features.profile.settings.reminders.all.ui.
 import com.elta.android.presentation.features.profile.support.model.SupportAction
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.SearchResultItem
 import com.elta.android.presentation.features.shops.map.ui.adapter.items.ShopItem
-import com.elta.android.presentation.features.sync.connect.base.ui.adapter.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import org.threeten.bp.LocalDate
 
 sealed class Clicks : Click {
