@@ -128,10 +128,11 @@ class DishDetailViewModel @Inject constructor(
                     reduceState { state.value.copy(dish = newDish) }
                     with(portionDescriptionTextField) {
                         setDropDownList(newDish.servings.map { it.servingDescription })
-                        newDish.servingSelect.takeIf { it.servingDescription.isNotEmpty() }
-                            ?.let { saveServing ->
-                                setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
-                            }
+                        val selectServing =
+                            newDish.servingSelect.takeIf { it.servingDescription.isNotEmpty() }
+                        selectServing?.let { saveServing ->
+                            setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
+                        }
                     }
                     portionCountTextField.setText(newDish.servingAmount.toInt().toString())
                 }
