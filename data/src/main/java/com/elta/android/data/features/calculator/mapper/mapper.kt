@@ -18,8 +18,8 @@ internal fun FoodGenericResponse.Food.toDomain(): Dish =
         name = foodName,
         type = DishType.Generic,
         brandName = brandName.orEmpty(),
-        servings = servingsGeneric.servings.servingToDomain(foodType.getDishType()),
-        servingSelect = servingsGeneric.servings.first().toDomain(foodType.getDishType()),
+        servings = servingsGeneric.servings.servingToDomain(),
+        servingSelect = servingsGeneric.servings.first().toDomain(),
         servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
@@ -32,20 +32,17 @@ internal fun FoodBrandResponse.Food.toDomain(): Dish =
         name = foodName,
         type = DishType.Brand,
         brandName = brandName.orEmpty(),
-        servings = listOf(servingsBrand.serving.toDomain(foodType.getDishType())),
-        servingSelect = servingsBrand.serving.toDomain(foodType.getDishType()),
+        servings = listOf(servingsBrand.serving.toDomain()),
+        servingSelect = servingsBrand.serving.toDomain(),
         servingAmount = 1.0,
         isVerification = false,
         breadUnits = 0.0
     )
 
-internal fun ServingNetworkEntity.toDomain(type: DishType): Serving =
+internal fun ServingNetworkEntity.toDomain(): Serving =
     Serving(
         id = servingId,
-        servingDescription = when (type) {
-            DishType.Generic -> measurementDescription
-            DishType.Brand -> servingDescription
-        },
+        servingDescription = measurementDescription,
         numberOfUnits = numberOfUnits.toDouble(),
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
@@ -53,8 +50,8 @@ internal fun ServingNetworkEntity.toDomain(type: DishType): Serving =
         carbs = carbohydrate.toDouble()
     )
 
-internal fun List<ServingNetworkEntity>.servingToDomain(type: DishType): List<Serving> =
-    map { it.toDomain(type) }
+internal fun List<ServingNetworkEntity>.servingToDomain(): List<Serving> =
+    map { it.toDomain() }
 
 internal fun CompactFoodNetworkEntity.toDomain(): Dish =
     Dish(
