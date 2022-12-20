@@ -1,4 +1,5 @@
 @file:Suppress("ReturnCount")
+
 package com.elta.android.common.utils
 
 fun <T> List<T>.takeFirst(n: Int): List<T> {
@@ -29,3 +30,9 @@ inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (
     }
     return true
 }
+
+/**
+ * Returns the first element matching the given [predicate], or first element given collection if element not found.
+ */
+inline fun <T> List<T>.findOrFirst(predicate: (T) -> Boolean): T =
+    find(predicate) ?: first()
