@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Text
@@ -26,6 +25,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -41,6 +41,7 @@ import com.nullgr.core.collections.isNotNullOrEmpty
 @Immutable
 data class IconTextFieldWidgetState(
     val text: String,
+    val oldText: String,
     @DrawableRes val leadIcon: Int?,
     val dropDownList: List<String>?,
     val isError: Boolean,
@@ -48,12 +49,11 @@ data class IconTextFieldWidgetState(
     val isExpanded: Boolean
 )
 
-class IconTextFieldWidgetModel(
-    private val iconClick: () -> Unit = {}
-) : BaseWidgetModel<IconTextFieldWidgetState>() {
+class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
     override fun createInitState(): IconTextFieldWidgetState =
         IconTextFieldWidgetState(
             text = "",
+            oldText = "",
             leadIcon = null,
             dropDownList = null,
             isError = false,
@@ -77,12 +77,23 @@ class IconTextFieldWidgetModel(
         }
     }
 
-    fun setIcon(@DrawableRes icon: Int?) {
-        setState { state.value.copy(leadIcon = icon) }
+    fun focusChanged(isFocused: Boolean) {
+        if (isFocused) {
+            setState {
+                state.value.copy(
+                    text = "",
+                    oldText = state.value.text
+                )
+            }
+        } else {
+            if (state.value.text.isEmpty()) {
+                setState { state.value.copy(text = state.value.oldText) }
+            }
+        }
     }
 
-    fun iconOnClick() {
-        iconClick()
+    fun setIcon(@DrawableRes icon: Int?) {
+        setState { state.value.copy(leadIcon = icon) }
     }
 
     fun setDropDownList(list: List<String>?) {
@@ -106,10 +117,11 @@ fun IconTextField(
     widgetModel: IconTextFieldWidgetModel,
     paddingValues: PaddingValues = PaddingValues(),
     keyboardType: KeyboardType = KeyboardType.Decimal,
-    imeAction: ImeAction = ImeAction.Go
+    imeAction: ImeAction = ImeAction.Go,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     val state = widgetModel.state.collectAsState()
-    val focusRequester = FocusRequester()
+    val isDropDown = state.value.isDropDown
     val localMaterialShapes = Shapes(
         large = RoundedCornerShape(0.dp),
         medium = RoundedCornerShape(0.dp),
@@ -128,15 +140,10 @@ fun IconTextField(
                     isError = state.value.isError,
                     leadingIcon = state.value.leadIcon?.let {
                         {
-                            IconButton(onClick = {
-                                focusRequester.requestFocus()
-                                widgetModel.iconOnClick()
-                            }) {
-                                Icon(
-                                    painter = painterResource(id = it),
-                                    contentDescription = null
-                                )
-                            }
+                            Icon(
+                                painter = painterResource(id = it),
+                                contentDescription = null
+                            )
                         }
                     },
                     trailingIcon = state.value.dropDownList?.let {
@@ -151,7 +158,12 @@ fun IconTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(paddingValues)
-                        .focusRequester(focusRequester),
+                        .focusRequester(focusRequester)
+                        .onFocusChanged {
+                            if (!isDropDown) {
+                                widgetModel.focusChanged(it.isFocused)
+                            }
+                        },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = colors.blackBlue,
                         backgroundColor = colors.white,
@@ -168,9 +180,9 @@ fun IconTextField(
                         onAny = { keyboardController?.hide() }
                     ),
                     singleLine = true,
-                    readOnly = state.value.isDropDown
+                    readOnly = isDropDown
                 )
-                if (state.value.isDropDown) {
+                if (isDropDown) {
                     DropdownMenu(
                         expanded = state.value.isExpanded,
                         onDismissRequest = { widgetModel.setExpandedState(false) },

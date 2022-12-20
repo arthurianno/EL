@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -103,11 +104,13 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     override fun Content(viewModel: DishDetailViewModel) {
         val state = viewModel.state.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
+        val descriptionFieldFocusRequester = FocusRequester()
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clickableWithNoRipple {
                     keyboardController?.hide()
+                    descriptionFieldFocusRequester.requestFocus()
                     viewModel.sendAction(AppAction.FreeScreenTap)
                 }
         ) {
@@ -115,7 +118,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 dish = state.value.dish,
                 onBackClick = { viewModel.sendAction(AppAction.BackPressure) }
             )
-            MainContent(viewModel, state)
+            MainContent(viewModel, state, descriptionFieldFocusRequester)
         }
     }
 
@@ -203,7 +206,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     private fun BoxScope.MainContent(
         viewModel: DishDetailViewModel,
-        state: State<DishDetailViewState>
+        state: State<DishDetailViewState>,
+        descriptionFieldFocusRequester: FocusRequester
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
@@ -223,7 +227,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     )
                     IconTextField(
                         widgetModel = viewModel.portionDescriptionTextField,
-                        paddingValues = PaddingValues(horizontal = dimens.contentPadding)
+                        paddingValues = PaddingValues(horizontal = dimens.contentPadding),
+                        focusRequester = descriptionFieldFocusRequester
                     )
                     Footer(state)
                 }

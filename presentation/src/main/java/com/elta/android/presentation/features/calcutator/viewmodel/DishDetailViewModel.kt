@@ -55,7 +55,7 @@ class DishDetailViewModel @Inject constructor(
         )
 
     val downButton = DownButtonWidgetModel()
-    val portionCountTextField = IconTextFieldWidgetModel(iconClick = ::clearPortion)
+    val portionCountTextField = IconTextFieldWidgetModel()
     val portionDescriptionTextField = IconTextFieldWidgetModel()
     val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
 
@@ -157,10 +157,6 @@ class DishDetailViewModel @Inject constructor(
         portionCountTextField.setError(visibilityState)
         portionDescriptionTextField.setError(visibilityState)
         state.value.copy(isShowCountHelpSnack = visibilityState)
-    }
-
-    private fun clearPortion() {
-        portionCountTextField.setText(null)
     }
 
     private fun saveDish() {
