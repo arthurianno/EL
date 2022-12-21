@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
+import com.elta.android.common.utils.findOrFirst
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetFatSecretDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
@@ -127,8 +128,11 @@ class DishDetailViewModel @Inject constructor(
                     reduceState { state.value.copy(dish = newDish) }
                     with(portionDescriptionTextField) {
                         setDropDownList(newDish.servings.map { it.servingDescription })
-                        newDish.servingSelect.servingDescription.takeIf { it.isNotEmpty() }
-                            ?.let { setText(it) }
+                        val selectServing =
+                            newDish.servingSelect.takeIf { it.servingDescription.isNotEmpty() }
+                        selectServing?.let { saveServing ->
+                            setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
+                        }
                     }
                     portionCountTextField.setText(newDish.servingAmount.toInt().toString())
                 }
