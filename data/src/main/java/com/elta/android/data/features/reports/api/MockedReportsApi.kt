@@ -4,8 +4,9 @@ import android.content.Context
 import com.elta.android.data.R
 import com.elta.android.data.features.reports.dto.TokenDto
 import io.reactivex.Single
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 
 class MockedReportsApi(
     private val context: Context
@@ -17,6 +18,6 @@ class MockedReportsApi(
     override fun downloadReport(token: String): Single<ResponseBody> =
         Single.fromCallable {
             val stream = context.resources.openRawResource(R.raw.test_report)
-            ResponseBody.create(MediaType.parse("application/octet-stream"), stream.readBytes())
+            stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())
         }
 }

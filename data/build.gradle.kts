@@ -74,5 +74,7 @@ dependencies {
 
     implementation(Dependencies.Utils.essentials)
 
+    implementation(Dependencies.Webim.core)
+
     testBaseDependencies()
 }

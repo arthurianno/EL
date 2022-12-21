@@ -89,7 +89,7 @@ class YandexClusterRenderer(
         clusterAnimator.duration = yandexRenderConfig.duration
         clusterAnimator.interpolator = yandexRenderConfig.interpolator
         clusterAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 checkPins(diffs.newClusters(), updateSelection)
                 clusterAnimator.removeListener(this)
             }
@@ -102,10 +102,11 @@ class YandexClusterRenderer(
         markers: Set<Cluster>,
         isCollapsing: Boolean
     ): Animator? =
-        if (isCollapsing)
+        if (isCollapsing) {
             animateMarkersToCluster(cluster, markers)
-        else
+        } else {
             animateClusterToMarkers(cluster, markers)
+        }
 
     private fun checkPins(clusters: Set<Cluster>, updateSelection: Boolean) {
         val iterator = mapObjects.iterator()
@@ -174,13 +175,13 @@ class YandexClusterRenderer(
         }
         animator.addUpdateListener(animatorUpdateListener)
         animator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(anim: Animator?) {
+            override fun onAnimationEnd(anim: Animator) {
                 removePlacemarks(clusters)
                 animator.removeUpdateListener(animatorUpdateListener)
                 animator.removeListener(this)
             }
 
-            override fun onAnimationStart(animation: Animator?) {
+            override fun onAnimationStart(animation: Animator) {
                 createPlacemark(cluster)
             }
         })
@@ -210,12 +211,12 @@ class YandexClusterRenderer(
         }
         animator.addUpdateListener(animatorUpdateListener)
         animator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(anim: Animator?) {
+            override fun onAnimationEnd(anim: Animator) {
                 animator.removeUpdateListener(animatorUpdateListener)
                 animator.removeListener(this)
             }
 
-            override fun onAnimationStart(animation: Animator?) {
+            override fun onAnimationStart(animation: Animator) {
                 removePlacemark(cluster)
             }
         })

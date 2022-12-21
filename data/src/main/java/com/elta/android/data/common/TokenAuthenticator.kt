@@ -14,16 +14,16 @@ class TokenAuthenticator(
     override fun authenticate(route: Route?, response: Response): Request? {
         synchronized(TokenAuthenticator::class.java) {
             val storedToken = storage.accessToken
-            val requestToken = response.request().header(AUTH_HEADER)?.removePrefix(PREFIX)?.trim()
+            val requestToken = response.request.header(AUTH_HEADER)?.removePrefix(PREFIX)?.trim()
 
             if (storedToken == requestToken) {
                 storage.refresh()
             }
 
-            val builder = response.request().newBuilder()
+            val builder = response.request.newBuilder()
             storage.accessToken?.let { token ->
                 builder.header(AUTH_HEADER, "$PREFIX $token")
-            } ?: throw InvalidRefreshTokenError("${response.code()}")
+            } ?: throw InvalidRefreshTokenError("${response.code}")
             return builder.build()
         }
     }
