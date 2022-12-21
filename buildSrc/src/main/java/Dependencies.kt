@@ -319,7 +319,7 @@ object Dependencies {
     }
 
     object OkHttp {
-        private const val version = "3.14.9" // 4.10.0
+        private const val version = "5.0.0-alpha.10"
 
         const val core = "com.squareup.okhttp3:okhttp:$version"
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"
