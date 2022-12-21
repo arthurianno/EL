@@ -175,6 +175,7 @@ dependencies {
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)
+    implementation(Dependencies.Webim.core)
 
     testBaseDependencies()
 }

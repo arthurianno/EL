@@ -128,6 +128,7 @@ dependencies {
     implementation(Dependencies.Google.FireBase.dynamicLinksBom)
     implementation(Dependencies.Google.GoogleMap.location)
     implementation(Dependencies.CustomView.cardView)
+    implementation(Dependencies.Webim.core)
 
     testComposeDependencies()
     testBaseDependencies()

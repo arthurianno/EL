@@ -6,6 +6,7 @@ import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
+import com.elta.android.presentation.features.consultant.viewmodel.MainChartViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -25,4 +26,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(DishDetailViewModel::class)
     abstract fun bindDishDetailViewModel(dishDetailViewModel: DishDetailViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainChartViewModel::class)
+    abstract fun bindMainChartViewModel(mainChartViewModel: MainChartViewModel): ViewModel
 }
