@@ -15,6 +15,7 @@ import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
+import com.elta.android.data.di.WebimModule
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.di.FragmentBuilder
@@ -47,6 +48,7 @@ import javax.inject.Singleton
         GlucometerModule::class,
         LocalSyncModule::class,
         FatSecretModule::class,
+        WebimModule::class,
         // domain
         RepoModule::class,
         // presentation

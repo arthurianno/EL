@@ -353,4 +353,10 @@ object Dependencies {
             "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
         const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
     }
+
+    object Webim {
+        private const val version = "3.+"
+
+        const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
+    }
 }
