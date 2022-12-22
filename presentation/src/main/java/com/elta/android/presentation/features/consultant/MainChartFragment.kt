@@ -11,4 +11,24 @@ class MainChartFragment : BaseComposeFragment<MainChartViewModel>() {
     @Composable
     override fun Content(viewModel: MainChartViewModel) {
     }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.webimSession.onResume()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.webimSession.onResume()
+    }
+
+    override fun onDestroy() {
+        viewModel.webimSession.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        viewModel.webimSession.onPause()
+        super.onPause()
+    }
 }

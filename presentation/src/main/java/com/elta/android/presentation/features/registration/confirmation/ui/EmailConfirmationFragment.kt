@@ -24,8 +24,8 @@ class EmailConfirmationFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.get(EXTRA_TOKEN)?.let {
-            presentationModel.setToken(it as String)
+        arguments?.getString(EXTRA_TOKEN)?.let {
+            presentationModel.setToken(it)
         }
     }
 
