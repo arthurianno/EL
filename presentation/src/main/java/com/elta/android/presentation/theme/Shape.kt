@@ -15,6 +15,7 @@ data class EltaShapes(
     val round: Shape,
     val sheet: Shape,
     val textField: Shape,
+    val consultantTextField: Shape,
     val dishCard: Shape,
     val dialog: Shape
 )
@@ -28,6 +29,7 @@ internal val eltaShapes = EltaShapes(
         bottomStart = 0.dp
     ),
     textField = RoundedCornerShape(8.dp),
+    consultantTextField = RoundedCornerShape(18.dp),
     dishCard = RoundedCornerShape(8.dp),
     dialog = RoundedCornerShape(4.dp)
 )
