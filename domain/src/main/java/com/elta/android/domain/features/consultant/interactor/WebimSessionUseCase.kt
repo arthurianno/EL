@@ -7,6 +7,10 @@ class WebimSessionUseCase @Inject constructor(
     private val repository: ConsultantRepository
 ) {
 
+    fun create() {
+        repository.webimSessionCreate()
+    }
+
     fun onResume() {
         repository.webimResume()
     }
@@ -17,5 +21,9 @@ class WebimSessionUseCase @Inject constructor(
 
     fun onDestroy() {
         repository.webimDestroy()
+    }
+
+    fun startChat() {
+        repository.startChat()
     }
 }

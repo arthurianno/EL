@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -22,11 +23,13 @@ import androidx.compose.ui.res.stringResource
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.common.NetworkState
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.theme.GetLocalProperties
+import com.elta.android.presentation.theme.LocalNetworkState
 
 internal data class ConsultantTopAppBarWidgetState(
     val connectState: ConnectState
@@ -36,8 +39,12 @@ internal class ConsultantTopAppBarWidgetModel() :
     BaseWidgetModel<ConsultantTopAppBarWidgetState>() {
     override fun createInitState(): ConsultantTopAppBarWidgetState =
         ConsultantTopAppBarWidgetState(
-            connectState = ConnectState.Offline
+            connectState = ConnectState.Connecting
         )
+
+    fun setConnectState(connectState: ConnectState) {
+        setState { state.value.copy(connectState = connectState) }
+    }
 }
 
 @Composable
@@ -48,7 +55,8 @@ internal fun ConsultantTopAppBar(widgetModel: ConsultantTopAppBarWidgetModel) {
         TopAppBar(
             backgroundColor = colors.white,
             elevation = dimens.zero,
-            contentPadding = dimens.consultantTopBarContentPadding
+            contentPadding = dimens.consultantTopBarContentPadding,
+            modifier = Modifier.statusBarsPadding()
         ) {
             BackButton(widgetModel)
             AppIcon(connectState)
@@ -80,6 +88,12 @@ private fun FindButton(widgetModel: ConsultantTopAppBarWidgetModel) {
 
 @Composable
 private fun TopBarText(connectState: ConnectState) {
+    val networkState = LocalNetworkState.current
+    val topBarText = if (networkState == NetworkState.Unavailable) {
+        stringResource(id = R.string.consultant_offline)
+    } else {
+        connectState.getTopBarText()
+    }
     GetLocalProperties { dimens, _, colors, _, types ->
         Column {
             Text(
@@ -88,14 +102,15 @@ private fun TopBarText(connectState: ConnectState) {
                 color = colors.blackBlue
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                when (connectState) {
-                    ConnectState.Connecting -> CircularProgressIndicator(
+                when {
+                    connectState == ConnectState.Connecting -> CircularProgressIndicator(
                         strokeWidth = dimens.progressSmallWidth,
                         color = colors.shadeBlack1,
                         modifier = Modifier.size(dimens.consultantTopBarProgress)
                     )
 
-                    ConnectState.Offline -> Image(
+                    connectState == ConnectState.Offline ||
+                        networkState == NetworkState.Unavailable -> Image(
                         painter = painterResource(id = R.drawable.ic_red_alert),
                         contentDescription = null
                     )
@@ -104,7 +119,7 @@ private fun TopBarText(connectState: ConnectState) {
                 }
                 HSpacerVerySmall()
                 Text(
-                    text = connectState.getTopBarText(),
+                    text = topBarText,
                     style = types.caption1,
                     color = colors.shadeBlack1
                 )
@@ -138,12 +153,13 @@ private fun ConnectState.getTopBarText() =
 
 @Composable
 private fun AppIcon(connectState: ConnectState) {
+    val networkState = LocalNetworkState.current
     Box {
         Image(
             painter = painterResource(id = R.drawable.img_round_elta),
             contentDescription = null
         )
-        if (connectState == ConnectState.Connect) {
+        if (connectState == ConnectState.Connect && networkState == NetworkState.Available) {
             Image(
                 painter = painterResource(id = R.drawable.img_green_dot),
                 contentDescription = null,

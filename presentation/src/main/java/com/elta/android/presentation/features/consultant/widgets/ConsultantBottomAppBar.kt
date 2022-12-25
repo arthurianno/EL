@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,19 +21,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.RoundedButton
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
+import com.elta.android.presentation.features.consultant.model.MessageType
 import com.elta.android.presentation.theme.GetLocalProperties
 
 private const val MESSAGE_MAX_LINES = 10
 
 internal data class ConsultantBottomAppBarWidgetState(
     val connectState: ConnectState,
-    val messageText: TextFieldValue
+    val messageText: TextFieldValue,
+    val messageType: MessageType
 )
 
 internal class ConsultantBottomAppBarWidgetModel :
@@ -40,11 +42,23 @@ internal class ConsultantBottomAppBarWidgetModel :
     override fun createInitState(): ConsultantBottomAppBarWidgetState =
         ConsultantBottomAppBarWidgetState(
             connectState = ConnectState.Offline,
-            messageText = TextFieldValue()
+            messageText = TextFieldValue(),
+            messageType = MessageType.Voice
         )
 
-    fun setText(newText: TextFieldValue) {
-        setState { state.value.copy(messageText = newText) }
+    fun setText(text: TextFieldValue?) {
+        val newText = text ?: TextFieldValue()
+        val messageType = if (newText.text.isEmpty()) {
+            MessageType.Voice
+        } else {
+            MessageType.Text
+        }
+        setState {
+            state.value.copy(
+                messageText = newText,
+                messageType = messageType
+            )
+        }
     }
 }
 
@@ -56,6 +70,7 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
                 .fillMaxWidth()
                 .background(color = colors.shadeBlack4)
                 .padding(dimens.consultantBottomBarContentPadding)
+                .imePadding()
         ) {
             FileButton(widgetModel)
             MessageField(widgetModel)
@@ -66,13 +81,26 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
 
 @Composable
 private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    val messageType = state.value.messageType
+    val icon = if (messageType == MessageType.Voice) {
+        R.drawable.ic_voice_message
+    } else {
+        R.drawable.ic_arrow_down
+    }
+    val action = if (messageType == MessageType.Voice) {
+        ConsultantAction.VoiceClick
+    } else {
+        ConsultantAction.SendMessageClick(state.value.messageText.text)
+    }
     GetLocalProperties { _, _, colors, _, _ ->
         Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
             RoundedButton(
-                icon = R.drawable.ic_voice_message,
+                icon = icon,
                 background = colors.gGreenB,
                 border = colors.gGreenB,
-                onClick = { widgetModel.sendAction(ConsultantAction.VoiceClick) }
+                iconColor = colors.shadeBlack4,
+                onClick = { widgetModel.sendAction(action) }
             )
         }
     }
@@ -138,11 +166,4 @@ private fun BoxScope.MessageField(widgetModel: ConsultantBottomAppBarWidgetModel
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun BottomBarPreview() {
-    val widgetModel = ConsultantBottomAppBarWidgetModel()
-    ConsultantBottomAppBar(widgetModel = widgetModel)
 }

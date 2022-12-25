@@ -6,4 +6,5 @@ sealed class ConsultantAction : Action {
     object SearchClick : ConsultantAction()
     object FileClick : ConsultantAction()
     object VoiceClick : ConsultantAction()
+    data class SendMessageClick(val text: String) : ConsultantAction()
 }

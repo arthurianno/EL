@@ -685,4 +685,5 @@
     <string name="consultant_connect">Мы с вами 24/7</string>
     <string name="consultant_offline">Не удалось подключиться</string>
     <string name="consultant_message_placeholder">Напишите сообщение</string>
+    <string name="consultant_chat_empty_text">Мы с удовольствием ответим\nна интересующие Вас вопросы</string>
 </resources>

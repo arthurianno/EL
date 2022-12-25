@@ -1,11 +1,6 @@
 package com.elta.android.presentation.features.consultant.model
 
 data class ConsultantViewState(
-    val webimConnectState: ConnectState
+    val webimConnectState: ConnectState,
+    val chat: List<ChatUiEntity>
 )
-
-enum class ConnectState {
-    Connecting,
-    Connect,
-    Offline
-}
