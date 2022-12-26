@@ -7,4 +7,6 @@ sealed class ConsultantAction : Action {
     object FileClick : ConsultantAction()
     object VoiceClick : ConsultantAction()
     data class SendMessageClick(val text: String) : ConsultantAction()
+    data class ChatMessageClick(val message: ChatUiEntity) : ConsultantAction()
+    data class ChatMessageLongClick(val message: ChatUiEntity) : ConsultantAction()
 }

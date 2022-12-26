@@ -4,6 +4,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.domain.features.consultant.interactor.WebimChatStateUseCase
+import com.elta.android.domain.features.consultant.interactor.WebimGetMessagesUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimNetworkStateUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimSendMessageUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimSessionUseCase
@@ -20,13 +21,15 @@ import com.elta.android.presentation.features.consultant.widgets.ConsultantBotto
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ConsultantViewModel @Inject constructor(
     private val webimSession: WebimSessionUseCase,
     private val webimNetworkState: WebimNetworkStateUseCase,
     private val webimChatState: WebimChatStateUseCase,
-    private val sendMessage: WebimSendMessageUseCase
+    private val sendMessage: WebimSendMessageUseCase,
+    private val getMessages: WebimGetMessagesUseCase
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
@@ -44,6 +47,14 @@ class ConsultantViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .collectLatest {
                     consultantTopAppBar.setConnectState(it.toUi())
+                }
+        }
+        launch {
+            getMessages()
+                .catch { handleError(it) }
+                .map { it.toUi() }
+                .collectLatest { messages ->
+                    reduceState { state.value.copy(chat = messages) }
                 }
         }
     }
@@ -68,14 +79,6 @@ class ConsultantViewModel @Inject constructor(
             }
         }
 
-    private fun sendNewMessage(text: String): ConsultantViewState {
-        launch {
-            sendMessage(text)
-        }
-        consultantBottomAppBar.setText(null)
-        return state.value.copy()
-    }
-
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             Lifecycle.Event.ON_CREATE -> {
@@ -90,5 +93,13 @@ class ConsultantViewModel @Inject constructor(
             Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
             else -> {}
         }
+    }
+
+    private fun sendNewMessage(text: String): ConsultantViewState {
+        launch {
+            sendMessage(text)
+        }
+        consultantBottomAppBar.setText(null)
+        return state.value.copy()
     }
 }

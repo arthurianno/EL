@@ -86,7 +86,7 @@ private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) 
     val icon = if (messageType == WebimMessageType.Voice) {
         R.drawable.ic_voice_message
     } else {
-        R.drawable.ic_arrow_down
+        R.drawable.ic_send
     }
     val action = if (messageType == WebimMessageType.Voice) {
         ConsultantAction.VoiceClick

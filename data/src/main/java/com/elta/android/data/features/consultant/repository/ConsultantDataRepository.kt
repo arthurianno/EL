@@ -1,10 +1,13 @@
 package com.elta.android.data.features.consultant.repository
 
 import android.content.Context
+import com.elta.android.data.features.consultant.model.toDomain
 import com.elta.android.data.features.consultant.model.toJSonObject
 import com.elta.android.data.features.consultant.model.toWebimUser
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
+import com.elta.android.domain.features.consultant.model.WebimMessageType
+import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
@@ -13,11 +16,12 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import ru.webim.android.sdk.Message
 import ru.webim.android.sdk.MessageListener
 import ru.webim.android.sdk.MessageStream
+import ru.webim.android.sdk.MessageStream.GreetingMessageListener
 import ru.webim.android.sdk.MessageTracker
 import ru.webim.android.sdk.Webim
 import ru.webim.android.sdk.WebimSession
@@ -38,10 +42,16 @@ class ConsultantDataRepository @Inject constructor(
     private val webimNetworkStatus: MutableStateFlow<WebimStatus> =
         MutableStateFlow(WebimStatus.Connecting)
     private var user: WebimUser? = null
+    private val _messages: MutableStateFlow<List<WebimMessage>> =
+        MutableStateFlow(emptyList())
+    override val messages: StateFlow<List<WebimMessage>>
+        get() = _messages.asStateFlow()
+
     private var _webimSession: WebimSession? = null
         set(value) {
-            _tracker = value?.stream?.newMessageTracker(ChatMessages())
+            tracker = value?.stream?.newMessageTracker(ChatMessages())
             field = value?.apply {
+                stream.setGreetingMessageListener(ChatGreetingListener())
                 stream.setChatStateListener { _, newState ->
                     webimChatState.value = when (newState) {
                         MessageStream.ChatState.CHATTING -> WebimChatState.Chatting
@@ -59,7 +69,10 @@ class ConsultantDataRepository @Inject constructor(
                 stream.setOnlineStatusChangeListener { _, newOnlineStatus ->
                     webimNetworkStatus.value = when (newOnlineStatus) {
                         MessageStream.OnlineStatus.ONLINE,
-                        MessageStream.OnlineStatus.BUSY_ONLINE -> WebimStatus.Online
+                        MessageStream.OnlineStatus.BUSY_ONLINE -> {
+                            _webimSession?.stream?.startChat()
+                            WebimStatus.Online
+                        }
 
                         MessageStream.OnlineStatus.UNKNOWN -> WebimStatus.Connecting
 
@@ -68,12 +81,11 @@ class ConsultantDataRepository @Inject constructor(
                 }
             }
         }
-    private var _tracker: MessageTracker? = null
-    private val tracker: MessageTracker
-        get() = checkNotNull(_tracker)
 
+    private var tracker: MessageTracker? = null
     private val webimSession: WebimSession
         get() = checkNotNull(_webimSession)
+
     private val disposableContainer = CompositeDisposable()
 
     init {
@@ -128,26 +140,59 @@ class ConsultantDataRepository @Inject constructor(
     override fun chatNetworkStatus(): Flow<WebimStatus> =
         webimNetworkStatus.asStateFlow()
 
-    override fun messages(): Flow<List<WebimMessage>> = flow {
-        tracker.getAllMessages {
-        }
-    }
-
     private inner class ChatMessages : MessageListener {
         override fun messageAdded(before: Message?, message: Message) {
-            TODO("Not yet implemented")
+            _messages.tryEmit(
+                _messages.value
+                    .toMutableList()
+                    .apply {
+                        add(message.toDomain())
+                    }
+            )
         }
 
         override fun messageRemoved(message: Message) {
-            TODO("Not yet implemented")
+            _messages.tryEmit(
+                _messages.value
+                    .toMutableList()
+                    .apply {
+                        remove(message.toDomain())
+                    }
+            )
         }
 
         override fun messageChanged(from: Message, to: Message) {
-            TODO("Not yet implemented")
+            val oldMessages = _messages.value.toMutableList()
+            val indexMessage = oldMessages.indexOf(from.toDomain())
+            _messages.tryEmit(
+                oldMessages
+                    .apply {
+                        removeAt(indexMessage)
+                        add(indexMessage, to.toDomain())
+                    }
+            )
         }
 
         override fun allMessagesRemoved() {
-            TODO("Not yet implemented")
+            _messages.tryEmit(emptyList())
+        }
+    }
+
+    private inner class ChatGreetingListener : GreetingMessageListener {
+        override fun greetingMessage(message: String) {
+            _messages.tryEmit(
+                _messages.value
+                    .toMutableList()
+                    .apply {
+                        add(
+                            WebimMessage(
+                                WebimOwner.Operator,
+                                WebimMessageType.Text,
+                                content = message
+                            )
+                        )
+                    }
+            )
         }
     }
 }

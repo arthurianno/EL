@@ -15,5 +15,5 @@ interface ConsultantRepository : BaseRepository {
     suspend fun sendMessage(message: String)
     fun chatState(): Flow<WebimChatState>
     fun chatNetworkStatus(): Flow<WebimStatus>
-    fun messages(): Flow<List<WebimMessage>>
+    val messages: Flow<List<WebimMessage>>
 }

@@ -36,11 +36,13 @@ data class EltaDimens(
     val verifyIconSize: Dp,
     val dishChars: PaddingValues,
     val portionCountHelpPadding: PaddingValues,
+    // Consultant
     val consultantTopBarContentPadding: PaddingValues,
     val consultantTopBarProgress: Dp,
     val consultantBottomBarContentPadding: PaddingValues,
     val messageTextFiledPadding: PaddingValues,
-    val messageTextPadding: PaddingValues
+    val messageTextPadding: PaddingValues,
+    val chatMessagePadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -75,5 +77,6 @@ internal val eltaDimens = EltaDimens(
     consultantTopBarProgress = 8.dp,
     consultantBottomBarContentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     messageTextFiledPadding = PaddingValues(horizontal = 46.dp),
-    messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+    messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+    chatMessagePadding = PaddingValues(top = 12.dp, bottom = 8.dp, start = 12.dp, end = 12.dp)
 )

@@ -17,7 +17,7 @@ internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
         type = type.toDomainType(),
         owner = type.toDomainOwner(),
-        content = this.data.orEmpty()
+        content = text
     )
 
 internal fun WebimUser.toJSonObject(key: String): JsonObject =
