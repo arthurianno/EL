@@ -21,12 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.RoundedButton
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
-import com.elta.android.presentation.features.consultant.model.MessageType
 import com.elta.android.presentation.theme.GetLocalProperties
 
 private const val MESSAGE_MAX_LINES = 10
@@ -34,7 +34,7 @@ private const val MESSAGE_MAX_LINES = 10
 internal data class ConsultantBottomAppBarWidgetState(
     val connectState: ConnectState,
     val messageText: TextFieldValue,
-    val messageType: MessageType
+    val messageType: WebimMessageType
 )
 
 internal class ConsultantBottomAppBarWidgetModel :
@@ -43,15 +43,15 @@ internal class ConsultantBottomAppBarWidgetModel :
         ConsultantBottomAppBarWidgetState(
             connectState = ConnectState.Offline,
             messageText = TextFieldValue(),
-            messageType = MessageType.Voice
+            messageType = WebimMessageType.Voice
         )
 
     fun setText(text: TextFieldValue?) {
         val newText = text ?: TextFieldValue()
         val messageType = if (newText.text.isEmpty()) {
-            MessageType.Voice
+            WebimMessageType.Voice
         } else {
-            MessageType.Text
+            WebimMessageType.Text
         }
         setState {
             state.value.copy(
@@ -83,12 +83,12 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
 private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
     val state = widgetModel.state.collectAsState()
     val messageType = state.value.messageType
-    val icon = if (messageType == MessageType.Voice) {
+    val icon = if (messageType == WebimMessageType.Voice) {
         R.drawable.ic_voice_message
     } else {
         R.drawable.ic_arrow_down
     }
-    val action = if (messageType == MessageType.Voice) {
+    val action = if (messageType == WebimMessageType.Voice) {
         ConsultantAction.VoiceClick
     } else {
         ConsultantAction.SendMessageClick(state.value.messageText.text)

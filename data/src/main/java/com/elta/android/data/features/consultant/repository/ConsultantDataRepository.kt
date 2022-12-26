@@ -4,6 +4,7 @@ import android.content.Context
 import com.elta.android.data.features.consultant.model.toJSonObject
 import com.elta.android.data.features.consultant.model.toWebimUser
 import com.elta.android.domain.features.consultant.model.WebimChatState
+import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
@@ -13,13 +14,18 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import ru.webim.android.sdk.Message
+import ru.webim.android.sdk.MessageListener
 import ru.webim.android.sdk.MessageStream
+import ru.webim.android.sdk.MessageTracker
 import ru.webim.android.sdk.Webim
 import ru.webim.android.sdk.WebimSession
 import javax.inject.Inject
 
 private const val ACCOUNT_NAME = "wwwmarslabru"
 private const val LOCATION_NAME = "mobile"
+private const val PRIVATE_KEY = "8599c5abfcd7342b5feac6599279ca06"
 
 class ConsultantDataRepository @Inject constructor(
     private val context: Context,
@@ -34,6 +40,7 @@ class ConsultantDataRepository @Inject constructor(
     private var user: WebimUser? = null
     private var _webimSession: WebimSession? = null
         set(value) {
+            _tracker = value?.stream?.newMessageTracker(ChatMessages())
             field = value?.apply {
                 stream.setChatStateListener { _, newState ->
                     webimChatState.value = when (newState) {
@@ -61,6 +68,9 @@ class ConsultantDataRepository @Inject constructor(
                 }
             }
         }
+    private var _tracker: MessageTracker? = null
+    private val tracker: MessageTracker
+        get() = checkNotNull(_tracker)
 
     private val webimSession: WebimSession
         get() = checkNotNull(_webimSession)
@@ -71,7 +81,7 @@ class ConsultantDataRepository @Inject constructor(
             profileRepository.getProfile()
                 .map { it.toWebimUser() }
                 .subscribe({
-                    user = null
+                    user = it
                 }, {
                     user = null
                 })
@@ -82,7 +92,12 @@ class ConsultantDataRepository @Inject constructor(
         _webimSession = Webim.newSessionBuilder()
             .setAccountName(ACCOUNT_NAME)
             .setLocation(LOCATION_NAME)
-            .also { user?.let { user -> it.setVisitorFieldsJson(user.toJSonObject()) } }
+            .also {
+                user?.let { user ->
+                    val toJSonObject = user.toJSonObject(PRIVATE_KEY)
+                    it.setVisitorFieldsJson(toJSonObject)
+                }
+            }
             .setContext(context)
             .build()
     }
@@ -112,4 +127,27 @@ class ConsultantDataRepository @Inject constructor(
 
     override fun chatNetworkStatus(): Flow<WebimStatus> =
         webimNetworkStatus.asStateFlow()
+
+    override fun messages(): Flow<List<WebimMessage>> = flow {
+        tracker.getAllMessages {
+        }
+    }
+
+    private inner class ChatMessages : MessageListener {
+        override fun messageAdded(before: Message?, message: Message) {
+            TODO("Not yet implemented")
+        }
+
+        override fun messageRemoved(message: Message) {
+            TODO("Not yet implemented")
+        }
+
+        override fun messageChanged(from: Message, to: Message) {
+            TODO("Not yet implemented")
+        }
+
+        override fun allMessagesRemoved() {
+            TODO("Not yet implemented")
+        }
+    }
 }
