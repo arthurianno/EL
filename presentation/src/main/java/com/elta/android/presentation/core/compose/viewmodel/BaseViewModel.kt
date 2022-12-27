@@ -60,6 +60,10 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
 
     fun routerIsNotSet(): Boolean = _router == null
 
+    fun backClick() {
+        router.exit()
+    }
+
     infix fun sendAction(action: AC) {
         launch {
             this@BaseViewModel.action.emit(action)

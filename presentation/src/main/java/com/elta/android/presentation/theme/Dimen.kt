@@ -18,6 +18,10 @@ data class EltaDimens(
     val textFieldPopupOffset: DpOffset,
     val borderWidth: Dp,
     val dialogPaddings: PaddingValues,
+    val zero: Dp,
+    val progressSmallWidth: Dp,
+    val progressRegularWidth: Dp,
+    val roundedButton: Dp,
     // Calculator Dims
     val lastWordVertical: Dp,
     val dishCardVerticalSpace: Dp,
@@ -31,7 +35,14 @@ data class EltaDimens(
     val xeValue: PaddingValues,
     val verifyIconSize: Dp,
     val dishChars: PaddingValues,
-    val portionCountHelpPadding: PaddingValues
+    val portionCountHelpPadding: PaddingValues,
+    // Consultant
+    val consultantTopBarContentPadding: PaddingValues,
+    val consultantTopBarProgress: Dp,
+    val consultantBottomBarContentPadding: PaddingValues,
+    val messageTextFiledPadding: PaddingValues,
+    val messageTextPadding: PaddingValues,
+    val chatMessagePadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -46,6 +57,10 @@ internal val eltaDimens = EltaDimens(
     textFieldPopupOffset = DpOffset(16.dp, 0.dp),
     borderWidth = 1.dp,
     dialogPaddings = PaddingValues(top = 24.dp, start = 24.dp, end = 8.dp, bottom = 8.dp),
+    zero = 0.dp,
+    progressSmallWidth = 1.dp,
+    progressRegularWidth = 2.dp,
+    roundedButton = 38.dp,
     lastWordVertical = 12.dp,
     dishCardVerticalSpace = 8.dp,
     dishNameSpace = 12.dp,
@@ -57,5 +72,11 @@ internal val eltaDimens = EltaDimens(
     xeValue = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
     verifyIconSize = 20.dp,
     dishChars = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-    portionCountHelpPadding = PaddingValues(horizontal = 76.dp)
+    portionCountHelpPadding = PaddingValues(horizontal = 76.dp),
+    consultantTopBarContentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+    consultantTopBarProgress = 8.dp,
+    consultantBottomBarContentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+    messageTextFiledPadding = PaddingValues(horizontal = 46.dp),
+    messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+    chatMessagePadding = PaddingValues(top = 12.dp, bottom = 8.dp, start = 12.dp, end = 12.dp)
 )

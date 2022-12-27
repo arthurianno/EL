@@ -42,6 +42,7 @@ class SupportPm @Inject constructor(
 
     private fun handleClick(action: SupportAction) {
         when (action) {
+            SupportAction.ConsultantAction -> router.navigateTo(Screens.ConsultantScreen)
             is SupportAction.CallAction -> router.navigateTo(Screens.CallScreen(action.phone))
             is SupportAction.MailAction -> router.navigateTo(Screens.EmailScreen(action.email))
             SupportAction.ServiceCentersAction -> router.startFlow(Screens.ServiceCentersMap)

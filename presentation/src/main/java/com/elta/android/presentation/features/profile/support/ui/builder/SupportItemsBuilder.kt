@@ -18,6 +18,12 @@ class SupportItemsBuilder @Inject constructor(
             text = resourceProvider.getString(R.string.profile_support_actions_header)
         ),
         SupportActionItem(
+            icon = R.drawable.ic_chat,
+            title = resourceProvider.getString(R.string.profile_support_consultant),
+            subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+            action = SupportAction.ConsultantAction
+        ),
+        SupportActionItem(
             icon = R.drawable.ic_support_call,
             title = resourceProvider.getString(R.string.profile_support_phone_number),
             subTitle = resourceProvider.getString(R.string.profile_support_phone_number_description),
