@@ -5,7 +5,7 @@ import javax.inject.Qualifier
 @MustBeDocumented
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Webim(val type: WebimAnnotationType)
+annotation class WebimAnnotation(val type: WebimAnnotationType)
 
 enum class WebimAnnotationType {
     Account,
