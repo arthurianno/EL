@@ -34,7 +34,7 @@ internal fun WebimUser.toJSonObject(key: String): JsonObject =
 
 internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
-        id = (firstName + secondName + email).hashCode().toString(),
+        id = "$firstName$secondName$email".hashCode().toString(),
         name = "$firstName $secondName"
     )
 
@@ -42,9 +42,7 @@ private fun Message.Type.toDomainType(): WebimMessageType =
     when (this) {
         Message.Type.FILE_FROM_OPERATOR -> WebimMessageType.File
         Message.Type.FILE_FROM_VISITOR -> WebimMessageType.File
-        else -> {
-            WebimMessageType.Text
-        }
+        else -> WebimMessageType.Text
     }
 
 private fun Message.Type.toDomainOwner(): WebimOwner =

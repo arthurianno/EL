@@ -115,7 +115,7 @@ private fun TopBarText(connectState: ConnectState) {
                         contentDescription = null
                     )
 
-                    else -> {}
+                    else -> Unit
                 }
                 HSpacerVerySmall()
                 Text(

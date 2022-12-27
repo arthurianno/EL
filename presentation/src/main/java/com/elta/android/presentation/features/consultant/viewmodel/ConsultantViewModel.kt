@@ -72,9 +72,7 @@ class ConsultantViewModel @Inject constructor(
             ConsultantAction.SearchClick -> currentState
             is ConsultantAction.SendMessageClick -> sendNewMessage(action.text)
             else -> {
-                when (action) {
-                    AppAction.BackPressure -> router.exit()
-                }
+                if (action == AppAction.BackPressure) router.exit()
                 currentState
             }
         }
@@ -91,7 +89,7 @@ class ConsultantViewModel @Inject constructor(
 
             Lifecycle.Event.ON_PAUSE -> webimSession.onPause()
             Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
-            else -> {}
+            else -> Unit
         }
     }
 

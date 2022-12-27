@@ -12,7 +12,6 @@ import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,18 +85,14 @@ class ConsultantDataRepository @Inject constructor(
     private val webimSession: WebimSession
         get() = checkNotNull(_webimSession)
 
-    private val disposableContainer = CompositeDisposable()
-
     init {
-        disposableContainer.add(
-            profileRepository.getProfile()
-                .map { it.toWebimUser() }
-                .subscribe({
-                    user = it
-                }, {
-                    user = null
-                })
-        )
+        profileRepository.getProfile()
+            .map { it.toWebimUser() }
+            .subscribe({
+                user = it
+            }, {
+                user = null
+            })
     }
 
     override fun webimSessionCreate() {

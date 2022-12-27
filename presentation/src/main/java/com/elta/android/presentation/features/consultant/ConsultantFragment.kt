@@ -43,6 +43,9 @@ import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalColors
 
 class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
+    companion object {
+        fun newInstance(): ConsultantFragment = ConsultantFragment()
+    }
 
     override val viewModel: ConsultantViewModel by viewModels { viewModelFactory }
 
@@ -53,13 +56,10 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     override fun Content(viewModel: ConsultantViewModel) {
-        val state = viewModel.state.collectAsState()
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
-            Column(modifier = Modifier.fillMaxSize()) {
-                ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
-                ChatContent(viewModel)
-                ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
-            }
+        Column(modifier = Modifier.fillMaxSize()) {
+            ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
+            ChatContent(viewModel)
+            ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
         }
     }
 
@@ -166,7 +166,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "14:17",
+                            text = "14:17", // TODO Моковые данные. Убрать при реализации получения данных от сервера
                             color = colors.shadeBlack1
                         )
                         HSpacerVerySmall()
@@ -178,9 +178,5 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 }
             }
         }
-    }
-
-    companion object {
-        fun newInstance(): ConsultantFragment = ConsultantFragment()
     }
 }
