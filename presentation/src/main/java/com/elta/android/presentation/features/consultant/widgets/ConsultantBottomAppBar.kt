@@ -46,16 +46,15 @@ internal class ConsultantBottomAppBarWidgetModel :
             messageType = WebimMessageType.Voice
         )
 
-    fun setText(text: TextFieldValue?) {
-        val newText = text ?: TextFieldValue()
-        val messageType = if (newText.text.isEmpty()) {
+    fun setText(value: TextFieldValue?) {
+        val messageType = if (value?.text?.isBlank() == true) {
             WebimMessageType.Voice
         } else {
             WebimMessageType.Text
         }
         setState {
             state.value.copy(
-                messageText = newText,
+                messageText = value ?: TextFieldValue(),
                 messageType = messageType
             )
         }

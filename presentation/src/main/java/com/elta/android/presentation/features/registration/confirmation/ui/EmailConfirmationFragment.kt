@@ -26,7 +26,7 @@ class EmailConfirmationFragment :
         super.onCreate(savedInstanceState)
         arguments?.getString(EXTRA_TOKEN)?.let {
             presentationModel.setToken(it)
-        }
+        } ?: router.exit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
