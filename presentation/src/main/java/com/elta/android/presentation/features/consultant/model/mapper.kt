@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.consultant.model // ktlint-disabl
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
+import com.elta.android.domain.features.consultant.model.WebimUser
+import com.elta.android.domain.features.user.model.Profile
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
 import java.sql.Time
@@ -33,3 +35,9 @@ internal fun WebimMessage.toUi(): ChatUiEntity =
 
 internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
     map { it.toUi() }
+
+internal fun Profile.toWebimUser(): WebimUser =
+    WebimUser(
+        id = "$firstName$secondName$email".hashCode().toString(),
+        name = "$firstName $secondName"
+    )

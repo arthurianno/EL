@@ -1,10 +1,8 @@
 package com.elta.android.data.features.consultant.repository
 
-import android.annotation.SuppressLint
 import android.content.Context
 import com.elta.android.data.features.consultant.model.toDomain
 import com.elta.android.data.features.consultant.model.toJSonObject
-import com.elta.android.data.features.consultant.model.toWebimUser
 import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
@@ -34,7 +32,6 @@ private const val ACCOUNT_NAME = "wwwmarslabru"
 private const val LOCATION_NAME = "mobile"
 private const val PRIVATE_KEY = "8599c5abfcd7342b5feac6599279ca06"
 
-@SuppressLint("CheckResult")
 class ConsultantDataRepository @Inject constructor(
     private val context: Context,
     private val profileRepository: ProfileRepository,
@@ -45,7 +42,6 @@ class ConsultantDataRepository @Inject constructor(
 
     private val webimNetworkStatus: MutableStateFlow<WebimStatus> =
         MutableStateFlow(WebimStatus.Connecting)
-    private var user: WebimUser? = null
     private val _chat: MutableStateFlow<ChatList> =
         MutableStateFlow(ChatList.emptyChat)
     override val chat: StateFlow<ChatList>
@@ -90,26 +86,11 @@ class ConsultantDataRepository @Inject constructor(
     private val webimSession: WebimSession
         get() = checkNotNull(_webimSession)
 
-    init {
-        profileRepository.getProfile()
-            .map { it.toWebimUser() }
-            .subscribe({
-                user = it
-            }, {
-                user = null
-            })
-    }
-
-    override fun webimSessionCreate() {
+    override fun webimSessionCreate(webimUser: WebimUser) {
         _webimSession = Webim.newSessionBuilder()
             .setAccountName(ACCOUNT_NAME)
             .setLocation(LOCATION_NAME)
-            .also {
-                user?.let { user ->
-                    val toJSonObject = user.toJSonObject(PRIVATE_KEY)
-                    it.setVisitorFieldsJson(toJSonObject)
-                }
-            }
+            .setVisitorFieldsJson(webimUser.toJSonObject(PRIVATE_KEY))
             .setContext(context)
             .build()
     }
