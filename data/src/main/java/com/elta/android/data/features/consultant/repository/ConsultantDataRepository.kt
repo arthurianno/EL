@@ -3,7 +3,6 @@ package com.elta.android.data.features.consultant.repository
 import android.content.Context
 import com.elta.android.data.features.consultant.model.toDomain
 import com.elta.android.data.features.consultant.model.toJSonObject
-import com.elta.android.data.features.consultant.model.toWebimUser
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimMessageType
@@ -40,7 +39,6 @@ class ConsultantDataRepository @Inject constructor(
 
     private val webimNetworkStatus: MutableStateFlow<WebimStatus> =
         MutableStateFlow(WebimStatus.Connecting)
-    private var user: WebimUser? = null
     private val _messages: MutableStateFlow<List<WebimMessage>> =
         MutableStateFlow(emptyList())
     override val messages: StateFlow<List<WebimMessage>>
@@ -85,26 +83,11 @@ class ConsultantDataRepository @Inject constructor(
     private val webimSession: WebimSession
         get() = checkNotNull(_webimSession)
 
-    init {
-        profileRepository.getProfile()
-            .map { it.toWebimUser() }
-            .subscribe({
-                user = it
-            }, {
-                user = null
-            })
-    }
-
-    override fun webimSessionCreate() {
+    override fun webimSessionCreate(webimUser: WebimUser) {
         _webimSession = Webim.newSessionBuilder()
             .setAccountName(ACCOUNT_NAME)
             .setLocation(LOCATION_NAME)
-            .also {
-                user?.let { user ->
-                    val toJSonObject = user.toJSonObject(PRIVATE_KEY)
-                    it.setVisitorFieldsJson(toJSonObject)
-                }
-            }
+            .setVisitorFieldsJson(webimUser.toJSonObject(PRIVATE_KEY))
             .setContext(context)
             .build()
     }

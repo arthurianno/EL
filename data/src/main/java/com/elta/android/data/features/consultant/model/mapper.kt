@@ -4,7 +4,6 @@ import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimUser
-import com.elta.android.domain.features.user.model.Profile
 import com.google.gson.JsonObject
 import com.nullgr.core.security.crypto.toHexDecimalString
 import ru.webim.android.sdk.Message
@@ -31,12 +30,6 @@ internal fun WebimUser.toJSonObject(key: String): JsonObject =
         )
         addProperty("hash", this@toJSonObject.toString().hmacSha1Signature(key))
     }
-
-internal fun Profile.toWebimUser(): WebimUser =
-    WebimUser(
-        id = "$firstName$secondName$email".hashCode().toString(),
-        name = "$firstName $secondName"
-    )
 
 private fun Message.Type.toDomainType(): WebimMessageType =
     when (this) {

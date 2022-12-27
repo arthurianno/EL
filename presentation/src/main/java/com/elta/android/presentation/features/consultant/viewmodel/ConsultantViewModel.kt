@@ -8,6 +8,7 @@ import com.elta.android.domain.features.consultant.interactor.WebimGetMessagesUs
 import com.elta.android.domain.features.consultant.interactor.WebimNetworkStateUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimSendMessageUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimSessionUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -17,11 +18,13 @@ import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.model.ConsultantViewState
 import com.elta.android.presentation.features.consultant.model.toUi
+import com.elta.android.presentation.features.consultant.model.toWebimUser
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
 class ConsultantViewModel @Inject constructor(
@@ -29,7 +32,8 @@ class ConsultantViewModel @Inject constructor(
     private val webimNetworkState: WebimNetworkStateUseCase,
     private val webimChatState: WebimChatStateUseCase,
     private val sendMessage: WebimSendMessageUseCase,
-    private val getMessages: WebimGetMessagesUseCase
+    private val getMessages: WebimGetMessagesUseCase,
+    private val getProfile: GetProfileUseCase
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
@@ -80,7 +84,14 @@ class ConsultantViewModel @Inject constructor(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             Lifecycle.Event.ON_CREATE -> {
-                webimSession.create()
+                launch {
+                    getProfile.execute()
+                        .toObservable()
+                        .asFlow()
+                        .map { it.toWebimUser() }
+                        .catch { handleError(it) }
+                        .collectLatest { webimSession.create(it) }
+                }
             }
 
             Lifecycle.Event.ON_RESUME -> {

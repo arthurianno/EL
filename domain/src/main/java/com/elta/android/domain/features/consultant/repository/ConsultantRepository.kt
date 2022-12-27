@@ -4,10 +4,11 @@ import com.elta.android.common.repository.BaseRepository
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
+import com.elta.android.domain.features.consultant.model.WebimUser
 import kotlinx.coroutines.flow.Flow
 
 interface ConsultantRepository : BaseRepository {
-    fun webimSessionCreate()
+    fun webimSessionCreate(webimUser: WebimUser)
     fun webimResume()
     fun webimPause()
     fun webimDestroy()
