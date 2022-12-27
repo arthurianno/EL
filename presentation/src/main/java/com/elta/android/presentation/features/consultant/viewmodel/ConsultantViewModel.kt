@@ -21,7 +21,6 @@ import com.elta.android.presentation.features.consultant.widgets.ConsultantBotto
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ConsultantViewModel @Inject constructor(
@@ -35,7 +34,8 @@ class ConsultantViewModel @Inject constructor(
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
             webimConnectState = ConnectState.Connecting,
-            chat = emptyList()
+            chat = emptyList(),
+            hasNewMessages = false
         )
 
     internal val consultantTopAppBar = ConsultantTopAppBarWidgetModel()
@@ -52,9 +52,13 @@ class ConsultantViewModel @Inject constructor(
         launch {
             getMessages()
                 .catch { handleError(it) }
-                .map { it.toUi() }
-                .collectLatest { messages ->
-                    reduceState { state.value.copy(chat = messages) }
+                .collectLatest {
+                    reduceState {
+                        state.value.copy(
+                            chat = it.messages.toUi(),
+                            hasNewMessages = it.hasNewMessage
+                        )
+                    }
                 }
         }
     }

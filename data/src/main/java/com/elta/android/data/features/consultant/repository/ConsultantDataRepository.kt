@@ -1,11 +1,14 @@
 package com.elta.android.data.features.consultant.repository
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.elta.android.data.features.consultant.model.toDomain
 import com.elta.android.data.features.consultant.model.toJSonObject
 import com.elta.android.data.features.consultant.model.toWebimUser
+import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
+import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimStatus
@@ -24,12 +27,14 @@ import ru.webim.android.sdk.MessageStream.GreetingMessageListener
 import ru.webim.android.sdk.MessageTracker
 import ru.webim.android.sdk.Webim
 import ru.webim.android.sdk.WebimSession
+import java.util.Date
 import javax.inject.Inject
 
 private const val ACCOUNT_NAME = "wwwmarslabru"
 private const val LOCATION_NAME = "mobile"
 private const val PRIVATE_KEY = "8599c5abfcd7342b5feac6599279ca06"
 
+@SuppressLint("CheckResult")
 class ConsultantDataRepository @Inject constructor(
     private val context: Context,
     private val profileRepository: ProfileRepository,
@@ -41,10 +46,10 @@ class ConsultantDataRepository @Inject constructor(
     private val webimNetworkStatus: MutableStateFlow<WebimStatus> =
         MutableStateFlow(WebimStatus.Connecting)
     private var user: WebimUser? = null
-    private val _messages: MutableStateFlow<List<WebimMessage>> =
-        MutableStateFlow(emptyList())
-    override val messages: StateFlow<List<WebimMessage>>
-        get() = _messages.asStateFlow()
+    private val _chat: MutableStateFlow<ChatList> =
+        MutableStateFlow(ChatList.emptyChat)
+    override val chat: StateFlow<ChatList>
+        get() = _chat.asStateFlow()
 
     private var _webimSession: WebimSession? = null
         set(value) {
@@ -137,18 +142,19 @@ class ConsultantDataRepository @Inject constructor(
 
     private inner class ChatMessages : MessageListener {
         override fun messageAdded(before: Message?, message: Message) {
-            _messages.tryEmit(
-                _messages.value
+            emitNewChat(
+                chat.value.messages
                     .toMutableList()
                     .apply {
                         add(message.toDomain())
-                    }
+                    },
+                hasNewMessages = true
             )
         }
 
         override fun messageRemoved(message: Message) {
-            _messages.tryEmit(
-                _messages.value
+            emitNewChat(
+                _chat.value.messages
                     .toMutableList()
                     .apply {
                         remove(message.toDomain())
@@ -157,9 +163,9 @@ class ConsultantDataRepository @Inject constructor(
         }
 
         override fun messageChanged(from: Message, to: Message) {
-            val oldMessages = _messages.value.toMutableList()
+            val oldMessages = _chat.value.messages.toMutableList()
             val indexMessage = oldMessages.indexOf(from.toDomain())
-            _messages.tryEmit(
+            emitNewChat(
                 oldMessages
                     .apply {
                         removeAt(indexMessage)
@@ -169,24 +175,35 @@ class ConsultantDataRepository @Inject constructor(
         }
 
         override fun allMessagesRemoved() {
-            _messages.tryEmit(emptyList())
+            _chat.tryEmit(ChatList.emptyChat)
         }
+    }
+
+    private fun emitNewChat(
+        newList: MutableList<WebimMessage>,
+        hasNewMessages: Boolean = false
+    ) {
+        _chat.tryEmit(chat.value.copy(messages = newList, hasNewMessage = hasNewMessages))
     }
 
     private inner class ChatGreetingListener : GreetingMessageListener {
         override fun greetingMessage(message: String) {
-            _messages.tryEmit(
-                _messages.value
+            emitNewChat(
+                _chat.value.messages
                     .toMutableList()
                     .apply {
                         add(
                             WebimMessage(
                                 WebimOwner.Operator,
                                 WebimMessageType.Text,
-                                content = message
+                                content = message,
+                                time = Date().time,
+                                sendStatus = WebimMessageSendStatus.Sent,
+                                isRead = true
                             )
                         )
-                    }
+                    },
+                hasNewMessages = true
             )
         }
     }

@@ -42,7 +42,8 @@ data class EltaDimens(
     val consultantBottomBarContentPadding: PaddingValues,
     val messageTextFiledPadding: PaddingValues,
     val messageTextPadding: PaddingValues,
-    val chatMessagePadding: PaddingValues
+    val chatMessagePadding: PaddingValues,
+    val chatPadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -78,5 +79,6 @@ internal val eltaDimens = EltaDimens(
     consultantBottomBarContentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     messageTextFiledPadding = PaddingValues(horizontal = 46.dp),
     messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-    chatMessagePadding = PaddingValues(top = 12.dp, bottom = 8.dp, start = 12.dp, end = 12.dp)
+    chatMessagePadding = PaddingValues(top = 12.dp, bottom = 8.dp, start = 12.dp, end = 12.dp),
+    chatPadding = PaddingValues(top = 12.dp, bottom = 12.dp, start = 12.dp, end = 12.dp)
 )
