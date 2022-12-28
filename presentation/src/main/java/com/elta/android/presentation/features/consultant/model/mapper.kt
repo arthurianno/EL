@@ -5,6 +5,9 @@ import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.user.model.Profile
+import com.nullgr.core.date.CommonFormats
+import com.nullgr.core.date.toStringWithFormat
+import java.sql.Time
 
 internal fun WebimStatus.toUi(): ConnectState =
     when (this) {
@@ -24,7 +27,10 @@ internal fun WebimMessage.toUi(): ChatUiEntity =
     ChatUiEntity(
         owner = owner,
         type = type,
-        text = content
+        text = content,
+        date = Time(time).toStringWithFormat(CommonFormats.FORMAT_TIME),
+        sendStatus = sendStatus,
+        isRead = isRead
     )
 
 internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =

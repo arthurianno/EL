@@ -1,12 +1,15 @@
 package com.elta.android.data.features.consultant.model // ktlint-disable filename
 
 import com.elta.android.domain.features.consultant.model.WebimMessage
+import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimUser
+import com.elta.android.domain.features.user.model.Profile
 import com.google.gson.JsonObject
 import com.nullgr.core.security.crypto.toHexDecimalString
 import ru.webim.android.sdk.Message
+import ru.webim.android.sdk.Message.SendStatus
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -16,7 +19,10 @@ internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
         type = type.toDomainType(),
         owner = type.toDomainOwner(),
-        content = text
+        content = text,
+        time = time,
+        sendStatus = sendStatus.toDomain(),
+        isRead = isReadByOperator
     )
 
 internal fun WebimUser.toJSonObject(key: String): JsonObject =
@@ -29,6 +35,18 @@ internal fun WebimUser.toJSonObject(key: String): JsonObject =
             }
         )
         addProperty("hash", this@toJSonObject.toString().hmacSha1Signature(key))
+    }
+
+internal fun Profile.toWebimUser(): WebimUser =
+    WebimUser(
+        id = "$firstName$secondName$email".hashCode().toString(),
+        name = "$firstName $secondName"
+    )
+
+private fun SendStatus.toDomain(): WebimMessageSendStatus =
+    when (this) {
+        SendStatus.SENDING -> WebimMessageSendStatus.Sending
+        SendStatus.SENT -> WebimMessageSendStatus.Sent
     }
 
 private fun Message.Type.toDomainType(): WebimMessageType =

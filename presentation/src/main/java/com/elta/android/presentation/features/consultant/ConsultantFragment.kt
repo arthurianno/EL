@@ -17,17 +17,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
+import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -67,6 +71,8 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     private fun ColumnScope.ChatContent(viewModel: ConsultantViewModel) {
         GetLocalProperties { dimens, brash, colors, shapes, types ->
             val state = viewModel.state.collectAsState()
+            val hasNewMessages = state.value.hasNewMessages
+            val listState = rememberLazyListState()
             Box(
                 modifier = Modifier.Companion
                     .weight(1f)
@@ -80,9 +86,16 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
+                    LaunchedEffect(key1 = hasNewMessages) {
+                        if (hasNewMessages) {
+                            listState.scrollToItem(state.value.chat.size)
+                        }
+                    }
                     LazyColumn(
                         modifier = Modifier.align(Alignment.BottomCenter),
-                        verticalArrangement = Arrangement.spacedBy(dimens.mediumDim)
+                        verticalArrangement = Arrangement.spacedBy(dimens.mediumDim),
+                        state = listState,
+                        contentPadding = dimens.chatMessagePadding
                     ) {
                         items(items = state.value.chat) { message ->
                             when (message.owner) {
@@ -100,9 +113,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     private fun UserMessage(message: ChatUiEntity) {
         GetLocalProperties { dimens, brash, colors, shapes, types ->
             Box(
-                modifier = Modifier
-                    .padding(horizontal = dimens.halfMediumDim)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 ChatMessage(message = message, color = colors.shadeBlack4)
@@ -114,12 +125,10 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     private fun OperatorMessage(message: ChatUiEntity) {
         GetLocalProperties { dimens, brash, colors, shapes, types ->
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimens.halfMediumDim),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomStart
             ) {
-                Row {
+                Row(verticalAlignment = Alignment.Bottom) {
                     Image(
                         painter = painterResource(id = R.drawable.img_round_elta),
                         contentDescription = null
@@ -166,14 +175,28 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "14:17", // TODO Моковые данные. Убрать при реализации получения данных от сервера
+                            text = message.date,
                             color = colors.shadeBlack1
                         )
-                        HSpacerVerySmall()
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_message_received),
-                            contentDescription = null
-                        )
+                        if (message.owner == WebimOwner.User) {
+                            HSpacerVerySmall()
+                            Image(
+                                painter = painterResource(
+                                    id = when (message.sendStatus) {
+                                        WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
+                                        WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
+                                    }
+                                ),
+                                colorFilter = ColorFilter.tint(
+                                    if (message.isRead) {
+                                        colors.gGreenB
+                                    } else {
+                                        colors.shadeBlack1
+                                    }
+                                ),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }

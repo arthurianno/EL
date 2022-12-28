@@ -1,6 +1,6 @@
 package com.elta.android.data.di
 
-import com.elta.android.common.di.qualifires.Webim
+import com.elta.android.common.di.qualifires.WebimAnnotation
 import com.elta.android.common.di.qualifires.WebimAnnotationType
 import dagger.Module
 import dagger.Provides
@@ -13,14 +13,14 @@ private const val PRIVATE_KEY = "8599c5abfcd7342b5feac6599279ca06"
 class WebimModule {
 
     @Provides
-    @Webim(WebimAnnotationType.Account)
+    @WebimAnnotation(WebimAnnotationType.Account)
     fun provideWebimAccountName(): String = ACCOUNT_NAME
 
     @Provides
-    @Webim(WebimAnnotationType.Location)
+    @WebimAnnotation(WebimAnnotationType.Location)
     fun provideWebimLocationName(): String = LOCATION_NAME
 
     @Provides
-    @Webim(WebimAnnotationType.PrivateKey)
+    @WebimAnnotation(WebimAnnotationType.PrivateKey)
     fun provideWebimPrivateKey(): String = PRIVATE_KEY
 }

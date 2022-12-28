@@ -39,7 +39,8 @@ class ConsultantViewModel @Inject constructor(
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
             webimConnectState = ConnectState.Connecting,
-            chat = emptyList()
+            chat = emptyList(),
+            hasNewMessages = false
         )
 
     internal val consultantTopAppBar = ConsultantTopAppBarWidgetModel()
@@ -56,9 +57,13 @@ class ConsultantViewModel @Inject constructor(
         launch {
             getMessages()
                 .catch { handleError(it) }
-                .map { it.toUi() }
-                .collectLatest { messages ->
-                    reduceState { state.value.copy(chat = messages) }
+                .collectLatest {
+                    reduceState {
+                        state.value.copy(
+                            chat = it.messages.toUi(),
+                            hasNewMessages = it.hasNewMessage
+                        )
+                    }
                 }
         }
     }
