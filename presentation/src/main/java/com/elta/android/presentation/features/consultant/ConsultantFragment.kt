@@ -2,10 +2,13 @@ package com.elta.android.presentation.features.consultant
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,10 +18,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +43,8 @@ import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
+import com.elta.android.presentation.core.compose.common.ShowBottomSheetDialog
+import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
@@ -58,12 +68,71 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
         lifecycle.addObserver(viewModel)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: ConsultantViewModel) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
-            ChatContent(viewModel)
-            ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
+        val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+        val event = viewModel.event.collectAsState(initial = null)
+        LaunchedEffect(key1 = event.value) {
+            when (event.value) {
+                ShowBottomSheetDialog -> sheetState.show()
+            }
+        }
+        GetLocalProperties { dimens, brash, colors, shapes, types ->
+            ModalBottomSheetLayout(
+                sheetContent = BottomSheetDialog(),
+                sheetState = sheetState,
+                sheetShape = shapes.sheet,
+                modifier = Modifier.systemBarsPadding()
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
+                    ChatContent(viewModel)
+                    ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun BottomSheetDialog(): @Composable (ColumnScope.() -> Unit) = {
+        BottomSheetMenuItem(
+            image = R.drawable.img_photo_select,
+            text = R.string.consultant_bottom_sheet_item_select_photo,
+            action = ConsultantAction.SelectPhotoClick
+        )
+        BottomSheetMenuItem(
+            image = R.drawable.img_camera,
+            text = R.string.consultant_bottom_sheet_item_make_photo,
+            action = ConsultantAction.MakePhotoClick
+        )
+        BottomSheetMenuItem(
+            image = R.drawable.img_file,
+            text = R.string.consultant_bottom_sheet_item_select_file,
+            action = ConsultantAction.SelectFileClick
+        )
+    }
+
+    @Composable
+    private fun BottomSheetMenuItem(
+        @DrawableRes image: Int,
+        @StringRes text: Int,
+        action: ConsultantAction
+    ) {
+        GetLocalProperties { dimens, _, _, _, _ ->
+            Row(
+                modifier = Modifier
+                    .clickable { viewModel.sendAction(action) }
+                    .fillMaxWidth()
+                    .padding(dimens.consultantBottomSheetItemPadding)
+            ) {
+                Image(
+                    painter = painterResource(id = image),
+                    contentDescription = null
+                )
+                HSpacerMedium()
+                Text(text = stringResource(id = text))
+            }
         }
     }
 

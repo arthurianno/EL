@@ -9,4 +9,7 @@ sealed class ConsultantAction : Action {
     data class SendMessageClick(val text: String) : ConsultantAction()
     data class ChatMessageClick(val message: ChatUiEntity) : ConsultantAction()
     data class ChatMessageLongClick(val message: ChatUiEntity) : ConsultantAction()
+    object SelectPhotoClick : ConsultantAction()
+    object MakePhotoClick : ConsultantAction()
+    object SelectFileClick : ConsultantAction()
 }

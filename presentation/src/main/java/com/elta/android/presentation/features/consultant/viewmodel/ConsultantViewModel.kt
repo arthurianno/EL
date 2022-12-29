@@ -13,6 +13,8 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
+import com.elta.android.presentation.core.compose.common.HideBottomSheetDialog
+import com.elta.android.presentation.core.compose.common.ShowBottomSheetDialog
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
@@ -81,7 +83,22 @@ class ConsultantViewModel @Inject constructor(
             ConsultantAction.SearchClick -> currentState
             is ConsultantAction.SendMessageClick -> sendNewMessage(action.text)
             else -> {
-                if (action == AppAction.BackPressure) router.exit()
+                when (action) {
+                    ConsultantAction.SelectPhotoClick -> {
+                        sendEvent(HideBottomSheetDialog, 100)
+                    }
+
+                    ConsultantAction.MakePhotoClick -> {
+                        sendEvent(HideBottomSheetDialog, 100)
+                    }
+
+                    ConsultantAction.SelectFileClick -> {
+                        sendEvent(HideBottomSheetDialog, 100)
+                    }
+
+                    ConsultantAction.FileClick -> sendEvent(ShowBottomSheetDialog, 100L)
+                    AppAction.BackPressure -> router.exit()
+                }
                 currentState
             }
         }
