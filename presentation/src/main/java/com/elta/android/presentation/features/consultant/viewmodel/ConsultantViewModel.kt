@@ -1,8 +1,11 @@
 package com.elta.android.presentation.features.consultant.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.elta.android.domain.features.consultant.interactor.PhotoCreateUseCase
+import com.elta.android.domain.features.consultant.interactor.PhotoDeleteUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimChatStateUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimGetMessagesUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimNetworkStateUseCase
@@ -13,8 +16,9 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
-import com.elta.android.presentation.core.compose.common.HideBottomSheetDialog
-import com.elta.android.presentation.core.compose.common.ShowBottomSheetDialog
+import com.elta.android.presentation.core.compose.common.FileSelect
+import com.elta.android.presentation.core.compose.common.OpenCamera
+import com.elta.android.presentation.core.compose.common.PhotoSelect
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
@@ -23,6 +27,8 @@ import com.elta.android.presentation.features.consultant.model.toUi
 import com.elta.android.presentation.features.consultant.model.toWebimUser
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
+import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBarWidgetModel
+import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBarWidgetModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -35,18 +41,25 @@ class ConsultantViewModel @Inject constructor(
     private val webimChatState: WebimChatStateUseCase,
     private val sendMessage: WebimSendMessageUseCase,
     private val getMessages: WebimGetMessagesUseCase,
-    private val getProfile: GetProfileUseCase
+    private val getProfile: GetProfileUseCase,
+    private val photoCreate: PhotoCreateUseCase,
+    private val photoDelete: PhotoDeleteUseCase
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
             webimConnectState = ConnectState.Connecting,
             chat = emptyList(),
-            hasNewMessages = false
+            previewPhoto = Uri.EMPTY,
+            hasNewMessages = false,
+            isOpenBottomSheet = false,
+            isPhotoPreview = false
         )
 
     internal val consultantTopAppBar = ConsultantTopAppBarWidgetModel()
     internal val consultantBottomAppBar = ConsultantBottomAppBarWidgetModel()
+    internal val previewTopAppBar = PhotoPreviewTopAppBarWidgetModel()
+    internal val previewBottomAppBar = PhotoPreviewBottomAppBarWidgetModel()
 
     init {
         launch {
@@ -72,8 +85,23 @@ class ConsultantViewModel @Inject constructor(
 
     override val widgets: List<BaseWidgetModel<*>> = listOf(
         consultantTopAppBar,
-        consultantBottomAppBar
+        consultantBottomAppBar,
+        previewTopAppBar,
+        previewBottomAppBar
     ).actionObserve()
+
+    fun setSheetVisibleState(isVisible: Boolean) {
+        reduceState { state.value.copy(isOpenBottomSheet = isVisible) }
+    }
+
+    fun createNewPhoto(): Uri =
+        photoCreate().also {
+            reduceState { state.value.copy(previewPhoto = it) }
+        }
+
+    fun showPhotoPreview() {
+        reduceState { state.value.copy(isPhotoPreview = true) }
+    }
 
     override fun reduceStateByAction(
         currentState: ConsultantViewState,
@@ -82,22 +110,34 @@ class ConsultantViewModel @Inject constructor(
         when (action) {
             ConsultantAction.SearchClick -> currentState
             is ConsultantAction.SendMessageClick -> sendNewMessage(action.text)
+            ConsultantAction.SelectPhotoClick -> {
+                sendEvent(PhotoSelect())
+                currentState.copy(isOpenBottomSheet = false)
+            }
+
+            ConsultantAction.MakePhotoClick -> {
+                sendEvent(OpenCamera())
+                currentState.copy(isOpenBottomSheet = false)
+            }
+
+            ConsultantAction.SelectFileClick -> {
+                sendEvent(FileSelect())
+                currentState.copy(isOpenBottomSheet = false)
+            }
+
+            ConsultantAction.FileClick -> currentState.copy(isOpenBottomSheet = true)
+            ConsultantAction.PreviewBackPressure -> {
+                photoDelete(currentState.previewPhoto)
+                currentState.copy(previewPhoto = Uri.EMPTY, isPhotoPreview = false)
+            }
+
+            ConsultantAction.PreviewSendClick -> {
+                currentState.copy(isPhotoPreview = false)
+            }
+
             else -> {
                 when (action) {
-                    ConsultantAction.SelectPhotoClick -> {
-                        sendEvent(HideBottomSheetDialog, 100)
-                    }
-
-                    ConsultantAction.MakePhotoClick -> {
-                        sendEvent(HideBottomSheetDialog, 100)
-                    }
-
-                    ConsultantAction.SelectFileClick -> {
-                        sendEvent(HideBottomSheetDialog, 100)
-                    }
-
-                    ConsultantAction.FileClick -> sendEvent(ShowBottomSheetDialog, 100L)
-                    AppAction.BackPressure -> router.exit()
+                    AppAction.BackPressure -> backClick()
                 }
                 currentState
             }

@@ -1,7 +1,12 @@
 package com.elta.android.presentation.features.consultant.model
 
+import android.net.Uri
+
 data class ConsultantViewState(
     val webimConnectState: ConnectState,
     val chat: List<ChatUiEntity>,
-    val hasNewMessages: Boolean
+    val previewPhoto: Uri,
+    val hasNewMessages: Boolean,
+    val isOpenBottomSheet: Boolean,
+    val isPhotoPreview: Boolean
 )

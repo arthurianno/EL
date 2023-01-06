@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.consultant.repository
 
+import android.net.Uri
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
@@ -17,4 +18,7 @@ interface ConsultantRepository : BaseRepository {
     fun chatState(): Flow<WebimChatState>
     fun chatNetworkStatus(): Flow<WebimStatus>
     val chat: Flow<ChatList>
+
+    fun createPhoto(): Uri
+    fun deletePhoto(uri: Uri)
 }

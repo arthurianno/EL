@@ -12,4 +12,6 @@ sealed class ConsultantAction : Action {
     object SelectPhotoClick : ConsultantAction()
     object MakePhotoClick : ConsultantAction()
     object SelectFileClick : ConsultantAction()
+    object PreviewBackPressure : ConsultantAction()
+    object PreviewSendClick : ConsultantAction()
 }

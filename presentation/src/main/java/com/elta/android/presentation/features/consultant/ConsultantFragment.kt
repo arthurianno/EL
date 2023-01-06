@@ -1,7 +1,11 @@
 package com.elta.android.presentation.features.consultant
 
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -38,12 +42,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.net.toFile
 import androidx.fragment.app.viewModels
+import coil.compose.AsyncImage
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.common.ShowBottomSheetDialog
+import com.elta.android.presentation.core.compose.common.FileSelect
+import com.elta.android.presentation.core.compose.common.OpenCamera
+import com.elta.android.presentation.core.compose.common.PhotoSelect
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
@@ -53,8 +61,17 @@ import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBar
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBar
+import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBar
+import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBar
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalColors
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
+import java.io.File
+
+private const val IMAGE = "image/*"
+private const val DOCUMENT = "*/*"
 
 class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     companion object {
@@ -62,6 +79,20 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     }
 
     override val viewModel: ConsultantViewModel by viewModels { viewModelFactory }
+
+    private val makePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+        if (it) {
+            viewModel.showPhotoPreview()
+        }
+    }
+    private val getPhoto = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        Log.d("MYTAG", "GET PHOTO ${it?.toFile()}: ")
+    }
+
+    private val getDocument = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        val file = File(it?.path)
+        Log.d("MYTAG", "DOCUMENT: --> ${file.extension}")
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,29 +104,72 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     override fun Content(viewModel: ConsultantViewModel) {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val event = viewModel.event.collectAsState(initial = null)
+        val state = viewModel.state.collectAsState()
+        LaunchedEffect(key1 = sheetState.currentValue) {
+            viewModel.setSheetVisibleState(sheetState.isVisible)
+        }
+        LaunchedEffect(key1 = state.value.isOpenBottomSheet) {
+            if (state.value.isOpenBottomSheet) {
+                sheetState.show()
+            } else {
+                sheetState.hide()
+            }
+        }
         LaunchedEffect(key1 = event.value) {
             when (event.value) {
-                ShowBottomSheetDialog -> sheetState.show()
+                is OpenCamera -> makePhoto.launch(viewModel.createNewPhoto())
+                is PhotoSelect -> getPhoto.launch(IMAGE)
+                is FileSelect -> getDocument.launch(DOCUMENT)
             }
         }
         GetLocalProperties { dimens, brash, colors, shapes, types ->
-            ModalBottomSheetLayout(
-                sheetContent = BottomSheetDialog(),
-                sheetState = sheetState,
-                sheetShape = shapes.sheet,
-                modifier = Modifier.systemBarsPadding()
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
-                    ChatContent(viewModel)
-                    ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
+            if (state.value.isPhotoPreview) {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .background(color = colors.black)
+                        .systemBarsPadding()
+                ) {
+                    PhotoPreviewTopAppBar(widgetModel = viewModel.previewTopAppBar)
+                    PreviewPhoto(state.value.previewPhoto)
+                    PhotoPreviewBottomAppBar(widgetModel = viewModel.previewBottomAppBar)
+                }
+            } else {
+                ModalBottomSheetLayout(
+                    sheetContent = { BottomSheetDialog() },
+                    sheetState = sheetState,
+                    sheetShape = shapes.sheet
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        ConsultantTopAppBar(widgetModel = viewModel.consultantTopAppBar)
+                        ChatContent()
+                        ConsultantBottomAppBar(widgetModel = viewModel.consultantBottomAppBar)
+                    }
                 }
             }
         }
     }
 
     @Composable
-    private fun BottomSheetDialog(): @Composable (ColumnScope.() -> Unit) = {
+    private fun ColumnScope.PreviewPhoto(uri: Uri) {
+        GetLocalProperties { dimens, _, colors, _, _ ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(color = colors.black)
+                    .padding(dimens.photoPreviewContentPadding)
+            ) {
+                AsyncImage(
+                    model = uri,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BottomSheetDialog() {
         BottomSheetMenuItem(
             image = R.drawable.img_photo_select,
             text = R.string.consultant_bottom_sheet_item_select_photo,
@@ -113,6 +187,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
         )
     }
 
+    @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     private fun BottomSheetMenuItem(
         @DrawableRes image: Int,
@@ -120,9 +195,17 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
         action: ConsultantAction
     ) {
         GetLocalProperties { dimens, _, _, _, _ ->
+            val storageAccessPermission =
+                rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
             Row(
                 modifier = Modifier
-                    .clickable { viewModel.sendAction(action) }
+                    .clickable {
+                        if (storageAccessPermission.status == PermissionStatus.Granted) {
+                            viewModel.sendAction(action)
+                        } else {
+                            storageAccessPermission.launchPermissionRequest()
+                        }
+                    }
                     .fillMaxWidth()
                     .padding(dimens.consultantBottomSheetItemPadding)
             ) {
@@ -137,7 +220,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     }
 
     @Composable
-    private fun ColumnScope.ChatContent(viewModel: ConsultantViewModel) {
+    private fun ColumnScope.ChatContent() {
         GetLocalProperties { dimens, brash, colors, shapes, types ->
             val state = viewModel.state.collectAsState()
             val hasNewMessages = state.value.hasNewMessages

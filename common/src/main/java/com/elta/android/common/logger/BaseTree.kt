@@ -1,6 +1,6 @@
 package com.elta.android.common.logger
 
-import android.os.Environment
+import android.content.Context
 import android.util.Log
 import com.elta.android.common.logger.model.DeviceDetails
 import com.elta.android.common.logger.model.LogRecord
@@ -17,7 +17,10 @@ import java.util.Locale
 
 internal const val DEFAULT_TAG = "ELTA_LOG_TAG"
 
-abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree() {
+abstract class BaseTree(
+    private val deviceDetails: DeviceDetails,
+    context: Context
+) : Timber.Tree() {
 
     private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS a zzz", Locale.getDefault())
@@ -26,10 +29,7 @@ abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree(
         FirebaseDatabase.getInstance().getReference("logs/$date/${deviceDetails.deviceId}")
 
     private val logsFile by lazy {
-        File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-            "EltaApplicationLog_$date.txt"
-        ).apply {
+        File(context.getExternalFilesDir("logs"), "EltaApplicationLog_$date.txt").apply {
             if (!exists()) {
                 runCatching { createNewFile() }
                     .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
@@ -54,10 +54,9 @@ abstract class BaseTree(private val deviceDetails: DeviceDetails) : Timber.Tree(
     }
 
     protected fun saveLogInFile(logRecord: LogRecord) {
-        BufferedWriter(FileWriter(logsFile, true)).also { file ->
+        BufferedWriter(FileWriter(logsFile, true)).use { file ->
             runCatching { file writeLog logRecord }
                 .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
-            file.close()
         }
     }
 

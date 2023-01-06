@@ -689,4 +689,5 @@
     <string name="consultant_bottom_sheet_item_select_photo">Выбрать фото</string>
     <string name="consultant_bottom_sheet_item_make_photo">Сделать фото</string>
     <string name="consultant_bottom_sheet_item_select_file">Выбрать файл</string>
+    <string name="consultant_send_photo">Отправить фото</string>
 </resources>

@@ -27,7 +27,6 @@
 
         <activity
             android:name=".presentation.features.app.ui.AppActivity"
-            android:launchMode="singleInstance"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
@@ -49,7 +48,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
+            android:authorities="com.elta.android.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
