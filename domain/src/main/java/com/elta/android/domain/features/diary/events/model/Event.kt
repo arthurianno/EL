@@ -20,5 +20,6 @@ data class Event(
     val insulinType: InsulinType?,
     val medicament: String?,
     val type: EventType,
-    val state: State
+    val state: State,
+    val glucometerSerialNumber: String?
 )

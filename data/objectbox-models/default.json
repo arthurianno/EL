@@ -81,7 +81,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "19:6583631272062989855",
+      "lastPropertyId": "20:6417863057937775068",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -173,6 +173,11 @@
         {
           "id": "19:6583631272062989855",
           "name": "medicament",
+          "type": 9
+        },
+        {
+          "id": "20:6417863057937775068",
+          "name": "glucometerSerialNumber",
           "type": 9
         }
       ],
@@ -505,7 +510,7 @@
     },
     {
       "id": "13:4893127598039866661",
-      "lastPropertyId": "10:6655224264396305099",
+      "lastPropertyId": "11:7426528494982581987",
       "name": "GlucometerInfoCachedDto",
       "properties": [
         {
@@ -552,6 +557,11 @@
         {
           "id": "10:6655224264396305099",
           "name": "lastSyncedEvent",
+          "type": 9
+        },
+        {
+          "id": "11:7426528494982581987",
+          "name": "glucometerSerialNumber",
           "type": 9
         }
       ],

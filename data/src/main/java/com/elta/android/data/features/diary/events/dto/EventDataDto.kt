@@ -12,5 +12,6 @@ data class EventDataDto(
     @SerializedName("mealTagging") val mealTag: MealTagDto?,
     @SerializedName("insulinType") val insulinType: InsulinTypeDto?,
     @SerializedName("insulinMedicament") val insulinMedicament: InsulinMedicamentDataDto?,
-    @SerializedName("eventType") val type: EventTypeDto
+    @SerializedName("eventType") val type: EventTypeDto,
+    @SerializedName("glucometerSerialNumber") val glucometerSerialNumber: String?
 )

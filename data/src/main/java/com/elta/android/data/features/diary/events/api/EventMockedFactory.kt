@@ -53,7 +53,8 @@ object EventMockedFactory {
                 mealTag = mealTag,
                 insulinType = insulinType,
                 insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
-                type = type
+                type = type,
+                glucometerSerialNumber = null
             )
         )
 }

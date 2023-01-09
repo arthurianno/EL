@@ -38,6 +38,7 @@ object EventTestFactory {
             insulinType = insulin?.type,
             medicament = insulin?.drug,
             type = type,
-            state = State.CREATED
+            state = State.CREATED,
+            glucometerSerialNumber = null
         )
 }

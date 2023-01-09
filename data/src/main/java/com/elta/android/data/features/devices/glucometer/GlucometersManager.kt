@@ -87,7 +87,8 @@ class GlucometersManager @Inject constructor(
     private val infoCommands = listOf(
         Commands.GetDate,
         Commands.GetBatteryAndTemperature,
-        Commands.GetVersion
+        Commands.GetVersion,
+        Commands.Serial
     )
 
     fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
@@ -161,7 +162,9 @@ class GlucometersManager @Inject constructor(
             }
             .takeUntil { it.isEmptyEvent() }
             .collectInto(mutableListOf<String>()) { responses, response ->
-                if (!response.isEmptyEvent()) responses.add(response)
+                if (!response.isEmptyEvent()) {
+                    responses.add(response)
+                }
             }
             .map { events ->
                 events.forEach {
@@ -170,7 +173,20 @@ class GlucometersManager @Inject constructor(
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
-                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                            val glucometerInfo =
+                                glucometersInfoCache.get(
+                                    CommonConditions.ById(
+                                        address.hashCode().toLong()
+                                    )
+                                )
+                            events.map { event ->
+                                eventBuilder.buildFrom(
+                                    userId = userId,
+                                    glucometerId = address,
+                                    response = event,
+                                    glucometerSerialNumber = glucometerInfo?.glucometerSerialNumber
+                                )
+                            }
                         }
                     }
                 } ?: emptyList()
@@ -389,7 +405,7 @@ class GlucometersManager @Inject constructor(
     private fun String.isError(): Boolean = contains("error")
     private fun String.isEvent(): Boolean = startsWith("rd")
 
-    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compotable
+    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compatible
     private fun isSupported(compatible: String): Boolean = true
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
@@ -425,7 +441,8 @@ class GlucometersManager @Inject constructor(
                     Commands.SetTime(ZonedDateTime.now()),
                     Commands.GetDate,
                     Commands.GetBatteryAndTemperature,
-                    Commands.GetVersion
+                    Commands.GetVersion,
+                    Commands.Serial
                 )
 
                 Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
@@ -438,7 +455,7 @@ class GlucometersManager @Inject constructor(
                 Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
 
                 Observable.range(0, EVENTS_COUNT)
-                    .map { index -> Commands.ReadEvent(index) as GlucometerCommand }
+                    .map<GlucometerCommand> { index -> Commands.ReadEvent(index) }
                     .startWith(startCommands)
                     .concatMap { command ->
                         Observable.just(command).delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
@@ -485,22 +502,40 @@ class GlucometersManager @Inject constructor(
             }
             .map(SyncResponseHolder::events)
             .map { events ->
+                val glucometerInfo =
+                    glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
-                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                            events.map { event ->
+                                eventBuilder.buildFrom(
+                                    userId,
+                                    address,
+                                    event,
+                                    glucometerInfo?.glucometerSerialNumber
+                                )
+                            }
                         }
                     }
                 } ?: emptyList()
             }
-            .map { events -> filterExistingEvents(events, getCachedEvents(events)) }
+            .map { events ->
+                val filterExistingEvents = filterExistingEvents(events, getCachedEvents(events))
+                filterExistingEvents
+            }
             .flatMap {
-                if (it.isEmpty()) Observable.empty()
-                else Observable.just(it)
+                if (it.isEmpty()) {
+                    Observable.empty()
+                } else {
+                    Observable.just(it)
+                }
             }
             .onErrorResumeNext { e: Throwable ->
-                if (e is BleException) Observable.error(GlucometerSyncError(GlucometerOfflineError))
-                else Observable.error(GlucometerSyncError(e))
+                if (e is BleException) {
+                    Observable.error(GlucometerSyncError(GlucometerOfflineError))
+                } else {
+                    Observable.error(GlucometerSyncError(e))
+                }
             }
 
     private fun filterConnectedDevices(
@@ -536,10 +571,13 @@ class GlucometersManager @Inject constructor(
         fromGlucometer: List<GlucometerEventDto>,
         cached: List<EventCachedDto>
     ): List<GlucometerEventDto> =
-        if (cached.isEmpty()) fromGlucometer
-        else arrayListOf<GlucometerEventDto>().apply {
-            fromGlucometer.forEach { event ->
-                if (cached.find { it.secondaryId == event.id } == null) add(event)
+        if (cached.isEmpty()) {
+            fromGlucometer
+        } else {
+            arrayListOf<GlucometerEventDto>().apply {
+                fromGlucometer.forEach { event ->
+                    if (cached.find { it.secondaryId == event.id } == null) add(event)
+                }
             }
         }
 

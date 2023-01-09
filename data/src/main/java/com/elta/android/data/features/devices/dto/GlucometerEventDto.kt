@@ -6,5 +6,6 @@ data class GlucometerEventDto(
     val id: String,
     val date: ZonedDateTime?,
     val temperature: Int?,
-    val value: Double?
+    val value: Double?,
+    val glucometerSerialNumber: String?
 )

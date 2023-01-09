@@ -52,4 +52,8 @@ object Commands {
     data class SetPin(val pin: String) : GlucometerCommand {
         override fun toGlucometerString(): String = "pin.$pin"
     }
+
+    object Serial : GlucometerCommand {
+        override fun toGlucometerString(): String = "serial"
+    }
 }

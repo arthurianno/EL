@@ -24,5 +24,6 @@ data class EventCachedDto(
     val mealTag: String?,
     val insulinType: String?,
     val medicament: String?,
-    val state: String
+    val state: String,
+    val glucometerSerialNumber: String?
 )
