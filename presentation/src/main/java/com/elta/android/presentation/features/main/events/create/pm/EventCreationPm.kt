@@ -150,7 +150,8 @@ class EventCreationPm @Inject constructor(
             insulin = form.insulin?.type,
             medicament = form.insulin?.drug,
             note = form.note,
-            eventType = checkNotNull(form.eventType)
+            eventType = checkNotNull(form.eventType),
+            glucometerSerialNumber = null
         )
     }
 
