@@ -21,6 +21,6 @@ class FileStorage @Inject constructor(val context: Context) {
         FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
     fun deleteFile(uri: Uri) {
-        File(uri.path.orEmpty()).takeIf { it.exists() }?.delete()
+        context.contentResolver.delete(uri, null, null)
     }
 }

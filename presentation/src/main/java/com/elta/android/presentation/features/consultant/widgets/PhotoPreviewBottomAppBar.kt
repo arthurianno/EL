@@ -37,6 +37,7 @@ internal fun PhotoPreviewBottomAppBar(widgetModel: PhotoPreviewBottomAppBarWidge
                 icon = R.drawable.ic_send,
                 background = colors.gGreenB,
                 border = colors.gGreenB,
+                size = dimens.previewSendButtonSize,
                 onClick = { widgetModel.sendAction(ConsultantAction.PreviewSendClick) }
             )
         }
