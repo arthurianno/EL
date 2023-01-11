@@ -17,6 +17,9 @@ class FileStorage @Inject constructor(val context: Context) {
     fun createJpgFile(name: String): File =
         File(context.getExternalFilesDir(PHOTO_PATH), "$name$JPG_EXT")
 
+    fun getPhotoFileByUri(uri: Uri): File =
+        File(context.getExternalFilesDir(PHOTO_PATH), uri.lastPathSegment.toString())
+
     fun getFileUri(file: File): Uri =
         FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 

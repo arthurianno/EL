@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.consultant.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.elta.android.domain.features.consultant.interactor.FileSendUseCase
 import com.elta.android.domain.features.consultant.interactor.PhotoCreateUseCase
 import com.elta.android.domain.features.consultant.interactor.PhotoDeleteUseCase
 import com.elta.android.domain.features.consultant.interactor.WebimChatStateUseCase
@@ -43,7 +45,8 @@ class ConsultantViewModel @Inject constructor(
     private val getMessages: WebimGetMessagesUseCase,
     private val getProfile: GetProfileUseCase,
     private val photoCreate: PhotoCreateUseCase,
-    private val photoDelete: PhotoDeleteUseCase
+    private val photoDelete: PhotoDeleteUseCase,
+    private val fileSend: FileSendUseCase
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
@@ -132,6 +135,13 @@ class ConsultantViewModel @Inject constructor(
             }
 
             ConsultantAction.PreviewSendClick -> {
+                launch {
+                    fileSend(currentState.previewPhoto)
+                        .catch { handleError(it) }
+                        .collectLatest {
+                            Log.d("MYTAG", "reduceStateByAction: $it")
+                        }
+                }
                 currentState.copy(isPhotoPreview = false)
             }
 

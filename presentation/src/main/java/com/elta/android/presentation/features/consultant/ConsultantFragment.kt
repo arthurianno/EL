@@ -337,6 +337,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                                     id = when (message.sendStatus) {
                                         WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
                                         WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
+                                        WebimMessageSendStatus.Error -> R.drawable.ic_send_error
                                     }
                                 ),
                                 colorFilter = ColorFilter.tint(

@@ -38,6 +38,6 @@ internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
 
 internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
-        id = "$firstName$secondName$email".hashCode().toString(),
+        id = "$firstName$secondName$email",
         name = "$firstName $secondName"
     )
