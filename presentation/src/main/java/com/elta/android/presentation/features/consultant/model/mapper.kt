@@ -27,10 +27,12 @@ internal fun WebimMessage.toUi(): ChatUiEntity =
     ChatUiEntity(
         owner = owner,
         type = type,
-        text = content,
+        text = text,
         date = Time(time).toStringWithFormat(CommonFormats.FORMAT_TIME),
         sendStatus = sendStatus,
-        isRead = isRead
+        isRead = isRead,
+        thumbnail = attachment?.thumbnail,
+        imageUrl = attachment?.url
     )
 
 internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =

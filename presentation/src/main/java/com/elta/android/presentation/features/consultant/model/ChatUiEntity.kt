@@ -9,6 +9,8 @@ import com.elta.android.domain.features.consultant.model.WebimOwner
 data class ChatUiEntity(
     val owner: WebimOwner,
     val type: WebimMessageType,
+    val thumbnail: String?,
+    val imageUrl: String?,
     val text: String,
     val date: String,
     val sendStatus: WebimMessageSendStatus,

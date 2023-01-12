@@ -24,6 +24,7 @@ import ru.webim.android.sdk.MessageTracker
 import ru.webim.android.sdk.Webim
 import ru.webim.android.sdk.WebimSession
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 @SuppressLint("CheckResult")
@@ -119,7 +120,8 @@ class WebimDataSource @Inject constructor(
 
         override fun messageChanged(from: Message, to: Message) {
             val oldMessages = _chat.value.messages.toMutableList()
-            val indexMessage = oldMessages.indexOf(from.toDomain())
+            val indexMessage =
+                oldMessages.indexOf(oldMessages.first { it.id == from.toDomain().id })
             emitNewChat(
                 oldMessages
                     .apply {
@@ -149,12 +151,14 @@ class WebimDataSource @Inject constructor(
                     .apply {
                         add(
                             WebimMessage(
-                                WebimOwner.Operator,
-                                WebimMessageType.Text,
-                                content = message,
+                                id = UUID.randomUUID().toString(),
+                                owner = WebimOwner.Operator,
+                                type = WebimMessageType.Text,
+                                text = message,
                                 time = Date().time,
                                 sendStatus = WebimMessageSendStatus.Sent,
-                                isRead = true
+                                isRead = true,
+                                attachment = null
                             )
                         )
                     },

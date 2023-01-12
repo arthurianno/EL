@@ -3,6 +3,7 @@ package com.elta.android.presentation.theme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 data class EltaDimens(
@@ -43,11 +44,13 @@ data class EltaDimens(
     val photoPreviewBottomBarContentPadding: PaddingValues,
     val messageTextFiledPadding: PaddingValues,
     val messageTextPadding: PaddingValues,
-    val chatMessagePadding: PaddingValues,
+    val chatMessageTextPadding: PaddingValues,
+    val chatMessageLabelPadding: PaddingValues,
     val chatPadding: PaddingValues,
     val consultantBottomSheetItemPadding: PaddingValues,
     val photoPreviewContentPadding: PaddingValues,
-    val previewSendButtonSize: Dp
+    val previewSendButtonSize: Dp,
+    val imageMessageSize: DpSize
 )
 
 internal val eltaDimens = EltaDimens(
@@ -84,9 +87,11 @@ internal val eltaDimens = EltaDimens(
     photoPreviewBottomBarContentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     messageTextFiledPadding = PaddingValues(horizontal = 46.dp),
     messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-    chatMessagePadding = PaddingValues(top = 12.dp, bottom = 8.dp, start = 12.dp, end = 12.dp),
+    chatMessageTextPadding = PaddingValues(top = 12.dp, bottom = 28.dp, start = 12.dp, end = 12.dp),
+    chatMessageLabelPadding = PaddingValues(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
     chatPadding = PaddingValues(top = 12.dp, bottom = 12.dp, start = 12.dp, end = 12.dp),
     consultantBottomSheetItemPadding = PaddingValues(16.dp),
     photoPreviewContentPadding = PaddingValues(top = 26.dp, bottom = 40.dp),
-    previewSendButtonSize = 48.dp
+    previewSendButtonSize = 48.dp,
+    imageMessageSize = DpSize(width = 268.dp, height = 254.dp)
 )

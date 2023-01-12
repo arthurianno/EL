@@ -16,12 +16,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +58,6 @@ import com.elta.android.presentation.core.compose.common.PhotoSelect
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
-import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.features.consultant.model.ChatUiEntity
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
@@ -247,7 +249,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         modifier = Modifier.align(Alignment.BottomCenter),
                         verticalArrangement = Arrangement.spacedBy(dimens.mediumDim),
                         state = listState,
-                        contentPadding = dimens.chatMessagePadding
+                        contentPadding = dimens.chatPadding
                     ) {
                         items(items = state.value.chat) { message ->
                             when (message.owner) {
@@ -316,41 +318,83 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                             viewModel.sendAction(ConsultantAction.ChatMessageLongClick(message))
                         }
                     )
-                    .padding(dimens.chatMessagePadding)
-
             ) {
-                Column {
-                    Text(text = message.text)
-                    VSpacerVerySmall()
-                    Row(
-                        modifier = Modifier.align(Alignment.End),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = message.date,
-                            color = colors.shadeBlack1
-                        )
-                        if (message.owner == WebimOwner.User) {
-                            HSpacerVerySmall()
-                            Image(
-                                painter = painterResource(
-                                    id = when (message.sendStatus) {
-                                        WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
-                                        WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
-                                        WebimMessageSendStatus.Error -> R.drawable.ic_send_error
-                                    }
-                                ),
-                                colorFilter = ColorFilter.tint(
-                                    if (message.isRead) {
-                                        colors.gGreenB
-                                    } else {
-                                        colors.shadeBlack1
-                                    }
-                                ),
-                                contentDescription = null
-                            )
-                        }
-                    }
+                ChatMessageContent(message)
+                ChatLabel(message)
+            }
+        }
+    }
+
+    @Composable
+    private fun BoxScope.ChatMessageContent(message: ChatUiEntity) {
+        GetLocalProperties { dimens, brash, colors, shapes, types ->
+            when {
+                message.thumbnail != null ->
+                    AsyncImage(
+                        model = message.thumbnail,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(dimens.imageMessageSize)
+                            .align(Alignment.Center)
+                    )
+
+                else -> Text(
+                    text = message.text,
+                    modifier = Modifier.Companion
+                        .align(Alignment.Center)
+                        .padding(dimens.chatMessageTextPadding)
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BoxScope.ChatLabel(message: ChatUiEntity) {
+        GetLocalProperties { dimens, brash, colors, shapes, types ->
+            val thumbnail = message.thumbnail
+            val textColor = if (thumbnail == null) {
+                colors.shadeBlack1
+            } else {
+                colors.white
+            }
+            val background = if (thumbnail == null) {
+                Modifier.background(color = Color.Unspecified)
+            } else {
+                Modifier.background(color = colors.blackBlue, shape = shapes.round)
+            }
+            Row(
+                modifier = Modifier
+                    .padding(dimens.smallDim)
+                    .align(Alignment.BottomEnd)
+                    .clip(shape = shapes.round)
+                    .then(background)
+                    .padding(dimens.chatMessageLabelPadding),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = message.date,
+                    color = textColor
+                )
+                if (message.owner == WebimOwner.User) {
+                    HSpacerVerySmall()
+                    Image(
+                        painter = painterResource(
+                            id = when (message.sendStatus) {
+                                WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
+                                WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
+                                is WebimMessageSendStatus.Error -> R.drawable.ic_send_error
+                            }
+                        ),
+                        colorFilter = ColorFilter.tint(
+                            if (message.isRead) {
+                                colors.gGreenB
+                            } else {
+                                colors.shadeBlack1
+                            }
+                        ),
+                        contentDescription = null
+                    )
                 }
             }
         }

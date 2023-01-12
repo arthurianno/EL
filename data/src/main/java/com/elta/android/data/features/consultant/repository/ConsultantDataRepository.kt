@@ -61,13 +61,14 @@ class ConsultantDataRepository @Inject constructor(
 
     override fun sendPhoto(photo: Uri): Flow<WebimMessageSendStatus> {
         val file = fileStorage.getPhotoFileByUri(photo)
-        val sendFlow = MutableStateFlow(WebimMessageSendStatus.Sending)
+        val sendFlow = MutableStateFlow<WebimMessageSendStatus>(WebimMessageSendStatus.Sending)
         MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)?.let { mimeType ->
             webimSession?.stream?.sendFile(
                 file,
                 file.name,
                 mimeType,
                 object : SendFileCallback {
+                    @Deprecated("Deprecated in Java")
                     override fun onProgress(id: Message.Id, sentBytes: Long) {}
 
                     override fun onSuccess(id: Message.Id) {
@@ -78,7 +79,7 @@ class ConsultantDataRepository @Inject constructor(
                         id: Message.Id,
                         error: WebimError<SendFileCallback.SendFileError>
                     ) {
-                        sendFlow.tryEmit(WebimMessageSendStatus.Error)
+                        sendFlow.tryEmit(WebimMessageSendStatus.Error(error.errorString))
                     }
                 }
             )
