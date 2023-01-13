@@ -52,14 +52,15 @@ import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.common.FileSelect
-import com.elta.android.presentation.core.compose.common.OpenCamera
-import com.elta.android.presentation.core.compose.common.PhotoSelect
+import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.features.consultant.model.ChatUiEntity
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
+import com.elta.android.presentation.features.consultant.model.FileSelect
+import com.elta.android.presentation.features.consultant.model.OpenCamera
+import com.elta.android.presentation.features.consultant.model.PhotoSelect
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBar
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBar
@@ -68,7 +69,6 @@ import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTop
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import java.io.File
 
@@ -101,12 +101,14 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
         lifecycle.addObserver(viewModel)
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
     @Composable
     override fun Content(viewModel: ConsultantViewModel) {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val event = viewModel.event.collectAsState(initial = null)
         val state = viewModel.state.collectAsState()
+        val storageAccessPermission =
+            rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
         LaunchedEffect(key1 = sheetState.currentValue) {
             viewModel.setSheetVisibleState(sheetState.isVisible)
         }
@@ -122,9 +124,10 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 is OpenCamera -> makePhoto.launch(viewModel.createNewPhoto())
                 is PhotoSelect -> getPhoto.launch(IMAGE)
                 is FileSelect -> getDocument.launch(DOCUMENT)
+                is PermissionEvent.Storage -> storageAccessPermission.launchPermissionRequest()
             }
         }
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
+        GetLocalProperties { _, _, colors, shapes, _ ->
             if (state.value.isPhotoPreview) {
                 Column(
                     Modifier
@@ -202,11 +205,10 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
             Row(
                 modifier = Modifier
                     .clickable {
-                        if (storageAccessPermission.status == PermissionStatus.Granted) {
-                            viewModel.sendAction(action)
-                        } else {
-                            storageAccessPermission.launchPermissionRequest()
-                        }
+                        viewModel.verifyStoragePermission(
+                            status = storageAccessPermission.status,
+                            onGrantedAction = action
+                        )
                     }
                     .fillMaxWidth()
                     .padding(dimens.consultantBottomSheetItemPadding)

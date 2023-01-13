@@ -18,19 +18,22 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
-import com.elta.android.presentation.core.compose.common.FileSelect
-import com.elta.android.presentation.core.compose.common.OpenCamera
-import com.elta.android.presentation.core.compose.common.PhotoSelect
+import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.model.ConsultantViewState
+import com.elta.android.presentation.features.consultant.model.FileSelect
+import com.elta.android.presentation.features.consultant.model.OpenCamera
+import com.elta.android.presentation.features.consultant.model.PhotoSelect
 import com.elta.android.presentation.features.consultant.model.toUi
 import com.elta.android.presentation.features.consultant.model.toWebimUser
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBarWidgetModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -104,6 +107,15 @@ class ConsultantViewModel @Inject constructor(
 
     fun showPhotoPreview() {
         reduceState { state.value.copy(isPhotoPreview = true) }
+    }
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    fun verifyStoragePermission(status: PermissionStatus, onGrantedAction: ConsultantAction) {
+        if (status != PermissionStatus.Granted) {
+            sendEvent(PermissionEvent.Storage())
+        } else {
+            sendAction(onGrantedAction)
+        }
     }
 
     override fun reduceStateByAction(

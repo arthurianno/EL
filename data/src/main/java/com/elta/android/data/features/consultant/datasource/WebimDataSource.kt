@@ -5,7 +5,7 @@ import android.content.Context
 import com.elta.android.common.di.qualifires.WebimAnnotation
 import com.elta.android.common.di.qualifires.WebimAnnotationType
 import com.elta.android.data.features.consultant.model.toDomain
-import com.elta.android.data.features.consultant.model.toJSonObject
+import com.elta.android.data.features.consultant.model.toJsonObject
 import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
@@ -57,7 +57,7 @@ class WebimDataSource @Inject constructor(
         Webim.newSessionBuilder()
             .setAccountName(accountName)
             .setLocation(location)
-            .setVisitorFieldsJson(webimUser.toJSonObject(privateKey))
+            .setVisitorFieldsJson(webimUser.toJsonObject(privateKey))
             .setContext(context)
             .build()
             .setListeners()

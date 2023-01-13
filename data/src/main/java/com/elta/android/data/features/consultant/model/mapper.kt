@@ -29,8 +29,8 @@ internal fun Message.toDomain(): WebimMessage =
         isRead = isReadByOperator
     )
 
-internal fun WebimUser.toJSonObject(key: String): JsonObject =
-    JsonParser.parseString(Gson().toJson(this.toJson(key))).asJsonObject
+internal fun WebimUser.toJsonObject(key: String): JsonObject =
+    JsonParser.parseString(Gson().toJson(this.toAuth(key))).asJsonObject
 
 private fun Attachment.toDomain(): WebimMessage.Attachment =
     WebimMessage.Attachment(
@@ -40,9 +40,9 @@ private fun Attachment.toDomain(): WebimMessage.Attachment =
         size = fileInfo.size
     )
 
-private fun WebimUser.toJson(key: String): WebimUserJson =
-    WebimUserJson(
-        fields = WebimUserJson.Fields(displayName = name, id = id),
+private fun WebimUser.toAuth(key: String): WebimUserAuthEntity =
+    WebimUserAuthEntity(
+        fields = WebimUserAuthEntity.Fields(displayName = name, id = id),
         hash = this.toString().hmacSha1Signature(key)
     )
 
