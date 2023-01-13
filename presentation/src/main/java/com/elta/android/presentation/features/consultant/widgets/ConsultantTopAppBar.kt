@@ -103,7 +103,8 @@ private fun TopBarText(connectState: ConnectState) {
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when {
-                    connectState == ConnectState.Connecting -> CircularProgressIndicator(
+                    connectState == ConnectState.Connecting ||
+                        networkState == NetworkState.Unavailable -> CircularProgressIndicator(
                         strokeWidth = dimens.progressSmallWidth,
                         color = colors.shadeBlack1,
                         modifier = Modifier.size(dimens.consultantTopBarProgress)

@@ -5,10 +5,12 @@ import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimUser
-import com.elta.android.domain.features.user.model.Profile
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.nullgr.core.security.crypto.toHexDecimalString
 import ru.webim.android.sdk.Message
+import ru.webim.android.sdk.Message.Attachment
 import ru.webim.android.sdk.Message.SendStatus
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -17,30 +19,31 @@ private const val HMAC_SHA1_ALGORITHM = "HmacSHA256"
 
 internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
+        id = serverSideId.orEmpty(),
         type = type.toDomainType(),
+        attachment = attachment?.toDomain(),
         owner = type.toDomainOwner(),
-        content = text,
+        text = text,
         time = time,
         sendStatus = sendStatus.toDomain(),
         isRead = isReadByOperator
     )
 
-internal fun WebimUser.toJSonObject(key: String): JsonObject =
-    JsonObject().apply {
-        add(
-            "fields",
-            JsonObject().apply {
-                addProperty("display_name", name)
-                addProperty("id", id)
-            }
-        )
-        addProperty("hash", this@toJSonObject.toString().hmacSha1Signature(key))
-    }
+internal fun WebimUser.toJsonObject(key: String): JsonObject =
+    JsonParser.parseString(Gson().toJson(this.toAuth(key))).asJsonObject
 
-internal fun Profile.toWebimUser(): WebimUser =
-    WebimUser(
-        id = "$firstName$secondName$email".hashCode().toString(),
-        name = "$firstName $secondName"
+private fun Attachment.toDomain(): WebimMessage.Attachment =
+    WebimMessage.Attachment(
+        contentType = fileInfo.contentType,
+        thumbnail = fileInfo.imageInfo?.thumbUrl,
+        url = fileInfo.url,
+        size = fileInfo.size
+    )
+
+private fun WebimUser.toAuth(key: String): WebimUserAuthEntity =
+    WebimUserAuthEntity(
+        fields = WebimUserAuthEntity.Fields(displayName = name, id = id),
+        hash = this.toString().hmacSha1Signature(key)
     )
 
 private fun SendStatus.toDomain(): WebimMessageSendStatus =

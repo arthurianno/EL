@@ -72,7 +72,11 @@ class AppModule(private val enableLog: Boolean) {
                 Settings.Secure.ANDROID_ID
             )
         )
-        return if (enableLog) DebugTree(deviceDetails) else ReleaseTree(deviceDetails)
+        return if (enableLog) {
+            DebugTree(deviceDetails, context)
+        } else {
+            ReleaseTree(deviceDetails, context)
+        }
     }
 
     @Provides

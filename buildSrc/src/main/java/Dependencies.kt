@@ -55,6 +55,12 @@ object Dependencies {
                 "com.google.android.material:compose-theme-adapter:$materialThemeAdapterVersion"
             const val rxJava2 = "androidx.compose.runtime:runtime-rxjava2:$composeVersion"
 
+            object Accompanist {
+                private const val version = "0.28.0"
+
+                const val permissions = "com.google.accompanist:accompanist-permissions:$version"
+            }
+
             object Voyager {
                 private const val version = "1.0.0-rc02"
 
@@ -326,7 +332,7 @@ object Dependencies {
     }
 
     object Coil {
-        private const val version = "2.1.0"
+        private const val version = "2.2.2"
 
         const val core = "io.coil-kt:coil:$version"
         const val compose = "io.coil-kt:coil-compose:$version"

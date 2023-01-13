@@ -86,6 +86,8 @@ dependencies {
     implementation(Dependencies.Jetpack.Compose.activity)
     implementation(Dependencies.Jetpack.Compose.viewModel)
     implementation(Dependencies.Jetpack.Compose.rxJava2)
+    implementation(Dependencies.Jetpack.Compose.Accompanist.permissions)
+    implementation(Dependencies.Coil.compose)
 
     implementation(Dependencies.Jetpack.core)
     implementation(Dependencies.Jetpack.fragment)
