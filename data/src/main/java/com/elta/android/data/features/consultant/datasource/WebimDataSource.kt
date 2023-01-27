@@ -10,7 +10,6 @@ import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
-import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
@@ -119,16 +118,18 @@ class WebimDataSource @Inject constructor(
         }
 
         override fun messageChanged(from: Message, to: Message) {
-            val oldMessages = _chat.value.messages.toMutableList()
-            val indexMessage =
-                oldMessages.indexOf(oldMessages.first { it.id == from.toDomain().id })
-            emitNewChat(
-                oldMessages
-                    .apply {
-                        removeAt(indexMessage)
-                        add(indexMessage, to.toDomain())
-                    }
-            )
+            runCatching {
+                val oldMessages = _chat.value.messages.toMutableList()
+                val indexMessage =
+                    oldMessages.indexOf(oldMessages.first { it.id == from.toDomain().id })
+                emitNewChat(
+                    oldMessages
+                        .apply {
+                            removeAt(indexMessage)
+                            add(indexMessage, to.toDomain())
+                        }
+                )
+            }
         }
 
         override fun allMessagesRemoved() {
@@ -153,7 +154,6 @@ class WebimDataSource @Inject constructor(
                             WebimMessage(
                                 id = UUID.randomUUID().toString(),
                                 owner = WebimOwner.Operator,
-                                type = WebimMessageType.Text,
                                 text = message,
                                 time = Date().time,
                                 sendStatus = WebimMessageSendStatus.Sent,

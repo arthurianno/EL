@@ -4,6 +4,7 @@ import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
+import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
@@ -26,13 +27,14 @@ internal fun WebimChatState.toUi(): ConnectState =
 internal fun WebimMessage.toUi(): ChatUiEntity =
     ChatUiEntity(
         owner = owner,
-        type = type,
+        type = attachment?.contentType,
         text = text,
+        fileSize = attachment?.size?.toSizeString(),
         date = Time(time).toStringWithFormat(CommonFormats.FORMAT_TIME),
         sendStatus = sendStatus,
         isRead = isRead,
         thumbnail = attachment?.thumbnail,
-        imageUrl = attachment?.url
+        attachmentUrl = attachment?.url
     )
 
 internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
@@ -43,3 +45,10 @@ internal fun Profile.toWebimUser(): WebimUser =
         id = "$firstName$secondName$email",
         name = "$firstName $secondName"
     )
+
+private fun Long.toSizeString(): String =
+    when {
+        this / 1048576 > 1 -> "${(this.toDouble() / 1048576).round(2)} MB"
+        this / 1024 > 1 -> "${(this.toDouble() / 1024).round(2)} KB"
+        else -> "${toString()} B"
+    }

@@ -109,6 +109,18 @@ class ConsultantViewModel @Inject constructor(
         reduceState { state.value.copy(isPhotoPreview = true) }
     }
 
+    fun sendFile(uri: Uri) {
+        launch {
+            uri.lastPathSegment?.let { fileName ->
+                fileSend(fileName)
+                    .catch { handleError(it) }
+                    .collectLatest {
+                        Log.d("MYTAG", "reduceStateByAction: $it")
+                    }
+            }
+        }
+    }
+
     @OptIn(ExperimentalPermissionsApi::class)
     fun verifyStoragePermission(status: PermissionStatus, onGrantedAction: ConsultantAction) {
         if (status != PermissionStatus.Granted) {
@@ -148,11 +160,13 @@ class ConsultantViewModel @Inject constructor(
 
             ConsultantAction.PreviewSendClick -> {
                 launch {
-                    fileSend(currentState.previewPhoto)
-                        .catch { handleError(it) }
-                        .collectLatest {
-                            Log.d("MYTAG", "reduceStateByAction: $it")
-                        }
+                    currentState.previewPhoto.lastPathSegment?.let { photoFileName ->
+                        fileSend(photoFileName)
+                            .catch { handleError(it) }
+                            .collectLatest {
+                                Log.d("MYTAG", "reduceStateByAction: $it")
+                            }
+                    }
                 }
                 currentState.copy(isPhotoPreview = false)
             }

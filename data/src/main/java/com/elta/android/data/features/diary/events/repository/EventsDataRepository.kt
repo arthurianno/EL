@@ -6,7 +6,7 @@ import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
-import com.elta.android.data.features.common.storage.BitmapStorage
+import com.elta.android.data.features.common.storage.FileStorage
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -31,7 +31,7 @@ class EventsDataRepository @Inject constructor(
     @Remote private val remoteSource: EventsDataSource,
     @Cache private val cacheSource: EventsDataSource,
     private val syncManager: LocalSyncManager,
-    private val bitmapStorage: BitmapStorage
+    private val fileStorage: FileStorage
 ) : EventsRepository {
 
     override fun getEvents(): Observable<List<Event>> =
@@ -156,14 +156,14 @@ class EventsDataRepository @Inject constructor(
         glucoseLevelSettings: GlucoseLevelSettings
     ): Single<Uri> =
         Single.fromCallable {
-            bitmapStorage.getFile(
+            fileStorage.getFile(
                 fileName = buildFileName(event, glucoseLevelSettings),
                 directoryName = EVENTS_DIR_NAME
             )
         }
             .map {
                 if (it.exists()) {
-                    bitmapStorage.getFileUri(it)
+                    fileStorage.getFileUri(it)
                 } else {
                     Uri.EMPTY
                 }
@@ -175,11 +175,11 @@ class EventsDataRepository @Inject constructor(
         bitmap: Bitmap
     ): Single<Uri> =
         Single.fromCallable {
-            bitmapStorage.saveBitmap(
+            fileStorage.saveBitmap(
                 fileName = buildFileName(event, glucoseLevelSettings),
                 directoryName = EVENTS_DIR_NAME,
                 bitmap = bitmap
             )
         }
-            .map { bitmapStorage.getFileUri(it) }
+            .map { fileStorage.getFileUri(it) }
 }
