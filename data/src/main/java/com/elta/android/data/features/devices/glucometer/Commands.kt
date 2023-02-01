@@ -13,7 +13,7 @@ object Commands {
     }
 
     object GetDate : GlucometerCommand {
-        override fun toGlucometerString(): String = "time"
+        override fun toGlucometerString(): String = "gettime"
     }
 
     object GetVersion : GlucometerCommand {
