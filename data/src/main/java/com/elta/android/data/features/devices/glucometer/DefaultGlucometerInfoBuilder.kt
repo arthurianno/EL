@@ -28,7 +28,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         params.forEach { param ->
             when {
                 param.startsWith("time") -> date = ZonedDateTime.of(extractDate(param), ZoneId.systemDefault())
-                param.startsWith("soft") -> version = extractVersion(param)
+                param.startsWith("hw") -> version = extractVersion(param)
                 param.startsWith("b") -> {
                     val response = extractBatteryAndTemperature(param)
                     batteryLevel = response.first
@@ -60,8 +60,8 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
 
     protected open fun extractVersion(param: String): VersionDto {
         val tokens = param.split(" ")
-        val soft = tokens[0].removePrefix("soft").toDouble()
-        val hard = tokens[1].removePrefix("hard").toDouble()
+        val soft = tokens[0].removePrefix("hw:")
+        val hard = tokens[1].removePrefix("sw:")
         return VersionDto(software = soft, hardware = hard)
     }
 
