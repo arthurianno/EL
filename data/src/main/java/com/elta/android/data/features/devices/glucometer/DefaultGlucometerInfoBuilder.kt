@@ -11,6 +11,15 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val RESPONSE_TIME = "time"
+private const val RESPONSE_HW_VERSION = "hw:"
+private const val RESPONSE_SW_VERSION = "sw:"
+private const val RESPONSE_BATTERY = "b"
+private const val DATETIME_PATTERN = "yyyyMMddHHmmss"
+private const val CENTURY = "20"
+private const val DELIMITER_SPACE = " "
+private const val DELIMITER_DOT = "."
+
 @Singleton
 open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBuilder {
 
@@ -27,9 +36,9 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
 
         params.forEach { param ->
             when {
-                param.startsWith("time") -> date = ZonedDateTime.of(extractDate(param), ZoneId.systemDefault())
-                param.startsWith("hw") -> version = extractVersion(param)
-                param.startsWith("b") -> {
+                param.startsWith(RESPONSE_TIME) -> date = ZonedDateTime.of(extractDate(param), ZoneId.systemDefault())
+                param.startsWith(RESPONSE_HW_VERSION) -> version = extractVersion(param)
+                param.startsWith(RESPONSE_BATTERY) -> {
                     val response = extractBatteryAndTemperature(param)
                     batteryLevel = response.first
                     temperature = response.second
@@ -50,24 +59,24 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
 
     protected open fun extractDate(param: String): LocalDateTime? {
         return try {
-            val payload = param.split(".")[1]
-            "20$payload".toLocalDateTime("yyyyMMddHHmmss")
-        } catch (ex: DateTimeParseException) {
-            Timber.e(ex)
+            val glucometerDate = param.split(DELIMITER_DOT)[1]
+            (CENTURY + glucometerDate).toLocalDateTime(DATETIME_PATTERN)
+        } catch (parseException: DateTimeParseException) {
+            Timber.e(parseException)
             LocalDateTime.now()
         }
     }
 
     protected open fun extractVersion(param: String): VersionDto {
-        val tokens = param.split(" ")
-        val soft = tokens[0].removePrefix("hw:")
-        val hard = tokens[1].removePrefix("sw:")
+        val tokens = param.split(DELIMITER_SPACE)
+        val soft = tokens[0].removePrefix(RESPONSE_HW_VERSION)
+        val hard = tokens[1].removePrefix(RESPONSE_SW_VERSION)
         return VersionDto(software = soft, hardware = hard)
     }
 
     protected open fun extractBatteryAndTemperature(param: String): Pair<Int, Int> {
-        val tokens = param.split(".")
-        val battery = tokens[0].removePrefix("b").toInt()
+        val tokens = param.split(DELIMITER_DOT)
+        val battery = tokens[0].removePrefix(RESPONSE_BATTERY).toInt()
         val temperature = tokens[1].toInt()
         return Pair(battery, temperature)
     }
