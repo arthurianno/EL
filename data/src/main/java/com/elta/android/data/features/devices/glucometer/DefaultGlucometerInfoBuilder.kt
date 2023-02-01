@@ -68,7 +68,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
     protected open fun extractBatteryAndTemperature(param: String): Pair<Int, Int> {
         val tokens = param.split(".")
         val battery = tokens[0].removePrefix("b").toInt()
-        val temperature = tokens[1].removePrefix("t").toInt()
+        val temperature = tokens[1].toInt()
         return Pair(battery, temperature)
     }
 }
