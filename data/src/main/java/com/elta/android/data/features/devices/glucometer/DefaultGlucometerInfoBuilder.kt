@@ -60,7 +60,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
     protected open fun extractDate(param: String): LocalDateTime? {
         return try {
             val glucometerDate = param.split(DELIMITER_DOT)[1]
-            (CENTURY + glucometerDate).toLocalDateTime(DATETIME_PATTERN)
+            "$CENTURY$glucometerDate".toLocalDateTime(DATETIME_PATTERN)
         } catch (parseException: DateTimeParseException) {
             Timber.e(parseException)
             LocalDateTime.now()
@@ -69,15 +69,15 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
 
     protected open fun extractVersion(param: String): VersionDto {
         val tokens = param.split(DELIMITER_SPACE)
-        val soft = tokens[0].removePrefix(RESPONSE_HW_VERSION)
-        val hard = tokens[1].removePrefix(RESPONSE_SW_VERSION)
+        val soft = tokens.component1().removePrefix(RESPONSE_HW_VERSION)
+        val hard = tokens.component2().removePrefix(RESPONSE_SW_VERSION)
         return VersionDto(software = soft, hardware = hard)
     }
 
     protected open fun extractBatteryAndTemperature(param: String): Pair<Int, Int> {
         val tokens = param.split(DELIMITER_DOT)
-        val battery = tokens[0].removePrefix(RESPONSE_BATTERY).toInt()
-        val temperature = tokens[1].toInt()
+        val battery = tokens.component1().removePrefix(RESPONSE_BATTERY).toInt()
+        val temperature = tokens.component2().toInt()
         return Pair(battery, temperature)
     }
 }
