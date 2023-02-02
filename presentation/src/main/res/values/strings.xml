@@ -445,6 +445,8 @@
 
     <string name="profile_name_min_length_error">Мин. количество символов - 2</string>
     <string name="profile_name_max_length_error">Макс. количество символов - 50</string>
+    <string name="profile_first_name_invalid_characters_error">Имя должно обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
+    <string name="profile_second_name_invalid_characters_error">Фамилия должна обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
 
     <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
