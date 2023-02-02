@@ -9,6 +9,8 @@ import com.elta.android.domain.features.user.model.Profile
 const val MAX_NAME_LENGTH = 50
 const val MIN_NAME_LENGTH = 2
 
+private const val REGEX_NAME_PATTERN = "^(?:[A-Za-zА-Яа-я '(),\\-.])*\$"
+
 fun buildProfile(original: Profile, events: List<Event>): Profile {
     if (events.isEmpty()) {
         return original
@@ -34,6 +36,11 @@ fun buildProfile(original: Profile, events: List<Event>): Profile {
 }
 
 fun isNameValid(name: String): Boolean =
-    name.isNotEmpty() && name.length in MIN_NAME_LENGTH..MAX_NAME_LENGTH
+    name.isNotEmpty() &&
+        name.length in MIN_NAME_LENGTH..MAX_NAME_LENGTH &&
+        isNameWithValidCharacters(name)
+
+fun isNameWithValidCharacters(name: String): Boolean =
+    name.contains(regex = Regex(REGEX_NAME_PATTERN))
 
 fun Profile.googleFitApp(): HealthApp? = healthApps?.find { it.type == HealthAppType.GOOGLE_FIT }

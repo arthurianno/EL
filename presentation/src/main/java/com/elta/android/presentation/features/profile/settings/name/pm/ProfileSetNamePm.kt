@@ -5,6 +5,7 @@ import com.elta.android.domain.features.user.interactor.MAX_NAME_LENGTH
 import com.elta.android.domain.features.user.interactor.MIN_NAME_LENGTH
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.interactor.isNameValid
+import com.elta.android.domain.features.user.interactor.isNameWithValidCharacters
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -170,8 +171,18 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun checkIsValid(name: PersonNameModel) {
-        firstNameInput.error.consumer.accept(getNameErrorString(name.firstName))
-        secondNameInput.error.consumer.accept(getNameErrorString(name.secondName))
+        firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
+        secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
+    }
+
+    private fun getFirstNameErrorString(name: String): String = when {
+        !isNameWithValidCharacters(name) -> services.resources.getString(R.string.profile_first_name_invalid_characters_error)
+        else -> getNameErrorString(name)
+    }
+
+    private fun getSecondNameErrorString(name: String): String = when {
+        !isNameWithValidCharacters(name) -> services.resources.getString(R.string.profile_second_name_invalid_characters_error)
+        else -> getNameErrorString(name)
     }
 
     private fun getNameErrorString(name: String) = when {
