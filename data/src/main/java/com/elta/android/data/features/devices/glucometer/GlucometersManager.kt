@@ -256,7 +256,7 @@ class GlucometersManager @Inject constructor(
                             .doOnComplete {
                                 val id = address.hashCode().toLong()
                                 glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
-                                    file.version.toDoubleOrNull()?.let { version ->
+                                    file.version.let { version ->
                                         val newInfo = info.copy(software = version)
                                         glucometersInfoCache.update(listOf(newInfo))
                                     }
@@ -353,18 +353,18 @@ class GlucometersManager @Inject constructor(
                 val connection = connections[address]
                 if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED) {
                     device.establishConnection(false)
-                        .onErrorResumeNext { e: Throwable ->
-                            Timber.e(javaClass.simpleName, e.message, e)
+                        .onErrorResumeNext { bleError: Throwable ->
+                            Timber.e(bleError, javaClass.simpleName, bleError.message)
                             when {
                                 client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
                                     Observable.error(BluetoothNotEnabledError)
                                 }
 
-                                e is BleDisconnectedException -> Observable.error(
+                                bleError is BleDisconnectedException -> Observable.error(
                                     GlucometerOfflineError
                                 )
 
-                                else -> Observable.error(e)
+                                else -> Observable.error(bleError)
                             }
                         }
                         .compose(ReplayingShare.instance())
