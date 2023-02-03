@@ -1,11 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.name.pm
 
+import com.elta.android.domain.features.user.hasWrongChars
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
-import com.elta.android.domain.features.user.interactor.hasWrongChars
 import com.elta.android.domain.features.user.interactor.isNameValid
-import com.elta.android.domain.features.user.interactor.isTooLong
-import com.elta.android.domain.features.user.interactor.isTooShort
+import com.elta.android.domain.features.user.isTooLong
+import com.elta.android.domain.features.user.isTooShort
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
