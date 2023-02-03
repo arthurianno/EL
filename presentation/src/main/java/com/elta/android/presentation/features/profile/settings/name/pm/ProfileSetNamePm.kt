@@ -1,11 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.name.pm
 
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
-import com.elta.android.domain.features.user.interactor.MAX_NAME_LENGTH
-import com.elta.android.domain.features.user.interactor.MIN_NAME_LENGTH
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
+import com.elta.android.domain.features.user.interactor.hasWrongChars
 import com.elta.android.domain.features.user.interactor.isNameValid
-import com.elta.android.domain.features.user.interactor.isNameWithValidCharacters
+import com.elta.android.domain.features.user.interactor.isTooLong
+import com.elta.android.domain.features.user.interactor.isTooShort
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -176,18 +176,16 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun getFirstNameErrorString(name: String): String = when {
-        !isNameWithValidCharacters(name) -> services.resources.getString(R.string.profile_first_name_invalid_characters_error)
-        else -> getNameErrorString(name)
+        name.hasWrongChars() -> services.resources.getString(R.string.profile_first_name_invalid_characters_error)
+        name.isTooShort() -> services.resources.getString(R.string.profile_first_name_min_length_error)
+        name.isTooLong() -> services.resources.getString(R.string.profile_name_max_length_error)
+        else -> ""
     }
 
     private fun getSecondNameErrorString(name: String): String = when {
-        !isNameWithValidCharacters(name) -> services.resources.getString(R.string.profile_second_name_invalid_characters_error)
-        else -> getNameErrorString(name)
-    }
-
-    private fun getNameErrorString(name: String) = when {
-        name.length < MIN_NAME_LENGTH -> services.resources.getString(R.string.profile_name_min_length_error)
-        name.length > MAX_NAME_LENGTH -> services.resources.getString(R.string.profile_name_max_length_error)
+        name.hasWrongChars() -> services.resources.getString(R.string.profile_second_name_invalid_characters_error)
+        name.isTooShort() -> services.resources.getString(R.string.profile_second_name_min_length_error)
+        name.isTooLong() -> services.resources.getString(R.string.profile_name_max_length_error)
         else -> ""
     }
 }
