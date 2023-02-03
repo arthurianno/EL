@@ -1,4 +1,4 @@
-package com.elta.android.domain.features.user.interactor
+package com.elta.android.domain.features.user
 
 private const val MAX_NAME_LENGTH = 50
 private const val MIN_NAME_LENGTH = 2
