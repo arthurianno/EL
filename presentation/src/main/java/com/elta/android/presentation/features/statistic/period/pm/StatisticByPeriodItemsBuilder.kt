@@ -273,32 +273,11 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private fun Long?.asTimeString(resources: ResourceProvider): String {
         val duration = this ?: ZERO
-        val days = TimeUnit.SECONDS.toDays(duration)
-        val hours = TimeUnit.SECONDS.toHours(duration) - days * HOURS_IN_DAY
-        val minutes =
-            TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.SECONDS.toHours(duration) * MINUTES_IN_HOUR
-        val seconds =
-            TimeUnit.SECONDS.toSeconds(duration) - TimeUnit.SECONDS.toMinutes(duration) * SECONDS_IN_MINUTE
+        val minutes = TimeUnit.SECONDS.toMinutes(duration)
 
         val time = StringBuilder().apply {
-            if (days > ZERO) {
-                append(resources.getString(R.string.activity_duration_day, days.toInt()))
-            }
-            if (hours > ZERO) {
-                if (isNotEmpty()) append("\u00A0") // non breaking space
-                append(resources.getString(R.string.activity_duration_hour, hours.toInt()))
-            }
-            if (minutes > ZERO) {
-                if (isNotEmpty()) append("\u00A0") // non breaking space
-                append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
-            }
-            if (seconds > ZERO && isEmpty()) {
-                append(resources.getString(R.string.activity_duration_sec, seconds.toInt()))
-            }
-            if (days == ZERO && hours == ZERO && minutes == ZERO && seconds == ZERO) {
-                append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
-            }
-            append(".")
+            if (isNotEmpty()) append("\u00A0") // non breaking space
+            append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
         }
 
         return time.toString()
@@ -312,9 +291,6 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         this != null && this.eventsCount > 0 && range?.contains(this.averageLevel) ?: false
 
     companion object {
-        const val HOURS_IN_DAY = 24
-        const val MINUTES_IN_HOUR = 60
-        const val SECONDS_IN_MINUTE = 60
         const val ZERO = 0L
         const val DAILY_CHART_DATE_FORMAT = "dd MMM. EEEE"
         const val STATISTIC_CHART_DATE_FORMAT = "dd MMM"
