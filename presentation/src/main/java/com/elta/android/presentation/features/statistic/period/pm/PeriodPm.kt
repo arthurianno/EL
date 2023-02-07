@@ -22,6 +22,8 @@ import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
+private const val STATISTIC_CHART_DATE_FORMAT = "dd MMM"
+
 class PeriodPm @Inject constructor(
     private val getStatisticByPeriodUseCase: GetStatisticByPeriodUseCase,
     private val periodBuilder: StatisticByPeriodItemsBuilder,
@@ -99,8 +101,8 @@ class PeriodPm @Inject constructor(
         GlucoseStatisticChartItem(
             datesTitle = resources.getString(
                 R.string.statistic_chart_period_dates_mask,
-                period.start.toStringWithFormat(StatisticByPeriodItemsBuilder.STATISTIC_CHART_DATE_FORMAT),
-                period.end.toStringWithFormat(StatisticByPeriodItemsBuilder.STATISTIC_CHART_DATE_FORMAT)
+                period.start.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT),
+                period.end.toStringWithFormat(STATISTIC_CHART_DATE_FORMAT)
             ),
             chartModel = this.toChartModel(selectedDate)
         )
