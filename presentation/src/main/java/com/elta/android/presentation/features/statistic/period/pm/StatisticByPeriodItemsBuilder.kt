@@ -22,6 +22,9 @@ import org.threeten.bp.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val ZERO = 0L
+private const val DAILY_CHART_DATE_FORMAT = "dd MMM. EEEE"
+
 class StatisticByPeriodItemsBuilder @Inject constructor(
     private val resources: ResourceProvider
 ) {
@@ -289,10 +292,4 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private fun GlucoseStatisticModel?.isAverageIn(range: DoubleRange?) =
         this != null && this.eventsCount > 0 && range?.contains(this.averageLevel) ?: false
-
-    companion object {
-        const val ZERO = 0L
-        const val DAILY_CHART_DATE_FORMAT = "dd MMM. EEEE"
-        const val STATISTIC_CHART_DATE_FORMAT = "dd MMM"
-    }
 }
