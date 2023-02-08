@@ -20,6 +20,7 @@ import ru.webim.android.sdk.Message
 import ru.webim.android.sdk.MessageStream.SendFileCallback
 import ru.webim.android.sdk.WebimError
 import ru.webim.android.sdk.WebimSession
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,7 +30,7 @@ private const val PHOTO_NAME_PREFIX = "eltaPhoto_"
 private const val PHOTO_NAME_PATTERN = "yyyyMMdd_HHmmss"
 private const val START_PROGRESS = 0f
 private const val END_PROGRESS = 1f
-private const val NO_CACHE_FILE_EXIST = "Файл не найден в кеше"
+private const val NO_CACHE_FILE_EXIST = "File not found in the cache!!! , Filename ----> "
 
 class ConsultantDataRepository @Inject constructor(
     private val webimDataSource: WebimDataSource,
@@ -89,7 +90,10 @@ class ConsultantDataRepository @Inject constructor(
                     }
                 )
             }
-        } ?: sendFlow.tryEmit(WebimMessageSendStatus.Error(NO_CACHE_FILE_EXIST))
+        } ?: run {
+            Timber.e("$NO_CACHE_FILE_EXIST$fileName")
+            sendFlow.tryEmit(WebimMessageSendStatus.Error(NO_CACHE_FILE_EXIST))
+        }
         return sendFlow
     }
 
