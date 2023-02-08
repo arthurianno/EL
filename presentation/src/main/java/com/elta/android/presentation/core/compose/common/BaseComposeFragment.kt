@@ -6,6 +6,7 @@ import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.R
@@ -31,6 +32,7 @@ abstract class BaseComposeFragment<VM : ViewModel> : Fragment(R.layout.fragment_
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (viewModel as? LifecycleEventObserver)?.let { lifecycle.addObserver(it) }
         view.findViewById<ComposeView>(R.id.main_view).setContent {
             EltaTheme {
                 Dialogs()

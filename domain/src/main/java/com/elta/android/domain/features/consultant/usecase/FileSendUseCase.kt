@@ -1,6 +1,5 @@
-package com.elta.android.domain.features.consultant.interactor
+package com.elta.android.domain.features.consultant.usecase
 
-import android.net.Uri
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +9,6 @@ class FileSendUseCase @Inject constructor(
     private val repository: ConsultantRepository
 ) {
 
-    operator fun invoke(file: Uri): Flow<WebimMessageSendStatus> =
-        repository.sendPhoto(file)
+    operator fun invoke(fileName: String): Flow<WebimMessageSendStatus> =
+        repository.sendFile(fileName)
 }

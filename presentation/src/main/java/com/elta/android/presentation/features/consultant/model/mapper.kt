@@ -4,11 +4,14 @@ import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
+import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
 import java.sql.Time
 
+private const val MB_SIZE = 1048576
+private const val KB_SIZE = 1024
 internal fun WebimStatus.toUi(): ConnectState =
     when (this) {
         WebimStatus.Online -> ConnectState.Connect
@@ -26,13 +29,14 @@ internal fun WebimChatState.toUi(): ConnectState =
 internal fun WebimMessage.toUi(): ChatUiEntity =
     ChatUiEntity(
         owner = owner,
-        type = type,
+        type = attachment?.contentType,
         text = text,
+        fileSize = attachment?.size?.toSizeString(),
         date = Time(time).toStringWithFormat(CommonFormats.FORMAT_TIME),
         sendStatus = sendStatus,
         isRead = isRead,
         thumbnail = attachment?.thumbnail,
-        imageUrl = attachment?.url
+        attachmentUrl = attachment?.url
     )
 
 internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
@@ -40,6 +44,13 @@ internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
 
 internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
-        id = "$firstName$secondName$email",
+        id = email.orEmpty(),
         name = "$firstName $secondName"
     )
+
+private fun Long.toSizeString(): String =
+    when {
+        this / MB_SIZE > 1 -> "${(this.toDouble() / MB_SIZE).round(2)} MB"
+        this / KB_SIZE > 1 -> "${(this.toDouble() / KB_SIZE).round(2)} KB"
+        else -> "${toString()} B"
+    }

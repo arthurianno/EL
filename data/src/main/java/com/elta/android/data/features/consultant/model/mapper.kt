@@ -1,8 +1,8 @@
 package com.elta.android.data.features.consultant.model // ktlint-disable filename
 
+import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
-import com.elta.android.domain.features.consultant.model.WebimMessageType
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.google.gson.Gson
@@ -16,11 +16,15 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 private const val HMAC_SHA1_ALGORITHM = "HmacSHA256"
+private const val JPG_TYPE = "image/jpeg"
+private const val PNG_TYPE = "image/png"
+private const val HEIF_TYPE = "image/heif"
+private const val PDF_TYPE = "application/pdf"
+private const val VOICE_TYPE = "audio/mpeg"
 
 internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
         id = serverSideId.orEmpty(),
-        type = type.toDomainType(),
         attachment = attachment?.toDomain(),
         owner = type.toDomainOwner(),
         text = text,
@@ -34,11 +38,21 @@ internal fun WebimUser.toJsonObject(key: String): JsonObject =
 
 private fun Attachment.toDomain(): WebimMessage.Attachment =
     WebimMessage.Attachment(
-        contentType = fileInfo.contentType,
+        contentType = fileInfo.contentType?.convertContentType(),
         thumbnail = fileInfo.imageInfo?.thumbUrl,
         url = fileInfo.url,
         size = fileInfo.size
     )
+
+private fun String.convertContentType(): WebimContentType? =
+    when (this) {
+        JPG_TYPE -> WebimContentType.Jpg
+        PNG_TYPE -> WebimContentType.Png
+        PDF_TYPE -> WebimContentType.Pdf
+        HEIF_TYPE -> WebimContentType.Heif
+        VOICE_TYPE -> WebimContentType.Voice
+        else -> null
+    }
 
 private fun WebimUser.toAuth(key: String): WebimUserAuthEntity =
     WebimUserAuthEntity(
@@ -50,13 +64,6 @@ private fun SendStatus.toDomain(): WebimMessageSendStatus =
     when (this) {
         SendStatus.SENDING -> WebimMessageSendStatus.Sending
         SendStatus.SENT -> WebimMessageSendStatus.Sent
-    }
-
-private fun Message.Type.toDomainType(): WebimMessageType =
-    when (this) {
-        Message.Type.FILE_FROM_OPERATOR -> WebimMessageType.File
-        Message.Type.FILE_FROM_VISITOR -> WebimMessageType.File
-        else -> WebimMessageType.Text
     }
 
 private fun Message.Type.toDomainOwner(): WebimOwner =

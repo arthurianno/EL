@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import com.elta.android.domain.features.consultant.model.WebimMessageType
+import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.RoundedButton
@@ -34,7 +34,7 @@ private const val MESSAGE_MAX_LINES = 10
 internal data class ConsultantBottomAppBarWidgetState(
     val connectState: ConnectState,
     val messageText: TextFieldValue,
-    val messageType: WebimMessageType
+    val messageType: WebimContentType
 )
 
 internal class ConsultantBottomAppBarWidgetModel :
@@ -43,14 +43,14 @@ internal class ConsultantBottomAppBarWidgetModel :
         ConsultantBottomAppBarWidgetState(
             connectState = ConnectState.Offline,
             messageText = TextFieldValue(),
-            messageType = WebimMessageType.Voice
+            messageType = WebimContentType.Voice
         )
 
     fun setText(value: TextFieldValue?) {
         val messageType = if (value?.text?.isNotBlank() == true) {
-            WebimMessageType.Text
+            WebimContentType.Text
         } else {
-            WebimMessageType.Voice
+            WebimContentType.Voice
         }
         setState {
             state.value.copy(
@@ -82,12 +82,12 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
 private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
     val state = widgetModel.state.collectAsState()
     val messageType = state.value.messageType
-    val icon = if (messageType == WebimMessageType.Voice) {
+    val icon = if (messageType == WebimContentType.Voice) {
         R.drawable.ic_voice_message
     } else {
         R.drawable.ic_send
     }
-    val action = if (messageType == WebimMessageType.Voice) {
+    val action = if (messageType == WebimContentType.Voice) {
         ConsultantAction.VoiceClick
     } else {
         ConsultantAction.SendMessageClick(state.value.messageText.text)
