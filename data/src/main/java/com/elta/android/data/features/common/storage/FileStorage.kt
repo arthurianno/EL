@@ -32,7 +32,6 @@ class FileStorage @Inject constructor(val context: Context) {
         return outputStream.use {
             bitmap.compress(Bitmap.CompressFormat.PNG, FINE_IMAGE_QUALITY, it)
             it.flush()
-            it.close()
             file
         }
     }
@@ -47,7 +46,6 @@ class FileStorage @Inject constructor(val context: Context) {
             FileOutputStream(file).use { fileOutputStream ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, FINE_IMAGE_QUALITY, fileOutputStream)
                 fileOutputStream.flush()
-                fileOutputStream.close()
             }
         }
         return getFileUri(file)
@@ -77,9 +75,7 @@ class FileStorage @Inject constructor(val context: Context) {
                     FileOutputStream(outputFile).use { outputStream ->
                         inputStream.copyTo(outputStream)
                         outputStream.flush()
-                        outputStream.close()
                     }
-                    inputStream.close()
                 }
             }
         return getFileUri(outputFile)

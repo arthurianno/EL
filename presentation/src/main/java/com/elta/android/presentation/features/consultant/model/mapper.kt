@@ -10,6 +10,8 @@ import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
 import java.sql.Time
 
+private const val MB_SIZE = 1048576
+private const val KB_SIZE = 1024
 internal fun WebimStatus.toUi(): ConnectState =
     when (this) {
         WebimStatus.Online -> ConnectState.Connect
@@ -48,7 +50,7 @@ internal fun Profile.toWebimUser(): WebimUser =
 
 private fun Long.toSizeString(): String =
     when {
-        this / 1048576 > 1 -> "${(this.toDouble() / 1048576).round(2)} MB"
-        this / 1024 > 1 -> "${(this.toDouble() / 1024).round(2)} KB"
+        this / MB_SIZE > 1 -> "${(this.toDouble() / MB_SIZE).round(2)} MB"
+        this / KB_SIZE > 1 -> "${(this.toDouble() / KB_SIZE).round(2)} KB"
         else -> "${toString()} B"
     }
