@@ -88,7 +88,6 @@ class WebimDataSource @Inject constructor(
                     }
 
                     MessageStream.OnlineStatus.UNKNOWN -> WebimStatus.Connecting
-
                     else -> WebimStatus.Offline
                 }
             }

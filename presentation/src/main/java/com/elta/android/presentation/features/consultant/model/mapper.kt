@@ -42,7 +42,7 @@ internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
 
 internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
-        id = "$firstName$secondName$email",
+        id = email.orEmpty(),
         name = "$firstName $secondName"
     )
 

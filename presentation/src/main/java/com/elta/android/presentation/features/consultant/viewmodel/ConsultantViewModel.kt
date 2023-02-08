@@ -1,18 +1,21 @@
 package com.elta.android.presentation.features.consultant.viewmodel
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.elta.android.domain.features.consultant.interactor.FileSendUseCase
-import com.elta.android.domain.features.consultant.interactor.PhotoCreateUseCase
-import com.elta.android.domain.features.consultant.interactor.PhotoDeleteUseCase
-import com.elta.android.domain.features.consultant.interactor.WebimChatStateUseCase
-import com.elta.android.domain.features.consultant.interactor.WebimGetMessagesUseCase
-import com.elta.android.domain.features.consultant.interactor.WebimNetworkStateUseCase
-import com.elta.android.domain.features.consultant.interactor.WebimSendMessageUseCase
-import com.elta.android.domain.features.consultant.interactor.WebimSessionUseCase
+import com.elta.android.domain.common.fileType
+import com.elta.android.domain.common.getFileName
+import com.elta.android.domain.common.model.FileType
+import com.elta.android.domain.features.consultant.usecase.FileCachingInteractor
+import com.elta.android.domain.features.consultant.usecase.FileSendUseCase
+import com.elta.android.domain.features.consultant.usecase.PhotoCreateUseCase
+import com.elta.android.domain.features.consultant.usecase.PhotoDeleteUseCase
+import com.elta.android.domain.features.consultant.usecase.WebimChatStateUseCase
+import com.elta.android.domain.features.consultant.usecase.WebimGetMessagesUseCase
+import com.elta.android.domain.features.consultant.usecase.WebimNetworkStateUseCase
+import com.elta.android.domain.features.consultant.usecase.WebimSendMessageUseCase
+import com.elta.android.domain.features.consultant.usecase.WebimSessionUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -35,6 +38,7 @@ import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTop
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
@@ -49,7 +53,8 @@ class ConsultantViewModel @Inject constructor(
     private val getProfile: GetProfileUseCase,
     private val photoCreate: PhotoCreateUseCase,
     private val photoDelete: PhotoDeleteUseCase,
-    private val fileSend: FileSendUseCase
+    private val fileSend: FileSendUseCase,
+    private val cache: FileCachingInteractor,
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
@@ -111,18 +116,20 @@ class ConsultantViewModel @Inject constructor(
 
     fun sendFile(uri: Uri) {
         launch {
-            uri.lastPathSegment?.let { fileName ->
-                fileSend(fileName)
-                    .catch { handleError(it) }
-                    .collectLatest {
-                        Log.d("MYTAG", "reduceStateByAction: $it")
-                    }
+            when (uri.fileType()) {
+                FileType.Heif -> {}
+                FileType.Jpg -> sendJpg(uri)
+                FileType.Pdf -> sendPdf(uri)
+                FileType.Png -> {}
+                FileType.Voice -> {}
+                else -> { /* TODO обработка ошибки типа файла */
+                }
             }
         }
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
-    fun verifyStoragePermission(status: PermissionStatus, onGrantedAction: ConsultantAction) {
+    fun verifyPermission(status: PermissionStatus, onGrantedAction: ConsultantAction) {
         if (status != PermissionStatus.Granted) {
             sendEvent(PermissionEvent.Storage())
         } else {
@@ -154,7 +161,9 @@ class ConsultantViewModel @Inject constructor(
 
             ConsultantAction.FileClick -> currentState.copy(isOpenBottomSheet = true)
             ConsultantAction.PreviewBackPressure -> {
-                photoDelete(currentState.previewPhoto)
+                launch {
+                    photoDelete(currentState.previewPhoto)
+                }
                 currentState.copy(previewPhoto = Uri.EMPTY, isPhotoPreview = false)
             }
 
@@ -163,9 +172,7 @@ class ConsultantViewModel @Inject constructor(
                     currentState.previewPhoto.lastPathSegment?.let { photoFileName ->
                         fileSend(photoFileName)
                             .catch { handleError(it) }
-                            .collectLatest {
-                                Log.d("MYTAG", "reduceStateByAction: $it")
-                            }
+                            .collect()
                     }
                 }
                 currentState.copy(isPhotoPreview = false)
@@ -199,6 +206,26 @@ class ConsultantViewModel @Inject constructor(
             Lifecycle.Event.ON_PAUSE -> webimSession.onPause()
             Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
             else -> Unit
+        }
+    }
+
+    private suspend fun sendPdf(uri: Uri) {
+        uri.getFileName()?.let { selectFileName ->
+            cache.savePgf(selectFileName, uri).lastPathSegment?.let { cacheFileName ->
+                fileSend(cacheFileName)
+                    .catch { handleError(it) }
+                    .collect()
+            }
+        }
+    }
+
+    private suspend fun sendJpg(uri: Uri) {
+        uri.getFileName()?.let { selectFileName ->
+            cache.saveJpg(selectFileName, uri).lastPathSegment?.let { cacheFileName ->
+                fileSend(cacheFileName)
+                    .catch { handleError(it) }
+                    .collect()
+            }
         }
     }
 

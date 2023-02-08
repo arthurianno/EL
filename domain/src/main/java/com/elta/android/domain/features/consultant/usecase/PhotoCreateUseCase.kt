@@ -1,4 +1,4 @@
-package com.elta.android.domain.features.consultant.interactor
+package com.elta.android.domain.features.consultant.usecase
 
 import android.net.Uri
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository

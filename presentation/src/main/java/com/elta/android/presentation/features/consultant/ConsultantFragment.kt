@@ -2,8 +2,6 @@ package com.elta.android.presentation.features.consultant
 
 import android.Manifest
 import android.net.Uri
-import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -79,11 +77,6 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     private val getDocument = registerForActivityResult(ActivityResultContracts.GetContent()) {
         it?.let { uri -> viewModel.sendFile(uri) }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        lifecycle.addObserver(viewModel)
     }
 
     @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
@@ -190,7 +183,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
             Row(
                 modifier = Modifier
                     .clickable {
-                        viewModel.verifyStoragePermission(
+                        viewModel.verifyPermission(
                             status = storageAccessPermission.status,
                             onGrantedAction = action
                         )
@@ -210,7 +203,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     private fun ColumnScope.ChatContent() {
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
+        GetLocalProperties { dimens, _, colors, _, _ ->
             val state = viewModel.state.collectAsState()
             val hasNewMessages = state.value.hasNewMessages
             val listState = rememberLazyListState()
@@ -252,7 +245,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     private fun UserMessage(message: ChatUiEntity) {
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
+        GetLocalProperties { _, _, colors, _, _ ->
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
@@ -273,19 +266,17 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     private fun OperatorMessage(message: ChatUiEntity) {
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_round_elta),
-                        contentDescription = null
-                    )
-                    HSpacerSmall()
-                    ChatMessage(message = message)
-                }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomStart
+        ) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Image(
+                    painter = painterResource(id = R.drawable.img_round_elta),
+                    contentDescription = null
+                )
+                HSpacerSmall()
+                ChatMessage(message = message)
             }
         }
     }

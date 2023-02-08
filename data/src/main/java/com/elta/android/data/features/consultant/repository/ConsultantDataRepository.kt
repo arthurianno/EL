@@ -1,9 +1,12 @@
 package com.elta.android.data.features.consultant.repository
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.elta.android.data.features.common.storage.FileStorage
 import com.elta.android.data.features.consultant.datasource.WebimDataSource
+import com.elta.android.domain.common.addExtension
+import com.elta.android.domain.common.model.FileType
 import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
@@ -26,7 +29,7 @@ private const val PHOTO_NAME_PREFIX = "eltaPhoto_"
 private const val PHOTO_NAME_PATTERN = "yyyyMMdd_HHmmss"
 private const val START_PROGRESS = 0f
 private const val END_PROGRESS = 1f
-private const val NO_CACHE_FILE_EXIST = "Файл не найден в кеше "
+private const val NO_CACHE_FILE_EXIST = "Файл не найден в кеше"
 
 class ConsultantDataRepository @Inject constructor(
     private val webimDataSource: WebimDataSource,
@@ -100,13 +103,31 @@ class ConsultantDataRepository @Inject constructor(
         webimDataSource.chat
 
     override fun createPhoto(): Uri =
-        fileStorage.createPhoto(
+        fileStorage.createCachedPhoto(
             PHOTO_NAME_PREFIX + SimpleDateFormat(
                 PHOTO_NAME_PATTERN,
                 Locale.getDefault()
             ).format(Date())
         )
 
-    override fun deletePhoto(uri: Uri) {
+    override suspend fun deletePhoto(uri: Uri) {
+        fileStorage.deleteFile(uri)
+    }
+
+    override suspend fun cachedPhoto(name: String, bitmap: Bitmap) {
+        fileStorage.createCachedPhoto(fileName = name, bitmap = bitmap)
+    }
+
+    override suspend fun cachedFile(cacheName: String, fileType: FileType, sourceUri: Uri): Uri =
+        fileStorage.createCachedFile(
+            cachedFileName = cacheName addExtension fileType,
+            sourceUri = sourceUri
+        )
+
+    override suspend fun clearCache() {
+        fileStorage.getAllCache()
+            .forEach {
+                fileStorage.deleteFile(fileStorage.getFileUri(it))
+            }
     }
 }

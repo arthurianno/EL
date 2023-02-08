@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
@@ -27,8 +26,8 @@ import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
-import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.features.consultant.model.ChatUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalColors
@@ -119,9 +118,9 @@ private fun BoxScope.FileCard(
                     .background(color = colors.gGreenB)
                     .clickable { onClick(message) }
             )
-            VSpacerSmall()
-            Column(Modifier.fillMaxWidth()) {
-                Text(text = message.text)
+            HSpacerSmall()
+            Column {
+                Text(text = message.text, style = types.title3)
                 Text(text = message.fileSize.orEmpty(), color = colors.gGreenB)
             }
         }

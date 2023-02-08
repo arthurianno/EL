@@ -1,7 +1,9 @@
 package com.elta.android.domain.features.consultant.repository
 
+import android.graphics.Bitmap
 import android.net.Uri
 import com.elta.android.common.repository.BaseRepository
+import com.elta.android.domain.common.model.FileType
 import com.elta.android.domain.features.consultant.model.ChatList
 import com.elta.android.domain.features.consultant.model.WebimChatState
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
@@ -22,5 +24,8 @@ interface ConsultantRepository : BaseRepository {
     val chat: Flow<ChatList>
 
     fun createPhoto(): Uri
-    fun deletePhoto(uri: Uri)
+    suspend fun deletePhoto(uri: Uri)
+    suspend fun cachedPhoto(name: String, bitmap: Bitmap)
+    suspend fun cachedFile(cacheName: String, fileType: FileType, sourceUri: Uri): Uri
+    suspend fun clearCache()
 }
