@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.consultant.widgets
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,10 +32,19 @@ import com.elta.android.presentation.theme.GetLocalProperties
 
 private const val MESSAGE_MAX_LINES = 10
 
+internal enum class RecordState {
+    Empty,
+    Recording,
+    Complete,
+    Deleted
+}
+
 internal data class ConsultantBottomAppBarWidgetState(
     val connectState: ConnectState,
     val messageText: TextFieldValue,
-    val messageType: WebimContentType
+    val messageType: WebimContentType,
+    val recordState: RecordState,
+    val voiceRecord: Boolean?
 )
 
 internal class ConsultantBottomAppBarWidgetModel :
@@ -43,8 +53,30 @@ internal class ConsultantBottomAppBarWidgetModel :
         ConsultantBottomAppBarWidgetState(
             connectState = ConnectState.Offline,
             messageText = TextFieldValue(),
-            messageType = WebimContentType.Voice
+            messageType = WebimContentType.Voice,
+            recordState = RecordState.Empty,
+            voiceRecord = null
         )
+
+    fun startRecord() {
+        setState { state.value.copy(recordState = RecordState.Recording) }
+    }
+
+    fun stopRecord() {
+        setState { state.value.copy(recordState = RecordState.Complete) }
+    }
+
+    fun deleteRecord() {
+        setState { state.value.copy(recordState = RecordState.Deleted) }
+    }
+
+    fun sendRecord() {
+        setState { state.value.copy(recordState = RecordState.Empty) }
+    }
+
+    fun clearRecordState() {
+        setState { state.value.copy(recordState = RecordState.Empty) }
+    }
 
     fun setText(value: TextFieldValue?) {
         val messageType = if (value?.text?.isNotBlank() == true) {
@@ -82,23 +114,46 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
 private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
     val state = widgetModel.state.collectAsState()
     val messageType = state.value.messageType
+    val recordState = state.value.recordState
     val icon = if (messageType == WebimContentType.Voice) {
-        R.drawable.ic_voice_message
+        when (recordState) {
+            RecordState.Empty -> R.drawable.ic_voice_message
+            RecordState.Recording -> R.drawable.ic_record_stop
+            RecordState.Complete,
+            RecordState.Deleted -> R.drawable.ic_send
+        }
     } else {
         R.drawable.ic_send
     }
     val action = if (messageType == WebimContentType.Voice) {
-        ConsultantAction.VoiceClick
+        when (recordState) {
+            RecordState.Empty -> ConsultantAction.StartRecVoiceClick
+            RecordState.Recording -> ConsultantAction.StopRecVoiceClick
+            RecordState.Complete,
+            RecordState.Deleted -> ConsultantAction.SendVoiceRecClick(Uri.EMPTY) // TODO Исправить!!!!
+        }
     } else {
         ConsultantAction.SendMessageClick(state.value.messageText.text)
     }
     GetLocalProperties { _, _, colors, _, _ ->
+        val sendButtonBackgroundColor = when (recordState) {
+            RecordState.Empty -> colors.gGreenB
+            RecordState.Recording,
+            RecordState.Complete,
+            RecordState.Deleted -> colors.white
+        }
+        val sendButtonContentColor = when (recordState) {
+            RecordState.Empty -> colors.white
+            RecordState.Recording,
+            RecordState.Complete,
+            RecordState.Deleted -> colors.gGreenB
+        }
         Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
             RoundedButton(
                 icon = icon,
-                background = colors.gGreenB,
-                border = colors.gGreenB,
-                iconColor = colors.shadeBlack4,
+                background = sendButtonBackgroundColor,
+                border = sendButtonBackgroundColor,
+                iconColor = sendButtonContentColor,
                 onClick = { widgetModel.sendAction(action) }
             )
         }
@@ -107,11 +162,41 @@ private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) 
 
 @Composable
 private fun BoxScope.FileButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
-    Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
-        RoundedButton(
-            icon = R.drawable.ic_file,
-            onClick = { widgetModel.sendAction(ConsultantAction.FileClick) }
-        )
+    GetLocalProperties { _, _, colors, _, _ ->
+        val recordState = widgetModel.state.collectAsState().value.recordState
+        val action = when (recordState) {
+            RecordState.Empty -> ConsultantAction.FileClick
+            RecordState.Recording,
+            RecordState.Complete -> ConsultantAction.DeleteRecVoiceClick
+
+            RecordState.Deleted -> null
+        }
+        val icon = when (recordState) {
+            RecordState.Empty -> R.drawable.ic_file
+            else -> R.drawable.ic_record_delete
+        }
+        val fileButtonBackgroundColor = when (recordState) {
+            RecordState.Deleted,
+            RecordState.Empty -> colors.white
+
+            RecordState.Recording,
+            RecordState.Complete -> colors.gGreenB
+        }
+        val fileButtonContentColor = when (recordState) {
+            RecordState.Empty -> colors.gGreenB
+            RecordState.Recording,
+            RecordState.Complete -> colors.white
+
+            RecordState.Deleted -> colors.gOrangeB
+        }
+        Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
+            RoundedButton(
+                icon = icon,
+                background = fileButtonBackgroundColor,
+                iconColor = fileButtonContentColor,
+                onClick = { action?.let { widgetModel.sendAction(it) } }
+            )
+        }
     }
 }
 

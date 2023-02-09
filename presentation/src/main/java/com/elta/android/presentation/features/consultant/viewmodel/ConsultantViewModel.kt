@@ -37,6 +37,7 @@ import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBot
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBarWidgetModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -143,6 +144,7 @@ class ConsultantViewModel @Inject constructor(
     ): ConsultantViewState =
         when (action) {
             ConsultantAction.SearchClick -> currentState
+
             is ConsultantAction.SendMessageClick -> sendNewMessage(action.text)
             ConsultantAction.SelectPhotoClick -> {
                 sendEvent(PhotoSelect())
@@ -181,6 +183,10 @@ class ConsultantViewModel @Inject constructor(
             else -> {
                 when (action) {
                     AppAction.BackPressure -> backClick()
+                    ConsultantAction.StartRecVoiceClick -> startRecordVoice()
+                    ConsultantAction.StopRecVoiceClick -> stopRecordVoice()
+                    ConsultantAction.DeleteRecVoiceClick -> deleteRecordVoice()
+                    is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord(action.uri)
                 }
                 currentState
             }
@@ -207,6 +213,26 @@ class ConsultantViewModel @Inject constructor(
             Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
             else -> Unit
         }
+    }
+
+    private fun sendVoiceRecord(uri: Uri) {
+        consultantBottomAppBar.sendRecord()
+    }
+
+    private fun deleteRecordVoice() {
+        launch {
+            consultantBottomAppBar.deleteRecord()
+            delay(1000)
+            consultantBottomAppBar.clearRecordState()
+        }
+    }
+
+    private fun stopRecordVoice() {
+        consultantBottomAppBar.stopRecord()
+    }
+
+    private fun startRecordVoice() {
+        consultantBottomAppBar.startRecord()
     }
 
     private suspend fun sendPdf(uri: Uri) {
