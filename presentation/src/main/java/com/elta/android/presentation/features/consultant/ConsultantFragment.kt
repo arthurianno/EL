@@ -57,7 +57,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 
 private const val IMAGE = "image/*"
-private const val DOCUMENT = "*/*"
+private const val DOCUMENT = "application/pdf"
 
 class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     companion object {
@@ -87,6 +87,8 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
         val state = viewModel.state.collectAsState()
         val storageAccessPermission =
             rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val recordAudionPermission =
+            rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
         LaunchedEffect(key1 = sheetState.currentValue) {
             viewModel.setSheetVisibleState(sheetState.isVisible)
         }
@@ -103,6 +105,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 is PhotoSelect -> getPhoto.launch(IMAGE)
                 is FileSelect -> getDocument.launch(DOCUMENT)
                 is PermissionEvent.Storage -> storageAccessPermission.launchPermissionRequest()
+                is PermissionEvent.RecordAudio -> recordAudionPermission.launchPermissionRequest()
             }
         }
         GetLocalProperties { _, _, colors, shapes, _ ->
@@ -185,7 +188,8 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                     .clickable {
                         viewModel.verifyPermission(
                             status = storageAccessPermission.status,
-                            onGrantedAction = action
+                            onGrantedAction = action,
+                            onDeniedEvent = PermissionEvent.Storage()
                         )
                     }
                     .fillMaxWidth()

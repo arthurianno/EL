@@ -1,14 +1,21 @@
 package com.elta.android.presentation.features.consultant.widgets
 
-import android.net.Uri
+import android.Manifest
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
@@ -19,18 +26,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.disableClickable
+import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
+import com.elta.android.presentation.core.compose.widgets.animation.HorizontallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.RoundedButton
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.theme.GetLocalProperties
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import kotlin.random.Random
 
 private const val MESSAGE_MAX_LINES = 10
+
+private val startGraph = (0..Random.nextInt(50)).map {
+    Random.nextFloat()
+}
 
 internal enum class RecordState {
     Empty,
@@ -44,18 +62,21 @@ internal data class ConsultantBottomAppBarWidgetState(
     val messageText: TextFieldValue,
     val messageType: WebimContentType,
     val recordState: RecordState,
-    val voiceRecord: Boolean?
+    val recordTime: Double,
+    val recordGraph: List<Float>
 )
 
 internal class ConsultantBottomAppBarWidgetModel :
     BaseWidgetModel<ConsultantBottomAppBarWidgetState>() {
+
     override fun createInitState(): ConsultantBottomAppBarWidgetState =
         ConsultantBottomAppBarWidgetState(
             connectState = ConnectState.Offline,
             messageText = TextFieldValue(),
             messageType = WebimContentType.Voice,
             recordState = RecordState.Empty,
-            voiceRecord = null
+            recordTime = 0.0,
+            recordGraph = startGraph
         )
 
     fun startRecord() {
@@ -78,6 +99,27 @@ internal class ConsultantBottomAppBarWidgetModel :
         setState { state.value.copy(recordState = RecordState.Empty) }
     }
 
+    fun setRecordTime(time: Double) {
+        setState { state.value.copy(recordTime = time) }
+    }
+
+    fun addValueToGraph(value: Float) {
+        val newValue = when {
+            value < 0.1 -> 0.1f
+            value > 1 -> 1f
+            else -> value
+        }
+        setState {
+            state.value.copy(
+                recordGraph = state.value.recordGraph
+                    .toMutableList()
+                    .apply {
+                        add(newValue)
+                    }
+            )
+        }
+    }
+
     fun setText(value: TextFieldValue?) {
         val messageType = if (value?.text?.isNotBlank() == true) {
             WebimContentType.Text
@@ -95,6 +137,18 @@ internal class ConsultantBottomAppBarWidgetModel :
 
 @Composable
 internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    val context = LocalContext.current
+    Box {
+        MessageBox(widgetModel)
+        HorizontallyAnimation(visualState = state.value.recordState != RecordState.Empty) {
+            WaveRecordGraph(widgetModel = widgetModel)
+        }
+    }
+}
+
+@Composable
+private fun MessageBox(widgetModel: ConsultantBottomAppBarWidgetModel) {
     GetLocalProperties { dimens, _, colors, _, _ ->
         Box(
             modifier = Modifier
@@ -111,49 +165,93 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
 }
 
 @Composable
+private fun WaveRecordGraph(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    GetLocalProperties { dimens, brash, colors, shapes, types ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .disableClickable()
+                .background(color = colors.gGreenB)
+                .padding(dimens.consultantBottomBarContentPadding)
+        ) {
+            RecordDeleteButton(widgetModel)
+            GraphField(widgetModel)
+            RecordControlButton(widgetModel)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.RecordControlButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    val recordState = state.value.recordState
+    val icon = when (recordState) {
+        RecordState.Recording -> R.drawable.ic_record_stop
+        else -> R.drawable.ic_send
+    }
+    val action = when (recordState) {
+        RecordState.Recording -> ConsultantAction.StopRecVoiceClick
+        else -> ConsultantAction.SendVoiceRecClick
+    }
+    GetLocalProperties { _, _, colors, _, _ ->
+        Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
+            RoundedButton(
+                icon = icon,
+                background = colors.white,
+                border = null,
+                iconColor = colors.gGreenB,
+                onClick = { widgetModel.sendAction(action) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.RecordDeleteButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val recordState = widgetModel.state.collectAsState().value.recordState
+    GetLocalProperties { _, _, colors, _, _ ->
+        var iconColor = colors.white
+        var backgroundColor = colors.blackBlue20
+        if (recordState == RecordState.Deleted) {
+            iconColor = colors.gOrangeB
+            backgroundColor = colors.white
+        }
+        Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
+            RoundedButton(
+                icon = R.drawable.ic_record_delete,
+                background = animateColorAsState(targetValue = backgroundColor).value,
+                iconColor = animateColorAsState(targetValue = iconColor).value,
+                border = null,
+                onClick = { widgetModel.sendAction(ConsultantAction.DeleteRecVoiceClick) }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
 private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
     val state = widgetModel.state.collectAsState()
     val messageType = state.value.messageType
-    val recordState = state.value.recordState
+    val recordPermissionState =
+        rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     val icon = if (messageType == WebimContentType.Voice) {
-        when (recordState) {
-            RecordState.Empty -> R.drawable.ic_voice_message
-            RecordState.Recording -> R.drawable.ic_record_stop
-            RecordState.Complete,
-            RecordState.Deleted -> R.drawable.ic_send
-        }
+        R.drawable.ic_voice_message
     } else {
         R.drawable.ic_send
     }
     val action = if (messageType == WebimContentType.Voice) {
-        when (recordState) {
-            RecordState.Empty -> ConsultantAction.StartRecVoiceClick
-            RecordState.Recording -> ConsultantAction.StopRecVoiceClick
-            RecordState.Complete,
-            RecordState.Deleted -> ConsultantAction.SendVoiceRecClick(Uri.EMPTY) // TODO Исправить!!!!
-        }
+        ConsultantAction.StartRecVoiceClick(recordPermissionState.status)
     } else {
         ConsultantAction.SendMessageClick(state.value.messageText.text)
     }
     GetLocalProperties { _, _, colors, _, _ ->
-        val sendButtonBackgroundColor = when (recordState) {
-            RecordState.Empty -> colors.gGreenB
-            RecordState.Recording,
-            RecordState.Complete,
-            RecordState.Deleted -> colors.white
-        }
-        val sendButtonContentColor = when (recordState) {
-            RecordState.Empty -> colors.white
-            RecordState.Recording,
-            RecordState.Complete,
-            RecordState.Deleted -> colors.gGreenB
-        }
         Box(modifier = Modifier.Companion.align(Alignment.BottomEnd)) {
             RoundedButton(
                 icon = icon,
-                background = sendButtonBackgroundColor,
-                border = sendButtonBackgroundColor,
-                iconColor = sendButtonContentColor,
+                background = colors.gGreenB,
+                border = null,
+                iconColor = colors.shadeBlack4,
                 onClick = { widgetModel.sendAction(action) }
             )
         }
@@ -162,39 +260,45 @@ private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) 
 
 @Composable
 private fun BoxScope.FileButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
-    GetLocalProperties { _, _, colors, _, _ ->
-        val recordState = widgetModel.state.collectAsState().value.recordState
-        val action = when (recordState) {
-            RecordState.Empty -> ConsultantAction.FileClick
-            RecordState.Recording,
-            RecordState.Complete -> ConsultantAction.DeleteRecVoiceClick
+    Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
+        RoundedButton(
+            icon = R.drawable.ic_file,
+            onClick = { widgetModel.sendAction(ConsultantAction.FileClick) }
+        )
+    }
+}
 
-            RecordState.Deleted -> null
-        }
-        val icon = when (recordState) {
-            RecordState.Empty -> R.drawable.ic_file
-            else -> R.drawable.ic_record_delete
-        }
-        val fileButtonBackgroundColor = when (recordState) {
-            RecordState.Deleted,
-            RecordState.Empty -> colors.white
-
-            RecordState.Recording,
-            RecordState.Complete -> colors.gGreenB
-        }
-        val fileButtonContentColor = when (recordState) {
-            RecordState.Empty -> colors.gGreenB
-            RecordState.Recording,
-            RecordState.Complete -> colors.white
-
-            RecordState.Deleted -> colors.gOrangeB
-        }
-        Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
-            RoundedButton(
-                icon = icon,
-                background = fileButtonBackgroundColor,
-                iconColor = fileButtonContentColor,
-                onClick = { action?.let { widgetModel.sendAction(it) } }
+@Composable
+private fun BoxScope.GraphField(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    GetLocalProperties { dimens, brash, colors, shapes, types ->
+        Row(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(dimens.graphFieldPadding)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            LazyRow(
+//                userScrollEnabled = false,
+//                reverseLayout = true,
+                horizontalArrangement = Arrangement.spacedBy(dimens.verySmallDim),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                items(items = state.value.recordGraph) {
+                    Box(
+                        modifier = Modifier
+                            .width(dimens.graphItemHeight)
+                            .height(dimens.graphItemMaxWidth * it)
+                            .background(color = colors.white, shape = shapes.round)
+                    )
+                }
+            }
+            HSpacerVerySmall()
+            Text(
+                text = state.value.recordTime.toString(),
+                style = types.title3,
+                color = colors.white
             )
         }
     }
@@ -210,7 +314,7 @@ private fun BoxScope.MessageField(widgetModel: ConsultantBottomAppBarWidgetModel
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(dimens.messageTextFiledPadding)
+                .padding(dimens.messageTextFieldPadding)
         ) {
             BasicTextField(
                 value = state.value.messageText,

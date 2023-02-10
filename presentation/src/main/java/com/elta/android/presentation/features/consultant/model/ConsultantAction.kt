@@ -1,15 +1,18 @@
 package com.elta.android.presentation.features.consultant.model
 
-import android.net.Uri
 import com.elta.android.presentation.core.compose.common.Action
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 
 sealed class ConsultantAction : Action {
     object SearchClick : ConsultantAction()
     object FileClick : ConsultantAction()
-    object StartRecVoiceClick : ConsultantAction()
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    data class StartRecVoiceClick(val permissionStatus: PermissionStatus) : ConsultantAction()
     object StopRecVoiceClick : ConsultantAction()
     object DeleteRecVoiceClick : ConsultantAction()
-    data class SendVoiceRecClick(val uri: Uri) : ConsultantAction()
+    object SendVoiceRecClick : ConsultantAction()
     data class SendMessageClick(val text: String) : ConsultantAction()
     data class ChatMessageClick(val message: ChatUiEntity) : ConsultantAction()
     data class ChatMessageLongClick(val message: ChatUiEntity) : ConsultantAction()

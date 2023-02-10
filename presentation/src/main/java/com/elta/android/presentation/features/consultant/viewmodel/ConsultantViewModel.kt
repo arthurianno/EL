@@ -37,6 +37,7 @@ import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBot
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBarWidgetModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -123,21 +124,25 @@ class ConsultantViewModel @Inject constructor(
                 FileType.Pdf -> sendPdf(uri)
                 FileType.Png -> {}
                 FileType.Voice -> {}
-                else -> { /* TODO обработка ошибки типа файла */
-                }
+                else -> {}
             }
         }
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
-    fun verifyPermission(status: PermissionStatus, onGrantedAction: ConsultantAction) {
+    fun verifyPermission(
+        status: PermissionStatus,
+        onGrantedAction: ConsultantAction,
+        onDeniedEvent: Event
+    ) {
         if (status != PermissionStatus.Granted) {
-            sendEvent(PermissionEvent.Storage())
+            sendEvent(onDeniedEvent)
         } else {
             sendAction(onGrantedAction)
         }
     }
 
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun reduceStateByAction(
         currentState: ConsultantViewState,
         action: Action
@@ -183,10 +188,10 @@ class ConsultantViewModel @Inject constructor(
             else -> {
                 when (action) {
                     AppAction.BackPressure -> backClick()
-                    ConsultantAction.StartRecVoiceClick -> startRecordVoice()
                     ConsultantAction.StopRecVoiceClick -> stopRecordVoice()
                     ConsultantAction.DeleteRecVoiceClick -> deleteRecordVoice()
-                    is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord(action.uri)
+                    is ConsultantAction.StartRecVoiceClick -> startRecordVoice(action.permissionStatus)
+                    is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord()
                 }
                 currentState
             }
@@ -215,7 +220,7 @@ class ConsultantViewModel @Inject constructor(
         }
     }
 
-    private fun sendVoiceRecord(uri: Uri) {
+    private fun sendVoiceRecord() {
         consultantBottomAppBar.sendRecord()
     }
 
@@ -231,8 +236,13 @@ class ConsultantViewModel @Inject constructor(
         consultantBottomAppBar.stopRecord()
     }
 
-    private fun startRecordVoice() {
-        consultantBottomAppBar.startRecord()
+    @OptIn(ExperimentalPermissionsApi::class)
+    private fun startRecordVoice(permissionStatus: PermissionStatus) {
+        if (permissionStatus.isGranted) {
+            consultantBottomAppBar.startRecord()
+        } else {
+            sendEvent(PermissionEvent.RecordAudio())
+        }
     }
 
     private suspend fun sendPdf(uri: Uri) {

@@ -24,7 +24,9 @@ internal class PhotoPreviewBottomAppBarWidgetModel : BaseWidgetModel<Unit>() {
 internal fun PhotoPreviewBottomAppBar(widgetModel: PhotoPreviewBottomAppBarWidgetModel) {
     GetLocalProperties { dimens, _, colors, _, _ ->
         Row(
-            Modifier.fillMaxWidth().padding(dimens.photoPreviewBottomBarContentPadding),
+            Modifier
+                .fillMaxWidth()
+                .padding(dimens.photoPreviewBottomBarContentPadding),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -36,7 +38,7 @@ internal fun PhotoPreviewBottomAppBar(widgetModel: PhotoPreviewBottomAppBarWidge
             RoundedButton(
                 icon = R.drawable.ic_send,
                 background = colors.gGreenB,
-                border = colors.gGreenB,
+                border = null,
                 size = dimens.previewSendButtonSize,
                 onClick = { widgetModel.sendAction(ConsultantAction.PreviewSendClick) }
             )
