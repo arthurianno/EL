@@ -19,6 +19,7 @@ import com.elta.android.data.di.WebimModule
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.di.FragmentBuilder
+import com.elta.android.presentation.di.MediaModule
 import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
@@ -58,6 +59,7 @@ import javax.inject.Singleton
         FragmentBuilder::class,
         NotificationModule::class,
         ReceiverBuilder::class,
+        MediaModule::class,
         // navigation
         NavigationModule::class,
         // analytics

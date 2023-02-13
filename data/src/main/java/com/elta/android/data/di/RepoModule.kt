@@ -4,6 +4,7 @@ import com.elta.android.data.features.auth.repository.AuthDataRepository
 import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.calculator.repository.CalculatorDataRepository
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
+import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
 import com.elta.android.data.features.diary.insulin.repository.DrugNameDataRepository
@@ -17,6 +18,7 @@ import com.elta.android.data.features.reports.repository.ReportsDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
+import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
@@ -109,4 +111,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindConsultantRepository(repo: ConsultantDataRepository): ConsultantRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMediaRepository(repo: MediaDataRepository): MediaRepository
 }

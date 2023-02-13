@@ -40,12 +40,16 @@ class FileStorage @Inject constructor(val context: Context) {
     fun getFileUri(file: File): Uri =
         FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
-    fun createCachedPhoto(fileName: String, bitmap: Bitmap? = null): Uri {
+    fun createCachedPhoto(
+        fileName: String,
+        imageQuality: Int = FINE_IMAGE_QUALITY,
+        bitmap: Bitmap? = null
+    ): Uri {
         val file = createCachedJpgFile(fileName)
         file.createNewFile()
         bitmap?.let {
             FileOutputStream(file).use { fileOutputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, FINE_IMAGE_QUALITY, fileOutputStream)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, imageQuality, fileOutputStream)
                 fileOutputStream.flush()
             }
         }
