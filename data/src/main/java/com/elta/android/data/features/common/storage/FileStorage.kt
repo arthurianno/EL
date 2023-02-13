@@ -12,6 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val FINE_IMAGE_QUALITY = 100
+private const val FILE_SCHEME = "file"
 
 @Singleton
 class FileStorage @Inject constructor(val context: Context) {
@@ -39,16 +40,26 @@ class FileStorage @Inject constructor(val context: Context) {
     fun getFileUri(file: File): Uri =
         FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
-    fun createCachedPhoto(fileName: String, bitmap: Bitmap? = null): Uri {
+    fun createCachedPhoto(
+        fileName: String,
+        imageQuality: Int = FINE_IMAGE_QUALITY,
+        bitmap: Bitmap? = null
+    ): Uri {
         val file = createCachedJpgFile(fileName)
         file.createNewFile()
         bitmap?.let {
             FileOutputStream(file).use { fileOutputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, FINE_IMAGE_QUALITY, fileOutputStream)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, imageQuality, fileOutputStream)
                 fileOutputStream.flush()
             }
         }
         return getFileUri(file)
+    }
+
+    fun createCachedAudio(fileName: String): File {
+        val file = File(context.cacheDir, fileName addExtension FileType.Voice)
+        file.createNewFile()
+        return file
     }
 
     fun createCachedFile(cachedFileName: String, sourceUri: Uri): Uri =
@@ -63,7 +74,10 @@ class FileStorage @Inject constructor(val context: Context) {
             .toList()
 
     fun deleteFile(uri: Uri) {
-        context.contentResolver.delete(uri, null, null)
+        when (uri.scheme) {
+            FILE_SCHEME -> uri.path?.let { File(it).delete() }
+            else -> context.contentResolver.delete(uri, null, null)
+        }
     }
 
     private fun cachedFile(fileName: String, sourceUri: Uri): Uri {

@@ -23,7 +23,7 @@ fun RoundedButton(
     @DrawableRes icon: Int,
     iconColor: Color = Color.Unspecified,
     background: Color = LocalColors.current.white,
-    border: Color = LocalColors.current.shadeBlack3,
+    border: Color? = LocalColors.current.shadeBlack3,
     size: Dp = LocalDimens.current.roundedButton,
     onClick: () -> Unit
 ) {
@@ -33,11 +33,14 @@ fun RoundedButton(
             .requiredSize(size)
             .clip(shape = shapes.round)
             .clickable(onClick = onClick)
-            .border(
-                width = LocalDimens.current.borderWidth,
-                color = border,
-                shape = shapes.round
-            )
+            .then(border?.let {
+                Modifier
+                    .border(
+                        width = LocalDimens.current.borderWidth,
+                        color = border,
+                        shape = shapes.round
+                    )
+            } ?: Modifier)
             .background(
                 color = background,
                 shape = shapes.round
