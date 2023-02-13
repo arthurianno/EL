@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -16,17 +15,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,21 +34,18 @@ import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.disableClickable
-import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.animation.HorizontallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.RoundedButton
 import com.elta.android.presentation.features.consultant.model.ConnectState
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
+import com.elta.android.presentation.features.consultant.model.toUi
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlin.random.Random
+import org.threeten.bp.LocalTime
+import org.threeten.bp.temporal.ChronoUnit
 
 private const val MESSAGE_MAX_LINES = 10
-
-private val startGraph = (0..Random.nextInt(50)).map {
-    Random.nextFloat()
-}
 
 internal enum class RecordState {
     Empty,
@@ -62,7 +59,7 @@ internal data class ConsultantBottomAppBarWidgetState(
     val messageText: TextFieldValue,
     val messageType: WebimContentType,
     val recordState: RecordState,
-    val recordTime: Double,
+    val recordTime: LocalTime,
     val recordGraph: List<Float>
 )
 
@@ -75,12 +72,18 @@ internal class ConsultantBottomAppBarWidgetModel :
             messageText = TextFieldValue(),
             messageType = WebimContentType.Voice,
             recordState = RecordState.Empty,
-            recordTime = 0.0,
-            recordGraph = startGraph
+            recordTime = LocalTime.MIN,
+            recordGraph = emptyList()
         )
 
     fun startRecord() {
-        setState { state.value.copy(recordState = RecordState.Recording) }
+        setState {
+            state.value.copy(
+                recordState = RecordState.Recording,
+                recordGraph = emptyList(),
+                recordTime = LocalTime.MIN
+            )
+        }
     }
 
     fun stopRecord() {
@@ -99,8 +102,9 @@ internal class ConsultantBottomAppBarWidgetModel :
         setState { state.value.copy(recordState = RecordState.Empty) }
     }
 
-    fun setRecordTime(time: Double) {
-        setState { state.value.copy(recordTime = time) }
+    fun addRecordTime(millis: Long) {
+        val oldTime = state.value.recordTime
+        setState { state.value.copy(recordTime = oldTime.plus(millis, ChronoUnit.MILLIS)) }
     }
 
     fun addValueToGraph(value: Float) {
@@ -138,7 +142,6 @@ internal class ConsultantBottomAppBarWidgetModel :
 @Composable
 internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetModel) {
     val state = widgetModel.state.collectAsState()
-    val context = LocalContext.current
     Box {
         MessageBox(widgetModel)
         HorizontallyAnimation(visualState = state.value.recordState != RecordState.Empty) {
@@ -270,20 +273,27 @@ private fun BoxScope.FileButton(widgetModel: ConsultantBottomAppBarWidgetModel) 
 
 @Composable
 private fun BoxScope.GraphField(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val listState = rememberLazyListState()
     val state = widgetModel.state.collectAsState()
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
-        Row(
+    LaunchedEffect(key1 = state.value.recordGraph.size) {
+        listState.scrollToItem(state.value.recordGraph.size)
+    }
+    GetLocalProperties { dimens, _, colors, shapes, _ ->
+        Box(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(dimens.graphFieldPadding)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
         ) {
             LazyRow(
-//                userScrollEnabled = false,
-//                reverseLayout = true,
+                userScrollEnabled = false,
+                state = listState,
                 horizontalArrangement = Arrangement.spacedBy(dimens.verySmallDim),
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(end = dimens.graphTimePadding)
+                    .fillMaxWidth()
             ) {
                 items(items = state.value.recordGraph) {
                     Box(
@@ -294,13 +304,21 @@ private fun BoxScope.GraphField(widgetModel: ConsultantBottomAppBarWidgetModel) 
                     )
                 }
             }
-            HSpacerVerySmall()
-            Text(
-                text = state.value.recordTime.toString(),
-                style = types.title3,
-                color = colors.white
-            )
+            TimeLabel(state.value.recordTime.toUi())
         }
+    }
+}
+
+@Composable
+private fun BoxScope.TimeLabel(time: String) {
+    GetLocalProperties { _, _, colors, _, types ->
+        Text(
+            text = time,
+            style = types.title3,
+            color = colors.white,
+            maxLines = 1,
+            modifier = Modifier.Companion.align(Alignment.CenterEnd)
+        )
     }
 }
 

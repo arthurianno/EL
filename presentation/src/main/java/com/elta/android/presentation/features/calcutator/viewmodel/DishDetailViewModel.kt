@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.common.utils.findOrFirst
+import com.elta.android.domain.common.mapDistinct
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetFatSecretDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
@@ -9,7 +10,6 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
-import com.elta.android.presentation.core.compose.mapDistinct
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel

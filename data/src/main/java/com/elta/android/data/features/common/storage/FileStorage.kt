@@ -12,6 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val FINE_IMAGE_QUALITY = 100
+private const val FILE_SCHEME = "file"
 
 @Singleton
 class FileStorage @Inject constructor(val context: Context) {
@@ -51,6 +52,12 @@ class FileStorage @Inject constructor(val context: Context) {
         return getFileUri(file)
     }
 
+    fun createCachedAudio(fileName: String): File {
+        val file = File(context.cacheDir, fileName addExtension FileType.Voice)
+        file.createNewFile()
+        return file
+    }
+
     fun createCachedFile(cachedFileName: String, sourceUri: Uri): Uri =
         cachedFile(fileName = cachedFileName, sourceUri = sourceUri)
 
@@ -63,7 +70,10 @@ class FileStorage @Inject constructor(val context: Context) {
             .toList()
 
     fun deleteFile(uri: Uri) {
-        context.contentResolver.delete(uri, null, null)
+        when (uri.scheme) {
+            FILE_SCHEME -> uri.path?.let { File(it).delete() }
+            else -> context.contentResolver.delete(uri, null, null)
+        }
     }
 
     private fun cachedFile(fileName: String, sourceUri: Uri): Uri {

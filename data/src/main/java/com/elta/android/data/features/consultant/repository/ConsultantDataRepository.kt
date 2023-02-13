@@ -27,9 +27,8 @@ import java.util.Locale
 import javax.inject.Inject
 
 private const val PHOTO_NAME_PREFIX = "eltaPhoto_"
-private const val PHOTO_NAME_PATTERN = "yyyyMMdd_HHmmss"
-private const val START_PROGRESS = 0f
-private const val END_PROGRESS = 1f
+private const val AUDIO_NAME_PREFIX = "eltaAudio_"
+private const val NAME_DATE_STAMP_PATTERN = "yyyyMMdd_HHmmss"
 private const val NO_CACHE_FILE_EXIST = "File not found in the cache!!! , Filename ----> "
 
 class ConsultantDataRepository @Inject constructor(
@@ -109,12 +108,12 @@ class ConsultantDataRepository @Inject constructor(
     override fun createPhoto(): Uri =
         fileStorage.createCachedPhoto(
             PHOTO_NAME_PREFIX + SimpleDateFormat(
-                PHOTO_NAME_PATTERN,
+                NAME_DATE_STAMP_PATTERN,
                 Locale.getDefault()
             ).format(Date())
         )
 
-    override suspend fun deletePhoto(uri: Uri) {
+    override suspend fun deleteFile(uri: Uri) {
         fileStorage.deleteFile(uri)
     }
 
@@ -134,4 +133,13 @@ class ConsultantDataRepository @Inject constructor(
                 fileStorage.deleteFile(fileStorage.getFileUri(it))
             }
     }
+
+    override fun createAudioFile() =
+        fileStorage.createCachedAudio(
+            AUDIO_NAME_PREFIX + SimpleDateFormat(
+                NAME_DATE_STAMP_PATTERN,
+                Locale.getDefault()
+            ).format(Date())
+        )
+
 }

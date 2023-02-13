@@ -1,16 +1,21 @@
 package com.elta.android.presentation.features.consultant.viewmodel
 
+import android.content.Context
+import android.media.MediaRecorder
 import android.net.Uri
+import android.os.Build
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.domain.common.fileType
 import com.elta.android.domain.common.getFileName
 import com.elta.android.domain.common.model.FileType
+import com.elta.android.domain.features.consultant.usecase.AudioRecordCreateUseCase
 import com.elta.android.domain.features.consultant.usecase.FileCachingInteractor
+import com.elta.android.domain.features.consultant.usecase.FileDeleteUseCase
 import com.elta.android.domain.features.consultant.usecase.FileSendUseCase
 import com.elta.android.domain.features.consultant.usecase.PhotoCreateUseCase
-import com.elta.android.domain.features.consultant.usecase.PhotoDeleteUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimChatStateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimGetMessagesUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimNetworkStateUseCase
@@ -35,16 +40,27 @@ import com.elta.android.presentation.features.consultant.widgets.ConsultantBotto
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewTopAppBarWidgetModel
+import com.elta.android.presentation.features.consultant.widgets.RecordState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.rx2.asFlow
+import java.io.File
 import javax.inject.Inject
+
+private const val MAX_FILE_SIZE = 10000000L
+private const val VOLUME_TIMER_DELAY = 200L
+private const val VOLUME_MAX_LEVEL = 7500F
 
 class ConsultantViewModel @Inject constructor(
     private val webimSession: WebimSessionUseCase,
@@ -54,10 +70,21 @@ class ConsultantViewModel @Inject constructor(
     private val getMessages: WebimGetMessagesUseCase,
     private val getProfile: GetProfileUseCase,
     private val photoCreate: PhotoCreateUseCase,
-    private val photoDelete: PhotoDeleteUseCase,
+    private val fileDelete: FileDeleteUseCase,
     private val fileSend: FileSendUseCase,
     private val cache: FileCachingInteractor,
+    private val audioFileCreate: AudioRecordCreateUseCase,
+    context: Context
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
+    private val mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        MediaRecorder(context)
+    } else {
+        MediaRecorder()
+    }
+
+    private var volumeLevelTicker: ReceiveChannel<Unit>? = null
+
+    private var audioFile: File? = null
 
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
@@ -124,7 +151,7 @@ class ConsultantViewModel @Inject constructor(
                 FileType.Pdf -> sendPdf(uri)
                 FileType.Png -> {}
                 FileType.Voice -> {}
-                else -> {}
+                else -> Unit
             }
         }
     }
@@ -169,7 +196,7 @@ class ConsultantViewModel @Inject constructor(
             ConsultantAction.FileClick -> currentState.copy(isOpenBottomSheet = true)
             ConsultantAction.PreviewBackPressure -> {
                 launch {
-                    photoDelete(currentState.previewPhoto)
+                    fileDelete(currentState.previewPhoto)
                 }
                 currentState.copy(previewPhoto = Uri.EMPTY, isPhotoPreview = false)
             }
@@ -221,25 +248,65 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun sendVoiceRecord() {
+        audioFile = null
         consultantBottomAppBar.sendRecord()
     }
 
     private fun deleteRecordVoice() {
+        if (consultantBottomAppBar.state.value.recordState == RecordState.Recording) {
+            stopRecordVoice()
+        }
+        consultantBottomAppBar.deleteRecord()
+        consultantBottomAppBar.clearRecordState()
         launch {
-            consultantBottomAppBar.deleteRecord()
-            delay(1000)
-            consultantBottomAppBar.clearRecordState()
+            audioFile?.toUri()?.let { fileDelete(it) }
+            audioFile = null
         }
     }
 
+
     private fun stopRecordVoice() {
+        mediaRecorder.stop()
+        mediaRecorder.reset()
+        volumeLevelTicker?.cancel()
+        volumeLevelTicker = null
         consultantBottomAppBar.stopRecord()
     }
 
-    @OptIn(ExperimentalPermissionsApi::class)
+    @OptIn(ExperimentalPermissionsApi::class, ObsoleteCoroutinesApi::class)
     private fun startRecordVoice(permissionStatus: PermissionStatus) {
         if (permissionStatus.isGranted) {
-            consultantBottomAppBar.startRecord()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioFile = audioFileCreate()
+                with(mediaRecorder) {
+                    setAudioSource(MediaRecorder.AudioSource.MIC)
+                    setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                    setMaxFileSize(MAX_FILE_SIZE)
+                    setOutputFile(audioFile)
+                    prepare()
+                    start()
+                }
+                launch {
+                    volumeLevelTicker = ticker(
+                        delayMillis = VOLUME_TIMER_DELAY,
+                        initialDelayMillis = VOLUME_TIMER_DELAY
+                    )
+                    volumeLevelTicker?.let { ticker ->
+                        ticker.receiveAsFlow()
+                            .filterNotNull()
+                            .catch { handleError(it) }
+                            .onEach {
+                                with(consultantBottomAppBar) {
+                                    addValueToGraph(mediaRecorder.maxAmplitude / VOLUME_MAX_LEVEL)
+                                    addRecordTime(VOLUME_TIMER_DELAY)
+                                }
+                            }
+                            .collect()
+                    }
+                }
+                consultantBottomAppBar.startRecord()
+            }
         } else {
             sendEvent(PermissionEvent.RecordAudio())
         }

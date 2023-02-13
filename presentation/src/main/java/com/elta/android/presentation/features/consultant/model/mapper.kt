@@ -8,6 +8,9 @@ import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toStringWithFormat
+import org.threeten.bp.LocalTime
+import org.threeten.bp.format.DateTimeFormatterBuilder
+import org.threeten.bp.temporal.ChronoField
 import java.sql.Time
 
 private const val MB_SIZE = 1048576
@@ -46,6 +49,15 @@ internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
         id = email.orEmpty(),
         name = "$firstName $secondName"
+    )
+
+internal fun LocalTime.toUi(): String =
+    format(
+        DateTimeFormatterBuilder()
+            .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+            .toFormatter()
     )
 
 private fun Long.toSizeString(): String =

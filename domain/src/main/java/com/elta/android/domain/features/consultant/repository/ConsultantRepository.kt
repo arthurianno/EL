@@ -10,6 +10,7 @@ import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimStatus
 import com.elta.android.domain.features.consultant.model.WebimUser
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface ConsultantRepository : BaseRepository {
     fun webimSessionCreate(webimUser: WebimUser)
@@ -24,8 +25,9 @@ interface ConsultantRepository : BaseRepository {
     val chat: Flow<ChatList>
 
     fun createPhoto(): Uri
-    suspend fun deletePhoto(uri: Uri)
+    suspend fun deleteFile(uri: Uri)
     suspend fun cachedPhoto(name: String, bitmap: Bitmap)
     suspend fun cachedFile(cacheName: String, fileType: FileType, sourceUri: Uri): Uri
     suspend fun clearCache()
+    fun createAudioFile(): File
 }
