@@ -18,7 +18,6 @@ import java.io.File
 import javax.inject.Inject
 
 private const val MAX_FILE_SIZE = 10000000L
-private const val VOLUME_TIMER_DELAY = 100L
 private const val VOLUME_MAX_LEVEL = 7500F
 
 class AudioRecorderImpl @Inject constructor(
@@ -38,17 +37,14 @@ class AudioRecorderImpl @Inject constructor(
             ?.receiveAsFlow()
             ?.map { mediaRecorder.maxAmplitude / VOLUME_MAX_LEVEL } ?: emptyFlow()
 
-    override val volumeRecordDelay: Long
-        get() = VOLUME_TIMER_DELAY
-
     private var audioFile: File? = null
 
-    override suspend fun deleteAudioFile() {
+    override suspend fun deleteFile() {
         audioFile?.toUri()?.let { fileDelete(it) }
         audioFile = null
     }
 
-    override fun recordStop(release: Boolean): Uri? {
+    override fun stop(release: Boolean): Uri? {
         with(mediaRecorder) {
             stop()
             if (release) {
@@ -63,11 +59,11 @@ class AudioRecorderImpl @Inject constructor(
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    override fun recordStart() {
+    override fun start(stepMillis: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             volumeLevelTicker = ticker(
-                delayMillis = VOLUME_TIMER_DELAY,
-                initialDelayMillis = VOLUME_TIMER_DELAY
+                delayMillis = stepMillis,
+                initialDelayMillis = stepMillis
             )
             audioFile = audioFileCreate()
             with(mediaRecorder) {

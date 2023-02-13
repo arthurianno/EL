@@ -5,8 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AudioRecorder {
     val volumeFlow: Flow<Float>
-    val volumeRecordDelay: Long
-    suspend fun deleteAudioFile()
-    fun recordStop(release: Boolean = false): Uri?
-    fun recordStart()
+    suspend fun deleteFile()
+    fun stop(release: Boolean = false): Uri?
+    fun start(stepMillis: Long)
 }

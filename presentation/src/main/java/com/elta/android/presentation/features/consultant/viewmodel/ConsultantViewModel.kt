@@ -52,7 +52,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
-private const val DELETE_FILE_DELAY = 500L
+private const val DELETE_FILE_DELAY_MILLIS = 500L
+private const val RECORD_STEP_DELAY_MILLIS = 100L
 
 class ConsultantViewModel @Inject constructor(
     private val webimSession: WebimSessionUseCase,
@@ -243,15 +244,15 @@ class ConsultantViewModel @Inject constructor(
         }
         launch {
             consultantBottomAppBar.deleteRecord()
-            delay(DELETE_FILE_DELAY)
+            delay(DELETE_FILE_DELAY_MILLIS)
             consultantBottomAppBar.clearRecordState()
-            audioRecorder.deleteAudioFile()
+            audioRecorder.deleteFile()
         }
     }
 
 
     private fun stopRecordVoice() {
-        recordFileUri = audioRecorder.recordStop()
+        recordFileUri = audioRecorder.stop()
         consultantBottomAppBar.stopRecord()
     }
 
@@ -260,13 +261,13 @@ class ConsultantViewModel @Inject constructor(
         if (permissionStatus.isGranted) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 launch {
-                    audioRecorder.recordStart()
+                    audioRecorder.start(stepMillis = RECORD_STEP_DELAY_MILLIS)
                     audioRecorder.volumeFlow
                         .catch { handleError(it) }
                         .onEach {
                             with(consultantBottomAppBar) {
                                 addValueToGraph(it)
-                                addRecordTime(audioRecorder.volumeRecordDelay)
+                                addRecordTime(RECORD_STEP_DELAY_MILLIS)
                             }
                         }
                         .collect()
