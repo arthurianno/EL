@@ -79,6 +79,8 @@ class ConsultantViewModel @Inject constructor(
             isPhotoPreview = false
         )
 
+    private var recordFileUri: Uri? = null
+
     internal val consultantTopAppBar = ConsultantTopAppBarWidgetModel()
     internal val consultantBottomAppBar = ConsultantBottomAppBarWidgetModel()
     internal val previewTopAppBar = PhotoPreviewTopAppBarWidgetModel()
@@ -231,8 +233,7 @@ class ConsultantViewModel @Inject constructor(
     }
 
     private fun sendVoiceRecord() {
-        audioRecorder.audioFile?.name?.let { fileSend(it) }
-        audioRecorder.clearAudioFile()
+        recordFileUri?.lastPathSegment?.let { fileSend(it) }
         consultantBottomAppBar.sendRecord()
     }
 
@@ -250,7 +251,7 @@ class ConsultantViewModel @Inject constructor(
 
 
     private fun stopRecordVoice() {
-        audioRecorder.recordStop()
+        recordFileUri = audioRecorder.recordStop()
         consultantBottomAppBar.stopRecord()
     }
 
@@ -259,7 +260,7 @@ class ConsultantViewModel @Inject constructor(
         if (permissionStatus.isGranted) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 launch {
-                    audioRecorder.startRecord()
+                    audioRecorder.recordStart()
                     audioRecorder.volumeFlow
                         .catch { handleError(it) }
                         .onEach {

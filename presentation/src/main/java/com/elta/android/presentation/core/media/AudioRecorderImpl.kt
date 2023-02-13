@@ -2,6 +2,7 @@ package com.elta.android.presentation.core.media
 
 import android.content.Context
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import androidx.core.net.toUri
 import com.elta.android.domain.common.usecase.AudioRecordCreateUseCase
@@ -40,19 +41,14 @@ class AudioRecorderImpl @Inject constructor(
     override val volumeRecordDelay: Long
         get() = VOLUME_TIMER_DELAY
 
-    override var audioFile: File? = null
-        private set
-
-    override fun clearAudioFile() {
-        audioFile = null
-    }
+    private var audioFile: File? = null
 
     override suspend fun deleteAudioFile() {
         audioFile?.toUri()?.let { fileDelete(it) }
-        clearAudioFile()
+        audioFile = null
     }
 
-    override fun recordStop(release: Boolean) {
+    override fun recordStop(release: Boolean): Uri? {
         with(mediaRecorder) {
             stop()
             if (release) {
@@ -63,10 +59,11 @@ class AudioRecorderImpl @Inject constructor(
         }
         volumeLevelTicker?.cancel()
         volumeLevelTicker = null
+        return audioFile?.toUri()
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    override fun startRecord() {
+    override fun recordStart() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             volumeLevelTicker = ticker(
                 delayMillis = VOLUME_TIMER_DELAY,

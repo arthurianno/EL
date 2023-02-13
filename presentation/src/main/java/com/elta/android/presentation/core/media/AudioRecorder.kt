@@ -1,14 +1,12 @@
 package com.elta.android.presentation.core.media
 
+import android.net.Uri
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 
 interface AudioRecorder {
-    val audioFile: File?
     val volumeFlow: Flow<Float>
     val volumeRecordDelay: Long
-    fun clearAudioFile()
     suspend fun deleteAudioFile()
-    fun recordStop(release: Boolean = false)
-    fun startRecord()
+    fun recordStop(release: Boolean = false): Uri?
+    fun recordStart()
 }
