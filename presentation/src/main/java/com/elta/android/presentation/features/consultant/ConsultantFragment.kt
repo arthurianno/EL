@@ -85,7 +85,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     @Composable
     override fun Content(viewModel: ConsultantViewModel) {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-        val event = viewModel.event.collectAsState(initial = null)
+        val event = viewModel.event.collectAsState(initial = null).value
         val state = viewModel.state.collectAsState()
         val storageAccessPermission =
             rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -101,8 +101,8 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 sheetState.hide()
             }
         }
-        LaunchedEffect(key1 = event.value) {
-            when (event.value) {
+        LaunchedEffect(key1 = event) {
+            when (event) {
                 is OpenCamera -> makePhoto.launch(viewModel.createNewPhoto())
                 is PhotoSelect -> getPhoto.launch(IMAGE)
                 is FileSelect -> getDocument.launch(DOCUMENT)
@@ -110,7 +110,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 is PermissionEvent.RecordAudio -> recordAudionPermission.launchPermissionRequest()
                 is ShowToast -> Toast.makeText(
                     requireContext(),
-                    (event.value as ShowToast).text,
+                    event.text,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -244,7 +244,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                     ) {
                         items(items = state.value.chat) { message ->
                             val chatMessageWidgetModel = ChatMessageWidgetModel().apply {
-                                attach(viewModel)
+                                setParentActionHandler(viewModel.actionHandler)
                                 setMessage(message)
                             }
                             when (message.owner) {

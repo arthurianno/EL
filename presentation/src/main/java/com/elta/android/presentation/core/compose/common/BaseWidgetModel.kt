@@ -14,13 +14,9 @@ abstract class BaseWidgetModel<D> {
     private val initState: D
         get() = createInitState()
 
-    @Suppress("UNCHECKED_CAST")
-    fun <VM> attach(viewModel: VM) {
-        this.viewModel = viewModel as? BaseViewModel<*, *, Action>
-    }
-
-    fun detach() {
-        viewModel = null
+    private var actionHandler: ((action: Action) -> Unit)? = null
+    fun setParentActionHandler(handler: (Action) -> Unit) {
+        actionHandler = handler
     }
 
     private var viewModel: BaseViewModel<*, *, in Action>? = null
@@ -36,7 +32,7 @@ abstract class BaseWidgetModel<D> {
         get() = _action.asSharedFlow()
 
     infix fun sendAction(action: Action) {
-        viewModel?.sendAction(action) ?: _action.tryEmit(action)
+        actionHandler?.let { it(action) } ?: _action.tryEmit(action)
     }
 
     protected fun setState(state: () -> D) {

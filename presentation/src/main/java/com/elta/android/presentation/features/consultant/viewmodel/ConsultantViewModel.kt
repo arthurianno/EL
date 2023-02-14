@@ -24,6 +24,7 @@ import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.common.PermissionEvent
+import com.elta.android.presentation.core.compose.common.ShowToast
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.media.AudioRecorder
 import com.elta.android.presentation.features.consultant.model.ConnectState
@@ -205,6 +206,7 @@ class ConsultantViewModel @Inject constructor(
                     ConsultantAction.DeleteRecVoiceClick -> deleteRecordVoice()
                     is ConsultantAction.StartRecVoiceClick -> startRecordVoice(action.permissionStatus)
                     is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord()
+                    is ConsultantAction.ChatMessageClick -> sendEvent(ShowToast(action.message.text))
                 }
                 currentState
             }
