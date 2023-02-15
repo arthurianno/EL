@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.consultant
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -39,15 +40,16 @@ import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.PermissionEvent
+import com.elta.android.presentation.core.compose.common.ShowToast
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
-import com.elta.android.presentation.features.consultant.model.ChatUiEntity
 import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.features.consultant.model.FileSelect
 import com.elta.android.presentation.features.consultant.model.OpenCamera
 import com.elta.android.presentation.features.consultant.model.PhotoSelect
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.consultant.widgets.ChatMessage
+import com.elta.android.presentation.features.consultant.widgets.ChatMessageWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBar
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBar
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBar
@@ -83,7 +85,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     @Composable
     override fun Content(viewModel: ConsultantViewModel) {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-        val event = viewModel.event.collectAsState(initial = null)
+        val event = viewModel.event.collectAsState(initial = null).value
         val state = viewModel.state.collectAsState()
         val storageAccessPermission =
             rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -99,13 +101,18 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                 sheetState.hide()
             }
         }
-        LaunchedEffect(key1 = event.value) {
-            when (event.value) {
+        LaunchedEffect(key1 = event) {
+            when (event) {
                 is OpenCamera -> makePhoto.launch(viewModel.createNewPhoto())
                 is PhotoSelect -> getPhoto.launch(IMAGE)
                 is FileSelect -> getDocument.launch(DOCUMENT)
                 is PermissionEvent.Storage -> storageAccessPermission.launchPermissionRequest()
                 is PermissionEvent.RecordAudio -> recordAudionPermission.launchPermissionRequest()
+                is ShowToast -> Toast.makeText(
+                    requireContext(),
+                    event.text,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         GetLocalProperties { _, _, colors, shapes, _ ->
@@ -236,9 +243,13 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                         contentPadding = dimens.chatPadding
                     ) {
                         items(items = state.value.chat) { message ->
+                            val chatMessageWidgetModel = ChatMessageWidgetModel().apply {
+                                setParentActionHandler(viewModel.actionHandler)
+                                setMessage(message)
+                            }
                             when (message.owner) {
-                                WebimOwner.User -> UserMessage(message)
-                                WebimOwner.Operator -> OperatorMessage(message)
+                                WebimOwner.User -> UserMessage(chatMessageWidgetModel)
+                                WebimOwner.Operator -> OperatorMessage(chatMessageWidgetModel)
                             }
                         }
                     }
@@ -248,28 +259,19 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     }
 
     @Composable
-    private fun UserMessage(message: ChatUiEntity) {
+    private fun UserMessage(widgetModel: ChatMessageWidgetModel) {
         GetLocalProperties { _, _, colors, _, _ ->
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                ChatMessage(
-                    message = message,
-                    color = colors.shadeBlack4,
-                    onClick = {
-                        viewModel.sendAction(ConsultantAction.ChatMessageClick(message))
-                    },
-                    onLongClick = {
-                        viewModel.sendAction(ConsultantAction.ChatMessageLongClick(message))
-                    }
-                )
+                ChatMessage(widgetModel)
             }
         }
     }
 
     @Composable
-    private fun OperatorMessage(message: ChatUiEntity) {
+    private fun OperatorMessage(widgetModel: ChatMessageWidgetModel) {
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomStart
@@ -280,7 +282,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                     contentDescription = null
                 )
                 HSpacerSmall()
-                ChatMessage(message = message)
+                ChatMessage(widgetModel)
             }
         }
     }

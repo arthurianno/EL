@@ -46,6 +46,7 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.temporal.ChronoUnit
 
 private const val MESSAGE_MAX_LINES = 10
+private const val BOTTOM_BAR_ANIMATION_DURATION_MILLIS = 500
 
 internal enum class RecordState {
     Empty,
@@ -144,7 +145,10 @@ internal fun ConsultantBottomAppBar(widgetModel: ConsultantBottomAppBarWidgetMod
     val state = widgetModel.state.collectAsState()
     Box {
         MessageBox(widgetModel)
-        HorizontallyAnimation(visualState = state.value.recordState != RecordState.Empty) {
+        HorizontallyAnimation(
+            visualState = state.value.recordState != RecordState.Empty,
+            duration = BOTTOM_BAR_ANIMATION_DURATION_MILLIS
+        ) {
             WaveRecordGraph(widgetModel = widgetModel)
         }
     }

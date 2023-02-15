@@ -12,6 +12,7 @@ internal val gOrangeA = Color(0xFFff8058)
 internal val gOrangeB = Color(0xFFff505d)
 internal val gGreenA = Color(0xFF43e695)
 internal val gGreenB = Color(0xFF3bb2b8)
+internal val gGreenB10 = Color(0x1A3BB2B8)
 internal val shadeGPurpurA = Color(0xFF38b7e1)
 internal val shadeGGreenA0_16 = Color(0x273ec9a8)
 internal val shadeGGreenA = Color(0xFF3ec9a8)
@@ -48,6 +49,7 @@ data class EltaColors(
     val gOrangeB: Color,
     val gGreenA: Color,
     val gGreenB: Color,
+    val gGreenB10: Color,
     val shadeGPurpurA: Color,
     val shadeGGreenA0_16: Color,
     val shadeGGreenA: Color,
@@ -79,6 +81,7 @@ internal val eltaColors = EltaColors(
     gOrangeB = gOrangeB,
     gGreenA = gGreenA,
     gGreenB = gGreenB,
+    gGreenB10 = gGreenB10,
     shadeGPurpurA = shadeGPurpurA,
     shadeGGreenA0_16 = shadeGGreenA0_16,
     shadeGGreenA = shadeGGreenA,

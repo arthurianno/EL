@@ -1,11 +1,9 @@
 package com.elta.android.presentation.features.consultant.widgets
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,21 +25,54 @@ import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
 import com.elta.android.domain.features.consultant.model.WebimOwner
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.features.consultant.model.ChatUiEntity
+import com.elta.android.presentation.features.consultant.model.ConsultantAction
 import com.elta.android.presentation.theme.GetLocalProperties
-import com.elta.android.presentation.theme.LocalColors
 
-@OptIn(ExperimentalFoundationApi::class)
+internal data class ChatMessageWidgetState(
+    val message: ChatUiEntity,
+    val backgroundColor: Color
+)
+
+internal class ChatMessageWidgetModel(
+    val message: ChatUiEntity? = null
+) : BaseWidgetModel<ChatMessageWidgetState>() {
+    override fun createInitState(): ChatMessageWidgetState =
+        ChatMessageWidgetState(
+            message = ChatUiEntity(
+                owner = WebimOwner.User,
+                type = null,
+                thumbnail = null,
+                attachmentUrl = null,
+                fileSize = null,
+                text = "",
+                date = "",
+                sendStatus = WebimMessageSendStatus.Sending,
+                isRead = false
+            ),
+            backgroundColor = Color.Unspecified
+        )
+
+    fun setMessage(message: ChatUiEntity) {
+        setState { state.value.copy(message = message) }
+    }
+}
+
 @Composable
-internal fun ChatMessage(
-    message: ChatUiEntity,
-    color: Color = LocalColors.current.white,
-    onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {}
-) {
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+internal fun ChatMessage(widgetModel: ChatMessageWidgetModel) {
+    val state = widgetModel.state.collectAsState()
+    val message = state.value.message
+    GetLocalProperties { dimens, _, colors, shapes, _ ->
+        val backgroundColor = when (state.value.message.owner) {
+            WebimOwner.Operator -> colors.white
+            WebimOwner.User -> when (state.value.message.type) {
+                WebimContentType.Voice -> colors.gGreenB10
+                else -> colors.shadeBlack4
+            }
+        }
         Box(
             modifier = Modifier
                 .clip(shape = shapes.chatMessage)
@@ -49,11 +81,8 @@ internal fun ChatMessage(
                     color = colors.shadeBlack4,
                     width = dimens.borderWidth
                 )
-                .background(color = color)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
+                .background(color = backgroundColor)
+                .clickable { widgetModel.sendAction(ConsultantAction.ChatMessageClick(message)) }
         ) {
             ChatMessageContent(message)
             ChatLabel(message)
@@ -75,7 +104,7 @@ private fun BoxScope.ChatMessageContent(message: ChatUiEntity) {
 
 @Composable
 private fun BoxScope.TextCard(message: ChatUiEntity) {
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, _, _, _, _ ->
         Text(
             text = message.text,
             modifier = Modifier.Companion
@@ -87,7 +116,7 @@ private fun BoxScope.TextCard(message: ChatUiEntity) {
 
 @Composable
 private fun BoxScope.ImageCard(message: ChatUiEntity) {
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, _, _, _, _ ->
         AsyncImage(
             model = message.thumbnail,
             contentScale = ContentScale.Crop,
@@ -104,7 +133,7 @@ private fun BoxScope.FileCard(
     message: ChatUiEntity,
     onClick: (message: ChatUiEntity) -> Unit
 ) {
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, _, colors, shapes, types ->
         Row(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -129,7 +158,7 @@ private fun BoxScope.FileCard(
 
 @Composable
 private fun BoxScope.ChatLabel(message: ChatUiEntity) {
-    GetLocalProperties { dimens, brash, colors, shapes, types ->
+    GetLocalProperties { dimens, _, colors, shapes, _ ->
         val thumbnail = message.thumbnail
         val textColor = if (thumbnail == null) {
             colors.shadeBlack1
