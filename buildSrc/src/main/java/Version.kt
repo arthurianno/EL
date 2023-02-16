@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 private const val WAIT_EXECUTE_COMMAND_TIME = 1000L
 
 object Version {
-    val versionCode: Int = 256
+    val versionCode: Int = 258
     val versionName: String
         get() =
             if (readCurrentBranch().contains("master", ignoreCase = true)) {
@@ -21,8 +21,8 @@ object Version {
 
     private object Debug : CurrentVersion {
         override val major: Int = 0
-        override val minor: Int = 62
-        override val patch: Int = 4
+        override val minor: Int = 63
+        override val patch: Int = 1
 
         override fun versionName(): String {
             return "${super.versionName()}-${getSufix()}"
