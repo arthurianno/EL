@@ -272,10 +272,8 @@ class GlucometersManager @Inject constructor(
                             .doOnComplete {
                                 val id = address.hashCode().toLong()
                                 glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
-                                    file.version.toDoubleOrNull()?.let { version ->
-                                        val newInfo = info.copy(software = version)
-                                        glucometersInfoCache.update(listOf(newInfo))
-                                    }
+                                    glucometersInfoCache.update(listOf(info.copy(software = file.version)))
+
                                 }
                             }
                     }
@@ -369,18 +367,18 @@ class GlucometersManager @Inject constructor(
                 val connection = connections[address]
                 if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED) {
                     device.establishConnection(false)
-                        .onErrorResumeNext { e: Throwable ->
-                            Timber.e(javaClass.simpleName, e.message, e)
+                        .onErrorResumeNext { throwable: Throwable ->
+                            Timber.e(javaClass.simpleName, throwable.message, throwable)
                             when {
                                 client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
                                     Observable.error(BluetoothNotEnabledError)
                                 }
 
-                                e is BleDisconnectedException -> Observable.error(
+                                throwable is BleDisconnectedException -> Observable.error(
                                     GlucometerOfflineError
                                 )
 
-                                else -> Observable.error(e)
+                                else -> Observable.error(throwable)
                             }
                         }
                         .compose(ReplayingShare.instance())

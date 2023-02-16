@@ -17,11 +17,11 @@ object Commands {
     }
 
     object GetVersion : GlucometerCommand {
-        override fun toGlucometerString(): String = "ver"
+        override fun toGlucometerString(): String = "version"
     }
 
     object GetBatteryAndTemperature : GlucometerCommand {
-        override fun toGlucometerString(): String = "bat"
+        override fun toGlucometerString(): String = "battery"
     }
 
     object TurnOnAntiLossMode : GlucometerCommand {
