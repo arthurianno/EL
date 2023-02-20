@@ -7,7 +7,8 @@ import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
 import javax.inject.Inject
 
-class GlucometerInfoFromCacheMapper @Inject constructor() : Mapper<GlucometerInfoCachedDto, GlucometerInfoDto> {
+class GlucometerInfoFromCacheMapper @Inject constructor() :
+    Mapper<GlucometerInfoCachedDto, GlucometerInfoDto> {
 
     override fun mapFromObject(source: GlucometerInfoCachedDto): GlucometerInfoDto =
         with(source) {
@@ -21,7 +22,8 @@ class GlucometerInfoFromCacheMapper @Inject constructor() : Mapper<GlucometerInf
                     software = software,
                     hardware = hardware
                 ),
-                lastSyncedEvent = lastSyncedEvent
+                lastSyncedEvent = lastSyncedEvent,
+                glucometerSerialNumber = glucometerSerialNumber
             )
         }
 }

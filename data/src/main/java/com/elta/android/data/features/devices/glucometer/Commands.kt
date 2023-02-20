@@ -17,11 +17,11 @@ object Commands {
     }
 
     object GetVersion : GlucometerCommand {
-        override fun toGlucometerString(): String = "ver"
+        override fun toGlucometerString(): String = "version"
     }
 
     object GetBatteryAndTemperature : GlucometerCommand {
-        override fun toGlucometerString(): String = "bat"
+        override fun toGlucometerString(): String = "battery"
     }
 
     object TurnOnAntiLossMode : GlucometerCommand {
@@ -51,5 +51,9 @@ object Commands {
 
     data class SetPin(val pin: String) : GlucometerCommand {
         override fun toGlucometerString(): String = "pin.$pin"
+    }
+
+    object Serial : GlucometerCommand {
+        override fun toGlucometerString(): String = "serial"
     }
 }
