@@ -39,7 +39,8 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
                     insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = dishes.toNetwork(),
-                    productsCount = dishes.countOrZero()
+                    productsCount = dishes.countOrZero(),
+                    glucometerSerialNumber = glucometerSerialNumber
                 )
             )
         }

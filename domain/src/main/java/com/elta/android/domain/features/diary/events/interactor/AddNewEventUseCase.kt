@@ -61,6 +61,7 @@ class AddNewEventUseCase @Inject constructor(
         val note: String? = null,
         val glucometerSerialNumber: String?,
         val eventType: EventType,
+        val glucometerSerialNumber: String?,
         val dishes: List<Dish> = emptyList()
     )
 }
