@@ -42,6 +42,7 @@ class AddNewEventUseCase @Inject constructor(
                 type = p.eventType,
                 mealTag = null,
                 state = State.CREATED,
+                glucometerSerialNumber = p.glucometerSerialNumber,
                 dishes = p.dishes
             )
         )
@@ -59,6 +60,7 @@ class AddNewEventUseCase @Inject constructor(
         val activity: ActivityType? = null,
         val note: String? = null,
         val eventType: EventType,
+        val glucometerSerialNumber: String?,
         val dishes: List<Dish> = emptyList()
     )
 }

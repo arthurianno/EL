@@ -13,5 +13,6 @@ data class GlucometerInfoCachedDto(
     val batteryLevel: Int? = null,
     val software: String? = null,
     val hardware: String? = null,
-    val lastSyncedEvent: String? = null
+    val lastSyncedEvent: String? = null,
+    val glucometerSerialNumber: String? = null
 )

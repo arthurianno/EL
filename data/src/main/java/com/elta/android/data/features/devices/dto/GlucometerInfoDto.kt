@@ -9,5 +9,6 @@ data class GlucometerInfoDto(
     val temperature: Int? = null,
     val batteryLevel: Int? = null,
     val version: VersionDto? = null,
-    val lastSyncedEvent: String? = null
+    val lastSyncedEvent: String? = null,
+    val glucometerSerialNumber: String? = null
 )

@@ -5,6 +5,7 @@ import org.threeten.bp.ZonedDateTime
 data class GlucometerEventDto(
     val id: String,
     val date: ZonedDateTime?,
-    val temperature: Int?,
-    val value: Double?
+    val temperature: Double?,
+    val value: Double?,
+    val glucometerSerialNumber: String?
 )

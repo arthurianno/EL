@@ -14,6 +14,7 @@ data class EventDataDto(
     @SerializedName("insulinType") val insulinType: InsulinTypeDto?,
     @SerializedName("insulinMedicament") val insulinMedicament: InsulinMedicamentDataDto?,
     @SerializedName("eventType") val type: EventTypeDto,
+    @SerializedName("glucometerSerialNumber") val glucometerSerialNumber: String?,
     @SerializedName("products") val products: List<ProductResponse>?,
     @SerializedName("productsCount") val productsCount: Long
 )
