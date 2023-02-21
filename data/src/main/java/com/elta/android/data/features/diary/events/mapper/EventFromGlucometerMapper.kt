@@ -6,7 +6,6 @@ import com.elta.android.data.features.devices.glucometer.toStorageDateTime
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.State
-import com.elta.android.domain.features.user.interactor.round
 import javax.inject.Inject
 
 class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDto, Event> {
@@ -24,7 +23,7 @@ class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDt
                 value = value,
                 kind = null,
                 name = null,
-                temperature = temperature.toCelsius().round(1),
+                temperature = temperature,
                 duration = null,
                 activityType = null,
                 mealTag = null,
@@ -34,15 +33,4 @@ class EventFromGlucometerMapper @Inject constructor() : Mapper<GlucometerEventDt
                 glucometerSerialNumber = glucometerSerialNumber
             )
         }
-
-    private fun Int?.toCelsius(): Double =
-        if (this == null) {
-            0.0
-        } else {
-            this - ABSOLUTE_ZERO
-        }
-
-    companion object {
-        private const val ABSOLUTE_ZERO = 273.15
-    }
 }

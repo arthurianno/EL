@@ -15,8 +15,8 @@ private const val DOT_SYMBOL = '.'
 private const val SPACE_SYMBOL = ' '
 private const val BATTERY_PREFIX = "b"
 private const val TEMPERATURE_PREFIX = "t"
-private const val SOFT_VERSION_PREFIX = "soft"
-private const val HARD_VERSION_PREFIX = "hard"
+private const val SOFT_VERSION_PREFIX = "sw:"
+private const val HARD_VERSION_PREFIX = "hw:"
 private const val TIME_PREFIX = "time"
 private const val SERIAL_PREFIX = "ser"
 private const val DATE_TIME_PATTERN = "yyyyMMddHHmmss"
@@ -76,8 +76,8 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
     private fun String.extractVersion(): VersionDto =
         with(split(SPACE_SYMBOL)) {
             VersionDto(
-                software = component1().removePrefix(SOFT_VERSION_PREFIX).toDouble(),
-                hardware = component2().removePrefix(HARD_VERSION_PREFIX).toDouble()
+                software = component1().removePrefix(SOFT_VERSION_PREFIX),
+                hardware = component2().removePrefix(HARD_VERSION_PREFIX)
             )
         }
 
