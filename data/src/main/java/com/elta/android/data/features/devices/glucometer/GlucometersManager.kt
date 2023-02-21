@@ -51,6 +51,13 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val MIN_BATTERY_LEVEL = 1
+private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
+private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+private const val EVENTS_COUNT = 1000
+private const val SYNC_DELAY = 500L
+private const val COMMAND_DELAY = 20L
+
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
 class GlucometersManager @Inject constructor(
@@ -255,7 +262,7 @@ class GlucometersManager @Inject constructor(
                                             !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
                                                 GlucometerLowBatteryLevelError(
                                                     current = info.batteryLevel ?: 0,
-                                                    required = MIN_LEVEL
+                                                    required = MIN_BATTERY_LEVEL
                                                 )
                                             )
 
@@ -378,7 +385,7 @@ class GlucometersManager @Inject constructor(
                 if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED) {
                     device.establishConnection(false)
                         .onErrorResumeNext { throwable: Throwable ->
-                            Timber.e(javaClass.simpleName, throwable.message, throwable)
+                            Timber.e(throwable, javaClass.simpleName, throwable.message)
                             when {
                                 client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
                                     Observable.error(BluetoothNotEnabledError)
@@ -419,7 +426,7 @@ class GlucometersManager @Inject constructor(
     private fun isSupported(compatible: String): Boolean = true
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
-        (batteryLevel ?: 0) >= MIN_LEVEL
+        (batteryLevel ?: 0) >= MIN_BATTERY_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
@@ -622,15 +629,4 @@ class GlucometersManager @Inject constructor(
         val events: MutableList<String> = mutableListOf(),
         var lastSyncedEvent: String? = null // #GlucometerInfoCachedDto.lastSyncedEvent
     )
-
-    companion object {
-        private const val FIRMWARE_VERSION = "3.0" // version of firmware supported by application
-        private const val MIN_LEVEL =
-            1 // minimal level of battery required to start firmware update
-        private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
-        private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-        private const val EVENTS_COUNT = 1000
-        private const val SYNC_DELAY = 500L
-        private const val COMMAND_DELAY = 20L
-    }
 }
