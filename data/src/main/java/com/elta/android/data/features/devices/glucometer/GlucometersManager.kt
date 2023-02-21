@@ -37,6 +37,7 @@ import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
 import com.polidea.rxandroidble2.exceptions.BleException
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
@@ -105,14 +106,7 @@ class GlucometersManager @Inject constructor(
 
     fun findDevices(): Observable<List<ScanResult>> =
         Observable.just(client.state)
-            .flatMap { state ->
-                val error = state.toError()
-                if (error != null) {
-                    Observable.error(error)
-                } else {
-                    Observable.just(state)
-                }
-            }
+            .flatMap { it.observableState() }
             .flatMap {
                 val connectedDevices = glucometersCache.getAll(CommonConditions.All)
                 scanner.startScan(filters, settings)
@@ -314,6 +308,10 @@ class GlucometersManager @Inject constructor(
             if (glucometersToUpdate.isNotEmpty()) glucometersCache.update(glucometersToUpdate)
         }
 
+    private fun RxBleClient.State.observableState(): ObservableSource<out RxBleClient.State> =
+        toError()?.let { Observable.error(it) }
+            ?: Observable.just(this)
+
     private fun RxBleConnection.simpleRequest(
         address: String,
         cmd: GlucometerCommand
@@ -505,10 +503,12 @@ class GlucometersManager @Inject constructor(
             // Pair.second -> last synced event
             .takeUntil { it.first.isEmptyEvent() || it.first == it.second }
             .collectInto(SyncResponseHolder()) { holder, pair ->
-                val r = pair.first
-                if (r.isEvent() && !r.isEmptyEvent() && r != pair.second) {
-                    holder.events.add(r)
-                } else if (!r.isOk() && !r.isError() && !r.isEmptyEvent()) holder.info.add(r)
+                val response = pair.first
+                if (response.isEvent() && !response.isEmptyEvent() && response != pair.second) {
+                    holder.events.add(response)
+                } else if (!response.isOk() && !response.isError() && !response.isEmptyEvent()) {
+                    holder.info.add(response)
+                }
             }
             .toObservable()
             .take(1)
@@ -545,17 +545,13 @@ class GlucometersManager @Inject constructor(
                 filterExistingEvents
             }
             .flatMap {
-                if (it.isEmpty()) {
-                    Observable.empty()
-                } else {
-                    Observable.just(it)
-                }
+                if (it.isEmpty()) Observable.empty() else Observable.just(it)
             }
-            .onErrorResumeNext { e: Throwable ->
-                if (e is BleException) {
+            .onErrorResumeNext { exception: Throwable ->
+                if (exception is BleException) {
                     Observable.error(GlucometerSyncError(GlucometerOfflineError))
                 } else {
-                    Observable.error(GlucometerSyncError(e))
+                    Observable.error(GlucometerSyncError(exception))
                 }
             }
 
@@ -574,14 +570,7 @@ class GlucometersManager @Inject constructor(
 
     private fun checkBluetoothClientState(): Observable<RxBleClient.State> =
         Observable.just(client.state)
-            .flatMap { state ->
-                val error = state.toError()
-                if (error != null) {
-                    Observable.error(error)
-                } else {
-                    Observable.just(state)
-                }
-            }
+            .flatMap { it.observableState() }
 
     private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
         eventsCache.getAll(
