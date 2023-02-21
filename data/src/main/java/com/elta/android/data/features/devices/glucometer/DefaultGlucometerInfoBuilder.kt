@@ -3,13 +3,13 @@ package com.elta.android.data.features.devices.glucometer
 import com.elta.android.common.utils.toLocalDateTime
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
-import javax.inject.Inject
-import javax.inject.Singleton
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeParseException
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val DOT_SYMBOL = '.'
 private const val SPACE_SYMBOL = ' '
