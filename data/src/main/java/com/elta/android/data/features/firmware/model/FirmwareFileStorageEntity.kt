@@ -1,6 +1,6 @@
-package com.elta.android.data.features.firmware.dto
+package com.elta.android.data.features.firmware.model
 
-data class FirmwareFileDto(
+data class FirmwareFileStorageEntity(
     val version: String,
     val compatible: String,
     val path: String,
