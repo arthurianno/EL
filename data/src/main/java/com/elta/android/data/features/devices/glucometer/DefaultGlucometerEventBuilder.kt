@@ -29,9 +29,7 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         Timber.i("<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Date : ${extractDate(dateToken)}")
         Timber.i(
             "<<<<<<< DefaultGlucometerEventBuilder >>>>>>  Temperature : ${
-                extractTemperature(
-                    temperatureAndValueToken
-                )
+                extractTemperature(temperatureAndValueToken)
             }"
         )
         Timber.i(
