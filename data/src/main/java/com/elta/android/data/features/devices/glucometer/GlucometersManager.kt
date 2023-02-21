@@ -39,17 +39,17 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import java.nio.charset.Charset
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
-import java.nio.charset.Charset
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
@@ -100,8 +100,11 @@ class GlucometersManager @Inject constructor(
         Observable.just(client.state)
             .flatMap { state ->
                 val error = state.toError()
-                if (error != null) Observable.error(error)
-                else Observable.just(state)
+                if (error != null) {
+                    Observable.error(error)
+                } else {
+                    Observable.just(state)
+                }
             }
             .flatMap {
                 val connectedDevices = glucometersCache.getAll(CommonConditions.All)
@@ -200,7 +203,10 @@ class GlucometersManager @Inject constructor(
             .take(1)
             .switchMapCompletable { response ->
                 when {
-                    response.isPinError() -> Completable.error(GlucometerPinIncorrectOrNotFoundError)
+                    response.isPinError() -> Completable.error(
+                        GlucometerPinIncorrectOrNotFoundError
+                    )
+
                     else -> Completable.fromCallable {
                         pinStorage.setPin(device.address, pinCode)
                         val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
@@ -232,7 +238,10 @@ class GlucometersManager @Inject constructor(
 
     fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
         when {
-            !isSupportedByApplication(file) -> Observable.error(FirmwareNotSupportedByAppError(file.version))
+            !isSupportedByApplication(file) -> Observable.error(
+                FirmwareNotSupportedByAppError(file.version)
+            )
+
             else ->
                 checkBluetoothClientState()
                     .flatMap {
@@ -272,8 +281,9 @@ class GlucometersManager @Inject constructor(
                             .doOnComplete {
                                 val id = address.hashCode().toLong()
                                 glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
-                                    glucometersInfoCache.update(listOf(info.copy(software = file.version)))
-
+                                    glucometersInfoCache.update(
+                                        listOf(info.copy(software = file.version))
+                                    )
                                 }
                             }
                     }
@@ -383,7 +393,9 @@ class GlucometersManager @Inject constructor(
                         }
                         .compose(ReplayingShare.instance())
                         .doOnNext { connections[address] = it }
-                } else Observable.just(connection)
+                } else {
+                    Observable.just(connection)
+                }
             }
 
     private fun Observable<RxBleConnection>.checkPinAndSend(address: String): Observable<RxBleConnection> =
@@ -475,8 +487,11 @@ class GlucometersManager @Inject constructor(
 
                     Timber.i("<<<<<<<Sync>>>>>>  Response: $response")
 
-                    if (response.isError()) Observable.error(CommandError)
-                    else Observable.just(Pair(response, pair.second))
+                    if (response.isError()) {
+                        Observable.error(CommandError)
+                    } else {
+                        Observable.just(Pair(response, pair.second))
+                    }
                 }
             }
             // Pair.first -> response
@@ -484,8 +499,9 @@ class GlucometersManager @Inject constructor(
             .takeUntil { it.first.isEmptyEvent() || it.first == it.second }
             .collectInto(SyncResponseHolder()) { holder, pair ->
                 val r = pair.first
-                if (r.isEvent() && !r.isEmptyEvent() && r != pair.second) holder.events.add(r)
-                else if (!r.isOk() && !r.isError() && !r.isEmptyEvent()) holder.info.add(r)
+                if (r.isEvent() && !r.isEmptyEvent() && r != pair.second) {
+                    holder.events.add(r)
+                } else if (!r.isOk() && !r.isError() && !r.isEmptyEvent()) holder.info.add(r)
             }
             .toObservable()
             .take(1)
@@ -553,8 +569,11 @@ class GlucometersManager @Inject constructor(
         Observable.just(client.state)
             .flatMap { state ->
                 val error = state.toError()
-                if (error != null) Observable.error(error)
-                else Observable.just(state)
+                if (error != null) {
+                    Observable.error(error)
+                } else {
+                    Observable.just(state)
+                }
             }
 
     private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
