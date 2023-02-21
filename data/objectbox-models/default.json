@@ -81,7 +81,7 @@
     },
     {
       "id": "2:5982963766031290345",
-      "lastPropertyId": "20:6417863057937775068",
+      "lastPropertyId": "21:4332282689500209208",
       "name": "EventCachedDto",
       "properties": [
         {
@@ -178,6 +178,11 @@
         {
           "id": "20:6417863057937775068",
           "name": "glucometerSerialNumber",
+          "type": 9
+        },
+        {
+          "id": "21:4332282689500209208",
+          "name": "products",
           "type": 9
         }
       ],
