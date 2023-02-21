@@ -2,11 +2,11 @@ package com.elta.android.data.features.devices.glucometer
 
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.domain.features.user.interactor.round
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeParseException
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Suppress("MagicNumber")
 @Singleton

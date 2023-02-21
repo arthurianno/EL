@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
-import java.util.concurrent.TimeUnit
 
 private const val SCAN_TIMEOUT = 60L // seconds
 
