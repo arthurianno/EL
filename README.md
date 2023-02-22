@@ -99,7 +99,10 @@ _PROJECT_ - path to project. For example: _nullgravity%2FTele2%2Ftele2-self-serv
 
 Build app in different environments
 -------------
-Project contains 2 predefined config file: [test](./configuration-build-test.properties) and [stage](./configuration-build-stage.properties).   
+Project contains 3 predefined config file: 
+[dev](./configuration-build-dev.properties)
+[stage](./configuration-build-stage.properties).   
+[prod](./configuration-build-prod.properties).   
 If you need to build app in other environment you need to create your own config file and set path to build file.  
 
 List of supported configs:
