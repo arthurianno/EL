@@ -587,7 +587,7 @@
     <string name="statistic_menu_button">Выгрузить отчет</string>
     <string name="statistic_share_pdf_dialog_title">Поделиться с помощью</string>
     <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
-    <string name="statistic_error">Невозможно выгрузить отчет</string>
+    <string name="statistic_error">Невозможно выгрузить отчет без Интернет-соединения</string>
 
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>
