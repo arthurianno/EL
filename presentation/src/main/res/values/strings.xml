@@ -564,7 +564,7 @@
     <string name="statistic_general_index_description_by_day_insulin">Количество общего инсулина\n(кроме смешанного): %s</string>
     <string name="statistic_general_index_description_by_period_insulin">Среднесуточное количество общего инсулина\n(кроме смешанного): %s</string>
     <string name="statistic_general_index_description_by_day_bolus_insulin">Количество болюсного инсулина\n(ультракороткий + короткий) в этот день: %s</string>
-    <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного\nинсулина (ультракороткий + короткий): %s</string>
+    <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного инсулина (ультракороткий + короткий + сверхбыстрый): %s</string>
     <string name="statistic_general_index_description_by_day_basal_insulin">Количество базального инсулина\n(средний + длинный + сверхдлинный)\nв этот день: %s</string>
     <string name="statistic_general_index_description_by_period_basal_insulin">Среднесуточное количество базального\nинсулина (средний + длинный + сверхдлинный): %s</string>
 
