@@ -6,28 +6,9 @@ import com.nullgr.core.adapter.items.ListItem
 
 data class ObserverItem(
     val id: String,
-    @DrawableRes
-    val type: Int,
+    @DrawableRes val type: Int,
     val title: String,
     val description: String,
-    @DrawableRes
-    val action: Int,
+    @DrawableRes val action: Int,
     val status: ObserverStatus
-) : ListItem {
-
-    override fun getUniqueProperty() = id
-
-    override fun getChangePayload(other: ListItem): Any {
-        if (other is ObserverItem) {
-            return mutableSetOf<Payload>().apply {
-                if (title != other.title) add(Payload.TITLE_CHANGED)
-                if (status != other.status) add(Payload.STATUS_CHANGED)
-            }
-        }
-        return super.getChangePayload(other)
-    }
-
-    enum class Payload {
-        STATUS_CHANGED, TITLE_CHANGED
-    }
-}
+) : ListItem

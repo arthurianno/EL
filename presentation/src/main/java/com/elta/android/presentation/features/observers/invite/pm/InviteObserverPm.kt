@@ -6,6 +6,7 @@ import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.observers.interactor.GetObserverInvitesUseCase
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
 import com.elta.android.domain.features.observers.model.Observer
+import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
@@ -63,6 +64,7 @@ class InviteObserverPm @Inject constructor(
                 getObserverInvitesUseCase.execute()
                     .hideErrorContainer()
                     .bindProgress()
+                    .mapFilter { it.status != ObserverStatus.EXPIRED }
                     .doOnNext(observersState.consumer)
                     .doOnError(::handleError)
             }
@@ -87,6 +89,7 @@ class InviteObserverPm @Inject constructor(
                 )
                 setErrorViewVisibility(true)
             }
+
             is CantSendInviteToYourselfError -> {
                 setErrorStateData(
                     States.SimpleError(
@@ -96,6 +99,7 @@ class InviteObserverPm @Inject constructor(
                 )
                 setErrorViewVisibility(true)
             }
+
             else -> super.handleError(error)
         }
     }

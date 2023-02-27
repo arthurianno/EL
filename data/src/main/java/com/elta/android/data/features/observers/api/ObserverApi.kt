@@ -1,9 +1,9 @@
 package com.elta.android.data.features.observers.api
 
-import com.elta.android.data.features.observers.dto.ObserverDto
-import com.elta.android.data.features.observers.dto.ObserverInviteEmailRequest
-import com.elta.android.data.features.observers.dto.ObserverUpdateNameRequest
-import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
+import com.elta.android.data.features.observers.model.ObserverInviteEmailNetworkRequest
+import com.elta.android.data.features.observers.model.ObserverNetworkResponse
+import com.elta.android.data.features.observers.model.ObserverUpdateNameNetworkRequest
+import com.elta.android.data.features.observers.model.ObserversNetworkResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -20,13 +20,16 @@ interface ObserverApi {
     fun getObserverInvites(
         @Query("pageIndex") page: Int,
         @Query("pageSize") pageSize: Int
-    ): Observable<ObserversQueryResultDto>
+    ): Observable<ObserversNetworkResponse>
 
     @PUT("api/share/v1/observers/invites")
-    fun sendObserverInvite(@Body email: ObserverInviteEmailRequest): Single<ObserverDto>
+    fun sendObserverInvite(@Body email: ObserverInviteEmailNetworkRequest): Single<ObserverNetworkResponse>
 
     @PUT("api/share/v1/observers/{id}")
-    fun updateObserverName(@Path("id") id: String, @Body name: ObserverUpdateNameRequest): Completable
+    fun updateObserverName(
+        @Path("id") id: String,
+        @Body name: ObserverUpdateNameNetworkRequest
+    ): Completable
 
     @DELETE("api/share/v1/observers/invites/{id}")
     fun deleteObserverInvite(@Path("id") id: String): Completable

@@ -100,6 +100,9 @@ abstract class BasePm(
         errorHandler.handleError(error)
     }
 
+    protected inline fun <T> Observable<List<T>>.mapFilter(crossinline predicate: (T) -> Boolean): Observable<List<T>> =
+        map { it.filter { item -> predicate(item) } }
+
     protected inline fun <T> Observable<T>.debounceAction(): Observable<T> =
         this.throttleFirst(ACTION_DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
 
