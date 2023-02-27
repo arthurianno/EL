@@ -1,10 +1,10 @@
 package com.elta.android.data.features.observers.datasource
 
-import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
-import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
-import com.elta.android.data.features.observers.dto.ObserverDto
+import com.elta.android.data.features.observers.model.ObserverDbEntity
+import com.elta.android.data.features.observers.model.ObserverNetworkResponse
+import com.elta.android.data.features.observers.toNetwork
 import com.elta.android.data.features.user.dto.SimpleObserverDto
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -12,19 +12,18 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class ObserverCachedDataSource @Inject constructor(
-    private val fromCacheMapper: Mapper<ObserverCacheDto, ObserverDto>,
-    private val cache: Cache<ObserverCacheDto>
+    private val cache: Cache<ObserverDbEntity>
 ) : ObserverDataSource {
 
-    override fun getObserverInvites(): Observable<List<ObserverDto>> =
+    override fun getObserverInvites(): Observable<List<ObserverNetworkResponse>> =
         Observable.fromCallable {
             cache.getAll(CommonConditions.All)
-        }.map(fromCacheMapper::mapFromObjects)
+        }.map { it.toNetwork() }
 
-    override fun getObserver(id: String): Single<ObserverDto> =
+    override fun getObserver(id: String): Single<ObserverNetworkResponse> =
         Single.fromCallable {
             cache.get(CommonConditions.ById(id.hashCode().toLong()))
-        }.map(fromCacheMapper::mapFromObject)
+        }.map { it.toNetwork() }
 
     override fun updateObserverName(id: String, name: String): Completable =
         Completable.fromCallable {

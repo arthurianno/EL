@@ -1,7 +1,7 @@
-package com.elta.android.data.features.observers.dto
+package com.elta.android.data.features.observers.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ObserverInviteEmailRequest(
+data class ObserverInviteEmailNetworkRequest(
     @SerializedName("email") val email: String
 )
