@@ -2,12 +2,10 @@ package com.elta.android.domain.features.user.interactor
 
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.user.isNameValid
 import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
-
-const val MAX_NAME_LENGTH = 50
-const val MIN_NAME_LENGTH = 2
 
 fun buildProfile(original: Profile, events: List<Event>): Profile {
     if (events.isEmpty()) {
@@ -33,7 +31,6 @@ fun buildProfile(original: Profile, events: List<Event>): Profile {
     return original.copy(weight = weight, hba1cLevel = hba1cLevel)
 }
 
-fun isNameValid(name: String): Boolean =
-    name.isNotEmpty() && name.length in MIN_NAME_LENGTH..MAX_NAME_LENGTH
+fun isNameValid(name: String): Boolean = name.isNameValid()
 
 fun Profile.googleFitApp(): HealthApp? = healthApps?.find { it.type == HealthAppType.GOOGLE_FIT }
