@@ -51,6 +51,9 @@ class ProfileChangePasswordPm @Inject constructor(
 
         continueAction.observable
             .skipWhileInProgress()
+            .doOnNext {
+                hideKeyBoardCommand.consumer.accept(Unit)
+            }
             .map(::createParams)
             .flatMapCompletable { params ->
                 changePasswordUseCase.execute(params)
@@ -96,7 +99,6 @@ class ProfileChangePasswordPm @Inject constructor(
                 resources.getString(R.string.profile_settings_change_password_changed)
             )
         )
-        hideKeyBoardCommand.consumer.accept(Unit)
         router.exit()
     }
 
@@ -108,8 +110,11 @@ class ProfileChangePasswordPm @Inject constructor(
 
     private fun getPasswordsError(oldAndNewPasswords: Pair<String, String>) {
         oldPasswordInput.error.consumer.accept(
-            if (!validatePassword(oldAndNewPasswords.first)) resources.getString(R.string.registration_password_pattern)
-            else ""
+            if (!validatePassword(oldAndNewPasswords.first)) {
+                resources.getString(R.string.registration_password_pattern)
+            } else {
+                ""
+            }
         )
         newPasswordInput.error.consumer.accept(
             when {
