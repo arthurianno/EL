@@ -20,10 +20,10 @@ class OnBoardingWeightViewHolder(
         }
         binding.weightView.valueChanges().throttleLast(INTERVAL, TimeUnit.MILLISECONDS)
             .subscribe { newValue ->
+                item.weight = newValue
                 item.weight?.let {
                     bus.event(Events.OnBoardingPageSelected(item))
                 }
-                item.weight = newValue
             }
     }
 }
