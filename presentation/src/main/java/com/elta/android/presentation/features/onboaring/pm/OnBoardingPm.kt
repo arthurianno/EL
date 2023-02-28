@@ -23,7 +23,6 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.nullgr.core.date.toTimestamp
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -174,24 +173,9 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
-        handleWeightItem(prevPage)
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
-    }
-
-    private fun handleWeightItem(prevPage: Int) {
-        (items.value[prevPage] as? OnBoardingItem)?.let {
-            createInitialWeightItem()
-        } ?: Timber.e("Item is not ${OnBoardingItem::class.java} or null")
-    }
-
-    private fun createInitialWeightItem() {
-        val weightItem = OnBoardingWeightItem(
-            resources.getString(R.string.on_boarding_header_user_weight),
-            INITIAL_WEIGHT
-        )
-        savePageData(weightItem)
     }
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
@@ -201,19 +185,19 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun savePageData(item: OnBoardingItem) {
-        val data = item.data
-        params[item::class.java] = data
+        params[item::class.java] = item.data
     }
 
     private fun updateNextButtonState(currentItem: OnBoardingItem) {
-        val data = currentItem.data
-        val isNextPageAvailable = when (currentItem) {
-            is OnBoardingGenderItem -> data != null
-            is OnBoardingDiabetesItem -> data != null
-            is OnBoardingWeightItem -> true
-            else -> false
-        }
-        nextPageVisibilityState.consumer.accept(isNextPageAvailable)
+        nextPageVisibilityState.consumer.accept(
+            when (currentItem) {
+                is OnBoardingGenderItem,
+                is OnBoardingDiabetesItem -> currentItem.data != null
+
+                is OnBoardingWeightItem -> true
+                else -> false
+            }
+        )
     }
 
     private fun createUseCaseParams(i: Unit): UpdateProfileUseCase.Params {
