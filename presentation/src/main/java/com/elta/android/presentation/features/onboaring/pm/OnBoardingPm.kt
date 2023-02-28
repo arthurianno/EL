@@ -240,25 +240,29 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun createOnBoardingEvent(): AnalyticsEvent? {
-        val currentPage = currentPageState.value
-        val item = items.value[currentPage] as OnBoardingItem
-        val data = checkNotNull(params[item::class.java]).toString()
-        return when (item) {
-            is OnBoardingGenderItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_GENDER_ADD,
-                    hashMapOf(AnalyticsEventParam.GENDER to data)
-                )
-            is OnBoardingWeightItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_WEIGHT_ADD
-                )
-            is OnBoardingDiabetesItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_DIABETES_ADD,
-                    hashMapOf(AnalyticsEventParam.TYPE to data)
-                )
-            else -> null
+        val item = items.value[currentPageState.value] as OnBoardingItem
+        return params[item::class.java]?.let {
+            val data = it.toString()
+            when (item) {
+                is OnBoardingGenderItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_GENDER_ADD,
+                        hashMapOf(AnalyticsEventParam.GENDER to data)
+                    )
+
+                is OnBoardingWeightItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_WEIGHT_ADD
+                    )
+
+                is OnBoardingDiabetesItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_DIABETES_ADD,
+                        hashMapOf(AnalyticsEventParam.TYPE to data)
+                    )
+
+                else -> null
+            }
         }
     }
 
