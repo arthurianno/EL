@@ -26,6 +26,9 @@ import me.dmdev.rxpm.state
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+private const val ACTION_DEBOUNCE_MILLIS = 500L
+private const val RELOAD_DELAY_MILLIS = 3000L
+
 @Suppress("SpreadOperator")
 abstract class BasePm(
     protected val services: ServiceFacade
@@ -103,28 +106,28 @@ abstract class BasePm(
     protected inline fun <T> Observable<List<T>>.mapFilter(crossinline predicate: (T) -> Boolean): Observable<List<T>> =
         map { it.filter { item -> predicate(item) } }
 
-    protected inline fun <T> Observable<T>.debounceAction(): Observable<T> =
+    protected fun <T> Observable<T>.debounceAction(): Observable<T> =
         this.throttleFirst(ACTION_DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
 
-    protected inline fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
+    protected fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun <T> Single<T>.hideErrorContainer(): Single<T> =
+    protected fun <T> Single<T>.hideErrorContainer(): Single<T> =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun Completable.hideErrorContainer(): Completable =
+    protected fun Completable.hideErrorContainer(): Completable =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
+    protected fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
         this.skipWhileInProgress(progressState.observable)
 
-    protected inline fun <T> Observable<T>.bindProgress(): Observable<T> =
+    protected fun <T> Observable<T>.bindProgress(): Observable<T> =
         this.bindProgress(progressState.consumer)
 
-    protected inline fun <T> Single<T>.bindProgress(): Single<T> =
+    protected fun <T> Single<T>.bindProgress(): Single<T> =
         this.bindProgress(progressState.consumer)
 
-    protected inline fun Completable.bindProgress(): Completable =
+    protected fun Completable.bindProgress(): Completable =
         this.bindProgress(progressState.consumer)
 
     protected inline fun <T> Single<T>.trackEvent(
@@ -154,9 +157,4 @@ abstract class BasePm(
         crossinline event: () -> AnalyticsEvent?
     ): Completable =
         this.doOnComplete { this@BasePm.trackEvent(event()) }
-
-    companion object {
-        const val ACTION_DEBOUNCE_MILLIS = 500L
-        const val RELOAD_DELAY_MILLIS = 3000L
-    }
 }
