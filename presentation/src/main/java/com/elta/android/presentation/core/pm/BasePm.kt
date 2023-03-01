@@ -2,6 +2,7 @@
 
 package com.elta.android.presentation.core.pm
 
+import androidx.annotation.StringRes
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.trackEvent
@@ -42,6 +43,7 @@ abstract class BasePm(
     val hideKeyBoardCommand = command<Unit>()
     val showKeyBoardCommand = command<Unit>()
     val showSnackBarCommand = command<SnackBarData>(bufferSize = 1)
+    val showToastCommand = command<Int>()
 
     val retryAction = action<Unit>()
 
@@ -96,6 +98,10 @@ abstract class BasePm(
 
     internal fun setErrorViewVisibility(visible: Boolean) {
         errorControl.visibilityState.consumer.accept(visible)
+    }
+
+    protected fun showToast(@StringRes messageId: Int) {
+        showToastCommand.consumer.accept(messageId)
     }
 
     protected open fun handleError(error: Throwable) {

@@ -127,6 +127,7 @@ class ReportPeriodChooserFragment :
 
     override fun onBindPresentationModel(pm: ReportPeriodChooserPm) {
         bindProgressDialog(pm)
+        pm.showSnackBarCommand.bindTo { showToast(getString(R.string.statistic_error)) }
         binding.dialogCloseButtonView.clicks().subscribe { dialog?.dismiss() }
         binding.dialogActionButtonView.clicks().bindTo(pm.mainAction)
         pm.closeDialogCommand.bindTo { dialog?.dismiss() }

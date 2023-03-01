@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.profile.settings.reminders.base.pm
 
 import com.elta.android.common.errors.ReminderAlreadyExistsError
+import com.elta.android.common.errors.ReminderTimeInPastError
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -71,7 +73,7 @@ abstract class BaseRemindPm constructor(
 
     protected fun isFormValid(reminderModel: ReminderFormModel) =
         !reminderModel.inputValue.isNullOrEmpty() &&
-            checkNotNull(reminderModel.date).isAfter(ZonedDateTime.now())
+            reminderModel.date?.isAfter(ZonedDateTime.now()) == true
 
     protected fun createScheduleItems() {
         schedulesState.consumer.accept(
@@ -106,22 +108,18 @@ abstract class BaseRemindPm constructor(
             .map { it.toEventTime(resources).toSimpleSelectorOption() }
             .subscribe(timeSelector.option.consumer)
             .untilDestroy()
-
         selectedDateState.observable
             .map { it.toStringWithFormat(DATE_FORMAT_WITHOUT_ZERO).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
-
         dateSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showDatePickerDialog.consumer)
             .untilDestroy()
-
         timeSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showTimePickerDialog.consumer)
             .untilDestroy()
-
         dateTimeSelectedAction.observable
             .subscribe(selectedDateState.consumer)
             .untilDestroy()
@@ -130,6 +128,7 @@ abstract class BaseRemindPm constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is ReminderAlreadyExistsError -> showExistingReminderDialog.consumer.accept(Unit)
+            is ReminderTimeInPastError -> showToastCommand.consumer.accept(R.string.profile_reminders_wrong_time)
             else -> super.handleError(error)
         }
     }

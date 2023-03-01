@@ -29,18 +29,15 @@ class RemindersPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        actionsSubscribe()
+        busEventsSubscribe()
+    }
 
-        bus.clicks<Clicks.ReminderItemClicked>()
-            .map { it.item.id }
-            .doOnNext { router.navigateTo(Screens.EditRemind(it)) }
-            .subscribe()
-            .untilDestroy()
-
+    private fun actionsSubscribe() {
         newReminderAction.observable
             .doOnNext { router.navigateTo(Screens.CreateRemind) }
             .subscribe()
             .untilDestroy()
-
         getReminders.observable
             .skipWhileInProgress()
             .flatMap {
@@ -53,13 +50,19 @@ class RemindersPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
 
+    private fun busEventsSubscribe() {
+        bus.clicks<Clicks.ReminderItemClicked>()
+            .map { it.item.id }
+            .doOnNext { router.navigateTo(Screens.EditRemind(it)) }
+            .subscribe()
+            .untilDestroy()
         bus.events<Events.ReminderDeleted>()
             .map { Unit }
             .doOnNext(::handleReminderDelete)
             .subscribe(getReminders.consumer)
             .untilDestroy()
-
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
             bus.events<Events.ReminderChanged>().map { Unit },
@@ -70,11 +73,7 @@ class RemindersPm @Inject constructor(
     }
 
     private fun handleSuccess(reminders: List<Reminder>) {
-        items.consumer.accept(
-            if (reminders.isEmpty()) emptyList() else mapper.mapFromObject(
-                reminders
-            )
-        )
+        items.consumer.accept(mapper.mapFromObject(reminders))
     }
 
     private fun handleReminderDelete(i: Unit) {
