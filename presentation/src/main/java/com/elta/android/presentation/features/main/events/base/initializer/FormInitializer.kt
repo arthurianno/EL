@@ -7,6 +7,18 @@ import com.elta.android.presentation.databinding.FragmentEventFormBinding
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
 
+internal const val DEFAULT_NOTE_LENGTH = 120
+internal const val DEFAULT_PICKER_VALUE = 0.0
+internal const val DEFAULT_FIRST_PICKER_MAX_VALUE = 99
+internal const val DEFAULT_FIRST_PICKER_MIN_VALUE = 0
+internal const val DEFAULT_SECOND_PICKER_MAX_VALUE = 9
+internal const val DEFAULT_SECOND_PICKER_MIN_VALUE = 0
+internal const val TEN = 10.0
+
+internal val defaultDoubleConverter: (Int, Int) -> Double = { left, right ->
+    (left * TEN + right) / TEN
+}
+
 abstract class FormInitializer {
 
     abstract val pickerConfiguration: FormMeasurementConfig?
@@ -25,7 +37,7 @@ abstract class FormInitializer {
         }
     }
 
-    fun setPickerValue(pickerValue: Double?) {
+    open fun setPickerValue(pickerValue: Double?) {
         binding.formPickerView.setValue(pickerValue ?: DEFAULT_PICKER_VALUE)
     }
 
@@ -38,18 +50,6 @@ abstract class FormInitializer {
     abstract fun FormPicker.initPickerView()
 
     abstract fun View.initFormView()
-}
-
-const val DEFAULT_NOTE_LENGTH = 120
-const val DEFAULT_PICKER_VALUE = 0.0
-const val DEFAULT_FIRST_PICKER_MAX_VALUE = 99
-const val DEFAULT_FIRST_PICKER_MIN_VALUE = 0
-const val DEFAULT_SECOND_PICKER_MAX_VALUE = 9
-const val DEFAULT_SECOND_PICKER_MIN_VALUE = 0
-const val TEN = 10.0
-
-val defaultDoubleConverter: (Int, Int) -> Double = { left, right ->
-    (left * TEN + right) / TEN
 }
 
 fun EventType.makeFormInitializer() =
