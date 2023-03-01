@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
@@ -34,6 +35,8 @@ import me.dmdev.rxpm.base.PmFragment
 import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+internal const val DEBOUNCE_MILLIS = 300L
 
 internal typealias Inflater<B> = (LayoutInflater, ViewGroup?, Boolean) -> B
 
@@ -118,6 +121,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
         homeButtonView?.clicks()?.subscribe { requireActivity().onBackPressed() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
+        pm.showToastCommand.bindTo { showToast(it) }
         pm.hideKeyBoardCommand.bindTo { requireActivity().hideKeyboard() }
     }
 
@@ -144,8 +148,12 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
+            .throttleLast(DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
             .subscribe(progressDialog.visibility(childFragmentManager)) {}
+    }
+
+    private fun showToast(messageId: Int, showTime: Int = Toast.LENGTH_LONG) {
+        Toast.makeText(requireContext(), getString(messageId), showTime).show()
     }
 
     private fun showSnackbar(data: SnackBarData) {
@@ -156,10 +164,6 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     fun <T> SnackBarControl<T>.bindTo(createSnackBar: (data: T, sc: SnackBarControl<T>) -> Snackbar) {
         bind({ data, sc -> createSnackBar(data, sc) }, compositeDestroy)
-    }
-
-    companion object {
-        const val DEBOUNCE = 300L
     }
 }
 
