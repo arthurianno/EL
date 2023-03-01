@@ -32,6 +32,8 @@ import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
+private const val OPEN_SCREEN_DELAY_MILLIS = 300L
+
 abstract class BaseEventPm(
     services: ServiceFacade
 ) : BasePm(services) {
@@ -75,11 +77,11 @@ abstract class BaseEventPm(
 
     override fun onCreate() {
         super.onCreate()
-        bindFormPicker()
-        bindFormVariantSelection()
-        bindFormTagSelection()
-        bindDateSelectors()
-        bindHandleBack()
+        observeFormPicker()
+        observeFormVariantSelection()
+        observeFormTagSelection()
+        observeDateSelectors()
+        observeHandleBack()
         observeEventChanges()
     }
 
@@ -105,7 +107,7 @@ abstract class BaseEventPm(
         router.exit()
     }
 
-    private fun bindHandleBack() {
+    private fun observeHandleBack() {
         backHandleAction.observable
             .doOnNext(::handleBack)
             .subscribe()
@@ -121,23 +123,22 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun bindFormPicker() {
+    private fun observeFormPicker() {
         formPickerValueChangedAction.observable
             .subscribe(formPickerValue.consumer)
             .untilDestroy()
     }
 
-    private fun bindFormVariantSelection() {
+    private fun observeFormVariantSelection() {
         formSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
             .subscribe {
                 router.navigateTo(Screens.EventsChooserScreen(it))
             }
             .untilDestroy()
-
         bus.events<Events.ChooserVariantSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(formSelector.option.consumer)
@@ -158,11 +159,11 @@ abstract class BaseEventPm(
         )
     }
 
-    private fun bindFormTagSelection() {
+    private fun observeFormTagSelection() {
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     chooserType = ChooserType.GROUP_TAGS,
@@ -172,34 +173,29 @@ abstract class BaseEventPm(
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
-
         bus.events<Events.ChooserTagSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(tagSelector.option.consumer)
             .untilDestroy()
     }
 
-    private fun bindDateSelectors() {
+    private fun observeDateSelectors() {
         selectedDateState.observable
             .map { it.toEventTime(resources).toSimpleSelectorOption() }
             .subscribe(timeSelector.option.consumer)
             .untilDestroy()
-
         selectedDateState.observable
             .map { it.toEventDate(resources).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
-
         dateSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showDatePickerDialog.consumer)
             .untilDestroy()
-
         timeSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showTimePickerDialog.consumer)
             .untilDestroy()
-
         dateTimeSelectedAction.observable
             .filter(::validateSelectedDate)
             .subscribe(selectedDateState.consumer)
@@ -225,8 +221,4 @@ abstract class BaseEventPm(
         !date.isAfter(ZonedDateTime.now().atEndOfDay()).also {
             if (it) showSnackBar(dateInFutureSnackBarData)
         }
-
-    companion object {
-        private const val OPEN_SCREEN_DELAY = 300L // millis
-    }
 }
