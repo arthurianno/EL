@@ -9,6 +9,7 @@ import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCa
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.MealTag
+import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -48,6 +49,8 @@ import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
@@ -94,7 +97,9 @@ class GlucoseEventPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
+        mainActionTitleState.consumer.accept(
+            resources.getString(R.string.event_form_save_updated_entry_title)
+        )
         bindFormTagSelection()
         bindMealTagsSelection()
         bindDateSelectors()
@@ -141,12 +146,16 @@ class GlucoseEventPm @Inject constructor(
             )
         }
             .doOnNext { eventFormHolderState.consumer.accept(it) }
-            .map(::checkIsChanged)
+            .map { checkIsChanged(it) && isFormValid(it) }
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
 
         mealSelector.observable
-            .map { eventFormHolderState.value.copy(mealTag = if (it == MealTag.NOT_SELECTED) null else it) }
+            .map {
+                eventFormHolderState.value.copy(
+                    mealTag = if (it == MealTag.NOT_SELECTED) null else it
+                )
+            }
             .doOnNext { eventFormHolderState.consumer.accept(it) }
             .map(::checkIsChanged)
             .subscribe(mainActionVisibilityState.consumer)
@@ -209,7 +218,7 @@ class GlucoseEventPm @Inject constructor(
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
@@ -244,6 +253,9 @@ class GlucoseEventPm @Inject constructor(
             note = eventFormModel.noteValue,
             mealTag = eventFormModel.mealTag
         ) ?: false
+
+    private fun isFormValid(eventFormModel: GlucoseFormModel): Boolean =
+        GlucoseValidator.isValidNote(eventFormModel.noteValue)
 
     private fun observeSaveEventAction() {
         mainAction.observable
@@ -366,8 +378,4 @@ class GlucoseEventPm @Inject constructor(
             this == GlucoseLevel.LOW -> R.drawable.bg_gradient_blue
             else -> R.drawable.bg_gradient_green
         }
-
-    companion object {
-        private const val OPEN_SCREEN_DELAY = 300L // millis
-    }
 }
