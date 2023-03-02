@@ -50,7 +50,7 @@ import org.threeten.bp.ZonedDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-private const val OPEN_SCREEN_DELAY_MILLS = 300L
+private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
@@ -218,7 +218,7 @@ class GlucoseEventPm @Inject constructor(
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY_MILLS, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
