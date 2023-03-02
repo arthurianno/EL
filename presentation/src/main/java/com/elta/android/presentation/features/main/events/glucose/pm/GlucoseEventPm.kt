@@ -42,15 +42,15 @@ import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-private const val OPEN_SCREEN_DELAY = 300L // millis
+private const val OPEN_SCREEN_DELAY_MILLS = 300L
 
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
@@ -218,7 +218,7 @@ class GlucoseEventPm @Inject constructor(
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
-            .delay(OPEN_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_SCREEN_DELAY_MILLS, TimeUnit.MILLISECONDS)
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
