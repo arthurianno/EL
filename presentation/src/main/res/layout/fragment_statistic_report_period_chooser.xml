@@ -141,9 +141,26 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/dialogActionButtonView"
-        style="@style/Button.Large"
-        android:text="@string/statistic_report_action_button" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/large_button_height"
+        android:layout_gravity="center"
+        android:background="@drawable/selector_button_large">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/dialogActionLoadingIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            app:indicatorColor="@color/white"
+            app:indicatorSize="24dp"
+            app:trackThickness="2dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dialogActionButtonView"
+            style="@style/Button.Large"
+            android:text="@string/statistic_report_action_button" />
+    </FrameLayout>
 
 </LinearLayout>

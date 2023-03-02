@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.elta.android.common.utils.MONTH_NAMES
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseBottomSheetFragment
@@ -18,14 +19,20 @@ import com.elta.android.presentation.widgets.simple_date_picker.RangeSpanDecorat
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.bindTo
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.TemporalAdjusters
+
+private const val DAYS_TO_ADD = 6L
 
 class ReportPeriodChooserFragment :
     BaseBottomSheetFragment<ReportPeriodChooserPm, FragmentStatisticReportPeriodChooserBinding>(
         FragmentStatisticReportPeriodChooserBinding::inflate
     ) {
+    companion object {
+        fun newInstance() = ReportPeriodChooserFragment()
+    }
 
     override val screenLayout: Int = R.layout.fragment_statistic_report_period_chooser
     override val classToken: Class<ReportPeriodChooserPm> = ReportPeriodChooserPm::class.java
@@ -106,10 +113,7 @@ class ReportPeriodChooserFragment :
             setTitleMonths(MONTH_NAMES)
             addDecorator(
                 BackgroundDecorator(
-                    drawable(
-                        R.drawable.selector_calendar_date,
-                        inset
-                    )
+                    drawable(R.drawable.selector_calendar_date, inset)
                 )
             )
             addDecorators(decorators)
@@ -135,6 +139,15 @@ class ReportPeriodChooserFragment :
             binding.calendarView.selectRange(CalendarDay.from(it.start), CalendarDay.from(it.end))
         }
         pm.titleState.bindTo(binding.dateView.text())
+        pm.progressState.bindTo(setLoadingState())
+    }
+
+    private fun setLoadingState() = Consumer<Boolean> { isLoading ->
+        with(binding) {
+            root.isClickable = !isLoading
+            dialogActionButtonView.isVisible = !isLoading
+            dialogActionLoadingIndicator.isVisible = isLoading
+        }
     }
 
     private fun drawable(drawable: Int, inset: Int): Drawable =
@@ -169,9 +182,4 @@ class ReportPeriodChooserFragment :
 
     private fun CalendarDay.isBoundary(dates: List<CalendarDay>) =
         dates.first() == this || dates.last() == this
-
-    companion object {
-        private const val DAYS_TO_ADD = 6L
-        fun newInstance() = ReportPeriodChooserFragment()
-    }
 }
