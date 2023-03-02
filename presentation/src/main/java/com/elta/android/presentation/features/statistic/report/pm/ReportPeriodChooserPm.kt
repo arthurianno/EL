@@ -18,6 +18,8 @@ import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
+private const val FORMAT = "d LLLL"
+
 class ReportPeriodChooserPm @Inject constructor(
     private val getReportUseCase: GetReportUseCase,
     services: ServiceFacade
@@ -31,17 +33,38 @@ class ReportPeriodChooserPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        observeActions()
+        observeStates()
+    }
 
-        selectDateAction.observable
-            .map(::buildRange)
-            .subscribe(selectedRangeState.consumer)
-            .untilDestroy()
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is NetworkConnectionError -> {
+                showSnackBar(
+                    SnackBarMessageData.SimpleTextMessage(
+                        error.message ?: resources.getString(
+                            R.string.default_error_message
+                        )
+                    )
+                )
+            }
 
+            else -> super.handleError(error)
+        }
+    }
+
+    private fun observeStates() {
         selectedRangeState.observable
             .map(::formatRange)
             .subscribe(titleState.consumer)
             .untilDestroy()
+    }
 
+    private fun observeActions() {
+        selectDateAction.observable
+            .map(::buildRange)
+            .subscribe(selectedRangeState.consumer)
+            .untilDestroy()
         mainAction.observable
             .map(::createGetReportParams)
             .flatMapSingle {
@@ -55,19 +78,6 @@ class ReportPeriodChooserPm @Inject constructor(
             .untilDestroy()
     }
 
-    override fun handleError(error: Throwable) {
-        if (error is NetworkConnectionError) {
-            showSnackBar(
-                SnackBarMessageData.SimpleTextMessage(
-                    error.message ?: resources.getString(
-                        R.string.default_error_message
-                    )
-                )
-            )
-        }
-        super.handleError(error)
-    }
-
     private fun formatRange(range: Range): String =
         "${range.start.toStringWithFormat(FORMAT)} - ${range.end.toStringWithFormat(FORMAT)}"
 
@@ -77,9 +87,5 @@ class ReportPeriodChooserPm @Inject constructor(
     private fun handleReport(uri: Uri) {
         bus.event(Events.ReportLoadedEvent(uri))
         closeDialogCommand.consumer.accept(Unit)
-    }
-
-    private companion object {
-        const val FORMAT = "d LLLL"
     }
 }
