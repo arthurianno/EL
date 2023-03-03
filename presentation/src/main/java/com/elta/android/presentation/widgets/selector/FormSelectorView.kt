@@ -34,6 +34,7 @@ class FormSelectorView @JvmOverloads constructor(
             field = value
             bindValue()
         }
+    private var isSingleLine: Boolean = false
     private var needDrawArrow: Boolean = true
     private var value: String? = null
         set(value) {
@@ -75,12 +76,14 @@ class FormSelectorView @JvmOverloads constructor(
             hint = array.getString(R.styleable.FormSelectorView_fsv_hint)
             value = array.getString(R.styleable.FormSelectorView_fsv_title)
             needDrawArrow = array.getBoolean(R.styleable.FormSelectorView_fsv_draw_arrow, true)
+            isSingleLine = array.getBoolean(R.styleable.FormSelectorView_fsv_single_line, false)
             array.recycle()
         }
     }
 
     private fun initDefault() = with(binding) {
         selectorArrowView.toggleView(needDrawArrow)
+        selectorTitleView.isSingleLine = isSingleLine
         bindIcon()
         bindValue()
     }
@@ -91,6 +94,7 @@ class FormSelectorView @JvmOverloads constructor(
                 selectorTitleView.text = hint
                 selectorTitleView.setTextColor(hintColor)
             }
+
             else -> {
                 selectorTitleView.text = value
                 selectorTitleView.setTextColor(textColor)
