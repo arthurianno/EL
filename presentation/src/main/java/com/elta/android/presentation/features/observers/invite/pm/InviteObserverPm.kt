@@ -108,12 +108,22 @@ class InviteObserverPm @Inject constructor(
         email.isNotBlank() && isEmailValid(email)
 
     private fun haveSameObserver(): Boolean =
-        observersState.valueOrNull?.any { it.email == emailInput.text.valueOrNull } ?: false
+        observersState.valueOrNull
+            ?.filter { it.status == ObserverStatus.CONFIRMED }
+            ?.any { it.email == emailInput.text.valueOrNull }
+            ?: false
+
+    private fun haveAwaitingObserver(): Boolean =
+        observersState.valueOrNull
+            ?.filter { it.status == ObserverStatus.PENDING }
+            ?.any { it.email == emailInput.text.valueOrNull }
+            ?: false
 
     private fun getEmailError(isEmailValid: Boolean): String =
         when {
             emailInput.text.valueOrNull.isNullOrBlank() -> EMPTY_STRING
             haveSameObserver() -> resources.getString(R.string.registration_error_same_email)
+            haveAwaitingObserver() -> resources.getString(R.string.registration_error_same_email_awaiting)
             !isEmailValid -> resources.getString(R.string.registration_error_input_email)
             else -> EMPTY_STRING
         }
