@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
-import android.os.Build
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.View
@@ -21,6 +20,16 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
 
+private const val LARGE_OVAL_COLOR_VALUE = "#99ffffff"
+private const val OVAL_OFFSET_ZERO = 0f
+private const val OVAL_OFFSET_HALF = 0.5f
+private const val OVAL_OFFSET_FULL = 1f
+private const val TIME = 1000L
+private const val FRAMES = 60f
+private const val FRAME_DELAY = 16L
+private const val PI_FLOAT = PI.toFloat()
+private const val END = 2 * PI_FLOAT
+
 @Suppress("LongMethod", "MagicNumber")
 class MorphView @JvmOverloads constructor(
     context: Context,
@@ -34,13 +43,13 @@ class MorphView @JvmOverloads constructor(
     }
 
     private val largeOvalPaint: Paint = Paint().apply {
-        color = Color.parseColor("#99ffffff")
+        color = Color.parseColor(LARGE_OVAL_COLOR_VALUE)
         isAntiAlias = true
     }
 
-    private val oval1 = Oval(rotateOffset = 0f)
-    private val oval2 = Oval(rotateOffset = 0.5f)
-    private val oval3 = Oval(rotateOffset = 1f)
+    private val oval1 = Oval(rotateOffset = OVAL_OFFSET_ZERO)
+    private val oval2 = Oval(rotateOffset = OVAL_OFFSET_HALF)
+    private val oval3 = Oval(rotateOffset = OVAL_OFFSET_FULL)
     private val ovals = arrayListOf<Oval>().apply {
         add(oval1)
         add(oval2)
@@ -65,10 +74,7 @@ class MorphView @JvmOverloads constructor(
     private val holders = mutableListOf<PathHolder>()
     private var holdersIterator: Iterator<PathHolder>? = null
 
-    private val time = 1000L
-    private val frames = 60
-    private val frameDuration = time / frames.toFloat()
-    private val frameDelay = 16L
+    private val frameDuration = TIME / FRAMES
 
     private var isInitialized = false
     private var wasAnimatingWhenDetached = false
@@ -79,7 +85,7 @@ class MorphView @JvmOverloads constructor(
     private val compositeDisposable = CompositeDisposable()
 
     private var isAnimating = false
-    private val animationHandler = Handler()
+    private val animationHandler = Handler(context.mainLooper)
     private val animation = object : Runnable {
         override fun run() {
             holdersIterator?.let {
@@ -88,7 +94,7 @@ class MorphView @JvmOverloads constructor(
                     oval2.path = holder.p2
                     oval3.path = holder.p3
                     invalidate()
-                    animationHandler.postDelayed(this, frameDelay)
+                    animationHandler.postDelayed(this, FRAME_DELAY)
                 }
             }
         }
@@ -100,12 +106,7 @@ class MorphView @JvmOverloads constructor(
             playAnimation()
             autoPlay = false
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // This is needed to mimic newer platform behavior.
-            // https://stackoverflow.com/a/53625860/715633
-            onVisibilityChanged(this, visibility)
-        }
-
+        onVisibilityChanged(this, visibility)
         initializeValuesAction
             .switchMapCompletable {
                 Completable.fromCallable { initializeValues() }
@@ -129,7 +130,7 @@ class MorphView @JvmOverloads constructor(
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         if (isShown) {
-            if (wasAnimatingWhenNotShown) {
+            if (!wasAnimatingWhenNotShown) {
                 resumeAnimation()
                 wasAnimatingWhenNotShown = false
             }
@@ -146,13 +147,13 @@ class MorphView @JvmOverloads constructor(
         measureOvals()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        canvas.drawPath(oval3.path, largeOvalPaint)
-        canvas.drawPath(oval2.path, smallOvalPaint)
-        canvas.drawPath(oval1.path, smallOvalPaint)
+    override fun onDraw(canvas: Canvas) = with(canvas) {
+        drawPath(oval3.path, largeOvalPaint)
+        drawPath(oval2.path, smallOvalPaint)
+        drawPath(oval1.path, smallOvalPaint)
     }
 
-    fun playAnimation() {
+    private fun playAnimation() {
         if (!isInitialized) return
 
         if (isShown) {
@@ -164,7 +165,7 @@ class MorphView @JvmOverloads constructor(
         }
     }
 
-    fun resumeAnimation() {
+    private fun resumeAnimation() {
         if (!isInitialized) return
 
         if (isShown) {
@@ -176,7 +177,7 @@ class MorphView @JvmOverloads constructor(
         }
     }
 
-    fun cancelAnimation() {
+    private fun cancelAnimation() {
         if (!isInitialized) return
 
         wasAnimatingWhenNotShown = false
@@ -184,7 +185,7 @@ class MorphView @JvmOverloads constructor(
         animationHandler.removeCallbacks(animation)
     }
 
-    fun pauseAnimation() {
+    private fun pauseAnimation() {
         if (!isInitialized) return
 
         autoPlay = false
@@ -225,38 +226,33 @@ class MorphView @JvmOverloads constructor(
     }
 
     private fun initializeValues() {
-
-        initializeValues(0f, 2f, 8000f, frameDuration, smallAngleValues.list)
-        initializeValues(0.65f, 0.8f, 4000f, frameDuration, largeAngleValues.list)
+        initializeValues(0f, 2f, 8000f, smallAngleValues.list)
+        initializeValues(0.65f, 0.8f, 4000f, largeAngleValues.list)
 
         initializeValues(
-            smallOvalSize.xMin,
-            smallOvalSize.xMax,
-            2500f,
-            frameDuration,
-            xRValues.list
+            min = smallOvalSize.xMin,
+            max = smallOvalSize.xMax,
+            duration = 2500f,
+            values = xRValues.list
         )
         initializeValues(
-            smallOvalSize.yMin,
-            smallOvalSize.yMax,
-            2000f,
-            frameDuration,
-            yRValues.list
+            min = smallOvalSize.yMin,
+            max = smallOvalSize.yMax,
+            duration = 2000f,
+            values = yRValues.list
         )
 
         initializeValues(
-            largeOvalSize.xMin,
-            largeOvalSize.xMax,
-            2500f,
-            frameDuration,
-            xRLargeValues.list
+            min = largeOvalSize.xMin,
+            max = largeOvalSize.xMax,
+            duration = 2500f,
+            values = xRLargeValues.list
         )
         initializeValues(
-            largeOvalSize.yMin,
-            largeOvalSize.yMax,
-            2000f,
-            frameDuration,
-            yRLargeValues.list
+            min = largeOvalSize.yMin,
+            max = largeOvalSize.yMax,
+            duration = 2000f,
+            values = yRLargeValues.list
         )
 
         val max0 = max(smallAngleValues.list.size, largeAngleValues.list.size)
@@ -266,7 +262,6 @@ class MorphView @JvmOverloads constructor(
         val max = maxOf(max0, max1, max2)
 
         (0 until max).forEach {
-
             val smallAngleValue = smallAngleValues.next()
             val largeAngleValue = largeAngleValues.next()
 
@@ -311,7 +306,6 @@ class MorphView @JvmOverloads constructor(
 
         var i = start
         while (i <= end) {
-
             val sinI = sin(i)
             val cosI = cos(i)
 
@@ -349,7 +343,6 @@ class MorphView @JvmOverloads constructor(
         min: Float,
         max: Float,
         duration: Float,
-        frameDuration: Float,
         values: MutableList<Float>
     ) {
         values.clear()
@@ -358,7 +351,7 @@ class MorphView @JvmOverloads constructor(
         val valuePerFrame = delta * frameDuration / duration
         var total: Float = min
 
-        var time: Float = 0f
+        var time = 0f
 
         while (time <= duration) {
             total += valuePerFrame
@@ -373,7 +366,7 @@ class MorphView @JvmOverloads constructor(
         var center: PointF = PointF(),
         var radius: PointF = PointF(),
         var angle: Float = 0f,
-        val rotateOffsetPiFloat: Float = rotateOffset * MorphView.PI_FLOAT
+        val rotateOffsetPiFloat: Float = rotateOffset * PI_FLOAT
     ) {
 
         fun setCenter(cx: Float, cy: Float) {
@@ -398,7 +391,6 @@ class MorphView @JvmOverloads constructor(
         val list = mutableListOf<Float>()
 
         fun next(): Float {
-
             if (mirror && forwardBackwardIterator == null) {
                 forwardBackwardIterator = list.forwardBackwardIterator()
             }
@@ -407,8 +399,12 @@ class MorphView @JvmOverloads constructor(
                 endlessIterator = list.endlessIterator()
             }
 
-            return if (mirror) forwardBackwardIterator?.next() ?: 0f else endlessIterator?.next()
-                ?: 0f
+            return if (mirror) {
+                forwardBackwardIterator?.next() ?: 0f
+            } else {
+                endlessIterator?.next()
+                    ?: 0f
+            }
         }
     }
 
@@ -417,10 +413,18 @@ class MorphView @JvmOverloads constructor(
         val p2: Path = Path(),
         val p3: Path = Path()
     ) {
-        inline fun getPath(index: Int): Path = if (index == 0) p1 else if (index == 1) p2 else p3
+        fun getPath(index: Int): Path =
+            when (index) {
+                0 -> p1
+                1 -> p2
+                else -> p3
+            }
     }
 
-    class ForwardBackwardIterator<T>(private val list: List<T>, private val count: Int = -1) :
+    internal class ForwardBackwardIterator<T>(
+        private val list: List<T>,
+        private val count: Int = -1
+    ) :
         Iterator<T> {
 
         private val size = list.size
@@ -448,7 +452,8 @@ class MorphView @JvmOverloads constructor(
         }
     }
 
-    class EndlessIterator<T>(private val list: List<T>, private val count: Int = -1) : Iterator<T> {
+    internal class EndlessIterator<T>(private val list: List<T>, private val count: Int = -1) :
+        Iterator<T> {
 
         private val size = list.size
         private var current = 0
@@ -465,15 +470,10 @@ class MorphView @JvmOverloads constructor(
             return item
         }
     }
-
-    companion object {
-        val PI_FLOAT = PI.toFloat()
-        val END = 2 * PI_FLOAT
-    }
 }
 
-fun <T> List<T>.forwardBackwardIterator(count: Int = -1): Iterator<T> =
+private fun <T> List<T>.forwardBackwardIterator(count: Int = -1): Iterator<T> =
     MorphView.ForwardBackwardIterator(this, count)
 
-fun <T> List<T>.endlessIterator(count: Int = -1): Iterator<T> =
+private fun <T> List<T>.endlessIterator(count: Int = -1): Iterator<T> =
     MorphView.EndlessIterator(this, count)
