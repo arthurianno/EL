@@ -28,8 +28,11 @@ import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val EMPTY_STATUS_DELAY_MILLIS = 400L
+private const val STATUS_DELAY_MILLIS = 2000L
+
 class AppPm @Inject constructor(
-    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val getUserInfo: GetUserInfoUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -49,7 +52,7 @@ class AppPm @Inject constructor(
         coldStartAction.observable
             .skipWhileInProgress()
             .flatMapSingle {
-                getUserInfoUseCase.execute()
+                getUserInfo.execute()
                     .doOnSuccess { user ->
                         when {
                             !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
@@ -57,11 +60,12 @@ class AppPm @Inject constructor(
                                 Screens.GreetingFlow,
                                 Screens.ActivateProfile
                             )
+
                             !user.isOnBoardingPassed -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
-                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
+                    .doOnError(::handleError)
                     .bindProgress()
             }
             .retry()
@@ -82,7 +86,7 @@ class AppPm @Inject constructor(
 
         notificationStartAction.observable
             .flatMapSingle { uri ->
-                getUserInfoUseCase.execute()
+                getUserInfo.execute()
                     .map { Pair(uri, it) }
                     .doOnSuccess(::handleNotification)
                     .doOnError(::handleError)
@@ -109,10 +113,10 @@ class AppPm @Inject constructor(
         bus.events<Events.Sync>()
             .concatMap { event ->
                 val delay = when {
-                    !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY // first start add delay to make smoooth
+                    !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth
                     event is Events.Sync.Glucometer.Error -> 0L
                     event is Events.Sync.Glucometer.Started -> 0L
-                    else -> STATUS_DELAY
+                    else -> STATUS_DELAY_MILLIS
                 }
                 Observable.just(event).delay(delay, TimeUnit.MILLISECONDS)
             }
@@ -123,22 +127,27 @@ class AppPm @Inject constructor(
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Glucometer.Started -> {
                         setStatus(SyncStatus.Glucometer.Started(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Glucometer.Success -> {
                         setStatus(SyncStatus.Glucometer.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
+
                     is Events.Sync.Server.Error -> {
-                        setStatus(SyncStatus.Server.Error(resources))
+                        setStatus(SyncStatus.Server.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
+
                     is Events.Sync.Server.Started -> {
                         setStatus(SyncStatus.Server.Started(resources))
                         setStatusVisibility(Visibility.Show)
                     }
+
                     is Events.Sync.Server.Success -> {
                         setStatus(SyncStatus.Server.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
@@ -159,11 +168,16 @@ class AppPm @Inject constructor(
     }
 
     override fun handleError(error: Throwable) {
-        if (error is NoSuchElementException) router.newRootChain(
-            Screens.GreetingFlow,
-            Screens.AuthFlow
-        )
-        else super.handleError(error)
+        when (error) {
+            is NoSuchElementException -> {
+                router.newRootChain(
+                    Screens.GreetingFlow,
+                    Screens.AuthFlow
+                )
+            }
+
+            else -> super.handleError(error)
+        }
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
@@ -171,7 +185,9 @@ class AppPm @Inject constructor(
             NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
                 router.newRootScreen(it)
             }
-        } else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        } else {
+            router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        }
     }
 
     private fun setStatus(status: SyncStatus) {
@@ -222,10 +238,5 @@ class AppPm @Inject constructor(
                 override val color: Int = resources.getColor(R.color.color_background_sync_error)
             ) : SyncStatus()
         }
-    }
-
-    private companion object {
-        const val EMPTY_STATUS_DELAY = 400L // millis
-        const val STATUS_DELAY = 2000L // millis
     }
 }
