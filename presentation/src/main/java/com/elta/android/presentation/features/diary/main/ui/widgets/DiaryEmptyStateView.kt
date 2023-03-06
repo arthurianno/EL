@@ -22,16 +22,11 @@ class DiaryEmptyStateView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.layout_diary_empty_state, this, true)
     }
 
-    override fun state() = STATE_CONSUMER_STUB
+    override fun state() = Consumer<StateData> { }
 
     override fun clicks(): Observable<Unit> = Observable.empty()
 
-    override fun enable() = CONSUMER_STUB
+    override fun enable() = Consumer<Boolean> {}
 
     override fun visibility(): Consumer<in Boolean> = this.visibility(View.GONE)
-
-    private companion object {
-        val CONSUMER_STUB = Consumer<Boolean> {}
-        val STATE_CONSUMER_STUB = Consumer<StateData> { }
-    }
 }

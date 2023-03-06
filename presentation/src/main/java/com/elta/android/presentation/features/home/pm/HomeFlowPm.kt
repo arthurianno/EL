@@ -3,9 +3,11 @@ package com.elta.android.presentation.features.home.pm
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
+import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
+import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -49,6 +51,11 @@ import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
+private const val META_SYNC = "meta_sync"
+private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
+private const val SNACK_BAR_DURATION = 2000
+
 class HomeFlowPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getDevicesUseCase: GetGlucometersUseCase,
@@ -57,6 +64,7 @@ class HomeFlowPm @Inject constructor(
     private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
     private val syncWithBackendUseCase: SyncLocalChangesUseCase,
+    private val logOutUseCase: LogOutUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
@@ -180,7 +188,7 @@ class HomeFlowPm @Inject constructor(
         bus.clicks<Clicks.AddUserEvent>()
             .map { it.meta }
             .doOnNext { closeBottomSheetCommand.consumer.accept(Unit) }
-            .delay(OPEN_EVENT_SCREEN_DELAY, TimeUnit.MILLISECONDS)
+            .delay(OPEN_EVENT_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .doOnNext(::handleAddEventClick)
             .subscribe()
             .untilDestroy()
@@ -233,7 +241,6 @@ class HomeFlowPm @Inject constructor(
                 syncWithBackendUseCase.execute()
                     .bindProgress(syncWithBackendProgressState.consumer)
                     .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
-                    .doOnError { bus.event(Events.Sync.Server.Error) }
                     .doOnComplete { bus.event(Events.Sync.Server.Success) }
                     .doOnComplete {
                         bus.event(Events.EventsChanged(false))
@@ -245,7 +252,7 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         networkStateCommand.observable
-            .delay(SYNC_AFTER_CONNECTION_RESTORED_DELAY, TimeUnit.MILLISECONDS)
+            .delay(SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .filter { it }
             .map { Unit }
             .skipWhileInProgress(syncProgressState.observable)
@@ -384,16 +391,20 @@ class HomeFlowPm @Inject constructor(
                                 btControl.requestEnableBluetooth()
                                     .filter { it }
                                     .flatMapObservable { syncWithGlucometer(auto) }
+
                             is LocationPermissionNotGrantedError ->
                                 btControl.requestLocationPermissions()
                                     .filter { it }
                                     .flatMapObservable { syncWithGlucometer(auto) }
+
                             is LocationNotEnabledError ->
                                 btControl.requestEnableLocation()
                                     .filter { it }
                                     .flatMapObservable { syncWithGlucometer(auto) }
+
                             else -> Observable.error(error)
                         }
+
                     else -> Observable.error(error)
                 }
             }
@@ -407,6 +418,7 @@ class HomeFlowPm @Inject constructor(
                     is GlucometerOfflineError -> showRetrySyncAction.consumer.accept(Unit)
                     else -> handleError(error)
                 }
+
             else -> handleError(error)
         }
     }
@@ -419,10 +431,13 @@ class HomeFlowPm @Inject constructor(
         }
     }
 
-    companion object {
-        private const val OPEN_EVENT_SCREEN_DELAY = 400L
-        private const val META_SYNC = "meta_sync"
-        private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY = 2800L
-        private const val SNACK_BAR_DURATION = 2000
+    override fun handleError(error: Throwable) {
+        if (error is InvalidRefreshTokenError) {
+            logOutUseCase.execute()
+                .subscribe()
+                .untilDestroy()
+        }
+        bus.event(Events.Sync.Server.Error)
+        super.handleError(error)
     }
 }

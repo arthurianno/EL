@@ -33,8 +33,17 @@ import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
 import kotlin.math.abs
 
+private const val EXTRA_ID = "extra_id"
+
 class GlucoseEventFragment :
     BaseFragment<GlucoseEventPm, FragmentGlucoseEventBinding>(FragmentGlucoseEventBinding::inflate) {
+    companion object {
+        fun newInstance(id: String): GlucoseEventFragment {
+            return GlucoseEventFragment().apply {
+                arguments = bundle(EXTRA_ID to id)
+            }
+        }
+    }
 
     override val screenLayout: Int = R.layout.fragment_glucose_event
     override val classToken: Class<GlucoseEventPm> = GlucoseEventPm::class.java
@@ -143,10 +152,12 @@ class GlucoseEventFragment :
                 binding.afterEatingAttribute.isSelected = false
                 binding.beforeEatingAttribute.isSelected = true
             }
+
             MealTag.AFTERMEAL -> {
                 binding.afterEatingAttribute.isSelected = true
                 binding.beforeEatingAttribute.isSelected = false
             }
+
             else -> {
                 binding.afterEatingAttribute.isSelected = false
                 binding.beforeEatingAttribute.isSelected = false
@@ -198,14 +209,4 @@ class GlucoseEventFragment :
         var subTitleAlpha: Float = 0f,
         var buttonVisibility: Int = View.INVISIBLE
     )
-
-    companion object {
-        private const val EXTRA_ID = "extra_id"
-
-        fun newInstance(id: String): GlucoseEventFragment {
-            return GlucoseEventFragment().apply {
-                arguments = bundle(EXTRA_ID to id)
-            }
-        }
-    }
 }
