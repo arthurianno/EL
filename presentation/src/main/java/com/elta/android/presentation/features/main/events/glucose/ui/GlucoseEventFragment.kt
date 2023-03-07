@@ -53,7 +53,6 @@ class GlucoseEventFragment :
 
     private lateinit var insetsListener: OnApplyBottomWindowInsetsListener
     private var maxTranslation: Int = 0
-    private val viewsState = ViewsState()
     private var isTouchingScroll = false
     private var isTouchingAppBar = false
 
@@ -69,23 +68,9 @@ class GlucoseEventFragment :
                 if (!isTouchingScroll || !isTouchingAppBar) {
                     val isOffsetZero = offset == 0
                     appBarLayoutView.setExpanded(isOffsetZero, true)
-
-                    // Это код был от прошлого разработчика. Закоментили при реализации ввода в барабан с клавиатуры.
-                    // Можно удалить после полного цикла тестирования от QA. Возможны проблемы с перекрытием контета клавиатурой
-//                    if (isOffsetZero) requireActivity().findAndClearFocus()
-//                    if (!isOffsetZero) scrollableView.scrollToBottom()
                 }
             }
             maxTranslation = view.resources?.getDimensionPixelSize(R.dimen.toolbar_translation) ?: 0
-            with(viewsState) {
-                glucoseEventValueTextView.alpha = valueViewAlpha
-                glucoseEventUnitsTextView.alpha = valueViewAlpha
-                eventInfoContainerView.alpha = eventInfoAlpha
-                toolbarTitleView.translationY = titleTranslation
-                toolbarSubTitleView.translationY = subTitleTranslation
-                toolbarSubTitleView.alpha = subTitleAlpha
-                formSaveButtonView.visibility = buttonVisibility
-            }
             formNoteView.applyLengthFilter(DEFAULT_NOTE_LENGTH)
         }
     }
@@ -98,20 +83,6 @@ class GlucoseEventFragment :
     override fun onStop() {
         super.onStop()
         view?.removeWindowBottomInsetsListener(insetsListener)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        with(binding) {
-            viewsState.apply {
-                valueViewAlpha = glucoseEventValueTextView.alpha
-                eventInfoAlpha = eventInfoContainerView.alpha
-                titleTranslation = toolbarTitleView.translationY
-                subTitleTranslation = toolbarSubTitleView.translationY
-                subTitleAlpha = toolbarSubTitleView.alpha
-                buttonVisibility = formSaveButtonView.visibility
-            }
-        }
     }
 
     override fun onBindPresentationModel(pm: GlucoseEventPm) {
@@ -200,13 +171,4 @@ class GlucoseEventFragment :
             }
         }
     }
-
-    private data class ViewsState(
-        var valueViewAlpha: Float = 1f,
-        var eventInfoAlpha: Float = 1f,
-        var titleTranslation: Float = 0f,
-        var subTitleTranslation: Float = 0f,
-        var subTitleAlpha: Float = 0f,
-        var buttonVisibility: Int = View.INVISIBLE
-    )
 }

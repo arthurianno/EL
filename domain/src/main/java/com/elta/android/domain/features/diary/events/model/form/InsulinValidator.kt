@@ -6,8 +6,8 @@ import org.threeten.bp.ZonedDateTime
 
 object InsulinValidator : FormValidator {
 
-    const val bottomLevelInclusive = 0.1
-    const val topLevelInclusive = 99.9
+    private const val bottomLevelInclusive = 0.1
+    private const val topLevelInclusive = 99.9
     private val valueDiapason = DoubleRange(bottomLevelInclusive, topLevelInclusive)
 
     override fun isValid(
@@ -18,7 +18,7 @@ object InsulinValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateValue(value) && insulin != null && date != null && isValidNote(note)
+    ): Boolean = validateValue(value) && insulin != null && date != null && note.noteIsValid()
 
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
 }
