@@ -556,7 +556,7 @@
     <string name="statistic_glucose_index_description_low">Измерения ниже целевого диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
-    <string name="statistic_general_index_title_insulin">Количество инсулина</string>
+    <string name="statistic_general_index_title_insulin">Количество общего инсулина</string>
     <string name="statistic_general_index_title_bolus_insulin">Болюсный инсулин</string>
     <string name="statistic_general_index_title_basal_insulin">Базальный инсулин</string>
     <string name="statistic_general_index_title_activity">Физическая активность</string>
