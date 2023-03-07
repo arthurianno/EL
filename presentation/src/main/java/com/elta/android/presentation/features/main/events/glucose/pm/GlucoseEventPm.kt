@@ -100,17 +100,17 @@ class GlucoseEventPm @Inject constructor(
         mainActionTitleState.consumer.accept(
             resources.getString(R.string.event_form_save_updated_entry_title)
         )
-        bindFormTagSelection()
-        bindMealTagsSelection()
-        bindDateSelectors()
-        bindHandleBack()
-        observeEventChanges()
-        observeSaveEventAction()
-        bindShare()
         loadEvent()
+        observeTagsAction()
+        observeMealsAction()
+        observeBackAction()
+        observeSaveEventAction()
+        observeShareAction()
+        observeDateTimeChanges()
+        observeEventChanges()
     }
 
-    private fun bindMealTagsSelection() {
+    private fun observeMealsAction() {
         beforeMealAction.observable
             .doOnNext { switchMealTag(MealTag.BEFOREMEAL) }
             .subscribe()
@@ -122,8 +122,9 @@ class GlucoseEventPm @Inject constructor(
     }
 
     private fun switchMealTag(mealTag: MealTag) {
+        val selectedValue = mealSelector.value
         mealSelector.consumer.accept(
-            if (mealSelector.value == MealTag.NOT_SELECTED) {
+            if (selectedValue == MealTag.NOT_SELECTED || selectedValue != mealTag) {
                 mealTag
             } else {
                 MealTag.NOT_SELECTED
@@ -151,9 +152,9 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
 
         mealSelector.observable
-            .map {
+            .map { mealTag ->
                 eventFormHolderState.value.copy(
-                    mealTag = if (it == MealTag.NOT_SELECTED) null else it
+                    mealTag = mealTag.takeUnless { it == MealTag.NOT_SELECTED }
                 )
             }
             .doOnNext { eventFormHolderState.consumer.accept(it) }
@@ -214,7 +215,7 @@ class GlucoseEventPm @Inject constructor(
         event.mealTag?.let { mealSelector.consumer.accept(it) }
     }
 
-    private fun bindFormTagSelection() {
+    private fun observeTagsAction() {
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
@@ -235,7 +236,7 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindDateSelectors() {
+    private fun observeDateTimeChanges() {
         selectedDateState.observable
             .map { it.toEventTime(resources).toSimpleSelectorOption() }
             .subscribe(timeSelector.option.consumer)
@@ -255,7 +256,11 @@ class GlucoseEventPm @Inject constructor(
         ) ?: false
 
     private fun isFormValid(eventFormModel: GlucoseFormModel): Boolean =
-        GlucoseValidator.isValidNote(eventFormModel.noteValue)
+        GlucoseValidator.isValid(
+            value = eventState.valueOrNull?.value,
+            date = eventState.valueOrNull?.additionTime,
+            note = eventFormModel.noteValue
+        )
 
     private fun observeSaveEventAction() {
         mainAction.observable
@@ -273,7 +278,7 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindShare() {
+    private fun observeShareAction() {
         shareAction.observable
             .map(::createGetShareEventUriUseCaseParams)
             .flatMapSingle {
@@ -300,7 +305,7 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindHandleBack() {
+    private fun observeBackAction() {
         backHandleAction.observable
             .doOnNext(::handleBack)
             .subscribe()
@@ -317,9 +322,10 @@ class GlucoseEventPm @Inject constructor(
     }
 
     private fun handleBack(i: Unit) {
-        when (mainActionVisibilityState.value) {
-            true -> exitDialogAction.consumer.accept(Unit)
-            else -> router.exit()
+        if (mainActionVisibilityState.value) {
+            exitDialogAction.consumer.accept(Unit)
+        } else {
+            router.exit()
         }
     }
 
