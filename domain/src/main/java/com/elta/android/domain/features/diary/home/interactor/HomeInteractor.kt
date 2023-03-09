@@ -16,6 +16,8 @@ import timber.log.Timber
 import java.util.Date
 import kotlin.math.abs
 
+private const val DOUBLE_ZERO: Double = 0.0
+
 fun buildHomeModel(
     events: List<Event>,
     tags: List<Tag>,
@@ -69,22 +71,25 @@ fun getDayPeriod(now: Long): DayPeriod =
     }
 
 fun Event.glucoseLevel(settings: GlucoseLevelSettings): GlucoseLevel =
-    when (value ?: 0.0) {
+    when (value.orZero()) {
         in settings.low -> GlucoseLevel.LOW
         in settings.normal -> GlucoseLevel.NORMAL
         else -> GlucoseLevel.HIGH
     }
 
-fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection =
+fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection? =
     when {
-        preLastEvent == null -> GlucoseLevelDirection.UP
-        (this.value ?: 0.0) > (preLastEvent.value ?: 0.0) -> GlucoseLevelDirection.UP
-        (this.value ?: 0.0) < (preLastEvent.value ?: 0.0) -> GlucoseLevelDirection.DOWN
+        preLastEvent == null -> null
+        (this.value.orZero()) > (preLastEvent.value.orZero()) -> GlucoseLevelDirection.UP
+        (this.value.orZero()) < (preLastEvent.value.orZero()) -> GlucoseLevelDirection.DOWN
         else -> GlucoseLevelDirection.STABLE
     }
 
-fun Event.glucoseLevelDifference(preLastEvent: Event?): Double =
-    abs(this.value?.minus(preLastEvent?.value ?: 0.0) ?: 0.0)
+fun Event.glucoseLevelDifference(preLastEvent: Event?): Double? {
+    return preLastEvent?.let {
+        abs(this.value?.minus(preLastEvent.value.orZero()).orZero())
+    }
+}
 
 fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
     if (events.isEmpty()) {
@@ -115,3 +120,5 @@ fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
 
     return blocks
 }
+
+private fun Double?.orZero(): Double = this ?: DOUBLE_ZERO
