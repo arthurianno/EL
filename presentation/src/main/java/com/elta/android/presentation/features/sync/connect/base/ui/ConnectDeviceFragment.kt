@@ -20,7 +20,9 @@ import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.ui.extensions.children
 import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
@@ -56,6 +58,11 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
         binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks()
             .bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
+        pm.mstate.bindTo { state ->
+            binding.syncStateContainerView.children().forEach { view ->
+                view.toggleView(state.getId() == view.id)
+            }
+        }
 
         pm.retrySearchControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
