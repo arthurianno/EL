@@ -21,6 +21,12 @@ android {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
     }
+    buildTypes {
+        create("debugDev")
+        create("debugStage")
+        create("releaseDev")
+        create("releaseStage")
+    }
 }
 
 dependencies {
