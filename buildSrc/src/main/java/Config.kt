@@ -8,26 +8,21 @@ object AppConfig {
     const val jvmTarget = "11"
     val javaVersion = JavaVersion.VERSION_11
 
-    object AppIdSufix {
-        const val stage = "stage"
-        const val dev = "dev"
-    }
-
     object DeppLink {
         const val host = "stage2.vdiabete.com"
         const val schema = "elta"
-    }
-
-    object ServerUrl {
-        const val prod = "https://vdiabete.com"
-        const val stage = "https://stage2.vdiabete.com"
-        const val dev = "https://dev.vdiabete.com"
     }
 
     object LogEnabled {
         const val debug = true
         const val release = false
     }
+}
+
+enum class BackendVariant(val path: String) {
+    prod("https://vdiabete.com"),
+    stage("https://stage2.vdiabete.com"),
+    dev("https://dev.vdiabete.com")
 }
 
 object Module {

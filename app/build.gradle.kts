@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileInputStream
 
@@ -72,14 +74,50 @@ android {
             resValue("string", "app_deep_link_host", AppConfig.DeppLink.host)
             resValue("string", "app_deep_link_schema", AppConfig.DeppLink.schema)
         }
-
         debug {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            versionNameSuffix = Version.prodNameSuffix
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}$versionNameSuffix\""
+            )
             signingConfig = signingConfigs["debug"]
         }
 
         release {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+        }
+
+        create("debugDev") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            versionNameSuffix = Version.devNameSuffix
+            signingConfig = signingConfigs["debug"]
+        }
+        create("releaseDev") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+        }
+        create("debugStage") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
+            versionNameSuffix = Version.stageNameSuffix
+            signingConfig = signingConfigs["debug"]
+        }
+        create("releaseStage") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -110,23 +148,6 @@ android {
         reset()
         include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         isUniversalApk = true
-    }
-    flavorDimensions += listOf("buildVariant")
-    productFlavors {
-        create("prod") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.prod}\"")
-        }
-        create("stage") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.stage}\"")
-            versionNameSuffix = Version.NameSufix.stage
-        }
-        create("dev") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.dev}\"")
-            versionNameSuffix = Version.NameSufix.dev
-        }
     }
 }
 

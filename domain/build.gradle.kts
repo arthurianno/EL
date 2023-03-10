@@ -23,6 +23,12 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    buildTypes {
+        create("debugDev")
+        create("debugStage")
+        create("releaseDev")
+        create("releaseStage")
+    }
 }
 
 dependencies {

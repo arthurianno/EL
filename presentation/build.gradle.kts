@@ -15,8 +15,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
-
-        buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
     }
 
     compileOptions {
@@ -43,6 +41,29 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = Dependencies.Jetpack.Compose.compilerVersion
+    }
+    buildTypes {
+        release {
+            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+        }
+        debug {
+            val debugVersionName = "\"${Version.versionName}${Version.prodNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugDev") {
+            val debugVersionName = "\"${Version.versionName}${Version.devNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugStage") {
+            val debugVersionName = "\"${Version.versionName}${Version.stageNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("releaseDev") {
+            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+        }
+        create("releaseStage") {
+            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+        }
     }
 }
 
