@@ -7,9 +7,6 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-private const val PREFIX = "Bearer"
-private const val AUTH_HEADER = "Authorization"
-
 class TokenAuthenticator(
     private val storage: TokenStorage
 ) : Authenticator {
