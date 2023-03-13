@@ -287,8 +287,9 @@ object Screens {
         override fun getFragment() = SupportFragment.newInstance()
     }
 
-    object ConsultantScreen : SupportAppScreen() {
-        override fun getFragment(): Fragment = ConsultantFragment.newInstance()
+    data class ConsultantScreen(val userId: String, val userName: String) : SupportAppScreen() {
+        override fun getFragment(): Fragment =
+            ConsultantFragment.newInstance(userId = userId, userName = userName)
     }
 
     data class EmailScreen(

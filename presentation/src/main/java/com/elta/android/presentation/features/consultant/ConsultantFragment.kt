@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.consultant
 
 import android.Manifest
 import android.net.Uri
+import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
 import coil.compose.AsyncImage
 import com.elta.android.domain.features.consultant.model.WebimOwner
+import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.PermissionEvent
@@ -60,13 +62,33 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 private const val IMAGE = "image/*"
 private const val DOCUMENT = "application/pdf"
+private const val USER_NAME_KEY_EXTRA = "user_name"
+private const val USER_ID_KEY_EXTRA = "user_id"
 
 class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
     companion object {
-        fun newInstance(): ConsultantFragment = ConsultantFragment()
+        fun newInstance(userId: String, userName: String): ConsultantFragment =
+            ConsultantFragment().apply {
+                arguments = Bundle().apply {
+                    putString(USER_ID_KEY_EXTRA, userId)
+                    putString(USER_NAME_KEY_EXTRA, userName)
+                }
+            }
     }
 
     override val viewModel: ConsultantViewModel by viewModels { viewModelFactory }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            viewModel.setWebimUser(
+                WebimUser(
+                    id = it.getString(USER_ID_KEY_EXTRA).orEmpty(),
+                    name = it.getString(USER_NAME_KEY_EXTRA).orEmpty()
+                )
+            )
+        }
+    }
 
     private val makePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         if (it) {
@@ -244,7 +266,7 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
                     ) {
                         items(items = state.value.chat) { message ->
                             val chatMessageWidgetModel = ChatMessageWidgetModel().apply {
-                                setParentActionHandler(viewModel.actionHandler)
+                                registrationActionReceiver(viewModel.actionReceiver)
                                 setMessage(message)
                             }
                             when (message.owner) {
@@ -260,9 +282,11 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     private fun UserMessage(widgetModel: ChatMessageWidgetModel) {
-        GetLocalProperties { _, _, colors, _, _ ->
+        GetLocalProperties { dimens, _, _, _, _ ->
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(dimens.charCardUserMessagePadding)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 ChatMessage(widgetModel)
@@ -272,17 +296,21 @@ class ConsultantFragment : BaseComposeFragment<ConsultantViewModel>() {
 
     @Composable
     private fun OperatorMessage(widgetModel: ChatMessageWidgetModel) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Image(
-                    painter = painterResource(id = R.drawable.img_round_elta),
-                    contentDescription = null
-                )
-                HSpacerSmall()
-                ChatMessage(widgetModel)
+        GetLocalProperties { dimens, _, _, _, _ ->
+            Box(
+                modifier = Modifier
+                    .padding(dimens.charCardOperatorMessagePadding)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_round_elta),
+                        contentDescription = null
+                    )
+                    HSpacerSmall()
+                    ChatMessage(widgetModel)
+                }
             }
         }
     }

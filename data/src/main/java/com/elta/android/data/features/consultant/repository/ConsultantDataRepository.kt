@@ -75,6 +75,7 @@ class ConsultantDataRepository @Inject constructor(
                             id: Message.Id,
                             error: WebimError<SendFileCallback.SendFileError>
                         ) {
+                            Timber.e("Webim send file error -> ${error.errorString}, message Id - $id, file name - $fileName")
                             sendFlow.tryEmit(WebimMessageSendStatus.Error(error.errorString))
                         }
                     }

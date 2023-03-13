@@ -25,8 +25,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -265,12 +267,17 @@ private fun BoxScope.SendButton(widgetModel: ConsultantBottomAppBarWidgetModel) 
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BoxScope.FileButton(widgetModel: ConsultantBottomAppBarWidgetModel) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Box(modifier = Modifier.Companion.align(Alignment.BottomStart)) {
         RoundedButton(
             icon = R.drawable.ic_file,
-            onClick = { widgetModel.sendAction(ConsultantAction.FileClick) }
+            onClick = {
+                keyboardController?.hide()
+                widgetModel.sendAction(ConsultantAction.FileClick)
+            }
         )
     }
 }
@@ -371,7 +378,7 @@ private fun BoxScope.MessageField(widgetModel: ConsultantBottomAppBarWidgetModel
                         placeholderColor = colors.shadeBlack1
                     ),
                     placeholder = { Text(text = stringResource(id = R.string.consultant_message_placeholder)) },
-                    contentPadding = dimens.messageTextPadding
+                    contentPadding = dimens.sendMessageTextFieldPadding
                 )
             }
         }

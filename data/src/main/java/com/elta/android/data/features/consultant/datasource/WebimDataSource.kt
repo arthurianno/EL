@@ -81,14 +81,11 @@ class WebimDataSource @Inject constructor(
             }
             stream.setOnlineStatusChangeListener { _, newOnlineStatus ->
                 _webimNetworkStatus.value = when (newOnlineStatus) {
-                    MessageStream.OnlineStatus.ONLINE,
-                    MessageStream.OnlineStatus.BUSY_ONLINE -> {
+                    MessageStream.OnlineStatus.UNKNOWN -> WebimStatus.Connecting
+                    else -> {
                         stream.startChat()
                         WebimStatus.Online
                     }
-
-                    MessageStream.OnlineStatus.UNKNOWN -> WebimStatus.Connecting
-                    else -> WebimStatus.Offline
                 }
             }
         }

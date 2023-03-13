@@ -5,5 +5,5 @@ sealed class FileType(val extension: String) {
     object Png : FileType(extension = "png")
     object Heif : FileType(extension = "heif")
     object Pdf : FileType(extension = "pdf")
-    object Voice : FileType(extension = "aac")
+    object Voice : FileType(extension = "m4a")
 }

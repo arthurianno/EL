@@ -9,7 +9,7 @@ interface MediaRepository {
     fun createAudioFile(): File
     fun createPhoto(): Uri
     suspend fun cachedPhoto(name: String, bitmap: Bitmap): Uri
-    suspend fun cachedFile(cacheName: String, fileType: FileType, sourceUri: Uri): Uri
+    suspend fun cachedFile(cacheName: String, fileType: FileType? = null, sourceUri: Uri): Uri
     suspend fun deleteFile(uri: Uri)
     suspend fun clearCache()
 }

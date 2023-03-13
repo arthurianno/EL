@@ -62,7 +62,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         router.exit()
     }
 
-    val actionHandler: (Action) -> Unit = { action ->
+    val actionReceiver: (Action) -> Unit = { action ->
         (action as? AC)?.let { sendAction(it) }
     }
 

@@ -1,5 +1,6 @@
 package com.elta.android.data.features.consultant.model // ktlint-disable filename
 
+import com.elta.android.domain.common.getFileExtension
 import com.elta.android.domain.features.consultant.model.WebimContentType
 import com.elta.android.domain.features.consultant.model.WebimMessage
 import com.elta.android.domain.features.consultant.model.WebimMessageSendStatus
@@ -20,12 +21,12 @@ private const val JPG_TYPE = "image/jpeg"
 private const val PNG_TYPE = "image/png"
 private const val HEIF_TYPE = "image/heif"
 private const val PDF_TYPE = "application/pdf"
-private const val VOICE_TYPE = "audio/mpeg"
+private const val VOICE_TYPE = "audio/x-hx-aac-adts"
 
 internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
         id = serverSideId.orEmpty(),
-        attachment = attachment?.toDomain(),
+        attachment = attachment.toDomain(text),
         owner = type.toDomainOwner(),
         text = text,
         time = time,
@@ -36,12 +37,17 @@ internal fun Message.toDomain(): WebimMessage =
 internal fun WebimUser.toJsonObject(key: String): JsonObject =
     JsonParser.parseString(Gson().toJson(this.toAuth(key))).asJsonObject
 
-private fun Attachment.toDomain(): WebimMessage.Attachment =
+private fun Attachment?.toDomain(text: String): WebimMessage.Attachment =
     WebimMessage.Attachment(
-        contentType = fileInfo.contentType?.convertContentType(),
-        thumbnail = fileInfo.imageInfo?.thumbUrl,
-        url = fileInfo.url,
-        size = fileInfo.size
+        contentType = run {
+            val contentType = text.getFileExtension()?.let {
+                runCatching { WebimContentType.getByExtension(it) }.getOrNull()
+            }
+            this?.fileInfo?.contentType?.convertContentType() ?: contentType
+        },
+        thumbnail = this?.fileInfo?.imageInfo?.thumbUrl,
+        url = this?.fileInfo?.url,
+        size = this?.fileInfo?.size ?: 0
     )
 
 private fun String.convertContentType(): WebimContentType? =

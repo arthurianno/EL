@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.support.pm
 
 import com.elta.android.domain.features.devices.interactor.GetGlucometerVersionUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
@@ -15,8 +16,12 @@ private const val SUPPORT_PHONE = "+79152767676"
 class SupportPm @Inject constructor(
     services: ServiceFacade,
     private val itemsBuilder: SupportItemsBuilder,
-    private val getGlucometerVersionUseCase: GetGlucometerVersionUseCase
+    private val getGlucometerVersionUseCase: GetGlucometerVersionUseCase,
+    private val userProfile: GetProfileUseCase
 ) : BaseListPm(services) {
+
+    private var userId: String = ""
+    private var userName: String = ""
 
     override fun onCreate() {
         super.onCreate()
@@ -28,6 +33,17 @@ class SupportPm @Inject constructor(
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .doOnNext {
+                userProfile.execute()
+                    .subscribe(
+                        {
+                            userId = it.email.orEmpty()
+                            userName = "${it.firstName} ${it.secondName}"
+                        },
+                        {}
+                    )
+                    .untilDestroy()
+            }
             .flatMapSingle {
                 getGlucometerVersionUseCase.execute()
             }
@@ -42,7 +58,10 @@ class SupportPm @Inject constructor(
 
     private fun handleClick(action: SupportAction) {
         when (action) {
-            SupportAction.ConsultantAction -> router.navigateTo(Screens.ConsultantScreen)
+            SupportAction.ConsultantAction -> router.navigateTo(
+                Screens.ConsultantScreen(userId, userName)
+            )
+
             is SupportAction.CallAction -> router.navigateTo(Screens.CallScreen(action.phone))
             is SupportAction.MailAction -> router.navigateTo(Screens.EmailScreen(action.email))
             SupportAction.ServiceCentersAction -> router.startFlow(Screens.ServiceCentersMap)
