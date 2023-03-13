@@ -2,31 +2,31 @@
 
 package com.elta.android.common.utils
 
-fun <T> List<T>.takeFirst(n: Int): List<T> {
-    require(n >= 0) { "Requested element count $n is less than zero." }
-    if (n == 0) return emptyList()
+fun <T> List<T>.takeFirst(count: Int): List<T> {
+    require(count >= 0) { "Requested element count $count is less than zero." }
+    if (count == 0) return emptyList()
     val size = size
-    if (n >= size) return toList()
-    if (n == 1) return listOf(first())
-    val list = ArrayList<T>(n)
+    if (count >= size) return toList()
+    if (count == 1) return listOf(first())
+    val list = ArrayList<T>(count)
 
-    for (index in 0 until n)
+    for (index in 0 until count)
         list.add(this[index])
     return list
 }
 
 inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (T) -> R): Boolean {
-    val iter = iterator()
-    if (!iter.hasNext()) {
+    val iterator = iterator()
+    if (!iterator.hasNext()) {
         return true
     }
-    var t = iter.next()
-    while (iter.hasNext()) {
-        val t2 = iter.next()
-        if (selector(t) > selector(t2)) {
+    var item = iterator.next()
+    while (iterator.hasNext()) {
+        val nextItem = iterator.next()
+        if (selector(item) > selector(nextItem)) {
             return false
         }
-        t = t2
+        item = nextItem
     }
     return true
 }

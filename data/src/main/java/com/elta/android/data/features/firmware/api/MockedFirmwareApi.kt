@@ -2,8 +2,7 @@ package com.elta.android.data.features.firmware.api
 
 import android.content.Context
 import com.elta.android.data.R
-import com.elta.android.data.features.firmware.dto.ActualFirmwareDto
-import com.elta.android.data.features.firmware.dto.FirmwareDto
+import com.elta.android.data.features.firmware.model.FirmwareNetworkResponse
 import io.reactivex.Single
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -14,18 +13,18 @@ class MockedFirmwareApi(
     private val context: Context
 ) : FirmwareApi {
 
-    override fun getFirmwareInfo(): Single<FirmwareDto> =
+    override fun getFirmwareInfo(): Single<FirmwareNetworkResponse> =
         Single.fromCallable {
             val stream = context.resources.openRawResource(R.raw.satellite_online_30)
             val hash = IoUtils.getMd5(stream)
             Timber.d("firmware hash: $hash")
-            FirmwareDto(
-                actual = ActualFirmwareDto(
+            FirmwareNetworkResponse(
+                actual = FirmwareNetworkResponse.ActualFirmware(
                     version = "3.0",
                     size = 0,
                     hash = hash
                 ),
-                compatible = "3.0"
+                compatible = null
             )
         }
 

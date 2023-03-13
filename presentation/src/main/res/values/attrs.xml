@@ -25,6 +25,7 @@
         <attr name="fsv_icon" format="reference" />
         <attr name="fsv_hint" format="reference|string" />
         <attr name="fsv_title" format="reference|string" />
+        <attr name="fsv_single_line" format="boolean" />
         <attr name="fsv_draw_arrow" format="boolean" />
     </declare-styleable>
 

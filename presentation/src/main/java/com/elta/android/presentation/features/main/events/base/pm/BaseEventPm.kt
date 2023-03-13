@@ -90,11 +90,11 @@ abstract class BaseEventPm(
 
     override fun onCreate() {
         super.onCreate()
-        bindFormPicker()
-        bindFormVariantSelection()
-        bindFormTagSelection()
-        bindDateSelectors()
-        bindHandleBack()
+        observeFormPicker()
+        observeFormVariantSelection()
+        observeFormTagSelection()
+        observeDateSelectors()
+        observeHandleBack()
         observeEventChanges()
         observeDishesResult()
     }
@@ -142,7 +142,7 @@ abstract class BaseEventPm(
         }
     }
 
-    private fun bindHandleBack() {
+    private fun observeHandleBack() {
         backHandleAction.observable
             .doOnNext(::handleBack)
             .subscribe()
@@ -158,7 +158,7 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun bindFormPicker() {
+    private fun observeFormPicker() {
         formPickerValueChangedAction.observable
             .subscribe {
                 formPickerValue.consumer.accept(it)
@@ -170,7 +170,7 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun bindFormVariantSelection() {
+    private fun observeFormVariantSelection() {
         formSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
@@ -187,7 +187,6 @@ abstract class BaseEventPm(
                 }
             }
             .untilDestroy()
-
         bus.events<Events.ChooserVariantSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(formSelector.option.consumer)
@@ -216,7 +215,7 @@ abstract class BaseEventPm(
                 )
         }
 
-    private fun bindFormTagSelection() {
+    private fun observeFormTagSelection() {
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
@@ -230,34 +229,29 @@ abstract class BaseEventPm(
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
-
         bus.events<Events.ChooserTagSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(tagSelector.option.consumer)
             .untilDestroy()
     }
 
-    private fun bindDateSelectors() {
+    private fun observeDateSelectors() {
         selectedDateState.observable
             .map { it.toEventTime(resources).toSimpleSelectorOption() }
             .subscribe(timeSelector.option.consumer)
             .untilDestroy()
-
         selectedDateState.observable
             .map { it.toEventDate(resources).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
-
         dateSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showDatePickerDialog.consumer)
             .untilDestroy()
-
         timeSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showTimePickerDialog.consumer)
             .untilDestroy()
-
         dateTimeSelectedAction.observable
             .filter(::validateSelectedDate)
             .subscribe(selectedDateState.consumer)

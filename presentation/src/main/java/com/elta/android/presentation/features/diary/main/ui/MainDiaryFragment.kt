@@ -22,6 +22,9 @@ import javax.inject.Inject
 
 class MainDiaryFragment @Inject constructor() :
     BaseRecyclerViewFragment<MainDiaryPm, FragmentMainDiaryBinding>(FragmentMainDiaryBinding::inflate) {
+    companion object {
+        fun newInstance() = MainDiaryFragment()
+    }
 
     @Inject
     lateinit var mainDiaryAdapter: MainDiaryAdapter
@@ -55,9 +58,5 @@ class MainDiaryFragment @Inject constructor() :
                 defaultFalseState = View.INVISIBLE
             )
         }
-    }
-
-    companion object {
-        fun newInstance() = MainDiaryFragment()
     }
 }

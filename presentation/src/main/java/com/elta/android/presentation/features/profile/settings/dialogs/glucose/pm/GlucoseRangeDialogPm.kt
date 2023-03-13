@@ -31,7 +31,7 @@ class GlucoseRangeDialogPm @Inject constructor(
         beforeEatGlucoseRangeChangedAction.observable
             .filter { it != beforeEatGlucoseRangeState.valueOrNull }
             .doOnNext(beforeEatGlucoseRangeState.consumer)
-            .map { it.isRangeChanged() }
+            .map { it.isBeforeRangeChanged() }
             .doOnNext { actionButtonEnabledCommand.consumer.accept(it) }
             .subscribe()
             .untilDestroy()
@@ -39,7 +39,7 @@ class GlucoseRangeDialogPm @Inject constructor(
         afterEatGlucoseRangeChangedAction.observable
             .filter { it != afterEatGlucoseRangeState.valueOrNull }
             .doOnNext(afterEatGlucoseRangeState.consumer)
-            .map { it.isRangeChanged() }
+            .map { it.isAfterRangeChanged() }
             .doOnNext { actionButtonEnabledCommand.consumer.accept(it) }
             .subscribe()
             .untilDestroy()
@@ -83,8 +83,15 @@ class GlucoseRangeDialogPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun Pair<Double, Double>.isRangeChanged(): Boolean {
-        profileState.valueOrNull?.glucoseLevelSettings?.let {
+    private fun Pair<Double, Double>.isBeforeRangeChanged(): Boolean {
+        profileState.valueOrNull?.glucoseLevelBeforeEatSettings?.let {
+            return this.first != it.normal.start || this.second != it.normal.end
+        }
+        return true
+    }
+
+    private fun Pair<Double, Double>.isAfterRangeChanged(): Boolean {
+        profileState.valueOrNull?.glucoseLevelAfterEatSettings?.let {
             return this.first != it.normal.start || this.second != it.normal.end
         }
         return true
