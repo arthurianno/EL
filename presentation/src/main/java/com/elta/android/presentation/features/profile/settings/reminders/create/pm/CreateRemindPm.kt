@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.reminders.create.pm
 
+import com.elta.android.common.errors.ReminderTimeInPastError
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.reminder.interactor.AddNewReminderUseCase
 import com.elta.android.domain.features.reminder.model.Reminder
@@ -12,6 +13,7 @@ import com.elta.android.presentation.utils.toString
 import com.elta.android.presentation.widgets.spinner.adapter.items.SpinnerItem
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.state
+import org.threeten.bp.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -25,39 +27,15 @@ class CreateRemindPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-
-        saveReminderAction.observable
-            .skipWhileInProgress()
-            .map(::createAddReminderParams)
-            .flatMapSingle { params ->
-                addNewReminderUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .trackEvent(AnalyticsEventType.REMINDER_ADD)
-                    .doOnSuccess { remindersManager.addReminder(params.reminder) }
-                    .map { Unit }
-                    .doOnSuccess(::handleSuccess)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
-            .retry()
-            .subscribe {
-                createScheduleItems()
-                setDefaultScheduler()
-            }
-            .untilDestroy()
+        saveActionSubscribe()
+        lifecycleSubscribe()
     }
 
     override fun handleBack(i: Unit) {
-        when (isFormNotEmptyState.value) {
-            true -> exitDialogAction.consumer.accept(Unit)
-            else -> router.exit()
+        if (isFormNotEmptyState.value) {
+            exitDialogAction.consumer.accept(Unit)
+        } else {
+            router.exit()
         }
     }
 
@@ -80,26 +58,60 @@ class CreateRemindPm @Inject constructor(
             .untilDestroy()
     }
 
+    private fun lifecycleSubscribe() {
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .retry()
+            .subscribe {
+                createScheduleItems()
+                setDefaultScheduler()
+            }
+            .untilDestroy()
+    }
+
+    private fun saveActionSubscribe() {
+        saveReminderAction.observable
+            .skipWhileInProgress()
+            .map(::createAddReminderParams)
+            .doOnError(::handleError)
+            .flatMapSingle { params ->
+                addNewReminderUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .trackEvent(AnalyticsEventType.REMINDER_ADD)
+                    .doOnSuccess { remindersManager.addReminder(params.reminder) }
+                    .map { Unit }
+                    .doOnSuccess(::handleSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
     private fun setDefaultScheduler() {
         selectedScheduleAction.consumer.accept(schedulesState.value.first())
         schedulesDefaultState.consumer.accept(schedulesState.value.first().type.toString(resources))
     }
 
     private fun checkIsEmpty(reminderModel: ReminderFormModel) {
-        isFormNotEmptyState.consumer.accept(
-            !reminderModel.inputValue.isNullOrEmpty()
-        )
+        isFormNotEmptyState.consumer.accept(!reminderModel.inputValue.isNullOrEmpty())
     }
 
     private fun createAddReminderParams(i: Unit): AddNewReminderUseCase.Params {
         val form = reminderFormHolderState.value
-        return AddNewReminderUseCase.Params(
-            Reminder(
-                id = UUID.randomUUID().toString(),
-                title = checkNotNull(form.inputValue),
-                date = checkNotNull(form.date),
-                scheduleType = checkNotNull(form.schedule)
+        return if (form.date?.isAfter(ZonedDateTime.now()) == true) {
+            AddNewReminderUseCase.Params(
+                Reminder(
+                    id = UUID.randomUUID().toString(),
+                    title = checkNotNull(form.inputValue),
+                    date = checkNotNull(form.date),
+                    scheduleType = checkNotNull(form.schedule)
+                )
             )
-        )
+        } else {
+            throw ReminderTimeInPastError()
+        }
     }
 }

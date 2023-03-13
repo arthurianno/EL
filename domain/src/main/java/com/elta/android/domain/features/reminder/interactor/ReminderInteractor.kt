@@ -11,33 +11,36 @@ fun getNextReminderDate(
     reminderDate: ZonedDateTime,
     now: ZonedDateTime
 ): ZonedDateTime? {
-    return if (reminderDate.isAfter(now)) reminderDate
-    else when (type) {
-        ScheduleType.NONE -> null
-        ScheduleType.DAY ->
-            reminderDate
-                .withYear(now.year)
-                .withMonth(now.monthValue)
-                .withDayOfMonth(now.dayOfMonth)
-                .plusDays(1)
-        ScheduleType.WEEK ->
-            reminderDate
-                .withYear(now.year)
-                .withMonth(now.monthValue)
-                .withDayOfMonth(now.dayOfMonth)
-                .plusDays(7)
-        ScheduleType.MONTH ->
-            reminderDate
-                .withYear(now.year)
-                .withMonth(now.monthValue)
-                .plusMonths(1)
-        ScheduleType.YEAR ->
-            reminderDate
-                .withYear(now.year)
-                .plusYears(1)
-    }?.apply {
-        withSecond(0)
-        withNano(0)
+    return if (reminderDate.isAfter(now)) {
+        reminderDate
+    } else {
+        when (type) {
+            ScheduleType.NONE -> null
+            ScheduleType.DAY ->
+                reminderDate
+                    .withYear(now.year)
+                    .withMonth(now.monthValue)
+                    .withDayOfMonth(now.dayOfMonth)
+                    .plusDays(1)
+            ScheduleType.WEEK ->
+                reminderDate
+                    .withYear(now.year)
+                    .withMonth(now.monthValue)
+                    .withDayOfMonth(now.dayOfMonth)
+                    .plusDays(7)
+            ScheduleType.MONTH ->
+                reminderDate
+                    .withYear(now.year)
+                    .withMonth(now.monthValue)
+                    .plusMonths(1)
+            ScheduleType.YEAR ->
+                reminderDate
+                    .withYear(now.year)
+                    .plusYears(1)
+        }?.apply {
+            withSecond(0)
+            withNano(0)
+        }
     }
 }
 

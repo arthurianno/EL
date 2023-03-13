@@ -122,9 +122,10 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun handleBack(i: Unit) {
-        when (isNameNotEmptyState.value && isNameChangedState.value) {
-            true -> exitDialogAction.consumer.accept(Unit)
-            else -> router.exit()
+        if (isNameNotEmptyState.value && isNameChangedState.value) {
+            exitDialogAction.consumer.accept(Unit)
+        } else {
+            router.exit()
         }
     }
 
@@ -171,8 +172,10 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun checkIsValid(name: PersonNameModel) {
-        firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
-        secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
+        if (profileState.hasValue()) {
+            firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
+            secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
+        }
     }
 
     private fun getFirstNameErrorString(name: String): String = when {

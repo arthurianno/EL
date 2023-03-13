@@ -46,9 +46,32 @@ class MainDiaryPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-
         observeDates()
+        observeActions()
+        observeEvents()
+    }
 
+    override fun onBind() {
+        super.onBind()
+        bus.clicks<Clicks.RecordClicked>()
+            .map { it.item }
+            .doOnNext(::navigateToEventScreen)
+            .subscribe()
+            .untilUnbind()
+    }
+
+    private fun observeEvents() {
+        Observable.merge(
+            selectedDateState.observable.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit },
+            bus.events<DateChangedEvent>().map { Unit }
+        )
+            .map { selectedDateState.value }
+            .subscribe(loadScreenAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeActions() {
         loadScreenAction.observable
             .map(::createUseCaseParams)
             .switchMap {
@@ -62,24 +85,6 @@ class MainDiaryPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-
-        Observable.merge(
-            selectedDateState.observable.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit },
-            bus.events<DateChangedEvent>().map { Unit }
-        )
-            .map { selectedDateState.value }
-            .subscribe(loadScreenAction.consumer)
-            .untilDestroy()
-    }
-
-    override fun onBind() {
-        super.onBind()
-        bus.clicks<Clicks.RecordClicked>()
-            .map { it.item }
-            .doOnNext(::navigateToEventScreen)
-            .subscribe()
-            .untilUnbind()
     }
 
     private fun observeDates() {

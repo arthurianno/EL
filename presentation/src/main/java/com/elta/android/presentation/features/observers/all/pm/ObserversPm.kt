@@ -44,9 +44,7 @@ class ObserversPm @Inject constructor(
                 getObserverInvitesUseCase.execute()
                     .hideErrorContainer()
                     .bindProgress()
-                    .map { observerList ->
-                        observerList.filter { it.status != ObserverStatus.EXPIRED }
-                    }
+                    .mapFilter { it.status != ObserverStatus.EXPIRED }
                     .bindEmpty(emptyControl.visibilityState.consumer)
                     .doOnNext(::handleSuccess)
                     .doOnError(::handleError)
@@ -65,10 +63,6 @@ class ObserversPm @Inject constructor(
     }
 
     private fun handleSuccess(observers: List<Observer>) {
-        items.consumer.accept(
-            if (observers.isEmpty()) emptyList() else mapper.mapFromObject(
-                observers
-            )
-        )
+        items.consumer.accept(mapper.mapFromObject(observers))
     }
 }

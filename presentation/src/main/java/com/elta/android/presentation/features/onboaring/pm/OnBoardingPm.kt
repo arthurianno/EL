@@ -16,6 +16,7 @@ import com.elta.android.presentation.analytics.updateStableParam
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
@@ -23,7 +24,6 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.nullgr.core.date.toTimestamp
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -50,18 +50,19 @@ class OnBoardingPm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         addItems()
+        observeCurrentPageState()
+        observePageActions()
+        observeBusEvents()
+        observeUpdateProfile()
+        observeLifecycle()
+    }
 
-        pageChangedAction.observable
-            .filter { it.isPageInRange() && it != currentPageState.value }
-            .subscribe(currentPageState.consumer)
-            .untilDestroy()
-
+    private fun observeCurrentPageState() {
         currentPageState.observable
             .map { it > 0 }
             .doOnNext(previousPageVisibilityState.consumer)
             .subscribe()
             .untilDestroy()
-
         currentPageState.observable
             .filter { it.isPageInRange() }
             .subscribe {
@@ -70,26 +71,26 @@ class OnBoardingPm @Inject constructor(
                 updateNextButtonState(currentItem)
             }
             .untilDestroy()
+    }
 
+    private fun observePageActions() {
+        pageChangedAction.observable
+            .filter { it.isPageInRange() && it != currentPageState.value }
+            .subscribe(currentPageState.consumer)
+            .untilDestroy()
         skipPageAction.observable
             .debounceAction()
             .subscribe(::skipPage)
             .untilDestroy()
-
         nextPageAction.observable
             .debounceAction()
             .trackEvent { createOnBoardingEvent() }
             .subscribe(::nextPage)
             .untilDestroy()
-
         previousPageAction.observable
             .debounceAction()
             .subscribe(::prevPage)
             .untilDestroy()
-
-        bindBusEvents()
-        bindUpdateProfileBehaviour()
-        bindLifecycle()
     }
 
     private fun addItems() {
@@ -98,17 +99,16 @@ class OnBoardingPm @Inject constructor(
         )
         val weightItem = OnBoardingWeightItem(
             resources.getString(R.string.on_boarding_header_user_weight),
-            INITIAL_WEIGHT
+            WeightFormInitializer.WEIGHT_DEFAULT_VALUE
         )
         val diabetesItem = OnBoardingDiabetesItem(
             resources.getString(R.string.on_boarding_header_user_diabetes_type),
             Diabetes.values().toList()
         )
-        savePageData(weightItem)
         items.consumer.accept(listOf(genderItem, weightItem, diabetesItem))
     }
 
-    private fun bindUpdateProfileBehaviour() {
+    private fun observeUpdateProfile() {
         updateUserInfoAction.observable
             .skipWhileInProgress()
             .map(::createEmailUserInfoParams)
@@ -139,13 +139,13 @@ class OnBoardingPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindBusEvents() {
+    private fun observeBusEvents() {
         bus.events<Events.OnBoardingPageSelected>()
             .subscribe(::onBoardingPageSelected)
             .untilDestroy()
     }
 
-    private fun bindLifecycle() {
+    private fun observeLifecycle() {
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { Unit }
             .subscribe(updateUserInfoAction.consumer)
@@ -174,24 +174,9 @@ class OnBoardingPm @Inject constructor(
     private fun prevPage(i: Unit) {
         val currentPage = currentPageState.value
         val prevPage = currentPage - 1
-        handleWeightItem(prevPage)
         if (prevPage.isPageInRange()) {
             currentPageState.consumer.accept(prevPage)
         }
-    }
-
-    private fun handleWeightItem(prevPage: Int) {
-        (items.value[prevPage] as? OnBoardingItem)?.let {
-            createInitialWeightItem()
-        } ?: Timber.e("Item is not ${OnBoardingItem::class.java} or null")
-    }
-
-    private fun createInitialWeightItem() {
-        val weightItem = OnBoardingWeightItem(
-            resources.getString(R.string.on_boarding_header_user_weight),
-            INITIAL_WEIGHT
-        )
-        savePageData(weightItem)
     }
 
     private fun onBoardingPageSelected(event: Events.OnBoardingPageSelected) {
@@ -201,19 +186,19 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun savePageData(item: OnBoardingItem) {
-        val data = item.data
-        params[item::class.java] = data
+        params[item::class.java] = item.data
     }
 
     private fun updateNextButtonState(currentItem: OnBoardingItem) {
-        val data = currentItem.data
-        val isNextPageAvailable = when (currentItem) {
-            is OnBoardingGenderItem -> data != null
-            is OnBoardingDiabetesItem -> data != null
-            is OnBoardingWeightItem -> true
-            else -> false
-        }
-        nextPageVisibilityState.consumer.accept(isNextPageAvailable)
+        nextPageVisibilityState.consumer.accept(
+            when (currentItem) {
+                is OnBoardingGenderItem,
+                is OnBoardingDiabetesItem -> currentItem.data != null
+
+                is OnBoardingWeightItem -> true
+                else -> false
+            }
+        )
     }
 
     private fun createUseCaseParams(i: Unit): UpdateProfileUseCase.Params {
@@ -240,31 +225,31 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun createOnBoardingEvent(): AnalyticsEvent? {
-        val currentPage = currentPageState.value
-        val item = items.value[currentPage] as OnBoardingItem
-        val data = checkNotNull(params[item::class.java]).toString()
-        return when (item) {
-            is OnBoardingGenderItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_GENDER_ADD,
-                    hashMapOf(AnalyticsEventParam.GENDER to data)
-                )
-            is OnBoardingWeightItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_WEIGHT_ADD
-                )
-            is OnBoardingDiabetesItem ->
-                AnalyticsEvent(
-                    AnalyticsEventType.ONB_DIABETES_ADD,
-                    hashMapOf(AnalyticsEventParam.TYPE to data)
-                )
-            else -> null
+        val item = items.value[currentPageState.value] as OnBoardingItem
+        return params[item::class.java]?.let {
+            val data = it.toString()
+            when (item) {
+                is OnBoardingGenderItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_GENDER_ADD,
+                        hashMapOf(AnalyticsEventParam.GENDER to data)
+                    )
+
+                is OnBoardingWeightItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_WEIGHT_ADD
+                    )
+
+                is OnBoardingDiabetesItem ->
+                    AnalyticsEvent(
+                        AnalyticsEventType.ONB_DIABETES_ADD,
+                        hashMapOf(AnalyticsEventParam.TYPE to data)
+                    )
+
+                else -> null
+            }
         }
     }
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size
-
-    private companion object {
-        const val INITIAL_WEIGHT = 70.0
-    }
 }

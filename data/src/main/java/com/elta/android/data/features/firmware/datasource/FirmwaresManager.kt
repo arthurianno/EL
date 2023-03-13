@@ -13,6 +13,7 @@ import java.io.OutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// TODO После мержа с релизом 2 перенести методы данного класса в FileStorage (общий класс для работы с файловой системой)
 @Singleton
 class FirmwaresManager @Inject constructor(context: Context) {
 

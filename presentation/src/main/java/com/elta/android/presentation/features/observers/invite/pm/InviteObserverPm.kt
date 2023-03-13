@@ -6,6 +6,7 @@ import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.observers.interactor.GetObserverInvitesUseCase
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
 import com.elta.android.domain.features.observers.model.Observer
+import com.elta.android.domain.features.observers.model.ObserverStatus
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.States
@@ -63,6 +64,7 @@ class InviteObserverPm @Inject constructor(
                 getObserverInvitesUseCase.execute()
                     .hideErrorContainer()
                     .bindProgress()
+                    .mapFilter { it.status != ObserverStatus.EXPIRED }
                     .doOnNext(observersState.consumer)
                     .doOnError(::handleError)
             }
@@ -87,6 +89,7 @@ class InviteObserverPm @Inject constructor(
                 )
                 setErrorViewVisibility(true)
             }
+
             is CantSendInviteToYourselfError -> {
                 setErrorStateData(
                     States.SimpleError(
@@ -96,6 +99,7 @@ class InviteObserverPm @Inject constructor(
                 )
                 setErrorViewVisibility(true)
             }
+
             else -> super.handleError(error)
         }
     }
@@ -104,12 +108,22 @@ class InviteObserverPm @Inject constructor(
         email.isNotBlank() && isEmailValid(email)
 
     private fun haveSameObserver(): Boolean =
-        observersState.valueOrNull?.any { it.email == emailInput.text.valueOrNull } ?: false
+        observersState.valueOrNull
+            ?.filter { it.status == ObserverStatus.CONFIRMED }
+            ?.any { it.email == emailInput.text.valueOrNull }
+            ?: false
+
+    private fun haveAwaitingObserver(): Boolean =
+        observersState.valueOrNull
+            ?.filter { it.status == ObserverStatus.PENDING }
+            ?.any { it.email == emailInput.text.valueOrNull }
+            ?: false
 
     private fun getEmailError(isEmailValid: Boolean): String =
         when {
             emailInput.text.valueOrNull.isNullOrBlank() -> EMPTY_STRING
             haveSameObserver() -> resources.getString(R.string.registration_error_same_email)
+            haveAwaitingObserver() -> resources.getString(R.string.registration_error_same_email_awaiting)
             !isEmailValid -> resources.getString(R.string.registration_error_input_email)
             else -> EMPTY_STRING
         }

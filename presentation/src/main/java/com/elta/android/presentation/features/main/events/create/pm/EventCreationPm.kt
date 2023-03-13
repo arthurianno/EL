@@ -107,7 +107,7 @@ class EventCreationPm @Inject constructor(
             isFormNotEmptyState.consumer.accept(
                 eventFormModel.pickerValue != (
                     profileState.valueOrNull?.weight
-                        ?: WeightFormInitializer.WEIGHT_DEFAULT_PICKER_VALUE
+                        ?: WeightFormInitializer.WEIGHT_DEFAULT_VALUE
                     ) ||
                     !eventFormModel.inputValue.isNullOrEmpty() ||
                     eventFormModel.meta != null ||

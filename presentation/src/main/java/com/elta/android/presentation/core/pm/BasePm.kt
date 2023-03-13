@@ -2,6 +2,7 @@
 
 package com.elta.android.presentation.core.pm
 
+import androidx.annotation.StringRes
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.trackEvent
@@ -31,6 +32,9 @@ import me.dmdev.rxpm.state
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+private const val ACTION_DEBOUNCE_MILLIS = 500L
+private const val RELOAD_DELAY_MILLIS = 3000L
+
 @Suppress("SpreadOperator")
 abstract class BasePm(
     protected val services: ServiceFacade
@@ -46,6 +50,7 @@ abstract class BasePm(
     val hideKeyBoardCommand = command<Unit>()
     val showKeyBoardCommand = command<Unit>()
     val showSnackBarCommand = command<SnackBarData>(bufferSize = 1)
+    val showToastCommand = command<Int>()
 
     val retryAction = action<Unit>()
 
@@ -102,33 +107,40 @@ abstract class BasePm(
         errorControl.visibilityState.consumer.accept(visible)
     }
 
+    protected fun showToast(@StringRes messageId: Int) {
+        showToastCommand.consumer.accept(messageId)
+    }
+
     protected open fun handleError(error: Throwable) {
         Timber.tag(this::class.java.simpleName).e(error)
         errorHandler.handleError(error)
     }
 
-    protected inline fun <T> Observable<T>.debounceAction(): Observable<T> =
+    protected inline fun <T> Observable<List<T>>.mapFilter(crossinline predicate: (T) -> Boolean): Observable<List<T>> =
+        map { it.filter { item -> predicate(item) } }
+
+    protected fun <T> Observable<T>.debounceAction(): Observable<T> =
         this.throttleFirst(ACTION_DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
 
-    protected inline fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
+    protected fun <T> Observable<T>.hideErrorContainer(): Observable<T> =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun <T> Single<T>.hideErrorContainer(): Single<T> =
+    protected fun <T> Single<T>.hideErrorContainer(): Single<T> =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun Completable.hideErrorContainer(): Completable =
+    protected fun Completable.hideErrorContainer(): Completable =
         this.doOnSubscribe { errorControl.visibilityState.consumer.accept(false) }
 
-    protected inline fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
+    protected fun <T> Observable<T>.skipWhileInProgress(): Observable<T> =
         this.skipWhileInProgress(progressState.observable)
 
-    protected inline fun <T> Observable<T>.bindProgress(): Observable<T> =
+    protected fun <T> Observable<T>.bindProgress(): Observable<T> =
         this.bindProgress(progressState.consumer)
 
-    protected inline fun <T> Single<T>.bindProgress(): Single<T> =
+    protected fun <T> Single<T>.bindProgress(): Single<T> =
         this.bindProgress(progressState.consumer)
 
-    protected inline fun Completable.bindProgress(): Completable =
+    protected fun Completable.bindProgress(): Completable =
         this.bindProgress(progressState.consumer)
 
     protected inline fun <T> Single<T>.trackEvent(
@@ -168,10 +180,5 @@ abstract class BasePm(
     override fun onDestroy() {
         coroutineScope.cancel()
         super.onDestroy()
-    }
-
-    companion object {
-        const val ACTION_DEBOUNCE_MILLIS = 500L
-        const val RELOAD_DELAY_MILLIS = 3000L
     }
 }

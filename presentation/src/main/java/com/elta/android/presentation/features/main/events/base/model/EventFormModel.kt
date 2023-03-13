@@ -8,7 +8,7 @@ import org.threeten.bp.ZonedDateTime
 
 data class EventFormModel(
     var eventType: EventType? = null,
-    var pickerValue: Double? = 0.0,
+    var pickerValue: Double? = null,
     var inputValue: String? = null,
     var tag: Tag? = null,
     var isDateChanged: Boolean = false,
