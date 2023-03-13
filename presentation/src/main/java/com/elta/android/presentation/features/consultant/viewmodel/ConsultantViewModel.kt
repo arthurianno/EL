@@ -8,17 +8,16 @@ import androidx.lifecycle.LifecycleOwner
 import com.elta.android.domain.common.fileType
 import com.elta.android.domain.common.getFileName
 import com.elta.android.domain.common.model.FileType
+import com.elta.android.domain.common.usecase.CachedJpgUseCase
+import com.elta.android.domain.common.usecase.CachedPdfUseCase
 import com.elta.android.domain.common.usecase.FileDeleteUseCase
 import com.elta.android.domain.common.usecase.PhotoCreateUseCase
-import com.elta.android.domain.common.usecase.SaveJpgUseCase
-import com.elta.android.domain.common.usecase.SavePdfUseCase
+import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.usecase.FileSendUseCase
-import com.elta.android.domain.features.consultant.usecase.WebimChatStateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimGetMessagesUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimNetworkStateUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimSendMessageUseCase
 import com.elta.android.domain.features.consultant.usecase.WebimSessionUseCase
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -34,7 +33,6 @@ import com.elta.android.presentation.features.consultant.model.FileSelect
 import com.elta.android.presentation.features.consultant.model.OpenCamera
 import com.elta.android.presentation.features.consultant.model.PhotoSelect
 import com.elta.android.presentation.features.consultant.model.toUi
-import com.elta.android.presentation.features.consultant.model.toWebimUser
 import com.elta.android.presentation.features.consultant.widgets.ConsultantBottomAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.ConsultantTopAppBarWidgetModel
 import com.elta.android.presentation.features.consultant.widgets.PhotoPreviewBottomAppBarWidgetModel
@@ -48,9 +46,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
 private const val DELETE_FILE_DELAY_MILLIS = 500L
@@ -59,15 +55,13 @@ private const val RECORD_STEP_DELAY_MILLIS = 100L
 class ConsultantViewModel @Inject constructor(
     private val webimSession: WebimSessionUseCase,
     private val webimNetworkState: WebimNetworkStateUseCase,
-    private val webimChatState: WebimChatStateUseCase,
     private val sendMessage: WebimSendMessageUseCase,
     private val getMessages: WebimGetMessagesUseCase,
-    private val getProfile: GetProfileUseCase,
     private val photoCreate: PhotoCreateUseCase,
     private val fileDelete: FileDeleteUseCase,
     private val fileSend: FileSendUseCase,
-    private val savePdf: SavePdfUseCase,
-    private val saveJpg: SaveJpgUseCase,
+    private val savePdf: CachedPdfUseCase,
+    private val saveJpg: CachedJpgUseCase,
     private val audioRecorder: AudioRecorder
 ) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
 
@@ -76,6 +70,7 @@ class ConsultantViewModel @Inject constructor(
             webimConnectState = ConnectState.Connecting,
             chat = emptyList(),
             previewPhoto = Uri.EMPTY,
+            user = WebimUser(id = "", name = ""),
             hasNewMessages = false,
             isOpenBottomSheet = false,
             isPhotoPreview = false
@@ -116,6 +111,10 @@ class ConsultantViewModel @Inject constructor(
         previewTopAppBar,
         previewBottomAppBar
     ).actionObserve()
+
+    fun setWebimUser(user: WebimUser) {
+        reduceState { state.value.copy(user = user) }
+    }
 
     fun setSheetVisibleState(isVisible: Boolean) {
         reduceState { state.value.copy(isOpenBottomSheet = isVisible) }
@@ -214,21 +213,9 @@ class ConsultantViewModel @Inject constructor(
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
-            Lifecycle.Event.ON_CREATE -> {
-                launch {
-                    getProfile.execute()
-                        .toObservable()
-                        .asFlow()
-                        .map { it.toWebimUser() }
-                        .catch { handleError(it) }
-                        .collectLatest { webimSession.create(it) }
-                }
-            }
-
-            Lifecycle.Event.ON_RESUME -> {
-                webimSession.onResume()
-            }
-
+            Lifecycle.Event.ON_CREATE -> webimSession.create(state.value.user)
+            Lifecycle.Event.ON_START -> webimSession.onResume()
+            Lifecycle.Event.ON_RESUME -> webimSession.onResume()
             Lifecycle.Event.ON_PAUSE -> webimSession.onPause()
             Lifecycle.Event.ON_DESTROY -> webimSession.onDestroy()
             else -> Unit

@@ -5,12 +5,16 @@ import com.elta.android.domain.common.model.FileType
 import java.io.File
 
 private const val DOT_SYMBOL = '.'
-fun Uri.getFileExtension(): String? = this.lastPathSegment?.split(DOT_SYMBOL)?.last()
-fun Uri.getFileName(): String? = this.lastPathSegment
-    ?.split(File.separator)
-    ?.last()
+fun Uri.getFileExtension(): String? = this.lastPathSegment?.getFileExtension()
+fun String.getFileExtension(): String? = runCatching { split(DOT_SYMBOL).last() }.getOrNull()
+
+fun Uri.getFileName(): String? = getFullFileName()
     ?.split(DOT_SYMBOL)
     ?.first()
+
+fun Uri.getFullFileName(): String? = lastPathSegment
+    ?.split(File.separator)
+    ?.last()
 
 fun Uri.fileType(): FileType? =
     when (getFileExtension()) {

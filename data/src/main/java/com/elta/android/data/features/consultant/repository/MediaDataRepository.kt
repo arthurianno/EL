@@ -37,9 +37,9 @@ class MediaDataRepository @Inject constructor(
     override suspend fun cachedPhoto(name: String, bitmap: Bitmap) =
         fileStorage.createCachedPhoto(fileName = name, bitmap = bitmap)
 
-    override suspend fun cachedFile(cacheName: String, fileType: FileType, sourceUri: Uri): Uri =
+    override suspend fun cachedFile(cacheName: String, fileType: FileType?, sourceUri: Uri): Uri =
         fileStorage.createCachedFile(
-            cachedFileName = cacheName addExtension fileType,
+            cachedFileName = fileType?.let { cacheName addExtension it } ?: cacheName,
             sourceUri = sourceUri
         )
 

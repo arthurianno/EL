@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.consultant.widgets
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +10,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,12 +35,10 @@ import com.elta.android.presentation.theme.GetLocalProperties
 
 internal data class ChatMessageWidgetState(
     val message: ChatUiEntity,
-    val backgroundColor: Color
+    val attachmentCacheUri: Uri?
 )
 
-internal class ChatMessageWidgetModel(
-    val message: ChatUiEntity? = null
-) : BaseWidgetModel<ChatMessageWidgetState>() {
+internal class ChatMessageWidgetModel : BaseWidgetModel<ChatMessageWidgetState>() {
     override fun createInitState(): ChatMessageWidgetState =
         ChatMessageWidgetState(
             message = ChatUiEntity(
@@ -53,7 +52,7 @@ internal class ChatMessageWidgetModel(
                 sendStatus = WebimMessageSendStatus.Sending,
                 isRead = false
             ),
-            backgroundColor = Color.Unspecified
+            attachmentCacheUri = null
         )
 
     fun setMessage(message: ChatUiEntity) {
@@ -109,7 +108,7 @@ private fun BoxScope.TextCard(message: ChatUiEntity) {
             text = message.text,
             modifier = Modifier.Companion
                 .align(Alignment.Center)
-                .padding(dimens.chatMessageTextPadding)
+                .padding(dimens.chatCardTextContentPadding)
         )
     }
 }
@@ -122,7 +121,7 @@ private fun BoxScope.ImageCard(message: ChatUiEntity) {
             contentScale = ContentScale.Crop,
             contentDescription = null,
             modifier = Modifier
-                .size(dimens.imageMessageSize)
+                .requiredHeight(dimens.imageMessageSize.height)
                 .align(Alignment.Center)
         )
     }
@@ -137,7 +136,7 @@ private fun BoxScope.FileCard(
         Row(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(dimens.chatMessageTextPadding)
+                .padding(dimens.chatCardFileContentPadding)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_arrow_download),
@@ -187,10 +186,14 @@ private fun BoxScope.ChatLabel(message: ChatUiEntity) {
                 HSpacerVerySmall()
                 Image(
                     painter = painterResource(
-                        id = when (message.sendStatus) {
-                            WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
-                            WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
-                            is WebimMessageSendStatus.Error -> R.drawable.ic_send_error
+                        id = if (message.attachmentUrl != null || message.type == WebimContentType.Text) {
+                            when (message.sendStatus) {
+                                WebimMessageSendStatus.Sent -> R.drawable.ic_message_received
+                                WebimMessageSendStatus.Sending -> R.drawable.ic_message_send
+                                is WebimMessageSendStatus.Error -> R.drawable.ic_send_error
+                            }
+                        } else {
+                            R.drawable.ic_clock
                         }
                     ),
                     colorFilter = ColorFilter.tint(

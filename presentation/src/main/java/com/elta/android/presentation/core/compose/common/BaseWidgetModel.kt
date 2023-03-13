@@ -14,9 +14,9 @@ abstract class BaseWidgetModel<D> {
     private val initState: D
         get() = createInitState()
 
-    private var actionHandler: ((action: Action) -> Unit)? = null
-    fun setParentActionHandler(handler: (Action) -> Unit) {
-        actionHandler = handler
+    private var viewModelActionReceiver: ((action: Action) -> Unit)? = null
+    fun registrationActionReceiver(receiver: (Action) -> Unit) {
+        viewModelActionReceiver = receiver
     }
 
     private var viewModel: BaseViewModel<*, *, in Action>? = null
@@ -32,7 +32,7 @@ abstract class BaseWidgetModel<D> {
         get() = _action.asSharedFlow()
 
     infix fun sendAction(action: Action) {
-        actionHandler?.let { it(action) } ?: _action.tryEmit(action)
+        viewModelActionReceiver?.let { it(action) } ?: _action.tryEmit(action)
     }
 
     protected fun setState(state: () -> D) {

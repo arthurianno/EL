@@ -17,8 +17,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import java.io.File
 import javax.inject.Inject
 
-private const val MAX_FILE_SIZE = 10000000L
-private const val VOLUME_MAX_LEVEL = 7500F
+internal const val MAX_FILE_SIZE = 10000000L
+internal const val SAMPLING_RATE = 44100
+internal const val AUDIO_BITRATE = 960
+internal const val AUDIO_CHANNELS_COUNT = 1
+internal const val VOLUME_MAX_LEVEL = 7500F
 
 class AudioRecorderImpl @Inject constructor(
     private val audioFileCreate: AudioRecordCreateUseCase,
@@ -61,20 +64,28 @@ class AudioRecorderImpl @Inject constructor(
     @OptIn(ObsoleteCoroutinesApi::class)
     override fun start(stepMillis: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            volumeLevelTicker = ticker(
-                delayMillis = stepMillis,
-                initialDelayMillis = stepMillis
-            )
-            audioFile = audioFileCreate()
-            with(mediaRecorder) {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                setMaxFileSize(MAX_FILE_SIZE)
-                setOutputFile(audioFile)
-                prepare()
-                start()
+            runCatching {
+                volumeLevelTicker = ticker(
+                    delayMillis = stepMillis,
+                    initialDelayMillis = stepMillis
+                )
+                audioFile = audioFileCreate()
+                with(mediaRecorder) {
+                    setAudioSource(MediaRecorder.AudioSource.MIC)
+                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                    setAudioChannels(AUDIO_CHANNELS_COUNT)
+                    setAudioSamplingRate(SAMPLING_RATE)
+                    setAudioEncodingBitRate(AUDIO_BITRATE)
+                    setMaxFileSize(MAX_FILE_SIZE)
+                    setOutputFile(audioFile)
+                    prepare()
+                    start()
+                }
             }
+                .onFailure {
+                    volumeLevelTicker = null
+                }
         }
     }
 }

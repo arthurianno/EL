@@ -47,14 +47,17 @@ data class EltaDimens(
     val graphTimePadding: Dp,
     val graphItemHeight: Dp,
     val graphItemMaxWidth: Dp,
-    val messageTextPadding: PaddingValues,
-    val chatMessageTextPadding: PaddingValues,
+    val sendMessageTextFieldPadding: PaddingValues,
+    val chatCardTextContentPadding: PaddingValues,
+    val chatCardFileContentPadding: PaddingValues,
     val chatMessageLabelPadding: PaddingValues,
     val chatPadding: PaddingValues,
     val consultantBottomSheetItemPadding: PaddingValues,
     val photoPreviewContentPadding: PaddingValues,
     val previewSendButtonSize: Dp,
-    val imageMessageSize: DpSize
+    val imageMessageSize: DpSize,
+    val charCardUserMessagePadding: PaddingValues,
+    val charCardOperatorMessagePadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -94,12 +97,35 @@ internal val eltaDimens = EltaDimens(
     graphTimePadding = 42.dp,
     graphItemHeight = 2.dp,
     graphItemMaxWidth = 20.dp,
-    messageTextPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-    chatMessageTextPadding = PaddingValues(top = 12.dp, bottom = 28.dp, start = 12.dp, end = 12.dp),
+    sendMessageTextFieldPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+    chatCardTextContentPadding = PaddingValues(
+        top = 12.dp,
+        bottom = 28.dp,
+        start = 12.dp,
+        end = 12.dp
+    ),
+    chatCardFileContentPadding = PaddingValues(
+        top = 12.dp,
+        bottom = 28.dp,
+        start = 12.dp,
+        end = 12.dp
+    ),
     chatMessageLabelPadding = PaddingValues(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
     chatPadding = PaddingValues(top = 12.dp, bottom = 12.dp, start = 12.dp, end = 12.dp),
     consultantBottomSheetItemPadding = PaddingValues(16.dp),
     photoPreviewContentPadding = PaddingValues(top = 26.dp, bottom = 40.dp),
     previewSendButtonSize = 48.dp,
-    imageMessageSize = DpSize(width = 268.dp, height = 254.dp)
+    imageMessageSize = DpSize(width = 174.dp, height = 342.dp),
+    charCardUserMessagePadding = PaddingValues(
+        top = 0.dp,
+        bottom = 0.dp,
+        start = 78.dp,
+        end = 12.dp
+    ),
+    charCardOperatorMessagePadding = PaddingValues(
+        top = 0.dp,
+        bottom = 0.dp,
+        start = 12.dp,
+        end = 32.dp
+    )
 )
