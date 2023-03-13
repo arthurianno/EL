@@ -11,7 +11,7 @@ import androidx.compose.ui.res.painterResource
 @Composable
 fun ButtonCircle(
     @DrawableRes icon: Int,
-    tint: Color = Color.Unspecified,
+    tint: Color? = null,
     enable: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -21,7 +21,7 @@ fun ButtonCircle(
     ) {
         Image(
             painter = painterResource(id = icon),
-            colorFilter = ColorFilter.tint(color = tint),
+            colorFilter = tint?.let { ColorFilter.tint(color = it) },
             contentDescription = null
         )
     }
