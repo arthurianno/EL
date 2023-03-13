@@ -10,3 +10,6 @@ fun Modifier.clickableWithNoRipple(onClick: () -> Unit): Modifier =
         indication = null,
         onClick = { onClick() }
     )
+
+fun Modifier.disableClickable(): Modifier =
+    this.clickable(enabled = false, onClick = {})
