@@ -20,6 +20,7 @@ interface FormValidator {
 }
 
 internal fun String?.noteIsValid(): Boolean =
-    orEmpty().length <= NOTE_MAX_LENGTH && orEmpty().trim().symbolsIsValid()
+    (this.orEmpty().length <= NOTE_MAX_LENGTH) && this.symbolsIsValid()
 
-internal fun String?.symbolsIsValid() = orEmpty().all { it.isLetterOrDigit() }
+internal fun String?.symbolsIsValid(): Boolean =
+    this.orEmpty().isEmpty() || this.orEmpty().any { it.isLetterOrDigit() }
