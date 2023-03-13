@@ -8,7 +8,6 @@ import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,8 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-private const val ERROR_LOG_TAG = "ViewModel Error"
-
+@Suppress("UNCHECKED_CAST")
 @Stable
 abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
     private val initState: ST
@@ -43,7 +41,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         get() = _state.asStateFlow()
     private val action = MutableSharedFlow<AC>()
 
-    private val _event = MutableSharedFlow<EV?>(extraBufferCapacity = 1)
+    private val _event = MutableSharedFlow<EV?>()
 
     val event: SharedFlow<EV?>
         get() = _event.asSharedFlow()
@@ -59,6 +57,14 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
     }
 
     fun routerIsNotSet(): Boolean = _router == null
+
+    fun backClick() {
+        router.exit()
+    }
+
+    val actionReceiver: (Action) -> Unit = { action ->
+        (action as? AC)?.let { sendAction(it) }
+    }
 
     infix fun sendAction(action: AC) {
         launch {
@@ -76,13 +82,9 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         Timber.e(error, message ?: error.message.orEmpty())
     }
 
-    protected fun sendEvent(event: EV, dismissDelay: Long? = null) {
+    protected fun sendEvent(event: EV) {
         launch {
             _event.emit(event)
-            dismissDelay?.let {
-                delay(it)
-                _event.emit(null)
-            }
         }
     }
 
@@ -92,7 +94,6 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
 
     protected abstract fun reduceStateByAction(currentState: ST, action: Action): ST
 
-    @Suppress("UNCHECKED_CAST")
     protected fun List<BaseWidgetModel<*>>.actionObserve() = this.also { widgets ->
         widgets.map { it.action }
             .merge()

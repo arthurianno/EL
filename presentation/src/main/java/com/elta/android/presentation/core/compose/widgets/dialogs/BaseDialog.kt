@@ -12,7 +12,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -138,18 +137,4 @@ private fun DialogButton(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewDialog() {
-    val widgetModel = BaseDialogWidgetModel<Nothing>().apply {
-        initDialog(
-            title = "Внимание",
-            message = "Значение ХЕ превышает 99,9. Проверьте и измените добавленные продукты/блюда.",
-            positiveButtonText = "ok"
-        )
-    }
-    widgetModel.dialogOpen()
-    BaseDialog(widgetModel = widgetModel)
 }
