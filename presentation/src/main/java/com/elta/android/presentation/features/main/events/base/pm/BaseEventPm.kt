@@ -97,6 +97,7 @@ abstract class BaseEventPm(
         observeHandleBack()
         observeEventChanges()
         observeDishesResult()
+        observeDishesChanges()
     }
 
     fun setEventType(eventType: EventType) {
@@ -135,10 +136,19 @@ abstract class BaseEventPm(
                             breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
                         }
                         updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
-                        delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
-                        lockedChangeFormPicker = true
                     }
                 }
+        }
+    }
+
+    private fun observeDishesChanges() {
+        dishes.observable.subscribe {
+            if (it.isNotEmpty()) {
+                launch {
+                    delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
+                    lockedChangeFormPicker = true
+                }
+            }
         }
     }
 
