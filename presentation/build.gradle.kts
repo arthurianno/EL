@@ -76,7 +76,7 @@ kapt {
 }
 
 configurations.all {
-    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.kotlinVersion}")
+    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.Kotlin.version}")
 }
 
 dependencies {
@@ -100,13 +100,13 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.Kotlin.coroutinesRx2)
 
-    implementation(Dependencies.Jetpack.Compose.material)
-    implementation(Dependencies.Jetpack.Compose.foundation)
-    implementation(Dependencies.Jetpack.Compose.ui)
-    implementation(Dependencies.Jetpack.Compose.uiToolingPreview)
+    implementation(platform(Dependencies.Jetpack.Compose.bom))
+    implementation(Dependencies.Jetpack.Compose.bomMaterial)
+    implementation(Dependencies.Jetpack.Compose.bomRxJava2)
+    bomUiToolingDependencies()
+    bomComposeTestsDependencies()
     implementation(Dependencies.Jetpack.Compose.activity)
     implementation(Dependencies.Jetpack.Compose.viewModel)
-    implementation(Dependencies.Jetpack.Compose.rxJava2)
 
     implementation(Dependencies.Jetpack.core)
     implementation(Dependencies.Jetpack.fragment)
@@ -150,6 +150,5 @@ dependencies {
     implementation(Dependencies.Google.GoogleMap.location)
     implementation(Dependencies.CustomView.cardView)
 
-    testComposeDependencies()
     testBaseDependencies()
 }

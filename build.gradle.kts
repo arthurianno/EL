@@ -11,7 +11,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:${Dependencies.gradleVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Kotlin.version}")
         classpath("com.google.gms:google-services:${Dependencies.Google.Services.servicesVersion}")
         classpath("com.google.firebase:firebase-plugins:${Dependencies.Google.FireBase.pluginVersion}")
         classpath("com.google.firebase:firebase-crashlytics-gradle:${Dependencies.Google.FireBase.crashliticsGradleVersion}")
