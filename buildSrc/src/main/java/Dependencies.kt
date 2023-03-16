@@ -235,7 +235,7 @@ object Dependencies {
     }
 
     object ObjectBox {
-        const val version = "3.1.3"
+        const val version = "3.5.1"
 
         const val core = "io.objectbox:objectbox-kotlin:$version"
         const val browser = "io.objectbox:objectbox-android-objectbrowser:$version"
