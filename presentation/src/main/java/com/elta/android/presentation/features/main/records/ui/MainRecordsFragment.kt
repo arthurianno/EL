@@ -20,6 +20,7 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleVisibilityState
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -61,9 +62,13 @@ class MainRecordsFragment :
         pm.mainScreenState
             .visibilityState
             .observable.map { !it }
-            .subscribe {
-                itemsView?.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
-            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    itemsView?.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+                },
+                {}
+            )
 
         bus.events<Events.HomeBottomSheetStateChanged>().map { it.opened }
             .subscribe(bottomSheetState)
