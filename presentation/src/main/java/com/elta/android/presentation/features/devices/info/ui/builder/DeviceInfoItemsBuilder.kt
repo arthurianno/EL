@@ -1,9 +1,7 @@
 package com.elta.android.presentation.features.devices.info.ui.builder
 
 import com.elta.android.domain.features.devices.model.GlucometerInfo
-import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.features.devices.info.ui.adapter.items.DeviceInfoItem
 import com.elta.android.presentation.features.devices.info.ui.adapter.items.DevicePrimaryInfoItem
 import com.elta.android.presentation.utils.toSyncDate
@@ -22,8 +20,7 @@ class DeviceInfoItemsBuilder @Inject constructor(
             add(
                 DeviceInfoItem(
                     title = resources.getString(R.string.profile_device_info_last_sync_title_field),
-                    description = it.toSyncDate(resources),
-                    onClick = { bus.click(Clicks.OpenBlueToothScreen) }
+                    description = it.toSyncDate(resources)
                 )
             )
         }

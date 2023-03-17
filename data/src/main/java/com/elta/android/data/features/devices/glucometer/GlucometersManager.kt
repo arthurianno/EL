@@ -504,6 +504,7 @@ class GlucometersManager @Inject constructor(
             .takeUntil { it.first.isEmptyEvent() || it.first == it.second }
             .collectInto(SyncResponseHolder()) { holder, pair ->
                 val response = pair.first
+                holder.lastSyncedEvent = pair.second
                 if (response.isEvent() && !response.isEmptyEvent() && response != pair.second) {
                     holder.events.add(response)
                 } else if (!response.isOk() && !response.isError() && !response.isEmptyEvent()) {
