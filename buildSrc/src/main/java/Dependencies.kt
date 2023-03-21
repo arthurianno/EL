@@ -1,5 +1,5 @@
 object Dependencies {
-    const val gradleVersion = "7.3.0"
+    const val gradleVersion = "7.4.2"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"

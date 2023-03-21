@@ -37,6 +37,7 @@ sealed class Clicks : Click {
     data class ObserverItemClicked(val item: ObserverItem) : Clicks()
     data class DateInStatisticsClicked(val date: LocalDate?) : Clicks()
     object PrimaryDeviceItemClicked : Clicks()
+    object DeviceSearchItemClicked : Clicks()
     object OpenBlueToothScreen : Clicks()
     data class SupportActionClicked(val action: SupportAction) : Clicks()
 }

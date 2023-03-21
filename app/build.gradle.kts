@@ -84,6 +84,7 @@ android {
                 "\"${Version.versionName}$versionNameSuffix\""
             )
             signingConfig = signingConfigs["debug"]
+            isDebuggable = true
         }
 
         release {
@@ -100,6 +101,7 @@ android {
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
             versionNameSuffix = Version.devNameSuffix
             signingConfig = signingConfigs["debug"]
+            isDebuggable = true
         }
         create("releaseDev") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
@@ -114,6 +116,7 @@ android {
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
             versionNameSuffix = Version.stageNameSuffix
             signingConfig = signingConfigs["debug"]
+            isDebuggable = true
         }
         create("releaseStage") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())

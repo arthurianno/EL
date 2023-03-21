@@ -10,6 +10,7 @@
     <string name="gender_not_specified">Пол не указан</string>
     <string name="yes_text">Да</string>
     <string name="no_text">Нет</string>
+    <string name="cancel_text">Отмена</string>
 
     <!-- ERROR VIEW ERRORS -->
     <string name="error_server_not_responding_title">Сервер недоступен</string>
@@ -492,7 +493,22 @@
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
     <string name="profile_device_info_charge_level_field">%d/3</string>
     <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
-
+    <string name="profile_device_search">Найти устройство</string>
+    <string name="profile_device_search_off_title">Поиск выключен  🔈</string>
+    <string name="profile_device_search_off_text">Чтобы начать поиск нажмите кнопку выше — после этого устройство начнёт издавать звук.</string>
+    <string name="profile_device_search_connecting_title">Подключение...</string>
+    <string name="profile_device_search_connecting_text">Начинаем поиск! Подождите пока телефон подключится к глюкометру по Bluetooth — после этого вы сможете начать его искать.</string>
+    <string name="profile_device_search_on_title">Поиск включен 🔊</string>
+    <string name="profile_device_search_on_text1">Устройство обнаружено! Прислушайтесь, сейчас глюкометр издает сигнал — возможно, он где-то рядом.</string>
+    <string name="profile_device_search_on_text2">После того как найдёте глюкометр, не забудьте выключить режим поиска.</string>
+    <string name="profile_device_search_not_found_title">Устройство не найдено</string>
+    <string name="profile_device_search_not_found_text1">Проверьте возможные причины и повторно начните поиск, нажав кнопку выше.</string>
+    <string name="profile_device_search_not_found_text2">1. На глюкометре выключен Bluetooth;</string>
+    <string name="profile_device_search_not_found_text3">2. Батарея на устройстве отсутствует, имеет низкий заряд или полностью разряжена;</string>
+    <string name="profile_device_search_not_found_text4">3. Глюкометр находится вне зоны действия поиска (8-10 метров).</string>
+    <string name="profile_device_cancel_search_dialog_text">Вы уверены что хотите прекратить поиск и выйти?</string>
+    <string name="profile_device_cancel_ring_dialog_text">Внимание: при выходе с экрана звуковой сигнал устройства прекратится. Вы уверены, что хотите выйти?</string>
+    <string name="profile_device_snackbar_connecting_to_device">Идёт процесс поиска устройства...</string>
     <string name="profile_delete_device_dialog_title">Внимание</string>
     <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
     <string name="profile_delete_primary_device_dialog_body">Вы действительно хотите удалить основной глюкометр?\nДанные будут сохранены</string>

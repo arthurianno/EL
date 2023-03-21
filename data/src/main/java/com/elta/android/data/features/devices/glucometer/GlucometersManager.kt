@@ -40,6 +40,16 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.rx2.asFlow
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
@@ -58,6 +68,7 @@ private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
 private const val EVENTS_COUNT = 1000
 private const val SYNC_DELAY = 500L
 private const val COMMAND_DELAY = 20L
+private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
 
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
@@ -434,6 +445,21 @@ class GlucometersManager @Inject constructor(
             RxBleClient.State.LOCATION_SERVICES_NOT_ENABLED -> LocationNotEnabledError
             else -> null
         }
+
+    @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun finGlucometer(address: String): Flow<Unit> =
+        client.findConnection(address)
+            .checkPinAndSend(address)
+            .asFlow()
+            .flatMapLatest { connection ->
+                ticker(delayMillis = SEND_FIND_COMMAND_DELAY_MILLIS)
+                    .receiveAsFlow()
+                    .flatMapMerge {
+                        connection.request(address, Commands.TurnOnFindMode)
+                            .asFlow()
+                            .map { Unit }
+                    }
+            }
 
     private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()

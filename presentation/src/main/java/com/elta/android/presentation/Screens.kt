@@ -18,6 +18,7 @@ import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
+import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -252,6 +253,10 @@ object Screens {
 
     object Devices : SupportAppScreen() {
         override fun getFragment() = DevicesFragment.newInstance()
+    }
+
+    class DeviceSearch(val address: String) : SupportAppScreen() {
+        override fun getFragment() = GlucometerSearchFragment.newInstance(address)
     }
 
     data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {

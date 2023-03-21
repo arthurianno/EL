@@ -1,6 +1,7 @@
 package com.elta.android.data.features.devices.repository
 
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.common.repository.BaseRepository
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
@@ -14,6 +15,9 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
@@ -22,8 +26,9 @@ class DeviceDataRepository @Inject constructor(
     private val glucometerToDtoMapper: Mapper<Glucometer, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
-    private val source: DeviceDataSource
-) : DeviceRepository {
+    private val source: DeviceDataSource,
+    override val dispatcher: CoroutineDispatcher
+) : DeviceRepository, BaseRepository {
 
     override fun findDevices(): Observable<List<Glucometer>> =
         source.findDevices().map(glucometerToDomainMapper::mapFromObjects)
@@ -62,4 +67,8 @@ class DeviceDataRepository @Inject constructor(
 
     override fun setPrimaryDevice(address: String): Completable =
         source.setPrimaryDevice(address)
+
+    override fun findGlucometer(address: String): Flow<Unit> =
+        source.findGlucometer(address)
+            .flowOn(dispatcher)
 }
