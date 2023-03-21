@@ -9,6 +9,7 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import javax.inject.Inject
 
@@ -50,4 +51,7 @@ class DeviceRemoteDataSource @Inject constructor(
 
     override fun setPrimaryDevice(address: String): Completable =
         glucometersManager.setPrimaryDevice(address)
+
+    override fun findGlucometer(address: String): Flow<Unit> =
+        glucometersManager.finGlucometer(address)
 }

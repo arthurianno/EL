@@ -7,6 +7,7 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Suppress("TooManyFunctions", "ComplexInterface")
 interface DeviceDataSource {
@@ -32,4 +33,6 @@ interface DeviceDataSource {
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String>
 
     fun setPrimaryDevice(address: String): Completable
+
+    fun findGlucometer(address: String): Flow<Unit>
 }

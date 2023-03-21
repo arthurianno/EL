@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.devices.info.pm
 
+import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.domain.features.devices.interactor.DeleteGlucometerUseCase
 import com.elta.android.domain.features.devices.interactor.GetLastGlucometerAndInfoUseCase
 import com.elta.android.domain.features.devices.interactor.SetPrimaryGlucometerUseCase
@@ -20,6 +21,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.devices.info.ui.builder.DeviceInfoItemsBuilder
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
@@ -42,6 +44,8 @@ class DeviceInfoPm @Inject constructor(
     private val getDeviceInfoAction = action<Unit>()
 
     private var glucometer: Glucometer? = null
+    val requestEnableBluetoothCommand = command<Unit>(bufferSize = 1)
+    val bluetoothEnabledAction = action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -49,6 +53,7 @@ class DeviceInfoPm @Inject constructor(
         observeGetDeviceAction()
         observeDeleteDeviceAction()
         observeSetPrimaryDeviceClicks()
+        observeBluetoothEnable()
 
         addressState.observable
             .map { resources.getString(R.string.profile_device_info_description, it) }
@@ -60,6 +65,24 @@ class DeviceInfoPm @Inject constructor(
             .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
             .untilDestroy()
 
+        observeEvents()
+    }
+
+    fun setDeviceData(name: String, address: String) {
+        nameDeviceState.consumer.accept(name)
+        addressState.consumer.accept(address)
+        getDeviceInfoAction.consumer.accept(Unit)
+    }
+
+    private fun observeBluetoothEnable() {
+        bluetoothEnabledAction.observable
+            .doOnError(::handleError)
+            .subscribe {
+                glucometer?.address?.let { router.navigateTo(Screens.DeviceSearch(it)) }
+            }
+    }
+
+    private fun observeEvents() {
         bus.events<Events.FirmwareUpdated>()
             .map { Unit }
             .subscribe(getDeviceInfoAction.consumer)
@@ -69,12 +92,13 @@ class DeviceInfoPm @Inject constructor(
             .map { Unit }
             .subscribe { router.navigateTo(Screens.BluetoothScreen) }
             .untilDestroy()
-    }
 
-    fun setDeviceData(name: String, address: String) {
-        nameDeviceState.consumer.accept(name)
-        addressState.consumer.accept(address)
-        getDeviceInfoAction.consumer.accept(Unit)
+        bus.clicks<Clicks.DeviceSearchItemClicked>()
+            .map { Unit }
+            .subscribe {
+                requestEnableBluetoothCommand.consumer.accept(Unit)
+            }
+            .untilDestroy()
     }
 
     private fun observeSetPrimaryDeviceClicks() =
@@ -141,6 +165,11 @@ class DeviceInfoPm @Inject constructor(
     private fun handleSuccess(data: Pair<Glucometer, GlucometerInfo>) {
         glucometer = data.first
         items.consumer.accept(itemsBuilder.buildItems(data.second, data.first.isPrimary))
+    }
+
+    override fun handleError(error: Throwable) {
+        if (error == BluetoothNotEnabledError) requestEnableBluetoothCommand.consumer.accept(Unit)
+        super.handleError(error)
     }
 
     private fun loadGlucometerInfo(i: Unit): Observable<Pair<Glucometer, GlucometerInfo>> =

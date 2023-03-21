@@ -8,6 +8,7 @@ import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -58,7 +59,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
 
     fun routerIsNotSet(): Boolean = _router == null
 
-    fun backClick() {
+    open fun backClick() {
         router.exit()
     }
 
@@ -72,11 +73,10 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         }
     }
 
-    protected fun launch(block: suspend CoroutineScope.() -> Unit) {
+    protected fun launch(block: suspend CoroutineScope.() -> Unit): Job =
         viewModelScope.launch {
             block(this)
         }
-    }
 
     protected open fun handleError(error: Throwable, message: String? = null) {
         Timber.e(error, message ?: error.message.orEmpty())
