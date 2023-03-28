@@ -3,6 +3,7 @@ package com.elta.android.presentation.theme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 data class EltaDimens(
@@ -46,7 +47,18 @@ data class EltaDimens(
     val targetCircleSize: Dp,
     val cleanerCircleWidth: Dp,
     val searchButtonTopInterval: Dp,
-    val searchDeviceBottomTextPadding: PaddingValues
+    val searchDeviceBottomTextPadding: PaddingValues,
+    // Connect Dims
+    val connectTypeButtonsHeight: Dp,
+    val clickableAreaMinSize: Dp,
+    val connectTypeImageToTextVInterval: Dp,
+    val sheetTopPadding: Dp,
+    val connectingImagePadding: PaddingValues,
+    val connectingImageSize: DpSize,
+    val scannerInfoSheetPadding: PaddingValues,
+    val scannerPreviewLeftPadding: Dp,
+    val scannerPreviewTopPadding: Dp,
+    val connectHelpTextBlockInterval: Dp
 )
 
 internal val eltaDimens = EltaDimens(
@@ -89,7 +101,17 @@ internal val eltaDimens = EltaDimens(
     searchGlucometerButtonSize = 112.dp,
     targetLineWidth = 4.dp,
     targetCircleSize = 208.dp,
-    cleanerCircleWidth = 92.dp,
+    cleanerCircleWidth = 136.dp,
     searchButtonTopInterval = 52.dp,
     searchDeviceBottomTextPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+    connectTypeButtonsHeight = 48.dp,
+    clickableAreaMinSize = 48.dp,
+    connectTypeImageToTextVInterval = 20.dp,
+    sheetTopPadding = 20.dp,
+    connectingImagePadding = PaddingValues(top = 56.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+    connectingImageSize = DpSize(width = 312.dp, height = 290.dp),
+    scannerInfoSheetPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+    scannerPreviewLeftPadding = 40.dp,
+    scannerPreviewTopPadding = 190.dp,
+    connectHelpTextBlockInterval = 20.dp
 )

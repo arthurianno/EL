@@ -54,8 +54,14 @@ import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFra
 import com.elta.android.presentation.features.statistic.period.di.PeriodModule
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
 import com.elta.android.presentation.features.statistic.report.ui.ReportPeriodChooserFragment
-import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
-import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.ConnectHelpFragment
+import com.elta.android.presentation.features.sync.connect.ConnectStartFragment
+import com.elta.android.presentation.features.sync.connect.ConnectTypeFragment
+import com.elta.android.presentation.features.sync.connect.ConnectingFragment
+import com.elta.android.presentation.features.sync.connect.HowToConnectFragment
+import com.elta.android.presentation.features.sync.connect.ScannerDmcFragment
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragment
 import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
@@ -184,11 +190,11 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindFromOnBoardingConnectDeviceFragment(): FromOnBoardingConnectDeviceFragment
+    abstract fun bindFromOnBoardingConnectDeviceByPinFragment(): FromOnBoardingConnectDeviceByPinFragment
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindFromOtherConnectDeviceFragment(): FromOtherConnectDeviceFragment
+    abstract fun bindFromOtherConnectDeviceByPinFragment(): FromOtherConnectDeviceByPinFragment
 
     // DIARY FLOW
     @FragmentScope
@@ -305,4 +311,28 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindAddDishFragment(): DishDetailFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindConnectStartFragment(): ConnectStartFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindConnectTypeFragment(): ConnectTypeFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindConnectHelpFragment(): ConnectHelpFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindHowToConnectFragment(): HowToConnectFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindScannerDmcFragment(): ScannerDmcFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindConnectingFragment(): ConnectingFragment
 }

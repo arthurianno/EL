@@ -8,7 +8,6 @@ import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.mapDistinct
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
@@ -37,7 +36,7 @@ private const val DIGIT_DOT = '.'
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
-) : BaseViewModel<DishDetailViewState, Event, Action>() {
+) : BaseViewModel<DishDetailViewState, Action>() {
     override fun createInitState(): DishDetailViewState =
         DishDetailViewState(
             dish = DishUiEntity(

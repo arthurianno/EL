@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.main.events.glucose.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -8,6 +9,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentGlucoseEventBinding
@@ -58,7 +60,7 @@ class GlucoseEventFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let { presentationModel.setEventData(checkNotNull(it[EXTRA_ID]) as String) }
+        arguments?.getString(EXTRA_ID)?.let { presentationModel.setEventData(it) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,6 +85,13 @@ class GlucoseEventFragment :
     override fun onStop() {
         super.onStop()
         view?.removeWindowBottomInsetsListener(insetsListener)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+        }
     }
 
     override fun onBindPresentationModel(pm: GlucoseEventPm) {
@@ -134,10 +143,6 @@ class GlucoseEventFragment :
                 binding.beforeEatingAttribute.isSelected = false
             }
         }
-    }
-
-    override fun handleBack() {
-        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
     }
 
     private fun observeAppBarChanges() {

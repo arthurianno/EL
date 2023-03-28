@@ -4,7 +4,8 @@ import androidx.compose.ui.graphics.Brush
 
 data class EltaBrash(
     val downButton: Brush,
-    val dishHeader: Brush
+    val dishHeader: Brush,
+    val smallButton: Brush
 )
 
 internal val eltaBrash = EltaBrash(
@@ -13,5 +14,8 @@ internal val eltaBrash = EltaBrash(
     ),
     dishHeader = Brush.verticalGradient(
         listOf(gOrangeA, gOrangeB)
+    ),
+    smallButton = Brush.horizontalGradient(
+        listOf(shadeGGreenA, gGreenB)
     )
 )

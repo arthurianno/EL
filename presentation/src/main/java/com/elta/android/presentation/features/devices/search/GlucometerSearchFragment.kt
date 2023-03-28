@@ -1,31 +1,35 @@
 package com.elta.android.presentation.features.devices.search
 
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
+import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.VSpacer
+import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
+import com.elta.android.presentation.core.compose.widgets.snackbar.BaseSnackBar
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchStatus
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.devices.search.widgets.GlucometerSearchButton
@@ -100,7 +104,7 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                     }
                 }
                 VerticallyAnimation(visualState = state.value.searchStatus == GlucometerSearchStatus.Connecting) {
-                    SnackBar(state.value.snackBar.stringId)
+                    BaseSnackBar(state.value.snackBar.stringId)
                 }
             }
         }
@@ -119,22 +123,22 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                     text = stringResource(id = R.string.profile_device_search_not_found_title),
                     style = types.h1
                 )
-                VSpacerSmall()
+                VSpacer(height = dimens.halfMediumDim)
                 Text(
                     text = stringResource(id = R.string.profile_device_search_not_found_text1),
                     color = colors.shadeBlack0
                 )
-                VSpacerSmall()
+                VSpacer(height = dimens.halfMediumDim)
                 Text(
                     text = stringResource(id = R.string.profile_device_search_not_found_text2),
                     color = colors.shadeBlack0
                 )
-                VSpacerSmall()
+                VSpacerMedium()
                 Text(
                     text = stringResource(id = R.string.profile_device_search_not_found_text3),
                     color = colors.shadeBlack0
                 )
-                VSpacerSmall()
+                VSpacerMedium()
                 Text(
                     text = stringResource(id = R.string.profile_device_search_not_found_text4),
                     color = colors.shadeBlack0
@@ -152,10 +156,18 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                     .padding(dimens.searchDeviceBottomTextPadding)
                     .align(Alignment.BottomCenter)
             ) {
-                Text(
-                    text = stringResource(id = R.string.profile_device_search_on_title),
-                    style = types.h1
-                )
+                Row {
+                    Text(
+                        text = stringResource(id = R.string.profile_device_search_on_title),
+                        style = types.h1
+                    )
+                    HSpacerVerySmall()
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_dinamic_on),
+                        contentDescription = null,
+                        modifier = Modifier.size(dimens.bigDim)
+                    )
+                }
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.profile_device_search_on_text1),
@@ -179,10 +191,18 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                     .padding(dimens.searchDeviceBottomTextPadding)
                     .align(Alignment.BottomCenter)
             ) {
-                Text(
-                    text = stringResource(id = R.string.profile_device_search_off_title),
-                    style = types.h1
-                )
+                Row {
+                    Text(
+                        text = stringResource(id = R.string.profile_device_search_off_title),
+                        style = types.h1
+                    )
+                    HSpacerVerySmall()
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_dinamic_off),
+                        contentDescription = null,
+                        modifier = Modifier.size(dimens.bigDim)
+                    )
+                }
                 VSpacerSmall()
                 Text(
                     text = stringResource(id = R.string.profile_device_search_off_text),
@@ -209,25 +229,6 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                 Text(
                     text = stringResource(id = R.string.profile_device_search_connecting_text),
                     color = colors.shadeBlack0
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun SnackBar(@StringRes textId: Int?) {
-        GetLocalProperties { dimens, _, colors, _, types ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimens.snackBarHeight)
-                    .background(color = colors.shadeBlue3)
-            ) {
-                Text(
-                    text = textId?.let { stringResource(id = it) }.orEmpty(),
-                    color = colors.white,
-                    style = types.caption1
                 )
             }
         }

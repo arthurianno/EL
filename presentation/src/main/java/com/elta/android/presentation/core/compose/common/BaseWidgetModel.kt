@@ -19,7 +19,7 @@ abstract class BaseWidgetModel<D> {
         viewModelActionReceiver = receiver
     }
 
-    private var viewModel: BaseViewModel<*, *, in Action>? = null
+    private var viewModel: BaseViewModel<*, in Action>? = null
 
     protected abstract fun createInitState(): D
 

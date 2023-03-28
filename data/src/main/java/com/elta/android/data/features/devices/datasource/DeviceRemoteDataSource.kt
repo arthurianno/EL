@@ -53,5 +53,5 @@ class DeviceRemoteDataSource @Inject constructor(
         glucometersManager.setPrimaryDevice(address)
 
     override fun findGlucometer(address: String): Flow<Unit> =
-        glucometersManager.finGlucometer(address)
+        glucometersManager.findGlucometer(address)
 }

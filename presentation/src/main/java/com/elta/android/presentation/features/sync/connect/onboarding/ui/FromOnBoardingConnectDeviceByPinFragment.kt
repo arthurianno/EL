@@ -1,16 +1,16 @@
 package com.elta.android.presentation.features.sync.connect.onboarding.ui
 
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
-import com.elta.android.presentation.features.sync.connect.base.ui.ConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.base.ui.ConnectDeviceByPinFragment
 import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnBoardingConnectDevicePm
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import me.dmdev.rxpm.bindTo
 
-class FromOnBoardingConnectDeviceFragment : ConnectDeviceFragment<FromOnBoardingConnectDevicePm>() {
+class FromOnBoardingConnectDeviceByPinFragment : ConnectDeviceByPinFragment<FromOnBoardingConnectDevicePm>() {
 
     companion object {
-        fun newInstance() = FromOnBoardingConnectDeviceFragment()
+        fun newInstance() = FromOnBoardingConnectDeviceByPinFragment()
     }
 
     override val classToken: Class<FromOnBoardingConnectDevicePm> =

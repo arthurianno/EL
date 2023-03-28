@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.base.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -28,7 +30,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
-abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
+abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     BaseRecyclerViewFragment<T, FragmentSyncConnectBinding>(FragmentSyncConnectBinding::inflate) {
 
     @Inject
@@ -99,11 +101,14 @@ abstract class ConnectDeviceFragment<T : ConnectDevicePm> :
         }
     }
 
-    override fun handleBack() {
-        if (presentationModel.mstate.valueOrNull == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
-            presentationModel.toAppAction.consumer.accept(Unit)
-        } else {
-            super.handleBack()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            if (presentationModel.mstate.valueOrNull == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
+                presentationModel.toAppAction.consumer.accept(Unit)
+            } else {
+                router.exit()
+            }
         }
     }
 

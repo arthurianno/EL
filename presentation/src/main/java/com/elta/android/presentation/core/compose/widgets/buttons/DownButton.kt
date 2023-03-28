@@ -37,10 +37,6 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
         setState { state.value.copy(enable = enableState) }
     }
 
-    fun onClick() {
-        sendAction(DownButtonClick)
-    }
-
     infix fun visibilityState(visibilityState: Boolean) {
         setState { state.value.copy(visible = visibilityState) }
     }
@@ -54,7 +50,10 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
 }
 
 @Composable
-fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
+fun BoxScope.DownButton(
+    widgetModel: DownButtonWidgetModel,
+    onClickAction: Action = DownButtonClick
+) {
     val state = widgetModel.state.collectAsState()
     GetLocalProperties { dimens, brash, colors, _, _ ->
         val isEnable = state.value.enable
@@ -79,7 +78,7 @@ fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
                         .clickable(
                             enabled = isEnable,
                             role = Role.Button,
-                            onClick = widgetModel::onClick
+                            onClick = { widgetModel.sendAction(onClickAction) }
                         )
                         .fillMaxWidth()
                         .height(dimens.downButtonHeight)

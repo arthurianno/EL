@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.devices.search.viewmodel
 import com.elta.android.domain.features.devices.usecase.FindGlucometerUseCase
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
-import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
@@ -19,7 +18,7 @@ import javax.inject.Inject
 
 class GlucometerSearchViewModel @Inject constructor(
     private val findGlucometer: FindGlucometerUseCase
-) : BaseViewModel<GlucometerSearchViewState, Event, GlucometerSearchAction>() {
+) : BaseViewModel<GlucometerSearchViewState, GlucometerSearchAction>() {
     override fun createInitState(): GlucometerSearchViewState =
         GlucometerSearchViewState(
             searchStatus = GlucometerSearchStatus.Off,

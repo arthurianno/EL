@@ -196,6 +196,7 @@ dependencies {
     implementation(Dependencies.OkHttp.core)
     implementation(Dependencies.OkHttp.loggingInterceptor)
     implementation(Dependencies.Google.gson)
+    implementation(Dependencies.Google.Services.MlKit.barcodeScaner)
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)

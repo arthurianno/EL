@@ -1,5 +1,6 @@
 package com.elta.android.presentation.di
 
+import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
@@ -7,6 +8,12 @@ import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectStartViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectTypeViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -20,15 +27,46 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(CalculatorViewModel::class)
-    abstract fun bindCalculatorViewModel(calculatorViewModel: CalculatorViewModel): ViewModel
+    abstract fun bindCalculatorViewModel(viewModel: CalculatorViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(DishDetailViewModel::class)
-    abstract fun bindDishDetailViewModel(dishDetailViewModel: DishDetailViewModel): ViewModel
+    abstract fun bindDishDetailViewModel(viewModel: DishDetailViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(GlucometerSearchViewModel::class)
-    abstract fun bindGlucometerSearchViewModel(glucometerSearchViewModel: GlucometerSearchViewModel): ViewModel
+    abstract fun bindGlucometerSearchViewModel(viewModel: GlucometerSearchViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConnectTypeViewModel::class)
+    abstract fun bindConnectTypeViewModel(viewModel: ConnectTypeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConnectHelpViewModel::class)
+    abstract fun bindConnectHelpViewModel(viewModel: ConnectHelpViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HowToConnectViewModel::class)
+    @ExperimentalCameraProviderConfiguration
+    abstract fun bindHowToConnectViewModel(viewModel: HowToConnectViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConnectingViewModel::class)
+    abstract fun bindConnectingViewModel(viewModel: ConnectingViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConnectStartViewModel::class)
+    abstract fun bindConnectStartViewModel(viewModel: ConnectStartViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ScannerDmcViewModel::class)
+    abstract fun bindScannerDmcViewModel(viewModel: ScannerDmcViewModel): ViewModel
 }

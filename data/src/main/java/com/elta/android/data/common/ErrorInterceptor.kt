@@ -42,14 +42,14 @@ class ErrorInterceptor @Inject constructor(
         val request = chain.request()
         val response = chain.proceed(request)
 
-        val responseCode = response.code()
+        val responseCode = response.code
         when {
             responseCode == ERROR_CODE_400 || responseCode.firstDigit() == SERVER_ERROR ->
                 throw ServiceUnavailableError()
 
-            responseCode == ERROR_CODE_410 -> throw ProfileIsDeletedError(response.message())
+            responseCode == ERROR_CODE_410 -> throw ProfileIsDeletedError(response.message)
             responseCode == ERROR_CODE_403 -> throw UnauthorizedError()
-            responseCode == ERROR_CODE_404 -> throw NotFoundError(response.message())
+            responseCode == ERROR_CODE_404 -> throw NotFoundError(response.message)
             responseCode >= ERROR_CODE_600 -> {
                 val message = getStringByCode(responseCode)
                 when (responseCode) {

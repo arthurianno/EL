@@ -4,8 +4,9 @@ import android.content.Context
 import com.elta.android.data.R
 import com.elta.android.data.features.firmware.model.FirmwareNetworkResponse
 import io.reactivex.Single
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.greenrobot.essentials.io.IoUtils
 import timber.log.Timber
 
@@ -31,6 +32,6 @@ class MockedFirmwareApi(
     override fun downloadFirmware(version: String): Single<ResponseBody> =
         Single.fromCallable {
             val stream = context.resources.openRawResource(R.raw.satellite_online_30)
-            ResponseBody.create(MediaType.parse("application/octet-stream"), stream.readBytes())
+            stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())
         }
 }

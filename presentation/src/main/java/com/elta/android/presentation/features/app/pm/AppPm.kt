@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
@@ -169,6 +170,7 @@ class AppPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
+            is UnauthorizedError -> router.newRootFlow(Screens.GreetingFlow)
             is NoSuchElementException -> {
                 router.newRootChain(
                     Screens.GreetingFlow,
@@ -230,12 +232,6 @@ class AppPm @Inject constructor(
                 val resources: ResourceProvider,
                 override val text: String = resources.getString(R.string.sync_with_backend_complete),
                 override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
-            ) : SyncStatus()
-
-            data class Error(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.no_connection_to_the_internet),
-                override val color: Int = resources.getColor(R.color.color_background_sync_error)
             ) : SyncStatus()
         }
     }

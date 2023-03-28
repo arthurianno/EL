@@ -61,6 +61,12 @@ object Dependencies {
             const val activity = "androidx.activity:activity-compose:$activityVersion"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-compose:$lifeCycleVersion"
 
+            object Accompanist {
+                private const val version = "0.30.0"
+
+                const val permissions = "com.google.accompanist:accompanist-permissions:$version"
+            }
+
             object Test {
                 const val bomJunit = "androidx.compose.ui:ui-test-junit4"
                 const val bomManifest = "androidx.compose.ui:ui-test-manifest"
@@ -117,6 +123,23 @@ object Dependencies {
 
             const val fitness = "com.google.android.gms:play-services-fitness:$fitnessVersion"
             const val auth = "com.google.android.gms:play-services-auth:$authVersion"
+
+            object MlKit {
+                private const val barcodeScanerVersion = "18.1.0"
+
+                const val barcodeScaner =
+                    "com.google.android.gms:play-services-mlkit-barcode-scanning:$barcodeScanerVersion"
+            }
+
+            object CameraX {
+                private const val cameraxVersion = "1.3.0-alpha05"
+
+                const val core = "androidx.camera:camera-core:$cameraxVersion"
+                const val camera2 = "androidx.camera:camera-camera2:$cameraxVersion"
+                const val lifecycle = "androidx.camera:camera-lifecycle:$cameraxVersion"
+                const val mlKit = "androidx.camera:camera-mlkit-vision:$cameraxVersion"
+                const val extentions = "androidx.camera:camera-extensions:$cameraxVersion"
+            }
         }
 
         object FireBase {
@@ -286,7 +309,7 @@ object Dependencies {
     }
 
     object OkHttp {
-        private const val version = "3.14.9" // 4.10.0
+        private const val version = "5.0.0-alpha.10"
 
         const val core = "com.squareup.okhttp3:okhttp:$version"
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"
@@ -304,5 +327,26 @@ object Dependencies {
 
         const val proto = "androidx.datastore:datastore:$version"
         const val preferences = "androidx.datastore:datastore-preferences:$version"
+    }
+
+    object KoDeIn {
+        private const val version = "7.12.0"
+        private const val versionCompose = "7.12.0"
+
+        const val core = "org.kodein.di:kodein-di:$version"
+        const val androidCore = "org.kodein.di:kodein-di-framework-android-core:$version"
+        const val androidSupport = "org.kodein.di:kodein-di-framework-android-support:$version"
+        const val androidJetpack = "org.kodein.di:kodein-di-framework-android-x:$version"
+        const val androidViewModel =
+            "org.kodein.di:kodein-di-framework-android-x-viewmodel:$version"
+        const val androidViewModelWithState =
+            "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
+        const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
+    }
+
+    object Webim {
+        private const val version = "3.+"
+
+        const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
     }
 }

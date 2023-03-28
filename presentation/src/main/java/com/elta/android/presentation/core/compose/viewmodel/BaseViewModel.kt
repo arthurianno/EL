@@ -1,5 +1,6 @@
 package com.elta.android.presentation.core.compose.viewmodel
 
+import android.os.Bundle
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,7 +26,7 @@ import timber.log.Timber
 
 @Suppress("UNCHECKED_CAST")
 @Stable
-abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
+abstract class BaseViewModel<ST, AC : Action> : ViewModel() {
     private val initState: ST
         get() = createInitState()
 
@@ -42,9 +43,9 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         get() = _state.asStateFlow()
     private val action = MutableSharedFlow<AC>()
 
-    private val _event = MutableSharedFlow<EV?>()
+    private val _event = MutableSharedFlow<Event?>()
 
-    val event: SharedFlow<EV?>
+    val event: SharedFlow<Event?>
         get() = _event.asSharedFlow()
 
     init {
@@ -57,7 +58,9 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         _router = router
     }
 
-    fun routerIsNotSet(): Boolean = _router == null
+    internal fun routerIsNotSet(): Boolean = _router == null
+
+    open fun handleFragmentArguments(arguments: Bundle) {}
 
     open fun backClick() {
         router.exit()
@@ -82,7 +85,7 @@ abstract class BaseViewModel<ST, EV : Event, AC : Action> : ViewModel() {
         Timber.e(error, message ?: error.message.orEmpty())
     }
 
-    protected fun sendEvent(event: EV) {
+    protected fun sendEvent(event: Event) {
         launch {
             _event.emit(event)
         }

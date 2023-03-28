@@ -11,7 +11,6 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
@@ -39,7 +38,7 @@ class CalculatorViewModel @Inject constructor(
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
-    BaseViewModel<CalculatorViewState, Event, CalculatorAction>() {
+    BaseViewModel<CalculatorViewState, CalculatorAction>() {
     override fun createInitState(): CalculatorViewState =
         CalculatorViewState(
             dishes = emptyList(),

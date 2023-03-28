@@ -1,6 +1,5 @@
 package com.elta.android.presentation.core.ui.activity
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.AppNavigator
-import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
@@ -31,12 +29,9 @@ import me.dmdev.rxpm.base.PmActivity
 import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
-@Suppress("TooManyFunctions")
-@SuppressLint("MissingSuperCall")
 abstract class BaseActivity<T : BasePm> :
     PmActivity<T>(),
     HasSupportFragmentInjector,
-    BackHandler,
     RouterProvider {
 
     @Inject
@@ -89,20 +84,12 @@ abstract class BaseActivity<T : BasePm> :
         super.onPause()
     }
 
-    override fun onBackPressed() {
-        if (currentFragment != null) {
-            currentFragment?.handleBack()
-        } else {
-            handleBack()
-        }
-    }
-
     override fun onBindPresentationModel(pm: T) {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.subscribe { onBackPressed() }
-        pm.showSnackBarCommand.bindTo { showSnackbar(it) }
+        homeButtonView?.clicks()?.subscribe { router.exit() }
+        pm.showSnackBarCommand.bindTo { showSnackBar(it) }
     }
 
     override fun providePresentationModel(): T {
@@ -113,10 +100,6 @@ abstract class BaseActivity<T : BasePm> :
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentInjector
 
-    override fun handleBack() {
-        router.exit()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         var fragment = supportFragmentManager.findFragmentById(R.id.containerView)
@@ -126,7 +109,7 @@ abstract class BaseActivity<T : BasePm> :
         } while (fragment != null)
     }
 
-    private fun showSnackbar(data: SnackBarData) {
+    private fun showSnackBar(data: SnackBarData) {
         findViewById<View>(android.R.id.content)?.let { content ->
             makeSnackBar(content, data).show()
         }
