@@ -447,7 +447,7 @@ class GlucometersManager @Inject constructor(
         }
 
     @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun finGlucometer(address: String): Flow<Unit> =
+    fun findGlucometer(address: String): Flow<Unit> =
         client.findConnection(address)
             .checkPinAndSend(address)
             .asFlow()

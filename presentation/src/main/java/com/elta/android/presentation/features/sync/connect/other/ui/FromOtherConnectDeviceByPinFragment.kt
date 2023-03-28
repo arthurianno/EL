@@ -3,12 +3,12 @@ package com.elta.android.presentation.features.sync.connect.other.ui
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.sync.connect.base.ui.ConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.base.ui.ConnectDeviceByPinFragment
 import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePm
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 
-class FromOtherConnectDeviceFragment : ConnectDeviceFragment<FromOtherConnectDevicePm>() {
+class FromOtherConnectDeviceByPinFragment : ConnectDeviceByPinFragment<FromOtherConnectDevicePm>() {
 
     override val classToken: Class<FromOtherConnectDevicePm> = FromOtherConnectDevicePm::class.java
 
@@ -22,6 +22,6 @@ class FromOtherConnectDeviceFragment : ConnectDeviceFragment<FromOtherConnectDev
     }
 
     companion object {
-        fun newInstance() = FromOtherConnectDeviceFragment()
+        fun newInstance() = FromOtherConnectDeviceByPinFragment()
     }
 }

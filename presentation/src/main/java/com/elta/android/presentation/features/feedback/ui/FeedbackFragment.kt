@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.feedback.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentFeedbackBinding
@@ -16,9 +18,13 @@ import me.dmdev.rxpm.widget.bindTo
 
 class FeedbackFragment :
     BaseFragment<FeedbackPm, FragmentFeedbackBinding>(FragmentFeedbackBinding::inflate) {
+    companion object {
+        fun newInstance() = FeedbackFragment()
+    }
 
     override val screenLayout: Int = R.layout.fragment_feedback
     override val classToken: Class<FeedbackPm> = FeedbackPm::class.java
+
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,12 +47,11 @@ class FeedbackFragment :
         binding.sendFeedbackButtonView.clicks() bindTo pm.continueAction
     }
 
-    override fun handleBack() {
-        view?.hideKeyboardFun()
-        super.handleBack()
-    }
-
-    companion object {
-        fun newInstance() = FeedbackFragment()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            view?.hideKeyboardFun()
+            router.exit()
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.dialog.buttons
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.databinding.FragmentHomeFlowBinding
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
@@ -36,8 +38,13 @@ import me.dmdev.rxpm.widget.DialogControl
 import me.dmdev.rxpm.widget.bindTo
 import javax.inject.Inject
 
+private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
+
 class HomeFlowFragment :
     BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(FragmentHomeFlowBinding::inflate) {
+    companion object {
+        fun newInstance() = HomeFlowFragment()
+    }
 
     override val screenLayout: Int = R.layout.fragment_home_flow
     override val classToken: Class<HomeFlowPm> = HomeFlowPm::class.java
@@ -108,9 +115,10 @@ class HomeFlowFragment :
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
-    override fun handleBack() {
-        if (!binding.homeBottomSheetView.handleBack()) {
-            super.handleBack()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            if (!binding.homeBottomSheetView.handleBack()) router.exit()
         }
     }
 
@@ -140,9 +148,4 @@ class HomeFlowFragment :
                 .buttons(dc, data)
                 .build()
         }
-
-    companion object {
-        fun newInstance() = HomeFlowFragment()
-        private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
-    }
 }

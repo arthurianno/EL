@@ -221,7 +221,7 @@ class OnBoardingPm @Inject constructor(
         UpdateUserInfoUseCase.Params(UserInfo(isEmailConfirmed = true))
 
     private fun handleSuccess() {
-        router.newRootScreen(Screens.FromOnBoardingSyncFlow)
+        router.newRootScreen(Screens.ConnectStartScreen(isOnBoarding = true))
     }
 
     private fun createOnBoardingEvent(): AnalyticsEvent? {

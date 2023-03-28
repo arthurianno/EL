@@ -412,7 +412,7 @@ class HomeFlowPm @Inject constructor(
 
     private fun handleSyncError(error: Throwable) {
         when (error) {
-            is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.FromOtherSyncFlow)
+            is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false))
             is GlucometerSyncError ->
                 when (error.cause) {
                     is GlucometerOfflineError -> showRetrySyncAction.consumer.accept(Unit)

@@ -1,5 +1,6 @@
 package com.elta.android.data.features.userinfo.datasource
 
+import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.storage.UserHolder
@@ -18,7 +19,7 @@ class UserInfoCachedDataSource @Inject constructor(
             userHolder.currentUser?.let {
                 cache.get(CommonConditions.ById(it))
                     ?: throw NoSuchElementException("Current user is empty.")
-            } ?: throw NoSuchElementException("Current user is not exist.")
+            } ?: throw UnauthorizedError()
         }
 
     override fun updateUserInfo(userInfo: UserInfoCacheDto): Completable =

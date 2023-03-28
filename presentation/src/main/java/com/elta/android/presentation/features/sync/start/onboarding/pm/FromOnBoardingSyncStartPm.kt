@@ -10,6 +10,6 @@ class FromOnBoardingSyncStartPm @Inject constructor(
 ) : SyncStartPm(services) {
 
     override fun navigateToConnectDeviceScreen(i: Unit) {
-        router.navigateTo(Screens.FromOnBoardingConnectDevice)
+        router.navigateTo(Screens.FromOnBoardingConnectDeviceByPin)
     }
 }

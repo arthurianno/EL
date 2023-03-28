@@ -59,21 +59,4 @@ abstract class BaseFlowFragment<T : BasePm, B : ViewBinding>(
         navigatorHolder.removeNavigator()
         super.onPause()
     }
-
-    override fun handleBack() {
-        if (maybeChildrenHandleBack()) {
-            currentFragment?.handleBack()
-        } else {
-            router.finishFlow()
-        }
-    }
-
-    @Suppress("UnnecessaryParentheses")
-    private fun maybeChildrenHandleBack(): Boolean {
-        currentFragment?.let {
-            return childFragmentManager.backStackEntryCount > 0 ||
-                (it is BaseFlowFragment && it.childFragmentManager.backStackEntryCount > 0)
-        }
-        return false
-    }
 }
