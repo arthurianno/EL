@@ -46,6 +46,14 @@ object Dependencies {
         const val annotations = "androidx.annotation:annotation:$annotationsVersion"
         const val browser = "androidx.browser:browser:$browserVersion"
 
+        object WorkManager {
+            private const val version = "2.8.1"
+
+            const val core = "androidx.work:work-runtime-ktx:$version"
+            const val rxJava2 = "androidx.work:work-rxjava2:$version"
+            const val test = "androidx.work:work-testing:$version"
+        }
+
         object Compose {
             const val compilerVersion = "1.3.2"
 
@@ -145,7 +153,7 @@ object Dependencies {
         object FireBase {
             const val pluginVersion = "2.0.0"
             const val crashliticsGradleVersion = "2.9.0"
-            private const val bomVersion = "31.0.1"
+            private const val bomVersion = "31.4.0"
 
             const val bom = "com.google.firebase:firebase-bom:$bomVersion"
             const val messagingBom = "com.google.firebase:firebase-messaging-ktx"

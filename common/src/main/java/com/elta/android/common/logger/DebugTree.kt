@@ -1,19 +1,11 @@
 package com.elta.android.common.logger
 
-import android.content.Context
-import android.util.Log
-import com.elta.android.common.logger.model.DeviceDetails
+import java.io.File
 
-class DebugTree(deviceDetails: DeviceDetails, context: Context) : BaseTree(deviceDetails, context) {
+class DebugTree(
+    logsFile: File,
+    private val enableLog: Boolean
+) : BaseTree(logsFile) {
 
-    override fun log(priority: Int, tag: String?, message: String, error: Throwable?) {
-        super.log(priority, tag, message, error)
-        val localTag = tag ?: DEFAULT_TAG
-        val logRecord = logs.last()
-        saveLogInFile(logRecord)
-        storeToFirebase(logRecord)
-        error?.let {
-            Log.e(localTag, message, error)
-        } ?: Log.println(priority, localTag, message)
-    }
+    override fun isLoggable(tag: String?, priority: Int): Boolean = enableLog
 }

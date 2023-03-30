@@ -15,7 +15,7 @@ object AppConfig {
 
     object LogEnabled {
         const val debug = true
-        const val release = false
+        const val release = true
     }
 }
 

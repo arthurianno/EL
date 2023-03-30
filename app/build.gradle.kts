@@ -78,11 +78,6 @@ android {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
             versionNameSuffix = Version.prodNameSuffix
-            buildConfigField(
-                "String",
-                "APP_VERSION",
-                "\"${Version.versionName}$versionNameSuffix\""
-            )
             signingConfig = signingConfigs["debug"]
             isDebuggable = true
         }
@@ -106,6 +101,7 @@ android {
         create("releaseDev") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            versionNameSuffix = "-${BackendVariant.dev.name}"
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -121,6 +117,7 @@ android {
         create("releaseStage") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
+            versionNameSuffix = "-${BackendVariant.stage.name}"
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")

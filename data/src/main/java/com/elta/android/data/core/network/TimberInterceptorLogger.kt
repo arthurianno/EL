@@ -7,5 +7,5 @@ class TimberInterceptorLogger(
     private val tag: String
 ) : HttpLoggingInterceptor.Logger {
 
-    override fun log(message: String) = Timber.tag(tag).d(message)
+    override fun log(message: String) = Timber.tag(tag).i(message)
 }
