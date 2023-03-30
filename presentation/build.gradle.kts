@@ -10,8 +10,6 @@ android {
 
     defaultConfig {
         minSdk = AppConfig.minSdk
-        targetSdk = AppConfig.targetSdk
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
@@ -59,10 +57,18 @@ android {
             buildConfigField("String", "APP_VERSION", debugVersionName)
         }
         create("releaseDev") {
-            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
         }
         create("releaseStage") {
-            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
         }
     }
 }
@@ -157,4 +163,5 @@ dependencies {
     implementation(Dependencies.CustomView.cardView)
 
     testBaseDependencies()
+    androidTestImplementation(Dependencies.Jetpack.WorkManager.test)
 }

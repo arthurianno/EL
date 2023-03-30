@@ -80,8 +80,9 @@ class AppActivity : BaseActivity<AppPm>() {
     }
 
     override fun onStop() {
-        super.onStop()
+        presentationModel.uploadLogs()
         findLastNestedFragmentAndSendEvent(currentFragment)
+        super.onStop()
     }
 
     private tailrec fun findLastNestedFragmentAndSendEvent(parentFragment: BaseFragment<*, *>?) {

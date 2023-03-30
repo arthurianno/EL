@@ -2,6 +2,8 @@ package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
 import com.elta.android.common.errors.UnauthorizedError
+import com.elta.android.common.logger.FirebaseStorage
+import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
@@ -34,6 +36,8 @@ private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
+    private val getUserId: GetUserIdUseCase,
+    private val firebaseStorage: FirebaseStorage,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -55,6 +59,9 @@ class AppPm @Inject constructor(
             .flatMapSingle {
                 getUserInfo.execute()
                     .doOnSuccess { user ->
+                        getUserId.execute()
+                            .doOnSuccess { firebaseStorage.userLogin = it }
+                            .subscribe()
                         when {
                             !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
                             !user.isEmailConfirmed -> router.newRootChain(
@@ -166,6 +173,10 @@ class AppPm @Inject constructor(
             }
             .subscribe()
             .untilDestroy()
+    }
+
+    fun uploadLogs() {
+        firebaseStorage.uploadLogFile()
     }
 
     override fun handleError(error: Throwable) {
