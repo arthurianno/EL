@@ -4,12 +4,15 @@ import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
 import javax.inject.Inject
+
+private const val SOURCE_PROFILE = "profile"
 
 class FromOtherConnectDevicePm @Inject constructor(
     syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
@@ -37,10 +40,6 @@ class FromOtherConnectDevicePm @Inject constructor(
 
     override fun navigateToApp(i: Unit) {
         bus.event(Events.DeviceChanged)
-        router.finishFlow()
-    }
-
-    companion object {
-        private const val SOURCE_PROFILE = "profile"
+        router.backTo(Screens.Devices)
     }
 }
