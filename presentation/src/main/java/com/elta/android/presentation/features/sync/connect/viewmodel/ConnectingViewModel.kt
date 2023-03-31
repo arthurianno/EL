@@ -4,7 +4,9 @@ import android.os.Bundle
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
@@ -18,6 +20,7 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
 import com.elta.android.presentation.features.sync.connect.model.ConnectingStageType
 import com.elta.android.presentation.features.sync.connect.model.ConnectingViewState
+import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -36,7 +39,8 @@ private const val CONNECT_DEVICE_TIMEOUT_SEC = 60L
 class ConnectingViewModel @Inject constructor(
     private val findGlucometers: FindGlucometersUseCase,
     private val connectDevice: ConnectDeviceUseCase,
-    private val syncWithGlucometer: SyncWithGlucometerUseCase
+    private val syncWithGlucometer: SyncWithGlucometerUseCase,
+    private val bus: RxBus
 ) :
     BaseViewModel<ConnectingViewState, ConnectAction>() {
     override fun createInitState(): ConnectingViewState =
@@ -91,10 +95,19 @@ class ConnectingViewModel @Inject constructor(
                     is ConnectAction.NeedHelp -> sendEvent(ConnectMainEvent.ShowSheet())
                     is AppAction.BackPressure -> backClick()
                     is ConnectAction.ConnectByPin -> connectByPin()
-                    is ConnectAction.Complete -> router.newRootScreen(Screens.HomeFlow)
+                    is ConnectAction.Complete -> completeConnect()
                 }
                 currentState
             }
+        }
+    }
+
+    private fun completeConnect() {
+        if (state.value.isOnBoarding) {
+            router.newRootScreen(Screens.HomeFlow)
+        } else {
+            bus.event(Events.DeviceChanged)
+            router.backTo(Screens.Devices)
         }
     }
 
