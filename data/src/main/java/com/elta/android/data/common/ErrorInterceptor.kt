@@ -25,6 +25,7 @@ private const val ERROR_CODE_404 = 404
 private const val ERROR_CODE_410 = 410
 private const val ERROR_CODE_600 = 600
 private const val ERROR_CODE_603 = 603
+private const val ERROR_CODE_604 = 604
 private const val ERROR_CODE_605 = 605
 private const val ERROR_CODE_606 = 606
 private const val ERROR_CODE_607 = 607
@@ -55,6 +56,7 @@ class ErrorInterceptor @Inject constructor(
                 when (responseCode) {
                     ERROR_CODE_600 -> throw IncorrectLoginOrPasswordError(message)
                     ERROR_CODE_603 -> throw EmailAlreadyRegisteredError(message)
+                    ERROR_CODE_604 -> throw InvalidRefreshTokenError(message)
                     ERROR_CODE_605 -> throw InvalidRefreshTokenError(message)
                     ERROR_CODE_606 -> throw EmailAlreadyConfirmedError(message)
                     ERROR_CODE_607 -> throw EmailLinkInvalid(message)
