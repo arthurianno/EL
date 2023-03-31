@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.devices.search
 
+import android.content.Context
 import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAn
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.snackbar.BaseSnackBar
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.features.devices.search.model.GlucometerSearchStatus
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.devices.search.widgets.GlucometerSearchButton
@@ -72,6 +74,11 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getString(ADDRESS_ARGUMENT_ID)?.let { viewModel.setGlucometerAddress(it) }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback { viewModel.backClick() }
     }
 
     @Composable
