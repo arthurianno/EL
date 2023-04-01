@@ -65,6 +65,7 @@
     <string name="auth_title">С возвращением!</string>
     <string name="auth_subtitle">Чтобы продолжить, введите ваш email\nи пароль от аккаунта</string>
     <string name="auth_button_continue">Войти</string>
+    <string name="auth_email_and_password_not_correct">Некорректный email или пароль</string>
 
     <string name="auth_password_recovery_title">Восстановление пароля</string>
     <string name="auth_password_recovery_subtitle">Введите email, указанный при регистрации аккаунта в нашем приложении</string>

@@ -58,7 +58,7 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
                 setErrorStateData(
                     States.SimpleError(
                         icon = R.drawable.ic_warning,
-                        description = resources.getString(R.string.user_not_found)
+                        description = resources.getString(R.string.auth_email_and_password_not_correct)
                     )
                 )
                 setErrorViewVisibility(true)
