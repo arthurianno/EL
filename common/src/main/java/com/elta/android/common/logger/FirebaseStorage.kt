@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters
 import com.elta.android.common.logger.model.DeviceDetails
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -21,6 +22,7 @@ import java.util.Locale
 
 private const val FIREBASE_STORAGE_PATH_KEY = "firebase_storage_path"
 private const val LOCAL_FILE_URI_KEY = "local_file_uri"
+private const val UPLOAD_ERROR_LOG_MESSAGE = "Upload log file is failure"
 
 class FirebaseStorage(private val context: Context) {
 
@@ -80,9 +82,10 @@ internal class UploadWorker(context: Context, params: WorkerParameters) :
         return try {
             Firebase.storage.reference.child(storagePath)
                 .putFile(localLogsFileUri)
-                .addOnFailureListener { throw Exception() }
+                .addOnFailureListener { Timber.e(it, UPLOAD_ERROR_LOG_MESSAGE) }
             Result.success()
         } catch (e: Exception) {
+            Timber.e(e, UPLOAD_ERROR_LOG_MESSAGE)
             Result.failure()
         }
     }
