@@ -32,14 +32,7 @@ class ScannerDmcViewModel @Inject constructor() :
             cropRect = DpSize.Zero
         )
 
-    private val closeTimer =
-        object : CountDownTimer(CLOSE_TIMER_DELAY_MILLIS, CLOSE_TIMER_DELAY_MILLIS) {
-            override fun onTick(millisUntilFinished: Long) {}
-
-            override fun onFinish() {
-                backClick()
-            }
-        }
+    private var closeTimer: CountDownTimer? = null
 
     internal val connectByPinButton = DownButtonWidgetModel()
     internal val appTopBar = BaseAppTopBarWidgetModel()
@@ -95,6 +88,7 @@ class ScannerDmcViewModel @Inject constructor() :
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
+            Lifecycle.Event.ON_START -> createStopTimer()
             Lifecycle.Event.ON_RESUME -> restartCloseTime()
             Lifecycle.Event.ON_PAUSE -> stopCloseTime()
             else -> Unit
@@ -102,12 +96,23 @@ class ScannerDmcViewModel @Inject constructor() :
     }
 
     private fun restartCloseTime() {
-        closeTimer.cancel()
-        closeTimer.start()
+        closeTimer?.cancel()
+        closeTimer?.start()
     }
 
     private fun stopCloseTime() {
-        closeTimer.cancel()
+        closeTimer?.cancel()
+        closeTimer = null
+    }
+
+    private fun createStopTimer() {
+        closeTimer = object : CountDownTimer(CLOSE_TIMER_DELAY_MILLIS, CLOSE_TIMER_DELAY_MILLIS) {
+            override fun onTick(millisUntilFinished: Long) {}
+
+            override fun onFinish() {
+                backClick()
+            }
+        }
     }
 
     private fun reloadSheetContent(newContentType: ScannerState): ScannerDmcViewState = run {

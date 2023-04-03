@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.sync.connect.model
 
 import com.elta.android.presentation.core.compose.common.Action
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.PermissionState
 
 sealed class ConnectAction : Action {
     object NeedHelp : ConnectAction()
@@ -16,5 +16,7 @@ sealed class ConnectAction : Action {
     object SkipNextStep : ConnectAction()
 
     @OptIn(ExperimentalPermissionsApi::class)
-    data class OpenConnectingScreen(val permissionStatus: PermissionStatus) : ConnectAction()
+    data class OpenConnectingScreen(
+        val permissionsStatus: List<PermissionState>
+    ) : ConnectAction()
 }

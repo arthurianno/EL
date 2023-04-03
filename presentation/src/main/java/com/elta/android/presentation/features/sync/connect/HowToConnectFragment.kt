@@ -35,8 +35,13 @@ import com.elta.android.presentation.features.sync.connect.widgets.TextNumericIt
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+
+private val requiredPermissions = listOf(
+    Manifest.permission.CAMERA,
+    Manifest.permission.ACCESS_FINE_LOCATION
+)
 
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     companion object {
@@ -57,10 +62,15 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     override fun Content(viewModel: HowToConnectViewModel) {
-        val cameraPermission = rememberPermissionState(permission = Manifest.permission.CAMERA)
+        val cameraPermission =
+            rememberMultiplePermissionsState(permissions = requiredPermissions)
         val event = viewModel.event.collectAsState(initial = null).value
         LaunchedEffect(key1 = event) {
-            if (event is PermissionEvent.Camera) cameraPermission.launchPermissionRequest()
+            if (event is PermissionEvent.Camera ||
+                event is PermissionEvent.FineLocation
+            ) {
+                cameraPermission.launchMultiplePermissionRequest()
+            }
         }
         GetLocalProperties { dimens, _, _, _, _ ->
             Column(
@@ -81,12 +91,12 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     @Composable
     private fun ScanButton(
         viewModel: HowToConnectViewModel,
-        cameraPermission: PermissionState
+        cameraPermission: MultiplePermissionsState
     ) {
         Box {
             DownButton(
                 widgetModel = viewModel.downButton,
-                onClickAction = ConnectAction.OpenConnectingScreen(cameraPermission.status)
+                onClickAction = ConnectAction.OpenConnectingScreen(cameraPermission.permissions)
             )
         }
     }

@@ -11,4 +11,5 @@ sealed class PermissionEvent : Event {
     class Storage : PermissionEvent()
     class RecordAudio : PermissionEvent()
     class Camera : PermissionEvent()
+    class FineLocation : PermissionEvent()
 }
