@@ -13,6 +13,7 @@ import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.HowToConnectViewState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import javax.inject.Inject
 
@@ -39,13 +40,23 @@ class HowToConnectViewModel @Inject constructor() :
     ): HowToConnectViewState {
         when (action) {
             is AppAction.BackPressure -> backClick()
-            is ConnectAction.OpenConnectingScreen -> if (action.permissionStatus.isGranted) {
-                router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
-            } else {
-                sendEvent(PermissionEvent.Camera())
-            }
+            is ConnectAction.OpenConnectingScreen -> checkPermissions(action.permissionsStatus)
         }
         return currentState
+    }
+
+    private fun checkPermissions(permissionStates: List<PermissionState>) {
+        if (permissionStates.all { it.status.isGranted }) {
+            router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
+        } else {
+            sendEvent(
+                if (!permissionStates.component1().status.isGranted) {
+                    PermissionEvent.Camera()
+                } else {
+                    PermissionEvent.FineLocation()
+                }
+            )
+        }
     }
 
     override fun handleFragmentArguments(arguments: Bundle) {
