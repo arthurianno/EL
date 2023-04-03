@@ -7,6 +7,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.core.Analytics
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
@@ -23,8 +26,9 @@ import javax.inject.Inject
 private const val SCANNER_ERROR_SHOWING_DELAY_MILLIS = 1000L
 private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 
-class ScannerDmcViewModel @Inject constructor() :
-    BaseViewModel<ScannerDmcViewState, ConnectAction>(), LifecycleEventObserver {
+class ScannerDmcViewModel @Inject constructor(
+    private val analytics: Analytics
+) : BaseViewModel<ScannerDmcViewState, ConnectAction>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewState =
         ScannerDmcViewState(
             scannerState = ScannerState.Info,
@@ -122,6 +126,7 @@ class ScannerDmcViewModel @Inject constructor() :
 
     private fun connectByPin() {
         sendEvent(ConnectMainEvent.HideSheet())
+        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
         router.navigateTo(
             if (state.value.isOnBoarding) {
                 Screens.FromOnBoardingConnectDeviceByPin

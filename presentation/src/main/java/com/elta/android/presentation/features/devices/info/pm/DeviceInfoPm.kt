@@ -11,6 +11,7 @@ import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -77,6 +78,7 @@ class DeviceInfoPm @Inject constructor(
     private fun observeBluetoothEnable() {
         bluetoothEnabledAction.observable
             .doOnError(::handleError)
+            .trackEvent(AnalyticsEventType.TURN_ON_SEARCH)
             .subscribe {
                 glucometer?.address?.let { router.navigateTo(Screens.DeviceSearch(it)) }
             }

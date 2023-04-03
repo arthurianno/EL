@@ -31,9 +31,13 @@ import androidx.annotation.StringDef
     AnalyticsEventType.GLYCATED_HEMOGLOBIN_ADD,
     AnalyticsEventType.PERIOD_TAB,
     AnalyticsEventType.APP_EXIT,
-    AnalyticsEventType.GLUCOMETERS_OPEN
+    AnalyticsEventType.GLUCOMETERS_OPEN,
+    AnalyticsEventType.TURN_ON_SEARCH,
+    AnalyticsEventType.FIND_GLUCOMETER,
+    AnalyticsEventType.SCAN_DMC,
+    AnalyticsEventType.PIN_CONNECTION
 )
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class AnalyticsEventType {
     companion object {
         const val APP_LAUNCH = "app_launch"
@@ -63,5 +67,9 @@ annotation class AnalyticsEventType {
         const val PERIOD_TAB = "period_tab"
         const val APP_EXIT = "app_exit"
         const val GLUCOMETERS_OPEN = "glucometers_open"
+        const val TURN_ON_SEARCH = "turn_on_search"
+        const val FIND_GLUCOMETER = "find_glucometer"
+        const val SCAN_DMC = "scan_dmc"
+        const val PIN_CONNECTION = "pin_connection"
     }
 }
