@@ -6,6 +6,9 @@ import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCas
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytics.core.Analytics
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -40,7 +43,8 @@ class ConnectingViewModel @Inject constructor(
     private val findGlucometers: FindGlucometersUseCase,
     private val connectDevice: ConnectDeviceUseCase,
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
-    private val bus: RxBus
+    private val bus: RxBus,
+    private val analytics: Analytics
 ) :
     BaseViewModel<ConnectingViewState, ConnectAction>() {
     override fun createInitState(): ConnectingViewState =
@@ -123,6 +127,7 @@ class ConnectingViewModel @Inject constructor(
 
     private fun connectByPin() {
         sendEvent(ConnectMainEvent.HideSheet())
+        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
         router.navigateTo(
             if (state.value.isOnBoarding) {
                 Screens.FromOnBoardingConnectDeviceByPin

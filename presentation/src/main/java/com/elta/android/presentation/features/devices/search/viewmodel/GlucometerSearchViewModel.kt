@@ -1,6 +1,9 @@
 package com.elta.android.presentation.features.devices.search.viewmodel
 
 import com.elta.android.domain.features.devices.usecase.FindGlucometerUseCase
+import com.elta.android.presentation.analytics.core.Analytics
+import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
@@ -17,7 +20,8 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class GlucometerSearchViewModel @Inject constructor(
-    private val findGlucometer: FindGlucometerUseCase
+    private val findGlucometer: FindGlucometerUseCase,
+    private val analytics: Analytics
 ) : BaseViewModel<GlucometerSearchViewState, GlucometerSearchAction>() {
     override fun createInitState(): GlucometerSearchViewState =
         GlucometerSearchViewState(
@@ -81,6 +85,7 @@ class GlucometerSearchViewModel @Inject constructor(
     private fun connectAndLaunchSearch() {
         findingJob?.cancel()
         findingJob = launch {
+            analytics.trackEvent(AnalyticsEvent(name = AnalyticsEventType.FIND_GLUCOMETER))
             findGlucometer(glucometerAddress)
                 .catch {
                     reduceState { state.value.copy(searchStatus = GlucometerSearchStatus.DeviceNotFound) }
