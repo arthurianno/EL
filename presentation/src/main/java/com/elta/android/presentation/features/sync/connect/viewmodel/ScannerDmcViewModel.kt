@@ -1,7 +1,11 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.compose.ui.unit.DpSize
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -17,15 +21,25 @@ import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 private const val SCANNER_ERROR_SHOWING_DELAY_MILLIS = 1000L
+private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 
 class ScannerDmcViewModel @Inject constructor() :
-    BaseViewModel<ScannerDmcViewState, ConnectAction>() {
+    BaseViewModel<ScannerDmcViewState, ConnectAction>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewState =
         ScannerDmcViewState(
             scannerState = ScannerState.Info,
             isOnBoarding = false,
             cropRect = DpSize.Zero
         )
+
+    private val closeTimer =
+        object : CountDownTimer(CLOSE_TIMER_DELAY_MILLIS, CLOSE_TIMER_DELAY_MILLIS) {
+            override fun onTick(millisUntilFinished: Long) {}
+
+            override fun onFinish() {
+                backClick()
+            }
+        }
 
     internal val connectByPinButton = DownButtonWidgetModel()
     internal val appTopBar = BaseAppTopBarWidgetModel()
@@ -40,6 +54,7 @@ class ScannerDmcViewModel @Inject constructor() :
     }
 
     fun setScannerError() {
+        restartCloseTime()
         launch {
             reduceState { state.value.copy(scannerState = ScannerState.Error) }
             delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
@@ -61,7 +76,7 @@ class ScannerDmcViewModel @Inject constructor() :
             else -> {
                 when (action) {
                     is ConnectAction.ConnectByPin -> connectByPin()
-                    is AppAction.BackPressure -> router.exit()
+                    is AppAction.BackPressure -> backClick()
                 }
                 currentState
             }
@@ -76,6 +91,23 @@ class ScannerDmcViewModel @Inject constructor() :
                 )
             )
         }
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> restartCloseTime()
+            Lifecycle.Event.ON_PAUSE -> stopCloseTime()
+            else -> Unit
+        }
+    }
+
+    private fun restartCloseTime() {
+        closeTimer.cancel()
+        closeTimer.start()
+    }
+
+    private fun stopCloseTime() {
+        closeTimer.cancel()
     }
 
     private fun reloadSheetContent(newContentType: ScannerState): ScannerDmcViewState = run {
