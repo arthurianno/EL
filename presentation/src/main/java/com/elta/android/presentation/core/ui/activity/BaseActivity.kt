@@ -84,6 +84,11 @@ abstract class BaseActivity<T : BasePm> :
         super.onPause()
     }
 
+    override fun onResume() {
+        super.onResume()
+        presentationModel.sendDateChangedEvent()
+    }
+
     override fun onBindPresentationModel(pm: T) {
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }

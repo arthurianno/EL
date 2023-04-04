@@ -6,6 +6,8 @@ import androidx.annotation.StringRes
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.analytics.trackEvent
+import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.core.pm.listeners.Trackable
@@ -33,7 +35,6 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 private const val ACTION_DEBOUNCE_MILLIS = 500L
-private const val RELOAD_DELAY_MILLIS = 3000L
 
 @Suppress("SpreadOperator")
 abstract class BasePm(
@@ -89,6 +90,10 @@ abstract class BasePm(
                 .subscribe()
                 .untilDestroy()
         }
+    }
+
+    internal fun sendDateChangedEvent() {
+        bus.event(DateChangedEvent)
     }
 
     internal fun showSnackBar(data: SnackBarData) {
