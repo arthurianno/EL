@@ -22,8 +22,6 @@ import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
-private const val FORMAT_MONTH_NAME_AND_YEAR = "LLLL yyyy"
-
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
@@ -61,10 +59,13 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun observeEvents() {
+        bus.events<DateChangedEvent>()
+            .subscribe { todayClickedAction.consumer.accept(Unit) }
+            .untilDestroy()
+
         Observable.merge(
             selectedDateState.observable.map { Unit },
             bus.events<Events.EventsChanged>().map { Unit },
-            bus.events<DateChangedEvent>().map { Unit }
         )
             .map { selectedDateState.value }
             .subscribe(loadScreenAction.consumer)
