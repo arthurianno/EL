@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.sync.connect
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -86,7 +85,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     @Composable
-    override fun Dialogs() {
+    override fun Dialogs(viewModel: ConnectingViewModel) {
         BaseDialog(widgetModel = viewModel.exitDialogFromConnecting)
         BaseDialog(widgetModel = viewModel.exitDialogFromSync)
     }
@@ -95,7 +94,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     @Composable
     override fun Content(viewModel: ConnectingViewModel) {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-        val state = viewModel.state.collectAsState()
+        val state = viewModel.state.collectAsState().value
         val event = viewModel.event.collectAsState(initial = null).value
         LaunchedEffect(key1 = event) {
             when (event) {
@@ -110,7 +109,9 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 sheetContent = {
                     HelpBottomSheet(
                         downButtonModel = viewModel.connectByPinButton,
-                        closeOnClick = viewModel::closeBottomSheet
+                        closeOnClick = {
+                            viewModel sendAction ConnectAction.CloseHelp
+                        }
                     )
                 },
                 sheetShape = shapes.sheet,
@@ -123,15 +124,22 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                         .fillMaxSize()
                         .systemBarsPadding()
                 ) {
-                    Header(state.value.stageType)
-                    Footer(state.value.stageType)
+                    Header(viewModel, state.stageType)
+                    Footer(
+                        viewModel = viewModel,
+                        stageType = state.stageType,
+                        glucometerName = state.glucometerName
+                    )
                 }
             }
         }
     }
 
     @Composable
-    private fun ColumnScope.Header(stageType: ConnectingStageType) {
+    private fun ColumnScope.Header(
+        viewModel: ConnectingViewModel,
+        stageType: ConnectingStageType
+    ) {
         val isCompleted =
             stageType == ConnectingStageType.Complete || stageType == ConnectingStageType.Sync
         AppTopBar(
@@ -149,19 +157,23 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     @Composable
-    private fun Footer(stageType: ConnectingStageType) {
+    private fun Footer(
+        viewModel: ConnectingViewModel,
+        stageType: ConnectingStageType,
+        glucometerName: String
+    ) {
         when (stageType) {
             ConnectingStageType.Connecting -> ConnectingFooter()
-            ConnectingStageType.DeviceNotFound -> DeviceNotFoundFooter()
-            ConnectingStageType.ErrorConnect -> ErrorConnectFooter()
-            ConnectingStageType.Sync -> SyncFooter()
-            ConnectingStageType.Complete -> CompleteFooter()
-            ConnectingStageType.ErrorSync -> ErrorSyncFooter()
+            ConnectingStageType.DeviceNotFound -> DeviceNotFoundFooter(viewModel)
+            ConnectingStageType.ErrorConnect -> ErrorConnectFooter(viewModel)
+            ConnectingStageType.Sync -> SyncFooter(glucometerName)
+            ConnectingStageType.Complete -> CompleteFooter(viewModel)
+            ConnectingStageType.ErrorSync -> ErrorSyncFooter(viewModel)
         }
     }
 
     @Composable
-    private fun CompleteFooter() {
+    private fun CompleteFooter(viewModel: ConnectingViewModel) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Row {
@@ -182,19 +194,16 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
                 VSpacerSmall()
             }
-            Box {
-                DownButton(
-                    widgetModel = viewModel.completeButton,
-                    onClickAction = ConnectAction.Complete
-                )
-            }
+            DownButton(
+                widgetModel = viewModel.completeButton,
+                onClickAction = ConnectAction.Complete
+            )
         }
     }
 
     @Composable
-    private fun SyncFooter() {
+    private fun SyncFooter(glucometerName: String) {
         GetLocalProperties { dimens, _, colors, _, types ->
-            val glucometerName = viewModel.state.collectAsState().value.glucometerName
             Column(Modifier.padding(dimens.contentPadding)) {
                 Row {
                     Text(
@@ -219,7 +228,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     @Composable
-    private fun ErrorSyncFooter() {
+    private fun ErrorSyncFooter(viewModel: ConnectingViewModel) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
@@ -233,17 +242,15 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
                 VSpacerSmall()
             }
-            Box {
-                DownButton(
-                    widgetModel = viewModel.syncRepeatButton,
-                    onClickAction = ConnectAction.RepeatSync
-                )
-            }
+            DownButton(
+                widgetModel = viewModel.syncRepeatButton,
+                onClickAction = ConnectAction.RepeatSync
+            )
         }
     }
 
     @Composable
-    private fun ErrorConnectFooter() {
+    private fun ErrorConnectFooter(viewModel: ConnectingViewModel) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
@@ -257,17 +264,15 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
                 VSpacerSmall()
             }
-            Box {
-                DownButton(
-                    widgetModel = viewModel.connectRepeatButton,
-                    onClickAction = ConnectAction.RepeatConnect
-                )
-            }
+            DownButton(
+                widgetModel = viewModel.connectRepeatButton,
+                onClickAction = ConnectAction.RepeatConnect
+            )
         }
     }
 
     @Composable
-    private fun DeviceNotFoundFooter() {
+    private fun DeviceNotFoundFooter(viewModel: ConnectingViewModel) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
@@ -296,12 +301,10 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
                 VSpacerSmall()
             }
-            Box {
-                DownButton(
-                    widgetModel = viewModel.searchRepeatButton,
-                    onClickAction = ConnectAction.RepeatSearch
-                )
-            }
+            DownButton(
+                widgetModel = viewModel.searchRepeatButton,
+                onClickAction = ConnectAction.RepeatSearch
+            )
         }
     }
 

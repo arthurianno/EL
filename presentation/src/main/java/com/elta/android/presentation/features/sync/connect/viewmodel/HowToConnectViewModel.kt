@@ -19,8 +19,7 @@ import javax.inject.Inject
 
 @ExperimentalCameraProviderConfiguration
 @OptIn(ExperimentalPermissionsApi::class)
-class HowToConnectViewModel @Inject constructor() :
-    BaseViewModel<HowToConnectViewState, ConnectAction>() {
+class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectViewState>() {
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
             isOnBoarding = false
@@ -34,15 +33,21 @@ class HowToConnectViewModel @Inject constructor() :
         downButton
     ).actionObserve()
 
-    override fun reduceStateByAction(
-        currentState: HowToConnectViewState,
-        action: Action
-    ): HowToConnectViewState {
+    override fun handleFragmentArguments(arguments: Bundle) {
+        reduceState {
+            state.value.copy(
+                isOnBoarding = arguments.getBoolean(
+                    IS_ON_BOARDING_ARGUMENT_NAME
+                )
+            )
+        }
+    }
+
+    override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
             is ConnectAction.OpenConnectingScreen -> checkPermissions(action.permissionsStatus)
         }
-        return currentState
     }
 
     private fun checkPermissions(permissionStates: List<PermissionState>) {
@@ -55,16 +60,6 @@ class HowToConnectViewModel @Inject constructor() :
                 } else {
                     PermissionEvent.FineLocation()
                 }
-            )
-        }
-    }
-
-    override fun handleFragmentArguments(arguments: Bundle) {
-        reduceState {
-            state.value.copy(
-                isOnBoarding = arguments.getBoolean(
-                    IS_ON_BOARDING_ARGUMENT_NAME
-                )
             )
         }
     }

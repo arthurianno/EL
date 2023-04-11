@@ -28,7 +28,7 @@ private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 
 class ScannerDmcViewModel @Inject constructor(
     private val analytics: Analytics
-) : BaseViewModel<ScannerDmcViewState, ConnectAction>(), LifecycleEventObserver {
+) : BaseViewModel<ScannerDmcViewState>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewState =
         ScannerDmcViewState(
             scannerState = ScannerState.Info,
@@ -46,21 +46,23 @@ class ScannerDmcViewModel @Inject constructor(
         appTopBar
     ).actionObserve()
 
-    fun setCropSize(cropRect: DpSize) {
-        reduceState { state.value.copy(cropRect = cropRect) }
-    }
-
-    fun setScannerError() {
-        restartCloseTime()
-        launch {
-            reduceState { state.value.copy(scannerState = ScannerState.Error) }
-            delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
-            reduceState { state.value.copy(scannerState = ScannerState.Info) }
+    override fun handleFragmentArguments(arguments: Bundle) {
+        reduceState {
+            state.value.copy(
+                isOnBoarding = arguments.getBoolean(
+                    IS_ON_BOARDING_ARGUMENT_NAME
+                )
+            )
         }
     }
 
-    fun startConnecting(pin: Int, name: String) {
-        router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            is ConnectAction.ConnectByPin -> connectByPin()
+            is AppAction.BackPressure -> backClick()
+            is ConnectAction.StartConnecting -> startConnecting(action.pin, action.name)
+            is ConnectAction.ScannerError -> setScannerError()
+        }
     }
 
     override fun reduceStateByAction(
@@ -70,24 +72,25 @@ class ScannerDmcViewModel @Inject constructor(
         when (action) {
             is ConnectAction.NeedHelp -> reloadSheetContent(ScannerState.Help)
             is ConnectAction.CloseHelp -> reloadSheetContent(ScannerState.Info)
-            else -> {
-                when (action) {
-                    is ConnectAction.ConnectByPin -> connectByPin()
-                    is AppAction.BackPressure -> backClick()
-                }
-                currentState
-            }
+            else -> currentState
         }
     }
 
-    override fun handleFragmentArguments(arguments: Bundle) {
-        reduceState {
-            state.value.copy(
-                isOnBoarding = arguments.getBoolean(
-                    IS_ON_BOARDING_ARGUMENT_NAME
-                )
-            )
+    fun setCropSize(cropRect: DpSize) {
+        reduceState { state.value.copy(cropRect = cropRect) }
+    }
+
+    private fun setScannerError() {
+        restartCloseTime()
+        launch {
+            reduceState { state.value.copy(scannerState = ScannerState.Error) }
+            delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
+            reduceState { state.value.copy(scannerState = ScannerState.Info) }
         }
+    }
+
+    private fun startConnecting(pin: Int, name: String) {
+        router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

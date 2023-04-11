@@ -745,4 +745,11 @@
     <string name="calculator_user_change_bread_units_message">Значение ХЕ было изменено, исходя из добавленных вами продуктов/блюд</string>
     <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
+
+    // Content Descriptions
+    <string name="content_description_bluetooth_icon">значек блютуза</string>
+    <string name="content_description_close_button">кнопка Закрыть</string>
+    <string name="content_description_clear_button">кнопка Очистить</string>
+    <string name="content_description_question_button">кнопка Вопрос</string>
+    <string name="content_description_back_button">кнопка Назад</string>
 </resources>

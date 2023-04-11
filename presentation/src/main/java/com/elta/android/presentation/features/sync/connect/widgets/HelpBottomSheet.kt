@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.widgets
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -35,7 +34,8 @@ internal fun HelpBottomSheet(
             )
             ButtonCircle(
                 icon = R.drawable.ic_dialog_close_profile,
-                onClick = closeOnClick
+                onClick = closeOnClick,
+                contentDescriptionId = R.string.content_description_close_button
             )
         }
         VSpacerMedium()
@@ -45,11 +45,9 @@ internal fun HelpBottomSheet(
             modifier = Modifier.padding(horizontal = dimens.contentPadding)
         )
         VSpacer(height = dimens.bigDim)
-        Box {
-            DownButton(
-                widgetModel = downButtonModel,
-                onClickAction = ConnectAction.ConnectByPin
-            )
-        }
+        DownButton(
+            widgetModel = downButtonModel,
+            onClickAction = ConnectAction.ConnectByPin
+        )
     }
 }

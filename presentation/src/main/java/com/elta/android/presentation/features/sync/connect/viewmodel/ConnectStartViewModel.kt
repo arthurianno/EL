@@ -12,8 +12,7 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectStartViewState
 import javax.inject.Inject
 
-class ConnectStartViewModel @Inject constructor() :
-    BaseViewModel<ConnectStartViewState, ConnectAction>() {
+class ConnectStartViewModel @Inject constructor() : BaseViewModel<ConnectStartViewState>() {
     override fun createInitState() = ConnectStartViewState(
         isOnBoarding = true
     )
@@ -36,14 +35,10 @@ class ConnectStartViewModel @Inject constructor() :
         }
     }
 
-    override fun reduceStateByAction(
-        currentState: ConnectStartViewState,
-        action: Action
-    ): ConnectStartViewState = run {
+    override fun handleUserAction(action: Action) {
         when (action) {
             is DownButtonClick -> router.navigateTo(Screens.ConnectTypeScreen(state.value.isOnBoarding))
             is ConnectAction.SkipNextStep -> router.navigateTo(Screens.ShopsStart)
         }
-        currentState
     }
 }

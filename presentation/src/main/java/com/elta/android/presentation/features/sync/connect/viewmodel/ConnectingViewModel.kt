@@ -45,8 +45,7 @@ class ConnectingViewModel @Inject constructor(
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
     private val bus: RxBus,
     private val analytics: Analytics
-) :
-    BaseViewModel<ConnectingViewState, ConnectAction>() {
+) : BaseViewModel<ConnectingViewState>() {
     override fun createInitState(): ConnectingViewState =
         ConnectingViewState(
             stageType = ConnectingStageType.Connecting,
@@ -82,8 +81,14 @@ class ConnectingViewModel @Inject constructor(
         completeButton
     ).actionObserve()
 
-    fun closeBottomSheet() {
-        sendEvent(ConnectMainEvent.HideSheet())
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            is ConnectAction.NeedHelp -> sendEvent(ConnectMainEvent.ShowSheet())
+            is ConnectAction.CloseHelp -> sendEvent(ConnectMainEvent.HideSheet())
+            is AppAction.BackPressure -> backClick()
+            is ConnectAction.ConnectByPin -> connectByPin()
+            is ConnectAction.Complete -> completeConnect()
+        }
     }
 
     override fun reduceStateByAction(
@@ -94,15 +99,7 @@ class ConnectingViewModel @Inject constructor(
             is ConnectAction.RepeatConnect -> repeatConnectDevice(currentState)
             is ConnectAction.RepeatSync -> repeatSyncDevice(currentState)
             is ConnectAction.RepeatSearch -> repeatConnectDevice(currentState)
-            else -> {
-                when (action) {
-                    is ConnectAction.NeedHelp -> sendEvent(ConnectMainEvent.ShowSheet())
-                    is AppAction.BackPressure -> backClick()
-                    is ConnectAction.ConnectByPin -> connectByPin()
-                    is ConnectAction.Complete -> completeConnect()
-                }
-                currentState
-            }
+            else -> currentState
         }
     }
 

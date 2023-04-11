@@ -109,8 +109,8 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     @Composable
     override fun Content(viewModel: ScannerDmcViewModel) {
         val event = viewModel.event.collectAsState(initial = null).value
-        val state = viewModel.state.collectAsState()
-        val cropSize = state.value.cropRect
+        val state = viewModel.state.collectAsState().value
+        val cropSize = state.cropRect
         val sheetState =
             rememberBottomSheetScaffoldState()
         LaunchedEffect(key1 = event) {
@@ -134,12 +134,12 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     },
                     sheetGesturesEnabled = false,
                     sheetShape = shapes.sheet,
-                    sheetContent = { BottomSheet(state.value.scannerState) },
+                    sheetContent = { BottomSheet(viewModel, state.scannerState) },
                     modifier = Modifier.systemBarsPadding()
                 ) {
-                    CameraPreView()
+                    CameraPreView(viewModel)
                 }
-                PreviewCropRect(cropSize, state.value.scannerState)
+                PreviewCropRect(cropSize, state.scannerState)
             }
         }
     }
@@ -186,7 +186,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     }
 
     @Composable
-    private fun CameraPreView() {
+    private fun CameraPreView(viewModel: ScannerDmcViewModel) {
         val lifecycleOwner = LocalLifecycleOwner.current
         val context = LocalContext.current
         val configuration = LocalConfiguration.current
@@ -215,7 +215,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     .also {
                         it.setAnalyzer(
                             ContextCompat.getMainExecutor(requireContext()),
-                            getImageAnalyzer(cropRect)
+                            getImageAnalyzer(cropRect, viewModel)
                         )
                     }
                 val cameraProvider = context.getCameraProvider()
@@ -236,29 +236,36 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
         }
     }
 
-    private fun getImageAnalyzer(cropRect: Rect) = ImageAnalysis.Analyzer { imageProxy ->
-        imageProxy.setCropRect(cropRect)
-        imageProxy.image?.let { image ->
-            scanner?.process(
-                InputImage.fromMediaImage(
-                    image,
-                    imageProxy.imageInfo.rotationDegrees
+    private fun getImageAnalyzer(
+        cropRect: Rect,
+        viewModel: ScannerDmcViewModel
+    ) =
+        ImageAnalysis.Analyzer { imageProxy ->
+            imageProxy.setCropRect(cropRect)
+            imageProxy.image?.let { image ->
+                scanner?.process(
+                    InputImage.fromMediaImage(
+                        image,
+                        imageProxy.imageInfo.rotationDegrees
+                    )
                 )
-            )
-                ?.addOnSuccessListener { barcodes ->
-                    handleBarcodes(barcodes)
-                    imageProxy.close()
-                }
-                ?.addOnFailureListener {
-                    viewModel.setScannerError()
-                }
-                ?.addOnCompleteListener {
-                    imageProxy.close()
-                }
+                    ?.addOnSuccessListener { barcodes ->
+                        handleBarcodes(barcodes, viewModel)
+                        imageProxy.close()
+                    }
+                    ?.addOnFailureListener {
+                        viewModel sendAction ConnectAction.ScannerError
+                    }
+                    ?.addOnCompleteListener {
+                        imageProxy.close()
+                    }
+            }
         }
-    }
 
-    private fun handleBarcodes(barcodes: MutableList<Barcode>) {
+    private fun handleBarcodes(
+        barcodes: MutableList<Barcode>,
+        viewModel: ScannerDmcViewModel
+    ) {
         if (barcodes.isNotEmpty()) {
             barcodes.forEach { code ->
                 val value = code.rawValue.orEmpty()
@@ -273,11 +280,11 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                             .mod(PIN_DIV_COEFFICIENT)
                         val name =
                             "$GLUCOMETER_NAME_SUFFIX${number.takeLast(NUMBERS_COUNT_FOR_NAME)}"
-                        viewModel.startConnecting(pin, name)
+                        viewModel sendAction ConnectAction.StartConnecting(pin, name)
                         scanner?.close()
                     }
                         .onFailure {
-                            viewModel.setScannerError()
+                            viewModel sendAction ConnectAction.ScannerError
                         }
                 }
             }
@@ -294,13 +301,15 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
         }
 
     @Composable
-    private fun BottomSheet(sheetType: ScannerState) {
+    private fun BottomSheet(viewModel: ScannerDmcViewModel, sheetType: ScannerState) {
         when (sheetType) {
             ScannerState.Info -> InfoSheet()
             ScannerState.Error -> ErrorSheet()
             ScannerState.Help -> HelpBottomSheet(
                 downButtonModel = viewModel.connectByPinButton,
-                closeOnClick = { viewModel.sendAction(ConnectAction.CloseHelp) }
+                closeOnClick = {
+                    viewModel sendAction ConnectAction.CloseHelp
+                }
             )
         }
     }

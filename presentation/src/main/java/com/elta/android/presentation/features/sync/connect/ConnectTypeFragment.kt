@@ -48,21 +48,21 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
                     .fillMaxSize()
                     .systemBarsPadding()
             ) {
-                TopAppBar()
+                TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.ic_connect_dev)
                 VSpacer(dimens.connectTypeImageToTextVInterval)
-                Footer()
+                Footer(viewModel)
             }
         }
     }
 
     @Composable
-    private fun Footer() {
+    private fun Footer(viewModel: ConnectTypeViewModel) {
         GetLocalProperties { dimens, _, _, _, _ ->
             Column(Modifier.padding(dimens.contentPadding)) {
                 Info()
                 VSpacer(dimens.bigDim)
-                Buttons()
+                Buttons(viewModel)
                 VSpacerSmall()
             }
         }
@@ -88,7 +88,7 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
     }
 
     @Composable
-    private fun Buttons() {
+    private fun Buttons(viewModel: ConnectTypeViewModel) {
         GetLocalProperties { dimens, _, colors, _, types ->
             SmallButton(
                 text = stringResource(id = R.string.sync_connect_type_button_enter_pin),
@@ -96,7 +96,9 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimens.connectTypeButtonsHeight),
-                onClick = viewModel::connectByPin
+                onClick = {
+                    viewModel sendAction ConnectAction.ConnectByPin
+                }
             )
             VSpacerSmall()
             Text(
@@ -113,13 +115,15 @@ class ConnectTypeFragment : BaseComposeFragment<ConnectTypeViewModel>() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimens.connectTypeButtonsHeight),
-                onClick = viewModel::connectByDmc
+                onClick = {
+                    viewModel sendAction ConnectAction.ConnectByDmc
+                }
             )
         }
     }
 
     @Composable
-    private fun TopAppBar() {
+    private fun TopAppBar(viewModel: ConnectTypeViewModel) {
         GetLocalProperties { _, _, colors, _, _ ->
             BaseAppTopBar(
                 widgetModel = viewModel.appTopBar,

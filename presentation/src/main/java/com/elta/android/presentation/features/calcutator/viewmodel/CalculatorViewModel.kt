@@ -38,7 +38,7 @@ class CalculatorViewModel @Inject constructor(
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
-    BaseViewModel<CalculatorViewState, CalculatorAction>() {
+    BaseViewModel<CalculatorViewState>() {
     override fun createInitState(): CalculatorViewState =
         CalculatorViewState(
             dishes = emptyList(),
@@ -107,16 +107,14 @@ class CalculatorViewModel @Inject constructor(
         reduceState { state.value.copy(helpText = text) }
     }
 
-    fun lastWordOnClick(word: String) {
-        sendAction(CalculatorAction.LastWordClick(word))
-    }
-
-    fun dishOnClick(dish: DishUiEntity) {
-        sendAction(CalculatorAction.AddDishClick(dish))
-    }
-
-    fun dishDeleteOnClick(dish: DishUiEntity) {
-        dishDeleteConfirmDialog.dialogOpen(dish)
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
+            is CalculatorAction.DishClick -> dishClick(action.dish)
+            is CalculatorAction.DeleteDishClick -> dishDeleteConfirmDialog.dialogOpen(action.dish)
+            AppAction.BackPressure -> backPressure()
+            DownButtonClick -> saveDishes()
+        }
     }
 
     override fun reduceStateByAction(
@@ -130,15 +128,7 @@ class CalculatorViewModel @Inject constructor(
                 currentState.copy(searchInFocus = inFocusState)
             }
 
-            else -> {
-                when (action) {
-                    is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
-                    is CalculatorAction.AddDishClick -> dishClick(action.dish)
-                    AppAction.BackPressure -> backPressure()
-                    DownButtonClick -> saveDishes()
-                }
-                currentState
-            }
+            else -> currentState
         }
 
     private fun backPressure() {

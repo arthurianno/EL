@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.sync.connect
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -50,21 +49,14 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                     .fillMaxSize()
                     .systemBarsPadding()
             ) {
-                TopAppBar()
+                TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.ic_connect_dev)
                 Title()
                 VSpacerSmall()
                 Body()
                 VSpacer(height = dimens.bigDim)
-                ConnectButton()
+                DownButton(widgetModel = viewModel.downButton)
             }
-        }
-    }
-
-    @Composable
-    private fun ConnectButton() {
-        Box {
-            DownButton(widgetModel = viewModel.downButton)
         }
     }
 
@@ -91,7 +83,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     }
 
     @Composable
-    fun TopAppBar() {
+    fun TopAppBar(viewModel: ConnectStartViewModel) {
         BaseAppTopBar(
             widgetModel = viewModel.appTopBar,
             endText = R.string.sync_start_menu_button_text
@@ -102,6 +94,8 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 @Preview
 @Composable
 fun ContentPreView() {
-    val viewModel = ConnectStartViewModel()
+    val viewModel = ConnectStartViewModel().apply {
+        downButton.setText(stringResource(id = R.string.sync_connect_start_title))
+    }
     ConnectStartFragment().Content(viewModel = viewModel)
 }

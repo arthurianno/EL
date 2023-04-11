@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.devices.search
 
 import android.content.Context
-import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -29,6 +28,7 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
+import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.snackbar.BaseSnackBar
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
@@ -38,7 +38,7 @@ import com.elta.android.presentation.features.devices.search.widgets.GlucometerS
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 
-private const val ADDRESS_ARGUMENT_ID = "address_argument"
+internal const val ADDRESS_ARGUMENT_ID = "address_argument"
 
 class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>() {
 
@@ -66,14 +66,9 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
     }
 
     @Composable
-    override fun Dialogs() {
+    override fun Dialogs(viewModel: GlucometerSearchViewModel) {
         BaseDialog(widgetModel = viewModel.cancelSearchDialog)
         BaseDialog(widgetModel = viewModel.cancelRingDialog)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.getString(ADDRESS_ARGUMENT_ID)?.let { viewModel.setGlucometerAddress(it) }
     }
 
     override fun onAttach(context: Context) {
@@ -84,7 +79,7 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
     @Composable
     override fun Content(viewModel: GlucometerSearchViewModel) {
         GetLocalProperties { dimens, _, _, _, _ ->
-            val state = viewModel.state.collectAsState()
+            val state = viewModel.state.collectAsState().value
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -99,19 +94,19 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        AppBar()
+                        AppBar(viewModel.appBar)
                         VSpacer(height = dimens.searchButtonTopInterval)
                         GlucometerSearchButton(widgetModel = viewModel.searchButton)
                     }
-                    when (state.value.searchStatus) {
+                    when (state.searchStatus) {
                         GlucometerSearchStatus.Off -> SearchOffText()
                         GlucometerSearchStatus.On -> SearchOnText()
                         GlucometerSearchStatus.Connecting -> ConnectionText()
                         GlucometerSearchStatus.DeviceNotFound -> DeviceNotFound()
                     }
                 }
-                VerticallyAnimation(visualState = state.value.searchStatus == GlucometerSearchStatus.Connecting) {
-                    BaseSnackBar(state.value.snackBar.stringId)
+                VerticallyAnimation(visualState = state.searchStatus == GlucometerSearchStatus.Connecting) {
+                    BaseSnackBar(state.snackBar.stringId)
                 }
             }
         }
@@ -242,9 +237,9 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
     }
 
     @Composable
-    private fun AppBar() {
+    private fun AppBar(appTopBarWidgetModel: BaseAppTopBarWidgetModel) {
         BaseAppTopBar(
-            widgetModel = viewModel.appBar,
+            widgetModel = appTopBarWidgetModel,
             startIcon = R.drawable.ic_back
         )
     }

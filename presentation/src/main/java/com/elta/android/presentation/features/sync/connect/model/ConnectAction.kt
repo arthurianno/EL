@@ -9,6 +9,7 @@ sealed class ConnectAction : Action {
     object CloseHelp : ConnectAction()
     object ConnectByPin : ConnectAction()
     object ConnectByDmc : ConnectAction()
+    data class StartConnecting(val pin: Int, val name: String) : ConnectAction()
     object RepeatConnect : ConnectAction()
     object RepeatSync : ConnectAction()
     object RepeatSearch : ConnectAction()
@@ -19,4 +20,6 @@ sealed class ConnectAction : Action {
     data class OpenConnectingScreen(
         val permissionsStatus: List<PermissionState>
     ) : ConnectAction()
+
+    object ScannerError : ConnectAction()
 }

@@ -40,7 +40,7 @@ class ConnectHelpFragment : BaseComposeFragment<ConnectHelpViewModel>() {
                     .fillMaxSize()
                     .systemBarsPadding()
             ) {
-                AppTopBar()
+                AppTopBar(viewModel)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -112,7 +112,7 @@ class ConnectHelpFragment : BaseComposeFragment<ConnectHelpViewModel>() {
     }
 
     @Composable
-    private fun AppTopBar() {
+    private fun AppTopBar(viewModel: ConnectHelpViewModel) {
         BaseAppTopBar(
             widgetModel = viewModel.appTopBar,
             startIcon = R.drawable.ic_back

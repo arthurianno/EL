@@ -55,7 +55,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val compilerVersion = "1.3.2"
+            const val compilerVersion = "1.4.0-alpha01"
 
             private const val bomVersion = "2023.01.00"
             private const val activityVersion = "1.6.1"
@@ -181,22 +181,29 @@ object Dependencies {
 
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val junitExtVersion = "1.1.3"
-        private const val espressoVersion = "3.4.0"
+        private const val extJunitVersion = "1.1.5"
+        private const val espressoVersion = "3.5.1"
+        private const val monitorVersion = "1.6.0"
+        private const val testStorageVersion = "1.4.2"
         private const val java310Version = "1.3.1" // 1.6.3
-        private const val androidxVersion = "1.4.0"
+        private const val coreTestVersion = "1.5.0"
+        private const val rulesVersion = "1.5.0"
+        private const val runnerVersion = "1.5.2"
         private const val robolectricVersion = "4.8"
         private const val mockitoKotlinVersion = "2.0.0-RC1"
         private const val mockitoAndroidVersion = "2.8.47"
 
         const val junit = "junit:junit:$junitVersion"
-        const val junitExt = "androidx.test.ext:junit-ktx:$junitExtVersion"
+        const val extJunit = "androidx.test.ext:junit:$extJunitVersion"
+        const val extJunitKtx = "androidx.test.ext:junit-ktx:$extJunitVersion"
         const val espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
+        const val testStorage = "androidx.test.services:test-services:$testStorageVersion"
 
-        const val rules = "androidx.test:rules:$androidxVersion"
-        const val runner = "androidx.test:runner:$androidxVersion"
-        const val core = "androidx.test:core:$androidxVersion"
-        const val coreKtx = "androidx.test:core-ktx$androidxVersion"
+        const val monitor = "androidx.test:monitor:$monitorVersion"
+        const val rules = "androidx.test:rules:$rulesVersion"
+        const val runner = "androidx.test:runner:$runnerVersion"
+        const val core = "androidx.test:core:$coreTestVersion"
+        const val coreKtx = "androidx.test:core-ktx:$coreTestVersion"
 
         const val jsr310 = "org.threeten:threetenbp:$java310Version"
 
@@ -302,7 +309,7 @@ object Dependencies {
     }
 
     object Timber {
-        private const val version = "4.7.1"
+        private const val version = "5.0.1"
 
         const val core = "com.jakewharton.timber:timber:$version"
     }

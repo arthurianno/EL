@@ -2,8 +2,9 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 
 fun DependencyHandler.testBaseDependencies() {
     addTestImplementation(Dependencies.Test.junit)
-    addAndroidTestImplementation(Dependencies.Test.junitExt)
+    addAndroidTestImplementation(Dependencies.Test.extJunitKtx)
     addAndroidTestImplementation(Dependencies.Test.espresso)
+    addAndroidTestImplementation(Dependencies.Test.monitor)
 }
 
 fun DependencyHandler.bomUiToolingDependencies() {
