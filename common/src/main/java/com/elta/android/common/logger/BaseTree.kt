@@ -2,7 +2,6 @@ package com.elta.android.common.logger
 
 import android.util.Log
 import com.elta.android.common.logger.model.LogRecord
-import com.elta.android.common.logger.model.priorityAsString
 import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
@@ -17,14 +16,12 @@ abstract class BaseTree(private val logsFile: File) : Timber.Tree() {
 
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS a zzz", Locale.getDefault())
 
-    private val _logs = mutableListOf<LogRecord>()
-    val logs: List<LogRecord>
-        get() = _logs
+    private val logs = mutableListOf<LogRecord>()
 
     override fun log(priority: Int, tag: String?, message: String, error: Throwable?) {
         val logRecord = LogRecord(timeFormat.format(Date()), priority, tag, message, error)
         Log.println(priority, tag, message)
-        _logs.add(logRecord)
+        logs.add(logRecord)
         saveLogInFile(logRecord)
     }
 
@@ -37,8 +34,18 @@ abstract class BaseTree(private val logsFile: File) : Timber.Tree() {
 
     private infix fun BufferedWriter.writeLog(logRecord: LogRecord) {
         append("[${logRecord.time}] --> ")
-        append("${priorityAsString(logRecord.priority)}/")
+        append(logRecord.priority.priorityToString())
         append("${logRecord.tag ?: DEFAULT_TAG}: ${logRecord.message}")
         newLine()
+    }
+
+    private fun Int.priorityToString(): String = when (this) {
+        Log.VERBOSE -> "VERBOSE"
+        Log.DEBUG -> "DEBUG"
+        Log.INFO -> "INFO"
+        Log.WARN -> "WARN"
+        Log.ERROR -> "ERROR"
+        Log.ASSERT -> "ASSERT"
+        else -> super.toString()
     }
 }

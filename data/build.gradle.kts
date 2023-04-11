@@ -36,6 +36,7 @@ dependencies {
     implementation(project(Module.core_preferences))
     implementation(project(Module.common))
     api(project(Module.domain))
+    implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)

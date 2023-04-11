@@ -82,6 +82,7 @@ class DeviceInfoPm @Inject constructor(
             .subscribe {
                 glucometer?.address?.let { router.navigateTo(Screens.DeviceSearch(it)) }
             }
+            .untilDestroy()
     }
 
     private fun observeEvents() {

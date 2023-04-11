@@ -1,5 +1,6 @@
 package com.elta.android
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.elta.android.common.di.qualifires.ComputationFacade
@@ -27,7 +28,15 @@ import javax.inject.Singleton
 
 @Suppress("TooManyFunctions")
 @Module
-class AppModule(private val enableLog: Boolean, private val isDebug: Boolean) {
+class AppModule(
+    private val app: Application,
+    private val enableLog: Boolean,
+    private val isDebug: Boolean
+) {
+
+    @Singleton
+    @Provides
+    fun provideApplication(): Application = app
 
     @Singleton
     @Provides
