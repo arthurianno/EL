@@ -15,7 +15,7 @@ import com.elta.android.presentation.theme.EltaTheme
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-abstract class BaseComposeFragment<VM : BaseViewModel<*, *>> :
+abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
     Fragment(R.layout.fragment_compose_view) {
 
     @Inject
@@ -34,7 +34,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*, *>> :
         (viewModel as? LifecycleEventObserver)?.let { lifecycle.addObserver(it) }
         view.findViewById<ComposeView>(R.id.main_view).setContent {
             EltaTheme {
-                Dialogs()
+                Dialogs(viewModel = viewModel)
                 Content(viewModel = viewModel)
             }
         }
@@ -43,7 +43,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*, *>> :
     protected open fun VM.init() {}
 
     @Composable
-    open fun Dialogs() {
+    open fun Dialogs(viewModel: VM) {
     }
 
     @Composable

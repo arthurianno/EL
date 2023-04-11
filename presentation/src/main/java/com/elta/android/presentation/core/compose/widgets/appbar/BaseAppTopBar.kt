@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -142,7 +141,7 @@ private fun BarIconOrTextButton(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .defaultMinSize(dimens.clickableAreaMinSize, dimens.clickableAreaMinSize)
-                .clickable(role = Role.Button, onClick = onClick)
+                .clickable(onClick = onClick)
         ) {
             HSpacerMedium()
             iconId?.let {

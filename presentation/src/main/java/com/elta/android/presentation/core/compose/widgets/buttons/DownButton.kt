@@ -12,9 +12,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.tests.TestTags
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.theme.GetLocalProperties
 
@@ -50,6 +52,16 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
 }
 
 @Composable
+fun DownButton(
+    widgetModel: DownButtonWidgetModel,
+    onClickAction: Action = DownButtonClick
+) {
+    Box {
+        DownButton(widgetModel = widgetModel, onClickAction = onClickAction)
+    }
+}
+
+@Composable
 fun BoxScope.DownButton(
     widgetModel: DownButtonWidgetModel,
     onClickAction: Action = DownButtonClick
@@ -82,6 +94,7 @@ fun BoxScope.DownButton(
                         )
                         .fillMaxWidth()
                         .height(dimens.downButtonHeight)
+                        .testTag(TestTags.DownButton.name)
                         .then(backgroundModifier)
                 ) {
                     Text(text = state.value.text, color = textColor)

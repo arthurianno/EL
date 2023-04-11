@@ -36,7 +36,7 @@ private const val DIGIT_DOT = '.'
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
-) : BaseViewModel<DishDetailViewState, Action>() {
+) : BaseViewModel<DishDetailViewState>() {
     override fun createInitState(): DishDetailViewState =
         DishDetailViewState(
             dish = DishUiEntity(
@@ -138,22 +138,21 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            AppAction.BackPressure -> router.exit()
+            DownButtonClick -> saveDish()
+        }
+    }
+
     override fun reduceStateByAction(
         currentState: DishDetailViewState,
         action: Action
     ): DishDetailViewState =
-        run {
-            when (action) {
-                CalculatorAction.PortionHelpClick -> showPortionHelp(true)
-                AppAction.FreeScreenTap -> showPortionHelp(false)
-                else -> {
-                    when (action) {
-                        AppAction.BackPressure -> router.exit()
-                        DownButtonClick -> saveDish()
-                    }
-                    currentState
-                }
-            }
+        when (action) {
+            CalculatorAction.PortionHelpClick -> showPortionHelp(true)
+            AppAction.FreeScreenTap -> showPortionHelp(false)
+            else -> currentState
         }
 
     private fun showPortionHelp(visibilityState: Boolean): DishDetailViewState = run {

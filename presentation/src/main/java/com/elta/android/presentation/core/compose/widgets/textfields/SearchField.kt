@@ -31,7 +31,6 @@ import com.elta.android.presentation.theme.GetLocalProperties
 
 sealed class SearchFiledAction : Action {
     data class FocusChanged(val focusState: FocusState) : SearchFiledAction()
-    object Clear : SearchFiledAction()
 }
 
 @Immutable
@@ -134,7 +133,8 @@ fun SearchField(
                     HorizontallyAnimation(visualState = searchInFocus, toLeft = false) {
                         ButtonCircle(
                             icon = R.drawable.ic_search_clean,
-                            onClick = widgetModel::clear
+                            onClick = widgetModel::clear,
+                            contentDescriptionId = R.string.content_description_close_button
                         )
                     }
                 },

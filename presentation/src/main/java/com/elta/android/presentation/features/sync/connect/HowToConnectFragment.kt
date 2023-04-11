@@ -2,7 +2,6 @@ package com.elta.android.presentation.features.sync.connect
 
 import android.Manifest
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +34,6 @@ import com.elta.android.presentation.features.sync.connect.widgets.TextNumericIt
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 private val requiredPermissions = listOf(
@@ -78,26 +76,15 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                     .fillMaxSize()
                     .systemBarsPadding()
             ) {
-                TopAppBar()
+                TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.img_dmc_connect)
                 Info()
                 VSpacer(dimens.bigDim)
-                ScanButton(viewModel, cameraPermission)
+                DownButton(
+                    widgetModel = viewModel.downButton,
+                    onClickAction = ConnectAction.OpenConnectingScreen(cameraPermission.permissions)
+                )
             }
-        }
-    }
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Composable
-    private fun ScanButton(
-        viewModel: HowToConnectViewModel,
-        cameraPermission: MultiplePermissionsState
-    ) {
-        Box {
-            DownButton(
-                widgetModel = viewModel.downButton,
-                onClickAction = ConnectAction.OpenConnectingScreen(cameraPermission.permissions)
-            )
         }
     }
 
@@ -140,7 +127,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     }
 
     @Composable
-    private fun TopAppBar() {
+    private fun TopAppBar(viewModel: HowToConnectViewModel) {
         GetLocalProperties { _, _, colors, _, _ ->
             BaseAppTopBar(
                 widgetModel = viewModel.appTopBar,

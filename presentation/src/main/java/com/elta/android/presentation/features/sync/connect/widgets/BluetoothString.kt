@@ -25,7 +25,7 @@ internal fun BluetoothString() {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_bluetooth),
-                contentDescription = null
+                contentDescription = stringResource(id = R.string.content_description_bluetooth_icon)
             )
             HSpacerSmall()
             Text(text = stringResource(id = R.string.sync_how_to_connect_bluetooth_text))

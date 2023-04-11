@@ -16,8 +16,7 @@ import javax.inject.Inject
 
 class ConnectTypeViewModel @Inject constructor(
     private val analytics: Analytics
-) :
-    BaseViewModel<ConnectTypeViewState, ConnectAction>() {
+) : BaseViewModel<ConnectTypeViewState>() {
     override fun createInitState(): ConnectTypeViewState =
         ConnectTypeViewState(
             isOnBoarding = true
@@ -39,7 +38,21 @@ class ConnectTypeViewModel @Inject constructor(
         }
     }
 
-    fun connectByPin() {
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            is AppAction.BackPressure -> backClick()
+            is ConnectAction.ConnectByPin -> connectByPin()
+            is ConnectAction.ConnectByDmc -> connectByDmc()
+            is ConnectAction.NeedHelp -> router.navigateTo(Screens.ConnectHelpScreen)
+        }
+    }
+
+    private fun connectByDmc() {
+        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.SCAN_DMC))
+        router.navigateTo(Screens.HowToConnectScreen(state.value.isOnBoarding))
+    }
+
+    private fun connectByPin() {
         analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
         router.navigateTo(
             if (state.value.isOnBoarding) {
@@ -48,30 +61,5 @@ class ConnectTypeViewModel @Inject constructor(
                 Screens.FromOtherConnectDeviceByPin
             }
         )
-    }
-
-    fun connectByDmc() {
-        analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.SCAN_DMC))
-        sendAction(ConnectAction.ConnectByDmc)
-    }
-
-    override fun reduceStateByAction(
-        currentState: ConnectTypeViewState,
-        action: Action
-    ): ConnectTypeViewState {
-        when (action) {
-            is AppAction.BackPressure -> backClick()
-            is ConnectAction.ConnectByPin -> router.navigateTo(
-                if (state.value.isOnBoarding) {
-                    Screens.FromOnBoardingConnectDeviceByPin
-                } else {
-                    Screens.FromOtherConnectDeviceByPin
-                }
-            )
-
-            is ConnectAction.ConnectByDmc -> router.navigateTo(Screens.HowToConnectScreen(state.value.isOnBoarding))
-            is ConnectAction.NeedHelp -> router.navigateTo(Screens.ConnectHelpScreen)
-        }
-        return currentState
     }
 }

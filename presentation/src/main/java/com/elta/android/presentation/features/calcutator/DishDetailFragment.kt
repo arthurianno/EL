@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -95,14 +94,14 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    override fun Dialogs() {
+    override fun Dialogs(viewModel: DishDetailViewModel) {
         BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content(viewModel: DishDetailViewModel) {
-        val state = viewModel.state.collectAsState()
+        val state = viewModel.state.collectAsState().value
         val keyboardController = LocalSoftwareKeyboardController.current
         val descriptionFieldFocusRequester = FocusRequester()
         Box(
@@ -111,19 +110,23 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 .clickableWithNoRipple {
                     keyboardController?.hide()
                     descriptionFieldFocusRequester.requestFocus()
-                    viewModel.sendAction(AppAction.FreeScreenTap)
+                    viewModel sendAction AppAction.FreeScreenTap
                 }
         ) {
-            Header(
-                dish = state.value.dish,
-                onBackClick = { viewModel.sendAction(AppAction.BackPressure) }
+            MainHeader(dish = state.dish, viewModel = viewModel)
+            MainContent(
+                viewModel = viewModel,
+                state = state,
+                descriptionFieldFocusRequester = descriptionFieldFocusRequester
             )
-            MainContent(viewModel, state, descriptionFieldFocusRequester)
         }
     }
 
     @Composable
-    private fun BoxScope.Header(dish: DishUiEntity, onBackClick: () -> Unit) {
+    private fun BoxScope.MainHeader(
+        dish: DishUiEntity,
+        viewModel: DishDetailViewModel
+    ) {
         GetLocalProperties { dimens, brash, colors, _, _ ->
             Box(
                 modifier = Modifier
@@ -138,7 +141,9 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         .statusBarsPadding()
                         .padding(dimens.contentPadding)
                         .align(Alignment.TopStart),
-                    onClick = onBackClick
+                    onClick = {
+                        viewModel sendAction AppAction.BackPressure
+                    }
                 )
                 HeaderTitle(dish)
                 BreadUnitsValue(dish)
@@ -206,7 +211,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     private fun BoxScope.MainContent(
         viewModel: DishDetailViewModel,
-        state: State<DishDetailViewState>,
+        state: DishDetailViewState,
         descriptionFieldFocusRequester: FocusRequester
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
@@ -238,10 +243,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun Footer(state: State<DishDetailViewState>) {
+    private fun Footer(state: DishDetailViewState) {
         GetLocalProperties { dimens, _, colors, _, _ ->
-            val dish = state.value.dish
-            val serving = state.value.dish.servingSelect
             Box(Modifier.fillMaxWidth()) {
                 Column {
                     VSpacerLarge()
@@ -250,14 +253,14 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         color = colors.shadeBlack2,
                         modifier = Modifier.padding(start = dimens.contentPadding)
                     )
-                    if (dish.isVerification) {
+                    if (state.dish.isVerification) {
                         VSpacerMedium()
                         VerifyProduct()
                     }
-                    DishChars(serving)
+                    DishChars(state.dish.servingSelect)
                 }
                 Box(modifier = Modifier.align(Alignment.TopCenter)) {
-                    VerticallyAnimation(visualState = state.value.isShowCountHelpSnack) {
+                    VerticallyAnimation(visualState = state.isShowCountHelpSnack) {
                         Image(
                             painter = painterResource(id = R.drawable.img_portion_count_help_snack),
                             contentDescription = null,
@@ -339,7 +342,10 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 )
                 ButtonCircle(
                     icon = R.drawable.btn_query_in_circle,
-                    onClick = { viewModel.sendAction(CalculatorAction.PortionHelpClick) }
+                    onClick = {
+                        viewModel sendAction CalculatorAction.PortionHelpClick
+                    },
+                    contentDescriptionId = R.string.content_description_question_button
                 )
             }
         }

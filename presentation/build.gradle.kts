@@ -28,8 +28,9 @@ android {
         disable.add("OldTargetApi")
     }
     testOptions {
-        unitTests.all {
-            it.jvmArgs("-noverify")
+        unitTests {
+            all { it.jvmArgs("-noverify") }
+            isIncludeAndroidResources = true
         }
     }
     buildFeatures {

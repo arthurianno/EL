@@ -22,7 +22,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -50,6 +49,7 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
+import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
@@ -85,7 +85,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 
     @Composable
-    override fun Dialogs() {
+    override fun Dialogs(viewModel: CalculatorViewModel) {
         BaseDialog(widgetModel = viewModel.dishDeleteConfirmDialog)
         BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
         BaseDialog(widgetModel = viewModel.exitDialog)
@@ -93,9 +93,11 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     override fun Content(viewModel: CalculatorViewModel) {
-        val state = viewModel.state.collectAsState()
-        val dishes = state.value.dishes
-        val searchInFocus = viewModel.state.collectAsState().value.searchInFocus
+        val state = viewModel.state.collectAsState().value
+        val searchState = viewModel.searchField.state.collectAsState().value
+        val dishes = state.dishes
+        val searchText = searchState.textField.text
+        val searchInFocus = state.searchInFocus
         val networkAvailable = LocalNetworkState.current == NetworkState.Available
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
@@ -130,15 +132,23 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             )
                         }
                         VSpacerMedium()
-                        HelpText(viewModel, searchInFocus)
+                        HelpText(
+                            state = state,
+                            searchText = searchText,
+                            searchInFocus
+                        )
                         VSpacerSmall()
                         if (searchInFocus) {
-                            SearchView(viewModel, state)
+                            SearchView(
+                                state = state,
+                                searchText = searchText,
+                                viewModel = viewModel
+                            )
                         } else {
                             MainContent(
-                                viewModel = viewModel,
                                 dishes = dishes,
-                                networkAvailable = networkAvailable
+                                networkAvailable = networkAvailable,
+                                viewModel = viewModel
                             )
                         }
                     }
@@ -150,42 +160,37 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun MainContent(
-        viewModel: CalculatorViewModel,
         dishes: List<DishUiEntity>,
-        networkAvailable: Boolean
+        networkAvailable: Boolean,
+        viewModel: CalculatorViewModel
     ) {
         if (dishes.isEmpty()) {
             EmptyContent()
         } else {
             CalculateDishes(
                 dishes = dishes,
-                viewModel = viewModel,
-                networkAvailable = networkAvailable
+                networkAvailable = networkAvailable,
+                viewModel = viewModel
             )
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     private fun SearchView(
-        viewModel: CalculatorViewModel,
-        state: State<CalculatorViewState>
+        state: CalculatorViewState,
+        searchText: String,
+        viewModel: CalculatorViewModel
     ) {
-        val searchFieldState = viewModel.searchField.state.collectAsState()
-        val keyboardController = LocalSoftwareKeyboardController.current
-        if (searchFieldState.value.textField.text.isEmpty()) {
+        if (searchText.isEmpty()) {
             LastWords(
-                lastWords = state.value.lastWords,
-                onClick = {
-                    viewModel.lastWordOnClick(it)
-                    keyboardController?.hide()
-                }
+                lastWords = state.lastWords,
+                viewModel = viewModel
             )
         } else {
             FindingDishes(
-                findingDishes = state.value.findingDishes,
-                isFindDishes = state.value.isFindDishes,
-                onClick = viewModel::dishOnClick
+                findingDishes = state.findingDishes,
+                isFindDishes = state.isFindDishes,
+                viewModel = viewModel
             )
         }
     }
@@ -194,7 +199,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     private fun FindingDishes(
         findingDishes: List<DishUiEntity>,
         isFindDishes: Boolean,
-        onClick: (dish: DishUiEntity) -> Unit
+        viewModel: CalculatorViewModel
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(modifier = Modifier.fillMaxSize()) {
@@ -214,7 +219,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(shapes.dishCard)
-                                        .clickable { onClick(dish) }
+                                        .clickable {
+                                            viewModel sendAction CalculatorAction.DishClick(dish)
+                                        }
                                         .border(
                                             dimens.borderWidth,
                                             colors.shadeBlack3,
@@ -265,16 +272,24 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    private fun LastWords(lastWords: List<String>, onClick: (word: String) -> Unit) {
+    private fun LastWords(
+        lastWords: List<String>,
+        viewModel: CalculatorViewModel
+    ) {
         GetLocalProperties { dimens, _, _, _, _ ->
+            val keyboardController = LocalSoftwareKeyboardController.current
             LazyColumn() {
                 items(items = lastWords) { word ->
                     Text(
                         text = word,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onClick(word) }
+                            .clickable {
+                                viewModel sendAction CalculatorAction.LastWordClick(word)
+                                keyboardController?.hide()
+                            }
                             .padding(vertical = dimens.lastWordVertical)
                     )
                 }
@@ -285,17 +300,16 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun CalculateDishes(
         dishes: List<DishUiEntity>,
-        viewModel: CalculatorViewModel,
-        networkAvailable: Boolean
+        networkAvailable: Boolean,
+        viewModel: CalculatorViewModel
     ) {
         val totalCountBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
         TotalCountBreadUnits(totalCountBreadUnits)
         VSpacerSmall()
         SelectedDishes(
-            dishes,
-            networkAvailable,
-            onCardClick = viewModel::dishOnClick,
-            onCloseClick = viewModel::dishDeleteOnClick
+            dishes = dishes,
+            networkAvailable = networkAvailable,
+            viewModel = viewModel
         )
     }
 
@@ -303,8 +317,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     private fun SelectedDishes(
         dishes: List<DishUiEntity>,
         networkAvailable: Boolean,
-        onCardClick: (dish: DishUiEntity) -> Unit,
-        onCloseClick: (dish: DishUiEntity) -> Unit
+        viewModel: CalculatorViewModel
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.smallDim)) {
@@ -313,7 +326,12 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(shape = shapes.dishCard)
-                            .clickable(enabled = networkAvailable, onClick = { onCardClick(dish) })
+                            .clickable(
+                                enabled = networkAvailable,
+                                onClick = {
+                                    viewModel sendAction CalculatorAction.DishClick(dish)
+                                }
+                            )
                             .border(
                                 width = dimens.borderWidth,
                                 color = colors.shadeBlack3,
@@ -323,10 +341,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     ) {
                         DishInfoBlock(dish)
                         if (networkAvailable) {
-                            CloseButton(
-                                dish = dish,
-                                onCloseClick = onCloseClick
-                            )
+                            CloseButton(dish = dish, viewModel = viewModel)
                         }
                         BreadUnitLabel(dish)
                     }
@@ -369,12 +384,15 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun BoxScope.CloseButton(
         dish: DishUiEntity,
-        onCloseClick: (dish: DishUiEntity) -> Unit
+        viewModel: CalculatorViewModel
     ) {
         Box(modifier = Modifier.align(Alignment.TopEnd)) {
             ButtonCircle(
                 icon = R.drawable.btn_close,
-                onClick = { onCloseClick(dish) }
+                onClick = {
+                    viewModel sendAction CalculatorAction.DeleteDishClick(dish)
+                },
+                contentDescriptionId = R.string.content_description_close_button
             )
         }
     }
@@ -419,18 +437,17 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun HelpText(
-        viewModel: CalculatorViewModel,
+        state: CalculatorViewState,
+        searchText: String,
         searchInFocus: Boolean
     ) {
         GetLocalProperties { _, _, colors, _, _ ->
-            val state = viewModel.state.collectAsState()
-            val searchFieldState = viewModel.searchField.state.collectAsState()
             Text(
                 text = if (!searchInFocus) {
-                    state.value.helpText
+                    state.helpText
                 } else {
                     stringResource(
-                        id = if (searchFieldState.value.textField.text.isEmpty()) {
+                        id = if (searchText.isEmpty()) {
                             R.string.calculator_last_search
                         } else {
                             R.string.calculator_search_result
