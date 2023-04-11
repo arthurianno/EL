@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.app.Application
 import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
@@ -15,6 +16,7 @@ import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.datasource.PersonalDataStorage
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.storage.UserHolder
@@ -55,6 +57,9 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
+import ru.SDK.BLE.DeviceCallBack
+import ru.SDK.BLE.DeviceService
+import ru.SDK.Test.ELTAConnect
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
@@ -86,6 +91,9 @@ class GlucometersManager @Inject constructor(
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
     private val client: RxBleClient,
+    private val application: Application,
+    private val personalData: PersonalDataStorage,
+    private val iiotSdkCallBack: DeviceCallBack,
     private val context: Context
 ) {
 
@@ -169,6 +177,7 @@ class GlucometersManager @Inject constructor(
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
         client.findConnection(address)
             .checkPinAndSend(address)
+            .deviceServiceConnect(address)
             .switchMap { connection ->
                 Observable.range(0, EVENTS_COUNT)
                     .concatMap {
@@ -417,10 +426,28 @@ class GlucometersManager @Inject constructor(
     private fun Observable<RxBleConnection>.checkPinAndSend(address: String): Observable<RxBleConnection> =
         this.switchMap { connection ->
             val pin = pinStorage.getPin(address)
-            when (pin.isNullOrEmpty()) {
-                true -> Observable.error(GlucometerPinIncorrectOrNotFoundError)
-                else -> connection.request(address, Commands.SetPin(pin))
+            if (pin.isNullOrEmpty()) {
+                Observable.error(GlucometerPinIncorrectOrNotFoundError)
+            } else {
+                connection.request(address, Commands.SetPin(pin))
                     .switchMap { Observable.just(connection) }
+            }
+        }
+
+    private fun <T> Observable<T>.deviceServiceConnect(address: String): Observable<T> =
+        doOnNext {
+            pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
+                personalData.getIiotLogin()
+                    .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
+                        DeviceService.init(
+                            application,
+                            iiotSdkLogin,
+                            iiotSdkPassword,
+                            iiotSdkCallBack
+                        )
+                        DeviceService.connect(ELTAConnect::class.java, address, pin)
+                    }
+                    .subscribe()
             }
         }
 
@@ -463,6 +490,7 @@ class GlucometersManager @Inject constructor(
 
     private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()
+            .deviceServiceConnect(address)
             .switchMap { client.findConnection(address) }
             .switchMap { connection ->
                 connection.setupNotification(UART_TX).map { Pair(connection, it) }

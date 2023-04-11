@@ -171,6 +171,7 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.presentation))
     api(project(Module.data))
+    implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)

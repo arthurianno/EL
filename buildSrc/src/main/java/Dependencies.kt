@@ -117,7 +117,7 @@ object Dependencies {
 
     object Google {
         private const val materialVersion = "1.6.1"
-        private const val gsonVersion = "2.8.5" // 2.9.1
+        private const val gsonVersion = "2.10.1"
 
         const val materialDesign = "com.google.android.material:material:$materialVersion"
         const val gson = "com.google.code.gson:gson:$gsonVersion"

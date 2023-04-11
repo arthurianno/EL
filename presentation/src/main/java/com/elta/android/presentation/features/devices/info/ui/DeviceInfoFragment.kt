@@ -60,12 +60,12 @@ class DeviceInfoFragment :
         pm.nameDeviceState.bindTo(binding.titleTextView.text())
         pm.descriptionAddressState.bindTo(binding.descriptionTextView.text())
         pm.deleteDeviceDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
-        pm.requestEnableBluetoothCommand.observable
-            .subscribe {
-                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                    .launchForResult(requireActivity(), REQUEST_CODE_ENABLE_BLUETOOTH)
-            }
+        pm.requestEnableBluetoothCommand.bindTo {
+            Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                .launchForResult(requireActivity(), REQUEST_CODE_ENABLE_BLUETOOTH)
+        }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {

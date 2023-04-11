@@ -69,7 +69,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
         DaggerAppComponent
             .builder()
             .context(this)
-            .appModule(AppModule(BuildConfig.IS_LOG_ENABLED, BuildConfig.DEBUG))
+            .appModule(AppModule(this, BuildConfig.IS_LOG_ENABLED, BuildConfig.DEBUG))
             .apiConstantsModule(ApiConstantsModule(BuildConfig.SERVER_URL))
             .interceptorModule(
                 InterceptorModule(
