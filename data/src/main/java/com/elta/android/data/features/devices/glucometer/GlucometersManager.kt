@@ -132,9 +132,18 @@ class GlucometersManager @Inject constructor(
                     .map { filterConnectedDevices(connectedDevices, it) }
             }
 
-    fun getDevices(): Single<List<GlucometerDto>> =
-        Single.just(glucometersCache.getAll(CommonConditions.All))
-            .map(glucometerFromCacheMapper::mapFromObjects)
+    fun getDevices(): Single<List<Pair<GlucometerDto, GlucometerInfoDto>>> =
+        Single.just(
+            glucometersCache.getAll(CommonConditions.All)
+                .map(glucometerFromCacheMapper::mapFromObject)
+                .map {
+                    val id = it.address.hashCode().toLong()
+                    it to glucometersInfoFromCacheMapper.mapFromObject(
+                        glucometersInfoCache.get(CommonConditions.ById(id))
+                            ?: GlucometerInfoCachedDto(id = id, secondaryId = it.address)
+                    )
+                }
+        )
 
     fun getDevice(address: String): Single<GlucometerDto> =
         Single.just(glucometersCache.get(CommonConditions.ById(address.hashCode().toLong())))

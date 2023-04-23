@@ -13,7 +13,7 @@ interface DeviceRepository {
 
     fun findDevices(): Observable<List<Glucometer>>
 
-    fun getDevices(): Single<List<Glucometer>>
+    fun getDevices(): Single<List<Pair<Glucometer, GlucometerInfo>>>
 
     fun getDevice(address: String): Single<Glucometer>
 

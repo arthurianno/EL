@@ -15,7 +15,7 @@ import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class DevicesPm @Inject constructor(
-    private val getGlucometersUseCase: GetGlucometersUseCase,
+    private val getGlucometers: GetGlucometersUseCase,
     private val itemsBuilder: DevicesOptionsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -54,7 +54,7 @@ class DevicesPm @Inject constructor(
         getGlucometersAction.observable
             .skipWhileInProgress()
             .flatMapSingle {
-                getGlucometersUseCase.execute()
+                getGlucometers.execute()
                     .bindProgress()
                     .bindEmpty(emptyControl.visibilityState.consumer)
                     .map(itemsBuilder::buildItems)

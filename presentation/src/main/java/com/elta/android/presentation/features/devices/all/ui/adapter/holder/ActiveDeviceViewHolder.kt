@@ -16,7 +16,7 @@ class ActiveDeviceViewHolder(
         with(binding) {
             deviceIconView.setImageResource(item.icon)
             deviceNameView.text = item.name
-            deviceAddressView.text = item.address
+            deviceAddressView.text = item.serial
             root.setOnClickListener {
                 bus.click(Clicks.ActiveDeviceItemClicked(item))
             }
