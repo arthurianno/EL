@@ -60,7 +60,6 @@ dependencies {
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Utils.jsr310)
     implementation(platform(Dependencies.Google.FireBase.bom))
-    implementation(Dependencies.Google.FireBase.databaseBom)
     implementation(Dependencies.Google.FireBase.storageBom)
     implementation(Dependencies.Jetpack.WorkManager.core)
 }
