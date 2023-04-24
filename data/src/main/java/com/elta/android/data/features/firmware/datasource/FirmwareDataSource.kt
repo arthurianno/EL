@@ -8,6 +8,7 @@ import io.reactivex.Single
 interface FirmwareDataSource {
 
     fun getFirmwareInfo(): Single<FirmwareNetworkResponse>
-
     fun getFirmware(firmware: Firmware): Single<FirmwareFileStorageEntity>
+    fun getModelFirmwareInfo(modelId: String): Single<FirmwareNetworkResponse>
+    fun getModelFirmware(firmware: Firmware, modelId: String): Single<FirmwareFileStorageEntity>
 }

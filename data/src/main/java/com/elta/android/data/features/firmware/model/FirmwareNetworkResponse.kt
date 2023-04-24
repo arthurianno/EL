@@ -7,6 +7,7 @@ data class FirmwareNetworkResponse(
     @SerializedName("compatible") val compatible: String?
 ) {
     data class ActualFirmware(
+        @SerializedName("id") val id: String,
         @SerializedName("version") val version: String,
         @SerializedName("size") val size: Int,
         @SerializedName("hash") val hash: String

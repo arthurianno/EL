@@ -25,4 +25,15 @@ class FirmwareRemoteDataSource @Inject constructor(
                     firmware.toFirmwareFileStorage(file)
                 } ?: throw FirmwareDownloadingError
             }.validateFileHash(firmware, FirmwareDownloadingError)
+
+    override fun getModelFirmwareInfo(modelId: String): Single<FirmwareNetworkResponse> =
+        api.getModelFirmwareInfo(modelId)
+
+    override fun getModelFirmware(firmware: Firmware, modelId: String): Single<FirmwareFileStorageEntity> =
+        api.downloadModelFirmware(modelId = modelId, version = firmware.version)
+            .map { body ->
+                firmwaresManager.writeToFile(firmware.version, body)?.let { file ->
+                    firmware.toFirmwareFileStorage(file)
+                } ?: throw FirmwareDownloadingError
+            }.validateFileHash(firmware, FirmwareDownloadingError)
 }
