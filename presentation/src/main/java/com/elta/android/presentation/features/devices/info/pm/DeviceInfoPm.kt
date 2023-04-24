@@ -56,11 +56,6 @@ class DeviceInfoPm @Inject constructor(
         observeSetPrimaryDeviceClicks()
         observeBluetoothEnable()
 
-        addressState.observable
-            .map { resources.getString(R.string.profile_device_info_description, it) }
-            .subscribe(descriptionAddressState.consumer)
-            .untilDestroy()
-
         checkUpdateAction.observable
             .skipWhileInProgress()
             .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
@@ -167,6 +162,12 @@ class DeviceInfoPm @Inject constructor(
 
     private fun handleSuccess(data: Pair<Glucometer, GlucometerInfo>) {
         glucometer = data.first
+        descriptionAddressState.consumer.accept(
+            resources.getString(
+                R.string.profile_device_info_description,
+                data.second.glucometerSerialNumber.orEmpty()
+            )
+        )
         items.consumer.accept(itemsBuilder.buildItems(data.second, data.first.isPrimary))
     }
 

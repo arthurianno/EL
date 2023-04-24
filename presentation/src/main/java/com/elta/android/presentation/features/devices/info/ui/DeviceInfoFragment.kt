@@ -31,6 +31,15 @@ private const val REQUEST_CODE_ENABLE_BLUETOOTH = 146
 class DeviceInfoFragment :
     BaseRecyclerViewFragment<DeviceInfoPm, FragmentDeviceInfoBinding>(FragmentDeviceInfoBinding::inflate) {
 
+    companion object {
+        fun newInstance(name: String, address: String) = DeviceInfoFragment().apply {
+            arguments = bundle(
+                DEVICE_NAME to name,
+                DEVICE_ADDRESS to address
+            )
+        }
+    }
+
     @Inject
     lateinit var deviceInfoAdapter: DeviceInfoAdapter
 
@@ -70,16 +79,6 @@ class DeviceInfoFragment :
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH && resultCode == Activity.RESULT_OK) {
             presentationModel.bluetoothEnabledAction.consumer.accept(Unit)
-        }
-    }
-
-    companion object {
-
-        fun newInstance(name: String, address: String) = DeviceInfoFragment().apply {
-            arguments = bundle(
-                DEVICE_NAME to name,
-                DEVICE_ADDRESS to address
-            )
         }
     }
 }

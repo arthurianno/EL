@@ -22,7 +22,7 @@ class DeviceRemoteDataSource @Inject constructor(
     override fun findDevices(): Observable<List<GlucometerDto>> =
         glucometersManager.findDevices().map(scanToDtoMapper::mapFromObjects)
 
-    override fun getDevices(): Single<List<GlucometerDto>> =
+    override fun getDevices(): Single<List<Pair<GlucometerDto, GlucometerInfoDto>>> =
         glucometersManager.getDevices()
 
     override fun getDevice(address: String): Single<GlucometerDto> =

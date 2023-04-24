@@ -80,14 +80,14 @@ class BluetoothPm @Inject constructor(
                 getGlucometersUseCase.execute()
                     .doOnSuccess { results ->
                         scanResults.clear()
-                        scanResults.addAll(results)
+                        scanResults.addAll(results.map { it.first })
                         items.consumer.accept(
                             results.map { meter ->
                                 DeviceItem(
-                                    id = meter.id,
-                                    name = meter.name ?: "Unknown device",
-                                    address = meter.address,
-                                    isSelected = meter.address == glucometer?.address,
+                                    id = meter.first.id,
+                                    name = meter.first.name ?: "Unknown device",
+                                    address = meter.second.glucometerSerialNumber.orEmpty(),
+                                    isSelected = meter.first.address == glucometer?.address,
                                     isLast = false
                                 )
                             }
@@ -234,12 +234,14 @@ class BluetoothPm @Inject constructor(
             is LocationPermissionNotGrantedError -> requestLocationPermissionsCommand.consumer.accept(
                 Unit
             )
+
             is LocationNotEnabledError -> requestEnableLocationCommand.consumer.accept(Unit)
             is GlucometerPinIncorrectOrNotFoundError -> {
                 openPinCodeDialogCommand.consumer.accept("SatelliteOnline")
                 Timber.e(error)
 //                showSnackBar(SnackBarMessageData.SimpleTextMessage("Enter pin code at input field and press SET PIN"))
             }
+
             is FirmwareDownloadingError -> showSnackBar(SnackBarMessageData.SimpleTextMessage("Firmware file is invalid"))
             else -> super.handleError(error)
         }

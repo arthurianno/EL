@@ -7,5 +7,6 @@ data class ActiveDeviceItem(
     @DrawableRes val icon: Int,
     val name: String,
     val address: String,
+    val serial: String,
     val isPrimary: Boolean
 ) : ListItem
