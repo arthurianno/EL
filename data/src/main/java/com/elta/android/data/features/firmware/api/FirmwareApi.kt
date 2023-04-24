@@ -13,4 +13,13 @@ interface FirmwareApi {
 
     @GET("api/glucometer/v1/firmwares/v{version}")
     fun downloadFirmware(@Path("version") version: String): Single<ResponseBody>
+
+    @GET("api/glucometer/v1/{glucometerModelId}/firmwares")
+    fun getModelFirmwareInfo(@Path("glucometerModelId") modelId: String): Single<FirmwareNetworkResponse>
+
+    @GET("api/glucometer/v1/{glucometerModelId}/firmwares/v{version}")
+    fun downloadModelFirmware(
+        @Path("glucometerModelId") modelId: String,
+        @Path("version") version: String
+    ): Single<ResponseBody>
 }

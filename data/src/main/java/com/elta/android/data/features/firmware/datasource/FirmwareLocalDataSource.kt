@@ -23,4 +23,18 @@ class FirmwareLocalDataSource @Inject constructor(
                 firmware.toFirmwareFileStorage(file)
             } ?: throw NoSuchFirmware
         }.validateFileHash(firmware, NoSuchFirmware)
+
+    override fun getModelFirmwareInfo(modelId: String): Single<FirmwareNetworkResponse> {
+        throw UnsupportedOperationException("${this.javaClass.simpleName} doesn't support getFirmwareInfo.")
+    }
+
+    override fun getModelFirmware(
+        firmware: Firmware,
+        modelId: String
+    ): Single<FirmwareFileStorageEntity> =
+        Single.fromCallable {
+            firmwaresManager.getFile(firmware.version)?.let { file ->
+                firmware.toFirmwareFileStorage(file)
+            } ?: throw NoSuchFirmware
+        }.validateFileHash(firmware, NoSuchFirmware)
 }

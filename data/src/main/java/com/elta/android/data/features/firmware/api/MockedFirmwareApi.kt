@@ -21,6 +21,7 @@ class MockedFirmwareApi(
             Timber.d("firmware hash: $hash")
             FirmwareNetworkResponse(
                 actual = FirmwareNetworkResponse.ActualFirmware(
+                    id = "Darick",
                     version = "3.0",
                     size = 0,
                     hash = hash
@@ -30,6 +31,25 @@ class MockedFirmwareApi(
         }
 
     override fun downloadFirmware(version: String): Single<ResponseBody> =
+        Single.fromCallable {
+            val stream = context.resources.openRawResource(R.raw.satellite_online_30)
+            stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())
+        }
+
+    override fun getModelFirmwareInfo(modelId: String): Single<FirmwareNetworkResponse> =
+        Single.just(
+            FirmwareNetworkResponse(
+                actual = FirmwareNetworkResponse.ActualFirmware(
+                    id = "Elyce",
+                    version = "Farrah",
+                    size = 3811,
+                    hash = "Kanani"
+                ),
+                compatible = null
+            )
+        )
+
+    override fun downloadModelFirmware(modelId: String, version: String): Single<ResponseBody> =
         Single.fromCallable {
             val stream = context.resources.openRawResource(R.raw.satellite_online_30)
             stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())
