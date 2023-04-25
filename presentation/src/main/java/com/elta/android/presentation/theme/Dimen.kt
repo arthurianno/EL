@@ -58,8 +58,7 @@ data class EltaDimens(
     val scannerInfoSheetPadding: PaddingValues,
     val scannerPreviewLeftPadding: Dp,
     val scannerPreviewTopPadding: Dp,
-    val connectHelpTextBlockInterval: Dp
-    val portionCountHelpPadding: PaddingValues,
+    val connectHelpTextBlockInterval: Dp,
     // Consultant
     val consultantTopBarContentPadding: PaddingValues,
     val consultantTopBarProgress: Dp,
@@ -135,8 +134,7 @@ internal val eltaDimens = EltaDimens(
     scannerInfoSheetPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
     scannerPreviewLeftPadding = 40.dp,
     scannerPreviewTopPadding = 190.dp,
-    connectHelpTextBlockInterval = 20.dp
-    portionCountHelpPadding = PaddingValues(horizontal = 76.dp),
+    connectHelpTextBlockInterval = 20.dp,
     consultantTopBarContentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
     consultantTopBarProgress = 8.dp,
     consultantBottomBarContentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),

@@ -20,7 +20,11 @@ internal fun PhotoPreviewTopAppBar(widgetModel: PhotoPreviewTopAppBarWidgetModel
             backgroundColor = colors.black,
             elevation = dimens.zero,
             navigationIcon = {
-                ButtonCircle(icon = R.drawable.ic_back, tint = colors.white) {
+                ButtonCircle(
+                    icon = R.drawable.ic_back,
+                    tint = colors.white,
+                    contentDescriptionId = R.string.content_description_back_button
+                ) {
                     widgetModel.sendAction(ConsultantAction.PreviewBackPressure)
                 }
             }

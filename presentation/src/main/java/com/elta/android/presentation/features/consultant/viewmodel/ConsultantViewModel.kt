@@ -63,7 +63,7 @@ class ConsultantViewModel @Inject constructor(
     private val savePdf: CachedPdfUseCase,
     private val saveJpg: CachedJpgUseCase,
     private val audioRecorder: AudioRecorder
-) : BaseViewModel<ConsultantViewState, Event, ConsultantAction>(), LifecycleEventObserver {
+) : BaseViewModel<ConsultantViewState>(), LifecycleEventObserver {
 
     override fun createInitState(): ConsultantViewState =
         ConsultantViewState(
@@ -156,6 +156,16 @@ class ConsultantViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            AppAction.BackPressure -> backClick()
+            ConsultantAction.StopRecVoiceClick -> stopRecordVoice()
+            ConsultantAction.DeleteRecVoiceClick -> deleteRecordVoice()
+            is ConsultantAction.StartRecVoiceClick -> startRecordVoice(action.permissionStatus)
+            is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord()
+            is ConsultantAction.ChatMessageClick -> sendEvent(ShowToast(action.message.text))
+        }
+    }
     override fun reduceStateByAction(
         currentState: ConsultantViewState,
         action: Action
@@ -198,17 +208,7 @@ class ConsultantViewModel @Inject constructor(
                 currentState.copy(isPhotoPreview = false)
             }
 
-            else -> {
-                when (action) {
-                    AppAction.BackPressure -> backClick()
-                    ConsultantAction.StopRecVoiceClick -> stopRecordVoice()
-                    ConsultantAction.DeleteRecVoiceClick -> deleteRecordVoice()
-                    is ConsultantAction.StartRecVoiceClick -> startRecordVoice(action.permissionStatus)
-                    is ConsultantAction.SendVoiceRecClick -> sendVoiceRecord()
-                    is ConsultantAction.ChatMessageClick -> sendEvent(ShowToast(action.message.text))
-                }
-                currentState
-            }
+            else -> currentState
         }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -238,7 +238,6 @@ class ConsultantViewModel @Inject constructor(
             audioRecorder.deleteFile()
         }
     }
-
 
     private fun stopRecordVoice() {
         recordFileUri = audioRecorder.stop()
