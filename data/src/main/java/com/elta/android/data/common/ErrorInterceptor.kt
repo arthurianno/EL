@@ -46,7 +46,7 @@ class ErrorInterceptor @Inject constructor(
         val responseCode = response.code
         when {
             responseCode == ERROR_CODE_400 || responseCode.firstDigit() == SERVER_ERROR ->
-                throw ServiceUnavailableError()
+                throw ServiceUnavailableError("response code = $responseCode")
 
             responseCode == ERROR_CODE_410 -> throw ProfileIsDeletedError(response.message)
             responseCode == ERROR_CODE_403 -> throw UnauthorizedError()

@@ -57,8 +57,8 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
-import ru.SDK.BLE.DeviceCallBack
-import ru.SDK.BLE.DeviceService
+import ru.SDK.Test.DeviceCallBack
+import ru.SDK.Test.DeviceService
 import ru.SDK.Test.ELTAConnect
 import timber.log.Timber
 import java.nio.charset.Charset
@@ -74,6 +74,7 @@ private const val EVENTS_COUNT = 1000
 private const val SYNC_DELAY = 500L
 private const val COMMAND_DELAY = 20L
 private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
+private const val IIOT_SDK_ENABLE = false
 
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
@@ -445,18 +446,20 @@ class GlucometersManager @Inject constructor(
 
     private fun <T> Observable<T>.deviceServiceConnect(address: String): Observable<T> =
         doOnNext {
-            pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
-                personalData.getIiotLogin()
-                    .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
-                        DeviceService.init(
-                            application,
-                            iiotSdkLogin,
-                            iiotSdkPassword,
-                            iiotSdkCallBack
-                        )
-                        DeviceService.connect(ELTAConnect::class.java, address, pin)
-                    }
-                    .subscribe()
+            if (IIOT_SDK_ENABLE) {
+                pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
+                    personalData.getIiotLogin()
+                        .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
+                            DeviceService.init(
+                                application,
+                                iiotSdkLogin,
+                                iiotSdkPassword,
+                                iiotSdkCallBack
+                            )
+                            DeviceService.connect(ELTAConnect::class.java, address, pin)
+                        }
+                        .subscribe()
+                }
             }
         }
 
