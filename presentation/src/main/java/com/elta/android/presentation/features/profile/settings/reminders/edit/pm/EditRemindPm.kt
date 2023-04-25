@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.reminders.edit.pm
 
+import com.elta.android.common.errors.ReminderTimeInPastError
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.reminder.interactor.DeleteReminderUseCase
 import com.elta.android.domain.features.reminder.interactor.GetReminderByIdUseCase
@@ -21,6 +22,7 @@ import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class EditRemindPm @Inject constructor(
@@ -45,60 +47,16 @@ class EditRemindPm @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         loadReminder()
-
-        deleteRemindAction.observable
-            .switchMapMaybe {
-                deleteRemindDialogControl.showForResult(deleteRemindDialogData)
-            }
-            .filter { it == DialogResult.POSITIVE }
-            .map { reminderState.value }
-            .map(::createDeleteReminderUseCaseParams)
-            .flatMapSingle { params ->
-                deleteReminderUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .map { params.reminder }
-                    .doOnSuccess(remindersManager::cancelReminder)
-                    .map { Unit }
-                    .doOnSuccess(::handleDeleted)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        saveReminderAction.observable
-            .skipWhileInProgress()
-            .map(::createUpdateReminderParams)
-            .flatMapSingle { params ->
-                updateReminderUseCase.execute(params)
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .map { params.reminder }
-                    .doOnSuccess { reminder ->
-                        remindersManager.cancelReminder(reminder)
-                        remindersManager.addReminder(reminder)
-                    }
-                    .map { Unit }
-                    .doOnSuccess(::handleSuccess)
-                    .doOnError(::handleError)
-            }
-            .retry()
-            .subscribe()
-            .untilDestroy()
-
-        lifecycleObservable
-            .filter { it == Lifecycle.CREATED }
-            .map { Unit }
-            .retry()
-            .subscribe { createScheduleItems() }
-            .untilDestroy()
+        deleteActionSubscribe()
+        saveActionSubscribe()
+        lifecycleSubsribe()
     }
 
     override fun handleBack(i: Unit) {
-        when (isFormChangedState.value) {
-            true -> exitDialogAction.consumer.accept(Unit)
-            else -> router.exit()
+        if (isFormChangedState.value) {
+            exitDialogAction.consumer.accept(Unit)
+        } else {
+            router.exit()
         }
     }
 
@@ -123,6 +81,61 @@ class EditRemindPm @Inject constructor(
 
     fun setReminderId(id: String) {
         reminderIdState.consumer.accept(id)
+    }
+
+    private fun lifecycleSubsribe() {
+        lifecycleObservable
+            .filter { it == Lifecycle.CREATED }
+            .map { Unit }
+            .retry()
+            .subscribe { createScheduleItems() }
+            .untilDestroy()
+    }
+
+    private fun saveActionSubscribe() {
+        saveReminderAction.observable
+            .skipWhileInProgress()
+            .map(::createUpdateReminderParams)
+            .doOnError(::handleError)
+            .flatMapSingle { params ->
+                updateReminderUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .map { params.reminder }
+                    .doOnSuccess { reminder ->
+                        remindersManager.cancelReminder(reminder)
+                        remindersManager.addReminder(reminder)
+                    }
+                    .map { Unit }
+                    .doOnSuccess(::handleSuccess)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun deleteActionSubscribe() {
+        deleteRemindAction.observable
+            .switchMapMaybe {
+                deleteRemindDialogControl.showForResult(deleteRemindDialogData)
+            }
+            .filter { it == DialogResult.POSITIVE }
+            .map { reminderState.value }
+            .map(::createDeleteReminderUseCaseParams)
+            .flatMapSingle { params ->
+                deleteReminderUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .map { params.reminder }
+                    .doOnSuccess(remindersManager::cancelReminder)
+                    .map { Unit }
+                    .doOnSuccess(::handleDeleted)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun loadReminder() {
@@ -169,13 +182,17 @@ class EditRemindPm @Inject constructor(
 
     private fun createUpdateReminderParams(i: Unit): UpdateReminderUseCase.Params {
         val form = reminderFormHolderState.value
-        return UpdateReminderUseCase.Params(
-            reminderState.value.copy(
-                title = checkNotNull(form.inputValue),
-                date = checkNotNull(form.date),
-                scheduleType = checkNotNull(form.schedule)
+        return if (form.date?.isAfter(ZonedDateTime.now()) == true) {
+            UpdateReminderUseCase.Params(
+                reminderState.value.copy(
+                    title = checkNotNull(form.inputValue),
+                    date = checkNotNull(form.date),
+                    scheduleType = checkNotNull(form.schedule)
+                )
             )
-        )
+        } else {
+            throw ReminderTimeInPastError()
+        }
     }
 
     private fun bindReminder(reminder: Reminder) {

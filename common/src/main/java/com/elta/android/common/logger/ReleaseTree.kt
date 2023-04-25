@@ -1,11 +1,12 @@
 package com.elta.android.common.logger
 
-import android.content.Context
 import android.util.Log
-import com.elta.android.common.logger.model.DeviceDetails
+import java.io.File
 
-class ReleaseTree(deviceDetails: DeviceDetails, context: Context) :
-    BaseTree(deviceDetails, context) {
-
-    override fun isLoggable(tag: String?, priority: Int): Boolean = priority == Log.INFO
+class ReleaseTree(
+    logsFile: File,
+    private val enableLog: Boolean
+) : BaseTree(logsFile) {
+    override fun isLoggable(tag: String?, priority: Int): Boolean =
+        enableLog || priority == Log.INFO || priority == Log.ERROR
 }

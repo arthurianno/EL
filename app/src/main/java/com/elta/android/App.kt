@@ -38,13 +38,21 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     override fun onCreate() {
         super.onCreate()
-        FirebaseApp.initializeApp(this)
-        initializeInjector()
-        initializeLogger()
-        initializeTime()
-        initializeSocialNetworks()
-        initalizeYandexMapKit()
+        initFirebase()
+        initInjector()
+        initLogger()
+        initTime()
+        initSocialNetworks()
+        initYandexMapKit()
+        initRxJava()
+    }
+
+    private fun initRxJava() {
         RxJavaPlugins.setErrorHandler { Timber.e(it, "RxJava global error: ") }
+    }
+
+    private fun initFirebase() {
+        FirebaseApp.initializeApp(this)
     }
 
     override fun attachBaseContext(base: Context) {
@@ -57,16 +65,16 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
     override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> =
         dispatchingReceiverInjector
 
-    private fun initializeInjector() {
+    private fun initInjector() {
         DaggerAppComponent
             .builder()
             .context(this)
-            .appModule(AppModule(BuildConfig.IS_LOG_ENABLED))
+            .appModule(AppModule(this, BuildConfig.IS_LOG_ENABLED, BuildConfig.DEBUG))
             .apiConstantsModule(ApiConstantsModule(BuildConfig.SERVER_URL))
             .interceptorModule(
                 InterceptorModule(
                     App::class.java.simpleName,
-                    HttpLoggingInterceptor.Level.BODY
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
                 )
             )
             .analyticsModule(AnalyticsModule(this))
@@ -74,19 +82,19 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
             .inject(this)
     }
 
-    private fun initializeLogger() {
+    private fun initLogger() {
         Timber.plant(logTree)
     }
 
-    private fun initializeTime() {
+    private fun initTime() {
         AndroidThreeTen.init(this)
     }
 
-    private fun initalizeYandexMapKit() {
+    private fun initYandexMapKit() {
         MapKitFactory.setApiKey(resources.getString(R.string.yandex_map_api_key))
     }
 
-    private fun initializeSocialNetworks() {
+    private fun initSocialNetworks() {
         SocialNetworks.initialize(this)
     }
 }

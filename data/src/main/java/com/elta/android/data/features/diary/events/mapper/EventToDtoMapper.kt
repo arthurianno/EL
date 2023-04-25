@@ -37,6 +37,7 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
                     mealTag = mealTag?.let { MealTagDto.valueOf(it.name) },
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it.name) },
                     insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
+                    glucometerSerialNumber = glucometerSerialNumber,
                     products = dishes.toNetwork(),
                     productsCount = dishes.countOrZero()
                 )

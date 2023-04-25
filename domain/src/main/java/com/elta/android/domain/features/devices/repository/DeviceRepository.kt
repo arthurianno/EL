@@ -6,13 +6,14 @@ import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Suppress("TooManyFunctions", "ComplexInterface")
 interface DeviceRepository {
 
     fun findDevices(): Observable<List<Glucometer>>
 
-    fun getDevices(): Single<List<Glucometer>>
+    fun getDevices(): Single<List<Pair<Glucometer, GlucometerInfo>>>
 
     fun getDevice(address: String): Single<Glucometer>
 
@@ -31,4 +32,6 @@ interface DeviceRepository {
     fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String>
 
     fun setPrimaryDevice(address: String): Completable
+
+    fun findGlucometer(address: String): Flow<Unit>
 }

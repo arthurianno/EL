@@ -1,11 +1,13 @@
 package com.elta.android.presentation.features.profile.settings.reminders.base.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentReminderFormBinding
@@ -48,10 +50,12 @@ abstract class BaseRemindFragment<T : BaseRemindPm> :
         pm.showExistingReminderDialog.bindTo { activity.showToast(getString(R.string.reminder_is_exists)) }
     }
 
-    override fun handleBack() {
-        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+        }
     }
-
     private fun T.bindDateSelection() {
         showDatePickerDialog.bindTo { originalDate ->
             activity.showDatePickerDialog(originalDate, minDate = ZonedDateTime.now()) {

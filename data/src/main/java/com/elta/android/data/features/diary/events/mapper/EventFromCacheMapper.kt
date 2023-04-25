@@ -31,6 +31,7 @@ class EventFromCacheMapper @Inject constructor() : Mapper<EventCachedDto, EventD
                     insulinType = insulinType?.let { InsulinTypeDto.valueOf(it) },
                     type = EventTypeDto.valueOf(type),
                     insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
+                    glucometerSerialNumber = glucometerSerialNumber,
                     products = productsList,
                     productsCount = productsList.countOrZero()
                 ),

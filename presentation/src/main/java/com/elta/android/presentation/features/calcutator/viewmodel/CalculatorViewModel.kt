@@ -11,7 +11,6 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.common.Event
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
@@ -39,7 +38,7 @@ class CalculatorViewModel @Inject constructor(
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
 ) :
-    BaseViewModel<CalculatorViewState, Event, CalculatorAction>() {
+    BaseViewModel<CalculatorViewState>() {
     override fun createInitState(): CalculatorViewState =
         CalculatorViewState(
             dishes = emptyList(),
@@ -108,16 +107,14 @@ class CalculatorViewModel @Inject constructor(
         reduceState { state.value.copy(helpText = text) }
     }
 
-    fun lastWordOnClick(word: String) {
-        sendAction(CalculatorAction.LastWordClick(word))
-    }
-
-    fun dishOnClick(dish: DishUiEntity) {
-        sendAction(CalculatorAction.AddDishClick(dish))
-    }
-
-    fun dishDeleteOnClick(dish: DishUiEntity) {
-        dishDeleteConfirmDialog.dialogOpen(dish)
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
+            is CalculatorAction.DishClick -> dishClick(action.dish)
+            is CalculatorAction.DeleteDishClick -> dishDeleteConfirmDialog.dialogOpen(action.dish)
+            AppAction.BackPressure -> backPressure()
+            DownButtonClick -> saveDishes()
+        }
     }
 
     override fun reduceStateByAction(
@@ -131,15 +128,7 @@ class CalculatorViewModel @Inject constructor(
                 currentState.copy(searchInFocus = inFocusState)
             }
 
-            else -> {
-                when (action) {
-                    is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
-                    is CalculatorAction.AddDishClick -> dishClick(action.dish)
-                    AppAction.BackPressure -> backPressure()
-                    DownButtonClick -> saveDishes()
-                }
-                currentState
-            }
+            else -> currentState
         }
 
     private fun backPressure() {

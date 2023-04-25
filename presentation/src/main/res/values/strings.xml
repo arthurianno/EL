@@ -10,6 +10,12 @@
     <string name="gender_not_specified">Пол не указан</string>
     <string name="yes_text">Да</string>
     <string name="no_text">Нет</string>
+    <string name="cancel_text">Отмена</string>
+    <string name="list_numbering_1_dot">1.</string>
+    <string name="list_numbering_2_dot">2.</string>
+    <string name="list_numbering_3_dot">3.</string>
+    <string name="list_numbering_4_dot">4.</string>
+    <string name="list_numbering_5_dot">5.</string>
 
     <!-- ERROR VIEW ERRORS -->
     <string name="error_server_not_responding_title">Сервер недоступен</string>
@@ -39,7 +45,8 @@
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
     <string name="registration_send_again">Отправить письмо повторно</string>
     <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
-    <string name="registration_error_same_email">Данному пользователю уже отправлено приглашение</string>
+    <string name="registration_error_same_email">Данный пользователь уже является вашим наблюдателем</string>
+    <string name="registration_error_same_email_awaiting">Данному пользователю уже отправлено приглашение</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="registration_password_the_same">Придумайте новый пароль</string>
@@ -58,6 +65,7 @@
     <string name="auth_title">С возвращением!</string>
     <string name="auth_subtitle">Чтобы продолжить, введите ваш email\nи пароль от аккаунта</string>
     <string name="auth_button_continue">Войти</string>
+    <string name="auth_email_and_password_not_correct">Некорректный email или пароль</string>
 
     <string name="auth_password_recovery_title">Восстановление пароля</string>
     <string name="auth_password_recovery_subtitle">Введите email, указанный при регистрации аккаунта в нашем приложении</string>
@@ -326,16 +334,57 @@
     <string name="sync_state_action_button_device_found">Подключить глюкометр</string>
 
     <string name="sync_state_title_sync_completed">Синхронизация\nзавершена!</string>
-    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром\nвыполнена успешно. Вы можете перейти\nк работе с приложением</string>
+    <string name="sync_state_subtitle_sync_completed">Синхронизация с вашим глюкометром выполнена успешно. Вы можете перейти к работе с приложением</string>
     <string name="sync_state_action_sync_completed">Перейти к приложению</string>
 
     <string name="sync_connect_menu_button_text">Пропустить этот шаг</string>
+    <string name="sync_connect_start_title">Хотите подключить глюкометр?</string>
+    <string name="sync_connect_start_text">Вы можете подключить глюкометр сейчас или пропустить этот шаг и сделать это позже в своём профиле</string>
 
     <string name="sync_connect_device_not_found">Устройство не найдено</string>
     <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
     <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
     <string name="sync_connect_sync_error">Ошибка синхронизации с устройством</string>
     <string name="sync_connect_button_retry">Повторить</string>
+    <string name="sync_connection_help_sheet_title">Не получается подключить устройство через DMC?</string>
+    <string name="sync_connection_help_sheet_text">Если по каким-либо причинам Вам не удаётся подключиться с помощью считывания DMC-кода, то советуем воспользоваться подключением через ПИН-код.</string>
+    <string name="sync_connection_exit_from_connecting_dialog_text">Вы уверены, что хотите прекратить подключение и выйти?</string>
+    <string name="sync_connection_exit_from_sync_dialog_text">Вы уверены, что хотите прекратить синхронизацию и выйти?</string>
+    <string name="connection_process_text">Идёт процесс подключения к устройству...</string>
+    <string name="sync_process_text">Идёт процесс синхронизации с глюкометром...</string>
+    <string name="sync_connection_screen_title">Подключаемся...</string>
+    <string name="sync_connection_screen_text">Проверяем Bluetooth-соединение и устанавливаем связь с вашим устройством.</string>
+    <string name="sync_connection_connect_error_title">Ошибка подключения</string>
+    <string name="sync_connection_sync_error_title">Ошибка синхронизации</string>
+    <string name="sync_connection_error_text">Проверьте, что глюкометр готов/доступен для подключения. Если подключиться так и не удается, повторите попытку позднее.</string>
+    <string name="sync_connection_scanner_sheet_info_text">Расположите DMC-код внутри выделенной области сверху</string>
+    <string name="sync_connection_scanner_sheet_error_title">Ошибка чтения</string>
+    <string name="sync_connection_scanner_sheet_error_text">Наведите камеру на DMC-код ещё раз</string>
+    <string name="sync_connected_text">Поздравляем! Глюкометр %s успешно подключен. Вы можете перейти к работе с приложением после завершения синхронизации.</string>
+    <string name="sync_connect_by_pin_boton_text">Подключить через ПИН-код</string>
+    <string name="repeat_search_button_text">Повторить поиск</string>
+    <string name="repeat_connect_button_text">Повторить подключение</string>
+    <string name="repeat_sync_button_text">Повторить синхронизацию</string>
+    <string name="connect_help_header_1">Как подключить глюкометр?</string>
+    <string name="connect_help_header_2">Подключение с помощью ПИН-кода</string>
+    <string name="connect_help_text_1_1">Ознакомьтесь с доступными вариантами подключения глюкометра к вашему устройству.</string>
+    <string name="connect_help_text_2_1">Включите Bluetooth® на вашем мобильном устройстве;</string>
+    <string name="connect_help_text_2_2">Включите глюкометр, нажав на кнопку;</string>
+    <string name="connect_help_text_2_3">Включите функцию Bluetooth® на Глюкометре Сателлит Online, удерживая кнопку в течении 3 секунд (до звукового сигнала). Наличие на экране символа говорит о том, что функция Bluetooth® включена.</string>
+
+    <string name="sync_connect_type_button_need_help">Нужна помощь?</string>
+    <string name="sync_connect_type_button_any_difficulties">Возникли сложности?</string>
+    <string name="sync_connect_type_button_enter_pin">Ввести ПИН-код</string>
+    <string name="sync_connect_type_button_scan_dmc">Отсканировать DMC-код</string>
+    <string name="sync_connect_type_title">Подключение</string>
+    <string name="sync_connect_type_text">Теперь необходимо синхронизировать ваш глюкометр с телефоном. Воспользуйтесь удобным для вас способом подключения:</string>
+    <string name="sync_connect_type_text_or">или</string>
+
+    <string name="sync_how_to_connect_button">Сканировать</string>
+    <string name="sync_how_to_connect_title">Как подключить?</string>
+    <string name="sync_how_to_connect_text_1">Проверьте, включен ли Bluetooth на вашем глюкометре;\n</string>
+    <string name="sync_how_to_connect_bluetooth_text">— индикатор включенного Bluetooth</string>
+    <string name="sync_how_to_connect_text_2">Переверните ваше устройство — на задней стороне корпуса должен быть стикер с изображением, похожим на QR. Это DMC-код, который нужно будет отсканировать.</string>
 
     <!-- DIARY FLOR -->
     <string name="diary_empty_state_title">За этот день у вас нет ни одной записи</string>
@@ -443,8 +492,11 @@
     <string name="profile_google_fit_activated_message">Теперь ваши тренировки из Google Fit будут подгружаться в Сателлит Online</string>
     <string name="profile_google_fit_activated_positive_button">Ок</string>
 
-    <string name="profile_name_min_length_error">Мин. количество символов - 2</string>
+    <string name="profile_first_name_min_length_error">Имя должно содержать минимум 2 символа</string>
+    <string name="profile_second_name_min_length_error">Фамилия должна содержать минимум 2 символа </string>
     <string name="profile_name_max_length_error">Макс. количество символов - 50</string>
+    <string name="profile_first_name_invalid_characters_error">Имя должно обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
+    <string name="profile_second_name_invalid_characters_error">Фамилия должна обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
 
     <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
@@ -488,7 +540,23 @@
     <string name="profile_device_info_charge_level_title_field">Заряд батареи:</string>
     <string name="profile_device_info_charge_level_field">%d/3</string>
     <string name="profile_device_info_change_primary_device">Сделать основным устройством</string>
-
+    <string name="profile_device_search">Найти устройство</string>
+    <string name="profile_device_search_off_title">Поиск выключен</string>
+    <string name="profile_device_search_off_text">Чтобы начать поиск нажмите кнопку выше — после этого устройство начнёт издавать звук.</string>
+    <string name="profile_device_search_connecting_title">Подключение...</string>
+    <string name="profile_device_search_connecting_text">Начинаем поиск! Подождите пока телефон подключится к глюкометру по Bluetooth — после этого вы сможете начать его искать.</string>
+    <string name="profile_device_search_on_title">Поиск включен</string>
+    <string name="profile_device_search_on_text1">Устройство обнаружено! Прислушайтесь, сейчас глюкометр издает сигнал — возможно, он где-то рядом.</string>
+    <string name="profile_device_search_on_text2">После того как найдёте глюкометр, не забудьте выключить режим поиска.</string>
+    <string name="profile_device_search_not_found_title">Устройство не найдено</string>
+    <string name="profile_device_search_not_found_text1">Проверьте возможные причины и повторно начните поиск, нажав кнопку выше.</string>
+    <string name="profile_device_search_not_found_connect_scenario_text1">Возможные причины:</string>
+    <string name="profile_device_search_not_found_text2">1. На глюкометре выключен Bluetooth;</string>
+    <string name="profile_device_search_not_found_text3">2. Батарея на устройстве отсутствует, имеет низкий заряд или полностью разряжена;</string>
+    <string name="profile_device_search_not_found_text4">3. Глюкометр находится вне зоны действия.</string>
+    <string name="profile_device_cancel_search_dialog_text">Вы уверены что хотите прекратить поиск и выйти?</string>
+    <string name="profile_device_cancel_ring_dialog_text">Внимание: при выходе с экрана звуковой сигнал устройства прекратится. Вы уверены, что хотите выйти?</string>
+    <string name="profile_device_snackbar_connecting_to_device">Идёт процесс поиска устройства...</string>
     <string name="profile_delete_device_dialog_title">Внимание</string>
     <string name="profile_delete_device_dialog_body">Вы действительно хотите удалить данный глюкометр?\nДанные будут сохранены</string>
     <string name="profile_delete_primary_device_dialog_body">Вы действительно хотите удалить основной глюкометр?\nДанные будут сохранены</string>
@@ -557,7 +625,7 @@
     <string name="statistic_glucose_index_description_low">Измерения ниже целевого диапазона</string>
 
     <string name="statistic_general_index_title_bread">Количество ХЕ</string>
-    <string name="statistic_general_index_title_insulin">Количество инсулина</string>
+    <string name="statistic_general_index_title_insulin">Количество общего инсулина</string>
     <string name="statistic_general_index_title_bolus_insulin">Болюсный инсулин</string>
     <string name="statistic_general_index_title_basal_insulin">Базальный инсулин</string>
     <string name="statistic_general_index_title_activity">Физическая активность</string>
@@ -569,7 +637,7 @@
     <string name="statistic_general_index_description_by_day_insulin">Количество общего инсулина\n(кроме смешанного): %s</string>
     <string name="statistic_general_index_description_by_period_insulin">Среднесуточное количество общего инсулина\n(кроме смешанного): %s</string>
     <string name="statistic_general_index_description_by_day_bolus_insulin">Количество болюсного инсулина\n(ультракороткий + короткий) в этот день: %s</string>
-    <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного\nинсулина (ультракороткий + короткий + сверхбыстрый): %s</string>
+    <string name="statistic_general_index_description_by_period_bolus_insulin">Среднесуточное количество болюсного инсулина (ультракороткий + короткий + сверхбыстрый): %s</string>
     <string name="statistic_general_index_description_by_day_basal_insulin">Количество базального инсулина\n(средний + длинный + сверхдлинный)\nв этот день: %s</string>
     <string name="statistic_general_index_description_by_period_basal_insulin">Среднесуточное количество базального\nинсулина (средний + длинный + сверхдлинный): %s</string>
 
@@ -592,7 +660,7 @@
     <string name="statistic_menu_button">Выгрузить отчет</string>
     <string name="statistic_share_pdf_dialog_title">Поделиться с помощью</string>
     <string name="statistic_view_pdf_dialog_title">Открыть с помощью</string>
-    <string name="statistic_error">Невозможно выгрузить отчет</string>
+    <string name="statistic_error">Невозможно выгрузить отчет без Интернет-соединения</string>
 
     <!--FEEDBACK-->
     <string name="feedback_title">Оставить отзыв</string>
@@ -690,4 +758,11 @@
     <string name="consultant_bottom_sheet_item_make_photo">Сделать фото</string>
     <string name="consultant_bottom_sheet_item_select_file">Выбрать файл</string>
     <string name="consultant_send_photo">Отправить фото</string>
+
+    <!-- Content Descriptions -->
+    <string name="content_description_bluetooth_icon">значек блютуза</string>
+    <string name="content_description_close_button">кнопка Закрыть</string>
+    <string name="content_description_clear_button">кнопка Очистить</string>
+    <string name="content_description_question_button">кнопка Вопрос</string>
+    <string name="content_description_back_button">кнопка Назад</string>
 </resources>

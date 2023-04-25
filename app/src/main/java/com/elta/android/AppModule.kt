@@ -1,12 +1,12 @@
 package com.elta.android
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.provider.Settings
 import com.elta.android.common.di.qualifires.ComputationFacade
 import com.elta.android.common.logger.DebugTree
+import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.ReleaseTree
-import com.elta.android.common.logger.model.DeviceDetails
 import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.pm.ExceptionParser
 import com.elta.android.presentation.core.pm.SimpleExceptionParser
@@ -28,7 +28,15 @@ import javax.inject.Singleton
 
 @Suppress("TooManyFunctions")
 @Module
-class AppModule(private val enableLog: Boolean) {
+class AppModule(
+    private val app: Application,
+    private val enableLog: Boolean,
+    private val isDebug: Boolean
+) {
+
+    @Singleton
+    @Provides
+    fun provideApplication(): Application = app
 
     @Singleton
     @Provides
@@ -65,18 +73,19 @@ class AppModule(private val enableLog: Boolean) {
 
     @Provides
     @Singleton
-    fun provideLogTree(context: Context): Timber.Tree {
-        val deviceDetails = DeviceDetails(
-            Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID
-            )
-        )
-        return if (enableLog) {
-            DebugTree(deviceDetails, context)
+    fun provideLogTree(firebaseStorage: FirebaseStorage): Timber.Tree {
+        val logsFile = firebaseStorage.localLogsFile
+        return if (isDebug) {
+            DebugTree(logsFile, enableLog)
         } else {
-            ReleaseTree(deviceDetails, context)
+            ReleaseTree(logsFile, enableLog)
         }
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(context: Context): FirebaseStorage = run {
+        FirebaseStorage(context)
     }
 
     @Provides

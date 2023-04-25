@@ -11,8 +11,6 @@ android {
 
     defaultConfig {
         minSdk = AppConfig.minSdk
-        targetSdk = AppConfig.targetSdk
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -20,6 +18,12 @@ android {
     compileOptions {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
+    }
+    buildTypes {
+        create("debugDev")
+        create("debugStage")
+        create("releaseDev")
+        create("releaseStage")
     }
 }
 
@@ -32,6 +36,7 @@ dependencies {
     implementation(project(Module.core_preferences))
     implementation(project(Module.common))
     api(project(Module.domain))
+    implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)

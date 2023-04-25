@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileInputStream
 
@@ -72,14 +74,50 @@ android {
             resValue("string", "app_deep_link_host", AppConfig.DeppLink.host)
             resValue("string", "app_deep_link_schema", AppConfig.DeppLink.schema)
         }
-
         debug {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            versionNameSuffix = Version.prodNameSuffix
             signingConfig = signingConfigs["debug"]
+            isDebuggable = true
         }
 
         release {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+        }
+
+        create("debugDev") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            versionNameSuffix = Version.devNameSuffix
+            signingConfig = signingConfigs["debug"]
+            isDebuggable = true
+        }
+        create("releaseDev") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            versionNameSuffix = "-${BackendVariant.dev.name}"
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+        }
+        create("debugStage") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
+            versionNameSuffix = Version.stageNameSuffix
+            signingConfig = signingConfigs["debug"]
+            isDebuggable = true
+        }
+        create("releaseStage") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
+            versionNameSuffix = "-${BackendVariant.stage.name}"
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -100,8 +138,9 @@ android {
         disable.add("OldTargetApi")
     }
     testOptions {
-        unitTests.all {
-            it.jvmArgs("-noverify")
+        unitTests {
+            all { it.jvmArgs("-noverify") }
+            isIncludeAndroidResources = true
         }
     }
 
@@ -110,23 +149,6 @@ android {
         reset()
         include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         isUniversalApk = true
-    }
-    flavorDimensions += listOf("buildVariant")
-    productFlavors {
-        create("prod") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.prod}\"")
-        }
-        create("stage") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.stage}\"")
-            versionNameSuffix = Version.NameSufix.stage
-        }
-        create("dev") {
-            dimension = "buildVariant"
-            buildConfigField("String", "SERVER_URL", "\"${AppConfig.ServerUrl.dev}\"")
-            versionNameSuffix = Version.NameSufix.dev
-        }
     }
 }
 
@@ -150,6 +172,7 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.presentation))
     api(project(Module.data))
+    implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
@@ -172,6 +195,7 @@ dependencies {
     implementation(Dependencies.OkHttp.core)
     implementation(Dependencies.OkHttp.loggingInterceptor)
     implementation(Dependencies.Google.gson)
+    implementation(Dependencies.Google.Services.MlKit.barcodeScaner)
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)

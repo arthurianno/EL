@@ -15,7 +15,7 @@ import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class DevicesPm @Inject constructor(
-    private val getGlucometersUseCase: GetGlucometersUseCase,
+    private val getGlucometers: GetGlucometersUseCase,
     private val itemsBuilder: DevicesOptionsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -31,7 +31,7 @@ class DevicesPm @Inject constructor(
         bindGlucometersAction()
 
         addNewDeviceAction.observable
-            .subscribe { router.startFlow(Screens.FromOtherSyncFlow) }
+            .subscribe { router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false)) }
             .untilDestroy()
 
         Observable.merge(
@@ -54,7 +54,7 @@ class DevicesPm @Inject constructor(
         getGlucometersAction.observable
             .skipWhileInProgress()
             .flatMapSingle {
-                getGlucometersUseCase.execute()
+                getGlucometers.execute()
                     .bindProgress()
                     .bindEmpty(emptyControl.visibilityState.consumer)
                     .map(itemsBuilder::buildItems)

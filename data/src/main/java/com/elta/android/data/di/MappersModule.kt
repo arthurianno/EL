@@ -34,18 +34,9 @@ import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.mapper.TagFromCacheMapper
 import com.elta.android.data.features.diary.tags.mapper.TagToCacheMapper
 import com.elta.android.data.features.diary.tags.mapper.TagToDomainMapper
-import com.elta.android.data.features.firmware.dto.FirmwareDto
-import com.elta.android.data.features.firmware.dto.FirmwareFileDto
-import com.elta.android.data.features.firmware.mapper.FirmwareFileToDomainMapper
-import com.elta.android.data.features.firmware.mapper.FirmwareToDomainMapper
 import com.elta.android.data.features.googlefit.dto.ActivityDto
 import com.elta.android.data.features.googlefit.mapper.FitnessActivityToActivityTypeMapper
 import com.elta.android.data.features.googlefit.mapper.SessionToActivityDtoMapper
-import com.elta.android.data.features.observers.cache.dto.ObserverCacheDto
-import com.elta.android.data.features.observers.dto.ObserverDto
-import com.elta.android.data.features.observers.mapper.ObserverFromCacheMapper
-import com.elta.android.data.features.observers.mapper.ObserverToCacheMapper
-import com.elta.android.data.features.observers.mapper.ObserverToDomainMapper
 import com.elta.android.data.features.reminder.cache.dto.ReminderCacheDto
 import com.elta.android.data.features.reminder.dto.ReminderDto
 import com.elta.android.data.features.reminder.mapper.ReminderFromCacheMapper
@@ -85,9 +76,6 @@ import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.tags.model.Tag
-import com.elta.android.domain.features.firmware.model.Firmware
-import com.elta.android.domain.features.firmware.model.FirmwareFile
-import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
@@ -185,21 +173,6 @@ abstract class MappersModule {
     ): Mapper<DrugCachedDto, DrugDto>
 
     @Binds
-    abstract fun bindObserverToCacheMapper(
-        mapper: ObserverToCacheMapper
-    ): Mapper<ObserverDto, ObserverCacheDto>
-
-    @Binds
-    abstract fun bindObserverFromCacheMapper(
-        mapper: ObserverFromCacheMapper
-    ): Mapper<ObserverCacheDto, ObserverDto>
-
-    @Binds
-    abstract fun bindObserverToDomainMapper(
-        mapper: ObserverToDomainMapper
-    ): Mapper<ObserverDto, Observer>
-
-    @Binds
     abstract fun bindProfileFromCacheMapper(
         mapper: ProfileFromCacheMapper
     ): Mapper<ProfileCacheDto, ProfileDto>
@@ -293,16 +266,6 @@ abstract class MappersModule {
     abstract fun bindReminderToDomainMapper(
         mapper: ReminderToDomainMapper
     ): Mapper<ReminderDto, Reminder>
-
-    @Binds
-    abstract fun bindFirmwareToDomainMapper(
-        mapper: FirmwareToDomainMapper
-    ): Mapper<FirmwareDto, Firmware>
-
-    @Binds
-    abstract fun bindFirmwareFileToDomainMapper(
-        mapper: FirmwareFileToDomainMapper
-    ): Mapper<FirmwareFileDto, FirmwareFile>
 
     @Binds
     abstract fun bindUserInfoToDomainMapper(

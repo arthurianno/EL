@@ -2,11 +2,11 @@ package com.elta.android.data.features.observers.api
 
 import com.elta.android.data.features.common.dto.MetaDto
 import com.elta.android.data.features.common.dto.StateDto
-import com.elta.android.data.features.observers.dto.ObserverDto
-import com.elta.android.data.features.observers.dto.ObserverInviteEmailRequest
-import com.elta.android.data.features.observers.dto.ObserverStatusDto
-import com.elta.android.data.features.observers.dto.ObserverUpdateNameRequest
-import com.elta.android.data.features.observers.dto.ObserversQueryResultDto
+import com.elta.android.data.features.observers.model.ObserverInviteEmailNetworkRequest
+import com.elta.android.data.features.observers.model.ObserverNetworkResponse
+import com.elta.android.data.features.observers.model.ObserverStatusNetworkEntity
+import com.elta.android.data.features.observers.model.ObserverUpdateNameNetworkRequest
+import com.elta.android.data.features.observers.model.ObserversNetworkResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,54 +18,57 @@ class MockedObserverApi : ObserverApi {
     override fun getObserverInvites(
         page: Int,
         pageSize: Int
-    ): Observable<ObserversQueryResultDto> = Observable.fromCallable {
-        val max = ObserverDto(
+    ): Observable<ObserversNetworkResponse> = Observable.fromCallable {
+        val max = ObserverNetworkResponse(
             id = "vcxz-bvxc-nbcc-mnbv",
             email = "maksim@gmail.com",
             name = "Maksim Drum",
             customName = "Some Name",
-            status = ObserverStatusDto.PENDING,
+            status = ObserverStatusNetworkEntity.PENDING,
             modificationTime = Date().time,
             state = StateDto.CREATED
         )
-        val vet = ObserverDto(
+        val vet = ObserverNetworkResponse(
             id = "fdas-gfsd-trwe-gfsd",
             email = "vitaliy@gmail.com",
             name = "Vitaliy Vocal",
             customName = "Some Name",
-            status = ObserverStatusDto.CONFIRMED,
+            status = ObserverStatusNetworkEntity.CONFIRMED,
             modificationTime = Date().time,
             state = StateDto.CREATED
         )
-        val dim = ObserverDto(
+        val dim = ObserverNetworkResponse(
             id = "trwe-hgfd-jhgf-nbvc",
             email = "dmitriy@gmail.com",
             name = "Dmitriy Bass",
             customName = "Some Name",
-            status = ObserverStatusDto.EXPIRED,
+            status = ObserverStatusNetworkEntity.EXPIRED,
             modificationTime = Date().time,
             state = StateDto.CREATED
         )
-        ObserversQueryResultDto(
+        ObserversNetworkResponse(
             items = listOf(max, vet, dim),
             meta = MetaDto(3, 1, 25)
         )
     }
 
-    override fun sendObserverInvite(email: ObserverInviteEmailRequest): Single<ObserverDto> =
+    override fun sendObserverInvite(email: ObserverInviteEmailNetworkRequest): Single<ObserverNetworkResponse> =
         Single.just(
-            ObserverDto(
+            ObserverNetworkResponse(
                 id = "vcxz-bvxc-nbcc-mnbv",
                 email = "maksim@gmail.com",
                 name = "Maksim Drum",
                 customName = "Some Name",
-                status = ObserverStatusDto.PENDING,
+                status = ObserverStatusNetworkEntity.PENDING,
                 modificationTime = Date().time,
                 state = StateDto.CREATED
             )
         )
 
-    override fun updateObserverName(id: String, name: ObserverUpdateNameRequest): Completable =
+    override fun updateObserverName(
+        id: String,
+        name: ObserverUpdateNameNetworkRequest
+    ): Completable =
         Completable.complete()
 
     override fun deleteObserverInvite(id: String): Completable =

@@ -6,8 +6,8 @@ import org.threeten.bp.ZonedDateTime
 
 object BreadValidator : FormValidator {
 
-    const val bottomLevelInclusive = 0.1
-    const val topLevelInclusive = 99.9
+    private const val bottomLevelInclusive = 0.1
+    private const val topLevelInclusive = 99.9
     private val valueDiapason = DoubleRange(bottomLevelInclusive, topLevelInclusive)
     private const val kindMaxLength = 40
 
@@ -19,9 +19,9 @@ object BreadValidator : FormValidator {
         insulin: Insulin?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean = validateValue(value) && validateKind(kind) && date != null && isValidNote(note)
+    ): Boolean = validateValue(value) && validateKind(kind) && date != null && note.noteIsValid()
 
     private fun validateValue(value: Double?): Boolean = value != null && value in valueDiapason
     private fun validateKind(kind: String?): Boolean =
-        (kind?.length ?: 0) <= kindMaxLength && isValidWithSpecSymbols(kind)
+        kind.orEmpty().length <= kindMaxLength && kind.symbolsIsValid()
 }

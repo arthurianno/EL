@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.app.Application
 import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
@@ -15,6 +16,7 @@ import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
+import com.elta.android.data.common.datasource.PersonalDataStorage
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.storage.UserHolder
@@ -28,6 +30,7 @@ import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
@@ -37,19 +40,41 @@ import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
 import com.polidea.rxandroidble2.exceptions.BleException
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.rx2.asFlow
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
+import ru.SDK.Test.DeviceCallBack
+import ru.SDK.Test.DeviceService
+import ru.SDK.Test.ELTAConnect
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val MIN_BATTERY_LEVEL = 1
+private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
+private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+private const val EVENTS_COUNT = 1000
+private const val SYNC_DELAY = 500L
+private const val COMMAND_DELAY = 20L
+private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
 
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
@@ -67,6 +92,9 @@ class GlucometersManager @Inject constructor(
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
     private val client: RxBleClient,
+    private val application: Application,
+    private val personalData: PersonalDataStorage,
+    private val iiotSdkCallBack: DeviceCallBack,
     private val context: Context
 ) {
 
@@ -87,7 +115,8 @@ class GlucometersManager @Inject constructor(
     private val infoCommands = listOf(
         Commands.GetDate,
         Commands.GetBatteryAndTemperature,
-        Commands.GetVersion
+        Commands.GetVersion,
+        Commands.Serial
     )
 
     fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
@@ -97,20 +126,25 @@ class GlucometersManager @Inject constructor(
 
     fun findDevices(): Observable<List<ScanResult>> =
         Observable.just(client.state)
-            .flatMap { state ->
-                val error = state.toError()
-                if (error != null) Observable.error(error)
-                else Observable.just(state)
-            }
+            .flatMap { it.observableState() }
             .flatMap {
                 val connectedDevices = glucometersCache.getAll(CommonConditions.All)
                 scanner.startScan(filters, settings)
                     .map { filterConnectedDevices(connectedDevices, it) }
             }
 
-    fun getDevices(): Single<List<GlucometerDto>> =
-        Single.just(glucometersCache.getAll(CommonConditions.All))
-            .map(glucometerFromCacheMapper::mapFromObjects)
+    fun getDevices(): Single<List<Pair<GlucometerDto, GlucometerInfoDto>>> =
+        Single.just(
+            glucometersCache.getAll(CommonConditions.All)
+                .map(glucometerFromCacheMapper::mapFromObject)
+                .map {
+                    val id = it.address.hashCode().toLong()
+                    it to glucometersInfoFromCacheMapper.mapFromObject(
+                        glucometersInfoCache.get(CommonConditions.ById(id))
+                            ?: GlucometerInfoCachedDto(id = id, secondaryId = it.address)
+                    )
+                }
+        )
 
     fun getDevice(address: String): Single<GlucometerDto> =
         Single.just(glucometersCache.get(CommonConditions.ById(address.hashCode().toLong())))
@@ -153,6 +187,7 @@ class GlucometersManager @Inject constructor(
     fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
         client.findConnection(address)
             .checkPinAndSend(address)
+            .deviceServiceConnect(address)
             .switchMap { connection ->
                 Observable.range(0, EVENTS_COUNT)
                     .concatMap {
@@ -161,7 +196,9 @@ class GlucometersManager @Inject constructor(
             }
             .takeUntil { it.isEmptyEvent() }
             .collectInto(mutableListOf<String>()) { responses, response ->
-                if (!response.isEmptyEvent()) responses.add(response)
+                if (!response.isEmptyEvent()) {
+                    responses.add(response)
+                }
             }
             .map { events ->
                 events.forEach {
@@ -170,7 +207,20 @@ class GlucometersManager @Inject constructor(
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
-                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                            val glucometerInfo =
+                                glucometersInfoCache.get(
+                                    CommonConditions.ById(
+                                        address.hashCode().toLong()
+                                    )
+                                )
+                            events.map { event ->
+                                eventBuilder.buildFrom(
+                                    userId = userId,
+                                    glucometerId = address,
+                                    response = event,
+                                    glucometerSerialNumber = glucometerInfo?.glucometerSerialNumber
+                                )
+                            }
                         }
                     }
                 } ?: emptyList()
@@ -184,7 +234,10 @@ class GlucometersManager @Inject constructor(
             .take(1)
             .switchMapCompletable { response ->
                 when {
-                    response.isPinError() -> Completable.error(GlucometerPinIncorrectOrNotFoundError)
+                    response.isPinError() -> Completable.error(
+                        GlucometerPinIncorrectOrNotFoundError
+                    )
+
                     else -> Completable.fromCallable {
                         pinStorage.setPin(device.address, pinCode)
                         val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
@@ -216,7 +269,10 @@ class GlucometersManager @Inject constructor(
 
     fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
         when {
-            !isSupportedByApplication(file) -> Observable.error(FirmwareNotSupportedByAppError(file.version))
+            !isSupportedByApplication(file) -> Observable.error(
+                FirmwareNotSupportedByAppError(file.version)
+            )
+
             else ->
                 checkBluetoothClientState()
                     .flatMap {
@@ -230,7 +286,7 @@ class GlucometersManager @Inject constructor(
                                             !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
                                                 GlucometerLowBatteryLevelError(
                                                     current = info.batteryLevel ?: 0,
-                                                    required = MIN_LEVEL
+                                                    required = MIN_BATTERY_LEVEL
                                                 )
                                             )
 
@@ -256,10 +312,9 @@ class GlucometersManager @Inject constructor(
                             .doOnComplete {
                                 val id = address.hashCode().toLong()
                                 glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
-                                    file.version.toDoubleOrNull()?.let { version ->
-                                        val newInfo = info.copy(software = version)
-                                        glucometersInfoCache.update(listOf(newInfo))
-                                    }
+                                    glucometersInfoCache.update(
+                                        listOf(info.copy(software = file.version))
+                                    )
                                 }
                             }
                     }
@@ -282,6 +337,10 @@ class GlucometersManager @Inject constructor(
             }.toList()
             if (glucometersToUpdate.isNotEmpty()) glucometersCache.update(glucometersToUpdate)
         }
+
+    private fun RxBleClient.State.observableState(): ObservableSource<out RxBleClient.State> =
+        toError()?.let { Observable.error(it) }
+            ?: Observable.just(this)
 
     private fun RxBleConnection.simpleRequest(
         address: String,
@@ -353,32 +412,54 @@ class GlucometersManager @Inject constructor(
                 val connection = connections[address]
                 if (connection == null || device.connectionState == RxBleConnection.RxBleConnectionState.DISCONNECTED) {
                     device.establishConnection(false)
-                        .onErrorResumeNext { e: Throwable ->
-                            Timber.e(javaClass.simpleName, e.message, e)
+                        .onErrorResumeNext { throwable: Throwable ->
+                            Timber.e(throwable, javaClass.simpleName, throwable.message)
                             when {
                                 client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED -> {
                                     Observable.error(BluetoothNotEnabledError)
                                 }
 
-                                e is BleDisconnectedException -> Observable.error(
+                                throwable is BleDisconnectedException -> Observable.error(
                                     GlucometerOfflineError
                                 )
 
-                                else -> Observable.error(e)
+                                else -> Observable.error(throwable)
                             }
                         }
                         .compose(ReplayingShare.instance())
                         .doOnNext { connections[address] = it }
-                } else Observable.just(connection)
+                } else {
+                    Observable.just(connection)
+                }
             }
 
     private fun Observable<RxBleConnection>.checkPinAndSend(address: String): Observable<RxBleConnection> =
         this.switchMap { connection ->
             val pin = pinStorage.getPin(address)
-            when (pin.isNullOrEmpty()) {
-                true -> Observable.error(GlucometerPinIncorrectOrNotFoundError)
-                else -> connection.request(address, Commands.SetPin(pin))
+            if (pin.isNullOrEmpty()) {
+                Observable.error(GlucometerPinIncorrectOrNotFoundError)
+            } else {
+                connection.request(address, Commands.SetPin(pin))
                     .switchMap { Observable.just(connection) }
+            }
+        }
+
+    private fun <T> Observable<T>.deviceServiceConnect(address: String): Observable<T> =
+        doOnNext {
+            if (FeatureToggles.isEnableIiotSdkFeature) {
+                pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
+                    personalData.getIiotLogin()
+                        .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
+                            DeviceService.init(
+                                application,
+                                iiotSdkLogin,
+                                iiotSdkPassword,
+                                iiotSdkCallBack
+                            )
+                            DeviceService.connect(ELTAConnect::class.java, address, pin)
+                        }
+                        .subscribe()
+                }
             }
         }
 
@@ -389,11 +470,11 @@ class GlucometersManager @Inject constructor(
     private fun String.isError(): Boolean = contains("error")
     private fun String.isEvent(): Boolean = startsWith("rd")
 
-    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compotable
+    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compatible
     private fun isSupported(compatible: String): Boolean = true
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
-        (batteryLevel ?: 0) >= MIN_LEVEL
+        (batteryLevel ?: 0) >= MIN_BATTERY_LEVEL
 
     private fun RxBleClient.State.toError(): Throwable? =
         when (this) {
@@ -404,8 +485,24 @@ class GlucometersManager @Inject constructor(
             else -> null
         }
 
+    @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun findGlucometer(address: String): Flow<Unit> =
+        client.findConnection(address)
+            .checkPinAndSend(address)
+            .asFlow()
+            .flatMapLatest { connection ->
+                ticker(delayMillis = SEND_FIND_COMMAND_DELAY_MILLIS)
+                    .receiveAsFlow()
+                    .flatMapMerge {
+                        connection.request(address, Commands.TurnOnFindMode)
+                            .asFlow()
+                            .map { Unit }
+                    }
+            }
+
     private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()
+            .deviceServiceConnect(address)
             .switchMap { client.findConnection(address) }
             .switchMap { connection ->
                 connection.setupNotification(UART_TX).map { Pair(connection, it) }
@@ -425,7 +522,8 @@ class GlucometersManager @Inject constructor(
                     Commands.SetTime(ZonedDateTime.now()),
                     Commands.GetDate,
                     Commands.GetBatteryAndTemperature,
-                    Commands.GetVersion
+                    Commands.GetVersion,
+                    Commands.Serial
                 )
 
                 Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
@@ -438,7 +536,7 @@ class GlucometersManager @Inject constructor(
                 Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
 
                 Observable.range(0, EVENTS_COUNT)
-                    .map { index -> Commands.ReadEvent(index) as GlucometerCommand }
+                    .map<GlucometerCommand> { index -> Commands.ReadEvent(index) }
                     .startWith(startCommands)
                     .concatMap { command ->
                         Observable.just(command).delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
@@ -460,17 +558,24 @@ class GlucometersManager @Inject constructor(
 
                     Timber.i("<<<<<<<Sync>>>>>>  Response: $response")
 
-                    if (response.isError()) Observable.error(CommandError)
-                    else Observable.just(Pair(response, pair.second))
+                    if (response.isError()) {
+                        Observable.error(CommandError)
+                    } else {
+                        Observable.just(Pair(response, pair.second))
+                    }
                 }
             }
             // Pair.first -> response
             // Pair.second -> last synced event
             .takeUntil { it.first.isEmptyEvent() || it.first == it.second }
             .collectInto(SyncResponseHolder()) { holder, pair ->
-                val r = pair.first
-                if (r.isEvent() && !r.isEmptyEvent() && r != pair.second) holder.events.add(r)
-                else if (!r.isOk() && !r.isError() && !r.isEmptyEvent()) holder.info.add(r)
+                val response = pair.first
+                holder.lastSyncedEvent = pair.second
+                if (response.isEvent() && !response.isEmptyEvent() && response != pair.second) {
+                    holder.events.add(response)
+                } else if (!response.isOk() && !response.isError() && !response.isEmptyEvent()) {
+                    holder.info.add(response)
+                }
             }
             .toObservable()
             .take(1)
@@ -485,22 +590,36 @@ class GlucometersManager @Inject constructor(
             }
             .map(SyncResponseHolder::events)
             .map { events ->
+                val glucometerInfo =
+                    glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
-                            events.map { event -> eventBuilder.buildFrom(userId, address, event) }
+                            events.map { event ->
+                                eventBuilder.buildFrom(
+                                    userId,
+                                    address,
+                                    event,
+                                    glucometerInfo?.glucometerSerialNumber
+                                )
+                            }
                         }
                     }
                 } ?: emptyList()
             }
-            .map { events -> filterExistingEvents(events, getCachedEvents(events)) }
-            .flatMap {
-                if (it.isEmpty()) Observable.empty()
-                else Observable.just(it)
+            .map { events ->
+                val filterExistingEvents = filterExistingEvents(events, getCachedEvents(events))
+                filterExistingEvents
             }
-            .onErrorResumeNext { e: Throwable ->
-                if (e is BleException) Observable.error(GlucometerSyncError(GlucometerOfflineError))
-                else Observable.error(GlucometerSyncError(e))
+            .flatMap {
+                if (it.isEmpty()) Observable.empty() else Observable.just(it)
+            }
+            .onErrorResumeNext { exception: Throwable ->
+                if (exception is BleException) {
+                    Observable.error(GlucometerSyncError(GlucometerOfflineError))
+                } else {
+                    Observable.error(GlucometerSyncError(exception))
+                }
             }
 
     private fun filterConnectedDevices(
@@ -518,11 +637,7 @@ class GlucometersManager @Inject constructor(
 
     private fun checkBluetoothClientState(): Observable<RxBleClient.State> =
         Observable.just(client.state)
-            .flatMap { state ->
-                val error = state.toError()
-                if (error != null) Observable.error(error)
-                else Observable.just(state)
-            }
+            .flatMap { it.observableState() }
 
     private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
         eventsCache.getAll(
@@ -536,10 +651,13 @@ class GlucometersManager @Inject constructor(
         fromGlucometer: List<GlucometerEventDto>,
         cached: List<EventCachedDto>
     ): List<GlucometerEventDto> =
-        if (cached.isEmpty()) fromGlucometer
-        else arrayListOf<GlucometerEventDto>().apply {
-            fromGlucometer.forEach { event ->
-                if (cached.find { it.secondaryId == event.id } == null) add(event)
+        if (cached.isEmpty()) {
+            fromGlucometer
+        } else {
+            arrayListOf<GlucometerEventDto>().apply {
+                fromGlucometer.forEach { event ->
+                    if (cached.find { it.secondaryId == event.id } == null) add(event)
+                }
             }
         }
 
@@ -567,15 +685,4 @@ class GlucometersManager @Inject constructor(
         val events: MutableList<String> = mutableListOf(),
         var lastSyncedEvent: String? = null // #GlucometerInfoCachedDto.lastSyncedEvent
     )
-
-    companion object {
-        private const val FIRMWARE_VERSION = "3.0" // version of firmware supported by application
-        private const val MIN_LEVEL =
-            1 // minimal level of battery required to start firmware update
-        private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
-        private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-        private const val EVENTS_COUNT = 1000
-        private const val SYNC_DELAY = 500L
-        private const val COMMAND_DELAY = 20L
-    }
 }

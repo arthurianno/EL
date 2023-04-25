@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.profile.settings.password.ui
 
+import android.content.Context
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileChangePasswordBinding
 import com.elta.android.presentation.features.profile.settings.password.pm.ProfileChangePasswordPm
@@ -22,9 +24,13 @@ class ProfileChangePasswordFragment :
     BaseFragment<ProfileChangePasswordPm, FragmentProfileChangePasswordBinding>(
         FragmentProfileChangePasswordBinding::inflate
     ) {
+    companion object {
+        fun newInstance() = ProfileChangePasswordFragment()
+    }
 
     override val screenLayout = R.layout.fragment_profile_change_password
     override val classToken = ProfileChangePasswordPm::class.java
+
     override val statusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onBindPresentationModel(pm: ProfileChangePasswordPm) {
@@ -47,8 +53,11 @@ class ProfileChangePasswordFragment :
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
-    override fun handleBack() {
-        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+        }
     }
 
     private infix fun AppCompatImageView.bindToggleTo(view: AppCompatEditText) =
@@ -57,9 +66,5 @@ class ProfileChangePasswordFragment :
     private infix fun InputControl.bindInputTo(view: AppCompatEditText) {
         bindTo(view)
         error.observable.distinctUntilChanged().subscribe(view.error())
-    }
-
-    companion object {
-        fun newInstance() = ProfileChangePasswordFragment()
     }
 }

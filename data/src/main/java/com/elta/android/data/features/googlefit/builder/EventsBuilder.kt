@@ -35,6 +35,7 @@ class EventsBuilder @Inject constructor(
             type = EventType.ACTIVITY,
             mealTag = null,
             state = State.CREATED,
+            glucometerSerialNumber = null,
             dishes = emptyList()
         )
 }

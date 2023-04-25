@@ -10,13 +10,9 @@ android {
 
     defaultConfig {
         minSdk = AppConfig.minSdk
-        targetSdk = AppConfig.targetSdk
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables.useSupportLibrary = true
-
-        buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
     }
 
     compileOptions {
@@ -32,8 +28,9 @@ android {
         disable.add("OldTargetApi")
     }
     testOptions {
-        unitTests.all {
-            it.jvmArgs("-noverify")
+        unitTests {
+            all { it.jvmArgs("-noverify") }
+            isIncludeAndroidResources = true
         }
     }
     buildFeatures {
@@ -43,6 +40,37 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = Dependencies.Jetpack.Compose.compilerVersion
+    }
+    buildTypes {
+        release {
+            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+        }
+        debug {
+            val debugVersionName = "\"${Version.versionName}${Version.prodNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugDev") {
+            val debugVersionName = "\"${Version.versionName}${Version.devNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugStage") {
+            val debugVersionName = "\"${Version.versionName}${Version.stageNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("releaseDev") {
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
+        }
+        create("releaseStage") {
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
+        }
     }
 }
 
@@ -55,7 +83,7 @@ kapt {
 }
 
 configurations.all {
-    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.kotlinVersion}")
+    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.Kotlin.version}")
 }
 
 dependencies {
@@ -79,21 +107,26 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.Kotlin.coroutinesRx2)
 
-    implementation(Dependencies.Jetpack.Compose.material)
-    implementation(Dependencies.Jetpack.Compose.foundation)
-    implementation(Dependencies.Jetpack.Compose.ui)
-    implementation(Dependencies.Jetpack.Compose.uiToolingPreview)
-    implementation(Dependencies.Jetpack.Compose.activity)
-    implementation(Dependencies.Jetpack.Compose.viewModel)
-    implementation(Dependencies.Jetpack.Compose.rxJava2)
+    implementation(platform(Dependencies.Jetpack.Compose.bom))
+    implementation(Dependencies.Jetpack.Compose.bomMaterial)
+    implementation(Dependencies.Jetpack.Compose.bomRxJava2)
     implementation(Dependencies.Jetpack.Compose.Accompanist.permissions)
     implementation(Dependencies.Coil.compose)
+    bomUiToolingDependencies()
+    bomComposeTestsDependencies()
+    implementation(Dependencies.Jetpack.Compose.activity)
+    implementation(Dependencies.Jetpack.Compose.viewModel)
 
     implementation(Dependencies.Jetpack.core)
     implementation(Dependencies.Jetpack.fragment)
     implementation(Dependencies.Google.materialDesign)
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)
+    implementation(Dependencies.Google.Services.MlKit.barcodeScaner)
+    implementation(Dependencies.Google.Services.CameraX.core)
+    implementation(Dependencies.Google.Services.CameraX.camera2)
+    implementation(Dependencies.Google.Services.CameraX.lifecycle)
+    implementation(Dependencies.Google.Services.CameraX.mlKit)
     implementation(Dependencies.CustomView.materialDialogs)
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.RxJava2.rxAndroid)
@@ -132,6 +165,6 @@ dependencies {
     implementation(Dependencies.CustomView.cardView)
     implementation(Dependencies.Webim.core)
 
-    testComposeDependencies()
     testBaseDependencies()
+    androidTestImplementation(Dependencies.Jetpack.WorkManager.test)
 }

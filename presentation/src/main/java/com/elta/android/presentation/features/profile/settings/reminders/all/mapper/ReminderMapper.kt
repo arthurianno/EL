@@ -18,28 +18,26 @@ class ReminderMapper @Inject constructor(
 
     override fun mapFromObject(source: List<Reminder>): List<ListItem> =
         arrayListOf<ListItem>().apply {
-            add(ReminderHeaderItem(resources.getString(R.string.profile_reminders_header_text)))
-            addAll(source.map { mapFromReminder(it) })
+            if (source.isNotEmpty()) {
+                add(ReminderHeaderItem(resources.getString(R.string.profile_reminders_header_text)))
+            }
+            addAll(source.toListItems())
         }
 
-    private fun mapFromReminder(source: Reminder): ListItem =
-        with(source) {
-            ReminderItem(
-                id = id,
-                type = R.drawable.ic_notification_bg,
-                title = title,
-                description = formatSchedule(),
-                action = R.drawable.ic_arrow_left
-            )
-        }
+    private fun Reminder.toListItem(): ListItem =
+        ReminderItem(
+            id = id,
+            type = R.drawable.ic_notification_bg,
+            title = title,
+            description = formatSchedule(),
+            action = R.drawable.ic_arrow_left
+        )
 
-    @Suppress("SwallowedException", "TooGenericExceptionCaught")
-    private fun Reminder.formatSchedule(): String {
-        return try {
-            val time = this.date.toStringWithFormat(CommonFormats.FORMAT_TIME)
-            "${scheduleType.toString(resources)} в $time"
-        } catch (ignored: Exception) {
-            ""
-        }
-    }
+    private fun List<Reminder>.toListItems(): List<ListItem> =
+        map { it.toListItem() }
+
+    private fun Reminder.formatSchedule(): String =
+        runCatching {
+            "${scheduleType.toString(resources)} в ${date.toStringWithFormat(CommonFormats.FORMAT_TIME)}"
+        }.getOrDefault("")
 }

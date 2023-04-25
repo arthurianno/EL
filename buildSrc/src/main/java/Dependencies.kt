@@ -1,9 +1,25 @@
 object Dependencies {
-    const val gradleVersion = "7.3.0"
-    const val kotlinVersion = "1.6.21"
+    const val gradleVersion = "7.4.2"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"
+
+    object Kotlin {
+        const val version = "1.7.20"
+        private const val serializationVersion = "1.4.0"
+        private const val coroutinesVersion = "1.6.4"
+        private const val dateTimeVersion = "0.3.1"
+
+        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
+        const val coroutinesCore =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
+        const val serialization =
+            "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
+        const val serializationJson =
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion"
+    }
 
     object Jetpack {
         private const val coreVersion = "1.8.0"
@@ -30,78 +46,40 @@ object Dependencies {
         const val annotations = "androidx.annotation:annotation:$annotationsVersion"
         const val browser = "androidx.browser:browser:$browserVersion"
 
+        object WorkManager {
+            private const val version = "2.8.1"
+
+            const val core = "androidx.work:work-runtime-ktx:$version"
+            const val rxJava2 = "androidx.work:work-rxjava2:$version"
+            const val test = "androidx.work:work-testing:$version"
+        }
+
         object Compose {
-            const val composeVersion = "1.2.0-rc02"
-            const val compilerVersion = "1.2.0-rc02"
+            const val compilerVersion = "1.4.0-alpha01"
 
-            private const val activityVersion = "1.5.1"
-            private const val constraintLayoutVersion = "1.0.1"
-            private const val pagingVersion = "1.0.0-alpha15"
-            private const val materialThemeAdapterVersion = "1.1.3"
+            private const val bomVersion = "2023.01.00"
+            private const val activityVersion = "1.6.1"
 
-            const val ui = "androidx.compose.ui:ui:$composeVersion"
-            const val runtime = "androidx.compose.runtime:runtime:$composeVersion"
+            const val bom = "androidx.compose:compose-bom:$bomVersion"
+            const val bomMaterial = "androidx.compose.material:material"
+            const val bomFoundation = "androidx.compose.foundation:foundation"
+            const val bomUiTooling = "androidx.compose.ui:ui-tooling"
+            const val bomUiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
+            const val bomRxJava2 = "androidx.compose.runtime:runtime-rxjava2"
             const val activity = "androidx.activity:activity-compose:$activityVersion"
-            const val material = "androidx.compose.material:material:$composeVersion"
-            const val foundation = "androidx.compose.foundation:foundation:$composeVersion"
-            const val animation = "androidx.compose.animation:animation:$composeVersion"
-            const val uiTooling = "androidx.compose.ui:ui-tooling:$composeVersion"
-            const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview:$composeVersion"
-            const val constraintLayout =
-                "androidx.constraintlayout:constraintlayout-compose:$constraintLayoutVersion"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-compose:$lifeCycleVersion"
-            const val paging = "androidx.paging:paging-compose:$pagingVersion"
-            const val MaterialThemeAdapter =
-                "com.google.android.material:compose-theme-adapter:$materialThemeAdapterVersion"
-            const val rxJava2 = "androidx.compose.runtime:runtime-rxjava2:$composeVersion"
 
             object Accompanist {
-                private const val version = "0.28.0"
+                private const val version = "0.30.0"
 
                 const val permissions = "com.google.accompanist:accompanist-permissions:$version"
             }
 
-            object Voyager {
-                private const val version = "1.0.0-rc02"
-
-                const val core = "cafe.adriel.voyager:voyager-navigator:$version"
-                const val bottomSheet =
-                    "cafe.adriel.voyager:voyager-bottom-sheet-navigator:$version"
-                const val tab = "cafe.adriel.voyager:voyager-tab-navigator:$version"
-                const val transitions =
-                    "cafe.adriel.voyager:voyager-transitions:$version"
-                const val viewModel = "cafe.adriel.voyager:voyager-androidx:$version"
-                const val koin = "cafe.adriel.voyager:voyager-koin:$version"
-                const val kodein = "cafe.adriel.voyager:voyager-kodein:$version"
-                const val hilt = "cafe.adriel.voyager:voyager-hilt:$version"
-                const val rxJava = "cafe.adriel.voyager:voyager-rxjava:$version"
-                const val liveData = "cafe.adriel.voyager:voyager-livedata:$version"
+            object Test {
+                const val bomJunit = "androidx.compose.ui:ui-test-junit4"
+                const val bomManifest = "androidx.compose.ui:ui-test-manifest"
             }
         }
-
-        object Navigation {
-            private const val version = "2.4.2"
-
-            const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
-            const val ui = "androidx.navigation:navigation-ui-ktx:$version"
-            const val runtime = "androidx.navigation:navigation-runtime-ktx:$version"
-        }
-    }
-
-    object Kotlin {
-        private const val serializationVersion = "1.4.0"
-        private const val coroutinesVersion = "1.6.4"
-        private const val dateTimeVersion = "0.3.1"
-
-        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        const val coroutinesCore =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
-        const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
-        const val serialization =
-            "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
-        const val serializationJson =
-            "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
-        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion"
     }
 
     object Utils {
@@ -139,7 +117,7 @@ object Dependencies {
 
     object Google {
         private const val materialVersion = "1.6.1"
-        private const val gsonVersion = "2.8.5" // 2.9.1
+        private const val gsonVersion = "2.10.1"
 
         const val materialDesign = "com.google.android.material:material:$materialVersion"
         const val gson = "com.google.code.gson:gson:$gsonVersion"
@@ -153,12 +131,29 @@ object Dependencies {
 
             const val fitness = "com.google.android.gms:play-services-fitness:$fitnessVersion"
             const val auth = "com.google.android.gms:play-services-auth:$authVersion"
+
+            object MlKit {
+                private const val barcodeScanerVersion = "18.1.0"
+
+                const val barcodeScaner =
+                    "com.google.android.gms:play-services-mlkit-barcode-scanning:$barcodeScanerVersion"
+            }
+
+            object CameraX {
+                private const val cameraxVersion = "1.3.0-alpha05"
+
+                const val core = "androidx.camera:camera-core:$cameraxVersion"
+                const val camera2 = "androidx.camera:camera-camera2:$cameraxVersion"
+                const val lifecycle = "androidx.camera:camera-lifecycle:$cameraxVersion"
+                const val mlKit = "androidx.camera:camera-mlkit-vision:$cameraxVersion"
+                const val extentions = "androidx.camera:camera-extensions:$cameraxVersion"
+            }
         }
 
         object FireBase {
             const val pluginVersion = "2.0.0"
             const val crashliticsGradleVersion = "2.9.0"
-            private const val bomVersion = "31.0.1"
+            private const val bomVersion = "31.4.0"
 
             const val bom = "com.google.firebase:firebase-bom:$bomVersion"
             const val messagingBom = "com.google.firebase:firebase-messaging-ktx"
@@ -186,29 +181,33 @@ object Dependencies {
 
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val junitExtVersion = "1.1.3"
-        private const val espressoVersion = "3.4.0"
+        private const val extJunitVersion = "1.1.5"
+        private const val espressoVersion = "3.5.1"
+        private const val monitorVersion = "1.6.0"
+        private const val testStorageVersion = "1.4.2"
         private const val java310Version = "1.3.1" // 1.6.3
-        private const val androidxVersion = "1.4.0"
+        private const val coreTestVersion = "1.5.0"
+        private const val rulesVersion = "1.5.0"
+        private const val runnerVersion = "1.5.2"
         private const val robolectricVersion = "4.8"
         private const val mockitoKotlinVersion = "2.0.0-RC1"
         private const val mockitoAndroidVersion = "2.8.47"
 
         const val junit = "junit:junit:$junitVersion"
-        const val junitExt = "androidx.test.ext:junit-ktx:$junitExtVersion"
+        const val extJunit = "androidx.test.ext:junit:$extJunitVersion"
+        const val extJunitKtx = "androidx.test.ext:junit-ktx:$extJunitVersion"
         const val espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-        const val composeUi = "androidx.compose.ui:ui-test-junit4:${Jetpack.Compose.composeVersion}"
-        const val composeUiTestManifest =
-            "androidx.compose.ui:ui-test-manifest:${Jetpack.Compose.composeVersion}"
+        const val testStorage = "androidx.test.services:test-services:$testStorageVersion"
 
-        const val rules = "androidx.test:rules:$androidxVersion"
-        const val runner = "androidx.test:runner:$androidxVersion"
-        const val core = "androidx.test:core:$androidxVersion"
-        const val coreKtx = "androidx.test:core-ktx$androidxVersion"
+        const val monitor = "androidx.test:monitor:$monitorVersion"
+        const val rules = "androidx.test:rules:$rulesVersion"
+        const val runner = "androidx.test:runner:$runnerVersion"
+        const val core = "androidx.test:core:$coreTestVersion"
+        const val coreKtx = "androidx.test:core-ktx:$coreTestVersion"
 
         const val jsr310 = "org.threeten:threetenbp:$java310Version"
 
-        const val kotlinJUnit = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+        const val kotlinJUnit = "org.jetbrains.kotlin:kotlin-test-junit:${Kotlin.version}"
         const val mockito =
             "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
         const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
@@ -274,7 +273,7 @@ object Dependencies {
     }
 
     object ObjectBox {
-        const val version = "3.1.3"
+        const val version = "3.5.1"
 
         const val core = "io.objectbox:objectbox-kotlin:$version"
         const val browser = "io.objectbox:objectbox-android-objectbrowser:$version"
@@ -310,7 +309,7 @@ object Dependencies {
     }
 
     object Timber {
-        private const val version = "4.7.1"
+        private const val version = "5.0.1"
 
         const val core = "com.jakewharton.timber:timber:$version"
     }

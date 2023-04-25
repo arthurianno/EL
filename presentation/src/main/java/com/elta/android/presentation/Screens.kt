@@ -3,6 +3,7 @@ package com.elta.android.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.sale_points.model.Type
@@ -19,6 +20,7 @@ import com.elta.android.presentation.features.consultant.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
+import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
 import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
@@ -55,8 +57,14 @@ import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
 import com.elta.android.presentation.features.statistic.flow.ui.StatisticFlowFragment
 import com.elta.android.presentation.features.statistic.period.ui.Period
 import com.elta.android.presentation.features.statistic.period.ui.PeriodFragment
-import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceFragment
-import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceFragment
+import com.elta.android.presentation.features.sync.connect.ConnectHelpFragment
+import com.elta.android.presentation.features.sync.connect.ConnectStartFragment
+import com.elta.android.presentation.features.sync.connect.ConnectTypeFragment
+import com.elta.android.presentation.features.sync.connect.ConnectingFragment
+import com.elta.android.presentation.features.sync.connect.HowToConnectFragment
+import com.elta.android.presentation.features.sync.connect.ScannerDmcFragment
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragment
 import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
@@ -213,12 +221,42 @@ object Screens {
         override fun getFragment(): Fragment = BluetoothFragment.newInstance()
     }
 
-    object FromOnBoardingConnectDevice : SupportAppScreen() {
-        override fun getFragment(): Fragment = FromOnBoardingConnectDeviceFragment.newInstance()
+    object FromOnBoardingConnectDeviceByPin : SupportAppScreen() {
+        override fun getFragment(): Fragment =
+            FromOnBoardingConnectDeviceByPinFragment.newInstance()
     }
 
-    object FromOtherConnectDevice : SupportAppScreen() {
-        override fun getFragment(): Fragment = FromOtherConnectDeviceFragment.newInstance()
+    object FromOtherConnectDeviceByPin : SupportAppScreen() {
+        override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragment.newInstance()
+    }
+
+    data class ConnectStartScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = ConnectStartFragment.newInstance(isOnBoarding)
+    }
+
+    data class ConnectTypeScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = ConnectTypeFragment.newInstance(isOnBoarding)
+    }
+
+    object ConnectHelpScreen : SupportAppScreen() {
+        override fun getFragment() = ConnectHelpFragment()
+    }
+
+    data class HowToConnectScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = HowToConnectFragment.newInstance(isOnBoarding)
+    }
+
+    @ExperimentalCameraProviderConfiguration
+    data class ScannerDmcScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = ScannerDmcFragment.newInstance(isOnBoarding)
+    }
+
+    data class ConnectingScreen(
+        val isOnBoarding: Boolean,
+        val pin: Int,
+        val name: String
+    ) : SupportAppScreen() {
+        override fun getFragment() = ConnectingFragment.newInstance(isOnBoarding, pin, name)
     }
 
     // DIARY FLOW
@@ -253,6 +291,10 @@ object Screens {
 
     object Devices : SupportAppScreen() {
         override fun getFragment() = DevicesFragment.newInstance()
+    }
+
+    class DeviceSearch(val address: String) : SupportAppScreen() {
+        override fun getFragment() = GlucometerSearchFragment.newInstance(address)
     }
 
     data class DeviceInfo(val name: String, val address: String) : SupportAppScreen() {

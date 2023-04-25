@@ -9,8 +9,6 @@ android {
 
     defaultConfig {
         minSdk = AppConfig.minSdk
-        targetSdk = AppConfig.targetSdk
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -18,6 +16,12 @@ android {
     compileOptions {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
+    }
+    buildTypes {
+        create("debugDev")
+        create("debugStage")
+        create("releaseDev")
+        create("releaseStage")
     }
 }
 

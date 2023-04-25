@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.gender.ui
 
+import android.content.Context
 import androidx.core.view.isVisible
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileSetGenderBinding
@@ -17,9 +19,13 @@ import me.dmdev.rxpm.widget.bindTo
 class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfileSetGenderBinding>(
     FragmentProfileSetGenderBinding::inflate
 ) {
+    companion object {
+        fun newInstance() = ProfileSetGenderFragment()
+    }
 
     override val screenLayout: Int = R.layout.fragment_profile_set_gender
     override val classToken: Class<ProfileSetGenderPm> = ProfileSetGenderPm::class.java
+
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
@@ -35,11 +41,10 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfil
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
-    override fun handleBack() {
-        Unit.passTo(presentationModel.backHandleAction)
-    }
-
-    companion object {
-        fun newInstance() = ProfileSetGenderFragment()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            Unit.passTo(presentationModel.backHandleAction)
+        }
     }
 }

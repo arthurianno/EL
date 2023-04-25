@@ -4,6 +4,7 @@ import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
+import com.elta.android.presentation.features.devices.info.ui.adapter.items.DeviceActionItem
 import com.elta.android.presentation.features.devices.info.ui.adapter.items.DeviceInfoItem
 import com.elta.android.presentation.features.devices.info.ui.adapter.items.DevicePrimaryInfoItem
 import com.elta.android.presentation.utils.toSyncDate
@@ -22,8 +23,7 @@ class DeviceInfoItemsBuilder @Inject constructor(
             add(
                 DeviceInfoItem(
                     title = resources.getString(R.string.profile_device_info_last_sync_title_field),
-                    description = it.toSyncDate(resources),
-                    onClick = { bus.click(Clicks.OpenBlueToothScreen) }
+                    description = it.toSyncDate(resources)
                 )
             )
         }
@@ -31,7 +31,7 @@ class DeviceInfoItemsBuilder @Inject constructor(
             add(
                 DeviceInfoItem(
                     resources.getString(R.string.profile_device_info_firmware_version_title_field),
-                    it.toString()
+                    it
                 )
             )
         }
@@ -49,5 +49,14 @@ class DeviceInfoItemsBuilder @Inject constructor(
                 isPrimary
             )
         )
+        if (isPrimary) {
+            add(
+                DeviceActionItem(
+                    startIcon = R.drawable.ic_location,
+                    title = R.string.profile_device_search,
+                    onClick = { bus.click(Clicks.DeviceSearchItemClicked) }
+                )
+            )
+        }
     }
 }

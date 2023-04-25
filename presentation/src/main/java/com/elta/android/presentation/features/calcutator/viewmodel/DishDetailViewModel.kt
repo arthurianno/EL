@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
 import com.elta.android.common.utils.findOrFirst
-import com.elta.android.domain.common.mapDistinct
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetFatSecretDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
@@ -9,7 +8,7 @@ import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
-import com.elta.android.presentation.core.compose.common.Event
+import com.elta.android.presentation.core.compose.mapDistinct
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
@@ -37,7 +36,7 @@ private const val DIGIT_DOT = '.'
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
-) : BaseViewModel<DishDetailViewState, Event, Action>() {
+) : BaseViewModel<DishDetailViewState>() {
     override fun createInitState(): DishDetailViewState =
         DishDetailViewState(
             dish = DishUiEntity(
@@ -139,22 +138,21 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
+    override fun handleUserAction(action: Action) {
+        when (action) {
+            AppAction.BackPressure -> router.exit()
+            DownButtonClick -> saveDish()
+        }
+    }
+
     override fun reduceStateByAction(
         currentState: DishDetailViewState,
         action: Action
     ): DishDetailViewState =
-        run {
-            when (action) {
-                CalculatorAction.PortionHelpClick -> showPortionHelp(true)
-                AppAction.FreeScreenTap -> showPortionHelp(false)
-                else -> {
-                    when (action) {
-                        AppAction.BackPressure -> router.exit()
-                        DownButtonClick -> saveDish()
-                    }
-                    currentState
-                }
-            }
+        when (action) {
+            CalculatorAction.PortionHelpClick -> showPortionHelp(true)
+            AppAction.FreeScreenTap -> showPortionHelp(false)
+            else -> currentState
         }
 
     private fun showPortionHelp(visibilityState: Boolean): DishDetailViewState = run {

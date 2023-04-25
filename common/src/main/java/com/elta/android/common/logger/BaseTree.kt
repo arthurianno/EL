@@ -1,12 +1,7 @@
 package com.elta.android.common.logger
 
-import android.content.Context
 import android.util.Log
-import com.elta.android.common.logger.model.DeviceDetails
 import com.elta.android.common.logger.model.LogRecord
-import com.elta.android.common.logger.model.priorityAsString
-import com.elta.android.common.logger.model.toFirebase
-import com.google.firebase.database.FirebaseDatabase
 import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
@@ -17,53 +12,40 @@ import java.util.Locale
 
 internal const val DEFAULT_TAG = "ELTA_LOG_TAG"
 
-abstract class BaseTree(
-    private val deviceDetails: DeviceDetails,
-    context: Context
-) : Timber.Tree() {
+abstract class BaseTree(private val logsFile: File) : Timber.Tree() {
 
-    private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS a zzz", Locale.getDefault())
-    private val date = dateFormat.format(Date())
-    private val firebaseRef =
-        FirebaseDatabase.getInstance().getReference("logs/$date/${deviceDetails.deviceId}")
 
-    private val logsFile by lazy {
-        File(context.getExternalFilesDir("logs"), "EltaApplicationLog_$date.txt").apply {
-            if (!exists()) {
-                runCatching { createNewFile() }
-                    .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
-            }
-        }
-    }
-
-    private val _logs = mutableListOf<LogRecord>()
-    val logs: List<LogRecord>
-        get() = _logs
+    private val logs = mutableListOf<LogRecord>()
 
     override fun log(priority: Int, tag: String?, message: String, error: Throwable?) {
-        _logs.add(LogRecord(timeFormat.format(Date()), priority, tag, message, error))
+        val logRecord = LogRecord(timeFormat.format(Date()), priority, tag, message, error)
+        Log.println(priority, tag, message)
+        logs.add(logRecord)
+        saveLogInFile(logRecord)
     }
 
-    protected fun storeToFirebase(logRecord: LogRecord) {
-        val timestamp = System.currentTimeMillis()
-        with(firebaseRef) {
-            updateChildren(mapOf(Pair("-DeviceDetails", deviceDetails)))
-            child(timestamp.toString()).setValue(logRecord.toFirebase())
-        }
-    }
-
-    protected fun saveLogInFile(logRecord: LogRecord) {
+    private fun saveLogInFile(logRecord: LogRecord) {
         BufferedWriter(FileWriter(logsFile, true)).use { file ->
             runCatching { file writeLog logRecord }
-                .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
+                .onFailure { Log.println(Log.ERROR, DEFAULT_TAG, it.message.orEmpty()) }
         }
     }
 
     private infix fun BufferedWriter.writeLog(logRecord: LogRecord) {
         append("[${logRecord.time}] --> ")
-        append("${priorityAsString(logRecord.priority)}/")
+        append(logRecord.priority.priorityToString())
         append("${logRecord.tag ?: DEFAULT_TAG}: ${logRecord.message}")
         newLine()
+    }
+
+    private fun Int.priorityToString(): String = when (this) {
+        Log.VERBOSE -> "VERBOSE"
+        Log.DEBUG -> "DEBUG"
+        Log.INFO -> "INFO"
+        Log.WARN -> "WARN"
+        Log.ERROR -> "ERROR"
+        Log.ASSERT -> "ASSERT"
+        else -> super.toString()
     }
 }

@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.navigation.BackHandler
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
@@ -35,11 +35,13 @@ import me.dmdev.rxpm.bindTo
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+internal const val DEBOUNCE_MILLIS = 300L
+
 internal typealias Inflater<B> = (LayoutInflater, ViewGroup?, Boolean) -> B
 
 abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     private val bindingInflater: Inflater<B>
-) : PmFragment<T>(), BackHandler {
+) : PmFragment<T>() {
 
     @Inject
     lateinit var factory: PmFactory
@@ -71,6 +73,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
+        addOnBackPressedCallback { router.exit() }
         super.onAttach(context)
     }
 
@@ -116,8 +119,9 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         errorStateView?.let { stateView -> pm.errorControl.bind(stateView, compositeUnbind) }
         emptyStateView?.let { stateView -> pm.emptyControl.bind(stateView, compositeUnbind) }
         progressView?.let { view -> pm.progressState.bindTo(view.visibility()) }
-        homeButtonView?.clicks()?.subscribe { requireActivity().onBackPressed() }
+        homeButtonView?.clicks()?.subscribe { router.exit() }
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
+        pm.showToastCommand.bindTo { showToast(it) }
         pm.hideKeyBoardCommand.bindTo { requireActivity().hideKeyboard() }
     }
 
@@ -125,10 +129,6 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         val pm = factory.createViewModel(classToken)
         pm.router = router
         return pm
-    }
-
-    override fun handleBack() {
-        router.exit()
     }
 
     open fun initStatusBarConfig() {
@@ -144,8 +144,12 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     protected fun bindProgressDialog(pm: T) {
         pm.progressState.observable
-            .throttleLast(DEBOUNCE, TimeUnit.MILLISECONDS)
+            .throttleLast(DEBOUNCE_MILLIS, TimeUnit.MILLISECONDS)
             .subscribe(progressDialog.visibility(childFragmentManager)) {}
+    }
+
+    private fun showToast(messageId: Int, showTime: Int = Toast.LENGTH_LONG) {
+        Toast.makeText(requireContext(), getString(messageId), showTime).show()
     }
 
     private fun showSnackbar(data: SnackBarData) {
@@ -157,17 +161,4 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
     fun <T> SnackBarControl<T>.bindTo(createSnackBar: (data: T, sc: SnackBarControl<T>) -> Snackbar) {
         bind({ data, sc -> createSnackBar(data, sc) }, compositeDestroy)
     }
-
-    companion object {
-        const val DEBOUNCE = 300L
-    }
-}
-
-private inline fun <reified V : ViewBinding> ViewGroup.toBinding(layoutInflater: LayoutInflater): V {
-    return V::class.java.getMethod(
-        "inflate",
-        LayoutInflater::class.java,
-        ViewGroup::class.java,
-        Boolean::class.java
-    ).invoke(null, layoutInflater, this, false) as V
 }

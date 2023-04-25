@@ -107,7 +107,7 @@ class EventCreationPm @Inject constructor(
             isFormNotEmptyState.consumer.accept(
                 eventFormModel.pickerValue != (
                     profileState.valueOrNull?.weight
-                        ?: WeightFormInitializer.WEIGHT_DEFAULT_PICKER_VALUE
+                        ?: WeightFormInitializer.WEIGHT_DEFAULT_VALUE
                     ) ||
                     !eventFormModel.inputValue.isNullOrEmpty() ||
                     eventFormModel.meta != null ||
@@ -160,6 +160,7 @@ class EventCreationPm @Inject constructor(
             medicament = form.insulin?.drug,
             note = form.note,
             eventType = checkNotNull(form.eventType),
+            glucometerSerialNumber = null,
             dishes = dishes.value
         )
     }

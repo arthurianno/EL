@@ -9,8 +9,6 @@ android {
 
     defaultConfig {
         minSdk = AppConfig.minSdk
-        targetSdk = AppConfig.targetSdk
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -18,6 +16,37 @@ android {
     compileOptions {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
+    }
+    buildTypes {
+        release {
+            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+        }
+        debug {
+            val debugVersionName = "\"${Version.versionName}${Version.prodNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugDev") {
+            val debugVersionName = "\"${Version.versionName}${Version.devNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("debugStage") {
+            val debugVersionName = "\"${Version.versionName}${Version.stageNameSuffix}\""
+            buildConfigField("String", "APP_VERSION", debugVersionName)
+        }
+        create("releaseDev") {
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
+        }
+        create("releaseStage") {
+            buildConfigField(
+                "String",
+                "APP_VERSION",
+                "\"${Version.versionName}-${BackendVariant.dev.name}\""
+            )
+        }
     }
 }
 
@@ -31,5 +60,6 @@ dependencies {
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Utils.jsr310)
     implementation(platform(Dependencies.Google.FireBase.bom))
-    implementation(Dependencies.Google.FireBase.databaseBom)
+    implementation(Dependencies.Google.FireBase.storageBom)
+    implementation(Dependencies.Jetpack.WorkManager.core)
 }

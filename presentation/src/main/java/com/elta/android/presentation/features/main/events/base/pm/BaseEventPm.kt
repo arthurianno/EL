@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.common.utils.atEndOfDay
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.model.Dish
@@ -90,13 +91,16 @@ abstract class BaseEventPm(
 
     override fun onCreate() {
         super.onCreate()
-        bindFormPicker()
-        bindFormVariantSelection()
-        bindFormTagSelection()
-        bindDateSelectors()
-        bindHandleBack()
+        observeFormPicker()
+        observeFormVariantSelection()
+        observeFormTagSelection()
+        observeDateSelectors()
+        observeHandleBack()
         observeEventChanges()
-        observeDishesResult()
+        if (FeatureToggles.isEnableCalculatorFeature) {
+            observeDishesResult()
+            observeDishesChanges()
+        }
     }
 
     fun setEventType(eventType: EventType) {
@@ -135,14 +139,23 @@ abstract class BaseEventPm(
                             breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
                         }
                         updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
-                        delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
-                        lockedChangeFormPicker = true
                     }
                 }
         }
     }
 
-    private fun bindHandleBack() {
+    private fun observeDishesChanges() {
+        dishes.observable.subscribe {
+            if (it.isNotEmpty()) {
+                launch {
+                    delay(LOCKED_FORM_PICKER_DELAY_MILLIS)
+                    lockedChangeFormPicker = true
+                }
+            }
+        }
+    }
+
+    private fun observeHandleBack() {
         backHandleAction.observable
             .doOnNext(::handleBack)
             .subscribe()
@@ -158,7 +171,7 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun bindFormPicker() {
+    private fun observeFormPicker() {
         formPickerValueChangedAction.observable
             .subscribe {
                 formPickerValue.consumer.accept(it)
@@ -170,24 +183,21 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
-    private fun bindFormVariantSelection() {
+    private fun observeFormVariantSelection() {
         formSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
             .subscribe {
-                when (it.eventType) {
-                    EventType.BREAD -> {
-                        lockedChangeFormPicker = false
-                        router.navigateTo(Screens.CalculatorScreen)
-                    }
-
-                    else -> router.navigateTo(Screens.EventsChooserScreen(it))
+                if (it.eventType == EventType.BREAD && FeatureToggles.isEnableCalculatorFeature) {
+                    lockedChangeFormPicker = false
+                    router.navigateTo(Screens.CalculatorScreen)
+                } else {
+                    router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }
             .untilDestroy()
-
         bus.events<Events.ChooserVariantSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(formSelector.option.consumer)
@@ -216,7 +226,7 @@ abstract class BaseEventPm(
                 )
         }
 
-    private fun bindFormTagSelection() {
+    private fun observeFormTagSelection() {
         tagSelector.clickAction.observable
             .debounceAction()
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
@@ -230,34 +240,29 @@ abstract class BaseEventPm(
             }
             .subscribe { router.navigateTo(Screens.EventsChooserScreen(it)) }
             .untilDestroy()
-
         bus.events<Events.ChooserTagSelected>()
             .map { it.chooserResult.toSelectorOption() }
             .subscribe(tagSelector.option.consumer)
             .untilDestroy()
     }
 
-    private fun bindDateSelectors() {
+    private fun observeDateSelectors() {
         selectedDateState.observable
             .map { it.toEventTime(resources).toSimpleSelectorOption() }
             .subscribe(timeSelector.option.consumer)
             .untilDestroy()
-
         selectedDateState.observable
             .map { it.toEventDate(resources).toSimpleSelectorOption() }
             .subscribe(dateSelector.option.consumer)
             .untilDestroy()
-
         dateSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showDatePickerDialog.consumer)
             .untilDestroy()
-
         timeSelector.clickAction.observable
             .map { selectedDateState.value }
             .subscribe(showTimePickerDialog.consumer)
             .untilDestroy()
-
         dateTimeSelectedAction.observable
             .filter(::validateSelectedDate)
             .subscribe(selectedDateState.consumer)

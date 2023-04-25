@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.auth.login.pm
 
+import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
@@ -19,6 +20,8 @@ class LoginPm @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val getUserId: GetUserIdUseCase,
+    private val firebaseStorage: FirebaseStorage,
     services: ServiceFacade
 ) : BaseRegistrationPm(services) {
 
@@ -73,12 +76,16 @@ class LoginPm @Inject constructor(
     private fun checkEmailAndOnBoarding(i: Boolean) =
         getUserInfoUseCase.execute()
             .doOnSuccess { info ->
+                getUserId.execute()
+                    .doOnSuccess { firebaseStorage.userLogin = it }
+                    .subscribe()
                 when {
                     !info.isEmailConfirmed -> router.navigateTo(ActivateProfile)
-                    info.isOnBoardingPassed || info.isEmailConfirmed -> {
+                    info.isOnBoardingPassed -> {
                         remindersManager.scheduleReminders()
                         router.newRootFlow(Screens.HomeFlow)
                     }
+
                     else -> router.newRootFlow(Screens.OnBoardingFlow)
                 }
             }

@@ -12,9 +12,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.tests.TestTags
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.theme.GetLocalProperties
 
@@ -37,10 +39,6 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
         setState { state.value.copy(enable = enableState) }
     }
 
-    fun onClick() {
-        sendAction(DownButtonClick)
-    }
-
     infix fun visibilityState(visibilityState: Boolean) {
         setState { state.value.copy(visible = visibilityState) }
     }
@@ -54,7 +52,20 @@ class DownButtonWidgetModel : BaseWidgetModel<DownButtonWidgetState>() {
 }
 
 @Composable
-fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
+fun DownButton(
+    widgetModel: DownButtonWidgetModel,
+    onClickAction: Action = DownButtonClick
+) {
+    Box {
+        DownButton(widgetModel = widgetModel, onClickAction = onClickAction)
+    }
+}
+
+@Composable
+fun BoxScope.DownButton(
+    widgetModel: DownButtonWidgetModel,
+    onClickAction: Action = DownButtonClick
+) {
     val state = widgetModel.state.collectAsState()
     GetLocalProperties { dimens, brash, colors, _, _ ->
         val isEnable = state.value.enable
@@ -79,10 +90,11 @@ fun BoxScope.DownButton(widgetModel: DownButtonWidgetModel) {
                         .clickable(
                             enabled = isEnable,
                             role = Role.Button,
-                            onClick = widgetModel::onClick
+                            onClick = { widgetModel.sendAction(onClickAction) }
                         )
                         .fillMaxWidth()
                         .height(dimens.downButtonHeight)
+                        .testTag(TestTags.DownButton.name)
                         .then(backgroundModifier)
                 ) {
                     Text(text = state.value.text, color = textColor)

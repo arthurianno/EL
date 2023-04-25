@@ -52,6 +52,11 @@ private val h2 = TextStyle(
     fontSize = 20.sp
 )
 
+private val h3 = TextStyle(
+    fontFamily = appBaseFontMedium,
+    fontSize = 16.sp
+)
+
 private val caption1 = TextStyle(
     fontFamily = appBaseFontRegular,
     fontSize = 12.sp
@@ -108,6 +113,7 @@ data class EltaTypes(
     val subtitle1: TextStyle,
     val h1: TextStyle,
     val h2: TextStyle,
+    val h3: TextStyle,
     val caption1: TextStyle,
     val caption2: TextStyle,
     val snackBar: TextStyle,
@@ -129,6 +135,7 @@ internal val eltaTypes = EltaTypes(
     subtitle1 = subtitle1,
     h1 = h1,
     h2 = h2,
+    h3 = h3,
     caption1 = caption1,
     caption2 = caption2,
     snackBar = snackBar,
@@ -144,7 +151,7 @@ internal val eltaTypes = EltaTypes(
 val materialThemeTypography = Typography(
     h1 = h1,
     h2 = h2,
-//    h3 = TextStyle(),
+    h3 = h3,
 //    h4 = TextStyle(),
 //    h5 = TextStyle(),
 //    h6 = TextStyle(),

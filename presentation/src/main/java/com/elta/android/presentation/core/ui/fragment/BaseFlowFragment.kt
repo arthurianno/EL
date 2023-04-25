@@ -25,7 +25,7 @@ abstract class BaseFlowFragment<T : BasePm, B : ViewBinding>(
 
     private val cicerone by lazy { Cicerone.create(FlowRouter(globalRouter)) }
     private val navigatorHolder: NavigatorHolder by lazy { cicerone.getNavigatorHolder() }
-    private lateinit var navigator: Navigator
+    private var navigator: Navigator? = null
 
     private val currentFragment: BaseFragment<*, *>?
         get() = childFragmentManager.findFragmentById(R.id.containerView) as? BaseFragment<*, *>
@@ -52,28 +52,11 @@ abstract class BaseFlowFragment<T : BasePm, B : ViewBinding>(
 
     override fun onResume() {
         super.onResume()
-        navigatorHolder.setNavigator(navigator)
+        navigator?.let { navigatorHolder.setNavigator(it) }
     }
 
     override fun onPause() {
         navigatorHolder.removeNavigator()
         super.onPause()
-    }
-
-    override fun handleBack() {
-        if (maybeChildrenHandleBack()) {
-            currentFragment?.handleBack()
-        } else {
-            router.finishFlow()
-        }
-    }
-
-    @Suppress("UnnecessaryParentheses")
-    private fun maybeChildrenHandleBack(): Boolean {
-        currentFragment?.let {
-            return childFragmentManager.backStackEntryCount > 0 ||
-                (it is BaseFlowFragment && it.childFragmentManager.backStackEntryCount > 0)
-        }
-        return false
     }
 }

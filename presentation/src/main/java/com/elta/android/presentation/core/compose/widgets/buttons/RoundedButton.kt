@@ -33,14 +33,16 @@ fun RoundedButton(
             .requiredSize(size)
             .clip(shape = shapes.round)
             .clickable(onClick = onClick)
-            .then(border?.let {
-                Modifier
-                    .border(
-                        width = LocalDimens.current.borderWidth,
-                        color = border,
-                        shape = shapes.round
-                    )
-            } ?: Modifier)
+            .then(
+                border?.let {
+                    Modifier
+                        .border(
+                            width = LocalDimens.current.borderWidth,
+                            color = border,
+                            shape = shapes.round
+                        )
+                } ?: Modifier
+            )
             .background(
                 color = background,
                 shape = shapes.round

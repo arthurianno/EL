@@ -25,9 +25,9 @@
                 android:id="@+id/formInputView"
                 style="@style/EventFormInputStyle"
                 android:layout_width="match_parent"
-                android:maxLength="100"
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_reminders_reminder_name_hint"
+                android:maxLength="100"
                 android:paddingTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +55,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
                     android:layout_weight="1"
-                    app:fsv_draw_arrow="false" />
+                    app:fsv_draw_arrow="false"
+                    app:fsv_single_line="true" />
 
                 <com.elta.android.presentation.widgets.selector.FormSelectorView
                     android:id="@+id/formTimeSelectorView"

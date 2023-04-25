@@ -1,17 +1,19 @@
 package com.elta.android.presentation.core.compose.widgets.buttons
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
+import androidx.annotation.StringRes
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun ButtonCircle(
     @DrawableRes icon: Int,
-    tint: Color = Color.Unspecified,
+    @StringRes contentDescriptionId: Int,
+    tint: Color? = null,
     enable: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -19,10 +21,10 @@ fun ButtonCircle(
         onClick = onClick,
         enabled = enable
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = icon),
-            colorFilter = ColorFilter.tint(color = tint),
-            contentDescription = null
+            tint = tint ?: Color.Unspecified,
+            contentDescription = stringResource(id = contentDescriptionId)
         )
     }
 }

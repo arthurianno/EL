@@ -57,6 +57,7 @@ object EventMockedFactory {
                 insulinType = insulinType,
                 insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
                 type = type,
+                glucometerSerialNumber = null,
                 products = products,
                 productsCount = products.countOrZero()
             )

@@ -1,14 +1,17 @@
 package com.elta.android.presentation.features.main.events.base.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentEventFormBinding
@@ -86,7 +89,9 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
         observeAppBarChanges()
-        observeBreadUnitsChanges(pm)
+        if (FeatureToggles.isEnableCalculatorFeature) {
+            observeBreadUnitsChanges(pm)
+        }
         if (pm.eventTypeState.valueOrNull == EventType.WEIGHT) {
             pm.profileState.observable.subscribe { initializer.setPickerValue(it.weight) }
         }
@@ -139,10 +144,12 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         }
     }
 
-    override fun handleBack() {
-        view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
+        }
     }
-
     override fun onDetach() {
         super.onDetach()
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)

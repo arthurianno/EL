@@ -126,20 +126,17 @@ class MainProfilePm @Inject constructor(
 
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
-            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL -> openGlucoseRangeDialogCommand.consumer.accept(
-                Unit
-            )
-            MainProfileIndicatorItem.Type.DIABETES -> openDiabetesTypeDialogCommand.consumer.accept(
-                Unit
-            )
-            MainProfileIndicatorItem.Type.WEIGHT -> router.startFlow(
-                Screens.EventsCreationScreen(
-                    EventType.WEIGHT
-                )
-            )
-            MainProfileIndicatorItem.Type.HEMOGLOBIN -> openHemoglobinTypeDialogCommand.consumer.accept(
-                Unit
-            )
+            MainProfileIndicatorItem.Type.GLUCOSE_LEVEL ->
+                openGlucoseRangeDialogCommand.consumer.accept(Unit)
+
+            MainProfileIndicatorItem.Type.DIABETES ->
+                openDiabetesTypeDialogCommand.consumer.accept(Unit)
+
+            MainProfileIndicatorItem.Type.WEIGHT ->
+                router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
+
+            MainProfileIndicatorItem.Type.HEMOGLOBIN ->
+                openHemoglobinTypeDialogCommand.consumer.accept(Unit)
         }
 
     private fun bindEventsChangedAction() =
@@ -166,11 +163,13 @@ class MainProfilePm @Inject constructor(
                 trackEvent(AnalyticsEventType.MAP_OPEN)
                 router.startFlow(Screens.ShopsMap)
             }
+
             MyObservers -> router.startFlow(Screens.Observers)
             MyDevices -> {
                 trackEvent(AnalyticsEventType.GLUCOMETERS_OPEN)
                 router.startFlow(Screens.Devices)
             }
+
             Support -> router.startFlow(Screens.Support)
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }

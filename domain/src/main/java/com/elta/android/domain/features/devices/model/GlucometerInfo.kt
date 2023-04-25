@@ -8,6 +8,7 @@ data class GlucometerInfo(
     val syncDate: ZonedDateTime? = null,
     val temperature: Int? = null,
     val batteryLevel: Int? = null,
-    val softwareVersion: Double? = null,
-    val hardwareVersion: Double? = null
+    val softwareVersion: String? = null,
+    val hardwareVersion: String? = null,
+    val glucometerSerialNumber: String? = null
 )

@@ -1,6 +1,9 @@
 package com.elta.android.presentation.features.app.pm
 
 import android.net.Uri
+import com.elta.android.common.errors.UnauthorizedError
+import com.elta.android.common.logger.FirebaseStorage
+import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
@@ -32,7 +35,9 @@ private const val EMPTY_STATUS_DELAY_MILLIS = 400L
 private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
-    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val getUserInfo: GetUserInfoUseCase,
+    private val getUserId: GetUserIdUseCase,
+    private val firebaseStorage: FirebaseStorage,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -52,8 +57,11 @@ class AppPm @Inject constructor(
         coldStartAction.observable
             .skipWhileInProgress()
             .flatMapSingle {
-                getUserInfoUseCase.execute()
+                getUserInfo.execute()
                     .doOnSuccess { user ->
+                        getUserId.execute()
+                            .doOnSuccess { firebaseStorage.userLogin = it }
+                            .subscribe()
                         when {
                             !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
                             !user.isEmailConfirmed -> router.newRootChain(
@@ -65,7 +73,7 @@ class AppPm @Inject constructor(
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
-                    .doOnError { router.newRootFlow(Screens.GreetingFlow) }
+                    .doOnError(::handleError)
                     .bindProgress()
             }
             .retry()
@@ -86,7 +94,7 @@ class AppPm @Inject constructor(
 
         notificationStartAction.observable
             .flatMapSingle { uri ->
-                getUserInfoUseCase.execute()
+                getUserInfo.execute()
                     .map { Pair(uri, it) }
                     .doOnSuccess(::handleNotification)
                     .doOnError(::handleError)
@@ -139,7 +147,7 @@ class AppPm @Inject constructor(
                     }
 
                     is Events.Sync.Server.Error -> {
-                        setStatus(SyncStatus.Server.Error(resources))
+                        setStatus(SyncStatus.Server.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
 
@@ -167,12 +175,22 @@ class AppPm @Inject constructor(
             .untilDestroy()
     }
 
+    fun uploadLogs() {
+        firebaseStorage.uploadLogFile()
+    }
+
     override fun handleError(error: Throwable) {
-        if (error is NoSuchElementException) router.newRootChain(
-            Screens.GreetingFlow,
-            Screens.AuthFlow
-        )
-        else super.handleError(error)
+        when (error) {
+            is UnauthorizedError -> router.newRootFlow(Screens.GreetingFlow)
+            is NoSuchElementException -> {
+                router.newRootChain(
+                    Screens.GreetingFlow,
+                    Screens.AuthFlow
+                )
+            }
+
+            else -> super.handleError(error)
+        }
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
@@ -180,7 +198,9 @@ class AppPm @Inject constructor(
             NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
                 router.newRootScreen(it)
             }
-        } else router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        } else {
+            router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+        }
     }
 
     private fun setStatus(status: SyncStatus) {
@@ -223,12 +243,6 @@ class AppPm @Inject constructor(
                 val resources: ResourceProvider,
                 override val text: String = resources.getString(R.string.sync_with_backend_complete),
                 override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
-            ) : SyncStatus()
-
-            data class Error(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.no_connection_to_the_internet),
-                override val color: Int = resources.getColor(R.color.color_background_sync_error)
             ) : SyncStatus()
         }
     }

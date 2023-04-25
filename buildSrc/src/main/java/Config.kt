@@ -2,32 +2,27 @@ import org.gradle.api.JavaVersion
 
 object AppConfig {
     const val applicationId = "com.elta.android"
-    const val minSdk = 24
+    const val minSdk = 28
     const val completeSdk = 33
     const val targetSdk = 32
     const val jvmTarget = "11"
     val javaVersion = JavaVersion.VERSION_11
-
-    object AppIdSufix {
-        const val stage = "stage"
-        const val dev = "dev"
-    }
 
     object DeppLink {
         const val host = "stage2.vdiabete.com"
         const val schema = "elta"
     }
 
-    object ServerUrl {
-        const val prod = "https://vdiabete.com"
-        const val stage = "https://stage2.vdiabete.com"
-        const val dev = "https://dev.vdiabete.com"
-    }
-
     object LogEnabled {
         const val debug = true
-        const val release = false
+        const val release = true
     }
+}
+
+enum class BackendVariant(val path: String) {
+    prod("https://vdiabete.com"),
+    stage("https://stage2.vdiabete.com"),
+    dev("https://dev.vdiabete.com")
 }
 
 object Module {

@@ -22,8 +22,6 @@ import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
-private const val FORMAT_MONTH_NAME_AND_YEAR = "LLLL yyyy"
-
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
@@ -46,9 +44,35 @@ class MainDiaryPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-
         observeDates()
+        observeActions()
+        observeEvents()
+    }
 
+    override fun onBind() {
+        super.onBind()
+        bus.clicks<Clicks.RecordClicked>()
+            .map { it.item }
+            .doOnNext(::navigateToEventScreen)
+            .subscribe()
+            .untilUnbind()
+    }
+
+    private fun observeEvents() {
+        bus.events<DateChangedEvent>()
+            .subscribe { todayClickedAction.consumer.accept(Unit) }
+            .untilDestroy()
+
+        Observable.merge(
+            selectedDateState.observable.map { Unit },
+            bus.events<Events.EventsChanged>().map { Unit },
+        )
+            .map { selectedDateState.value }
+            .subscribe(loadScreenAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeActions() {
         loadScreenAction.observable
             .map(::createUseCaseParams)
             .switchMap {
@@ -62,24 +86,6 @@ class MainDiaryPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-
-        Observable.merge(
-            selectedDateState.observable.map { Unit },
-            bus.events<Events.EventsChanged>().map { Unit },
-            bus.events<DateChangedEvent>().map { Unit }
-        )
-            .map { selectedDateState.value }
-            .subscribe(loadScreenAction.consumer)
-            .untilDestroy()
-    }
-
-    override fun onBind() {
-        super.onBind()
-        bus.clicks<Clicks.RecordClicked>()
-            .map { it.item }
-            .doOnNext(::navigateToEventScreen)
-            .subscribe()
-            .untilUnbind()
     }
 
     private fun observeDates() {

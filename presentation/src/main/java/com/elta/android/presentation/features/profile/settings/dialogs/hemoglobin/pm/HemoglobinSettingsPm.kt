@@ -171,7 +171,8 @@ class HemoglobinSettingsPm @Inject constructor(
         AddNewEventUseCase.Params(
             value = inputValueState.value,
             date = dateSelectedState.value,
-            eventType = EventType.GLYCATEDHEMOGLOBIN
+            eventType = EventType.GLYCATEDHEMOGLOBIN,
+            glucometerSerialNumber = null
         )
 
     private fun createDeleteEventParams(event: Event): DeleteEventUseCase.Params =

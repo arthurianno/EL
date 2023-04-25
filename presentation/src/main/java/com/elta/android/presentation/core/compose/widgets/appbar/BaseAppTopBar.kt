@@ -1,6 +1,11 @@
 package com.elta.android.presentation.core.compose.widgets.appbar
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalAbsoluteElevation
@@ -10,11 +15,21 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
+import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
+import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
+import com.elta.android.presentation.theme.GetLocalProperties
+import com.elta.android.presentation.theme.eltaColors
+import com.elta.android.presentation.theme.eltaTypes
+
+private const val EMPTY_STRING = ""
 
 @Immutable
 data class BaseTopAppBarWidgetState(
@@ -46,21 +61,20 @@ class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarWidgetState>() {
     }
 
     override fun createInitState(): BaseTopAppBarWidgetState =
-        BaseTopAppBarWidgetState(
-            title = ""
-        )
+        BaseTopAppBarWidgetState(title = EMPTY_STRING)
 }
 
 @Composable
 fun BaseAppTopBar(
     widgetModel: BaseAppTopBarWidgetModel,
-    backgroundColor: Color = MaterialTheme.colors.background,
-    textStyle: TextStyle = MaterialTheme.typography.body1,
-    textColor: Color = MaterialTheme.colors.onPrimary,
+    backgroundColor: Color = eltaColors.white,
+    textStyle: TextStyle = eltaTypes.toolBar,
+    textColor: Color = eltaColors.shadeBlack1,
     @DrawableRes startIcon: Int? = null,
     startIconColor: Color = textColor,
     @DrawableRes endIcon: Int? = null,
-    endIconColor: Color = textColor
+    endIconColor: Color = textColor,
+    @StringRes endText: Int? = null
 ) {
     val state = widgetModel.state.collectAsState()
     TopAppBar(
@@ -81,13 +95,14 @@ fun BaseAppTopBar(
             }
         },
         actions = {
-            endIcon?.let {
-                BarIconButton(
-                    iconId = it,
-                    color = endIconColor,
-                    onClick = widgetModel::endIconClick
-                )
-            }
+            BarIconOrTextButton(
+                iconId = endIcon,
+                iconColor = endIconColor,
+                onClick = widgetModel::endIconClick,
+                text = endText,
+                textColor = textColor,
+                textStyle = textStyle
+            )
         },
         elevation = LocalAbsoluteElevation.current
     )
@@ -106,5 +121,45 @@ private fun BarIconButton(
             tint = color,
             contentDescription = contentDescription
         )
+    }
+}
+
+@Composable
+private fun BarIconOrTextButton(
+    @DrawableRes iconId: Int?,
+    iconColor: Color,
+    contentDescription: String? = null,
+    @StringRes text: Int? = null,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
+    textColor: Color = MaterialTheme.colors.onPrimary,
+    onClick: () -> Unit
+) {
+    if (text == null && iconId == null) return
+    GetLocalProperties { dimens, _, _, _, _ ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .defaultMinSize(dimens.clickableAreaMinSize, dimens.clickableAreaMinSize)
+                .clickable(onClick = onClick)
+        ) {
+            HSpacerMedium()
+            iconId?.let {
+                Icon(
+                    painter = painterResource(id = it),
+                    tint = iconColor,
+                    contentDescription = contentDescription
+                )
+                text?.let { HSpacerVerySmall() }
+            }
+            text?.let {
+                Text(
+                    text = stringResource(id = it),
+                    color = textColor,
+                    style = textStyle
+                )
+            }
+            HSpacerMedium()
+        }
     }
 }

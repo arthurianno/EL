@@ -22,5 +22,6 @@ data class Event(
     val medicament: String?,
     val type: EventType,
     val state: State,
+    val glucometerSerialNumber: String?,
     val dishes: List<Dish>
 )

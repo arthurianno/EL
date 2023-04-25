@@ -1,61 +1,40 @@
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 
+// Формат номера версии
+// develop version name 1.2.3.35-stage(123)
+// reseale version name 1.2.3
+
 private const val WAIT_EXECUTE_COMMAND_TIME = 1000L
+private const val VERSION_PROPERTIES_FILE = "./version.properties"
+private const val MAJOR = "major"
+private const val MINOR = "minor"
+private const val PATCH = "patch"
+private const val DEVELOP = "develop"
+private const val BUILD_NUMBER = "build"
 
 object Version {
-    val versionCode: Int = 256
+    private val versionProperties = Properties().apply {
+        load(FileInputStream(VERSION_PROPERTIES_FILE))
+    }
+    private val major: Int by lazy { versionProperties[MAJOR].toString().toInt() }
+    private val minor: Int by lazy { versionProperties[MINOR].toString().toInt() }
+    private val patch: Int by lazy { versionProperties[PATCH].toString().toInt() }
+    private val developCode: Int
+        get() = versionProperties[DEVELOP].toString().toInt()
+    val versionCode: Int
+        get() = versionProperties[BUILD_NUMBER].toString().toInt()
     val versionName: String
-        get() =
-            if (readCurrentBranch().contains("master", ignoreCase = true)) {
-                Release.versionName()
-            } else {
-                Debug.versionName()
-            }.also { println("Version name -  $it") }
+        get() = "$major.$minor.$patch"
 
-    object NameSufix {
-        const val stage = "stage"
-        const val dev = "dev"
-    }
-
-    private object Debug : CurrentVersion {
-        override val major: Int = 0
-        override val minor: Int = 62
-        override val patch: Int = 4
-
-        override fun versionName(): String {
-            return "${super.versionName()}-${getSufix()}"
-        }
-
-        private fun getSufix(): String {
-            val branchName = readCurrentBranch()
-            val build = versionCode
-            return when {
-                branchName.contains("develop") -> "beta.$build"
-                branchName.contains("release") -> "rc$build"
-                branchName.contains("hotfix") -> "rc$build"
-                branchName.contains("master") -> "release.$build"
-                branchName.startsWith("tags/") -> {
-                    when {
-                        branchName.contains("beta") -> "beta.$build"
-                        branchName.contains("rc") -> "rc.$build"
-                        branchName.contains("hotfix") -> "rc.$build"
-                        branchName.contains("uat") -> "uat.$build"
-                        else -> "alpha.$build"
-                    }
-                }
-
-                else -> "alpha.$build"
-            }
-        }
-    }
-
-    private object Release : CurrentVersion {
-        override val major: Int = 1
-        override val minor: Int = 2
-        override val patch: Int = 2
-    }
+    val prodNameSuffix: String = getDebugSuffix(BackendVariant.prod)
+    val stageNameSuffix: String = getDebugSuffix(BackendVariant.stage)
+    val devNameSuffix: String = getDebugSuffix(BackendVariant.dev)
+    private fun getDebugSuffix(equipement: BackendVariant): String =
+        ".$developCode-${equipement.name}($versionCode)"
 
     private fun readCurrentBranch(): String =
         commandExec("git name-rev --name-only HEAD", File(".")).orEmpty()
@@ -74,13 +53,5 @@ object Version {
             e.printStackTrace()
             return null
         }
-    }
-
-    private interface CurrentVersion {
-        val major: Int
-        val minor: Int
-        val patch: Int
-        fun versionName(): String =
-            "$major.$minor.$patch"
     }
 }

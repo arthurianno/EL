@@ -11,6 +11,16 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val DOT_SYMBOL = '.'
+private const val SPACE_SYMBOL = ' '
+private const val BATTERY_PREFIX = "b"
+private const val TEMPERATURE_PREFIX = "t"
+private const val SOFT_VERSION_PREFIX = "sw:"
+private const val HARD_VERSION_PREFIX = "hw:"
+private const val TIME_PREFIX = "time"
+private const val SERIAL_PREFIX = "ser"
+private const val DATE_TIME_PATTERN = "yyyyMMddHHmmss"
+
 @Singleton
 open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBuilder {
 
@@ -24,15 +34,20 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         var temperature: Int? = null
         var batteryLevel: Int? = null
         var version: VersionDto? = null
+        var serial: String? = null
 
         params.forEach { param ->
             when {
-                param.startsWith("time") -> date = ZonedDateTime.of(extractDate(param), ZoneId.systemDefault())
-                param.startsWith("soft") -> version = extractVersion(param)
-                param.startsWith("b") -> {
-                    val response = extractBatteryAndTemperature(param)
-                    batteryLevel = response.first
-                    temperature = response.second
+                param.startsWith(TIME_PREFIX) ->
+                    date = ZonedDateTime.of(param.extractDate(), ZoneId.systemDefault())
+
+                param.startsWith(HARD_VERSION_PREFIX) -> version = param.extractVersion()
+                param.startsWith(SERIAL_PREFIX) -> serial = param.extractSerial()
+                param.startsWith(BATTERY_PREFIX) -> {
+                    with(param.extractBatteryAndTemperature()) {
+                        batteryLevel = first
+                        temperature = second
+                    }
                 }
             }
         }
@@ -44,31 +59,35 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
             temperature = temperature,
             batteryLevel = batteryLevel,
             version = version,
+            glucometerSerialNumber = serial,
             lastSyncedEvent = lastSyncedEvent
         )
     }
 
-    protected open fun extractDate(param: String): LocalDateTime? {
+    private fun String.extractDate(): LocalDateTime {
         return try {
-            val payload = param.split(".")[1]
-            "20$payload".toLocalDateTime("yyyyMMddHHmmss")
+            "20${split(DOT_SYMBOL).component2()}".toLocalDateTime(DATE_TIME_PATTERN)
         } catch (ex: DateTimeParseException) {
             Timber.e(ex)
             LocalDateTime.now()
         }
     }
 
-    protected open fun extractVersion(param: String): VersionDto {
-        val tokens = param.split(" ")
-        val soft = tokens[0].removePrefix("soft").toDouble()
-        val hard = tokens[1].removePrefix("hard").toDouble()
-        return VersionDto(software = soft, hardware = hard)
-    }
+    private fun String.extractVersion(): VersionDto =
+        with(split(SPACE_SYMBOL)) {
+            VersionDto(
+                software = component2().removePrefix(SOFT_VERSION_PREFIX),
+                hardware = component1().removePrefix(HARD_VERSION_PREFIX)
+            )
+        }
 
-    protected open fun extractBatteryAndTemperature(param: String): Pair<Int, Int> {
-        val tokens = param.split(".")
-        val battery = tokens[0].removePrefix("b").toInt()
-        val temperature = tokens[1].removePrefix("t").toInt()
-        return Pair(battery, temperature)
-    }
+    private fun String.extractBatteryAndTemperature(): Pair<Int, Int> =
+        with(split(DOT_SYMBOL)) {
+            Pair(
+                component1().removePrefix(BATTERY_PREFIX).toInt(),
+                component2().removePrefix(TEMPERATURE_PREFIX).toInt()
+            )
+        }
+
+    private fun String.extractSerial(): String = split(DOT_SYMBOL).last()
 }
