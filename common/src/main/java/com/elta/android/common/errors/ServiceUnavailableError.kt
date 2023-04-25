@@ -1,3 +1,3 @@
 package com.elta.android.common.errors
 
-class ServiceUnavailableError : RuntimeException()
+class ServiceUnavailableError(message: String) : RuntimeException(message)
