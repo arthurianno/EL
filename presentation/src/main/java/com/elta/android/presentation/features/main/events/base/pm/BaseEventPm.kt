@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.common.utils.atEndOfDay
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.model.Dish
@@ -96,8 +97,10 @@ abstract class BaseEventPm(
         observeDateSelectors()
         observeHandleBack()
         observeEventChanges()
-        observeDishesResult()
-        observeDishesChanges()
+        if (FeatureToggles.isEnableCalculatorFeature) {
+            observeDishesResult()
+            observeDishesChanges()
+        }
     }
 
     fun setEventType(eventType: EventType) {
@@ -187,13 +190,11 @@ abstract class BaseEventPm(
             .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
             .subscribe {
-                when (it.eventType) {
-                    EventType.BREAD -> {
-                        lockedChangeFormPicker = false
-                        router.navigateTo(Screens.CalculatorScreen)
-                    }
-
-                    else -> router.navigateTo(Screens.EventsChooserScreen(it))
+                if (it.eventType == EventType.BREAD && FeatureToggles.isEnableCalculatorFeature) {
+                    lockedChangeFormPicker = false
+                    router.navigateTo(Screens.CalculatorScreen)
+                } else {
+                    router.navigateTo(Screens.EventsChooserScreen(it))
                 }
             }
             .untilDestroy()

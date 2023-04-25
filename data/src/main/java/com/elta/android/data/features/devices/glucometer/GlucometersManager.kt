@@ -30,6 +30,7 @@ import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
@@ -74,7 +75,6 @@ private const val EVENTS_COUNT = 1000
 private const val SYNC_DELAY = 500L
 private const val COMMAND_DELAY = 20L
 private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
-private const val IIOT_SDK_ENABLE = false
 
 @Singleton
 @Suppress("TooManyFunctions", "NestedBlockDepth")
@@ -446,7 +446,7 @@ class GlucometersManager @Inject constructor(
 
     private fun <T> Observable<T>.deviceServiceConnect(address: String): Observable<T> =
         doOnNext {
-            if (IIOT_SDK_ENABLE) {
+            if (FeatureToggles.isEnableIiotSdkFeature) {
                 pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
                     personalData.getIiotLogin()
                         .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->

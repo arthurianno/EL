@@ -2,10 +2,13 @@ package com.elta.android.presentation.features.main.events.base.initializer
 
 import android.content.res.Resources
 import android.view.View
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
+import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 
 object BreadFormInitializer : FormInitializer() {
 
@@ -36,10 +39,17 @@ object BreadFormInitializer : FormInitializer() {
     }
 
     override fun View.initFormView() = with(binding) {
-        formInputView.hide()
-        with(formVariantSelectorView) {
-            hint = context.getString(R.string.events_creation_hint_bread)
-            icon = context.getDrawable(R.drawable.ic_tag_def)
+        if (FeatureToggles.isEnableCalculatorFeature) {
+            formInputView.hide()
+            with(formVariantSelectorView) {
+                hint = context.getString(R.string.events_creation_hint_bread)
+                icon = context.getDrawable(R.drawable.ic_tag_def)
+            }
+        } else {
+            formVariantSelectorView.hide()
+            formInputView.show()
+            formInputView.setHint(R.string.events_creation_hint_bread)
+            formInputView.applyLengthFilter(INPUT_LENGTH)
         }
         eventInfoTextView.setText(R.string.events_helper_text_bread)
     }
