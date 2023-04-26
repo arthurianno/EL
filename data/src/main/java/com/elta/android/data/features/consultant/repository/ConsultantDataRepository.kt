@@ -19,7 +19,6 @@ import ru.webim.android.sdk.WebimSession
 import timber.log.Timber
 import javax.inject.Inject
 
-
 private const val NO_CACHE_FILE_EXIST = "File not found in the cache!!! , Filename ----> "
 
 class ConsultantDataRepository @Inject constructor(
@@ -96,5 +95,4 @@ class ConsultantDataRepository @Inject constructor(
 
     override val chat: Flow<ChatList> =
         webimDataSource.chat
-
 }
