@@ -16,6 +16,7 @@ import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.consultant.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
@@ -326,6 +327,11 @@ object Screens {
 
     object Support : SupportAppScreen() {
         override fun getFragment() = SupportFragment.newInstance()
+    }
+
+    data class ConsultantScreen(val userId: String, val userName: String) : SupportAppScreen() {
+        override fun getFragment(): Fragment =
+            ConsultantFragment.newInstance(userId = userId, userName = userName)
     }
 
     data class EmailScreen(

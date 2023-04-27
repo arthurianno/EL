@@ -16,9 +16,11 @@ import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
+import com.elta.android.data.di.WebimModule
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.di.FragmentBuilder
+import com.elta.android.presentation.di.MediaModule
 import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
@@ -49,6 +51,7 @@ import javax.inject.Singleton
         LocalSyncModule::class,
         FatSecretModule::class,
         IiotSdkModule::class,
+        WebimModule::class,
         // domain
         RepoModule::class,
         // presentation
@@ -58,6 +61,7 @@ import javax.inject.Singleton
         FragmentBuilder::class,
         NotificationModule::class,
         ReceiverBuilder::class,
+        MediaModule::class,
         // navigation
         NavigationModule::class,
         // analytics

@@ -7,6 +7,7 @@ import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
+import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectStartViewModel
@@ -69,4 +70,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ScannerDmcViewModel::class)
     abstract fun bindScannerDmcViewModel(viewModel: ScannerDmcViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConsultantViewModel::class)
+    abstract fun bindConsultantViewModel(consultantViewModel: ConsultantViewModel): ViewModel
 }

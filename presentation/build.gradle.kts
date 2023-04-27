@@ -111,6 +111,7 @@ dependencies {
     implementation(Dependencies.Jetpack.Compose.bomMaterial)
     implementation(Dependencies.Jetpack.Compose.bomRxJava2)
     implementation(Dependencies.Jetpack.Compose.Accompanist.permissions)
+    implementation(Dependencies.Coil.compose)
     bomUiToolingDependencies()
     bomComposeTestsDependencies()
     implementation(Dependencies.Jetpack.Compose.activity)
@@ -162,6 +163,7 @@ dependencies {
     implementation(Dependencies.Google.FireBase.dynamicLinksBom)
     implementation(Dependencies.Google.GoogleMap.location)
     implementation(Dependencies.CustomView.cardView)
+    implementation(Dependencies.Webim.core)
 
     testBaseDependencies()
     androidTestImplementation(Dependencies.Jetpack.WorkManager.test)

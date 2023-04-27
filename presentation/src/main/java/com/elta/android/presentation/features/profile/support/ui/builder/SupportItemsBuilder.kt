@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.profile.support.ui.builder
 
+import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.support.model.SupportAction
@@ -13,10 +14,8 @@ import javax.inject.Inject
 class SupportItemsBuilder @Inject constructor(
     private val resourceProvider: ResourceProvider
 ) {
-    fun buildItems(glucometerVersion: String): List<ListItem> = listOf(
-        SupportHeaderItem(
-            text = resourceProvider.getString(R.string.profile_support_actions_header)
-        ),
+    fun buildItems(glucometerVersion: String): List<ListItem> = mutableListOf(
+        SupportHeaderItem(text = resourceProvider.getString(R.string.profile_support_actions_header)),
         SupportActionItem(
             icon = R.drawable.ic_support_call,
             title = resourceProvider.getString(R.string.profile_support_phone_number),
@@ -64,5 +63,17 @@ class SupportItemsBuilder @Inject constructor(
             title = resourceProvider.getString(R.string.profile_support_app_version),
             version = BuildConfig.APP_VERSION
         )
-    )
+    ).apply {
+        if (FeatureToggles.isEnableConsultantFeature) {
+            add(
+                index = 2,
+                element = SupportActionItem(
+                    icon = R.drawable.ic_chat,
+                    title = resourceProvider.getString(R.string.profile_support_consultant),
+                    subTitle = resourceProvider.getString(R.string.profile_support_email_description),
+                    action = SupportAction.ConsultantAction
+                )
+            )
+        }
+    }
 }

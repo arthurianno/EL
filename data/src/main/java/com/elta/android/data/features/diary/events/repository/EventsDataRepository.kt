@@ -6,7 +6,7 @@ import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
-import com.elta.android.data.features.common.storage.BitmapStorage
+import com.elta.android.data.features.common.storage.FileStorage
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -31,7 +31,7 @@ class EventsDataRepository @Inject constructor(
     @Remote private val remoteSource: EventsDataSource,
     @Cache private val cacheSource: EventsDataSource,
     private val syncManager: LocalSyncManager,
-    private val bitmapStorage: BitmapStorage
+    private val fileStorage: FileStorage
 ) : EventsRepository {
 
     override fun getEvents(): Observable<List<Event>> =
@@ -80,7 +80,14 @@ class EventsDataRepository @Inject constructor(
             }
 
     override fun deleteEvent(event: Event): Completable =
-        Single.fromCallable { listOf(SimpleEventDto(event.id, EventTypeDto.valueOf(event.type.name))) }
+        Single.fromCallable {
+            listOf(
+                SimpleEventDto(
+                    event.id,
+                    EventTypeDto.valueOf(event.type.name)
+                )
+            )
+        }
             .flatMapCompletable {
                 cacheSource.deleteEvents(it)
                     .andThen(
@@ -94,19 +101,26 @@ class EventsDataRepository @Inject constructor(
             .flatMap {
                 syncManager.needToSync<Event>()
                     .flatMapObservable { needToSync ->
-                        when (needToSync) {
-                            true -> syncManager.getNotSynced<Event>()
-                            else -> Observable.empty()
+                        if (needToSync) {
+                            syncManager.getNotSynced<Event>()
+                        } else {
+                            Observable.empty()
                         }
                     }
             }
             .flatMap { toSync ->
                 val toDelete = toSync.filter { it.state == StateDto.DELETED }
-                    .map { SimpleEventDto(it.secondaryId, EventTypeDto.valueOf(checkNotNull(it.meta))) }
+                    .map {
+                        SimpleEventDto(
+                            it.secondaryId,
+                            EventTypeDto.valueOf(checkNotNull(it.meta))
+                        )
+                    }
 
-                when (toDelete.isEmpty()) {
-                    true -> Observable.just(toSync)
-                    else -> remoteSource.deleteEvents(toDelete)
+                if (toDelete.isEmpty()) {
+                    Observable.just(toSync)
+                } else {
+                    remoteSource.deleteEvents(toDelete)
                         .andThen(syncManager.setAllSynced<Event>(StateDto.DELETED))
                         .andThen(Observable.just(toSync))
                 }
@@ -115,9 +129,10 @@ class EventsDataRepository @Inject constructor(
                 val toCreate = toSync.filter { it.state == StateDto.CREATED }
                     .map { it.secondaryId.hashCode().toLong() }
 
-                when (toCreate.isEmpty()) {
-                    true -> Observable.just(toSync)
-                    else -> cacheSource.getEventsById(toCreate)
+                if (toCreate.isEmpty()) {
+                    Observable.just(toSync)
+                } else {
+                    cacheSource.getEventsById(toCreate)
                         .flatMapCompletable { remoteSource.addEvents(it) }
                         .andThen(syncManager.setAllSynced<Event>(StateDto.CREATED))
                         .andThen(Observable.just(toSync))
@@ -127,35 +142,44 @@ class EventsDataRepository @Inject constructor(
                 val toUpdate = toSync.filter { it.state == StateDto.UPDATED }
                     .map { it.secondaryId.hashCode().toLong() }
 
-                when (toUpdate.isEmpty()) {
-                    true -> Completable.complete()
-                    else -> cacheSource.getEventsById(toUpdate)
+                if (toUpdate.isEmpty()) {
+                    Completable.complete()
+                } else {
+                    cacheSource.getEventsById(toUpdate)
                         .flatMapCompletable { remoteSource.updateEvents(it) }
                         .andThen(syncManager.setAllSynced<Event>(StateDto.UPDATED))
                 }
             }
 
-    override fun getShareEventUri(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Single<Uri> =
+    override fun getShareEventUri(
+        event: Event,
+        glucoseLevelSettings: GlucoseLevelSettings
+    ): Single<Uri> =
         Single.fromCallable {
-            bitmapStorage.getFile(
+            fileStorage.getFile(
                 fileName = buildFileName(event, glucoseLevelSettings),
                 directoryName = EVENTS_DIR_NAME
             )
         }
             .map {
-                when (it.exists()) {
-                    true -> bitmapStorage.getFileUri(it)
-                    else -> Uri.EMPTY
+                if (it.exists()) {
+                    fileStorage.getFileUri(it)
+                } else {
+                    Uri.EMPTY
                 }
             }
 
-    override fun saveShareEventBitmap(event: Event, glucoseLevelSettings: GlucoseLevelSettings, bitmap: Bitmap): Single<Uri> =
+    override fun saveShareEventBitmap(
+        event: Event,
+        glucoseLevelSettings: GlucoseLevelSettings,
+        bitmap: Bitmap
+    ): Single<Uri> =
         Single.fromCallable {
-            bitmapStorage.saveBitmap(
+            fileStorage.saveBitmap(
                 fileName = buildFileName(event, glucoseLevelSettings),
                 directoryName = EVENTS_DIR_NAME,
                 bitmap = bitmap
             )
         }
-            .map { bitmapStorage.getFileUri(it) }
+            .map { fileStorage.getFileUri(it) }
 }

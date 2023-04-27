@@ -596,6 +596,7 @@
     <string name="profile_support_subtitle">Служба заботы о пользователях</string>
     <string name="profile_support_actions_header">Доступные действия</string>
     <string name="profile_support_versions_header">Информация об устройствах</string>
+    <string name="profile_support_consultant">Онлайн консультант</string>
     <string name="profile_support_phone_number">8 800 250 17 50</string>
     <string name="profile_support_phone_number_description">Позвонить</string>
     <string name="profile_support_email">service@eltaltd.ru</string>
@@ -746,7 +747,19 @@
     <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
 
-    // Content Descriptions
+    <!-- CONSULTANT -->
+    <string name="consultant_topbar_title">Онлайн консультант</string>
+    <string name="consultant_connecting">Подключение</string>
+    <string name="consultant_connect">Мы с вами 24/7</string>
+    <string name="consultant_offline">Не удалось подключиться</string>
+    <string name="consultant_message_placeholder">Напишите сообщение</string>
+    <string name="consultant_chat_empty_text">Мы с удовольствием ответим\nна интересующие Вас вопросы</string>
+    <string name="consultant_bottom_sheet_item_select_photo">Выбрать фото</string>
+    <string name="consultant_bottom_sheet_item_make_photo">Сделать фото</string>
+    <string name="consultant_bottom_sheet_item_select_file">Выбрать файл</string>
+    <string name="consultant_send_photo">Отправить фото</string>
+
+    <!-- Content Descriptions -->
     <string name="content_description_bluetooth_icon">значек блютуза</string>
     <string name="content_description_close_button">кнопка Закрыть</string>
     <string name="content_description_clear_button">кнопка Очистить</string>

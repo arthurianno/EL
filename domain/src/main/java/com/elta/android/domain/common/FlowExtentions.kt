@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.compose // ktlint-disable filename
+package com.elta.android.domain.common // ktlint-disable filename
 
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
