@@ -64,7 +64,7 @@ class SupportItemsBuilder @Inject constructor(
             version = BuildConfig.APP_VERSION
         )
     ).apply {
-        if (FeatureToggles.isEnableConsultant) {
+        if (FeatureToggles.isEnableConsultantFeature) {
             add(
                 index = 2,
                 element = SupportActionItem(
