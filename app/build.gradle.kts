@@ -71,8 +71,8 @@ android {
     buildTypes {
 
         all {
-            resValue("string", "app_deep_link_host", AppConfig.DeppLink.host)
-            resValue("string", "app_deep_link_schema", AppConfig.DeppLink.schema)
+            resValue("string", "app_deep_link_host", AppConfig.DeepLink.host)
+            resValue("string", "app_deep_link_schema", AppConfig.DeepLink.schema)
         }
         debug {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())

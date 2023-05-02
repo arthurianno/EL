@@ -14,8 +14,9 @@ class GetGlucometerVersionUseCase @Inject constructor(
     override fun buildUseCaseObservable(params: Unit?): Single<String> =
         repo.getDevices()
             .map { it.find { glucometer -> glucometer.first.isPrimary } }
-            .flatMap { glucometer ->
-                repo.getLastDeviceInfo(glucometer.second.glucometerSerialNumber.orEmpty())
-                    .map { it.softwareVersion.toString() }
-            }
+            .map { it.second.softwareVersion.orEmpty() }
+//            .flatMap { glucometer ->
+//                repo.getLastDeviceInfo(glucometer.second.glucometerSerialNumber.orEmpty())
+//                    .map { it.softwareVersion.toString() }
+//            }
 }
