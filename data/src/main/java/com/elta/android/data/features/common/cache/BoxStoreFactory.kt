@@ -23,8 +23,11 @@ class BoxStoreFactory @Inject constructor(
                 BoxScope.PER_APP -> createOrGetStore(commonId)
                 BoxScope.PER_USER -> {
                     val user = userHolder.currentUser
-                    if (user != null) createOrGetStore(user)
-                    else throw AccessDeniedError
+                    if (user != null) {
+                        createOrGetStore(user)
+                    } else {
+                        throw AccessDeniedError
+                    }
                 }
             }
         }
@@ -34,5 +37,5 @@ class BoxStoreFactory @Inject constructor(
         ?: createBoxStore(id).also { stores[id] = it }
 
     private fun createBoxStore(id: Long): BoxStore =
-        MyObjectBox.builder().androidContext(context).name("box_$id").build()
+        MyObjectBox.builder().androidContext(context).name("boxStore_$id").build()
 }
