@@ -15,8 +15,8 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.pm.widgets.bind
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
-import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
+import com.elta.android.presentation.core.ui.stateview.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.utils.applyInsetsToContentView
 import com.elta.android.presentation.utils.hideKeyboardFun

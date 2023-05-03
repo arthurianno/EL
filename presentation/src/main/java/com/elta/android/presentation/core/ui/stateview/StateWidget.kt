@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.ui.state_view
+package com.elta.android.presentation.core.ui.stateview
 
 import android.content.Context
 import android.util.AttributeSet

@@ -10,7 +10,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentSyncConnectBinding

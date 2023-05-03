@@ -21,7 +21,7 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.messages.SnackBarMessageData
@@ -93,7 +93,6 @@ abstract class ConnectDevicePm constructor(
         )
     }
 
-    private val showRetryEnableBluetoothAction = action<Unit>()
     private val showRetrySearchAction = action<Unit>()
     private val showRetryPinAction = action<Unit>()
     private val showRetrySyncAction = action<Unit>()
@@ -127,31 +126,28 @@ abstract class ConnectDevicePm constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is BluetoothNotEnabledError -> {
-                handleBluetoothDisableError()
+                btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
             }
+
             is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
                 Unit
             )
+
             is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(
                 Unit
             )
+
             is TimeoutException -> {
-                val devices = items.valueOrNull
-                if (devices == null || devices.isEmpty()) {
+                if (items.valueOrNull.isNullOrEmpty()) {
                     showRetrySearchAction.consumer.accept(Unit)
                 }
             }
+
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
             is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
-    }
-
-    private fun handleBluetoothDisableError() {
-        bus.event(Events.Sync.Glucometer.Error)
-        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-        showRetryEnableBluetoothAction.consumer.accept(Unit)
     }
 
     private fun bindActions() {

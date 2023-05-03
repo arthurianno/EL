@@ -15,8 +15,8 @@ import com.elta.android.presentation.core.pm.widgets.ErrorHandler
 import com.elta.android.presentation.core.pm.widgets.errorHandler
 import com.elta.android.presentation.core.pm.widgets.networkControl
 import com.elta.android.presentation.core.pm.widgets.stateControl
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
-import com.elta.android.presentation.core.ui.state_view.StateData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
+import com.elta.android.presentation.core.ui.stateview.StateData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
 import io.reactivex.Observable

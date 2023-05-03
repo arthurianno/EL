@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.google.android.material.snackbar.Snackbar
 
 fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {

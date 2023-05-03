@@ -11,7 +11,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import java.util.concurrent.TimeUnit
 
-private const val SCAN_TIMEOUT = 60L // seconds
+private const val SCAN_TIMEOUT_SECOND = 60L
 
 fun BluetoothLeScannerCompat.startScan(
     filters: List<ScanFilter> = emptyList(),
@@ -57,7 +57,7 @@ fun BluetoothLeScannerCompat.startScan(
     .map(MutableSet<ScanResult>::toList)
     .distinctUntilChanged { r1, r2 -> !r1.isResultChanged(r2) }
     .skip(1)
-    .timeout(SCAN_TIMEOUT, TimeUnit.SECONDS, Schedulers.computation())
+    .timeout(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, Schedulers.computation())
 
 @Suppress("ReturnCount")
 fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {

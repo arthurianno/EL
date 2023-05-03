@@ -2,8 +2,8 @@
 
 package com.elta.android.presentation.core.pm.widgets
 
-import com.elta.android.presentation.core.ui.state_view.StateData
-import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.core.ui.stateview.StateData
+import com.elta.android.presentation.core.ui.stateview.StateView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import me.dmdev.rxpm.PresentationModel
