@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.ui.bottom_sheet
+package com.elta.android.presentation.core.ui.bottomsheet
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

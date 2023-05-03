@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.state_view.StateData
-import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.core.ui.stateview.StateData
+import com.elta.android.presentation.core.ui.stateview.StateView
 import com.jakewharton.rxbinding2.view.visibility
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer

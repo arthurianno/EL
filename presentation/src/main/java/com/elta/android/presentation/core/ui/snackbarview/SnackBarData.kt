@@ -1,4 +1,4 @@
-package com.elta.android.presentation.core.ui.snack_bar_view
+package com.elta.android.presentation.core.ui.snackbarview
 
 interface SnackBarData {
 

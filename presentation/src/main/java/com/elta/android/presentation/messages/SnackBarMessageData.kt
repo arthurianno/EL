@@ -1,7 +1,7 @@
 package com.elta.android.presentation.messages
 
 import com.elta.android.presentation.R
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.nullgr.core.resources.ResourceProvider
 
 sealed class SnackBarMessageData(

@@ -45,7 +45,7 @@ class FirebaseStorage(private val context: Context) {
         )
     )
 
-    private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val date = dateFormat.format(Date())
 
     fun uploadLogFile() {

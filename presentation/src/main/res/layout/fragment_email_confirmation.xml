@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <com.elta.android.presentation.core.ui.state_view.StateWidget
+        <com.elta.android.presentation.core.ui.stateview.StateWidget
             android:id="@+id/confirmationSuccessStateView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -29,7 +29,7 @@
 
     </LinearLayout>
 
-    <com.elta.android.presentation.core.ui.state_view.StateWidget
+    <com.elta.android.presentation.core.ui.stateview.StateWidget
         android:id="@+id/errorStateView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

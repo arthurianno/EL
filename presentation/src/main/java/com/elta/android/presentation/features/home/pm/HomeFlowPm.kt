@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.pm
 
+import android.os.CountDownTimer
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
@@ -33,7 +34,7 @@ import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl2
 import com.elta.android.presentation.messages.SnackBarMessageData
@@ -42,6 +43,7 @@ import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
+import io.reactivex.functions.Predicate
 import io.reactivex.rxkotlin.Singles
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
@@ -54,7 +56,8 @@ import javax.inject.Inject
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
-private const val SNACK_BAR_DURATION = 2000
+private const val SNACK_BAR_DURATION = 60000
+private const val SYNC_TIMER_DELAY_MILLIS = 60000L
 
 class HomeFlowPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -67,6 +70,17 @@ class HomeFlowPm @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
+
+    private val timer = object : CountDownTimer(SYNC_TIMER_DELAY_MILLIS, SYNC_TIMER_DELAY_MILLIS) {
+        override fun onTick(millisUntilFinished: Long) {}
+
+        override fun onFinish() {
+            syncTimerIsRun = false
+        }
+    }
+
+    @Volatile
+    private var syncTimerIsRun: Boolean = false
 
     val bottomSheetItems = state<List<ListItem>>()
     val closeBottomSheetCommand = command<Unit>()
@@ -206,7 +220,9 @@ class HomeFlowPm @Inject constructor(
         startSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
             .flatMap {
+                startSyncTimer()
                 syncWithGlucometer(auto = false)
+                    .retry(Predicate { syncTimerIsRun })
                     .doOnError(::handleSyncError)
             }
             .retry()
@@ -226,6 +242,17 @@ class HomeFlowPm @Inject constructor(
             }
             .subscribe(startSyncAction.consumer)
             .untilDestroy()
+    }
+
+    private fun startSyncTimer() {
+        timer.cancel()
+        timer.start()
+        syncTimerIsRun = true
+    }
+
+    private fun stopSyncTimer() {
+        timer.cancel()
+        syncTimerIsRun = false
     }
 
     private fun bindSyncWithBackendAction() {
@@ -370,6 +397,14 @@ class HomeFlowPm @Inject constructor(
             .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
             .doOnComplete { bus.event(Events.Sync.Glucometer.Success) }
             .doOnError { error ->
+                if (error is PrimaryGlucometerNotFoundError) {
+                    stopSyncTimer()
+                    router.startFlow(
+                        Screens.ConnectTypeScreen(
+                            isOnBoarding = false
+                        )
+                    )
+                }
                 if (auto) {
                     if (error.cause is BluetoothNotEnabledError ||
                         error.cause is LocationNotEnabledError ||
@@ -412,7 +447,7 @@ class HomeFlowPm @Inject constructor(
 
     private fun handleSyncError(error: Throwable) {
         when (error) {
-            is PrimaryGlucometerNotFoundError -> router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false))
+            is PrimaryGlucometerNotFoundError -> stopSyncTimer()
             is GlucometerSyncError ->
                 when (error.cause) {
                     is GlucometerOfflineError -> showRetrySyncAction.consumer.accept(Unit)

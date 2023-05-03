@@ -1,6 +1,6 @@
 package com.elta.android.presentation
 
-import com.elta.android.presentation.core.ui.state_view.StateData
+import com.elta.android.presentation.core.ui.stateview.StateData
 import com.nullgr.core.resources.ResourceProvider
 
 sealed class States : StateData {

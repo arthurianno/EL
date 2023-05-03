@@ -13,8 +13,8 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
-import com.elta.android.presentation.core.ui.snack_bar_view.SnackBarData
-import com.elta.android.presentation.core.ui.state_view.StateView
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
+import com.elta.android.presentation.core.ui.stateview.StateView
 import com.elta.android.presentation.utils.makeSnackBar
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder

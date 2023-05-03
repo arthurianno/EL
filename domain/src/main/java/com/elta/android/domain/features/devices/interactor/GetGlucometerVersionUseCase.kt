@@ -15,8 +15,4 @@ class GetGlucometerVersionUseCase @Inject constructor(
         repo.getDevices()
             .map { it.find { glucometer -> glucometer.first.isPrimary } }
             .map { it.second.softwareVersion.orEmpty() }
-//            .flatMap { glucometer ->
-//                repo.getLastDeviceInfo(glucometer.second.glucometerSerialNumber.orEmpty())
-//                    .map { it.softwareVersion.toString() }
-//            }
 }

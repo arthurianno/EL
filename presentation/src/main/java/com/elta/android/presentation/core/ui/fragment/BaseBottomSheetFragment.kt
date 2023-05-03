@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.viewbinding.ViewBinding
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.factory.PmFactory
-import com.elta.android.presentation.core.ui.bottom_sheet.BottomSheetDialog
+import com.elta.android.presentation.core.ui.bottomsheet.BottomSheetDialog
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.visibility
 import com.elta.android.presentation.widgets.dialogs.ProgressDialog
