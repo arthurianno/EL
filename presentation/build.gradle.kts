@@ -166,5 +166,6 @@ dependencies {
     implementation(Dependencies.Webim.core)
 
     testBaseDependencies()
+    testImplementation(Dependencies.Test.kotlinJUnit)
     androidTestImplementation(Dependencies.Jetpack.WorkManager.test)
 }

@@ -50,7 +50,7 @@ class ConnectingViewModel @Inject constructor(
         ConnectingViewState(
             stageType = ConnectingStageType.Connecting,
             isOnBoarding = false,
-            pinCode = 0,
+            pinCode = "",
             glucometerName = "",
             connectDevice = null
         )
@@ -138,7 +138,7 @@ class ConnectingViewModel @Inject constructor(
         reduceState {
             state.value.copy(
                 isOnBoarding = arguments.getBoolean(IS_ON_BOARDING_ARGUMENT_NAME),
-                pinCode = arguments.getInt(PIN_ARGUMENT_NAME),
+                pinCode = arguments.getString(PIN_ARGUMENT_NAME).orEmpty(),
                 glucometerName = arguments.getString(GLUCOMETER_NAME_ARGUMENT_NAME).orEmpty()
             )
         }
@@ -169,7 +169,7 @@ class ConnectingViewModel @Inject constructor(
                     reduceState { state.value.copy(connectDevice = it) }
                     ConnectDeviceUseCase.Params(
                         device = it,
-                        pinCode = state.value.pinCode.toString()
+                        pinCode = state.value.pinCode
                     )
                 }
                 .flatMapLatest {
