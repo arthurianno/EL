@@ -59,6 +59,7 @@ import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheet
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.extractPinCode
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -69,11 +70,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val NUMBER_SUFFIX = "D"
-private const val PIN_MUL_COEFFICIENT = 599681139
-private const val PIN_PLUS_COEFFICIENT = 123
-private const val PIN_AND_COEFFICIENT = 0xFFFFFFFF
-private const val PIN_DIV_COEFFICIENT = 1000
-private const val NUMBERS_COUNT_FOR_PIN = 6
 private const val GLUCOMETER_NAME_SUFFIX = "SatelliteOnline"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
@@ -272,16 +268,11 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 val value = code.rawValue.orEmpty()
                 if (value.startsWith(NUMBER_SUFFIX)) {
                     runCatching {
-                        val number = value.drop(1)
-                        val pin = number
-                            .takeLast(NUMBERS_COUNT_FOR_PIN)
-                            .toLong()
-                            .times(PIN_MUL_COEFFICIENT)
-                            .plus(PIN_PLUS_COEFFICIENT)
-                            .and(PIN_AND_COEFFICIENT)
-                            .mod(PIN_DIV_COEFFICIENT)
+                        val pin = value.extractPinCode()
                         val name =
-                            "$GLUCOMETER_NAME_SUFFIX${number.takeLast(NUMBERS_COUNT_FOR_NAME)}"
+                            "$GLUCOMETER_NAME_SUFFIX${
+                                value.drop(1).takeLast(NUMBERS_COUNT_FOR_NAME)
+                            }"
                         viewModel sendAction ConnectAction.StartConnecting(pin, name)
                         scanner?.close()
                     }

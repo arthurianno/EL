@@ -46,7 +46,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     companion object {
         fun newInstance(
             isOnBoarding: Boolean,
-            pin: Int,
+            pin: String,
             name: String
         ) = ConnectingFragment().apply {
             arguments = bundle(

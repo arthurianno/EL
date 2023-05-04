@@ -89,7 +89,7 @@ class ScannerDmcViewModel @Inject constructor(
         }
     }
 
-    private fun startConnecting(pin: Int, name: String) {
+    private fun startConnecting(pin: String, name: String) {
         router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))
     }
 

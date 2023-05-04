@@ -253,7 +253,7 @@ object Screens {
 
     data class ConnectingScreen(
         val isOnBoarding: Boolean,
-        val pin: Int,
+        val pin: String,
         val name: String
     ) : SupportAppScreen() {
         override fun getFragment() = ConnectingFragment.newInstance(isOnBoarding, pin, name)
