@@ -231,7 +231,10 @@ class HomeFlowPm @Inject constructor(
 
         startAutoSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
-            .flatMap { autoSyncObservable() }
+            .flatMap {
+                startSyncTimer()
+                autoSyncObservable()
+            }
             .retry()
             .subscribe()
             .untilDestroy()
@@ -381,6 +384,7 @@ class HomeFlowPm @Inject constructor(
                 val devices = pair.second
                 if (devices.find { it.first.isPrimary } != null && !info.isFirstHomeEntrance) {
                     syncWithGlucometer(auto = true)
+                        .retry(Predicate { syncTimerIsRun })
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
                         .doOnComplete { startSyncWithBackendAction.consumer.accept(Unit) }
@@ -412,7 +416,7 @@ class HomeFlowPm @Inject constructor(
                     ) {
                         bus.event(Events.Sync.Glucometer.Error)
                     } else {
-                        bus.event(Events.Sync.Glucometer.ErrorWithMessage)
+                        if (!syncTimerIsRun) bus.event(Events.Sync.Glucometer.ErrorWithMessage)
                     }
                 } else {
                     bus.event(Events.Sync.Glucometer.Error)
