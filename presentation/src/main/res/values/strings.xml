@@ -91,8 +91,8 @@
     <string name="on_boarding_prev_button_title">Назад</string>
     <string name="on_boarding_next_button_title">Далее</string>
 
-    <string name="diabetes_type_first">Первый тип</string>
-    <string name="diabetes_type_second">Второй тип</string>
+    <string name="diabetes_type_first">1 тип</string>
+    <string name="diabetes_type_second">2 тип</string>
     <string name="diabetes_type_lada">LADA</string>
     <string name="diabetes_type_gestational">Гестационный</string>
     <string name="diabetes_type_prediabetes">Предиабет</string>
