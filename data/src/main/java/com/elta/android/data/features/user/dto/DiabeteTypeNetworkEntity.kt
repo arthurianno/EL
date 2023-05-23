@@ -1,6 +1,6 @@
 package com.elta.android.data.features.user.dto
 
-enum class DiabetTypeDto {
+enum class DiabeteTypeNetworkEntity {
     FIRST,
     SECOND,
     LADA,

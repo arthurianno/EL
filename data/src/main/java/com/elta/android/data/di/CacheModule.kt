@@ -24,7 +24,9 @@ import com.elta.android.data.features.sale_points.cache.dto.SalePointCacheDto
 import com.elta.android.data.features.sync.cache.LocalSyncChangesCache
 import com.elta.android.data.features.sync.cache.dto.LocalSyncCachedDto
 import com.elta.android.data.features.user.cache.DbProfileCache
+import com.elta.android.data.features.user.cache.ProfileSettingsCache
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
+import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
 import com.elta.android.data.features.userinfo.cache.DbUserInfoCache
 import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
 import dagger.Binds
@@ -60,6 +62,10 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindProfileCache(cache: DbProfileCache): Cache<ProfileCacheDto>
+
+        @Binds
+        @Singleton
+        fun bindProfileSettingsCache(cache: ProfileSettingsCache): Cache<ProfileSettingsDbEntity>
 
         @Binds
         @Singleton

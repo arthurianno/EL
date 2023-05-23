@@ -9,7 +9,11 @@ import retrofit2.http.Query
 interface ReportsApi {
 
     @GET("api/reports/v1/analytics/tokens")
-    fun getReportToken(@Query("startPeriod") startDate: String, @Query("endPeriod") endDate: String): Single<TokenDto>
+    fun getReportToken(
+        @Query("startPeriod") startDate: String,
+        @Query("endPeriod") endDate: String,
+        @Query("glucoseFormat") glucoseFormat: String
+    ): Single<TokenDto>
 
     @GET("api/reports/v1/analytics")
     fun downloadReport(@Query("token") token: String): Single<ResponseBody>

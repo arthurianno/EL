@@ -1,21 +1,21 @@
 package com.elta.android.data.features.auth.datasource
 
-import com.elta.android.data.features.auth.dto.EmailStatusDto
-import com.elta.android.data.features.auth.dto.LoginDto
-import com.elta.android.data.features.auth.dto.TokenOwnerDto
-import com.elta.android.data.features.auth.dto.TokensDto
+import com.elta.android.data.features.auth.model.EmailStatusNetworkResponse
+import com.elta.android.data.features.auth.model.LoginNetworkResponse
+import com.elta.android.data.features.auth.model.TokenOwnerNetworkResponse
+import com.elta.android.data.features.auth.model.TokensNetworkResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 
 interface AuthDataSource {
 
-    fun register(email: String, password: String): Single<TokensDto>
+    fun register(email: String, password: String): Single<TokensNetworkResponse>
 
-    fun login(email: String, password: String): Single<LoginDto>
+    fun login(email: String, password: String): Single<LoginNetworkResponse>
 
     fun sendConfirmationLink(): Completable
 
-    fun isEmailConfirmed(): Single<EmailStatusDto>
+    fun isEmailConfirmed(): Single<EmailStatusNetworkResponse>
 
     fun sendResetPasswordLink(email: String): Completable
 
@@ -23,7 +23,7 @@ interface AuthDataSource {
 
     fun changePassword(currentPassword: String, newPassword: String): Completable
 
-    fun checkTokenOwner(token: String): Single<TokenOwnerDto>
+    fun checkTokenOwner(token: String): Single<TokenOwnerNetworkResponse>
 
     fun confirmEmail(token: String): Completable
 

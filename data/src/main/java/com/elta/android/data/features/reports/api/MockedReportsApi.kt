@@ -12,7 +12,11 @@ class MockedReportsApi(
     private val context: Context
 ) : ReportsApi {
 
-    override fun getReportToken(startDate: String, endDate: String): Single<TokenDto> =
+    override fun getReportToken(
+        startDate: String,
+        endDate: String,
+        glucoseFormat: String
+    ): Single<TokenDto> =
         Single.just(TokenDto("Test-token-bro"))
 
     override fun downloadReport(token: String): Single<ResponseBody> =

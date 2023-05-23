@@ -1,7 +1,7 @@
-package com.elta.android.data.features.auth.dto
+package com.elta.android.data.features.auth.model
 
 import com.google.gson.annotations.SerializedName
 
-data class TokenOwnerDto(
+data class TokenOwnerNetworkResponse(
     @SerializedName("isOwner") val isOwner: Boolean
 )

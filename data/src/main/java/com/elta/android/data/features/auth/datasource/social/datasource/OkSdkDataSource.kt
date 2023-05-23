@@ -3,7 +3,7 @@ package com.elta.android.data.features.auth.datasource.social.datasource
 import android.content.Context
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
-import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.data.features.auth.model.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -37,7 +37,9 @@ class OkSdkDataSource(private val context: Context) : SocialNetworkDataSource {
 
     override fun getSocialUser(): Single<SocialUserDto> = Single.create { emitter ->
         ok.requestAsync(
-            "users.getCurrentUser", null, OkRequestMode.DEFAULT,
+            "users.getCurrentUser",
+            null,
+            OkRequestMode.DEFAULT,
             object : OkListener {
                 override fun onSuccess(json: JSONObject) {
                     if (!emitter.isDisposed) {

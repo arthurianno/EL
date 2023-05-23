@@ -1,6 +1,6 @@
 package com.elta.android.data.features.user.dto
 
-enum class GenderTypeDto {
+enum class GenderTypeNetworkEntity {
     MALE,
     FEMALE
 }

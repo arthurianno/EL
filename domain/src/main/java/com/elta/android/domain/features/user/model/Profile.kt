@@ -19,6 +19,7 @@ data class Profile(
         GlucoseLevelSettings.NORMAL_START,
         GlucoseLevelSettings.NORMAL_END
     ),
+    val glucoseFormat: GlucoseFormat,
     val diabetes: Diabetes? = null,
     val weight: Double? = null,
     val hba1cLevel: Double? = null,

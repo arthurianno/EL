@@ -6,7 +6,7 @@ import com.elta.android.data.common.onConnectionErrorCompletes
 import com.elta.android.data.common.onConnectionErrorReturnsEmpty
 import com.elta.android.data.features.observers.datasource.ObserverDataSource
 import com.elta.android.data.features.observers.toDomain
-import com.elta.android.data.features.user.dto.SimpleObserverDto
+import com.elta.android.data.features.user.dto.SimpleObserverNetworkEntity
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import io.reactivex.Completable
@@ -37,7 +37,7 @@ class ObserverDataRepository @Inject constructor(
         remoteSource.sendObserverInvite(email)
 
     override fun deleteObserverInvite(id: String): Completable =
-        Single.just(listOf(SimpleObserverDto(id)))
+        Single.just(listOf(SimpleObserverNetworkEntity(id)))
             .flatMapCompletable {
                 cacheSource.deleteObserverInvite(it)
                     .andThen(
