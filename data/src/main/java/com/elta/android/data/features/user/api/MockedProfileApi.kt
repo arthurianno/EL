@@ -4,58 +4,78 @@ package com.elta.android.data.features.user.api
 
 import com.elta.android.common.utils.log
 import com.elta.android.common.utils.timestamp
-import com.elta.android.data.features.user.dto.DiabetTypeDto
-import com.elta.android.data.features.user.dto.GenderTypeDto
-import com.elta.android.data.features.user.dto.GlucoseLevelDto
-import com.elta.android.data.features.user.dto.HealthAppDto
-import com.elta.android.data.features.user.dto.HealthAppTypeDto
-import com.elta.android.data.features.user.dto.PersonDto
-import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.DiabeteTypeNetworkEntity
+import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
+import com.elta.android.data.features.user.dto.GlucoseFormatNetworkEntity
+import com.elta.android.data.features.user.dto.GlucoseLevelNetworkEntity
+import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
+import com.elta.android.data.features.user.dto.HealthAppTypeNetworkEntity
+import com.elta.android.data.features.user.dto.PersonNetworkEntity
+import com.elta.android.data.features.user.dto.ProfileNetworkResponse
+import com.elta.android.data.features.user.dto.ProfileSettingsNetworkRequest
+import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
-import com.elta.android.data.features.user.dto.SocialNetworkTypeDto
+import com.elta.android.data.features.user.dto.SocialNetworkTypeNetworkEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
 class MockedProfileApi : ProfileApi {
 
-    override fun updateUserSettings(profile: ProfileDto): Completable =
+    override fun updateUserSettings(profile: ProfileNetworkResponse): Completable =
         Completable.complete()
 
-    override fun getUserSettings(): Single<ProfileDto> =
+    override fun getUserSettings(): Single<ProfileNetworkResponse> =
         Observable.fromCallable {
-            ProfileDto(
-                diabetes = DiabetTypeDto.LADA,
+            ProfileNetworkResponse(
+                diabetes = DiabeteTypeNetworkEntity.LADA,
                 weight = 80.0,
-                gender = GenderTypeDto.MALE,
-                person = PersonDto(
+                gender = GenderTypeNetworkEntity.MALE,
+                person = PersonNetworkEntity(
                     firstName = "Анатолий",
                     lastName = "Савин"
                 ),
-                glucoseLevelsAverage = GlucoseLevelDto(
+                glucoseLevelsAverage = GlucoseLevelNetworkEntity(
                     1.2,
                     5.7
                 ),
-                glucoseLevelsBeforeEating = GlucoseLevelDto(
+                glucoseLevelsBeforeEating = GlucoseLevelNetworkEntity(
                     1.2,
                     5.7
                 ),
-                glucoseLevelsAfterEating = GlucoseLevelDto(
+                glucoseLevelsAfterEating = GlucoseLevelNetworkEntity(
                     1.2,
                     5.7
                 ),
                 email = "test@gmail.com",
                 socialNetworks = listOf(
-                    SocialNetworkDto(type = SocialNetworkTypeDto.FB, isLinked = true),
-                    SocialNetworkDto(type = SocialNetworkTypeDto.VK, isLinked = false),
-                    SocialNetworkDto(type = SocialNetworkTypeDto.OK, isLinked = false)
+                    SocialNetworkDto(type = SocialNetworkTypeNetworkEntity.FB, isLinked = true),
+                    SocialNetworkDto(type = SocialNetworkTypeNetworkEntity.VK, isLinked = false),
+                    SocialNetworkDto(type = SocialNetworkTypeNetworkEntity.OK, isLinked = false)
                 ),
                 healthApps = listOf(
-                    HealthAppDto(type = HealthAppTypeDto.GOOGLE_FIT, isActive = true),
-                    HealthAppDto(type = HealthAppTypeDto.APPLE_HEALTH, isActive = false)
+                    HealthAppNetworkEntity(
+                        type = HealthAppTypeNetworkEntity.GOOGLE_FIT,
+                        isActive = true
+                    ),
+                    HealthAppNetworkEntity(
+                        type = HealthAppTypeNetworkEntity.APPLE_HEALTH,
+                        isActive = false
+                    )
                 ),
                 timeStamp = timestamp()
             )
         }.log("Settings", "profile") { it.toString() }
             .singleOrError()
+
+    override fun getProfileSettings(): Single<ProfileSettingsNetworkResponse> =
+        Single.just(
+            ProfileSettingsNetworkResponse(
+                isOnboarded = false,
+                glucoseFormat = GlucoseFormatNetworkEntity.CAPLILARY
+            )
+        )
+
+    override fun updateProfileSettings(settings: ProfileSettingsNetworkRequest): Completable =
+        Completable.complete()
 }

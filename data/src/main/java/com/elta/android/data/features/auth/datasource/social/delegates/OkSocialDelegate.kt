@@ -40,8 +40,11 @@ class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
             override fun onError(error: String?) {
                 Odnoklassniki.getInstance().requestAuthorization(
-                    activity, activity.getString(R.string.OK_REDIRECT_URL),
-                    OkAuthType.ANY, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN
+                    activity,
+                    activity.getString(R.string.OK_REDIRECT_URL),
+                    OkAuthType.ANY,
+                    OkScope.VALUABLE_ACCESS,
+                    OkScope.LONG_ACCESS_TOKEN
                 )
             }
         })
@@ -49,7 +52,8 @@ class OkSocialDelegate(activity: Activity) : SocialDelegate(activity) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
         if (Odnoklassniki.getInstance().isActivityRequestOAuth(requestCode)) {
-            Odnoklassniki.getInstance().onAuthActivityResult(requestCode, resultCode, data, okCallback)
+            Odnoklassniki.getInstance()
+                .onAuthActivityResult(requestCode, resultCode, data, okCallback)
             true
         } else {
             false

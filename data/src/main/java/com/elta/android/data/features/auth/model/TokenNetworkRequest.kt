@@ -1,7 +1,7 @@
-package com.elta.android.data.features.auth.api.request
+package com.elta.android.data.features.auth.model
 
 import com.google.gson.annotations.SerializedName
 
-data class SocialNetworkRequest(
+data class TokenNetworkRequest(
     @SerializedName("token") val token: String
 )

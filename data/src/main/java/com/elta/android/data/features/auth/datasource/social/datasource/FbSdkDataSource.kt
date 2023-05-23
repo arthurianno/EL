@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
-import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.data.features.auth.model.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.facebook.AccessToken
 import com.facebook.GraphRequest
@@ -54,7 +54,8 @@ class FbSdkDataSource(private val context: Context) : SocialNetworkDataSource {
         }
 
     override fun logout() = Completable.fromCallable {
-        if (AccessToken.getCurrentAccessToken() != null)
+        if (AccessToken.getCurrentAccessToken() != null) {
             LoginManager.getInstance().logOut()
+        }
     }
 }

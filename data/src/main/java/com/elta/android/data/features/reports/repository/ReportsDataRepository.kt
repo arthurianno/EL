@@ -11,7 +11,6 @@ import com.elta.android.domain.features.reports.repository.ReportsRepository
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import javax.inject.Inject
 
 class ReportsDataRepository @Inject constructor(
@@ -21,12 +20,14 @@ class ReportsDataRepository @Inject constructor(
 ) : ReportsRepository {
 
     override fun getReport(range: Range): Single<Uri> =
-        Singles.zip(
-            remoteDataSource.getReportToken(range.start, range.end),
-            profileRepository.getProfile()
-        ).flatMap {
-            remoteDataSource.downloadReport(it.first.token, buildFileName(it.second, range))
-        }
+        profileRepository.getProfile()
+            .flatMap { profile ->
+                remoteDataSource.getReportToken(range.start, range.end, profile.glucoseFormat)
+                    .map { it to profile }
+            }
+            .flatMap {
+                remoteDataSource.downloadReport(it.first.token, buildFileName(it.second, range))
+            }
 
     private fun buildFileName(profile: Profile, range: Range): String =
         context.getString(

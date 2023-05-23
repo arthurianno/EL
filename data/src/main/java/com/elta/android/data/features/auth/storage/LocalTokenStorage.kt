@@ -3,7 +3,7 @@ package com.elta.android.data.features.auth.storage
 import android.annotation.SuppressLint
 import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.data.features.auth.api.TokenRefreshApi
-import com.elta.android.data.features.auth.api.request.RefreshRequest
+import com.elta.android.data.features.auth.model.RefreshNetworkRequest
 import com.nullgr.core.security.prefs.CryptoPreferences
 
 private const val ACCESS_TOKEN = "access_token"
@@ -29,13 +29,15 @@ class LocalTokenStorage(
     @SuppressLint("CheckResult")
     override fun refresh() {
         if (accessToken != null && refreshToken != null) {
-            api.refresh(RefreshRequest(accessToken, refreshToken))
+            api.refresh(RefreshNetworkRequest(accessToken, refreshToken))
                 .doOnSuccess { tokens ->
                     accessToken = tokens.accessToken
                     refreshToken = tokens.refreshToken
                 }
                 .blockingGet()
-        } else throw InvalidRefreshTokenError("Tokens can`t be null")
+        } else {
+            throw InvalidRefreshTokenError("Tokens can`t be null")
+        }
     }
 
     override fun isUserLoggedIn(): Boolean =

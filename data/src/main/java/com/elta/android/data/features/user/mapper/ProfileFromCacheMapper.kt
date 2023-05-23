@@ -4,38 +4,38 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
-import com.elta.android.data.features.user.dto.DiabetTypeDto
-import com.elta.android.data.features.user.dto.GenderTypeDto
-import com.elta.android.data.features.user.dto.GlucoseLevelDto
-import com.elta.android.data.features.user.dto.HealthAppDto
-import com.elta.android.data.features.user.dto.PersonDto
-import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.DiabeteTypeNetworkEntity
+import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
+import com.elta.android.data.features.user.dto.GlucoseLevelNetworkEntity
+import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
+import com.elta.android.data.features.user.dto.PersonNetworkEntity
+import com.elta.android.data.features.user.dto.ProfileNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import javax.inject.Inject
 
 class ProfileFromCacheMapper @Inject constructor(
     private val mapper: Mapper<NetworkCacheDto, SocialNetworkDto>,
-    private val healthAppsMapper: Mapper<HealthAppCacheDto, HealthAppDto>
-) : Mapper<ProfileCacheDto, ProfileDto> {
-    override fun mapFromObject(source: ProfileCacheDto): ProfileDto =
+    private val healthAppsMapper: Mapper<HealthAppCacheDto, HealthAppNetworkEntity>
+) : Mapper<ProfileCacheDto, ProfileNetworkResponse> {
+    override fun mapFromObject(source: ProfileCacheDto): ProfileNetworkResponse =
         with(source) {
-            ProfileDto(
-                diabetes = diabetes?.let { DiabetTypeDto.valueOf(it) },
+            ProfileNetworkResponse(
+                diabetes = diabetes?.let { DiabeteTypeNetworkEntity.valueOf(it) },
                 weight = weight,
-                gender = gender?.let { GenderTypeDto.valueOf(it) },
-                person = PersonDto(
+                gender = gender?.let { GenderTypeNetworkEntity.valueOf(it) },
+                person = PersonNetworkEntity(
                     firstName = firstName,
                     lastName = lastName
                 ),
-                glucoseLevelsBeforeEating = GlucoseLevelDto(
+                glucoseLevelsBeforeEating = GlucoseLevelNetworkEntity(
                     minBeforeEatingValue,
                     maxBeforeEatingValue
                 ),
-                glucoseLevelsAfterEating = GlucoseLevelDto(
+                glucoseLevelsAfterEating = GlucoseLevelNetworkEntity(
                     minAfterEatingValue,
                     maxAfterEatingValue
                 ),
-                glucoseLevelsAverage = GlucoseLevelDto(
+                glucoseLevelsAverage = GlucoseLevelNetworkEntity(
                     minAverageValue,
                     maxAverageValue
                 ),

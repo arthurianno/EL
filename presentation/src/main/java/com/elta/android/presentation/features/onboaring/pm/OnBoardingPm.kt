@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.onboaring.pm
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
@@ -209,7 +210,8 @@ class OnBoardingPm @Inject constructor(
             gender = gender ?: Gender.NOT_SPECIFIED,
             weight = weight,
             diabetes = diabetes,
-            timeStamp = Date().toTimestamp()
+            timeStamp = Date().toTimestamp(),
+            glucoseFormat = GlucoseFormat.CAPLILARY
         )
         return UpdateProfileUseCase.Params(profile)
     }

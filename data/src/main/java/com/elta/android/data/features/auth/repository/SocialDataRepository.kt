@@ -5,9 +5,9 @@ import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.social.datasource.SocialDataSourceFactory
-import com.elta.android.data.features.auth.dto.LoginDto
-import com.elta.android.data.features.auth.dto.SocialUserDto
-import com.elta.android.data.features.auth.dto.TokensDto
+import com.elta.android.data.features.auth.model.LoginNetworkResponse
+import com.elta.android.data.features.auth.model.SocialUserDto
+import com.elta.android.data.features.auth.model.TokensNetworkResponse
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.domain.features.auth.model.SocialUser
@@ -55,11 +55,14 @@ class SocialDataRepository @Inject constructor(
                     .applyScheduler(schedulersFacade)
                     .doOnSuccess { saveTokens(it.tokens) }
                     .flatMap { login ->
-                        if (login.isEmailConfirmed) profileSource.getUserProfile().map { login }
-                        else Single.just(login)
+                        if (login.isEmailConfirmed) {
+                            profileSource.getUserProfile().map { login }
+                        } else {
+                            Single.just(login)
+                        }
                     }
             }
-            .map(LoginDto::isEmailConfirmed)
+            .map(LoginNetworkResponse::isEmailConfirmed)
             .flatMapSingle {
                 userInfoRepository.updateUserInfo(
                     createUserInfoWithEmailStatus(it)
@@ -78,7 +81,7 @@ class SocialDataRepository @Inject constructor(
     override fun logout(network: SocialNetworkType): Completable =
         socialFactory.getDataSource(network).logout()
 
-    private fun saveTokens(tokens: TokensDto) {
+    private fun saveTokens(tokens: TokensNetworkResponse) {
         tokenStorage.accessToken = tokens.accessToken
         tokenStorage.refreshToken = tokens.refreshToken
     }
