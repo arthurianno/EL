@@ -88,6 +88,7 @@
     <string name="on_boarding_header_user_sex">Укажите ваш пол</string>
     <string name="on_boarding_header_user_weight">Какой у вас вес?</string>
     <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
+    <string name="on_boarding_header_user_glucose_format">В каком формате отображать уровень глюкозы?</string>
     <string name="on_boarding_prev_button_title">Назад</string>
     <string name="on_boarding_next_button_title">Далее</string>
 
@@ -98,6 +99,10 @@
     <string name="diabetes_type_prediabetes">Предиабет</string>
     <string name="diabetes_type_other">Другой</string>
     <string name="coma">,</string>
+    <string name="on_boarding_glucose_format_help_header">Обратите внимание!</string>
+    <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны из цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
+    <string name="on_boarding_glucose_format_help_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то выберите этот вариант.</string>
+    <string name="on_boarding_glucose_format_help_text3">Значение глюкозы всегда можно изменить в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
 
     <!-- SHOPS FLOW -->
     <string name="shops_start_title">У вас нет глюкометра?</string>
@@ -440,7 +445,8 @@
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
     <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
     <string name="profile_is_deleted_body">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
-
+    <string name="profile_glucose_format_plasma">В плазме</string>
+    <string name="profile_glucose_format_caplilary">В цельной капиллярной крови</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>

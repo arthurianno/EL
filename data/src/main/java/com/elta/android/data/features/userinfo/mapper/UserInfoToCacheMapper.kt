@@ -17,7 +17,6 @@ class UserInfoToCacheMapper @Inject constructor(
                 isUserLoggedIn = isUserLoggedIn,
                 isEmailConfirmed = isEmailConfirmed,
                 isFeedbackSent = isFeedbackSent,
-                isOnboardingPassed = isOnBoardingPassed,
                 isFirstHomeEntrance = isFirstHomeEntrance
             )
         }

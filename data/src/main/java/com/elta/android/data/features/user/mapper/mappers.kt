@@ -9,7 +9,6 @@ import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
 import com.elta.android.data.features.user.dto.HealthAppTypeNetworkEntity
 import com.elta.android.data.features.user.dto.PersonNetworkEntity
 import com.elta.android.data.features.user.dto.ProfileNetworkResponse
-import com.elta.android.data.features.user.dto.ProfileSettingsNetworkRequest
 import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.dto.SocialNetworkTypeNetworkEntity
@@ -20,6 +19,7 @@ import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
+import com.elta.android.domain.features.user.model.ProfileSettings
 import com.elta.android.domain.features.user.model.SocialNetwork
 import com.elta.android.domain.features.user.model.SocialNetworkType
 
@@ -30,17 +30,16 @@ internal fun ProfileSettingsNetworkResponse.toDb(id: Long): ProfileSettingsDbEnt
         glucoseFormat = glucoseFormat.name
     )
 
-internal fun ProfileSettingsNetworkRequest.toDb(id: Long): ProfileSettingsDbEntity =
-    ProfileSettingsDbEntity(
-        id = id,
-        isOnboarded = isOnboarded == true,
-        glucoseFormat = glucoseFormat?.name ?: GlucoseFormatNetworkEntity.CAPLILARY.name
-    )
-
 internal fun ProfileSettingsDbEntity.toNetwork(): ProfileSettingsNetworkResponse =
     ProfileSettingsNetworkResponse(
         isOnboarded = isOnboarded,
         glucoseFormat = GlucoseFormatNetworkEntity.valueOf(glucoseFormat)
+    )
+
+internal fun ProfileSettingsNetworkResponse.toDomain(): ProfileSettings =
+    ProfileSettings(
+        isOnboarded = isOnboarded,
+        glucoseFormat = glucoseFormat.toDomain()
     )
 
 internal fun Profile.toNetwork(): ProfileNetworkResponse =
@@ -92,13 +91,13 @@ internal fun ProfileNetworkResponse.toDomain(glucoseFormat: GlucoseFormatNetwork
 
 private fun GlucoseFormatNetworkEntity.toDomain(): GlucoseFormat =
     when (this) {
-        GlucoseFormatNetworkEntity.CAPLILARY -> GlucoseFormat.CAPLILARY
+        GlucoseFormatNetworkEntity.CAPILLARY -> GlucoseFormat.CAPILLARY
         GlucoseFormatNetworkEntity.PLASMA -> GlucoseFormat.PLASMA
     }
 
 internal fun GlucoseFormat.toNetwork(): GlucoseFormatNetworkEntity =
     when (this) {
-        GlucoseFormat.CAPLILARY -> GlucoseFormatNetworkEntity.CAPLILARY
+        GlucoseFormat.CAPILLARY -> GlucoseFormatNetworkEntity.CAPILLARY
         GlucoseFormat.PLASMA -> GlucoseFormatNetworkEntity.PLASMA
     }
 

@@ -8,6 +8,7 @@ import com.elta.android.data.features.auth.model.TokensNetworkResponse
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
 import io.reactivex.Completable
@@ -18,13 +19,17 @@ class AuthDataRepository @Inject constructor(
     private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
     private val source: AuthDataSource,
-    private val userInfoRepository: UserInfoRepository
+    private val userInfoRepository: UserInfoRepository,
+    private val profileRepository: ProfileRepository
 ) : AuthRepository {
 
     override fun register(email: String, password: String): Completable =
         source.register(email, password)
             .doOnSuccess { response ->
                 saveUserCredentials(response, email)
+            }
+            .flatMap {
+                profileRepository.getProfileSettings(fromCache = false)
             }
             .flatMapCompletable {
                 userInfoRepository.updateUserInfo(createNewUserInfo())
@@ -36,11 +41,14 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginNetworkResponse::isEmailConfirmed)
+            .flatMap { isConfirm ->
+                profileRepository.getProfileSettings(fromCache = false)
+                    .map { isConfirm }
+            }
             .flatMap {
                 val userInfo = UserInfo(
                     isUserLoggedIn = tokenStorage.isUserLoggedIn(),
-                    isEmailConfirmed = it,
-                    isOnBoardingPassed = it
+                    isEmailConfirmed = it
                 )
                 userInfoRepository
                     .updateUserInfo(userInfo)
@@ -115,7 +123,6 @@ class AuthDataRepository @Inject constructor(
     private fun createNewUserInfo(): UserInfo =
         UserInfo(
             isUserLoggedIn = tokenStorage.isUserLoggedIn(),
-            isOnBoardingPassed = false,
             isFeedbackSent = false,
             isEmailConfirmed = false
         )

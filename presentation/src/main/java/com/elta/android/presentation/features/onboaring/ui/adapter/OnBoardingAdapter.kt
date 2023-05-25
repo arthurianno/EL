@@ -6,12 +6,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.core.ui.adapter.BaseListAdapter
 import com.elta.android.presentation.databinding.ItemOnboardingDiabetesTypesBinding
 import com.elta.android.presentation.databinding.ItemOnboardingGenderBinding
+import com.elta.android.presentation.databinding.ItemOnboardingGlucoseFormatBinding
 import com.elta.android.presentation.databinding.ItemOnboardingWeightBinding
 import com.elta.android.presentation.features.onboaring.ui.adapter.holder.OnBoardingDiabetesViewHolder
 import com.elta.android.presentation.features.onboaring.ui.adapter.holder.OnBoardingGenderViewHolder
+import com.elta.android.presentation.features.onboaring.ui.adapter.holder.OnBoardingGlucoseFormatViewHolder
 import com.elta.android.presentation.features.onboaring.ui.adapter.holder.OnBoardingWeightViewHolder
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGlucoseFormatItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.resources.ResourceProvider
 import com.nullgr.core.rx.RxBus
@@ -28,15 +31,23 @@ class OnBoardingAdapter @Inject constructor(
                 binding = ItemOnboardingGenderBinding.inflate(inflater, parent, false),
                 bus = bus
             )
+
             OnBoardingWeightItem::class.java.hashCode() -> OnBoardingWeightViewHolder(
                 binding = ItemOnboardingWeightBinding.inflate(inflater, parent, false),
                 bus = bus
             )
+
             OnBoardingDiabetesItem::class.java.hashCode() -> OnBoardingDiabetesViewHolder(
                 binding = ItemOnboardingDiabetesTypesBinding.inflate(inflater, parent, false),
                 bus = bus,
                 resources = resources
             )
+
+            OnBoardingGlucoseFormatItem::class.java.hashCode() -> OnBoardingGlucoseFormatViewHolder(
+                binding = ItemOnboardingGlucoseFormatBinding.inflate(inflater, parent, false),
+                bus = bus
+            )
+
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }
     }
