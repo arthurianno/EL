@@ -10,7 +10,6 @@ import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
 import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
 import com.elta.android.data.features.user.dto.ProfileNetworkResponse
-import com.elta.android.data.features.user.dto.ProfileSettingsNetworkRequest
 import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.mapper.toDb
@@ -89,7 +88,7 @@ class ProfileCachedDataSource @Inject constructor(
             }
         }.map { it.toNetwork() }
 
-    override fun updateProfileSettings(settings: ProfileSettingsNetworkRequest): Completable =
+    override fun updateProfileSettings(settings: ProfileSettingsNetworkResponse): Completable =
         Completable.fromCallable {
             userHolder.currentUser?.let {
                 profileSettingsCache.update(listOf(settings.toDb(it)))

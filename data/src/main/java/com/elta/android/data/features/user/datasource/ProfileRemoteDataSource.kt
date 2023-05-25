@@ -8,7 +8,6 @@ import com.elta.android.data.features.user.api.ProfileApi
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
 import com.elta.android.data.features.user.dto.ProfileNetworkResponse
-import com.elta.android.data.features.user.dto.ProfileSettingsNetworkRequest
 import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.mapper.toDb
 import io.reactivex.Completable
@@ -24,11 +23,11 @@ class ProfileRemoteDataSource @Inject constructor(
 ) : ProfileDataSource {
 
     override fun updateProfile(profile: ProfileNetworkResponse): Completable =
-        api.updateUserSettings(profile)
+        api.updateProfile(profile)
 
     @Suppress("MagicNumber")
     override fun getUserProfile(): Single<ProfileNetworkResponse> =
-        api.getUserSettings()
+        api.getProfile()
             .doOnSuccess { userHolder.currentUser = it.email.hashCode().toLong() }
             .doOnSuccess(::saveLocalIfNeed)
 
@@ -51,10 +50,10 @@ class ProfileRemoteDataSource @Inject constructor(
         api.getProfileSettings()
             .doOnSuccess { profile ->
                 userHolder.currentUser?.let { id ->
-                    profileSettingsCache.update(listOf(profile.toDb(id)))
+                    profileSettingsCache.add(listOf(profile.toDb(id)))
                 }
             }
 
-    override fun updateProfileSettings(settings: ProfileSettingsNetworkRequest): Completable =
+    override fun updateProfileSettings(settings: ProfileSettingsNetworkResponse): Completable =
         api.updateProfileSettings(settings)
 }

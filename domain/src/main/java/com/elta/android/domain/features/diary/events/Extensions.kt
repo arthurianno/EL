@@ -9,7 +9,7 @@ const val GLUCOSE_PLASMA_COEFFICIENT = 1.12
 fun Event.glucoseValue(format: GlucoseFormat): Double = run {
     value?.let {
         when (format) {
-            GlucoseFormat.CAPLILARY -> it
+            GlucoseFormat.CAPILLARY -> it
             GlucoseFormat.PLASMA -> it * GLUCOSE_PLASMA_COEFFICIENT
         }
     } ?: GLUCOSE_DEFAULT_VALUE

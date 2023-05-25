@@ -20,6 +20,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingDiabetesItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGenderItem
+import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGlucoseFormatItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.date.toTimestamp
@@ -106,7 +107,17 @@ class OnBoardingPm @Inject constructor(
             resources.getString(R.string.on_boarding_header_user_diabetes_type),
             Diabetes.values().toList()
         )
-        items.consumer.accept(listOf(genderItem, weightItem, diabetesItem))
+        val glucoseFormatItem = OnBoardingGlucoseFormatItem(
+            resources.getString(R.string.on_boarding_header_user_glucose_format)
+        )
+        items.consumer.accept(
+            listOf(
+                genderItem,
+                weightItem,
+                diabetesItem,
+                glucoseFormatItem
+            )
+        )
     }
 
     private fun observeUpdateProfile() {
@@ -130,7 +141,6 @@ class OnBoardingPm @Inject constructor(
                 updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
-                    .andThen(updateUserInfoUseCase.execute(createOnBoardingUserInfoParams()))
                     .doOnComplete { updateStableParam(profile = params.profile) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
@@ -194,7 +204,8 @@ class OnBoardingPm @Inject constructor(
         nextPageVisibilityState.consumer.accept(
             when (currentItem) {
                 is OnBoardingGenderItem,
-                is OnBoardingDiabetesItem -> currentItem.data != null
+                is OnBoardingDiabetesItem,
+                is OnBoardingGlucoseFormatItem -> currentItem.data != null
 
                 is OnBoardingWeightItem -> true
                 else -> false
@@ -206,18 +217,16 @@ class OnBoardingPm @Inject constructor(
         val gender = params[OnBoardingGenderItem::class.java] as? Gender
         val weight = params[OnBoardingWeightItem::class.java] as? Double
         val diabetes = params[OnBoardingDiabetesItem::class.java] as? Diabetes
+        val glucoseFormat = params[OnBoardingGlucoseFormatItem::class.java] as? GlucoseFormat
         val profile = Profile(
             gender = gender ?: Gender.NOT_SPECIFIED,
             weight = weight,
             diabetes = diabetes,
             timeStamp = Date().toTimestamp(),
-            glucoseFormat = GlucoseFormat.CAPLILARY
+            glucoseFormat = glucoseFormat ?: GlucoseFormat.CAPILLARY
         )
-        return UpdateProfileUseCase.Params(profile)
+        return UpdateProfileUseCase.Params(profile = profile, isOnboarding = true)
     }
-
-    private fun createOnBoardingUserInfoParams(): UpdateUserInfoUseCase.Params =
-        UpdateUserInfoUseCase.Params(UserInfo(isOnBoardingPassed = true))
 
     private fun createEmailUserInfoParams(i: Unit): UpdateUserInfoUseCase.Params =
         UpdateUserInfoUseCase.Params(UserInfo(isEmailConfirmed = true))

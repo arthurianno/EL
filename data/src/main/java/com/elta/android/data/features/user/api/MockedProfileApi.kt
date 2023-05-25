@@ -12,7 +12,6 @@ import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
 import com.elta.android.data.features.user.dto.HealthAppTypeNetworkEntity
 import com.elta.android.data.features.user.dto.PersonNetworkEntity
 import com.elta.android.data.features.user.dto.ProfileNetworkResponse
-import com.elta.android.data.features.user.dto.ProfileSettingsNetworkRequest
 import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.dto.SocialNetworkTypeNetworkEntity
@@ -22,10 +21,10 @@ import io.reactivex.Single
 
 class MockedProfileApi : ProfileApi {
 
-    override fun updateUserSettings(profile: ProfileNetworkResponse): Completable =
+    override fun updateProfile(profile: ProfileNetworkResponse): Completable =
         Completable.complete()
 
-    override fun getUserSettings(): Single<ProfileNetworkResponse> =
+    override fun getProfile(): Single<ProfileNetworkResponse> =
         Observable.fromCallable {
             ProfileNetworkResponse(
                 diabetes = DiabeteTypeNetworkEntity.LADA,
@@ -72,10 +71,10 @@ class MockedProfileApi : ProfileApi {
         Single.just(
             ProfileSettingsNetworkResponse(
                 isOnboarded = false,
-                glucoseFormat = GlucoseFormatNetworkEntity.CAPLILARY
+                glucoseFormat = GlucoseFormatNetworkEntity.CAPILLARY
             )
         )
 
-    override fun updateProfileSettings(settings: ProfileSettingsNetworkRequest): Completable =
+    override fun updateProfileSettings(settings: ProfileSettingsNetworkResponse): Completable =
         Completable.complete()
 }
