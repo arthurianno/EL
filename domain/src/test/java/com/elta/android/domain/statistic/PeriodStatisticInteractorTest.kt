@@ -15,6 +15,7 @@ import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPe
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.InsulinStatisticModelByPeriod
 import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.junit.Test
 import org.threeten.bp.LocalTime
 import org.threeten.bp.ZonedDateTime
@@ -195,7 +196,7 @@ class PeriodStatisticInteractorTest {
             dailyGlucoseModel = null
         )
 
-        val model = buildGlucoseStatisticModel(events, settings)
+        val model = buildGlucoseStatisticModel(events, settings, GlucoseFormat.PLASMA)
 
         assert(model == expected)
     }

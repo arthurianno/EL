@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.diary.home.model
 
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.user.model.GlucoseFormat
 
 data class HomeModel(
     val isFirstEntrance: Boolean,
@@ -12,7 +13,8 @@ data class HomeModel(
     val glucoseLevelDirection: GlucoseLevelDirection?,
     val glucoseLevelDifference: Double?,
     val eventsBlocks: List<EventsBlock>,
-    val dailyGlucoseModel: DailyGlucoseModel
+    val dailyGlucoseModel: DailyGlucoseModel,
+    val glucoseFormat: GlucoseFormat
 ) {
     val hasEvents: Boolean
         get() = eventsBlocks.isNotEmpty()

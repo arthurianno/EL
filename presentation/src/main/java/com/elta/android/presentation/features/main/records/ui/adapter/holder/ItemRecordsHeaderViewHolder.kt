@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.holder
 
 import androidx.annotation.StringRes
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemRecordsHeaderBinding
@@ -27,7 +28,12 @@ class ItemRecordsHeaderViewHolder(
             glucoseLevelDirectionView.toggleView(item.glucoseLevelIndex != null)
             item.glucoseLevelIndex?.let { glucoseLevelChangeIndexView.text = it.format() }
             item.glucoseLevelIndexIcon?.let { glucoseLevelChangeIndexIconView.setImageResource(it) }
-
+            glucoseLevelTitleView.setText(
+                when (item.glucoseFormat) {
+                    GlucoseFormat.CAPILLARY -> R.string.main_records_glucose_capillary
+                    GlucoseFormat.PLASMA -> R.string.main_records_glucose_plasma
+                }
+            )
             root.background = item.background
         }
     }

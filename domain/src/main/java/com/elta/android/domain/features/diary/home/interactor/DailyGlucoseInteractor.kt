@@ -5,10 +5,12 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.user.model.GlucoseFormat
 
 fun buildDailyGlucoseModel(
     list: List<Event>,
-    glucoseLevelSettings: GlucoseLevelSettings
+    glucoseLevelSettings: GlucoseLevelSettings,
+    glucoseFormat: GlucoseFormat
 ): DailyGlucoseModel {
     val sortedEvents = list.sortGlucoseOnly()
     return DailyGlucoseModel(
@@ -16,7 +18,8 @@ fun buildDailyGlucoseModel(
         glucoseLevelSettings = glucoseLevelSettings,
         maxEvent = sortedEvents.max(glucoseLevelSettings.high),
         minEvent = sortedEvents.min(glucoseLevelSettings.low),
-        lastEvent = sortedEvents.lastOrNull()
+        lastEvent = sortedEvents.lastOrNull(),
+        glucoseFormat = glucoseFormat
     )
 }
 

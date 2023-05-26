@@ -11,13 +11,15 @@ import com.elta.android.domain.features.statistics.model.InsulinStatisticModelBy
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.threeten.bp.LocalDate
 import timber.log.Timber
 
 fun buildStatisticModel(
     period: StatisticPeriod,
     events: List<Event>,
-    settings: GlucoseLevelSettings
+    settings: GlucoseLevelSettings,
+    glucoseFormat: GlucoseFormat
 ): StatisticByPeriodModel {
     val eventsContainer = events.toEventsContainer()
 
@@ -32,7 +34,12 @@ fun buildStatisticModel(
     eventsByTypePerDay.entries.forEach { entry ->
         val day = entry.key
         val eventsPerDay = entry.value
-        val dayStatistic = buildDailyStatisticModel(day, eventsPerDay, settings)
+        val dayStatistic = buildDailyStatisticModel(
+            date = day,
+            eventsPerDay = eventsPerDay,
+            settings = settings,
+            glucoseFormat = glucoseFormat
+        )
 
         dayWithMaxLevel = dayWithMaxLevel?.let { dayStatistic.checkMax(it) } ?: dayStatistic
         dayWithMinLevel = dayWithMinLevel?.let { dayStatistic.checkMin(it) } ?: dayStatistic
@@ -46,7 +53,11 @@ fun buildStatisticModel(
         dayWithMaxLevel = dayWithMaxLevel,
         dayWithMinLevel = dayWithMinLevel,
         allDays = statisticByDay,
-        glucose = buildGlucoseStatisticModel(eventsByType[EventType.GLUCOSE], settings),
+        glucose = buildGlucoseStatisticModel(
+            eventsByType[EventType.GLUCOSE],
+            settings,
+            glucoseFormat
+        ),
         insulin = buildInsulinStatisticModelByPeriod(eventsByType[EventType.INSULIN]),
         bread = buildBreadStatisticModelByPeriod(eventsByType[EventType.BREAD]),
         activity = buildActivityStatisticModel(eventsByType[EventType.ACTIVITY])
@@ -57,6 +68,7 @@ fun buildStatisticModel(
 fun buildGlucoseStatisticModel(
     glucoseEventsPerPeriod: List<Event>?,
     settings: GlucoseLevelSettings,
+    glucoseFormat: GlucoseFormat,
     forPeriod: Boolean = true
 ): GlucoseStatisticModel {
     val count = glucoseEventsPerPeriod?.size ?: 0
@@ -91,16 +103,19 @@ fun buildGlucoseStatisticModel(
                     maxHighLevel = value.checkMax(maxHighLevel)
                     minHighLevel = value.checkMin(minHighLevel)
                 }
+
                 in settings.normal -> {
                     eventsNormalCount++
                     maxNormalLevel = value.checkMax(maxNormalLevel)
                     minNormalLevel = value.checkMin(minNormalLevel)
                 }
+
                 in settings.low -> {
                     eventsLowCount++
                     maxLowLevel = value.checkMax(maxLowLevel)
                     minLowLevel = value.checkMin(minLowLevel)
                 }
+
                 else -> Timber.w("$value doesn't enter in any diapason")
             }
         }
@@ -108,7 +123,8 @@ fun buildGlucoseStatisticModel(
 
     val eventsHighPercent = eventsHighCount.percent(count)
     val eventsNormalPercent = eventsNormalCount.percent(count)
-    val eventsLowPercent = if (eventsLowCount != 0) 100 - eventsHighPercent - eventsNormalPercent else 0
+    val eventsLowPercent =
+        if (eventsLowCount != 0) 100 - eventsHighPercent - eventsNormalPercent else 0
 
     return GlucoseStatisticModel(
         settings = settings,
@@ -138,7 +154,13 @@ fun buildGlucoseStatisticModel(
 
         dailyGlucoseModel = when (forPeriod) {
             true -> null
-            else -> glucoseEventsPerPeriod?.let { buildDailyGlucoseModel(it, settings) }
+            else -> glucoseEventsPerPeriod?.let {
+                buildDailyGlucoseModel(
+                    list = it,
+                    glucoseLevelSettings = settings,
+                    glucoseFormat = glucoseFormat
+                )
+            }
         }
     )
 }

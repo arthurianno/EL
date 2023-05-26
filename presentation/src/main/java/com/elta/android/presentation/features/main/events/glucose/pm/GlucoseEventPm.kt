@@ -15,6 +15,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -64,6 +65,7 @@ class GlucoseEventPm @Inject constructor(
 ) : BasePm(services) {
     val glucoseValueState = state<String>()
     val glucoseInfoState = state<String>()
+    val glucoseFormatState = state<GlucoseFormat>()
 
     val glucoseLevelBackgroundState = state<Int>()
     val tagSelector = formSelectorControl()
@@ -194,6 +196,7 @@ class GlucoseEventPm @Inject constructor(
     }
 
     private fun handleScreenLoading(data: Pair<Event, Profile>) {
+        glucoseFormatState.consumer.accept(data.second.glucoseFormat)
         glucoseLevelSettingsState.consumer.accept(data.second.glucoseLevelSettings)
         eventState.consumer.accept(data.first)
     }

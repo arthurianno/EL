@@ -16,6 +16,11 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
 import java.util.concurrent.TimeUnit
 
+private const val HOURS_IN_DAY = 24
+private const val MINUTES_IN_HOUR = 60
+private const val SECONDS_IN_MINUTE = 60
+private const val ZERO = 0
+
 open class BaseRecordsMapper(
     protected val resources: ResourceProvider
 ) {
@@ -46,24 +51,24 @@ open class BaseRecordsMapper(
         when (type) {
             EventType.INSULIN -> resources.getString(
                 R.string.event_type_insulin_pattern,
-                value.format()
-                    ?: ""
+                value.format().orEmpty()
             )
+
             EventType.BREAD -> resources.getString(
                 R.string.event_type_bread_pattern,
-                value.format()
-                    ?: ""
+                value.format().orEmpty()
             )
+
             EventType.WEIGHT -> resources.getString(
                 R.string.event_type_weight_pattern,
-                value.format()
-                    ?: ""
+                value.format().orEmpty()
             )
+
             EventType.GLUCOSE -> resources.getString(
                 R.string.event_type_glucose_pattern,
-                value.format()
-                    ?: ""
+                value.format().orEmpty()
             )
+
             EventType.ACTIVITY -> this.formatDuration(resources)
             else -> null
         }
@@ -87,6 +92,7 @@ open class BaseRecordsMapper(
             EventType.INSULIN -> resources.getString(checkNotNull(insulinType).toName())
             EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) }
                 ?: resources.getString(R.string.event_type_activity_no_name)
+
             EventType.BREAD -> kind ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.MEDICAMENTS -> checkNotNull(name)
             EventType.WEIGHT -> resources.getString(R.string.event_type_weight_no_name)
@@ -125,11 +131,4 @@ open class BaseRecordsMapper(
 
     protected fun Double?.format(): String? =
         this?.let { NumberFormatter.numberFormat.format(it) }
-
-    private companion object {
-        const val HOURS_IN_DAY = 24
-        const val MINUTES_IN_HOUR = 60
-        const val SECONDS_IN_MINUTE = 60
-        const val ZERO = 0
-    }
 }

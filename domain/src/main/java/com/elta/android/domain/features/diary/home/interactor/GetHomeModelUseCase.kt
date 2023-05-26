@@ -31,9 +31,13 @@ class GetHomeModelUseCase @Inject constructor(
             profileRepo.getProfile().toObservable().applyScheduler(schedulers),
             userInfoRepo.getUserInfo().toObservable().applyScheduler(schedulers)
         ) { events, tags, profile, userInfo ->
-            val eventsWithTags = events.map { it.addTag(tags) }
-            val glucoseLevelSettings = profile.glucoseLevelSettings
-            buildHomeModel(eventsWithTags, tags, glucoseLevelSettings, userInfo)
+            buildHomeModel(
+                events = events.map { it.addTag(tags) },
+                tags = tags,
+                settings = profile.glucoseLevelSettings,
+                userInfo = userInfo,
+                glucoseFormat = profile.glucoseFormat
+            )
         }
     }
 }
