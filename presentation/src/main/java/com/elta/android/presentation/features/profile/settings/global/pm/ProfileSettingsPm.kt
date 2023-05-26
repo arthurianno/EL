@@ -98,6 +98,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.PASSWORD -> router.navigateTo(Screens.ChangePassword)
                     Type.LEGAL_INFO -> openPrivacyPolicyCommand.consumer.accept(Unit)
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
+                    Type.GLUCOSE_FORMAT -> router.navigateTo(Screens.GlucoseFormat)
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.APP_VERSION, Type.EMAIL -> {}
                     else -> Log.e(javaClass.simpleName, "This type:$type haven`t implemented yet...")

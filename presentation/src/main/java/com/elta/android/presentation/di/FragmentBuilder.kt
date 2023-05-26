@@ -37,6 +37,7 @@ import com.elta.android.presentation.features.profile.settings.dialogs.glucose.u
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
 import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
 import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
@@ -340,4 +341,8 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindConsultantFragment(): ConsultantFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindGlucoseFormatFragment(): GlucoseFormatFragment
 }

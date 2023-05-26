@@ -434,6 +434,7 @@
     <string name="profile_manage_glucometer">Управление глюкометром</string>
     <string name="profile_change_password">Изменить пароль</string>
     <string name="profile_notification">Напоминания</string>
+    <string name="profile_glucose_format">Формат отображения глюкозы</string>
     <string name="profile_legal_information">Юридическая информация</string>
     <string name="facebook">Facebook</string>
     <string name="vkontakte">VK</string>
@@ -448,8 +449,6 @@
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
     <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
     <string name="profile_is_deleted_body">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
-    <string name="profile_glucose_format_plasma">В плазме</string>
-    <string name="profile_glucose_format_caplilary">В цельной капиллярной крови</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
@@ -506,6 +505,13 @@
     <string name="profile_name_max_length_error">Макс. количество символов - 50</string>
     <string name="profile_first_name_invalid_characters_error">Имя должно обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
     <string name="profile_second_name_invalid_characters_error">Фамилия должна обязательно содержать буквы (A-Z, А-Я, a-z, а-я)</string>
+
+    <string name="profile_glucose_format_plasma">В плазме</string>
+    <string name="profile_glucose_format_caplilary">В цельной капиллярной крови</string>
+    <string name="profile_setting_glucose_format_title">Формат уровня глюкозы</string>
+    <string name="profile_setting_glucose_format_subtitle">Изменение формата отображения</string>
+    <string name="profile_setting_glucose_format_text1">Значения уровня глюкозы на экране глюкометра указаны в цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
+    <string name="profile_setting_glucose_format_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то выберите этот вариант.</string>
 
     <!--REMINDERS-->
     <string name="profile_reminders_description">Создавайте и редактируйте свои напоминания, чтобы ничего не пропустить</string>
