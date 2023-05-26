@@ -22,11 +22,12 @@ class GetStatisticByPeriodUseCase @Inject constructor(
             eventsRepo.getEvents(p.period.start, p.period.end).single(emptyList()),
             userRepo.getProfile()
         )
-            .map { pair ->
+            .map { (events, profile) ->
                 buildStatisticModel(
                     period = p.period,
-                    events = pair.first,
-                    settings = pair.second.glucoseLevelSettings
+                    events = events,
+                    settings = profile.glucoseLevelSettings,
+                    glucoseFormat = profile.glucoseFormat
                 )
             }
     }

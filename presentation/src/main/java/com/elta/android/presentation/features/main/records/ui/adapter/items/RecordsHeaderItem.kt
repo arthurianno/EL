@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
 import android.graphics.drawable.Drawable
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.nullgr.core.adapter.items.ListItem
 
 data class RecordsHeaderItem(
@@ -9,7 +10,8 @@ data class RecordsHeaderItem(
     val glucoseLevelIndex: String?,
     val glucoseLevelIndexIcon: Int?,
     val breadLevel: String?,
-    val insulinLevel: String?
+    val insulinLevel: String?,
+    val glucoseFormat: GlucoseFormat
 ) : ListItem {
 
     override fun getChangePayload(other: ListItem): Any {

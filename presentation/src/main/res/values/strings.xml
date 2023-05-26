@@ -232,6 +232,9 @@
     <string name="main_records_daily_chart_min_title">min</string>
     <string name="main_records_daily_chart_max_title">max</string>
     <string name="main_records_event_time_mask">в %s (UTC %s)</string>
+    <string name="main_records_glucose_plasma">Уровень глюкозы в плазме крови</string>
+    <string name="main_records_glucose_capillary">Уровень глюкозы в цельной капиллярной крови</string>
+
 
     <!-- EVENTS -->
     <string name="events_options_chooser_title_tags">Метка для группировки</string>

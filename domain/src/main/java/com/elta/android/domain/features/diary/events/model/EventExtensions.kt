@@ -8,7 +8,12 @@ import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.threeten.bp.ZonedDateTime
+
+const val GLUCOSE_DEFAULT_VALUE = 0.0
+const val GLUCOSE_PLASMA_COEFFICIENT = 1.12
 
 fun EventType.getValidator(): FormValidator =
     when (this) {
@@ -47,3 +52,22 @@ fun Event.isChanged(
 
 fun Event.addTag(tags: List<Tag>): Event =
     this.copy(tag = tags.firstOrNull { tagId == it.id })
+
+fun Event.glucoseValue(format: GlucoseFormat): Double = run {
+    value?.let {
+        when (format) {
+            GlucoseFormat.CAPILLARY -> it
+            GlucoseFormat.PLASMA -> it * GLUCOSE_PLASMA_COEFFICIENT
+        }
+    } ?: GLUCOSE_DEFAULT_VALUE
+}.round(2)
+
+fun Event.modifyValue(format: GlucoseFormat): Event =
+    if (type == EventType.GLUCOSE) {
+        copy(value = glucoseValue(format))
+    } else {
+        this
+    }
+
+fun List<Event>.modifyValues(format: GlucoseFormat): List<Event> =
+    map { it.modifyValue(format) }

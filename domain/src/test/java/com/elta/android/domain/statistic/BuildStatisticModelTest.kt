@@ -19,6 +19,7 @@ import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatist
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.junit.Test
 import org.threeten.bp.LocalDate
 
@@ -116,7 +117,7 @@ class BuildStatisticModelTest {
             activity = getExpectedActivityStatistic()
         )
 
-        val model = buildStatisticModel(period, allEvents, settings)
+        val model = buildStatisticModel(period, allEvents, settings, GlucoseFormat.PLASMA)
 
         assert(model == expected)
     }
@@ -178,7 +179,7 @@ class BuildStatisticModelTest {
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
                 eventsLowPercent = 1.percent(glucoseEvents.size),
 
-                dailyGlucoseModel = buildDailyGlucoseModel(glucoseEvents, settings)
+                dailyGlucoseModel = buildDailyGlucoseModel(glucoseEvents, settings, GlucoseFormat.PLASMA)
             ),
             insulin = DailyInsulinStatisticModel(
                 totalBolusLevel = 20.0,
