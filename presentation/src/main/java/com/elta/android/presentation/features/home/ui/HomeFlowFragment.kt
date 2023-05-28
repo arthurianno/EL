@@ -5,10 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
@@ -113,6 +116,38 @@ class HomeFlowFragment :
         pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        bindHelpBottomSheet(pm)
+    }
+
+    private fun bindHelpBottomSheet(pm: HomeFlowPm) {
+        pm.closeHelpBottomSheetCommand.bindTo { binding.helpBottomSheetView.hide() }
+        pm.showHelpBottomSheetCommand.bindTo {
+            binding.homeActionView.hide()
+            binding.helpBottomSheetView.show()
+        }
+        binding.helpBottomSheetView.visibilityChanges().subscribe {
+            binding.homeActionView.isVisible = !it
+        }
+        binding.helpBottomSheetView.findViewById<AppCompatTextView>(R.id.confirmButtonView)
+            .clicks()
+            .subscribe(pm.firstSyncAction.consumer)
+        val caplilaryImage =
+            binding.helpBottomSheetView.findViewById<ImageView>(R.id.caplilaryImage)
+        val plasmaImage =
+            binding.helpBottomSheetView.findViewById<ImageView>(R.id.plasmaImage)
+        pm.glucoseFormat.bindTo {
+            when (it) {
+                GlucoseFormat.CAPILLARY -> {
+                    caplilaryImage.show()
+                    plasmaImage.hide()
+                }
+
+                GlucoseFormat.PLASMA -> {
+                    caplilaryImage.hide()
+                    plasmaImage.show()
+                }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

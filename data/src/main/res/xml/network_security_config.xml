@@ -8,6 +8,7 @@
             <certificates src="@raw/vdiabete_test1" />
             <certificates src="@raw/vdiabete_test2" />
             <certificates src="@raw/vdiabete_test3" />
+            <certificates src="@raw/vdiabete_test4" />
         </trust-anchors>
     </debug-overrides>
 </network-security-config>

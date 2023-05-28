@@ -69,8 +69,8 @@ class AppPm @Inject constructor(
                             .doOnSuccess { firebaseStorage.userLogin = it }
                             .subscribe()
                         when {
-                            !info.first.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
-                            !info.first.isEmailConfirmed -> router.newRootChain(
+                            info.first.isUserLoggedIn != true -> router.newRootFlow(Screens.GreetingFlow)
+                            info.first.isEmailConfirmed != true -> router.newRootChain(
                                 Screens.GreetingFlow,
                                 Screens.ActivateProfile
                             )
@@ -200,7 +200,7 @@ class AppPm @Inject constructor(
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
-        if (pair.second.isUserLoggedIn) {
+        if (pair.second.isUserLoggedIn == true) {
             NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
                 router.newRootScreen(it)
             }

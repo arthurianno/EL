@@ -13,6 +13,7 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
@@ -81,6 +82,7 @@ class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
     ) {
         val glucoseFormat = viewModel.state.collectAsState().value.profile.glucoseFormat
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .selectable(
