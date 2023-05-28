@@ -72,7 +72,7 @@ private const val MIN_BATTERY_LEVEL = 1
 private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
 private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
 private const val EVENTS_COUNT = 1000
-private const val SYNC_DELAY = 500L
+private const val SYNC_DELAY = 1000L
 private const val COMMAND_DELAY = 20L
 private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
 
@@ -258,14 +258,28 @@ class GlucometersManager @Inject constructor(
                 }
             }
 
-    fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> =
-        device?.let {
-            Observable.just(Unit)
-                .delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
-                .flatMap { syncInternal(device.address) }
+    fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> {
+        val findDeviceAddress =
+            device?.address ?: glucometersCache.get(GlucometersConditions.Primary)?.address
+        return findDeviceAddress?.let { address ->
+            if (client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED) {
+                Observable.error(BluetoothNotEnabledError)
+            } else {
+                scanner.startScan(filters, settings)
+                    .filter { findGlucometers ->
+                        findGlucometers.map { it.device.address }
+                            .contains(address)
+                    }
+                    .take(1)
+                    .flatMap {
+                        Observable.just(Unit)
+                            .delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
+                            .flatMap { syncInternal(address) }
+                    }
+            }
         }
-            ?: glucometersCache.get(GlucometersConditions.Primary)?.let { syncInternal(it.address) }
             ?: Observable.error(PrimaryGlucometerNotFoundError)
+    }
 
     fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
         when {

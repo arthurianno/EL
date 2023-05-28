@@ -9,10 +9,13 @@ import com.elta.android.data.features.devices.glucometer.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.GlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.GlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.GlucometerPinStorage
+import com.polidea.rxandroidble2.LogConstants
+import com.polidea.rxandroidble2.LogOptions
 import com.polidea.rxandroidble2.RxBleClient
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Module(includes = [GlucometerModule.Declarations::class])
@@ -43,5 +46,17 @@ class GlucometerModule {
 
     @Provides
     @Singleton
-    fun provideRxBleClient(context: Context): RxBleClient = RxBleClient.create(context)
+    fun provideRxBleClient(context: Context): RxBleClient =
+        RxBleClient
+            .create(context)
+            .also {
+                RxBleClient.updateLogOptions(
+                    LogOptions.Builder()
+                        .setLogLevel(LogConstants.DEBUG)
+                        .setLogger { level, tag, msg ->
+                            Timber.tag(tag).log(level, msg)
+                        }
+                        .build()
+                )
+            }
 }
