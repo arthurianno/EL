@@ -249,7 +249,7 @@ object Dependencies {
         private const val rxBindingVersion = "2.0.0"
         private const val rxNetworkVersion = "3.0.2"
         private const val rxReplayingVersion = "2.1.1"
-        private const val rxBluetoothVersion = "1.8.2"
+        private const val rxBluetoothVersion = "1.17.2"
 
         const val rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
         const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
