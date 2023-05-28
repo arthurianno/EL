@@ -86,7 +86,7 @@ class LoginPm @Inject constructor(
                     .doOnSuccess { firebaseStorage.userLogin = it }
                     .subscribe()
                 when {
-                    !info.first.isEmailConfirmed -> router.navigateTo(ActivateProfile)
+                    info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
                     info.second -> {
                         remindersManager.scheduleReminders()
                         router.newRootFlow(Screens.HomeFlow)

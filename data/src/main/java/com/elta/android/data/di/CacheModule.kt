@@ -28,7 +28,7 @@ import com.elta.android.data.features.user.cache.ProfileSettingsCache
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
 import com.elta.android.data.features.userinfo.cache.DbUserInfoCache
-import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
+import com.elta.android.data.features.userinfo.cache.dto.UserInfoDbEntity
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -85,7 +85,7 @@ class CacheModule {
 
         @Binds
         @Singleton
-        fun bindUserInfoCache(cached: DbUserInfoCache): Cache<UserInfoCacheDto>
+        fun bindUserInfoCache(cached: DbUserInfoCache): Cache<UserInfoDbEntity>
 
         @Binds
         @Singleton

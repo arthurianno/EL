@@ -103,6 +103,9 @@
     <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны из цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
     <string name="on_boarding_glucose_format_help_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то выберите этот вариант.</string>
     <string name="on_boarding_glucose_format_help_text3">Значение глюкозы всегда можно изменить в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
+    <string name="on_boarding_glucose_format_event_text1">Значения уровня глюкозы в приложении указаны в цельной капиллярной крови.</string>
+    <string name="on_boarding_glucose_format_event_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то вы можете изменить формат отображения в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
+    <string name="on_boarding_glucose_format_button">Понятно</string>
 
     <!-- SHOPS FLOW -->
     <string name="shops_start_title">У вас нет глюкометра?</string>

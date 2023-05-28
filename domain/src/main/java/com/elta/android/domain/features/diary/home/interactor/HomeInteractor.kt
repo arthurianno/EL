@@ -52,7 +52,7 @@ fun buildHomeModel(
     }
 
     return HomeModel(
-        isFirstEntrance = userInfo.isFirstHomeEntrance,
+        isFirstEntrance = userInfo.isFirstHomeEntrance ?: true,
         dayPeriod = getDayPeriod(Date().time),
         lastBreadEvent = lastBreadEvent,
         lastInsulinEvent = lastInsulinEvent,
