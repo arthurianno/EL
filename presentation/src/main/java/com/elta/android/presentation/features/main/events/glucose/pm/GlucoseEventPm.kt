@@ -10,6 +10,7 @@ import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
+import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -65,7 +66,7 @@ class GlucoseEventPm @Inject constructor(
 ) : BasePm(services) {
     val glucoseValueState = state<String>()
     val glucoseInfoState = state<String>()
-    val glucoseFormatState = state<GlucoseFormat>()
+    val glucoseFormatState = state(GlucoseFormat.CAPILLARY)
 
     val glucoseLevelBackgroundState = state<Int>()
     val tagSelector = formSelectorControl()
@@ -202,7 +203,7 @@ class GlucoseEventPm @Inject constructor(
     }
 
     private fun bindEvent(event: Event) {
-        glucoseValueState.consumer.accept(NumberFormatter.format(event.getValue()))
+        glucoseValueState.consumer.accept(NumberFormatter.format(event.glucoseValue(glucoseFormatState.value)))
         glucoseInfoState.consumer.accept(
             resources.getString(
                 R.string.event_form_glucose_info_mask_title,

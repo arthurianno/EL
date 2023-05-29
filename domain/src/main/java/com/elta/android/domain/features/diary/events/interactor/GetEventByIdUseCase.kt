@@ -16,20 +16,15 @@ import javax.inject.Inject
 class GetEventByIdUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     private val tagsRepo: TagsRepository,
-    private val profileRepo: ProfileRepository,
     private val schedulers: SchedulersFacade
 ) : SingleUseCase<Event, GetEventByIdUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Single<Event> =
         Singles.zip(
             eventsRepo.getEventById(checkNotNull(params).id).applyScheduler(schedulers),
-            tagsRepo.getTags().singleOrError().applyScheduler(schedulers),
-            profileRepo.getProfile()
-                .applyScheduler(schedulers)
-        ).map { (events, tags, profile) ->
-            events
-                .modifyValue(profile.glucoseFormat)
-                .addTag(tags)
+            tagsRepo.getTags().singleOrError().applyScheduler(schedulers)
+        ).map { (events, tags) ->
+            events.addTag(tags)
         }
 
     data class Params(val id: String)
