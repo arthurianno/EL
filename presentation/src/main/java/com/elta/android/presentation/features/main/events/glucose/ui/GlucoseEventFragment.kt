@@ -107,7 +107,7 @@ class GlucoseEventFragment :
             binding.toolbarSubTitleView.text = it
         }
         pm.glucoseFormatState.bindTo {
-            getString(
+            binding.glucoseEventFormatTextView.setText(
                 when (it) {
                     GlucoseFormat.CAPILLARY -> R.string.main_records_glucose_capillary
                     GlucoseFormat.PLASMA -> R.string.main_records_glucose_plasma
