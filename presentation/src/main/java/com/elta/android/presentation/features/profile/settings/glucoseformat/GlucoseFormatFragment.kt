@@ -41,24 +41,29 @@ class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
     @Composable
     override fun Content(viewModel: GlucoseFormatViewModel) {
         GetLocalProperties { dimens, _, _, _, _ ->
-            Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-                Column(modifier = Modifier.padding(horizontal = dimens.contentPadding)) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()) {
+                Column {
                     AppTopBar(viewModel = viewModel)
-                    Title()
-                    VSpacerSmall()
-                    FormatRadioItem(
-                        viewModel = viewModel,
-                        selectedFormat = GlucoseFormat.PLASMA,
-                        textId = R.string.profile_glucose_format_plasma
-                    )
-                    VSpacer(height = dimens.glucoseFormatRadioGroupSpacer)
-                    FormatRadioItem(
-                        viewModel = viewModel,
-                        selectedFormat = GlucoseFormat.CAPILLARY,
-                        textId = R.string.profile_glucose_format_caplilary
-                    )
-                    VSpacer(height = dimens.glucoseFormatTextTopPadding)
-                    MainText()
+                    Column(modifier = Modifier.padding(horizontal = dimens.contentPadding)) {
+                        Title()
+                        VSpacerSmall()
+                        VSpacer(height = dimens.glucoseFormatRadioGroupTopSpacer)
+                        FormatRadioItem(
+                            viewModel = viewModel,
+                            selectedFormat = GlucoseFormat.PLASMA,
+                            textId = R.string.profile_glucose_format_plasma
+                        )
+                        VSpacer(height = dimens.glucoseFormatRadioGroupSpacer)
+                        FormatRadioItem(
+                            viewModel = viewModel,
+                            selectedFormat = GlucoseFormat.CAPILLARY,
+                            textId = R.string.profile_glucose_format_caplilary
+                        )
+                        VSpacer(height = dimens.glucoseFormatTextTopPadding)
+                        MainText()
+                    }
                 }
             }
             DownButton(widgetModel = viewModel.downButton)
