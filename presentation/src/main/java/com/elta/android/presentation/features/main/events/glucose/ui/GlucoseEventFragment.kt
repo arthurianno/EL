@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.MealTag
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
@@ -104,6 +105,14 @@ class GlucoseEventFragment :
         pm.glucoseValueState.bindTo {
             binding.glucoseEventValueTextView.text = it
             binding.toolbarSubTitleView.text = it
+        }
+        pm.glucoseFormatState.bindTo {
+            getString(
+                when (it) {
+                    GlucoseFormat.CAPILLARY -> R.string.main_records_glucose_capillary
+                    GlucoseFormat.PLASMA -> R.string.main_records_glucose_plasma
+                }
+            )
         }
         pm.glucoseInfoState.bindTo(binding.eventInfoTextView.text())
         pm.glucoseLevelBackgroundState.bindTo { binding.appBarLayoutView.setBackgroundResource(it) }

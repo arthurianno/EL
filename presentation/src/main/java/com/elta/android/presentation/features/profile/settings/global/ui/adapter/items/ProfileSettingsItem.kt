@@ -29,6 +29,7 @@ data class ProfileSettingsItem(
         PASSWORD,
         EMAIL,
         NOTIFICATION,
+        GLUCOSE_FORMAT,
         LEGAL_INFO,
         DELETE_PROFILE,
         APP_VERSION

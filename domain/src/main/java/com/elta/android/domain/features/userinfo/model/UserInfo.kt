@@ -7,9 +7,9 @@ package com.elta.android.domain.features.userinfo.model
  * For example: to update #UserInfo.isFeedbackSent create UserInfo(isFeedbackSent = true).
  */
 data class UserInfo(
-    val isUserLoggedIn: Boolean = false,
-    val isFeedbackSent: Boolean = false,
-    val isEmailConfirmed: Boolean = false,
-    val isOnBoardingPassed: Boolean = false,
-    val isFirstHomeEntrance: Boolean = true
+    val isUserLoggedIn: Boolean? = null,
+    val isFeedbackSent: Boolean? = null,
+    val isEmailConfirmed: Boolean? = null,
+    val isFirstHomeEntrance: Boolean? = null,
+    val isFirstSync: Boolean? = null
 )

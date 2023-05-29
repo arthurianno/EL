@@ -1,6 +1,6 @@
 package com.elta.android.data.features.auth.datasource.social
 
-import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.data.features.auth.model.SocialUserDto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

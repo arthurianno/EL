@@ -15,6 +15,8 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
+import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
@@ -67,17 +69,21 @@ class HomeFlowPm @Inject constructor(
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
     private val syncWithBackendUseCase: SyncLocalChangesUseCase,
     private val logOutUseCase: LogOutUseCase,
+    private val getGlucoseFormat: GetGlucoseFormatUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
     val bottomSheetItems = state<List<ListItem>>()
     val closeBottomSheetCommand = command<Unit>()
     val showBottomSheetCommand = command<Unit>()
+    val closeHelpBottomSheetCommand = command<Unit>()
+    val showHelpBottomSheetCommand = command<Unit>()
     val pulseCommand = command<Boolean>()
     val homeAction = action<Boolean>()
     val menuItemSelectedAction = action<Int>()
     val menuItemRestoredAction = action<Int>()
     val selectedItemIdState = state(R.id.mainMenuItemView)
+    val glucoseFormat = state<GlucoseFormat>()
 
     val btControl = bluetoothControl2()
     val retryDeviceNotFoundControl = snackBarControl<SnackBarData>()
@@ -86,6 +92,8 @@ class HomeFlowPm @Inject constructor(
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
     val likeAppDialogControl = dialogControl<DialogData, DialogResult>()
 
+    val firstSyncAction = action<Unit>()
+    private val isFirstSync = state<Boolean>()
     private val loadEvents = action<Unit>()
     private val startSyncAction = action<Unit>()
     private val startAutoSyncAction = action<Unit>()
@@ -131,6 +139,7 @@ class HomeFlowPm @Inject constructor(
         bindGooglePlayRateDialog()
         bindFeedbackDialog()
         bindFeedbackAction()
+        initGlucoseFormat()
 
         loadEvents.observable
             .skipWhileInProgress()
@@ -176,6 +185,20 @@ class HomeFlowPm @Inject constructor(
             .subscribe(feedbackAction.consumer)
             .untilDestroy()
 
+        bus.events<Events.EventsChanged>()
+            .flatMap {
+                getGlucoseFormat.execute()
+                    .toObservable()
+            }
+            .subscribe(glucoseFormat.consumer)
+
+        bus.events<Events.DeviceChanged>()
+            .flatMapSingle {
+                getUserInfoUseCase.execute()
+                    .map { it.isFirstSync == true }
+            }
+            .subscribe(isFirstSync.consumer)
+
         observeClicks()
     }
 
@@ -189,6 +212,19 @@ class HomeFlowPm @Inject constructor(
             )
         )
         router.navigateToTab(Screens.MainTab)
+    }
+
+    private fun initGlucoseFormat() {
+        getUserInfoUseCase.execute()
+            .toObservable()
+            .map { it.isFirstSync == true }
+            .subscribe{
+                isFirstSync.consumer.accept(it)
+            }
+            .untilDestroy()
+
+        getGlucoseFormat.execute()
+            .subscribe(glucoseFormat.consumer)
     }
 
     private fun handleSuccess(events: List<EventType>) {
@@ -217,6 +253,17 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun bindSyncAction() {
+        firstSyncAction.observable
+            .doOnNext(startSyncAction.consumer)
+            .doOnNext(closeHelpBottomSheetCommand.consumer)
+            .map { false }
+            .doOnNext(isFirstSync.consumer)
+            .flatMapCompletable {
+                updateUserInfoUseCase.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = it)))
+            }
+            .subscribe()
+            .untilDestroy()
+
         startSyncAction.observable
             .skipWhileInProgress(syncProgressState.observable)
             .flatMap {
@@ -335,7 +382,11 @@ class HomeFlowPm @Inject constructor(
         if (meta is EventType) {
             router.startFlow(Screens.EventsCreationScreen(meta))
         } else if (meta == META_SYNC) {
-            startSyncAction.consumer.accept(Unit)
+            if (isFirstSync.valueOrNull == true) {
+                showHelpBottomSheetCommand.consumer.accept(Unit)
+            } else {
+                startSyncAction.consumer.accept(Unit)
+            }
         }
     }
 
@@ -364,10 +415,8 @@ class HomeFlowPm @Inject constructor(
 
     private fun autoSyncObservable(): Observable<Unit> =
         Singles.zip(getUserInfoUseCase.execute(), getDevicesUseCase.execute())
-            .flatMapObservable { pair ->
-                val info = pair.first
-                val devices = pair.second
-                if (devices.find { it.first.isPrimary } != null && !info.isFirstHomeEntrance) {
+            .flatMapObservable { (info, devices) ->
+                if (devices.find { it.first.isPrimary } != null && info.isFirstHomeEntrance != true) {
                     startSyncTimer()
                     syncWithGlucometer(auto = true)
                         .map { Unit }

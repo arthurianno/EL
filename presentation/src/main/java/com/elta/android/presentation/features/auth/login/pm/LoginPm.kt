@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.auth.login.pm
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.domain.features.auth.interactor.LoginUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
+import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.Screens.ActivateProfile
@@ -20,6 +21,7 @@ class LoginPm @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val firebaseStorage: FirebaseStorage,
     services: ServiceFacade
@@ -75,13 +77,17 @@ class LoginPm @Inject constructor(
 
     private fun checkEmailAndOnBoarding(i: Boolean) =
         getUserInfoUseCase.execute()
+            .flatMap { userInfo ->
+                getProfileSettings.execute()
+                    .map { userInfo to it.isOnboarded }
+            }
             .doOnSuccess { info ->
                 getUserId.execute()
                     .doOnSuccess { firebaseStorage.userLogin = it }
                     .subscribe()
                 when {
-                    !info.isEmailConfirmed -> router.navigateTo(ActivateProfile)
-                    info.isOnBoardingPassed -> {
+                    info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
+                    info.second -> {
                         remindersManager.scheduleReminders()
                         router.newRootFlow(Screens.HomeFlow)
                     }

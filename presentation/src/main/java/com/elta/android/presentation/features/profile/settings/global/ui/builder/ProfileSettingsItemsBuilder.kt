@@ -61,6 +61,13 @@ class ProfileSettingsItemsBuilder @Inject constructor(
             )
             add(
                 ProfileSettingsItem(
+                    icon = R.drawable.ic_glucose_format,
+                    title = resources.getString(R.string.profile_glucose_format),
+                    type = ProfileSettingsItem.Type.GLUCOSE_FORMAT
+                )
+            )
+            add(
+                ProfileSettingsItem(
                     icon = R.drawable.ic_doc,
                     title = resources.getString(R.string.profile_legal_information),
                     type = ProfileSettingsItem.Type.LEGAL_INFO

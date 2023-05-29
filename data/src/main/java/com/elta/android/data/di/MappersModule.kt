@@ -1,8 +1,8 @@
 package com.elta.android.data.di
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.auth.dto.SocialUserDto
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
+import com.elta.android.data.features.auth.model.SocialUserDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
@@ -53,23 +53,16 @@ import com.elta.android.data.features.sale_points.mapper.SalePointToDomainMapper
 import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
-import com.elta.android.data.features.user.dto.HealthAppDto
-import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
+import com.elta.android.data.features.user.dto.ProfileNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
 import com.elta.android.data.features.user.mapper.HealthAppFromCacheMapper
 import com.elta.android.data.features.user.mapper.HealthAppToCacheMapper
-import com.elta.android.data.features.user.mapper.HealthAppToDomainMapper
-import com.elta.android.data.features.user.mapper.HealthAppToDtoMapper
 import com.elta.android.data.features.user.mapper.NetworkFromCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToCacheMapper
 import com.elta.android.data.features.user.mapper.NetworkToDomainMapper
 import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
-import com.elta.android.data.features.user.mapper.ProfileToDomainMapper
-import com.elta.android.data.features.user.mapper.ProfileToDtoMapper
-import com.elta.android.data.features.userinfo.cache.dto.UserInfoCacheDto
-import com.elta.android.data.features.userinfo.mapper.UserInfoToCacheMapper
-import com.elta.android.data.features.userinfo.mapper.UserInfoToDomainMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
@@ -79,10 +72,7 @@ import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.sale_points.model.Coordinates
 import com.elta.android.domain.features.sale_points.model.SalePoint
-import com.elta.android.domain.features.user.model.HealthApp
-import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetwork
-import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.google.android.gms.fitness.data.Session
 import dagger.Binds
 import dagger.Module
@@ -175,7 +165,7 @@ abstract class MappersModule {
     @Binds
     abstract fun bindProfileFromCacheMapper(
         mapper: ProfileFromCacheMapper
-    ): Mapper<ProfileCacheDto, ProfileDto>
+    ): Mapper<ProfileCacheDto, ProfileNetworkResponse>
 
     @Binds
     abstract fun bindNetworkFromCacheMapper(
@@ -185,22 +175,12 @@ abstract class MappersModule {
     @Binds
     abstract fun bindProfileToCacheMapper(
         mapper: ProfileToCacheMapper
-    ): Mapper<ProfileDto, ProfileCacheDto>
+    ): Mapper<ProfileNetworkResponse, ProfileCacheDto>
 
     @Binds
     abstract fun bindNetworkToCacheMapper(
         mapper: NetworkToCacheMapper
     ): Mapper<SocialNetworkDto, NetworkCacheDto>
-
-    @Binds
-    abstract fun bindProfileToDtoMapper(
-        mapper: ProfileToDtoMapper
-    ): Mapper<Profile, ProfileDto>
-
-    @Binds
-    abstract fun bindProfileToDomainMapper(
-        mapper: ProfileToDomainMapper
-    ): Mapper<ProfileDto, Profile>
 
     @Binds
     abstract fun bindNetworkToDomainMapper(
@@ -268,34 +248,14 @@ abstract class MappersModule {
     ): Mapper<ReminderDto, Reminder>
 
     @Binds
-    abstract fun bindUserInfoToDomainMapper(
-        mapper: UserInfoToDomainMapper
-    ): Mapper<UserInfoCacheDto, UserInfo>
-
-    @Binds
-    abstract fun bindUserInfoToCacheMapper(
-        mapper: UserInfoToCacheMapper
-    ): Mapper<UserInfo, UserInfoCacheDto>
-
-    @Binds
     abstract fun bindHealthAppFromCacheMapper(
         mapper: HealthAppFromCacheMapper
-    ): Mapper<HealthAppCacheDto, HealthAppDto>
+    ): Mapper<HealthAppCacheDto, HealthAppNetworkEntity>
 
     @Binds
     abstract fun bindHealthAppToCacheMapper(
         mapper: HealthAppToCacheMapper
-    ): Mapper<HealthAppDto, HealthAppCacheDto>
-
-    @Binds
-    abstract fun bindHealthAppToDomainMapper(
-        mapper: HealthAppToDomainMapper
-    ): Mapper<HealthAppDto, HealthApp>
-
-    @Binds
-    abstract fun bindHealthAppToDtoCacheMapper(
-        mapper: HealthAppToDtoMapper
-    ): Mapper<HealthApp, HealthAppDto>
+    ): Mapper<HealthAppNetworkEntity, HealthAppCacheDto>
 
     @Binds
     abstract fun bindSessionsToActivityDtoMapper(

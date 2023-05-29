@@ -10,7 +10,7 @@ import com.elta.android.data.features.observers.model.ObserverNetworkResponse
 import com.elta.android.data.features.observers.model.ObserverUpdateNameNetworkRequest
 import com.elta.android.data.features.observers.model.ObserversNetworkResponse
 import com.elta.android.data.features.observers.toDb
-import com.elta.android.data.features.user.dto.SimpleObserverDto
+import com.elta.android.data.features.user.dto.SimpleObserverNetworkEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -42,7 +42,7 @@ class ObserverRemoteDataSource @Inject constructor(
             .doOnSuccess { cache.add(listOf(it.toDb())) }
             .ignoreElement()
 
-    override fun deleteObserverInvite(observables: List<SimpleObserverDto>): Completable =
+    override fun deleteObserverInvite(observables: List<SimpleObserverNetworkEntity>): Completable =
         api.deleteObserverInvite(observables.first().id)
 
     private fun getObserverInvitesByPage(

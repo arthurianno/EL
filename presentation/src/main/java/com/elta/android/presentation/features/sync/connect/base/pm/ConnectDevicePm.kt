@@ -10,6 +10,8 @@ import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -34,9 +36,10 @@ import me.dmdev.rxpm.state
 import java.util.concurrent.TimeoutException
 
 abstract class ConnectDevicePm constructor(
-    private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
-    private val connectDeviceUseCase: ConnectDeviceUseCase,
-    private val findGlucometersUseCase: FindGlucometersUseCase,
+    private val syncWithGlucometer: SyncWithGlucometerUseCase,
+    private val connectDevice: ConnectDeviceUseCase,
+    private val findGlucometers: FindGlucometersUseCase,
+    private val updateUserInfo: UpdateUserInfoUseCase,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -170,7 +173,7 @@ abstract class ConnectDevicePm constructor(
             .filter { glucometer != null && pinState.hasValue() }
             .map { ConnectDeviceUseCase.Params(checkNotNull(glucometer), pinState.value) }
             .flatMapCompletable { params ->
-                connectDeviceUseCase.execute(params)
+                connectDevice.execute(params)
                     .bindProgress()
                     .doOnComplete {
                         startSyncAction.consumer.accept(Unit)
@@ -183,14 +186,17 @@ abstract class ConnectDevicePm constructor(
             .untilDestroy()
 
         toAppAction.observable
+            .flatMapSingle {
+                updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
+                    .toSingleDefault(Unit)
+            }
             .subscribe(::navigateToApp)
-            .untilDestroy()
     }
 
     private fun bindStartScanAction() {
         startScanAction.observable
             .flatMap {
-                findGlucometersUseCase.execute()
+                findGlucometers.execute()
                     .doOnSubscribe {
                         mstate.consumer.accept(ViewState.SEARCH)
                     }
@@ -208,7 +214,7 @@ abstract class ConnectDevicePm constructor(
             .filter { glucometer != null }
             .map { SyncWithGlucometerUseCase.Params(glucometer) }
             .flatMap { params ->
-                syncWithGlucometerUseCase.execute(params)
+                syncWithGlucometer.execute(params)
                     .bindProgress(syncProgressState.consumer)
                     .doOnNext { events ->
                         if (events > 0) bus.event(Events.EventsChanged(true))
@@ -282,10 +288,10 @@ abstract class ConnectDevicePm constructor(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>
     ) = glucometer != null ||
-        isDevicesEquals(
-            prevItems = prevItems,
-            newItems = newItems
-        )
+            isDevicesEquals(
+                prevItems = prevItems,
+                newItems = newItems
+            )
 
     private fun isDevicesEquals(
         prevItems: List<DeviceItem>,

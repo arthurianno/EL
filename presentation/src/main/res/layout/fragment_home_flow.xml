@@ -61,4 +61,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:bottom_sheet_layout="@layout/layout_home_bottom_sheet" />
+
+    <com.elta.android.presentation.widgets.bottom_sheet.BottomSheetView
+        android:id="@+id/helpBottomSheetView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:bottom_sheet_layout="@layout/layout_help_glucose_format_bottom_sheet" />
 </FrameLayout>

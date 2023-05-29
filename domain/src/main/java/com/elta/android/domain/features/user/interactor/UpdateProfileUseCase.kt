@@ -14,6 +14,16 @@ class UpdateProfileUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Completable =
         repository.updateProfile(checkNotNull(params).profile)
+            .toSingleDefault(params)
+            .flatMapCompletable {
+                repository.updateProfileSettings(
+                    isOnboarded = it.isOnboarding,
+                    glucoseFormat = it.profile.glucoseFormat
+                )
+            }
 
-    data class Params(val profile: Profile)
+    data class Params(
+        val profile: Profile,
+        val isOnboarding: Boolean? = null
+    )
 }

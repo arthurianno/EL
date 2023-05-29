@@ -41,6 +41,7 @@ import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragmen
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
+import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
 import com.elta.android.presentation.features.profile.settings.name.ui.ProfileSetNameFragment
 import com.elta.android.presentation.features.profile.settings.password.ui.ProfileChangePasswordFragment
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.RemindersFragment
@@ -287,6 +288,10 @@ object Screens {
 
     object Reminders : SupportAppScreen() {
         override fun getFragment() = RemindersFragment.newInstance()
+    }
+
+    object GlucoseFormat : SupportAppScreen() {
+        override fun getFragment() = GlucoseFormatFragment()
     }
 
     object Devices : SupportAppScreen() {

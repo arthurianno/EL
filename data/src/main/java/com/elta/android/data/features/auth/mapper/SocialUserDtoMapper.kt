@@ -1,7 +1,7 @@
 package com.elta.android.data.features.auth.mapper
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.data.features.auth.model.SocialUserDto
 import com.elta.android.domain.features.auth.model.SocialUser
 import javax.inject.Inject
 

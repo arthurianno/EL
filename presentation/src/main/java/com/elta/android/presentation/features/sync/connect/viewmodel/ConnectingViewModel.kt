@@ -4,6 +4,8 @@ import android.os.Bundle
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.core.Analytics
@@ -43,6 +45,7 @@ class ConnectingViewModel @Inject constructor(
     private val findGlucometers: FindGlucometersUseCase,
     private val connectDevice: ConnectDeviceUseCase,
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
+    private val updateUserInfo: UpdateUserInfoUseCase,
     private val bus: RxBus,
     private val analytics: Analytics
 ) : BaseViewModel<ConnectingViewState>() {
@@ -104,12 +107,18 @@ class ConnectingViewModel @Inject constructor(
     }
 
     private fun completeConnect() {
-        if (state.value.isOnBoarding) {
-            router.newRootScreen(Screens.HomeFlow)
-        } else {
-            bus.event(Events.DeviceChanged)
-            router.backTo(Screens.Devices)
-        }
+        updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
+            .subscribe(
+                {
+                    bus.event(Events.DeviceChanged)
+                    if (state.value.isOnBoarding) {
+                        router.newRootScreen(Screens.HomeFlow)
+                    } else {
+                        router.backTo(Screens.Devices)
+                    }
+                },
+                { handleError(it) }
+            )
     }
 
     private fun repeatSyncDevice(currentState: ConnectingViewState) = run {

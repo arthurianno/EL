@@ -44,7 +44,10 @@ class RxSocialActivity : Activity() {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
 
-        fun launchForResult(context: Context, network: SocialNetworkType): Observable<SocialResult> =
+        fun launchForResult(
+            context: Context,
+            network: SocialNetworkType
+        ): Observable<SocialResult> =
             Observable.fromCallable { newInstance(context, network).launch(context) }
                 .flatMap {
                     SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)

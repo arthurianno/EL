@@ -43,7 +43,8 @@ class MainRecordsMapper @Inject constructor(
             glucoseLevelIndex = glucoseLevelDifference.format(),
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
             breadLevel = lastBreadEvent?.value.format(),
-            insulinLevel = lastInsulinEvent?.value.format()
+            insulinLevel = lastInsulinEvent?.value.format(),
+            glucoseFormat = glucoseFormat
         )
 
     private fun GlucoseLevelDirection.icon(): Int? =

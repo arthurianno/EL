@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.records.mapper
 
 import com.elta.android.common.utils.CommonFormats
 import com.elta.android.common.utils.toStringWithFormat
+import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
@@ -15,22 +16,18 @@ object ChartItemsBuilder {
         ChartDataModel(glucoseModel.items(), glucoseModel.ranges())
 
     private fun DailyGlucoseModel.items() =
-        arrayListOf<ChartItemModel>().apply {
-            glucoseEvents.forEach {
-                add(
-                    ChartItemModel(
-                        value = it.value ?: 0.0,
-                        dateTime = it.additionTime,
-                        formattedTime = it.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME),
-                        hourOfEvent = it.additionTime.hour,
-                        minutesOfEvent = it.additionTime.minute,
-                        valueType = it.value.toValueType(glucoseLevelSettings),
-                        isMaxValue = it == maxEvent,
-                        isMinValue = it == minEvent,
-                        isLastValue = it == lastEvent
-                    )
-                )
-            }
+        glucoseEvents.map {
+            ChartItemModel(
+                value = it.glucoseValue(glucoseFormat),
+                dateTime = it.additionTime,
+                formattedTime = it.additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME),
+                hourOfEvent = it.additionTime.hour,
+                minutesOfEvent = it.additionTime.minute,
+                valueType = it.value.toValueType(glucoseLevelSettings),
+                isMaxValue = it == maxEvent,
+                isMinValue = it == minEvent,
+                isLastValue = it == lastEvent
+            )
         }
 
     private fun Double?.toValueType(glucoseLevelSettings: GlucoseLevelSettings) =

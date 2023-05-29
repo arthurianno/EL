@@ -4,6 +4,7 @@ import android.net.Uri
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.data.features.reports.api.ReportsApi
 import com.elta.android.data.features.reports.dto.TokenDto
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
@@ -13,10 +14,15 @@ class ReportsRemoteDataSource @Inject constructor(
     private val fileManager: ReportFileManager
 ) : ReportsDataSource {
 
-    override fun getReportToken(startDate: LocalDate, endDate: LocalDate): Single<TokenDto> =
+    override fun getReportToken(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        glucoseFormat: GlucoseFormat
+    ): Single<TokenDto> =
         reportsApi.getReportToken(
             startDate = startDate.toStringWithFormat(DATE_PATTERN),
-            endDate = endDate.toStringWithFormat(DATE_PATTERN)
+            endDate = endDate.toStringWithFormat(DATE_PATTERN),
+            glucoseFormat = glucoseFormat.name
         )
 
     override fun downloadReport(token: String, fileName: String): Single<Uri> =

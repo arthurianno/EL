@@ -5,6 +5,7 @@ import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
+import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
@@ -36,6 +37,7 @@ private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
+    private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val firebaseStorage: FirebaseStorage,
     services: ServiceFacade
@@ -58,18 +60,22 @@ class AppPm @Inject constructor(
             .skipWhileInProgress()
             .flatMapSingle {
                 getUserInfo.execute()
-                    .doOnSuccess { user ->
+                    .flatMap { userInfo ->
+                        getProfileSettings.execute()
+                            .map { userInfo to it.isOnboarded }
+                    }
+                    .doOnSuccess { info ->
                         getUserId.execute()
                             .doOnSuccess { firebaseStorage.userLogin = it }
                             .subscribe()
                         when {
-                            !user.isUserLoggedIn -> router.newRootFlow(Screens.GreetingFlow)
-                            !user.isEmailConfirmed -> router.newRootChain(
+                            info.first.isUserLoggedIn != true -> router.newRootFlow(Screens.GreetingFlow)
+                            info.first.isEmailConfirmed != true -> router.newRootChain(
                                 Screens.GreetingFlow,
                                 Screens.ActivateProfile
                             )
 
-                            !user.isOnBoardingPassed -> router.newRootFlow(Screens.OnBoardingFlow)
+                            !info.second -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
@@ -194,7 +200,7 @@ class AppPm @Inject constructor(
     }
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
-        if (pair.second.isUserLoggedIn) {
+        if (pair.second.isUserLoggedIn == true) {
             NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
                 router.newRootScreen(it)
             }

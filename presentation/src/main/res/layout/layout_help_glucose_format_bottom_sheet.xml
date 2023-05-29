@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="@drawable/bg_bottom_sheet_toolbar"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp">
+
+        <ImageView
+            android:id="@+id/caplilaryImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_help_glucose_caplilary" />
+
+        <ImageView
+            android:id="@+id/plasmaImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_help_glucose_plasma" />
+
+    </FrameLayout>
+
+    <TextView
+        style="@style/Headline1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+
+        android:text="@string/on_boarding_glucose_format_help_header" />
+
+    <TextView
+        style="@style/Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+
+        android:text="@string/on_boarding_glucose_format_event_text1" />
+
+    <TextView
+        style="@style/Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+
+        android:text="@string/on_boarding_glucose_format_event_text2" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/confirmButtonView"
+        style="@style/Button.Large"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="24dp"
+        android:text="@string/on_boarding_glucose_format_button" />
+</LinearLayout>

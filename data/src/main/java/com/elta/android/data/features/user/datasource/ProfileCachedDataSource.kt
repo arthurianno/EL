@@ -7,23 +7,28 @@ import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
-import com.elta.android.data.features.user.dto.HealthAppDto
-import com.elta.android.data.features.user.dto.ProfileDto
+import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
+import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
+import com.elta.android.data.features.user.dto.ProfileNetworkResponse
+import com.elta.android.data.features.user.dto.ProfileSettingsNetworkResponse
 import com.elta.android.data.features.user.dto.SocialNetworkDto
+import com.elta.android.data.features.user.mapper.toDb
+import com.elta.android.data.features.user.mapper.toNetwork
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
 
 class ProfileCachedDataSource @Inject constructor(
     private val userHolder: UserHolder,
-    private val profileFromCacheMapper: Mapper<ProfileCacheDto, ProfileDto>,
-    private val profileToCacheMapper: Mapper<ProfileDto, ProfileCacheDto>,
+    private val profileFromCacheMapper: Mapper<ProfileCacheDto, ProfileNetworkResponse>,
+    private val profileToCacheMapper: Mapper<ProfileNetworkResponse, ProfileCacheDto>,
     private val networkToCacheMapper: Mapper<SocialNetworkDto, NetworkCacheDto>,
-    private val healthAppsCacheMapper: Mapper<HealthAppDto, HealthAppCacheDto>,
-    private val profileCache: Cache<ProfileCacheDto>
+    private val healthAppsCacheMapper: Mapper<HealthAppNetworkEntity, HealthAppCacheDto>,
+    private val profileCache: Cache<ProfileCacheDto>,
+    private val profileSettingsCache: Cache<ProfileSettingsDbEntity>
 ) : ProfileDataSource {
 
-    override fun updateProfile(profile: ProfileDto): Completable =
+    override fun updateProfile(profile: ProfileNetworkResponse): Completable =
         Completable.fromCallable {
             userHolder.currentUser?.let {
                 profileCache.get(CommonConditions.ById(it))?.let { cachedProfile ->
@@ -61,7 +66,7 @@ class ProfileCachedDataSource @Inject constructor(
             }
         }
 
-    override fun getUserProfile(): Single<ProfileDto> =
+    override fun getUserProfile(): Single<ProfileNetworkResponse> =
         Single.fromCallable {
             userHolder.currentUser?.let {
                 profileCache.get(CommonConditions.ById(it))
@@ -74,4 +79,19 @@ class ProfileCachedDataSource @Inject constructor(
             profileCache.contains(CommonConditions.ById(it))
         } ?: false
     }
+
+    override fun getProfileSettings(): Single<ProfileSettingsNetworkResponse> =
+        Single.fromCallable {
+            userHolder.currentUser?.let {
+                profileSettingsCache.get(CommonConditions.ById(it))
+                    ?: throw NoSuchElementException("Current user profile is empty.")
+            }
+        }.map { it.toNetwork() }
+
+    override fun updateProfileSettings(settings: ProfileSettingsNetworkResponse): Completable =
+        Completable.fromCallable {
+            userHolder.currentUser?.let {
+                profileSettingsCache.update(listOf(settings.toDb(it)))
+            }
+        }
 }

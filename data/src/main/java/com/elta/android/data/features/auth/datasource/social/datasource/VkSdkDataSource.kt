@@ -3,7 +3,7 @@ package com.elta.android.data.features.auth.datasource.social.datasource
 import android.content.Context
 import com.elta.android.data.features.auth.datasource.social.SocialNetworkDataSource
 import com.elta.android.data.features.auth.datasource.social.authAndGetToken
-import com.elta.android.data.features.auth.dto.SocialUserDto
+import com.elta.android.data.features.auth.model.SocialUserDto
 import com.elta.android.domain.features.user.model.SocialNetworkType
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKSdk

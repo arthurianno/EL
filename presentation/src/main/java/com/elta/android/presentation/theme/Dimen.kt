@@ -79,7 +79,12 @@ data class EltaDimens(
     val previewSendButtonSize: Dp,
     val imageMessageSize: DpSize,
     val charCardUserMessagePadding: PaddingValues,
-    val charCardOperatorMessagePadding: PaddingValues
+    val charCardOperatorMessagePadding: PaddingValues,
+    // GlucoseFormat
+    val glucoseFormatRadioGroupTopSpacer: Dp,
+    val glucoseFormatRadioGroupSpacer: Dp,
+    val glucoseFormatTextTopPadding: Dp,
+    val glucoseFormatTextBetweenPadding: Dp
 )
 
 internal val eltaDimens = EltaDimens(
@@ -174,5 +179,9 @@ internal val eltaDimens = EltaDimens(
         bottom = 0.dp,
         start = 12.dp,
         end = 32.dp
-    )
+    ),
+    glucoseFormatRadioGroupTopSpacer = 28.dp,
+    glucoseFormatRadioGroupSpacer = 32.dp,
+    glucoseFormatTextTopPadding = 40.dp,
+    glucoseFormatTextBetweenPadding = 24.dp,
 )
