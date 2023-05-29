@@ -34,22 +34,18 @@ class ProfileDataRepository @Inject constructor(
 
     override fun getProfile(): Single<Profile> =
         cachedSource.hasProfile().flatMap { isCached ->
-            run {
-                if (isCached) {
-                    cachedSource.getUserProfile()
-                } else {
-                    remoteSource.getUserProfile()
-                        .flatMap { cachedSource.getUserProfile() }
-                }
+            if (isCached) {
+                cachedSource.getUserProfile()
+            } else {
+                remoteSource.getUserProfile()
+                    .flatMap { cachedSource.getUserProfile() }
             }
                 .flatMap { profile ->
-                    run {
-                        if (isCached) {
-                            cachedSource.getProfileSettings()
-                        } else {
-                            remoteSource.getProfileSettings()
-                                .flatMap { cachedSource.getProfileSettings() }
-                        }
+                    if (isCached) {
+                        cachedSource.getProfileSettings()
+                    } else {
+                        remoteSource.getProfileSettings()
+                            .flatMap { cachedSource.getProfileSettings() }
                     }
                         .map { profile.toDomain(it.glucoseFormat) }
                 }
