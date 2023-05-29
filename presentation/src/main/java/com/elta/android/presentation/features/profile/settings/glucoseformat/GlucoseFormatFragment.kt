@@ -50,7 +50,6 @@ class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
                     AppTopBar(viewModel = viewModel)
                     Column(modifier = Modifier.padding(horizontal = dimens.contentPadding)) {
                         Title()
-                        VSpacerSmall()
                         VSpacer(height = dimens.glucoseFormatRadioGroupTopSpacer)
                         FormatRadioItem(
                             viewModel = viewModel,
