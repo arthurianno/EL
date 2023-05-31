@@ -43,6 +43,7 @@ class OnBoardingPm @Inject constructor(
     val nextPageVisibilityState = state(false)
     val previousPageVisibilityState = state(false)
     val titleState = state(resources.getString(R.string.on_boarding_header_user_sex))
+    val toolbarMenuButtonIsVisibleState = state(true)
 
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
     private val updateProfileSettingsAction = action<Unit>()
@@ -70,6 +71,8 @@ class OnBoardingPm @Inject constructor(
             .subscribe {
                 val currentItem = items.value[it] as OnBoardingItem
                 titleState.consumer.accept(currentItem.title)
+                val currentItemIsGlucoseFormat = items.value[it] !is OnBoardingGlucoseFormatItem
+                toolbarMenuButtonIsVisibleState.consumer.accept(currentItemIsGlucoseFormat)
                 updateNextButtonState(currentItem)
             }
             .untilDestroy()

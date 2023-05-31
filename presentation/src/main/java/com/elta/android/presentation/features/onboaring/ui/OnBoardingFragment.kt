@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -73,6 +74,7 @@ class OnBoardingFragment :
         pm.titleState.observable.skip(1)
             .subscribe { binding.onBoardingHeaderTextView.animateText(it) }
         pm.titleState.observable.take(1).subscribe(binding.onBoardingHeaderTextView.text())
+        pm.toolbarMenuButtonIsVisibleState.observable.subscribe{ binding.toolbar.menuButtonView.isVisible = it }
         pm.previousPageVisibilityState.bindTo(binding.previewPageButtonView.fadeVisibility())
         pm.nextPageVisibilityState.bindTo(binding.nextPageButtonView.fadeVisibility())
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
@@ -82,16 +84,6 @@ class OnBoardingFragment :
         binding.toolbar.menuButtonView.clicks().bindTo(pm.skipPageAction)
 
         bindProgressDialog(pm)
-    }
-
-    private fun TextView.available(): Consumer<Boolean> {
-        return Consumer {
-            this.fadeVisibility(it, View.INVISIBLE)
-            when (it) {
-                true -> this.isEnabled = true
-                else -> postDelayed({ this.isEnabled = false }, DISABLE_DELAY)
-            }
-        }
     }
 
     companion object {

@@ -28,9 +28,6 @@ class AuthDataRepository @Inject constructor(
             .doOnSuccess { response ->
                 saveUserCredentials(response, email)
             }
-            .flatMap {
-                profileRepository.getProfileSettings(fromCache = false)
-            }
             .flatMapCompletable {
                 userInfoRepository.updateUserInfo(createNewUserInfo())
             }

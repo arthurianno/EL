@@ -7,6 +7,7 @@ import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
@@ -26,7 +27,8 @@ class GlucoseFormatViewModel @Inject constructor(
 ) : BaseViewModel<GlucoseFormatViewState>() {
     override fun createInitState(): GlucoseFormatViewState =
         GlucoseFormatViewState(
-            profile = Profile(glucoseFormat = GlucoseFormat.CAPILLARY)
+            profile = Profile(glucoseFormat = GlucoseFormat.CAPILLARY),
+            initGlucoseFormat = GlucoseFormat.CAPILLARY
         )
 
     init {
@@ -36,13 +38,16 @@ class GlucoseFormatViewModel @Inject constructor(
                 .asFlow()
                 .catch { handleError(it) }
                 .collectLatest {
-                    reduceState { state.value.copy(profile = it) }
+                    reduceState { state.value.copy(
+                        profile = it,
+                        initGlucoseFormat = it.glucoseFormat
+                    ) }
                 }
         }
     }
 
     val appTopBar: BaseAppTopBarWidgetModel = BaseAppTopBarWidgetModel()
-    val downButton: DownButtonWidgetModel = DownButtonWidgetModel()
+    val downButton: DownButtonWidgetModel = DownButtonWidgetModel().apply { setEnableState(false) }
 
     override val widgets = listOf(
         appTopBar,
@@ -50,26 +55,30 @@ class GlucoseFormatViewModel @Inject constructor(
     ).actionObserve()
 
     override fun handleUserAction(action: Action) {
-        if (action is DownButtonClick) {
-            updateProfile.execute(UpdateProfileUseCase.Params(state.value.profile))
-                .subscribe(
-                    {
-                        bus.event(Events.EventsChanged(false))
-                        backClick()
-                    },
-                    { handleError(it) }
-                )
+        when(action) {
+            is DownButtonClick -> {
+                updateProfile.execute(UpdateProfileUseCase.Params(state.value.profile))
+                    .subscribe(
+                        {
+                            bus.event(Events.EventsChanged(false))
+                            backClick()
+                        },
+                        { handleError(it) }
+                    )
+            }
+            is AppAction.BackPressure -> backClick()
         }
     }
 
     override fun reduceStateByAction(
         currentState: GlucoseFormatViewState,
         action: Action
-    ): GlucoseFormatViewState =
-        if (action is GlucoseFormatAction.SelectFormat) {
+    ): GlucoseFormatViewState = when (action) {
+        is GlucoseFormatAction.SelectFormat -> {
+            downButton.setEnableState(state.value.initGlucoseFormat != action.format)
             val newProfile = state.value.profile.copy(glucoseFormat = action.format)
             currentState.copy(profile = newProfile)
-        } else {
-            currentState
         }
+        else -> currentState
+    }
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -131,22 +132,17 @@ class HomeFlowFragment :
         binding.helpBottomSheetView.findViewById<AppCompatTextView>(R.id.confirmButtonView)
             .clicks()
             .subscribe(pm.firstSyncAction.consumer)
-        val caplilaryImage =
-            binding.helpBottomSheetView.findViewById<ImageView>(R.id.caplilaryImage)
-        val plasmaImage =
-            binding.helpBottomSheetView.findViewById<ImageView>(R.id.plasmaImage)
         pm.glucoseFormat.bindTo {
-            when (it) {
-                GlucoseFormat.CAPILLARY -> {
-                    caplilaryImage.show()
-                    plasmaImage.hide()
-                }
-
-                GlucoseFormat.PLASMA -> {
-                    caplilaryImage.hide()
-                    plasmaImage.show()
-                }
+            val (drawableId, textId) = when (it) {
+                GlucoseFormat.CAPILLARY -> R.drawable.img_help_glucose_caplilary to R.string.on_boarding_glucose_format_event_text_capillary
+                GlucoseFormat.PLASMA -> R.drawable.img_help_glucose_plasma to R.string.on_boarding_glucose_format_event_text_plasma
             }
+            binding.helpBottomSheetView
+                .findViewById<ImageView>(R.id.image)
+                .setImageResource(drawableId)
+            binding.helpBottomSheetView
+                .findViewById<TextView>(R.id.warning_text)
+                .setText(textId)
         }
     }
 

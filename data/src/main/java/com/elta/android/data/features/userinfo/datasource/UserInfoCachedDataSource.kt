@@ -47,7 +47,7 @@ class UserInfoCachedDataSource @Inject constructor(
             id = id,
             isUserLoggedIn = true,
             isFeedbackSent = false,
-            isEmailConfirmed = true,
+            isEmailConfirmed = false,
             isFirstHomeEntrance = true,
             isFirstSync = false
         )

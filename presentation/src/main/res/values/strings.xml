@@ -100,10 +100,11 @@
     <string name="diabetes_type_other">Другой</string>
     <string name="coma">,</string>
     <string name="on_boarding_glucose_format_help_header">Обратите внимание!</string>
-    <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны из цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
+    <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны в цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
     <string name="on_boarding_glucose_format_help_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то выберите этот вариант.</string>
     <string name="on_boarding_glucose_format_help_text3">Значение глюкозы всегда можно изменить в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
-    <string name="on_boarding_glucose_format_event_text1">Значения уровня глюкозы в приложении указаны в цельной капиллярной крови.</string>
+    <string name="on_boarding_glucose_format_event_text_plasma">Значения уровня глюкозы в приложении указаны в плазме.</string>
+    <string name="on_boarding_glucose_format_event_text_capillary">Значения уровня глюкозы в приложении указаны в цельной капиллярной крови.</string>
     <string name="on_boarding_glucose_format_event_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то вы можете изменить формат отображения в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
     <string name="on_boarding_glucose_format_button">Понятно</string>
 
@@ -481,6 +482,7 @@
     <string name="profile_settings_change_name_second_hint">Фамилия</string>
     <string name="profile_settings_apply_changes">Изменить</string>
     <string name="profile_settings_save_changes">Сохранить</string>
+    <string name="profile_settings_choose">Выбрать</string>
 
     <string name="profile_settings_change_gender_title">Пол</string>
     <string name="profile_settings_change_gender_description">Изменение персональных данных</string>

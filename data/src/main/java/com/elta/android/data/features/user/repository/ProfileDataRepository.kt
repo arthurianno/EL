@@ -96,20 +96,17 @@ class ProfileDataRepository @Inject constructor(
 
     override fun updateProfileSettings(
         isOnboarded: Boolean?,
-        glucoseFormat: GlucoseFormat?
-    ): Completable =
-        cachedSource.getProfileSettings()
-            .map {
-                ProfileSettingsNetworkResponse(
-                    isOnboarded = isOnboarded ?: it.isOnboarded,
-                    glucoseFormat = glucoseFormat?.toNetwork() ?: it.glucoseFormat
-                )
-            }
-            .flatMap {
-                cachedSource.updateProfileSettings(it)
-                    .toSingleDefault(it)
-            }
-            .flatMapCompletable {
-                remoteSource.updateProfileSettings(it)
-            }
+        glucoseFormat: GlucoseFormat
+    ): Completable = cachedSource.getProfileSettings()
+        .map { it.isOnboarded }
+        .onErrorReturn { true }
+        .flatMapCompletable { isOnboardedCache ->
+            val response = ProfileSettingsNetworkResponse(
+                isOnboarded = isOnboarded ?: isOnboardedCache,
+                glucoseFormat = glucoseFormat.toNetwork()
+            )
+            cachedSource.updateProfileSettings(response)
+                .andThen(remoteSource.updateProfileSettings(response).onErrorComplete())
+        }
+
 }
