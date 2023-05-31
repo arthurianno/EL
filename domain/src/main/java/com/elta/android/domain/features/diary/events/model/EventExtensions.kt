@@ -60,7 +60,7 @@ fun Event.glucoseValue(format: GlucoseFormat): Double = run {
             GlucoseFormat.PLASMA -> it * GLUCOSE_PLASMA_COEFFICIENT
         }
     } ?: GLUCOSE_DEFAULT_VALUE
-}.round(2)
+}.round(1)
 
 fun Event.modifyValue(format: GlucoseFormat): Event =
     if (type == EventType.GLUCOSE) {

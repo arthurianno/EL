@@ -13,8 +13,5 @@ interface ProfileRepository {
     fun getProfileSettings(fromCache: Boolean = true): Single<ProfileSettings>
     fun getUserId(): Single<String>
     fun sync(): Completable
-    fun updateProfileSettings(
-        isOnboarded: Boolean? = null,
-        glucoseFormat: GlucoseFormat? = null
-    ): Completable
+    fun updateProfileSettings(isOnboarded: Boolean?, glucoseFormat: GlucoseFormat): Completable
 }

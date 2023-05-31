@@ -35,7 +35,7 @@ class GlucoseFormatFragment : BaseComposeFragment<GlucoseFormatViewModel>() {
 
     override fun GlucoseFormatViewModel.init() {
         appTopBar.setStartIconAction(AppAction.BackPressure)
-        downButton.setText(getString(R.string.profile_settings_save_changes))
+        downButton.setText(getString(R.string.profile_settings_choose))
     }
 
     @Composable

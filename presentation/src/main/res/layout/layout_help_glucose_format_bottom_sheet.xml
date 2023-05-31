@@ -1,30 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@drawable/bg_bottom_sheet_toolbar"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="52dp">
-
-        <ImageView
-            android:id="@+id/caplilaryImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/img_help_glucose_caplilary" />
-
-        <ImageView
-            android:id="@+id/plasmaImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/img_help_glucose_plasma" />
-
-    </FrameLayout>
+        android:layout_marginTop="52dp"
+        android:src="@drawable/img_help_glucose_caplilary" />
 
     <TextView
         style="@style/Headline1"
@@ -36,13 +24,14 @@
         android:text="@string/on_boarding_glucose_format_help_header" />
 
     <TextView
+        android:id="@+id/warning_text"
         style="@style/Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
 
-        android:text="@string/on_boarding_glucose_format_event_text1" />
+        tools:text="@string/on_boarding_glucose_format_event_text_capillary" />
 
     <TextView
         style="@style/Body1"
