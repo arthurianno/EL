@@ -75,24 +75,33 @@ class LoginPm @Inject constructor(
             }
         }
 
-    private fun checkEmailAndOnBoarding(i: Boolean) =
-        getUserInfoUseCase.execute()
-            .flatMap { userInfo ->
-                getProfileSettings.execute()
-                    .map { userInfo to it.isOnboarded }
-            }
-            .doOnSuccess { info ->
-                getUserId.execute()
-                    .doOnSuccess { firebaseStorage.userLogin = it }
-                    .subscribe()
-                when {
-                    info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
-                    info.second -> {
-                        remindersManager.scheduleReminders()
-                        router.newRootFlow(Screens.HomeFlow)
-                    }
-
-                    else -> router.newRootFlow(Screens.OnBoardingFlow)
+    //TODO: need refactor
+    private fun checkEmailAndOnBoarding(isEmailConfirmed: Boolean): Single<*> {
+        return if (isEmailConfirmed) {
+            getUserInfoUseCase.execute()
+                .flatMap { userInfo ->
+                    getProfileSettings.execute()
+                        .map { userInfo to it.isOnboarded }
                 }
+                .doOnSuccess { info ->
+                    getUserId.execute()
+                        .doOnSuccess { firebaseStorage.userLogin = it }
+                        .subscribe()
+                    when {
+                        info.first.isEmailConfirmed != true -> router.navigateTo(ActivateProfile)
+                        info.second -> {
+                            remindersManager.scheduleReminders()
+                            router.newRootFlow(Screens.HomeFlow)
+                        }
+
+                        else -> router.newRootFlow(Screens.OnBoardingFlow)
+                    }
+                }
+
+        } else {
+            Single.fromCallable {
+                router.navigateTo(ActivateProfile)
             }
+        }
+    }
 }

@@ -146,6 +146,7 @@ dependencies {
     implementation(Dependencies.Yandex.mapKitClustering)
     implementation(Dependencies.CustomView.pulseView)
     implementation(Dependencies.CustomView.datePicker)
+    implementation(Dependencies.CustomView.lottie)
 
     kapt(Dependencies.Dagger.daggerCompiler)
     kapt(Dependencies.Dagger.daggerAndroidProcessor)

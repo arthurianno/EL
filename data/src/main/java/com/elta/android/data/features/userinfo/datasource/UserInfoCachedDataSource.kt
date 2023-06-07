@@ -19,7 +19,14 @@ class UserInfoCachedDataSource @Inject constructor(
         Single.fromCallable {
             userHolder.currentUser?.let {
                 cache.get(CommonConditions.ById(it))
-                    ?: newUser(it).also { newUser ->
+                    ?: UserInfoDbEntity(
+                        id = it,
+                        isUserLoggedIn = true,
+                        isFeedbackSent = false,
+                        isEmailConfirmed = true,
+                        isFirstHomeEntrance = true,
+                        isFirstSync = false
+                    ).also { newUser ->
                         cache.add(listOf(newUser))
                     }
             } ?: throw UnauthorizedError()
@@ -38,17 +45,18 @@ class UserInfoCachedDataSource @Inject constructor(
                         isFirstSync = userInfo.isFirstSync ?: cachedInfo.isFirstSync
                     )
                     cache.update(listOf(updatedInfo))
-                } ?: cache.add(listOf(newUser(it)))
+                } ?: cache.add(
+                    listOf(
+                        UserInfoDbEntity(
+                            id = it,
+                            isUserLoggedIn = true,
+                            isFeedbackSent = false,
+                            isEmailConfirmed = userInfo.isEmailConfirmed ?: false,
+                            isFirstHomeEntrance = true,
+                            isFirstSync = false
+                        )
+                    )
+                )
             }
         }
-
-    private fun newUser(id: Long) =
-        UserInfoDbEntity(
-            id = id,
-            isUserLoggedIn = true,
-            isFeedbackSent = false,
-            isEmailConfirmed = false,
-            isFirstHomeEntrance = true,
-            isFirstSync = false
-        )
 }

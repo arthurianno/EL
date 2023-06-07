@@ -52,6 +52,7 @@ import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
@@ -268,7 +269,7 @@ class HomeFlowPm @Inject constructor(
             .skipWhileInProgress(syncProgressState.observable)
             .flatMap {
                 startSyncTimer()
-                syncWithGlucometer(auto = false)
+                syncWithGlucometer(isAuto = false)
                     .doOnError(::handleSyncError)
             }
             .retry()
@@ -418,7 +419,7 @@ class HomeFlowPm @Inject constructor(
             .flatMapObservable { (info, devices) ->
                 if (devices.find { it.first.isPrimary } != null && info.isFirstHomeEntrance != true) {
                     startSyncTimer()
-                    syncWithGlucometer(auto = true)
+                    syncWithGlucometer(isAuto = true)
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
                         .doOnComplete { startSyncWithBackendAction.consumer.accept(Unit) }
@@ -429,7 +430,7 @@ class HomeFlowPm @Inject constructor(
                 }
             }
 
-    private fun syncWithGlucometer(auto: Boolean): Observable<Int> =
+    private fun syncWithGlucometer(isAuto: Boolean): Observable<Int> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCase.Params())
             .bindProgress(syncProgressState.consumer)
             .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
@@ -439,36 +440,38 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnError { error ->
                 if (!syncTimerIsRun) {
-                    bus.event(
-                        if (auto) {
-                            if (error.cause is BluetoothNotEnabledError ||
-                                error.cause is LocationNotEnabledError ||
-                                error.cause is LocationPermissionNotGrantedError
-                            ) {
-                                Events.Sync.Glucometer.Error
-                            } else {
-                                Events.Sync.Glucometer.ErrorWithMessage
-                            }
-                        } else {
-                            Events.Sync.Glucometer.Error
-                        }
-                    )
+                    val autoSyncGlucometerIsError = isAuto
+                            && (error.cause is BluetoothNotEnabledError ||
+                            error.cause is LocationNotEnabledError ||
+                            error.cause is LocationPermissionNotGrantedError)
+
+                    val event = when {
+                        autoSyncGlucometerIsError -> Events.Sync.Glucometer.Error
+                        isAuto -> Events.Sync.Glucometer.ErrorWithMessage
+                        error is GlucometerSyncError -> Events.Sync.Glucometer.Error
+                        else -> Events.Sync.Glucometer.Error
+                    }
+                    bus.event(event)
+
+                    if (error is GlucometerSyncError) {
+                        handleSyncError(error)
+                    }
                 }
             }
             .onErrorResumeNext { error: Throwable ->
                 when (error) {
-                    is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(auto)
+                    is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
 
                     is GlucometerSyncError ->
                         when (error.cause) {
-                            is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(auto)
+                            is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
                             is LocationPermissionNotGrantedError ->
-                                requestLocatePermissionAndRepeat(auto)
+                                requestLocatePermissionAndRepeat(isAuto)
 
-                            is LocationNotEnabledError -> locationEnableAndRepeat(auto)
+                            is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
 
                             else -> if (syncTimerIsRun) {
-                                syncWithGlucometer(auto)
+                                syncWithGlucometer(isAuto)
                             } else {
                                 Observable.error(error)
                             }
@@ -479,18 +482,18 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnNext(::handleSyncCompleted)
 
-    private fun locationEnableAndRepeat(auto: Boolean) = btControl.requestEnableLocation()
+    private fun locationEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableLocation()
         .filter { it }
-        .flatMapObservable { syncWithGlucometer(auto) }
+        .flatMapObservable { syncWithGlucometer(isAuto) }
 
-    private fun requestLocatePermissionAndRepeat(auto: Boolean) =
+    private fun requestLocatePermissionAndRepeat(isAuto: Boolean) =
         btControl.requestLocationPermissions()
             .filter { it }
-            .flatMapObservable { syncWithGlucometer(auto) }
+            .flatMapObservable { syncWithGlucometer(isAuto) }
 
-    private fun bluetoothEnableAndRepeat(auto: Boolean) = btControl.requestEnableBluetooth()
+    private fun bluetoothEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableBluetooth()
         .filter { it }
-        .flatMapObservable { syncWithGlucometer(auto) }
+        .flatMapObservable { syncWithGlucometer(isAuto) }
 
     private fun startSyncTimer() {
         syncTimer.cancel()
@@ -514,6 +517,7 @@ class HomeFlowPm @Inject constructor(
             is GlucometerSyncError ->
                 when (error.cause) {
                     is GlucometerOfflineError -> showRetrySyncAction.consumer.accept(Unit)
+                    is TimeoutException -> showRetrySyncAction.consumer.accept(Unit)
                     else -> handleError(error)
                 }
 

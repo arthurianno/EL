@@ -6,6 +6,7 @@ import com.elta.android.domain.features.calculator.interactor.CalculatorFragment
 import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.Events
@@ -131,6 +132,7 @@ class EventCreationPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createAddEventParams)
+            .filter { isValidDuration(it.duration) }
             .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()

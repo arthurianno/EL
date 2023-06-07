@@ -23,7 +23,6 @@ import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.children
-import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -46,7 +45,6 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.toolbar) {
-            homeButtonView.hide()
             menuButtonView.text = getString(R.string.sync_connect_menu_button_text)
         }
     }

@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCa
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.events.model.isChanged
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.Dialogs
@@ -178,6 +179,7 @@ class EditEventPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createEditEventParams)
+            .filter { isValidDuration(it.event.duration) }
             .flatMapSingle { params ->
                 updateEventUseCase.execute(params)
                     .hideErrorContainer()

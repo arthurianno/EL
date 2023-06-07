@@ -1,6 +1,10 @@
 package com.elta.android.presentation.features.sync.connect
 
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -96,6 +100,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val state = viewModel.state.collectAsState().value
         val event = viewModel.event.collectAsState(initial = null).value
+        if (state.requestBluetoothActivation) { requestEnableBluetooth() }
         LaunchedEffect(key1 = event) {
             when (event) {
                 is ConnectMainEvent.ShowSheet -> sheetState.show()
@@ -326,4 +331,20 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             BaseSnackBar(textId = R.string.connection_process_text)
         }
     }
+
+    private fun requestEnableBluetooth() {
+        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        resultLauncher.launch(intent)
+    }
+
+    private val resultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val connectAction = when (result.resultCode) {
+            Activity.RESULT_OK -> ConnectAction.RepeatSearch
+            else -> ConnectAction.ScannerError
+        }
+        viewModel sendAction connectAction
+    }
+
 }
