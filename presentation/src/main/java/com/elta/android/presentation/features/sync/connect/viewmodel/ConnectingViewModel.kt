@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
+import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
@@ -55,7 +56,8 @@ class ConnectingViewModel @Inject constructor(
             isOnBoarding = false,
             pinCode = "",
             glucometerName = "",
-            connectDevice = null
+            connectDevice = null,
+            requestBluetoothActivation = false
         )
 
     internal val appTopBar: BaseAppTopBarWidgetModel = BaseAppTopBarWidgetModel()
@@ -102,6 +104,7 @@ class ConnectingViewModel @Inject constructor(
             is ConnectAction.RepeatConnect -> repeatConnectDevice(currentState)
             is ConnectAction.RepeatSync -> repeatSyncDevice(currentState)
             is ConnectAction.RepeatSearch -> repeatConnectDevice(currentState)
+            is ConnectAction.ScannerError -> scannerError(currentState)
             else -> currentState
         }
     }
@@ -128,8 +131,17 @@ class ConnectingViewModel @Inject constructor(
 
     private fun repeatConnectDevice(currentState: ConnectingViewState) = run {
         connectDevice()
-        currentState.copy(stageType = ConnectingStageType.Connecting)
+        currentState.copy(
+            requestBluetoothActivation = false,
+            stageType = ConnectingStageType.Connecting
+        )
     }
+
+    private fun scannerError(currentState: ConnectingViewState) =
+        currentState.copy(
+            requestBluetoothActivation = false,
+            stageType = ConnectingStageType.ErrorConnect
+        )
 
     private fun connectByPin() {
         sendEvent(ConnectMainEvent.HideSheet())
@@ -168,7 +180,6 @@ class ConnectingViewModel @Inject constructor(
         connectJob = launch {
             findGlucometers.execute()
                 .timeout(CONNECT_DEVICE_TIMEOUT_SEC, TimeUnit.SECONDS)
-                .doOnError { handleConnectError(it) }
                 .asFlow()
                 .cancellable()
                 .map { devices -> devices.filter { it.name == state.value.glucometerName } }
@@ -211,7 +222,11 @@ class ConnectingViewModel @Inject constructor(
     }
 
     private fun handleConnectError(error: Throwable) {
-        reduceState { state.value.copy(stageType = ConnectingStageType.ErrorConnect) }
+        val newState = when (error) {
+            BluetoothNotEnabledError -> state.value.copy(requestBluetoothActivation = true)
+            else -> state.value.copy(stageType = ConnectingStageType.ErrorConnect)
+        }
+        reduceState { newState }
     }
 
     private fun handleSyncError(error: Throwable) {

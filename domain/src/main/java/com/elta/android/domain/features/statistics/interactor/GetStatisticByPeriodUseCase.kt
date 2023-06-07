@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.statistics.interactor
 
+import com.elta.android.domain.features.diary.events.model.modifyValues
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
@@ -25,7 +26,7 @@ class GetStatisticByPeriodUseCase @Inject constructor(
             .map { (events, profile) ->
                 buildStatisticModel(
                     period = p.period,
-                    events = events,
+                    events = events.modifyValues(profile.glucoseFormat),
                     settings = profile.glucoseLevelSettings,
                     glucoseFormat = profile.glucoseFormat
                 )

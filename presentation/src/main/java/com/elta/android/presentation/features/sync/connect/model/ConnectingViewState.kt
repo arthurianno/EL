@@ -7,5 +7,6 @@ data class ConnectingViewState(
     val isOnBoarding: Boolean,
     val pinCode: String,
     val glucometerName: String,
-    val connectDevice: Glucometer?
+    val connectDevice: Glucometer?,
+    val requestBluetoothActivation: Boolean,
 )

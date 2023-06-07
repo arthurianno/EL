@@ -114,7 +114,7 @@ abstract class ConnectDevicePm constructor(
         bindAnalytics()
 
         btControl.bluetoothDeniedAction.observable
-            .subscribe { router.exit() }
+            .subscribe { mstate.consumer.accept(ViewState.HOW_TO_CONNECT) }
             .untilDestroy()
 
         Observable.merge(

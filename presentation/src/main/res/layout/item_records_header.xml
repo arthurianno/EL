@@ -17,11 +17,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3">
 
-        <com.elta.android.presentation.widgets.MorphView
-            android:id="@+id/morphView"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/blob"
             android:layout_width="156dp"
             android:layout_height="156dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            app:lottie_rawRes="@raw/blob"
+            app:lottie_loop="true"
+            app:lottie_autoPlay="true"
+            />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/glucoseEmptyValueView"

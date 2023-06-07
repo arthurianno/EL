@@ -38,9 +38,10 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginNetworkResponse::isEmailConfirmed)
-            .flatMap { isConfirm ->
+            .flatMap { isConfirm -> //TODO: Вынести получение настроек
                 profileRepository.getProfileSettings(fromCache = false)
                     .map { isConfirm }
+                    .onErrorReturn { isConfirm }
             }
             .flatMap {
                 val userInfo = UserInfo(

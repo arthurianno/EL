@@ -224,6 +224,7 @@ object Dependencies {
         private const val datePickerVersion = "2.0.0"
         private const val materialEditTextVersion = "2.1.4"
         private const val cardViewVersion = "1.0.0"
+        private const val lottieVersion = "6.0.0"
 
         const val pulseView = "pl.bclogic:pulsator4droid:$pulseViewVersion"
         const val pinView = "io.github.chaosleung:pinview:$pinViewVersion"
@@ -236,6 +237,7 @@ object Dependencies {
         const val materialEditText =
             "com.rengwuxian.materialedittext:library:$materialEditTextVersion"
         const val cardView = "com.github.captain-miao:optroundcardview:$cardViewVersion"
+        const val lottie = "com.airbnb.android:lottie:$lottieVersion"
     }
 
     object RxJava2 {

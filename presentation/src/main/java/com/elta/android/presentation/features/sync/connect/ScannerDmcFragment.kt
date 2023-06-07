@@ -2,7 +2,9 @@ package com.elta.android.presentation.features.sync.connect
 
 import android.content.Context
 import android.graphics.Rect
+import android.os.Bundle
 import android.util.Size
+import android.view.View
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -65,6 +67,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -100,6 +104,13 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
         connectByPinButton.setText(getString(R.string.sync_connect_by_pin_boton_text))
         appTopBar.setStartIconAction(AppAction.BackPressure)
         appTopBar.setEndIconAction(ConnectAction.NeedHelp)
+    }
+    
+    private lateinit var cameraExecutor: ExecutorService
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -209,11 +220,8 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     .setTargetResolution(Size(1280, 720))
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
-                    .also {
-                        it.setAnalyzer(
-                            ContextCompat.getMainExecutor(requireContext()),
-                            getImageAnalyzer(cropRect, viewModel)
-                        )
+                    .apply {
+                        setAnalyzer(cameraExecutor, getImageAnalyzer(cropRect, viewModel))
                     }
                 val cameraProvider = context.getCameraProvider()
                 cameraProvider.unbindAll()
@@ -344,5 +352,10 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 )
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cameraExecutor.shutdown()
     }
 }

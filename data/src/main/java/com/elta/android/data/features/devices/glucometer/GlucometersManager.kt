@@ -65,6 +65,7 @@ import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -278,6 +279,14 @@ class GlucometersManager @Inject constructor(
                     }
             }
         }
+            ?.onErrorResumeNext { exception: Throwable ->
+                val error = when (exception) {
+                    is BleException -> GlucometerOfflineError
+                    is TimeoutException -> GlucometerSyncError(exception)
+                    else -> exception
+                }
+                Observable.error(error)
+            }
             ?: Observable.error(PrimaryGlucometerNotFoundError)
     }
 
