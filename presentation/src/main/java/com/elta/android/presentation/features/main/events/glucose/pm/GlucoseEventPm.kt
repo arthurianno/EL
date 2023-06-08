@@ -40,8 +40,7 @@ import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
-import com.nullgr.core.rx.applyScheduler
-import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
+import com.nullgr.core.rx.applySchedulers
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
@@ -190,7 +189,7 @@ class GlucoseEventPm @Inject constructor(
         eventState.observable
             .take(1)
             .doOnNext(::bindEvent)
-            .applyScheduler(ioToMainSchedulers)
+            .applySchedulers(ioToMainSchedulers)
             .doOnNext { bindNoteInput(it.note) }
             .subscribe()
             .untilDestroy()
