@@ -34,13 +34,15 @@ import com.elta.android.presentation.features.main.events.chooser.models.Chooser
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormattedTemperature
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
-import com.elta.android.presentation.features.main.events.edit.pm.mapper.getValue
 import com.elta.android.presentation.features.main.events.glucose.model.GlucoseFormModel
 import com.elta.android.presentation.features.main.events.glucose.share.ShareImageBuilder
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toEventDate
 import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import com.nullgr.core.rx.applyScheduler
+import com.nullgr.core.rx.schedulers.IoToMainSchedulersFacade
+import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
@@ -62,6 +64,7 @@ class GlucoseEventPm @Inject constructor(
     private val getShareEventUriUseCase: GetShareEventUriUseCase,
     private val saveEventBitmapUseCase: SaveEventBitmapUseCase,
     private val shareImageBuilder: ShareImageBuilder,
+    private val ioToMainSchedulers : SchedulersFacade,
     services: ServiceFacade
 ) : BasePm(services) {
     val glucoseValueState = state<String>()
@@ -187,6 +190,8 @@ class GlucoseEventPm @Inject constructor(
         eventState.observable
             .take(1)
             .doOnNext(::bindEvent)
+            .applyScheduler(ioToMainSchedulers)
+            .doOnNext { bindNoteInput(it.note) }
             .subscribe()
             .untilDestroy()
 
@@ -212,11 +217,14 @@ class GlucoseEventPm @Inject constructor(
         )
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
         selectedDateState.consumer.accept(event.additionTime)
-        event.note?.let { noteInput.text.consumer.accept(it) }
         glucoseLevelBackgroundState.consumer.accept(
             event.glucoseLevel(glucoseLevelSettingsState.value).toBackground()
         )
         event.mealTag?.let { mealSelector.consumer.accept(it) }
+    }
+
+    private fun bindNoteInput(note: String?) {
+        note?.let { noteInput.text.consumer.accept(it) }
     }
 
     private fun observeTagsAction() {
