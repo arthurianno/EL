@@ -179,7 +179,7 @@ class EditEventPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createEditEventParams)
-            .filter { isValidDuration(it.event.duration) }
+            .filter { isValidDuration(it.event.duration) || it.event.duration == null }
             .flatMapSingle { params ->
                 updateEventUseCase.execute(params)
                     .hideErrorContainer()
