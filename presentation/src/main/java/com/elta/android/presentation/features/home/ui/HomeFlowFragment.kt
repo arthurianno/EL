@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -133,16 +132,15 @@ class HomeFlowFragment :
             .clicks()
             .subscribe(pm.firstSyncAction.consumer)
         pm.glucoseFormat.bindTo {
-            val (drawableId, textId) = when (it) {
-                GlucoseFormat.CAPILLARY -> R.drawable.img_help_glucose_caplilary to R.string.on_boarding_glucose_format_event_text_capillary
-                GlucoseFormat.PLASMA -> R.drawable.img_help_glucose_plasma to R.string.on_boarding_glucose_format_event_text_plasma
+            val (drawableId, textId, textSecondId) = when (it) {
+                GlucoseFormat.CAPILLARY -> Triple(R.drawable.img_help_glucose_caplilary, R.string.on_boarding_glucose_format_event_text_capillary, R.string.on_boarding_glucose_format_event_text_second_capillary)
+                GlucoseFormat.PLASMA -> Triple(R.drawable.img_help_glucose_plasma, R.string.on_boarding_glucose_format_event_text_plasma, R.string.on_boarding_glucose_format_event_text_second_plasma)
             }
-            binding.helpBottomSheetView
-                .findViewById<ImageView>(R.id.image)
-                .setImageResource(drawableId)
-            binding.helpBottomSheetView
-                .findViewById<TextView>(R.id.warning_text)
-                .setText(textId)
+            with(binding.helpBottomSheetView) {
+                findViewById<ImageView>(R.id.image).setImageResource(drawableId)
+                findViewById<TextView>(R.id.warning_text).setText(textId)
+                findViewById<TextView>(R.id.warning_text_second).setText(textSecondId)
+            }
         }
     }
 

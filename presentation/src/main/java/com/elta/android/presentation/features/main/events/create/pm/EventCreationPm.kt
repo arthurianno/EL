@@ -132,7 +132,7 @@ class EventCreationPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createAddEventParams)
-            .filter { isValidDuration(it.duration) }
+            .filter { isValidDuration(it.duration) || it.duration == null }
             .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()

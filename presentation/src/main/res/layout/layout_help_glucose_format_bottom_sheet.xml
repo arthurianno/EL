@@ -34,13 +34,14 @@
         tools:text="@string/on_boarding_glucose_format_event_text_capillary" />
 
     <TextView
+        android:id="@+id/warning_text_second"
         style="@style/Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp"
 
-        android:text="@string/on_boarding_glucose_format_event_text2" />
+        tools:text="@string/on_boarding_glucose_format_event_text_second_capillary" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/confirmButtonView"

@@ -105,7 +105,8 @@
     <string name="on_boarding_glucose_format_help_text3">Значение глюкозы всегда можно изменить в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
     <string name="on_boarding_glucose_format_event_text_plasma">Значения уровня глюкозы в приложении указаны в плазме.</string>
     <string name="on_boarding_glucose_format_event_text_capillary">Значения уровня глюкозы в приложении указаны в цельной капиллярной крови.</string>
-    <string name="on_boarding_glucose_format_event_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то вы можете изменить формат отображения в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
+    <string name="on_boarding_glucose_format_event_text_second_plasma">Отображение значения глюкозы всегда можно изменить в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
+    <string name="on_boarding_glucose_format_event_text_second_capillary">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то вы можете изменить формат отображения в <b>«Настройки профиля»</b>, выбрав вкладку <b>«Формат уровня глюкозы»</b>.</string>
     <string name="on_boarding_glucose_format_button">Понятно</string>
 
     <!-- SHOPS FLOW -->
