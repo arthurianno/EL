@@ -75,6 +75,8 @@ internal fun Profile.toNetwork(): ProfileNetworkResponse =
 
 internal fun ProfileNetworkResponse.toDomain(glucoseFormat: GlucoseFormatNetworkEntity): Profile =
     Profile(
+        firstName = person?.firstName,
+        secondName = person?.lastName,
         gender = gender.toDomain(),
         email = email,
         glucoseLevelSettings = glucoseLevelsAverage.toSettings(),
