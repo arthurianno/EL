@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.events.glucose.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.MealTag
@@ -31,10 +32,10 @@ import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hideKeyboard
+import kotlin.math.abs
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
-import kotlin.math.abs
 
 private const val EXTRA_ID = "extra_id"
 
@@ -180,6 +181,7 @@ class GlucoseEventFragment :
                 toolbarSubTitleView.translationY = translation
                 if (isTouchingScroll || isTouchingAppBar) {
                     view?.hideKeyboard()
+                    binding.formSaveButtonView.foregroundGravity = Gravity.BOTTOM
                     requireActivity().findAndClearFocus()
                 }
             }
