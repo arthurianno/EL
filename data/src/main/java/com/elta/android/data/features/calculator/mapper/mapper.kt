@@ -42,7 +42,7 @@ internal fun FoodBrandResponse.Food.toDomain(): Dish =
 internal fun ServingNetworkEntity.toDomain(): Serving =
     Serving(
         id = servingId,
-        servingDescription = measurementDescription,
+        servingDescription = servingDescription,
         numberOfUnits = numberOfUnits.toDouble(),
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
