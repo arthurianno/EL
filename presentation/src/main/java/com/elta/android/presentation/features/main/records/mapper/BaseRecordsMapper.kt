@@ -119,9 +119,9 @@ open class BaseRecordsMapper(
             }
             if (minutes > ZERO) {
                 append(resources.getString(R.string.activity_duration_min, minutes.toInt()))
-                append(" ")
             }
             if (seconds > ZERO && isEmpty()) {
+                append(" ")
                 append(resources.getString(R.string.activity_duration_sec, seconds.toInt()))
             }
         }
