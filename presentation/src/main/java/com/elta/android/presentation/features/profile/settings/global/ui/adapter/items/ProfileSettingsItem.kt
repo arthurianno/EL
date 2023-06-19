@@ -28,6 +28,7 @@ data class ProfileSettingsItem(
         GENDER,
         PASSWORD,
         EMAIL,
+        TOKEN,
         NOTIFICATION,
         GLUCOSE_FORMAT,
         LEGAL_INFO,

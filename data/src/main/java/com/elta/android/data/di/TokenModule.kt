@@ -9,6 +9,8 @@ import com.elta.android.data.core.qualifires.ServerUrl
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.auth.storage.LocalTokenStorage
 import com.elta.android.data.features.auth.storage.TokenStorage
+import com.elta.android.data.features.firebase.MessagingTokenDataRepository
+import com.elta.android.domain.features.firebase.repository.MessagingTokenRepository
 import com.nullgr.core.security.prefs.CryptoPreferences
 import dagger.Module
 import dagger.Provides
@@ -56,4 +58,8 @@ class TokenModule {
         baseUrl,
         Executors.newSingleThreadExecutor()
     )
+
+    @Provides
+    @Singleton
+    fun messagingToken(): MessagingTokenRepository = MessagingTokenDataRepository()
 }

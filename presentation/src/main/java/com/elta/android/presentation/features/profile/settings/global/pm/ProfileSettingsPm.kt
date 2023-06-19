@@ -4,6 +4,7 @@ import android.util.Log
 import com.elta.android.domain.features.auth.interactor.DeleteProfileUseCase
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
+import com.elta.android.domain.features.firebase.interactor.TokenUseCase
 import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
@@ -32,6 +33,7 @@ import me.dmdev.rxpm.widget.dialogControl
 import javax.inject.Inject
 
 class ProfileSettingsPm @Inject constructor(
+    private val tokenUseCase: TokenUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val deleteProfileUseCase: DeleteProfileUseCase,
@@ -46,6 +48,7 @@ class ProfileSettingsPm @Inject constructor(
     val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
     val profileDeleteDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
+    val copyTokenCommand = command<String>()
 
     private val socialNetworkState = state<SocialNetworkType>()
     private val getProfileSettingsAction = action<Unit>()
@@ -100,6 +103,7 @@ class ProfileSettingsPm @Inject constructor(
                     Type.NOTIFICATION -> router.startFlow(Screens.Reminders)
                     Type.GLUCOSE_FORMAT -> router.navigateTo(Screens.GlucoseFormat)
                     Type.DELETE_PROFILE -> deleteProfile()
+                    Type.TOKEN -> copyToken()
                     Type.APP_VERSION, Type.EMAIL -> {}
                     else -> Log.e(javaClass.simpleName, "This type:$type haven`t implemented yet...")
                 }
@@ -121,6 +125,12 @@ class ProfileSettingsPm @Inject constructor(
             }
             .retry()
             .subscribe()
+            .untilDestroy()
+    }
+
+    private fun copyToken() {
+        tokenUseCase()
+            .subscribe(copyTokenCommand.consumer)
             .untilDestroy()
     }
 

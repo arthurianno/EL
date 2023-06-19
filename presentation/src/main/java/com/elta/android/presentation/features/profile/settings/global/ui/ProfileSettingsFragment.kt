@@ -1,7 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.global.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
@@ -55,9 +59,17 @@ class ProfileSettingsFragment :
             )
         }
         pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.copyTokenCommand.bindTo{ copyToClipboard(it) }
     }
 
     companion object {
         fun newInstance() = ProfileSettingsFragment()
+    }
+
+    private fun copyToClipboard(message: String) {
+        val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("TOKEN", message)
+        clipboardManager.setPrimaryClip(clip)
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }
