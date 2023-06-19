@@ -51,6 +51,16 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                 )
             )
 
+            if (BuildConfig.DEBUG) {
+                add(
+                    ProfileSettingsItem(
+                        icon = R.drawable.ic_mail,
+                        title = "Copy Token",
+                        type = ProfileSettingsItem.Type.TOKEN
+                    )
+                )
+            }
+
             add(ProfileSettingsHeaderItem(resources.getString(R.string.profile_additional_settings)))
             add(
                 ProfileSettingsItem(

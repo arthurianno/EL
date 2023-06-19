@@ -22,6 +22,10 @@ class ProfileSettingsViewHolder(
                     toggleFocus(false)
                     dividerView.isInvisible = true
                 }
+                ProfileSettingsItem.Type.TOKEN -> {
+                    toggleFocus(false)
+                    dividerView.isInvisible = true
+                }
                 ProfileSettingsItem.Type.DELETE_PROFILE -> nextIconView.isInvisible = true
                 ProfileSettingsItem.Type.APP_VERSION -> {
                     toggleFocus(false)
