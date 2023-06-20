@@ -116,6 +116,7 @@
     <string name="shops_start_find_action_button">Найти точки продаж на карте</string>
     <string name="shops_map_toolbar_title">Приобрести продукцию</string>
     <string name="shops_map_toolbar_title_services">Получить заботу</string>
+    <string name="shops_map_alert">Уточняйте актуальную информацию о наличии товара в аптеках.</string>
     <string name="shops_map_route">Как доехать</string>
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
