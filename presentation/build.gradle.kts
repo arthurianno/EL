@@ -52,10 +52,12 @@ android {
         create("debugDev") {
             val debugVersionName = "\"${Version.versionName}${Version.devNameSuffix}\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
+            buildConfigField("boolean", "DEBUG", "true")
         }
         create("debugStage") {
             val debugVersionName = "\"${Version.versionName}${Version.stageNameSuffix}\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
+            buildConfigField("boolean", "DEBUG", "true")
         }
         create("releaseDev") {
             buildConfigField(
