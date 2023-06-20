@@ -94,6 +94,7 @@ android {
         create("debugDev") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            buildConfigField("boolean", "DEBUG", "true")
             versionNameSuffix = Version.devNameSuffix
             signingConfig = signingConfigs["debug"]
             isDebuggable = true
@@ -110,6 +111,7 @@ android {
         create("debugStage") {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
+            buildConfigField("boolean", "DEBUG", "true")
             versionNameSuffix = Version.stageNameSuffix
             signingConfig = signingConfigs["debug"]
             isDebuggable = true
