@@ -31,7 +31,7 @@ class NotificationHelper @Inject constructor(
                 .appendPath(screen)
                 .build()
         }
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)

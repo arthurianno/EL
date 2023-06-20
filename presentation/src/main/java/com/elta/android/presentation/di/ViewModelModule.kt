@@ -10,6 +10,7 @@ import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailVie
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
+import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectStartViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectTypeViewModel
@@ -81,4 +82,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(GlucoseFormatViewModel::class)
     abstract fun bindGlucoseFormatViewModel(viewModel: GlucoseFormatViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RemindersViewModel::class)
+    abstract fun bindRemindersViewModel(viewModel: RemindersViewModel): ViewModel
 }

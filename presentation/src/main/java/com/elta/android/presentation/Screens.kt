@@ -287,7 +287,7 @@ object Screens {
     }
 
     object Reminders : SupportAppScreen() {
-        override fun getFragment() = RemindersFragment.newInstance()
+        override fun getFragment() = RemindersFragment()
     }
 
     object GlucoseFormat : SupportAppScreen() {

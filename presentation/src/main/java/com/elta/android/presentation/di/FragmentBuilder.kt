@@ -254,10 +254,6 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindRemindersFragment(): RemindersFragment
-
-    @FragmentScope
-    @ContributesAndroidInjector
     abstract fun bindCreateRemindFragment(): CreateRemindFragment
 
     @FragmentScope
@@ -345,4 +341,8 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindGlucoseFormatFragment(): GlucoseFormatFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindRemindersFragment(): RemindersFragment
 }

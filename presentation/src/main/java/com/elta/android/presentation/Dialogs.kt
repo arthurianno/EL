@@ -125,4 +125,12 @@ sealed class Dialogs : DialogData {
         override val negative: String? = null,
         override val positive: String? = resourceProvider.getString(R.string.ok)
     ) : Dialogs()
+
+    data class NotificationDisableData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.notifications_dialog_title),
+        override val message: String = resourceProvider.getString(R.string.notifications_dialog_message),
+        override val negative: String = resourceProvider.getString(R.string.notifications_dialog_negative),
+        override val positive: String = resourceProvider.getString(R.string.notifications_dialog_positive),
+    ) : Dialogs()
 }
