@@ -5,8 +5,8 @@ import com.elta.android.common.utils.CommonFormats
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.presentation.R
-import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderHeaderItem
-import com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items.ReminderItem
+import com.elta.android.presentation.features.profile.settings.reminders.all.model.ReminderHeaderItem
+import com.elta.android.presentation.features.profile.settings.reminders.all.model.ReminderItem
 import com.elta.android.presentation.utils.toString
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider

@@ -36,7 +36,6 @@ import com.elta.android.presentation.features.profile.settings.gender.pm.Profile
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.profile.settings.name.pm.ProfileSetNamePm
 import com.elta.android.presentation.features.profile.settings.password.pm.ProfileChangePasswordPm
-import com.elta.android.presentation.features.profile.settings.reminders.all.pm.RemindersPm
 import com.elta.android.presentation.features.profile.settings.reminders.create.pm.CreateRemindPm
 import com.elta.android.presentation.features.profile.settings.reminders.edit.pm.EditRemindPm
 import com.elta.android.presentation.features.profile.support.pm.SupportPm
@@ -280,11 +279,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(GlucoseRangeDialogPm::class)
     abstract fun bindGlucoseRangeDialogPm(pm: GlucoseRangeDialogPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(RemindersPm::class)
-    abstract fun bindRemindersPm(pm: RemindersPm): PresentationModel
 
     @Binds
     @IntoMap

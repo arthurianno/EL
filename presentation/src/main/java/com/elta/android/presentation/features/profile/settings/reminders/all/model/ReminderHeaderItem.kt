@@ -1,4 +1,4 @@
-package com.elta.android.presentation.features.profile.settings.reminders.all.ui.adapter.items
+package com.elta.android.presentation.features.profile.settings.reminders.all.model
 
 import com.nullgr.core.adapter.items.ListItem
 
