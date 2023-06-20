@@ -59,41 +59,23 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/shopAvailabilityView"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/shopAlertView"
+                style="@style/Caption2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/pale_gray"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp"
+                android:background="@drawable/bg_alert_gray"
+                android:drawableLeft="@drawable/ic_alert"
+                android:drawablePadding="10dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp"
+                android:singleLine="false"
+                android:text="@string/shops_map_alert"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/shopAddressView">
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="8dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_alert" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/Caption2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/shops_map_availability" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-            </androidx.cardview.widget.CardView>
+                app:layout_constraintTop_toBottomOf="@id/shopAddressView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/shopRouteView"
@@ -107,7 +89,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/separatorCenter"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/shopAvailabilityView"
+                app:layout_constraintTop_toBottomOf="@+id/shopAlertView"
                 app:layout_goneMarginTop="22dp" />
 
             <androidx.constraintlayout.widget.Guideline

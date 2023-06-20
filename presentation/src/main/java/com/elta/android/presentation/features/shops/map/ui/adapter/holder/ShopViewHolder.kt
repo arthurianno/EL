@@ -21,7 +21,7 @@ class ShopViewHolder(
             shopAddressView.text = item.address
             shopDistanceView.toggleView(!item.distance.isNullOrEmpty())
             shopDistanceView.text = item.distance
-            shopAvailabilityView.isVisible = item.isSale
+            shopAlertView.isVisible = item.isSale
             val listener = View.OnClickListener { view ->
                 bus.click(
                     if (view.id == R.id.shopRouteView) {
