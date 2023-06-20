@@ -357,8 +357,7 @@ class ShopsMapPm @Inject constructor(
             name = name,
             address = "$city, $address",
             distance = distance.formatDistance(resources),
-            phone = phone,
-            isSale = shopsTypeState.value == Type.SALE
+            phone = phone
         )
 
     private fun SalePoint.toGeoPoint(): GeoPoint =

@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.shops.map.ui.adapter.holder
 
 import android.view.View
-import androidx.core.view.isVisible
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
@@ -21,7 +20,6 @@ class ShopViewHolder(
             shopAddressView.text = item.address
             shopDistanceView.toggleView(!item.distance.isNullOrEmpty())
             shopDistanceView.text = item.distance
-            shopAlertView.isVisible = item.isSale
             val listener = View.OnClickListener { view ->
                 bus.click(
                     if (view.id == R.id.shopRouteView) {
