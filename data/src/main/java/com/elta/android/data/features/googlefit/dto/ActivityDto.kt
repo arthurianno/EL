@@ -4,5 +4,6 @@ data class ActivityDto(
     val id: String,
     val activityType: String,
     val duration: Long,
-    val additionTime: Long
+    val additionTime: Long,
+    val note: String
 )

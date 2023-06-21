@@ -22,7 +22,7 @@ class EventsBuilder @Inject constructor(
             additionTime = source.additionTime.toZonedDateTime(),
             tagId = null,
             tag = null,
-            note = null,
+            note = source.note,
             modificationTime = null,
             value = null,
             name = null,
