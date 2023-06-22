@@ -9,12 +9,14 @@ import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.HowToConnectViewState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.shouldShowRationale
 import javax.inject.Inject
 
 @ExperimentalCameraProviderConfiguration
@@ -27,6 +29,14 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
 
     val appTopBar = BaseAppTopBarWidgetModel()
     val downButton = DownButtonWidgetModel()
+
+    val cameraPermissionDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
+    )
+
+    val locationPermissionDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
+    )
 
     override val widgets = listOf(
         appTopBar,
@@ -54,13 +64,15 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
         if (permissionStates.all { it.status.isGranted }) {
             router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
         } else {
-            sendEvent(
-                if (!permissionStates.component1().status.isGranted) {
-                    PermissionEvent.Camera()
-                } else {
-                    PermissionEvent.FineLocation()
-                }
-            )
+            val cameraPermission = permissionStates.component1()
+            val locationPermission = permissionStates.component2()
+            when {
+                !cameraPermission.status.isGranted && !cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
+                !locationPermission.status.isGranted && !locationPermission.status.shouldShowRationale -> locationPermissionDialog.dialogOpen()
+
+                !cameraPermission.status.isGranted -> sendEvent(PermissionEvent.Camera())
+                !locationPermission.status.isGranted -> sendEvent(PermissionEvent.FineLocation())
+            }
         }
     }
 }

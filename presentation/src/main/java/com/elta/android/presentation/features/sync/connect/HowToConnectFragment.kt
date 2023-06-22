@@ -26,6 +26,7 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModel
 import com.elta.android.presentation.features.sync.connect.widgets.BluetoothString
@@ -33,6 +34,7 @@ import com.elta.android.presentation.features.sync.connect.widgets.MainImage
 import com.elta.android.presentation.features.sync.connect.widgets.TextNumericItem
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
@@ -55,19 +57,44 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         downButton.setText(getString(R.string.sync_how_to_connect_button))
         downButton.setEnableState(true)
         downButton.visibilityState(true)
+
+        cameraPermissionDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.camera_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
+        )
+
+        locationPermissionDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.location_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
+        )
+    }
+
+    @Composable
+    override fun Dialogs(viewModel: HowToConnectViewModel) {
+        BaseDialog(widgetModel = viewModel.cameraPermissionDialog)
+        BaseDialog(widgetModel = viewModel.locationPermissionDialog)
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     override fun Content(viewModel: HowToConnectViewModel) {
-        val cameraPermission =
+        val permissions =
             rememberMultiplePermissionsState(permissions = requiredPermissions)
         val event = viewModel.event.collectAsState(initial = null).value
         LaunchedEffect(key1 = event) {
             if (event is PermissionEvent.Camera ||
                 event is PermissionEvent.FineLocation
             ) {
-                cameraPermission.launchMultiplePermissionRequest()
+                permissions.launchMultiplePermissionRequest()
+            }
+            when (event) {
+                is PermissionEvent.Camera -> permissions.launchMultiplePermissionRequest()
+                is PermissionEvent.FineLocation -> permissions.launchMultiplePermissionRequest()
+                is PermissionEvent.OpenSettings -> openSettingsIntent(requireContext())
             }
         }
         GetLocalProperties { dimens, _, _, _, _ ->
@@ -82,7 +109,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 VSpacer(dimens.bigDim)
                 DownButton(
                     widgetModel = viewModel.downButton,
-                    onClickAction = ConnectAction.OpenConnectingScreen(cameraPermission.permissions)
+                    onClickAction = ConnectAction.OpenConnectingScreen(permissions.permissions)
                 )
             }
         }

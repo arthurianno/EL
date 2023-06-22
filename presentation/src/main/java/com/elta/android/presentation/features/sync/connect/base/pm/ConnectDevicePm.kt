@@ -13,6 +13,7 @@ import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -23,6 +24,8 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.snackBarControl
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
@@ -33,6 +36,7 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
+import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeoutException
 
 abstract class ConnectDevicePm constructor(
@@ -67,6 +71,11 @@ abstract class ConnectDevicePm constructor(
 
     private val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
+
+    val settingsDialog = dialogControl<DialogData, DialogResult>()
+    private val settingsDialogData: DialogData by lazy { Dialogs.SettingsDialogData(resources) }
+    val settingsIsVisible = state(false)
+    val openSettingsCloseAction = action<Unit>()
 
     private val deviceNotFound: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -119,10 +128,28 @@ abstract class ConnectDevicePm constructor(
 
         Observable.merge(
             btControl.bluetoothEnabledAction.observable,
-            btControl.locationPermissionsGrantedAction.observable,
             btControl.locationEnabledAction.observable
         )
             .subscribe(startScanAction.consumer)
+            .untilDestroy()
+
+        btControl.locationPermissionsGrantedAction.observable
+            .subscribe { permission ->
+                when {
+                    permission.granted -> startScanAction.consumer.accept(Unit)
+                    !permission.granted && !permission.shouldShowRequestPermissionRationale -> {
+                        mstate.consumer.accept(ViewState.HOW_TO_CONNECT)
+                        settingsDialog.showForResult(settingsDialogData)
+                            .map { it == DialogResult.POSITIVE }
+                            .subscribe(settingsIsVisible.consumer)
+                    }
+                    !permission.granted -> mstate.consumer.accept(ViewState.HOW_TO_CONNECT)
+                }
+            }
+            .untilDestroy()
+
+        openSettingsCloseAction.observable
+            .subscribe { settingsIsVisible.accept(false) }
             .untilDestroy()
     }
 

@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.location.SettingsClient
 import com.nullgr.core.intents.launchForResult
+import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -31,7 +32,7 @@ class BluetoothControl(pm: PresentationModel) {
 
     val bluetoothEnabledAction = pm.action<Unit>()
     val bluetoothDeniedAction = pm.action<Unit>()
-    val locationPermissionsGrantedAction = pm.action<Unit>()
+    val locationPermissionsGrantedAction = pm.action<Permission>()
     val locationEnabledAction = pm.action<Unit>()
 
     companion object {
@@ -60,9 +61,7 @@ fun BluetoothControl.bindTo(
     requestLocationPermissionsCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.request(android.Manifest.permission.ACCESS_FINE_LOCATION)
-                .filter { it }
-                .map { Unit }
+            permissions.requestEach(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
         .subscribe(locationPermissionsGrantedAction.consumer)
         .addTo(compositeUnbind)

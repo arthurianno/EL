@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
@@ -20,6 +21,7 @@ import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.children
@@ -27,6 +29,7 @@ import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 import javax.inject.Inject
 
 abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
@@ -96,6 +99,14 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
 
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
+        }
+
+        pm.settingsDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.settingsIsVisible.bindTo {
+            if (it) {
+                openSettingsIntent(requireContext())
+                pm.openSettingsCloseAction.consumer.accept(Unit)
+            }
         }
     }
 

@@ -787,9 +787,19 @@
     <string name="content_description_question_button">кнопка Вопрос</string>
     <string name="content_description_back_button">кнопка Назад</string>
 
+    <!-- Settings Dialog -->
+    <string name="settings_dialog_title">Внимание</string>
+    <string name="settings_dialog_negative">Отменить</string>
+    <string name="settings_dialog_positive">Настройки</string>
+
+
     <!-- Notifications Dialog -->
-    <string name="notifications_dialog_title">Внимание</string>
-    <string name="notifications_dialog_message">Для отправки напоминаний, необходимо включить уведомления</string>
-    <string name="notifications_dialog_negative">Отменить</string>
-    <string name="notifications_dialog_positive">Настройки</string>
+    <string name="notification_dialog_message">Для отправки напоминаний, необходимо включить уведомления</string>
+
+    <!-- Camera Dialog -->
+    <string name="camera_dialog_message">Для подключения к глюкометру приложению необходим доступ к камере устройства</string>
+
+    <!-- Location Dialog -->
+    <string name="location_dialog_message">Для подключения к глюкометру приложению необходим доступ к местоположению</string>
+
 </resources>

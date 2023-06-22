@@ -12,4 +12,5 @@ sealed class PermissionEvent : Event {
     class RecordAudio : PermissionEvent()
     class Camera : PermissionEvent()
     class FineLocation : PermissionEvent()
+    object OpenSettings : PermissionEvent()
 }

@@ -1,9 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.reminders.all.ui
 
 import android.Manifest
-import android.content.Intent
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +17,7 @@ import com.elta.android.presentation.features.profile.settings.reminders.all.mod
 import com.elta.android.presentation.features.profile.settings.reminders.all.ui.widgets.ReminderScreen
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.notifications.areNotificationsEnabled
-import com.nullgr.core.intents.launch
+import com.elta.android.presentation.utils.openNotificationSettingsIntent
 
 class RemindersFragment : BaseComposeFragment<RemindersViewModel>() {
 
@@ -38,11 +36,11 @@ class RemindersFragment : BaseComposeFragment<RemindersViewModel>() {
         appTopBar.setStartIconAction(AppAction.BackPressure)
         appTopBar.setEndIconAction(RemindersAction.CreateReminder)
 
-        settingDialog.initDialog(
-            title = getString(R.string.notifications_dialog_title),
-            message = getString(R.string.notifications_dialog_message),
-            positiveButtonText = getString(R.string.notifications_dialog_positive),
-            negativeButtonText = getString(R.string.notifications_dialog_negative)
+        settingsDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.notification_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
         )
     }
 
@@ -55,7 +53,7 @@ class RemindersFragment : BaseComposeFragment<RemindersViewModel>() {
         LaunchedEffect(key1 = event) {
             when (event) {
                 is RemindersEvent.CheckNotificationPermission -> checkNotificationPermission()
-                is RemindersEvent.OpenSettings -> openNotificationsSettings()
+                is RemindersEvent.OpenSettings -> openNotificationSettingsIntent(requireContext())
             }
         }
 
@@ -63,7 +61,7 @@ class RemindersFragment : BaseComposeFragment<RemindersViewModel>() {
 
     @Composable
     override fun Dialogs(viewModel: RemindersViewModel) {
-        BaseDialog(widgetModel = viewModel.settingDialog)
+        BaseDialog(widgetModel = viewModel.settingsDialog)
     }
 
     private fun requestNotificationPermission() {
@@ -80,13 +78,5 @@ class RemindersFragment : BaseComposeFragment<RemindersViewModel>() {
         } else {
             requestNotificationPermission()
         }
-    }
-
-
-    private fun openNotificationsSettings() {
-        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
-            .launch(requireContext())
     }
 }
