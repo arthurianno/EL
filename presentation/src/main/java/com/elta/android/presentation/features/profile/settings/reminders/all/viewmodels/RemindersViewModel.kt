@@ -32,7 +32,7 @@ class RemindersViewModel @Inject constructor(
         )
     }
 
-    val settingDialog = BaseDialogWidgetModel<Nothing>(
+    val settingsDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(RemindersEvent.OpenSettings) }
     )
 
@@ -49,7 +49,7 @@ class RemindersViewModel @Inject constructor(
             is RemindersAction.OpenCreateReminder -> router.navigateTo(Screens.CreateRemind)
             is RemindersAction.OpenReminder -> router.navigateTo(Screens.EditRemind(action.id))
             is RemindersAction.PermissionResult -> permissionResult(action.isGranted)
-            is RemindersAction.OpenSettingsDialog -> settingDialog.dialogOpen()
+            is RemindersAction.OpenSettingsDialog -> settingsDialog.dialogOpen()
         }
     }
 
@@ -97,7 +97,7 @@ class RemindersViewModel @Inject constructor(
         if (isGranted)
             sendAction(RemindersAction.OpenCreateReminder)
         else
-            settingDialog.dialogOpen()
+            settingsDialog.dialogOpen()
     }
 
 }

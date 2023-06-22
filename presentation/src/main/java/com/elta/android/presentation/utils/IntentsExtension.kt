@@ -3,7 +3,9 @@ package com.elta.android.presentation.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import com.elta.android.presentation.R
+import com.nullgr.core.intents.launch
 
 fun navigationIntent(lat: Double, lng: Double, address: String): Intent =
     Intent(Intent.ACTION_VIEW).apply {
@@ -36,4 +38,18 @@ fun pdfActionIntent(uri: Uri, context: Context): Intent {
         title = context.getString(R.string.statistic_share_pdf_dialog_title)
     }
     return Intent.createChooser(intent, title)
+}
+
+fun openSettingsIntent(context: Context) {
+    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        .setData(Uri.fromParts("package", context.packageName, null))
+        .launch(context)
+}
+
+fun openNotificationSettingsIntent(context: Context) {
+    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        .launch(context)
 }
