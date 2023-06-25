@@ -133,25 +133,26 @@ fun enableLocation2(fragment: Fragment) {
 
 fun checkBluetoothPermissions(activity: Activity) {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-        if (ActivityCompat
-            .checkSelfPermission(
-                    activity,
-                    android.Manifest.permission.BLUETOOTH_SCAN
-                ) != PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat
-                .checkSelfPermission(
-                        activity,
-                        android.Manifest.permission.BLUETOOTH_CONNECT
-                    ) != PackageManager.PERMISSION_GRANTED
+        val bluetoothScanName = android.Manifest.permission.BLUETOOTH_SCAN
+        val bluetoothConnectName = android.Manifest.permission.BLUETOOTH_CONNECT
+
+        if (ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
+            PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
+            PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(
-                    android.Manifest.permission.BLUETOOTH_SCAN,
-                    android.Manifest.permission.BLUETOOTH_CONNECT
-                ),
-                1
-            )
+            if (isShowingInFirstTime(activity, bluetoothScanName) ||
+                isShowingInFirstTime(activity, bluetoothConnectName)
+            ) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(bluetoothScanName, bluetoothConnectName),
+                    1
+                )
+            }
         }
     }
 }
+
+private fun isShowingInFirstTime(activity: Activity, permissionName: String): Boolean =
+    !ActivityCompat.shouldShowRequestPermissionRationale(activity, permissionName)
