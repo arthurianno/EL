@@ -141,18 +141,11 @@ fun checkBluetoothPermissions(activity: Activity) {
             ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            if (isShowingInFirstTime(activity, bluetoothScanName) ||
-                isShowingInFirstTime(activity, bluetoothConnectName)
-            ) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(bluetoothScanName, bluetoothConnectName),
-                    1
-                )
-            }
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(bluetoothScanName, bluetoothConnectName),
+                1
+            )
         }
     }
 }
-
-private fun isShowingInFirstTime(activity: Activity, permissionName: String): Boolean =
-    !ActivityCompat.shouldShowRequestPermissionRationale(activity, permissionName)

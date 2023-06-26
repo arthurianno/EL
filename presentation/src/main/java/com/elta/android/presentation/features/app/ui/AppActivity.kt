@@ -40,6 +40,7 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+        checkBluetoothPermissions(this)
         DynamicLinkProcessor.from(intent)
             .ignoreColdStart(false)
             .withSavedState(savedInstanceState)
@@ -60,7 +61,6 @@ class AppActivity : BaseActivity<AppPm>() {
         KeyboardEventListener(this) { isKeyboardOpen ->
             connectionStatusView.isVisible = !isKeyboardOpen
         }
-        checkBluetoothPermissions(this)
     }
 
     override fun onBindPresentationModel(pm: AppPm) {
