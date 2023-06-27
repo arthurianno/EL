@@ -97,6 +97,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         }
         binding.formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         binding.formSaveButtonView.clicks().bindTo(pm.mainAction)
+        binding.homeButtonView.clicks().bindTo(pm.backHandleAction)
         pm.updateFormPickerValueCommand.bindTo {
             binding.formPickerView.setValues(
                 it.first,
