@@ -16,7 +16,6 @@ import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvi
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentOnboardingBinding
 import com.elta.android.presentation.features.onboaring.pm.OnBoardingPm
-import com.elta.android.presentation.features.onboaring.pm.START_PAGE
 import com.elta.android.presentation.features.onboaring.ui.adapter.OnBoardingAdapter
 import com.elta.android.presentation.utils.animateText
 import com.elta.android.presentation.utils.fadeVisibility
@@ -28,6 +27,7 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hide
 import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 
 private const val DISABLE_DELAY = 300L
 
@@ -90,11 +90,7 @@ class OnBoardingFragment :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            if (presentationModel.currentPageState.value != START_PAGE) {
-                presentationModel.previousPageAction.consumer.accept(Unit)
-            } else {
-                router.exit()
-            }
+            Unit.passTo(presentationModel.backHandleAction)
         }
     }
 
