@@ -14,6 +14,7 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.passTo
 
 abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragment<PM>() {
 
@@ -21,6 +22,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override val continueButtonText: Int = R.string.registration_main_button_continue
     override val authTitleText: Int = R.string.registration_main_title_new_user
     override val authSubtitleText: Int = R.string.registration_main_subtitle
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +57,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            presentationModel.backHandleAction.consumer.accept(Unit)
+            Unit.passTo(presentationModel.backHandleAction)
         }
     }
 }
