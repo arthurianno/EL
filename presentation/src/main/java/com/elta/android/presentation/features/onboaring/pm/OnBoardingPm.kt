@@ -36,7 +36,7 @@ class OnBoardingPm @Inject constructor(
 ) : BaseListPm(services) {
 
     val pageChangedAction = action<Int>()
-    val currentPageState = state(0)
+    val currentPageState = state(START_PAGE)
     val skipPageAction = action<Unit>()
     val nextPageAction = action<Unit>()
     val previousPageAction = action<Unit>()
@@ -267,3 +267,5 @@ class OnBoardingPm @Inject constructor(
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size
 }
+
+internal const val START_PAGE = 0
