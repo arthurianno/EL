@@ -1,11 +1,14 @@
 package com.elta.android.presentation.features.registration.main.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.features.registration.main.pm.BaseRegistrationPm
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.utils.clickableSpan
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
@@ -19,6 +22,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override val authTitleText: Int = R.string.registration_main_title_new_user
     override val authSubtitleText: Int = R.string.registration_main_subtitle
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.privacyPolicyView.show()
@@ -27,6 +31,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         binding.policyDescriptionTextView.text =
             getString(R.string.registration_main_description_privacy_policy)
         binding.policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
@@ -45,5 +50,12 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
         }
 
         binding.policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            presentationModel.backHandleAction.consumer.accept(Unit)
+        }
     }
 }
