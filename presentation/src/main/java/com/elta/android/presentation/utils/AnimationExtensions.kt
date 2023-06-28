@@ -85,7 +85,7 @@ fun View.fadeVisibility(state: Boolean, visibilityWhenFalse: Int = View.GONE) {
 }
 
 private fun View.showViewWithFadeAnimation() {
-    if (visibility != View.VISIBLE && getTag(fadingTag) != FADING_OUT) {
+    if (getTag(fadingTag) != FADING_OUT) {
         animate().cancel()
         visibility = View.VISIBLE
         setTag(fadingTag, FADING_OUT)
@@ -96,7 +96,7 @@ private fun View.showViewWithFadeAnimation() {
 }
 
 private fun View.hideViewWithFadeAnimation(visibilityWhenFalse: Int = View.GONE) {
-    if (visibility == View.VISIBLE && getTag(fadingTag) != FADING_IN) {
+    if (getTag(fadingTag) != FADING_IN) {
         animate().cancel()
         setTag(fadingTag, FADING_IN)
         animate()

@@ -1,9 +1,9 @@
 package com.elta.android.presentation.features.onboaring.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
-import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentOnboardingBinding
@@ -25,8 +24,9 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hide
-import javax.inject.Inject
+import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.bindTo
+import javax.inject.Inject
 
 private const val DISABLE_DELAY = 300L
 
