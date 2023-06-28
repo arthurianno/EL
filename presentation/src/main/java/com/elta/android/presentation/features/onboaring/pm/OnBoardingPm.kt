@@ -24,22 +24,23 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
 import com.nullgr.core.date.toTimestamp
-import me.dmdev.rxpm.action
-import me.dmdev.rxpm.state
 import java.util.Date
 import javax.inject.Inject
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 
 class OnBoardingPm @Inject constructor(
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    services: ServiceFacade
+    services: ServiceFacade,
 ) : BaseListPm(services) {
 
     val pageChangedAction = action<Int>()
-    val currentPageState = state(0)
+    val currentPageState = state(START_PAGE)
     val skipPageAction = action<Unit>()
     val nextPageAction = action<Unit>()
     val previousPageAction = action<Unit>()
+    val backHandleAction = action<Unit>()
     val nextPageVisibilityState = state(false)
     val previousPageVisibilityState = state(false)
     val titleState = state(resources.getString(R.string.on_boarding_header_user_sex))
@@ -58,6 +59,7 @@ class OnBoardingPm @Inject constructor(
         observeBusEvents()
         observeUpdateProfile()
         observeLifecycle()
+        observeBackAction()
     }
 
     private fun observeCurrentPageState() {
@@ -166,6 +168,21 @@ class OnBoardingPm @Inject constructor(
             .untilDestroy()
     }
 
+    private fun observeBackAction() {
+        backHandleAction.observable
+            .doOnNext(::handleBack)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleBack(i: Unit) {
+        if (currentPageState.value != START_PAGE) {
+            previousPageAction.consumer.accept(Unit)
+        } else {
+            router.exit()
+        }
+    }
+
     private fun nextPage(i: Unit) {
         val currentPage = currentPageState.value
         if (currentPage == items.value.size - 1) {
@@ -208,7 +225,8 @@ class OnBoardingPm @Inject constructor(
             when (currentItem) {
                 is OnBoardingGenderItem,
                 is OnBoardingDiabetesItem,
-                is OnBoardingGlucoseFormatItem -> currentItem.data != null
+                is OnBoardingGlucoseFormatItem,
+                -> currentItem.data != null
 
                 is OnBoardingWeightItem -> true
                 else -> false
@@ -267,3 +285,5 @@ class OnBoardingPm @Inject constructor(
 
     private fun Int.isPageInRange(): Boolean = this in 0 until items.value.size
 }
+
+private const val START_PAGE = 0
