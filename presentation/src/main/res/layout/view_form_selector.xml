@@ -15,6 +15,7 @@
         android:paddingBottom="14dp">
 
         <FrameLayout
+            android:id="@+id/iconView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center"
