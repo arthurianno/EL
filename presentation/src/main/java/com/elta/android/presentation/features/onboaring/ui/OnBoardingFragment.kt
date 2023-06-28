@@ -27,7 +27,6 @@ import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hide
 import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
-import me.dmdev.rxpm.passTo
 
 private const val DISABLE_DELAY = 300L
 
@@ -90,7 +89,7 @@ class OnBoardingFragment :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            Unit.passTo(presentationModel.backHandleAction)
+            presentationModel.backHandleAction.consumer.accept(Unit)
         }
     }
 
