@@ -31,8 +31,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
 
     override fun onBindPresentationModel(pm: PM) {
         super.onBindPresentationModel(pm)
-        binding.toolbar.homeButtonView.clicks()
-            .subscribe(pm.backHandleAction.consumer)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         binding.policyDescriptionTextView.text =
             getString(R.string.registration_main_description_privacy_policy)
         binding.policyDescriptionTextView.clickableSpan(getString(R.string.registration_main_privacy_policy_clickable_mask))
