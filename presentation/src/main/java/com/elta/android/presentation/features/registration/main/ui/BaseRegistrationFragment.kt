@@ -14,7 +14,6 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
-import me.dmdev.rxpm.passTo
 
 abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragment<PM>() {
 
@@ -57,7 +56,7 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            Unit.passTo(presentationModel.backHandleAction)
+            presentationModel.backHandleAction.consumer.accept(Unit)
         }
     }
 }
