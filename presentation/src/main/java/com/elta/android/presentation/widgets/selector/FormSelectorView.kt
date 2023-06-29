@@ -108,7 +108,7 @@ class FormSelectorView @JvmOverloads constructor(
     }
 
     private fun bindIcon() = with(binding) {
-        selectorIconView.toggleView(icon != null)
+        iconView.toggleView(icon != null)
         icon?.let { selectorIconView.setImageDrawable(it) }
     }
 

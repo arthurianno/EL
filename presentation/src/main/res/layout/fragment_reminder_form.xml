@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
-                    app:srcCompat="@drawable/ic_time" />
+                    app:srcCompat="@drawable/ic_calendar" />
 
                 <com.elta.android.presentation.widgets.selector.FormSelectorView
                     android:id="@+id/formDateSelectorView"
@@ -73,7 +73,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/timeContainerView"
-                app:topicDrawable="@drawable/ic_calendar" />
+                app:topicDrawable="@drawable/ic_tag_def" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
