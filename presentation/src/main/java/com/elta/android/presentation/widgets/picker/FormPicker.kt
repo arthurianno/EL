@@ -17,6 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 private const val TEN = 10
 private const val EMPTY_STRING = ""
@@ -65,7 +66,7 @@ class FormPicker @JvmOverloads constructor(
 
     fun setValue(value: Double) = with(binding) {
         val left = value.toInt()
-        val right = ((value - left) * TEN).toInt()
+        val right = ((value - left) * TEN).roundToInt()
         leftPickerView.pickerValue = left
         rightPickerView.pickerValue = right
     }
