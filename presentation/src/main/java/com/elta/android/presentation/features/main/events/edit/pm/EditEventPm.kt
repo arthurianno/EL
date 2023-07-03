@@ -27,6 +27,8 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import javax.inject.Inject
 
+private const val DEFAULT_SCREEN = 1L
+
 class EditEventPm @Inject constructor(
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
@@ -83,6 +85,7 @@ class EditEventPm @Inject constructor(
                 this.meta = variant.meta
             }
         }
+            .skip(DEFAULT_SCREEN)
             .doOnNext(::checkIsChanged)
             .map { isFormValid(it) && isFormChangedState.value }
             .subscribe(mainActionVisibilityState.consumer)
