@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.shops.map.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.elta.android.presentation.core.permissions.statusFor
 import com.elta.android.presentation.core.pm.widgets.bindTo
 import com.elta.android.presentation.core.pm.widgets.resolveResults
 import com.elta.android.presentation.core.ui.fragment.BaseYandexMapFragment
+import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentShopsMapBinding
@@ -68,6 +70,13 @@ class ShopsMapFragment :
 
     private val rxPermissions by lazy { RxPermissions(this) }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        addOnBackPressedCallback {
+            presentationModel.skipAction.consumer.accept(Unit)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (arguments?.get(EXTRA_TYPE) as? Type)?.let { presentationModel.setShopsType(it) }
@@ -102,6 +111,7 @@ class ShopsMapFragment :
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         binding.myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.skipAction)
         pm.titleState.bindTo(binding.toolbar.toolbarTitleView.text())
         // due to large data set diff utils works with issues or
         // requires a lot of resources for calculation, so disable it.
