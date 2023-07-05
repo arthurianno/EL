@@ -13,7 +13,6 @@ import com.elta.android.presentation.features.profile.settings.gender.pm.Profile
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import me.dmdev.rxpm.bindTo
-import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
 
 class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfileSetGenderBinding>(
@@ -25,12 +24,12 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfil
 
     override val screenLayout: Int = R.layout.fragment_profile_set_gender
     override val classToken: Class<ProfileSetGenderPm> = ProfileSetGenderPm::class.java
-
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onBindPresentationModel(pm: ProfileSetGenderPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         pm.progressState.bindTo { binding.radioGroup.isVisible = !it }
         pm.checkNotSpecifiedVisibility.bindTo(binding.notSpecifiedButtonView.visibility())
         pm.checkNotSpecified.bindTo(binding.notSpecifiedButtonView)
@@ -44,7 +43,7 @@ class ProfileSetGenderFragment : BaseFragment<ProfileSetGenderPm, FragmentProfil
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            Unit.passTo(presentationModel.backHandleAction)
+            presentationModel.backHandleAction.consumer.accept(Unit)
         }
     }
 }
