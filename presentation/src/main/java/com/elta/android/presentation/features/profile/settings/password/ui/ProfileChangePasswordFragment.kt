@@ -30,26 +30,21 @@ class ProfileChangePasswordFragment :
 
     override val screenLayout = R.layout.fragment_profile_change_password
     override val classToken = ProfileChangePasswordPm::class.java
-
     override val statusBarConfigProvider = LightStatusBarConfigProvider
 
     override fun onBindPresentationModel(pm: ProfileChangePasswordPm) {
         super.onBindPresentationModel(pm)
-
         bindProgressDialog(pm)
 
-        with(binding) {
-            oldPasswordVisibilityView bindToggleTo oldPasswordView
-            newPasswordVisibilityView bindToggleTo newPasswordView
-        }
+        binding.oldPasswordVisibilityView.bindToggleTo(binding.oldPasswordView)
+        binding.newPasswordVisibilityView.bindToggleTo(binding.newPasswordView)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
+        binding.changePasswordView.clicks().bindTo(pm.continueAction)
 
-        with(pm) {
-            binding.changePasswordView.clicks() bindTo continueAction
-            oldPasswordInput bindInputTo binding.oldPasswordView
-            newPasswordInput bindInputTo binding.newPasswordView
-            changePasswordEnabledState bindTo { binding.changePasswordView.isEnabled = it }
-            hideKeyBoardCommand bindTo { view?.hideKeyboardFun() }
-        }
+        pm.oldPasswordInput.bindInputTo(binding.oldPasswordView)
+        pm.newPasswordInput.bindInputTo(binding.newPasswordView)
+        pm.changePasswordEnabledState.bindTo { binding.changePasswordView.isEnabled = it }
+        pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
