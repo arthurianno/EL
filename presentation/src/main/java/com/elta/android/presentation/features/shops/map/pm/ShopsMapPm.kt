@@ -69,6 +69,7 @@ class ShopsMapPm @Inject constructor(
     val addMyLocationPinCommand = command<Location>()
     val navigateToLocationCommand = command<ExtendedLocation>()
     val moveToMyLocationAction = action<Unit>()
+    val skipAction = action<Unit>()
 
     val shopListItemSelectedAction = action<Int>()
     val shopItemGeoPointSelectedAction = action<GeoPoint>()
@@ -105,6 +106,11 @@ class ShopsMapPm @Inject constructor(
         bindShopSelectionBehaviour()
         bindSearchBehaviour()
         bindClicks()
+
+        skipAction.observable
+            .doOnNext(::navigateToMainScreen)
+            .subscribe()
+            .untilDestroy()
 
         locationControl.locationEnabledAction.observable
             .subscribe(fetchMyLocationAction.consumer)
@@ -466,6 +472,10 @@ class ShopsMapPm @Inject constructor(
             Type.SALE -> resources.getString(R.string.shops_search_hint)
             Type.SERVICE -> resources.getString(R.string.shops_search_hint_services)
         }
+
+    private fun navigateToMainScreen(i: Unit) {
+        router.newRootFlow(Screens.HomeFlow)
+    }
 
     private companion object {
         const val INVALID_INDEX = -1
