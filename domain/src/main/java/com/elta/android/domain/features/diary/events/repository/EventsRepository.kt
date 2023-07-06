@@ -3,7 +3,7 @@ package com.elta.android.domain.features.diary.events.repository
 import android.graphics.Bitmap
 import android.net.Uri
 import com.elta.android.domain.features.diary.events.model.Event
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -30,7 +30,7 @@ interface EventsRepository {
 
     fun sync(): Completable
 
-    fun getShareEventUri(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Single<Uri>
+    fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri>
 
-    fun saveShareEventBitmap(event: Event, glucoseLevelSettings: GlucoseLevelSettings, bitmap: Bitmap): Single<Uri>
+    fun saveShareEventBitmap(sharingInfo: GlucoseSharingInfo, bitmap: Bitmap): Single<Uri>
 }

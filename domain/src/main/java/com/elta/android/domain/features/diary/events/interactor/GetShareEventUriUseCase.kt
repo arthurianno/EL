@@ -1,9 +1,8 @@
 package com.elta.android.domain.features.diary.events.interactor
 
 import android.net.Uri
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import com.nullgr.core.interactor.SingleUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
@@ -16,8 +15,8 @@ class GetShareEventUriUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Single<Uri> {
         val p = checkNotNull(params)
-        return eventsRepo.getShareEventUri(p.event, p.glucoseLevelSettings)
+        return eventsRepo.getShareEventUri(p.sharingInfo)
     }
 
-    data class Params(val event: Event, val glucoseLevelSettings: GlucoseLevelSettings)
+    data class Params(val sharingInfo: GlucoseSharingInfo)
 }
