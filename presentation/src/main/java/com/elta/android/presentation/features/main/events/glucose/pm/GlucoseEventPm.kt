@@ -14,6 +14,7 @@ import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
@@ -360,19 +361,22 @@ class GlucoseEventPm @Inject constructor(
         )
     }
 
-    private fun createGetShareEventUriUseCaseParams(i: Unit) =
-        GetShareEventUriUseCase.Params(eventState.value, glucoseLevelSettingsState.value)
+    private fun createGetShareEventUriUseCaseParams(i: Unit): GetShareEventUriUseCase.Params {
+        val sharingInfo = getGlucoseSharingInfo()
+        return GetShareEventUriUseCase.Params(sharingInfo)
+    }
 
     private fun createSaveEventBitmapUseCaseParams() =
         SaveEventBitmapUseCase.Params(
-            event = eventState.value,
-            glucoseLevelSettings = glucoseLevelSettingsState.value,
-            bitmap = shareImageBuilder.createBitmap(
-                eventState.value,
-                glucoseFormatState.value,
-                glucoseLevelSettingsState.value
-            )
+            glucoseSharingInfo = getGlucoseSharingInfo(),
+            bitmap = shareImageBuilder.createBitmap(getGlucoseSharingInfo())
         )
+
+    private fun getGlucoseSharingInfo() = GlucoseSharingInfo(
+        event = eventState.value,
+        glucoseFormat = glucoseFormatState.value,
+        glucoseLevelSettings = glucoseLevelSettingsState.value
+    )
 
     private fun Event.isGlucoseEventChanged(
         tagId: String?,

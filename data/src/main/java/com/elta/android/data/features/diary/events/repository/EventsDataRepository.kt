@@ -16,12 +16,12 @@ import com.elta.android.data.features.diary.events.extensions.buildFileName
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
+import org.threeten.bp.LocalDateTime
 
 // TODO: CRUD logic should be improved
 @Suppress("MaxLineLength")
@@ -151,13 +151,10 @@ class EventsDataRepository @Inject constructor(
                 }
             }
 
-    override fun getShareEventUri(
-        event: Event,
-        glucoseLevelSettings: GlucoseLevelSettings
-    ): Single<Uri> =
+    override fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri> =
         Single.fromCallable {
             fileStorage.getFile(
-                fileName = buildFileName(event, glucoseLevelSettings),
+                fileName = buildFileName(sharingInfo),
                 directoryName = EVENTS_DIR_NAME
             )
         }
@@ -170,13 +167,12 @@ class EventsDataRepository @Inject constructor(
             }
 
     override fun saveShareEventBitmap(
-        event: Event,
-        glucoseLevelSettings: GlucoseLevelSettings,
-        bitmap: Bitmap
+        sharingInfo: GlucoseSharingInfo,
+        bitmap: Bitmap,
     ): Single<Uri> =
         Single.fromCallable {
             fileStorage.saveBitmap(
-                fileName = buildFileName(event, glucoseLevelSettings),
+                fileName = buildFileName(sharingInfo),
                 directoryName = EVENTS_DIR_NAME,
                 bitmap = bitmap
             )

@@ -6,12 +6,10 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import com.elta.android.common.utils.toStringWithFormat
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
-import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
-import com.elta.android.domain.features.user.model.GlucoseFormat
+import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutShareGlucoseEventBinding
 import com.elta.android.presentation.utils.NumberFormatter
@@ -24,17 +22,13 @@ class ShareImageBuilder @Inject constructor(val context: Context) {
         LayoutShareGlucoseEventBinding.inflate(LayoutInflater.from(context))
     }
 
-    fun createBitmap(
-        event: Event,
-        glucoseFormat: GlucoseFormat,
-        glucoseLevelSettings: GlucoseLevelSettings,
-    ): Bitmap {
+    fun createBitmap(sharingInfo: GlucoseSharingInfo): Bitmap {
         with(binding) {
-            val glucoseLevel = event.glucoseLevel(glucoseLevelSettings)
+            val glucoseLevel = sharingInfo.event.glucoseLevel(sharingInfo.glucoseLevelSettings)
             root.background = glucoseLevel.toBackground()
-            valueView.text = NumberFormatter.format(event.glucoseValue(glucoseFormat))
+            valueView.text = NumberFormatter.format(sharingInfo.event.glucoseValue(sharingInfo.glucoseFormat))
             emojiView.setImageResource(glucoseLevel.toEmoji())
-            dateView.text = event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
+            dateView.text = sharingInfo.event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
         }
         return binding.root.getBitmapFromView(GLUCOSE_SHARE_EVENT_PICTURE_SIZE)
     }
