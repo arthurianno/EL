@@ -45,13 +45,13 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 
@@ -369,6 +369,7 @@ class GlucoseEventPm @Inject constructor(
             glucoseLevelSettings = glucoseLevelSettingsState.value,
             bitmap = shareImageBuilder.createBitmap(
                 eventState.value,
+                glucoseFormatState.value,
                 glucoseLevelSettingsState.value
             )
         )
