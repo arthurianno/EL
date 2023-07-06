@@ -16,16 +16,19 @@ import com.elta.android.presentation.features.statistic.period.ui.adapter.items.
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseDailyChartItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexItem
 import com.elta.android.presentation.features.statistic.period.ui.adapter.items.GlucoseIndexesItem
+import com.nullgr.core.resources.ResourceProvider
 import javax.inject.Inject
 
 class PeriodAdapter @Inject constructor(
-    private val viewPool: RecyclerView.RecycledViewPool
+    private val viewPool: RecyclerView.RecycledViewPool,
+    private val resources: ResourceProvider
 ) : BaseListAdapter() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             GlucoseDailyChartItem::class.java.hashCode() -> GlucoseDailyChartViewHolder(
-                ItemGlucoseDailyChartBinding.inflate(inflater, parent, false)
+                ItemGlucoseDailyChartBinding.inflate(inflater, parent, false),
+                resources
             )
             GlucoseIndexItem::class.java.hashCode() -> GlucoseIndexViewHolder(
                 ItemStatGlucoseIndexBinding.inflate(inflater, parent, false)

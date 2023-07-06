@@ -22,7 +22,7 @@ import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
-private const val STATISTIC_CHART_DATE_FORMAT = "dd MMM"
+private const val STATISTIC_CHART_DATE_FORMAT = "dd MMMM"
 
 class PeriodPm @Inject constructor(
     private val getStatisticByPeriodUseCase: GetStatisticByPeriodUseCase,
