@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.glucoseValue
 import com.elta.android.domain.features.diary.home.interactor.glucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutShareGlucoseEventBinding
 import com.elta.android.presentation.utils.NumberFormatter
@@ -22,11 +24,15 @@ class ShareImageBuilder @Inject constructor(val context: Context) {
         LayoutShareGlucoseEventBinding.inflate(LayoutInflater.from(context))
     }
 
-    fun createBitmap(event: Event, glucoseLevelSettings: GlucoseLevelSettings): Bitmap {
+    fun createBitmap(
+        event: Event,
+        glucoseFormat: GlucoseFormat,
+        glucoseLevelSettings: GlucoseLevelSettings,
+    ): Bitmap {
         with(binding) {
             val glucoseLevel = event.glucoseLevel(glucoseLevelSettings)
             root.background = glucoseLevel.toBackground()
-            valueView.text = NumberFormatter.format(event.value ?: 0.0)
+            valueView.text = NumberFormatter.format(event.glucoseValue(glucoseFormat))
             emojiView.setImageResource(glucoseLevel.toEmoji())
             dateView.text = event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
         }
