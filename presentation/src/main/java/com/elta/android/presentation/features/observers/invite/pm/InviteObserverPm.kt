@@ -110,7 +110,7 @@ class InviteObserverPm @Inject constructor(
     private fun haveSameObserver(): Boolean =
         observersState.valueOrNull
             ?.filter { it.status == ObserverStatus.CONFIRMED }
-            ?.any { it.email == emailInput.text.valueOrNull }
+            ?.any { it.email.equals(emailInput.text.valueOrNull,true) }
             ?: false
 
     private fun haveAwaitingObserver(): Boolean =
