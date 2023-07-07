@@ -1,20 +1,19 @@
-package com.elta.android.data.features.googlefit.datasource.utils
+package com.elta.android.presentation.features.googlefit
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.nullgr.core.intents.launch
+import com.google.android.gms.fitness.FitnessOptions
+import com.google.android.gms.fitness.data.DataType
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
-import io.reactivex.Observable
 
 class RxGoogleFitAuthActivity : Activity() {
 
@@ -79,7 +78,8 @@ class RxGoogleFitAuthActivity : Activity() {
     }
 
     private fun sendResult(result: Boolean) {
-        SingletonRxBusProvider.BUS.post(RxBus.Keys.SINGLE, AuthResult(result))
+        val googleFitAuthResult = if (result) GoogleFitAuthResult.Access else GoogleFitAuthResult.NotAccess
+        SingletonRxBusProvider.BUS.post(RxBus.Keys.SINGLE, googleFitAuthResult)
         finish()
         overridePendingTransition(0, 0)
     }
@@ -87,44 +87,12 @@ class RxGoogleFitAuthActivity : Activity() {
     companion object {
         private const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 101
         private const val ACTIVITY_RECOGNITION_PERMISSIONS_REQUEST_CODE = 102
-        private const val FIT_PACKAGE_NAME = "com.google.android.apps.fitness"
-        private const val PLAY_MARKET_URI = "market://details?id="
-
-        fun newInstance(context: Context): Intent =
-            Intent(context, RxGoogleFitAuthActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-
-        fun launchForResult(context: Context): Observable<AuthResult> =
-            Observable.fromCallable {
-                launchGoogleFitAppAndPermissions(context)
-            }
-                .flatMap {
-                    SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)
-                        .filter { it is AuthResult }
-                        .map { it as AuthResult }
-                        .flatMap { Observable.just(it) }
-                }
-
-        private fun launchGoogleFitAppAndPermissions(context: Context) {
-            runCatching {
-                context.packageManager.getPackageInfo(
-                    FIT_PACKAGE_NAME,
-                    PackageManager.GET_ACTIVITIES
-                )
-            }.onFailure {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(PLAY_MARKET_URI + FIT_PACKAGE_NAME)
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                )
-            }.onSuccess {
-                newInstance(context).launch(context)
-            }
-        }
     }
 }
+
+private fun makeFitnessOptions(): FitnessOptions =
+    FitnessOptions.builder()
+        .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
+        .addDataType(DataType.TYPE_WORKOUT_EXERCISE, FitnessOptions.ACCESS_READ)
+        .build()
+

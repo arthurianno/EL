@@ -8,13 +8,16 @@ import com.elta.android.data.features.googlefit.datasource.errors.GoogleFitPermi
 import com.elta.android.data.features.googlefit.datasource.errors.GoogleFitSyncNotAllowed
 import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.user.interactor.googleFitApp
+import com.elta.android.domain.features.user.model.HealthAppType
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
@@ -27,26 +30,28 @@ class GoogleFitDataRepository @Inject constructor(
     private val schedulersFacade: SchedulersFacade
 ) : GoogleFitRepository {
 
-    override fun checkAuthorization(): Observable<Boolean> = dataSource.checkAuthorization()
+    override fun checkAuthorization(): Single<GoogleFitAuthResult> = dataSource.checkAuthorization()
 
     override fun sync(): Completable =
         profileRepository.getProfile()
             .applyScheduler(schedulersFacade)
-            .map { it.googleFitApp()?.isActive ?: false }
-            .flatMapCompletable {
-                when (it) {
-                    true -> checkPermissionsAndSync()
+            .flatMapCompletable { profile ->
+                when (profile.googleFitApp()?.isActive ?: false) {
+                    true -> checkPermissionsAndSync(profile)
                     else -> Completable.error(GoogleFitSyncNotAllowed)
                 }
             }
 
-    private fun checkPermissionsAndSync() =
+    private fun checkPermissionsAndSync(profile: Profile) =
         checkAuthorization()
-            .take(1)
-            .switchMapCompletable {
+            .flatMapCompletable {
                 when (it) {
-                    true -> syncInternal()
-                    else -> Completable.error(GoogleFitPermissionNotGranted)
+                    GoogleFitAuthResult.Access -> syncInternal()
+                    GoogleFitAuthResult.ApplicationNotInstalled, GoogleFitAuthResult.NotAccess -> {
+                        val updateProfile = disableGoogleFit(profile)
+                        profileRepository.updateProfile(updateProfile)
+                            .andThen(Completable.error(GoogleFitPermissionNotGranted))
+                    }
                 }
             }
 
@@ -66,4 +71,13 @@ class GoogleFitDataRepository @Inject constructor(
     private fun filterExistingEvents(fromFit: List<Event>): List<Event> =
         if (!eventsCache.contains(CommonConditions.All)) fromFit
         else fromFit.filter { !eventsCache.contains(CommonConditions.ById(it.id.hashCode().toLong())) }
+
+    private fun disableGoogleFit(profile: Profile) = profile.copy(
+        healthApps = profile.healthApps?.map { healthApp ->
+            if (healthApp.type == HealthAppType.GOOGLE_FIT)
+                healthApp.copy(isActive = false)
+            else
+                healthApp
+        }
+    )
 }

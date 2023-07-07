@@ -21,11 +21,6 @@
             android:theme="@style/SocialTheme" />
 
         <activity
-            android:name=".features.googlefit.datasource.utils.RxGoogleFitAuthActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/GoogleFitTheme" />
-
-        <activity
             android:name="ru.ok.android.sdk.OkAuthActivity"
             android:screenOrientation="portrait"
             android:exported="true"

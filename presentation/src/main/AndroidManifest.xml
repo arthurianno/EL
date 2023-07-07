@@ -24,4 +24,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <application>
+        <activity
+            android:name="com.elta.android.presentation.features.googlefit.RxGoogleFitAuthActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/GoogleFitTheme" />
+    </application>
+
+
 </manifest>

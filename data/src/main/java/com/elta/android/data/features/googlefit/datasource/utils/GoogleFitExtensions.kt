@@ -23,12 +23,6 @@ private val ignoreActivities = arrayListOf(
     FitnessActivities.EXTRA_STATUS
 )
 
-fun makeFitnessOptions(): FitnessOptions =
-    FitnessOptions.builder()
-        .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
-        .addDataType(DataType.TYPE_WORKOUT_EXERCISE, FitnessOptions.ACCESS_READ)
-        .build()
-
 fun buildSessionsRequest(startTime: Long): SessionReadRequest =
     SessionReadRequest.Builder()
         .setTimeInterval(startTime, currentMillis(), TimeUnit.MILLISECONDS)
