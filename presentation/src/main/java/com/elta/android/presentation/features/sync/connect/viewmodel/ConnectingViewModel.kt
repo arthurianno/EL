@@ -192,6 +192,7 @@ class ConnectingViewModel @Inject constructor(
                         pinCode = state.value.pinCode
                     )
                 }
+                .catch { handleNotFoundError(it) }
                 .flatMapLatest {
                     connectDevice.execute(it)
                         .doOnComplete {
@@ -219,6 +220,10 @@ class ConnectingViewModel @Inject constructor(
                 .catch { handleSyncError(it) }
                 .collect()
         }
+    }
+
+    private fun handleNotFoundError(error: Throwable) {
+        reduceState { state.value.copy(stageType = ConnectingStageType.DeviceNotFound) }
     }
 
     private fun handleConnectError(error: Throwable) {

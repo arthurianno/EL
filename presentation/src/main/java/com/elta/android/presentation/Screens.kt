@@ -12,7 +12,6 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
-import com.elta.android.presentation.features.bluetooth.ui.BluetoothFragment
 import com.elta.android.presentation.features.calcutator.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -216,10 +215,6 @@ object Screens {
 
     object FromOnBoardingSyncStart : SupportAppScreen() {
         override fun getFragment() = FromOnBoardingSyncStartFragment.newInstance()
-    }
-
-    object BluetoothScreen : SupportAppScreen() {
-        override fun getFragment(): Fragment = BluetoothFragment.newInstance()
     }
 
     object FromOnBoardingConnectDeviceByPin : SupportAppScreen() {

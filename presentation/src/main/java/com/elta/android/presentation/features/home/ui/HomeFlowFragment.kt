@@ -22,6 +22,7 @@ import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFlowFragment
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.databinding.FragmentHomeFlowBinding
+import com.elta.android.presentation.features.home.model.ManualSyncError
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
@@ -104,13 +105,6 @@ class HomeFlowFragment :
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         binding.homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
-        pm.retryDeviceNotFoundControl.bindTo { data, sc ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
-        }
         pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
 
         pm.likeAppDialogControl.bindLikeAppDialog()
@@ -142,6 +136,34 @@ class HomeFlowFragment :
                 findViewById<TextView>(R.id.warning_text_second).setText(textSecondId)
             }
         }
+
+        pm.manualSyncError.bindTo { error ->
+            with(binding.syncErrorBottomSheetView) {
+
+                val title = when (error) {
+                    ManualSyncError.ErrorSync -> R.string.sync_connection_sync_error_title
+                    ManualSyncError.NotFound -> R.string.sync_connect_device_not_found
+                }
+                val errorIsNotFound = error is ManualSyncError.NotFound
+                findViewById<TextView>(R.id.title).setText(title)
+                findViewById<TextView>(R.id.error_sync_text).isVisible = !errorIsNotFound
+                findViewById<TextView>(R.id.not_found_text).isVisible = errorIsNotFound
+                findViewById<AppCompatTextView>(R.id.confirmButtonView).clicks().bindTo(pm.manualSyncErrorAction)
+            }
+        }
+
+        binding.syncErrorBottomSheetView.visibilityChanges().subscribe {
+            binding.homeActionView.isVisible = !it
+        }
+        pm.manualSyncErrorBottomSheetCommand.bindTo {
+            binding.homeActionView.hide()
+            binding.syncErrorBottomSheetView.show()
+        }
+        pm.closeManualSyncErrorBottomSheetCommand.bindTo {
+            binding.syncErrorBottomSheetView.hide()
+            binding.homeActionView.isVisible = true
+        }
+
     }
 
     override fun onAttach(context: Context) {

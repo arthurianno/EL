@@ -47,6 +47,16 @@
             layout="@layout/layout_sync_state_sync_completed"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/layoutSyncStateSyncError"
+            layout="@layout/layout_sync_state_sync_error"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layoutSyncStateNotFound"
+            layout="@layout/layout_sync_state_not_found"
+            android:visibility="gone" />
+
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,12 +1,13 @@
 package com.elta.android.domain.features.firmware.repository
 
-import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.firmware.model.FirmwareFile
+import com.elta.android.domain.features.firmware.model.FirmwareInfo
 import io.reactivex.Single
 
 interface FirmwareRepository {
 
-    fun getFirmwareInfo(): Single<Firmware>
+    fun getFirmwareInfo(glucometerInfo: GlucometerInfo): Single<FirmwareInfo>
 
-    fun getFirmware(firmware: Firmware): Single<FirmwareFile>
+    fun downloadFirmware(firmwareInfo: FirmwareInfo): Single<FirmwareFile>
 }

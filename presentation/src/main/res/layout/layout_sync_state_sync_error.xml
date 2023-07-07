@@ -1,6 +1,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/stateSearchView"
+    android:id="@+id/stateSyncCompletedView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,12 +9,12 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/titleView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_bias="0.1"
         app:srcCompat="@drawable/ic_connect_dev" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -23,9 +23,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:text="@string/sync_connection_screen_title"
+        android:text="@string/sync_connection_sync_error_title"
         app:layout_constraintBottom_toTopOf="@+id/messageView"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -38,20 +37,15 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="36dp"
         android:lineSpacingExtra="2dp"
-        android:text="@string/sync_connection_screen_text"
-        app:layout_constraintBottom_toTopOf="@+id/infoView"
+        android:text="@string/sync_connection_error_text"
+        app:layout_constraintBottom_toTopOf="@+id/actionButtonView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/infoView"
-        style="@style/New.Caption1.White"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/shade_blue3"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="@string/connection_process_text"
+        android:id="@+id/actionButtonView"
+        style="@style/Button.Large"
+        android:text="@string/repeat_sync_button_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
