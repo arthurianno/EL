@@ -8,7 +8,6 @@ import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
-import com.elta.android.presentation.features.bluetooth.pm.BluetoothPm
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
@@ -202,11 +201,6 @@ abstract class PmModule {
     @IntoMap
     @PmKey(FromOtherSyncStartPm::class)
     abstract fun bindFromOtherSyncStartPm(pm: FromOtherSyncStartPm): PresentationModel
-
-    @Binds
-    @IntoMap
-    @PmKey(BluetoothPm::class)
-    abstract fun bindBluetoothPm(pm: BluetoothPm): PresentationModel
 
     @Binds
     @IntoMap

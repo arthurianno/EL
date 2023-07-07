@@ -166,6 +166,10 @@ class AppPm @Inject constructor(
                         setStatus(SyncStatus.Server.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
+
+                    Events.Sync.Glucometer.Nothing -> {
+                        setStatusVisibility(Visibility.Hide)
+                    }
                 }
             }
             .subscribe()

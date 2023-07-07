@@ -19,9 +19,11 @@ import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSource
-import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
-import com.elta.android.data.features.firmware.datasource.FirmwareLocalDataSource
-import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareDownloadDataSource
+import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoDataSource
+import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoRemoteDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareLocalDownloadDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDownloadDataSource
 import com.elta.android.data.features.googlefit.datasource.GoogleFitDataSource
 import com.elta.android.data.features.googlefit.datasource.HealthAppDataSource
 import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
@@ -129,12 +131,17 @@ abstract class DataSourceModule {
     @Remote
     @Binds
     @Singleton
-    abstract fun bindFirmwareRemoteDataSource(source: FirmwareRemoteDataSource): FirmwareDataSource
+    abstract fun bindFirmwareDownloadRemoteDataSource(source: FirmwareRemoteDownloadDataSource): FirmwareDownloadDataSource
 
     @Cache
     @Binds
     @Singleton
-    abstract fun bindFirmwareLocalDataSource(source: FirmwareLocalDataSource): FirmwareDataSource
+    abstract fun bindFirmwareDownloadLocalDataSource(source: FirmwareLocalDownloadDataSource): FirmwareDownloadDataSource
+
+    @Remote
+    @Binds
+    @Singleton
+    abstract fun bindFirmwareInfoRemoteDataSource(source: FirmwareInfoRemoteDataSource): FirmwareInfoDataSource
 
     @Binds
     @Singleton

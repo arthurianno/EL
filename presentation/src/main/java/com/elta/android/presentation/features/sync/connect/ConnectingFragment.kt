@@ -43,6 +43,7 @@ import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingV
 import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheet
 import com.elta.android.presentation.features.sync.connect.widgets.MainImage
+import com.elta.android.presentation.features.sync.connect.widgets.TextNumericItem
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 
@@ -286,23 +287,23 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
                 VSpacerSmall()
                 Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_connect_scenario_text1),
+                    text = stringResource(id = R.string.profile_device_search_not_found_connect_title),
                     color = colors.shadeBlack0
                 )
                 VSpacer(height = dimens.halfMediumDim)
-                Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text2),
-                    color = colors.shadeBlack0
+                TextNumericItem(
+                    number = R.string.list_numbering_1_dot,
+                    text = R.string.profile_device_search_not_found_disable_ble
                 )
                 VSpacerMedium()
-                Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text3),
-                    color = colors.shadeBlack0
+                TextNumericItem(
+                    number = R.string.list_numbering_2_dot,
+                    text = R.string.profile_device_search_not_found_low_energy,
                 )
                 VSpacerMedium()
-                Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text4),
-                    color = colors.shadeBlack0
+                TextNumericItem(
+                    number = R.string.list_numbering_3_dot,
+                    text = R.string.profile_device_search_not_found_out_of_range,
                 )
                 VSpacerSmall()
             }

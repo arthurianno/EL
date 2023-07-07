@@ -67,8 +67,8 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
             val cameraPermission = permissionStates.component1()
             val locationPermission = permissionStates.component2()
             when {
-                !cameraPermission.status.isGranted && !cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
-                !locationPermission.status.isGranted && !locationPermission.status.shouldShowRationale -> locationPermissionDialog.dialogOpen()
+                !cameraPermission.status.isGranted && cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
+                !locationPermission.status.isGranted && locationPermission.status.shouldShowRationale -> locationPermissionDialog.dialogOpen()
 
                 !cameraPermission.status.isGranted -> sendEvent(PermissionEvent.Camera())
                 !locationPermission.status.isGranted -> sendEvent(PermissionEvent.FineLocation())

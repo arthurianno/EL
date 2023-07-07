@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.sync.pin.pm
 
-import com.elta.android.domain.features.devices.interactor.isPinValid
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
@@ -47,4 +46,7 @@ class PinDialogPm @Inject constructor(
             )
         )
     }
+
+    private val pinRegex = Regex("^[0-9]{3}")
+    private fun isPinValid(pin: String) = pin.matches(pinRegex)
 }

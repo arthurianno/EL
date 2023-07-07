@@ -3,33 +3,35 @@ package com.elta.android.data.features.firmware.repository
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.errors.NoSuchFirmware
-import com.elta.android.data.features.devices.glucometer.GlucometersManager
-import com.elta.android.data.features.firmware.datasource.FirmwareDataSource
+import com.elta.android.data.features.firmware.datasource.FirmwareDownloadDataSource
+import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoDataSource
 import com.elta.android.data.features.firmware.toDomain
-import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.firmware.model.FirmwareFile
+import com.elta.android.domain.features.firmware.model.FirmwareInfo
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
 import io.reactivex.Single
 import javax.inject.Inject
 
 class FirmwareDataRepository @Inject constructor(
-    private val glucometersManager: GlucometersManager,
-    @Remote private val remoteSource: FirmwareDataSource,
-    @Cache private val localSource: FirmwareDataSource
+    @Remote private val remoteSource: FirmwareDownloadDataSource,
+    @Cache private val localSource: FirmwareDownloadDataSource,
+    @Remote private val remoteInfoSource: FirmwareInfoDataSource
 ) : FirmwareRepository {
 
-    override fun getFirmwareInfo(): Single<Firmware> =
-        remoteSource.getFirmwareInfo()
+    override fun getFirmwareInfo(
+        glucometerInfo: GlucometerInfo
+    ): Single<FirmwareInfo> =
+        remoteInfoSource.getFirmwareInfo(
+            glucometerInfo = glucometerInfo
+        )
             .map { it.toDomain() }
-            .map {
-                it.copy(isCompatibleWithApplication = glucometersManager.isSupportedByApplication(it))
-            }
 
-    override fun getFirmware(firmware: Firmware): Single<FirmwareFile> =
-        localSource.getFirmware(firmware)
+    override fun downloadFirmware(firmwareInfo: FirmwareInfo): Single<FirmwareFile> =
+        localSource.downloadFirmware(firmwareInfo)
             .onErrorResumeNext { error ->
                 when (error) {
-                    is NoSuchFirmware -> remoteSource.getFirmware(firmware)
+                    is NoSuchFirmware -> remoteSource.downloadFirmware(firmwareInfo)
                     else -> Single.error(error)
                 }
             }

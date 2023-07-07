@@ -132,17 +132,17 @@ class GlucometerSearchFragment : BaseComposeFragment<GlucometerSearchViewModel>(
                 )
                 VSpacer(height = dimens.halfMediumDim)
                 Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text2),
+                    text = stringResource(id = R.string.profile_device_search_not_found_disable_ble),
                     color = colors.shadeBlack0
                 )
                 VSpacerMedium()
                 Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text3),
+                    text = stringResource(id = R.string.profile_device_search_not_found_low_energy),
                     color = colors.shadeBlack0
                 )
                 VSpacerMedium()
                 Text(
-                    text = stringResource(id = R.string.profile_device_search_not_found_text4),
+                    text = stringResource(id = R.string.profile_device_search_not_found_out_of_range),
                     color = colors.shadeBlack0
                 )
             }

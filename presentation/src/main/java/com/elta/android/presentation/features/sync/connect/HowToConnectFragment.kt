@@ -24,6 +24,7 @@ import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
+import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
@@ -123,7 +124,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 VSpacer(dimens.halfMediumDim)
                 TextNumericItem(
                     number = R.string.list_numbering_1_dot,
-                    text = R.string.sync_how_to_connect_text_1
+                    text = R.string.how_to_connect_description_check_ble
                 )
                 VSpacerSmall()
                 BluetoothString()

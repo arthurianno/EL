@@ -57,9 +57,10 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         bindProgressDialog(pm)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.skipAction)
         binding.layoutSyncStateDeviceFound.actionButtonView.clicks().bindTo(pm.connectDeviceAction)
+        binding.layoutSyncStateNotFound.actionButtonView.clicks().bindTo(pm.startScanAction)
+        binding.layoutSyncStateSyncError.actionButtonView.clicks().bindTo(pm.startSyncAction)
         binding.layoutSyncStateSyncCompleted.toAppButtonView.clicks().bindTo(pm.toAppAction)
-        binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks()
-            .bindTo(pm.startScanAction)
+        binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks().bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
         pm.mstate.bindTo { state ->
             binding.syncStateContainerView.children().forEach { view ->
@@ -67,13 +68,6 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
             }
         }
 
-        pm.retrySearchControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
-        }
         pm.retryPinControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
@@ -82,13 +76,6 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
             )
         }
         pm.retryConnectControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
-        }
-        pm.retrySyncControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
             makeSnackBarWithAction(
                 binding.root,
                 data,
@@ -126,12 +113,14 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         presentationModel.btControl.resolveResults(requestCode, resultCode)
     }
 
-    protected fun ConnectDevicePm.ViewState.getId() =
+    private fun ConnectDevicePm.ViewState.getId() =
         when (this) {
             ConnectDevicePm.ViewState.SEARCH -> R.id.layoutSyncStateSearch
             ConnectDevicePm.ViewState.FOUND -> R.id.layoutSyncStateDeviceFound
             ConnectDevicePm.ViewState.CONNECTED -> R.id.layoutSyncStateConnected
             ConnectDevicePm.ViewState.HOW_TO_CONNECT -> R.id.layoutSyncStateHowToConnect
             ConnectDevicePm.ViewState.SYNC_COMPLETED -> R.id.layoutSyncStateSyncCompleted
+            ConnectDevicePm.ViewState.SYNC_ERROR -> R.id.layoutSyncStateSyncError
+            ConnectDevicePm.ViewState.NOT_FOUND -> R.id.layoutSyncStateNotFound
         }
 }

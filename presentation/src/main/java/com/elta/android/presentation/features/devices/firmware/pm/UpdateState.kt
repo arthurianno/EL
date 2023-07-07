@@ -84,15 +84,6 @@ sealed class UpdateState {
         override val button: String? = resources.getString(R.string.firmware_button_close)
     ) : UpdateState()
 
-    data class UnsupportedFirmwareVersion(
-        val resources: ResourceProvider,
-        override val icon: Int = R.drawable.ic_firmware_error_app_version,
-        override val title: String = resources.getString(R.string.firmware_unsupported_version_title),
-        override val description: String? = resources.getString(R.string.firmware_unsupported_version_description),
-        override val hint: String? = null,
-        override val button: String? = resources.getString(R.string.firmware_unsupported_version_button)
-    ) : UpdateState()
-
     data class FirmwareDownloadingError(
         val resources: ResourceProvider,
         override val icon: Int = R.drawable.ic_firmware_error_general,

@@ -61,28 +61,19 @@ abstract class ConnectDevicePm constructor(
 
     val btControl = bluetoothControl()
 
-    val retrySearchControl = snackBarControl<SnackBarData>()
     val retryPinControl = snackBarControl<SnackBarData>()
     val retryConnectControl = snackBarControl<SnackBarData>()
-    val retrySyncControl = snackBarControl<SnackBarData>()
 
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
-    private val startSyncAction = action<Unit>()
+    val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
 
     val settingsDialog = dialogControl<DialogData, DialogResult>()
     private val settingsDialogData: DialogData by lazy { Dialogs.SettingsDialogData(resources) }
     val settingsIsVisible = state(false)
     val openSettingsCloseAction = action<Unit>()
-
-    private val deviceNotFound: SnackBarData by lazy {
-        SnackBarMessageData.WithButton(
-            message = resources.getString(R.string.sync_connect_device_not_found),
-            button = resources.getString(R.string.sync_connect_button_retry)
-        )
-    }
 
     private val incorrectPinCode: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -98,16 +89,7 @@ abstract class ConnectDevicePm constructor(
         )
     }
 
-    private val syncError: SnackBarData by lazy {
-        SnackBarMessageData.WithButton(
-            message = resources.getString(R.string.sync_connect_sync_error),
-            button = resources.getString(R.string.sync_connect_button_retry)
-        )
-    }
-
-    private val showRetrySearchAction = action<Unit>()
     private val showRetryPinAction = action<Unit>()
-    private val showRetrySyncAction = action<Unit>()
     private val showRetryConnectAction = action<Unit>()
 
     private val internalConnectDeviceAction = action<Unit>()
@@ -169,12 +151,12 @@ abstract class ConnectDevicePm constructor(
 
             is TimeoutException -> {
                 if (items.valueOrNull.isNullOrEmpty()) {
-                    showRetrySearchAction.consumer.accept(Unit)
+                    mstate.consumer.accept(ViewState.NOT_FOUND)
                 }
             }
 
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
-            is GlucometerSyncError -> showRetrySyncAction.consumer.accept(Unit)
+            is GlucometerSyncError -> mstate.consumer.accept(ViewState.SYNC_ERROR)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
@@ -237,6 +219,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun bindStartSyncAction() {
         startSyncAction.observable
+            .doOnNext { mstate.consumer.accept(ViewState.CONNECTED) }
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
             .map { SyncWithGlucometerUseCase.Params(glucometer) }
@@ -255,12 +238,6 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindRetryActions() {
-        showRetrySearchAction.observable
-            .switchMapMaybe {
-                retrySearchControl.showForResult(deviceNotFound)
-            }
-            .subscribe(startScanAction.consumer)
-            .untilDestroy()
 
         showRetryPinAction.observable
             .switchMapMaybe {
@@ -274,13 +251,6 @@ abstract class ConnectDevicePm constructor(
                 retryConnectControl.showForResult(connectError)
             }
             .subscribe(internalConnectDeviceAction.consumer)
-            .untilDestroy()
-
-        showRetrySyncAction.observable
-            .switchMapMaybe {
-                retrySyncControl.showForResult(syncError)
-            }
-            .subscribe(startSyncAction.consumer)
             .untilDestroy()
     }
 
@@ -332,7 +302,6 @@ abstract class ConnectDevicePm constructor(
     private fun handleSearchResults(results: List<Glucometer>) {
         if (results.isNotEmpty()) {
             mstate.consumer.accept(ViewState.FOUND)
-            retrySearchControl.dismiss()
         }
         scanResults.clear()
         scanResults.addAll(results)
@@ -365,6 +334,8 @@ abstract class ConnectDevicePm constructor(
         SEARCH,
         FOUND,
         CONNECTED,
-        SYNC_COMPLETED
+        SYNC_COMPLETED,
+        SYNC_ERROR,
+        NOT_FOUND
     }
 }

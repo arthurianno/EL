@@ -86,11 +86,6 @@ class DeviceInfoPm @Inject constructor(
             .subscribe(getDeviceInfoAction.consumer)
             .untilDestroy()
 
-        bus.clicks<Clicks.OpenBlueToothScreen>()
-            .map { Unit }
-            .subscribe { router.navigateTo(Screens.BluetoothScreen) }
-            .untilDestroy()
-
         bus.clicks<Clicks.DeviceSearchItemClicked>()
             .map { Unit }
             .subscribe {

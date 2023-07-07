@@ -116,6 +116,7 @@
     <string name="shops_start_find_action_button">Найти точки продаж на карте</string>
     <string name="shops_map_toolbar_title">Приобрести продукцию</string>
     <string name="shops_map_toolbar_title_services">Получить заботу</string>
+    <string name="shops_map_alert">Уточняйте актуальную информацию о наличии товара в аптеках.</string>
     <string name="shops_map_route">Как доехать</string>
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
@@ -330,8 +331,8 @@
     <string name="sync_with_glucometer_error">Синхронизация с глюкометром не выполнена</string>
 
     <string name="sync_state_title_how_to_connect">Как подключить?</string>
-    <string name="sync_state_subtitle_how_to_connect">На несколько секунд извлеките из глюкометра держатель с батарейкой и установите обратно. Глюкометр отобразит ПИН-код, необходимый для подключения устройства.</string>
-    <string name="sync_state_title_progress_connect">Идет процесс поиска устройства…</string>
+    <string name="how_to_connect_description_pin">На несколько секунд извлеките из глюкометра держатель с батарейкой и установите обратно. Глюкометр отобразит ПИН-код, необходимый для подключения устройства.</string>
+    <string name="how_to_connect_description_check_ble">Проверьте, включен ли Bluetooth на вашем глюкометре;</string>
 
     <string name="sync_state_title_connected">Подключено!</string>
     <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
@@ -395,7 +396,6 @@
 
     <string name="sync_how_to_connect_button">Сканировать</string>
     <string name="sync_how_to_connect_title">Как подключить?</string>
-    <string name="sync_how_to_connect_text_1">Проверьте, включен ли Bluetooth на вашем глюкометре;\n</string>
     <string name="sync_how_to_connect_bluetooth_text">— индикатор включенного Bluetooth</string>
     <string name="sync_how_to_connect_text_2">Переверните ваше устройство — на задней стороне корпуса должен быть стикер с изображением, похожим на QR. Это DMC-код, который нужно будет отсканировать.</string>
 
@@ -571,10 +571,12 @@
     <string name="profile_device_search_on_text2">После того как найдёте глюкометр, не забудьте выключить режим поиска.</string>
     <string name="profile_device_search_not_found_title">Устройство не найдено</string>
     <string name="profile_device_search_not_found_text1">Проверьте возможные причины и повторно начните поиск, нажав кнопку выше.</string>
-    <string name="profile_device_search_not_found_connect_scenario_text1">Возможные причины:</string>
-    <string name="profile_device_search_not_found_text2">1. На глюкометре выключен Bluetooth;</string>
-    <string name="profile_device_search_not_found_text3">2. Батарея на устройстве отсутствует, имеет низкий заряд или полностью разряжена;</string>
-    <string name="profile_device_search_not_found_text4">3. Глюкометр находится вне зоны действия.</string>
+
+    <string name="profile_device_search_not_found_connect_title">Возможные причины:</string>
+    <string name="profile_device_search_not_found_disable_ble">На глюкометре выключен Bluetooth;</string>
+    <string name="profile_device_search_not_found_low_energy">Батарея на устройстве отсутствует, имеет низкий заряд или полностью разряжена;</string>
+    <string name="profile_device_search_not_found_out_of_range">Глюкометр находится вне зоны действия поиска.</string>
+
     <string name="profile_device_cancel_search_dialog_text">Вы уверены что хотите прекратить поиск и выйти?</string>
     <string name="profile_device_cancel_ring_dialog_text">Внимание: при выходе с экрана звуковой сигнал устройства прекратится. Вы уверены, что хотите выйти?</string>
     <string name="profile_device_snackbar_connecting_to_device">Идёт процесс поиска устройства...</string>
@@ -711,10 +713,6 @@
     <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка ПО глюкометра, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
     <string name="firmware_dialog_button">Закрыть</string>
 
-    <string name="firmware_unsupported_version_title">Версия приложения устарела</string>
-    <string name="firmware_unsupported_version_description">Для обновления версии ПО\nглюкометра, необходимо обновить\nприложение</string>
-    <string name="firmware_unsupported_version_button">Обновить в Google Play</string>
-
     <string name="firmware_downloading_error_title">Ошибка загрузки</string>
     <string name="firmware_downloading_error_description">Во время загрузки обновления на\nустройство произошла ошибка. Чтобы\nпродолжить, необходимо повторить\nпроцесс</string>
     <string name="firmware_downloading_error_button">Повторить</string>
@@ -781,7 +779,7 @@
     <string name="consultant_send_photo">Отправить фото</string>
 
     <!-- Content Descriptions -->
-    <string name="content_description_bluetooth_icon">значек блютуза</string>
+    <string name="content_description_bluetooth_icon">значок блютуза</string>
     <string name="content_description_close_button">кнопка Закрыть</string>
     <string name="content_description_clear_button">кнопка Очистить</string>
     <string name="content_description_question_button">кнопка Вопрос</string>

@@ -5,7 +5,6 @@ import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.CommandError
-import com.elta.android.common.errors.FirmwareNotSupportedByAppError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
@@ -31,7 +30,6 @@ import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.FeatureToggles
-import com.elta.android.domain.features.firmware.model.Firmware
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -119,11 +117,6 @@ class GlucometersManager @Inject constructor(
         Commands.GetVersion,
         Commands.Serial
     )
-
-    fun isSupportedByApplication(firmware: Firmware): Boolean = isSupported(firmware.compatible)
-
-    fun isSupportedByApplication(firmwareFile: FirmwareFile): Boolean =
-        isSupported(firmwareFile.compatible)
 
     fun findDevices(): Observable<List<ScanResult>> =
         Observable.just(client.state)
@@ -291,57 +284,52 @@ class GlucometersManager @Inject constructor(
     }
 
     fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
-        when {
-            !isSupportedByApplication(file) -> Observable.error(
-                FirmwareNotSupportedByAppError(file.version)
-            )
-
-            else ->
-                checkBluetoothClientState()
-                    .flatMap {
-                        client.findConnection(address)
-                            .checkPinAndSend(address)
-                            .switchMap { connection ->
-                                connection.request(address, Commands.GetBatteryAndTemperature)
-                                    .map { infoBuilder.buildFrom(address, listOf(it)) }
-                                    .switchMap { info ->
-                                        when {
-                                            !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
-                                                GlucometerLowBatteryLevelError(
-                                                    current = info.batteryLevel ?: 0,
-                                                    required = MIN_BATTERY_LEVEL
-                                                )
-                                            )
-
-                                            else -> connection.request(address, Commands.ToDfuMode)
-                                        }
-                                    }
-                            }
-                            .take(1)
-                            .switchMap { response ->
-                                when (response.isOk()) {
-                                    true -> startFirmwareUpdate(
-                                        context,
-                                        file.path,
-                                        address.toDfuAddress()
-                                    )
-
-                                    else -> Observable.error(GlucometerToDfuModeError)
-                                }
-                            }
-                            // we can't know when device will completely reboot after update
-                            // to get actual info so we using this this hack to update glucometer
-                            // version after update firmware.
-                            .doOnComplete {
-                                val id = address.hashCode().toLong()
-                                glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
-                                    glucometersInfoCache.update(
-                                        listOf(info.copy(software = file.version))
-                                    )
-                                }
+        checkBluetoothClientState()
+            .flatMap {
+                client.findConnection(address)
+                    .checkPinAndSend(address)
+                    .switchMap { connection ->
+                        connection.request(address, Commands.GetBatteryAndTemperature)
+                            .map { infoBuilder.buildFrom(address, listOf(it)) }
+                            .switchMap { info ->
+                                checkBattery(info, connection, address)
                             }
                     }
-        }
+                    .take(1)
+                    .switchMap { response ->
+                        if(response.isOk()) {
+                            startFirmwareUpdate(context, file.path, address.toDfuAddress())
+                        } else {
+                            Observable.error(GlucometerToDfuModeError)
+                        }
+                    }
+                    // we can't know when device will completely reboot after update
+                    // to get actual info so we using this this hack to update glucometer
+                    // version after update firmware.
+                    .doOnComplete {
+                        val id = address.hashCode().toLong()
+                        glucometersInfoCache.get(CommonConditions.ById(id))?.let { info ->
+                            glucometersInfoCache.update(
+                                listOf(info.copy(software = file.version))
+                            )
+                        }
+                    }
+            }
+
+    private fun checkBattery(
+        info: GlucometerInfoDto,
+        connection: RxBleConnection,
+        address: String
+    ) = when {
+        !info.isBatteryLevelEnoughForUpdate() -> Observable.error(
+            GlucometerLowBatteryLevelError(
+                current = info.batteryLevel ?: 0,
+                required = MIN_BATTERY_LEVEL
+            )
+        )
+
+        else -> connection.request(address, Commands.ToDfuMode)
+    }
 
     fun setPrimaryDevice(address: String): Completable =
         Completable.fromCallable {
@@ -492,9 +480,6 @@ class GlucometersManager @Inject constructor(
     private fun String.isOk(): Boolean = endsWith("ok")
     private fun String.isError(): Boolean = contains("error")
     private fun String.isEvent(): Boolean = startsWith("rd")
-
-    // TODO Метод всегда возвращает true ввиду того, что сервер не возвращает параметор compatible
-    private fun isSupported(compatible: String): Boolean = true
 
     private fun GlucometerInfoDto.isBatteryLevelEnoughForUpdate(): Boolean =
         (batteryLevel ?: 0) >= MIN_BATTERY_LEVEL

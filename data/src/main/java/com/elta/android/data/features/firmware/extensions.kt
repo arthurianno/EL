@@ -1,11 +1,11 @@
 package com.elta.android.data.features.firmware // ktlint-disable filename
 
 import com.elta.android.data.features.firmware.model.FirmwareFileStorageEntity
-import com.elta.android.domain.features.firmware.model.Firmware
+import com.elta.android.domain.features.firmware.model.FirmwareInfo
 import io.reactivex.Single
 
 internal fun Single<FirmwareFileStorageEntity>.validateFileHash(
-    firmware: Firmware,
+    firmware: FirmwareInfo,
     error: Throwable
 ): Single<FirmwareFileStorageEntity> =
     compose { files ->

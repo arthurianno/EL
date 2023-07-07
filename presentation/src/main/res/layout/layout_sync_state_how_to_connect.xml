@@ -10,12 +10,12 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/titleView"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintVertical_bias="0.8"
         app:srcCompat="@drawable/ic_inst_dev_2" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -27,7 +27,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:text="@string/sync_state_title_how_to_connect"
-        app:layout_constraintBottom_toTopOf="@+id/messageView"
+        app:layout_constraintBottom_toTopOf="@+id/messageViewLayout"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -40,19 +40,87 @@
         app:layout_constraintStart_toEndOf="@+id/titleView"
         app:layout_constraintTop_toTopOf="@+id/titleView" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/messageView"
-        style="@style/New.Title2.ShadeBlack0"
+    <LinearLayout
+        android:id="@+id/messageViewLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="36dp"
-        android:lineSpacingExtra="2dp"
-        android:text="@string/sync_state_subtitle_how_to_connect"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/manualStartButtonView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="36dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/messageView1"
+
+                style="@style/New.Title2.ShadeBlack0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/list_numbering_1_dot"
+                app:layout_constraintBottom_toTopOf="@+id/manualStartButtonView"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/messageView1Text"
+                style="@style/New.Title2.ShadeBlack0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/how_to_connect_description_pin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/messageView2"
+
+                style="@style/New.Title2.ShadeBlack0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/list_numbering_2_dot"
+                app:layout_constraintBottom_toTopOf="@+id/manualStartButtonView"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/messageView2Text"
+                style="@style/New.Title2.ShadeBlack0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/how_to_connect_description_check_ble" />
+
+        </LinearLayout>
+
+        <TextView
+            android:background="@drawable/bg_rounded_4dp"
+            android:backgroundTint="@color/pale_gray"
+            style="@style/Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_bluetooth"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            android:paddingHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/sync_how_to_connect_bluetooth_text"/>
+
+
+    </LinearLayout>
+
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/manualStartButtonView"

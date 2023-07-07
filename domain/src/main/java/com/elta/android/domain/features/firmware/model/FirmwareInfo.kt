@@ -1,7 +1,8 @@
 package com.elta.android.domain.features.firmware.model
 
-data class FirmwareFile(
+data class FirmwareInfo(
+    val id: String,
     val version: String,
-    val path: String,
+    val size: Int,
     val hash: String
 )
