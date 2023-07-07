@@ -14,6 +14,8 @@ import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentProfileSettingsBinding
+import com.elta.android.presentation.features.googlefit.openGoogleFitInStoreIntent
+import com.elta.android.presentation.features.googlefit.openGoogleFitIntent
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.ProfileSettingsAdapter
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
@@ -60,6 +62,8 @@ class ProfileSettingsFragment :
         }
         pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.copyTokenCommand.bindTo{ copyToClipboard(it) }
+        pm.downloadGoogleFitCommand.bindTo { requireContext().openGoogleFitInStoreIntent() }
+        pm.openGoogleFitCommand.bindTo { requireContext().openGoogleFitIntent() }
     }
 
     companion object {

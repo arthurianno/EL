@@ -6,9 +6,10 @@ import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
 import com.elta.android.domain.features.firebase.interactor.TokenUseCase
 import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
+import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
-import com.elta.android.domain.features.user.interactor.googleFitApp
+import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.SocialNetworkType
@@ -24,6 +25,8 @@ import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem.Type
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
+import com.nullgr.core.rx.RxBus
+import com.nullgr.core.rx.SingletonRxBusProvider
 import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.action
@@ -49,6 +52,8 @@ class ProfileSettingsPm @Inject constructor(
     val profileDeleteDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
     val copyTokenCommand = command<String>()
+    val downloadGoogleFitCommand = command<Unit>()
+    val openGoogleFitCommand = command<Unit>()
 
     private val socialNetworkState = state<SocialNetworkType>()
     private val getProfileSettingsAction = action<Unit>()
@@ -69,7 +74,6 @@ class ProfileSettingsPm @Inject constructor(
         super.onCreate()
         observeClicks()
         observeNetworksActions()
-        observeGoogleFitAction()
 
         getProfileSettingsAction.observable
             .skipWhileInProgress()
@@ -112,15 +116,30 @@ class ProfileSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
-            .map { it.type }
-            .map(::createSwitchHealthAppParams)
+        Observable.merge(
+            SingletonRxBusProvider.BUS.observable(RxBus.Keys.SINGLE)
+                .filter { it is GoogleFitAuthResult.Access }
+                .map { HealthAppType.GOOGLE_FIT },
+            bus.clicks<Clicks.ProfileSettingsHealthAppItemClicked>()
+                .map { it.type }
+        )
+            .flatMapSingle { type ->
+                checkGoogleFitAuthUseCase.execute()
+                    .doOnError(::handleError)
+                    .map { googleFitAuthResult ->
+                        createSwitchHealthAppParams(type, googleFitAuthResult) to googleFitAuthResult
+                    }
+                    .doOnSuccess { (params, googleFitAuthResult) ->
+                        val isActive = params.profile.healthApps?.first { it.type == type }?.isActive ?: false
+                        showGoogleFitEnabledDialog(googleFitAuthResult, isActive)
+                    }
+            }
+            .map { (params, _) -> params }
             .flatMapSingle {
                 updateProfileUseCase.execute(it)
                     .andThen(getProfileUseCase.execute())
                     .bindProgress()
                     .handleProfileUseCase()
-                    .doOnSuccess { checkGoogleFitAuthAction.consumer.accept(Unit) }
                     .doOnError(::handleError)
             }
             .retry()
@@ -148,22 +167,11 @@ class ProfileSettingsPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun observeGoogleFitAction() {
-        checkGoogleFitAuthAction.observable
-            .map { profileState.value }
-            .filter { it.googleFitApp()?.isActive ?: false }
-            .flatMap {
-                checkGoogleFitAuthUseCase.execute()
-                    .doOnNext(::showGoogleFitEnabledDialog)
-                    .doOnError(::handleError)
-            }
-            .subscribe()
-            .untilDestroy()
-    }
-
-    private fun showGoogleFitEnabledDialog(isEnabled: Boolean) {
-        if (isEnabled) {
-            googleFitActivatedDialogControl.show(googleFitActivatedDialogData)
+    private fun showGoogleFitEnabledDialog(googleFitAuthResult: GoogleFitAuthResult, isActive: Boolean) {
+        when(googleFitAuthResult) {
+            GoogleFitAuthResult.Access -> if (isActive) googleFitActivatedDialogControl.show(googleFitActivatedDialogData)
+            GoogleFitAuthResult.ApplicationNotInstalled -> downloadGoogleFitCommand.consumer.accept(Unit)
+            GoogleFitAuthResult.NotAccess -> openGoogleFitCommand.consumer.accept(Unit)
         }
     }
 
@@ -208,11 +216,23 @@ class ProfileSettingsPm @Inject constructor(
     private fun createUnlinkSocialUserParams(network: SocialNetworkType) =
         UnLinkSocialNetworkUseCase.Params(network)
 
-    private fun createSwitchHealthAppParams(type: HealthAppType): UpdateProfileUseCase.Params =
-        UpdateProfileUseCase.Params(
-            profileState.value.copy().apply {
-                val healthApp = healthApps?.find { it.type == type }
-                healthApp?.isActive = healthApp?.isActive?.not() ?: false
+    private fun createSwitchHealthAppParams(type: HealthAppType, googleFitAuthResult: GoogleFitAuthResult): UpdateProfileUseCase.Params {
+        val list = profileState.value.healthApps?.map {
+            if (it.type == type) {
+                it.copy(isActive = it.getActive(googleFitAuthResult))
+            } else {
+                it
             }
+        }
+        return UpdateProfileUseCase.Params(
+            profileState.value.copy(
+                healthApps = list
+            )
         )
+
+    }
+
+    private fun HealthApp.getActive(googleFitAuthResult: GoogleFitAuthResult) =
+        googleFitAuthResult is GoogleFitAuthResult.Access && !isActive
+
 }
