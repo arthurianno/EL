@@ -9,21 +9,19 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
-import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
-import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
-import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import me.dmdev.rxpm.state
 
 private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
 
@@ -138,7 +136,6 @@ class EventCreationPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .trackEvent { createCreationEvent(params) }
-                    .doOnComplete { sendEventIfNeed(params) }
                     .andThen(Single.just(true))
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
@@ -186,10 +183,6 @@ class EventCreationPm @Inject constructor(
             else -> null
         }
         return if (name == null) null else AnalyticsEvent(name, data)
-    }
-
-    private fun sendEventIfNeed(params: AddNewEventUseCase.Params) {
-        if (params.eventType == EventType.WEIGHT) bus.event(Events.ShouldUpdateProfile)
     }
 
     companion object {
