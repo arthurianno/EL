@@ -6,12 +6,13 @@ import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
+import org.threeten.bp.LocalDateTime
 
 class EventsCachedDataSource @Inject constructor(
     private val toCacheMapper: Mapper<EventDto, EventCachedDto>,
@@ -44,6 +45,11 @@ class EventsCachedDataSource @Inject constructor(
         Observable.fromCallable {
             cache.getAll(CommonConditions.ByIds(ids))
         }.map(fromCacheMapper::mapFromObjects)
+
+    override fun getLastEvent(eventType: EventTypeDto): Single<EventDto> =
+        Single.fromCallable {
+            cache.get(EventsConditions.LastByType(eventType))
+        }.map(fromCacheMapper::mapFromObject)
 
     override fun countEvents(): Single<Long> =
         Single.fromCallable { cache.count(CommonConditions.All) }

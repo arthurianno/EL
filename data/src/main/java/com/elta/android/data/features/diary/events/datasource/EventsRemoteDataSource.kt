@@ -9,6 +9,7 @@ import com.elta.android.data.features.common.storage.SyncStorage
 import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import io.reactivex.Completable
@@ -38,6 +39,10 @@ class EventsRemoteDataSource @Inject constructor(
 
     override fun getEventsById(ids: List<Long>): Observable<List<EventDto>> {
         throw UnsupportedOperationException("${this::class.java.simpleName} doesn't support getting events by id.")
+    }
+
+    override fun getLastEvent(eventType: EventTypeDto): Single<EventDto> {
+        throw UnsupportedOperationException("${this::class.java.simpleName} doesn't support getting event by type.")
     }
 
     override fun countEvents(): Single<Long> {
