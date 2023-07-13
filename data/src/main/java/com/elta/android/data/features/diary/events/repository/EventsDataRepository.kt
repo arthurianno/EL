@@ -22,6 +22,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 import org.threeten.bp.LocalDateTime
+import timber.log.Timber
 
 // TODO: CRUD logic should be improved
 @Suppress("MaxLineLength")
@@ -55,7 +56,10 @@ class EventsDataRepository @Inject constructor(
                 cacheSource.addEvents(it)
                     .andThen(
                         remoteSource.addEvents(it)
-                            .onErrorResumeNext { syncManager.saveAsCreated(event) }
+                            .onErrorResumeNext { th ->
+                                Timber.e(th, "<<<<< AddEvent error >>>>>")
+                                syncManager.saveAsCreated(event)
+                            }
                     )
             }
 
@@ -65,7 +69,10 @@ class EventsDataRepository @Inject constructor(
                 cacheSource.addEvents(it)
                     .andThen(
                         remoteSource.addEvents(it)
-                            .onErrorResumeNext { syncManager.saveAsCreated(events) }
+                            .onErrorResumeNext { th ->
+                                Timber.e(th, "<<<<< AddEvents error >>>>>")
+                                syncManager.saveAsCreated(events)
+                            }
                     )
             }
 
@@ -75,7 +82,10 @@ class EventsDataRepository @Inject constructor(
                 cacheSource.updateEvents(it)
                     .andThen(
                         remoteSource.updateEvents(it)
-                            .onErrorResumeNext { syncManager.saveAsUpdated(event) }
+                            .onErrorResumeNext { th ->
+                                Timber.e(th, "<<<<< UpdateEvent error >>>>>")
+                                syncManager.saveAsUpdated(event)
+                            }
                     )
             }
 

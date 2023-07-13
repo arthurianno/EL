@@ -297,7 +297,7 @@ class GlucometersManager @Inject constructor(
                     }
                     .take(1)
                     .switchMap { response ->
-                        if(response.isOk()) {
+                        if (response.isOk()) {
                             startFirmwareUpdate(context, file.path, address.toDfuAddress())
                         } else {
                             Observable.error(GlucometerToDfuModeError)
@@ -601,7 +601,9 @@ class GlucometersManager @Inject constructor(
                 val glucometerInfo =
                     glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                 userHolder.currentUser?.let { id ->
+                    Timber.i("<<<<<<<Sync>>>>>>  currentUser: $id")
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
+                        Timber.i("<<<<<<<Sync>>>>>>  profile.email: ${profile.email}")
                         profile.email?.let { userId ->
                             events.map { event ->
                                 eventBuilder.buildFrom(
@@ -616,13 +618,16 @@ class GlucometersManager @Inject constructor(
                 } ?: emptyList()
             }
             .map { events ->
+                Timber.i("<<<<<<<Sync>>>>>>  events: $events")
                 val filterExistingEvents = filterExistingEvents(events, getCachedEvents(events))
+                Timber.i("<<<<<<<Sync>>>>>>  filterExistingEvents: $events")
                 filterExistingEvents
             }
             .flatMap {
                 if (it.isEmpty()) Observable.empty() else Observable.just(it)
             }
             .onErrorResumeNext { exception: Throwable ->
+                Timber.e(exception, "<<<<<<<Sync>>>>>> error ${exception.message}")
                 if (exception is BleException) {
                     Observable.error(GlucometerSyncError(GlucometerOfflineError))
                 } else {
