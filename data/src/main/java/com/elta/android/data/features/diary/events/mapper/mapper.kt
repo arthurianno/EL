@@ -1,6 +1,8 @@
 package com.elta.android.data.features.diary.events.mapper // ktlint-disable filename
 
 import com.elta.android.data.features.calculator.model.ProductResponse
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.domain.features.diary.events.model.EventType
 
 private const val ELEMENT_SEPARATOR = "~"
 private const val FIELD_SEPARATOR = "|"
@@ -32,3 +34,5 @@ internal fun List<ProductResponse>?.toCache(): String? =
                 servingName + FIELD_SEPARATOR + breadUnits
         }
     }
+
+internal fun EventType.toDb(): EventTypeDto = EventTypeDto.valueOf(this.name)
