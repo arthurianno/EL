@@ -475,7 +475,7 @@ class ShopsMapPm @Inject constructor(
         }
 
     private fun navigateToMainScreen(i: Unit) {
-        router.newRootFlow(Screens.HomeFlow)
+        router.newRootFlow(Screens.MainProfileScreen)
     }
 
     private companion object {
