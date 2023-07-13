@@ -19,6 +19,7 @@ import com.elta.android.presentation.features.main.events.base.initializer.Weigh
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
+import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import java.util.concurrent.TimeUnit
@@ -26,6 +27,7 @@ import javax.inject.Inject
 import me.dmdev.rxpm.state
 
 private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
+private val EMPTY_SELECTOR_OPTION = SelectorOption(text = null)
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
@@ -153,14 +155,16 @@ class EventCreationPm @Inject constructor(
     private fun loadLastInsulinEvent() {
         eventTypeState.observable
             .flatMapSingle { type ->
-                if (type == EventType.INSULIN) getLastInsulinEventUseCase.execute()
-                    .hideErrorContainer()
-                    .bindProgress()
-                    .map { event -> event.getSelectorOption(resources) }
-                    .doOnSuccess { formSelector.option.consumer.accept(it) }
-                else Single.just(type)
+                if (type == EventType.INSULIN) {
+                    getLastInsulinEventUseCase.execute()
+                        .hideErrorContainer()
+                        .bindProgress()
+                        .map { event -> event.getSelectorOption(resources) }
+                        .onErrorReturn { EMPTY_SELECTOR_OPTION }
+                        .doOnSuccess { formSelector.option.consumer.accept(it) }
+                        .doOnError(::handleError)
+                } else Single.just(type)
             }
-            .retry()
             .subscribe()
             .untilDestroy()
     }
