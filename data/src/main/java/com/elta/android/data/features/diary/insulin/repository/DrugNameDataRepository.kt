@@ -31,7 +31,6 @@ class DrugNameDataRepository @Inject constructor(
     override fun sync(): Completable =
         Completable
             .fromCallable {
-                cacheSource.clearDrugs()
                 InsulinType.values().map { insulinType ->
                     remoteSource.getDrugNames(insulinType)
                         .subscribe { cacheSource.saveDrugs(toCacheMapper.mapFromObjects(it)) }
