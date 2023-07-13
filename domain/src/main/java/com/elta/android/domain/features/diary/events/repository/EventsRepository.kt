@@ -3,6 +3,7 @@ package com.elta.android.domain.features.diary.events.repository
 import android.graphics.Bitmap
 import android.net.Uri
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -17,6 +18,8 @@ interface EventsRepository {
     fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<Event>>
 
     fun getEventById(id: String): Single<Event>
+
+    fun getLastEvent(eventType: EventType): Single<Event>
 
     fun countEvents(): Single<Long>
 

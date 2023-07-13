@@ -5,6 +5,7 @@ import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCas
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
+import com.elta.android.domain.features.diary.events.interactor.GetLastInsulinEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -17,6 +18,8 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
+import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import java.util.concurrent.TimeUnit
@@ -24,11 +27,13 @@ import javax.inject.Inject
 import me.dmdev.rxpm.state
 
 private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
+private val EMPTY_SELECTOR_OPTION = SelectorOption(text = null)
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val clearCachedDishes: ClearCachedDishesUseCase,
+    private val getLastInsulinEventUseCase: GetLastInsulinEventUseCase,
     cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
@@ -61,6 +66,8 @@ class EventCreationPm @Inject constructor(
 
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
         observeSaveEventAction()
+        loadLastInsulinEvent()
+
         launch {
             clearCachedDishes()
         }
@@ -141,6 +148,23 @@ class EventCreationPm @Inject constructor(
                     .doOnError(::handleError)
             }
             .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun loadLastInsulinEvent() {
+        eventTypeState.observable
+            .flatMapSingle { type ->
+                if (type == EventType.INSULIN) {
+                    getLastInsulinEventUseCase.execute()
+                        .hideErrorContainer()
+                        .bindProgress()
+                        .map { event -> event.getSelectorOption(resources) }
+                        .onErrorReturn { EMPTY_SELECTOR_OPTION }
+                        .doOnSuccess { formSelector.option.consumer.accept(it) }
+                        .doOnError(::handleError)
+                } else Single.just(type)
+            }
             .subscribe()
             .untilDestroy()
     }

@@ -13,8 +13,10 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
+import com.elta.android.data.features.diary.events.mapper.toDb
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import io.reactivex.Completable
@@ -45,6 +47,10 @@ class EventsDataRepository @Inject constructor(
 
     override fun getEventById(id: String): Single<Event> =
         cacheSource.getEventById(id)
+            .map(toDomainMapper::mapFromObject)
+
+    override fun getLastEvent(eventType: EventType): Single<Event> =
+        cacheSource.getLastEvent(eventType.toDb())
             .map(toDomainMapper::mapFromObject)
 
     override fun countEvents(): Single<Long> =

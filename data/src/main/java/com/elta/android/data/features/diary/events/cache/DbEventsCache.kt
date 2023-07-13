@@ -9,9 +9,10 @@ import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto_
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.extensions.toQueryMillis
 import io.objectbox.kotlin.query
+import io.objectbox.query.QueryBuilder
 import io.objectbox.query.QueryBuilder.StringOrder.CASE_INSENSITIVE
-import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
+import org.threeten.bp.LocalDateTime
 
 class DbEventsCache @Inject constructor(
     factory: BoxStoreFactory
@@ -24,6 +25,12 @@ class DbEventsCache @Inject constructor(
             is EventsConditions.ByPeriod -> getAllForPeriod(condition.start, condition.end)
             is EventsConditions.ByTypeAndIds -> getAllByTypeAndIds(condition.type, condition.ids)
             else -> super.getAll(condition)
+        }
+
+    override fun get(condition: Condition): EventCachedDto? =
+        when (condition) {
+            is EventsConditions.LastByType -> getLastByType(condition.type)
+            else -> super.get(condition)
         }
 
     override fun contains(condition: Condition): Boolean =
@@ -43,6 +50,12 @@ class DbEventsCache @Inject constructor(
             and()
             `in`(EventCachedDto_.id, ids)
         }.find()
+
+    private fun getLastByType(type: EventTypeDto): EventCachedDto? =
+        box.query {
+            equal(EventCachedDto_.type, type.name, CASE_INSENSITIVE)
+            order(EventCachedDto_.additionTimeString, QueryBuilder.DESCENDING)
+        }.findFirst()
 
     private fun containsById(id: Long): Boolean =
         box.query {

@@ -1,6 +1,7 @@
 package com.elta.android.data.features.diary.events.datasource
 
 import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -16,6 +17,8 @@ interface EventsDataSource {
     fun getEventById(id: String): Single<EventDto>
 
     fun getEventsById(ids: List<Long>): Observable<List<EventDto>>
+
+    fun getLastEvent(eventType: EventTypeDto): Single<EventDto>
 
     fun countEvents(): Single<Long>
 
