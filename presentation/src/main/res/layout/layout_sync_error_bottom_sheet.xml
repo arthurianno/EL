@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@drawable/bg_bottom_sheet_toolbar"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_toolbar"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/Headline1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
+        android:gravity="clip_horizontal"
 
-        android:text="@string/sync_connect_device_not_found" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/Headline1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+
+            android:text="@string/sync_connect_device_not_found" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/dialogCloseButtonView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:src="@drawable/ic_dialog_close_profile" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/error_sync_text"
@@ -24,13 +41,12 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:text="@string/sync_connection_error_text"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 
     <include
         android:id="@+id/not_found_text"
-        layout="@layout/layout_device_not_found"
-        />
+        layout="@layout/layout_device_not_found" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/confirmButtonView"

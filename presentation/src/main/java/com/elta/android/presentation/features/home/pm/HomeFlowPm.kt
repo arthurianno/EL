@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.home.pm
 
 import android.os.CountDownTimer
+import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
@@ -33,14 +34,11 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
-import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
-import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.home.model.ManualSyncError
 import com.elta.android.presentation.features.home.ui.adapter.items.UserEventItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl2
-import com.elta.android.presentation.messages.SnackBarMessageData
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
@@ -48,14 +46,15 @@ import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Singles
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
-import javax.inject.Inject
+import timber.log.Timber
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
@@ -91,6 +90,7 @@ class HomeFlowPm @Inject constructor(
     val manualSyncError = state<ManualSyncError>()
     val manualSyncErrorBottomSheetCommand = command<Unit>()
     val manualSyncErrorAction = action<Unit>()
+    val closeBottomSheetErrorAction = action<Unit>()
     val closeManualSyncErrorBottomSheetCommand = command<Unit>()
 
     val btControl = bluetoothControl2()
@@ -188,6 +188,7 @@ class HomeFlowPm @Inject constructor(
                 getGlucoseFormat.execute()
                     .toObservable()
             }
+            .doOnError { Log.d("error", "bus.events<Events.EventsChanged> error") }
             .subscribe(glucoseFormat.consumer)
 
         bus.events<Events.DeviceChanged>()
@@ -195,6 +196,7 @@ class HomeFlowPm @Inject constructor(
                 getUserInfoUseCase.execute()
                     .map { it.isFirstSync == true }
             }
+            .doOnError { Log.d("error", "bus.events<Events.DeviceChanged> error") }
             .subscribe(isFirstSync.consumer)
 
         observeClicks()
@@ -216,13 +218,14 @@ class HomeFlowPm @Inject constructor(
         getUserInfoUseCase.execute()
             .toObservable()
             .map { it.isFirstSync == true }
-            .subscribe{
-                isFirstSync.consumer.accept(it)
-            }
+            .subscribe(
+                { isFirstSync.consumer.accept(it) },
+                { Timber.e(it) })
             .untilDestroy()
 
         getGlucoseFormat.execute()
             .subscribe(glucoseFormat.consumer)
+            .untilDestroy()
     }
 
     private fun handleSuccess(events: List<EventType>) {
@@ -263,6 +266,10 @@ class HomeFlowPm @Inject constructor(
             .untilDestroy()
 
         manualSyncErrorAction.observable
+            .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
+            .untilDestroy()
+
+        closeBottomSheetErrorAction.observable
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
             .untilDestroy()
 

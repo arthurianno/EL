@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +28,6 @@ import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
-import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.widgets.BottomNavigationView
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
@@ -36,11 +36,11 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.rxkotlin.Observables
+import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.DialogControl
 import me.dmdev.rxpm.widget.bindTo
-import javax.inject.Inject
 
 private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
 
@@ -149,6 +149,7 @@ class HomeFlowFragment :
                 findViewById<TextView>(R.id.error_sync_text).isVisible = !errorIsNotFound
                 findViewById<TextView>(R.id.not_found_text).isVisible = errorIsNotFound
                 findViewById<AppCompatTextView>(R.id.confirmButtonView).clicks().bindTo(pm.manualSyncErrorAction)
+                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks().bindTo(pm.closeBottomSheetErrorAction)
             }
         }
 
