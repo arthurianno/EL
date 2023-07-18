@@ -22,9 +22,9 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSele
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.state
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import me.dmdev.rxpm.state
 
 private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
 private val EMPTY_SELECTOR_OPTION = SelectorOption(text = null)
@@ -41,6 +41,7 @@ class EventCreationPm @Inject constructor(
 
     private val isFormNotEmptyState = state(false)
     private val eventFormHolderState = state(EventFormModel())
+    private val selectorInsulinState = state(SelectorOption(text = null))
 
     override fun onCreate() {
         super.onCreate()
@@ -109,28 +110,31 @@ class EventCreationPm @Inject constructor(
     }
 
     private fun checkIsEmpty(eventFormModel: EventFormModel) {
-        if (eventTypeState.valueOrNull == EventType.WEIGHT) {
-            isFormNotEmptyState.consumer.accept(
+        val isSpecialChanged = when (eventTypeState.valueOrNull) {
+            EventType.WEIGHT -> {
                 eventFormModel.pickerValue != (
-                    profileState.valueOrNull?.weight
-                        ?: WeightFormInitializer.WEIGHT_DEFAULT_VALUE
-                    ) ||
-                    !eventFormModel.inputValue.isNullOrEmpty() ||
-                    eventFormModel.meta != null ||
-                    eventFormModel.tag != null ||
-                    !eventFormModel.note.isNullOrEmpty() ||
-                    eventFormModel.isDateChanged
-            )
-        } else {
-            isFormNotEmptyState.consumer.accept(
+                        profileState.valueOrNull?.weight
+                            ?: WeightFormInitializer.WEIGHT_DEFAULT_VALUE
+                        ) ||
+                        eventFormModel.meta != null
+            }
+
+            EventType.INSULIN -> {
+                eventFormModel.meta != selectorInsulinState.valueOrNull?.meta ||
+                        eventFormModel.pickerValue != ZERO_PICKER_VALUE
+            }
+
+            else -> {
                 eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
-                    !eventFormModel.inputValue.isNullOrEmpty() ||
-                    eventFormModel.meta != null ||
-                    eventFormModel.tag != null ||
-                    !eventFormModel.note.isNullOrEmpty() ||
-                    eventFormModel.isDateChanged
-            )
+                        eventFormModel.meta != null
+            }
         }
+        val isCommonChanged = !eventFormModel.inputValue.isNullOrEmpty() ||
+                eventFormModel.tag != null ||
+                !eventFormModel.note.isNullOrEmpty() ||
+                eventFormModel.isDateChanged
+
+        isFormNotEmptyState.consumer.accept(isSpecialChanged || isCommonChanged)
     }
 
     private fun observeSaveEventAction() {
@@ -162,6 +166,7 @@ class EventCreationPm @Inject constructor(
                         .map { event -> event.getSelectorOption(resources) }
                         .onErrorReturn { EMPTY_SELECTOR_OPTION }
                         .doOnSuccess { formSelector.option.consumer.accept(it) }
+                        .doOnSuccess { selectorInsulinState.consumer.accept(it) }
                         .doOnError(::handleError)
                 } else Single.just(type)
             }
