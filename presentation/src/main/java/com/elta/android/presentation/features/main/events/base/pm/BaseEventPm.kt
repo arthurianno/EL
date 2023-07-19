@@ -21,6 +21,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.features.main.events.base.mapper.toChooserInsulin
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
@@ -209,7 +210,8 @@ abstract class BaseEventPm(
             EventType.INSULIN -> ChooserConfiguration(
                 ChooserType.VARIANTS_WITH_SUBTYPE,
                 eventTypeState.value,
-                generateChooserId()
+                generateChooserId(),
+                formSelector.option.valueOrNull.toChooserInsulin()
             )
 
             EventType.BREAD -> ChooserConfiguration(

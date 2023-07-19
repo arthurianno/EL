@@ -15,10 +15,12 @@ class ChooserWithSubtypeItemViewHolder(
 ) : BaseListItemViewHolder<ChooserWithSubtypeItem>(binding.root) {
     override fun bind(item: ChooserWithSubtypeItem) {
         with(binding) {
+            chooserRightIconView.toggleView(true)
+            chooserDrugView.toggleView(item.isSelectedType)
             chooserIconView.toggleView(item.iconId != null)
             item.iconId?.let { chooserIconView.setImageResource(it) }
             chooserTitleView.text = item.title
-            chooserRightIconView.toggleView(true)
+            chooserDrugView.text = item.drug
             chooserRightIconView.setImageResource(R.drawable.ic_arrow_left)
             root.setOnClickListener {
                 bus.click(Clicks.ChooserWithSubtypesOptionClicked(item))

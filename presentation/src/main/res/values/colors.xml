@@ -21,6 +21,7 @@
     <color name="g_green_a">#43e695</color>
     <color name="g_green_b">#3bb2b8</color>
     <color name="shade_g_purpur_a">#38b7e1</color>
+    <color name="shade_g_purpor_20">#3338B7E1</color>
     <color name="shade_g_green_a_016">#273ec9a8</color>
     <color name="shade_g_green_a">#3ec9a8</color>
     <color name="black_blue">#3d4556</color>
@@ -32,6 +33,7 @@
     <color name="shade_blue_10">#1A1C7AFF</color>
     <color name="shade_blue3">#4480d4</color>
     <color name="shade_blue3_20">#334480d4</color>
+    <color name="dark_shade_blue">#334480</color>
     <color name="black">#17191f</color>
     <color name="shade_black0">#626a7c</color>
     <color name="white">#ffffff</color>
