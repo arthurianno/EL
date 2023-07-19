@@ -16,6 +16,7 @@ import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
+import timber.log.Timber
 import javax.inject.Inject
 
 class ChooserOptionsItemsBuilder @Inject constructor(
@@ -37,17 +38,20 @@ class ChooserOptionsItemsBuilder @Inject constructor(
             is ActivityType -> mapAsActivityItem(source)
             is InsulinType -> mapAsInsulinItem(source, config.chooserInsulin)
             is Tag -> mapAsTagItem(source)
-            is String -> mapAsInsulinNameItem(source)
+            is String -> mapAsInsulinNameItem(source, config.chooserInsulin)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
 
-    private fun mapAsInsulinNameItem(source: ChooserOptionModel): ListItem {
+    private fun mapAsInsulinNameItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
         val meta = source.meta as String
+        Timber.d("checkOption $meta")
+        Timber.d("checkOption drug ${chooserInsulin?.insulin?.drug}")
         return ChooserItem(
             id = source.id,
             title = source.id,
             iconId = null,
-            meta = meta
+            meta = meta,
+            isSelected = chooserInsulin?.insulin?.drug == meta
         )
     }
 

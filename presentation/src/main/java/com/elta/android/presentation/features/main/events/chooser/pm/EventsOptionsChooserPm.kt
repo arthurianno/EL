@@ -100,7 +100,7 @@ class EventsOptionsChooserPm @Inject constructor(
         bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
             .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.title)
+                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.title, configurationState.valueOrNull?.chooserInsulin)
             }
             .subscribe {
                 router.navigateTo(Screens.EventsChooserScreen(it))
@@ -141,17 +141,28 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun performSelection(id: String) {
         items.consumer.accept(
             items.value.map {
-                if (it is ChooserItem) {
-                    return@map when {
-                        it.isSelected -> it.copy(isSelected = false)
-                        it.id == id -> it.copy(isSelected = true)
-                        else -> it
-                    }
-                }
-                return@map it
+                return@map if (it is ChooserItem) {
+                    it.copy(isSelected = it.id == id && !it.isSelected)
+                } else it
             }
         )
     }
+
+//    private fun performSelection(id: String) {
+//
+//        items.consumer.accept(
+//            items.value.map {
+//                if (it is ChooserItem) {
+//                    return@map when {
+//                        it.isSelected -> it.copy(isSelected = false)
+//                        it.id == id -> it.copy(isSelected = true)
+//                        else -> it
+//                    }
+//                }
+//                return@map it
+//            }
+//        )
+//    }
 
     private fun buildChooserResult(i: Unit): ChooserResult {
         val selectedItemId = selectedItemIdState.value
