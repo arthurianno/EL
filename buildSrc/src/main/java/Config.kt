@@ -48,4 +48,5 @@ object Module {
     const val domain = ":domain"
     const val data = ":data"
     const val common = ":common"
+    const val iiot_sdk = ":iiot-sdk"
 }

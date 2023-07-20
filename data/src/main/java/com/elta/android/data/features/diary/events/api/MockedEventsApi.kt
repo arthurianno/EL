@@ -62,7 +62,7 @@ class MockedEventsApi(private val context: Context) : EventsApi {
             EventsDto(pageOfData, MetaDto(list.size, page, pageSize))
         }.log("Events", "meta") { it.meta.toString() }
 
-    override fun addEvents(events: List<EventDto>): Observable<List<EventDto>> =
+    override fun addEvents(requireSendingToRostech: Boolean, events: List<EventDto>): Observable<List<EventDto>> =
         Observable.just(events)
 
     override fun updateEvents(events: List<EventDto>): Observable<List<EventDto>> =

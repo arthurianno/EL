@@ -31,6 +31,7 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.firmware.model.FirmwareFile
+import com.elta.android.iiot.IiotSdkDeviceService
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -56,9 +57,6 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
-import ru.SDK.Test.DeviceCallBack
-import ru.SDK.Test.DeviceService
-import ru.SDK.Test.ELTAConnect
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
@@ -93,7 +91,6 @@ class GlucometersManager @Inject constructor(
     private val client: RxBleClient,
     private val application: Application,
     private val personalData: PersonalDataStorage,
-    private val iiotSdkCallBack: DeviceCallBack,
     private val context: Context
 ) {
 
@@ -461,13 +458,12 @@ class GlucometersManager @Inject constructor(
                 pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
                     personalData.getIiotLogin()
                         .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
-                            DeviceService.init(
-                                application,
-                                iiotSdkLogin,
-                                iiotSdkPassword,
-                                iiotSdkCallBack
+                            IiotSdkDeviceService.init(
+                                application = application,
+                                iiotSdkLogin = iiotSdkLogin,
+                                iiotSdkPassword = iiotSdkPassword,
                             )
-                            DeviceService.connect(ELTAConnect::class.java, address, pin)
+                            IiotSdkDeviceService.connect(pin = pin, address = address)
                         }
                         .subscribe()
                 }

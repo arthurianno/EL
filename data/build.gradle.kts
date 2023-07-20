@@ -36,6 +36,7 @@ dependencies {
     implementation(project(Module.core_preferences))
     implementation(project(Module.common))
     api(project(Module.domain))
+    api(project(Module.iiot_sdk))
     implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Google.Services.fitness)

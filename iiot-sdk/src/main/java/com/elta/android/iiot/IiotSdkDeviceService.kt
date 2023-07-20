@@ -1,22 +1,31 @@
-package com.elta.android.data.di
+package com.elta.android.iiot
 
-import dagger.Module
-import dagger.Provides
+import android.app.Application
 import ru.SDK.Test.BluetoothStatusCode
 import ru.SDK.Test.DeviceCallBack
 import ru.SDK.Test.DeviceService
+import ru.SDK.Test.ELTAConnect
 import ru.SDK.Test.PlatformStatusCode
 import timber.log.Timber
-import javax.inject.Singleton
 
 private const val LOG_TAG = "SDK_DeviceService_ELTA"
 
-@Module
-class IiotSdkModule {
+object IiotSdkDeviceService {
 
-    @Singleton
-    @Provides
-    fun provideIiotSdkCallback(): DeviceCallBack = object : DeviceCallBack {
+    fun init(application: Application, iiotSdkLogin: String, iiotSdkPassword: String) {
+        DeviceService.init(
+            application,
+            iiotSdkLogin,
+            iiotSdkPassword,
+            deviceCallBack
+        )
+    }
+
+    fun connect(pin: String, address: String) {
+        DeviceService.connect(ELTAConnect::class.java, address, pin)
+    }
+
+    private val deviceCallBack = object : DeviceCallBack {
         override fun onExploreDevice(name: String?, value: String?, p2: Any?) {
             Timber.tag(LOG_TAG).i("<READ Event ($LOG_TAG)> -> $name=$value - $p2")
         }
@@ -37,8 +46,4 @@ class IiotSdkModule {
             Timber.tag(LOG_TAG).e(exception, "<$LOG_TAG ERROR ($p0)> -> ${exception?.message}")
         }
     }
-
-    @Provides
-    @Singleton
-    fun provideDeviceService(): DeviceService = DeviceService()
 }
