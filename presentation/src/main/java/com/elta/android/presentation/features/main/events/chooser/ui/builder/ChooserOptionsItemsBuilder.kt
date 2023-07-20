@@ -8,6 +8,7 @@ import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
+import com.elta.android.presentation.features.main.events.chooser.models.ChooserInsulin
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
@@ -27,26 +28,27 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     ): List<ListItem> {
         return mutableListOf<ListItem>().apply {
             add(ChooserHeaderItem(configuration.toHeaderTitle()))
-            addAll(options.map { mapFromObject(it) })
+            addAll(options.map { mapFromObject(it, configuration) })
         }
     }
 
-    private fun mapFromObject(source: ChooserOptionModel): ListItem =
+    private fun mapFromObject(source: ChooserOptionModel, config: ChooserConfiguration): ListItem =
         when (source.meta) {
             is ActivityType -> mapAsActivityItem(source)
-            is InsulinType -> mapAsInsulinItem(source)
+            is InsulinType -> mapAsInsulinItem(source, config.chooserInsulin)
             is Tag -> mapAsTagItem(source)
-            is String -> mapAsInsulinNameItem(source)
+            is String -> mapAsInsulinNameItem(source, config.chooserInsulin)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
 
-    private fun mapAsInsulinNameItem(source: ChooserOptionModel): ListItem {
+    private fun mapAsInsulinNameItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
         val meta = source.meta as String
         return ChooserItem(
             id = source.id,
             title = source.id,
             iconId = null,
-            meta = meta
+            meta = meta,
+            isSelected = chooserInsulin?.insulin?.drug == meta
         )
     }
 
@@ -60,13 +62,16 @@ class ChooserOptionsItemsBuilder @Inject constructor(
         )
     }
 
-    private fun mapAsInsulinItem(source: ChooserOptionModel): ListItem {
+    private fun mapAsInsulinItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
         val meta = source.meta as InsulinType
+        val insulin = chooserInsulin?.insulin
         return ChooserWithSubtypeItem(
             id = source.id,
             title = resourceProvider.getString(meta.toName()),
             iconId = null,
-            meta = meta
+            meta = meta,
+            isSelectedType = insulin?.type == meta,
+            drug = insulin?.drug.orEmpty()
         )
     }
 

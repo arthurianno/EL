@@ -46,6 +46,8 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
+    private var selectedItemId = NONE_ID
+
     override fun onCreate() {
         super.onCreate()
 
@@ -64,6 +66,15 @@ class EventsOptionsChooserPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .map { options -> itemsBuilder.buildItems(configurationState.value, options) }
+                    .map { items ->
+                        items
+                            .find { item -> item is ChooserItem && item.isSelected }
+                            ?.let { chooserItem ->
+                                selectedItemId = (chooserItem as ChooserItem).id
+                                setPreviousSelection(configurationState.value)
+                            }
+                        items
+                    }
                     .doOnNext(items.consumer)
                     .doOnError(::handleError)
             }
@@ -81,14 +92,15 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun bindSelectionBehaviour() {
         selectedItemIdState.observable
             .skip(1)
-            .doOnNext(::performSelection)
-            .map { it != NONE_ID && it != previousSelectionState.valueOrNull }
+            .doOnNext { performSelection(selectedItemId) }
+            .map { items.value.find { it is ChooserItem && it.isSelected } != null }
             .doOnNext(confirmButtonVisibilityCommand.consumer)
             .subscribe()
             .untilDestroy()
 
         bus.clicks<Clicks.ChooserOptionClicked>()
             .map {
+                selectedItemId = it.item.id
                 if (it.item.id == selectedItemIdState.value) NONE_ID
                 else it.item.id
             }
@@ -100,7 +112,12 @@ class EventsOptionsChooserPm @Inject constructor(
         bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
             .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(ChooserType.VARIANTS, EventType.INSULIN, it.item.title)
+                ChooserConfiguration(
+                    ChooserType.VARIANTS,
+                    EventType.INSULIN,
+                    it.item.title,
+                    configurationState.valueOrNull?.chooserInsulin
+                )
             }
             .subscribe {
                 router.navigateTo(Screens.EventsChooserScreen(it))
@@ -141,20 +158,14 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun performSelection(id: String) {
         items.consumer.accept(
             items.value.map {
-                if (it is ChooserItem) {
-                    return@map when {
-                        it.isSelected -> it.copy(isSelected = false)
-                        it.id == id -> it.copy(isSelected = true)
-                        else -> it
-                    }
-                }
-                return@map it
+                return@map if (it is ChooserItem) {
+                    it.copy(isSelected = it.id == id && !it.isSelected)
+                } else it
             }
         )
     }
 
     private fun buildChooserResult(i: Unit): ChooserResult {
-        val selectedItemId = selectedItemIdState.value
         val item = items.value.find { it is ChooserItem && it.id == selectedItemId }
         val chooserItem = item as? ChooserItem
         return ChooserResult(
@@ -199,17 +210,17 @@ class EventsOptionsChooserPm @Inject constructor(
         toolbarTitleCommand.consumer.accept(
             when {
                 configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
-                    configuration.eventType == EventType.INSULIN -> {
+                        configuration.eventType == EventType.INSULIN -> {
                     resources.getString(R.string.events_options_chooser_title_insulin)
                 }
 
                 configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.ACTIVITY -> {
+                        configuration.eventType == EventType.ACTIVITY -> {
                     resources.getString(R.string.events_options_chooser_title_activities)
                 }
 
                 configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.INSULIN -> {
+                        configuration.eventType == EventType.INSULIN -> {
                     previousSelectionState.valueOrNull
                         ?: resources.getString(R.string.events_options_chooser_title_tags)
                 }
