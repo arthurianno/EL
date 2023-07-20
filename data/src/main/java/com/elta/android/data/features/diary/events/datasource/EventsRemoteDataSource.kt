@@ -12,6 +12,7 @@ import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.EventsDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
+import com.elta.android.domain.features.FeatureToggles
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -50,7 +51,7 @@ class EventsRemoteDataSource @Inject constructor(
     }
 
     override fun addEvents(events: List<EventDto>): Completable =
-        api.addEvents(events)
+        api.addEvents(FeatureToggles.isEnableIiotSdkFeature, events)
             .flatMapCompletable { Completable.complete() }
 
     override fun updateEvents(events: List<EventDto>): Completable =

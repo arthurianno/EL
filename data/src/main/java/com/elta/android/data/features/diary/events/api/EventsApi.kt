@@ -22,6 +22,7 @@ interface EventsApi {
 
     @POST("api/diary/v1/events")
     fun addEvents(
+        @Query("requireSendingToRostech") requireSendingToRostech: Boolean,
         @Body events: List<EventDto>
     ): Observable<List<EventDto>>
 

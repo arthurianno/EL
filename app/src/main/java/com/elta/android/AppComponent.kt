@@ -8,7 +8,6 @@ import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
 import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerModule
-import com.elta.android.data.di.IiotSdkModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
 import com.elta.android.data.di.MappersModule
@@ -50,7 +49,6 @@ import javax.inject.Singleton
         GlucometerModule::class,
         LocalSyncModule::class,
         FatSecretModule::class,
-        IiotSdkModule::class,
         WebimModule::class,
         // domain
         RepoModule::class,
