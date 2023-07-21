@@ -13,4 +13,5 @@ sealed class PermissionEvent : Event {
     class Camera : PermissionEvent()
     class FineLocation : PermissionEvent()
     object OpenSettings : PermissionEvent()
+    object Bluetooth : PermissionEvent()
 }

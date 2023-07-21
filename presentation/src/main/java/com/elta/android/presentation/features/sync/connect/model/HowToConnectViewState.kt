@@ -4,5 +4,6 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class HowToConnectViewState(
-    val isOnBoarding: Boolean
+    val isOnBoarding: Boolean,
+    val bluetoothEnabled: Boolean
 )
