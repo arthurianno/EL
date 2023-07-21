@@ -800,4 +800,7 @@
     <!-- Location Dialog -->
     <string name="location_dialog_message">Для подключения к глюкометру приложению необходим доступ к местоположению</string>
 
+    <!-- Bluetooth Dialog -->
+    <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
+
 </resources>
