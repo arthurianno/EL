@@ -1,6 +1,10 @@
 package com.elta.android.presentation.features.sync.connect
 
 import android.Manifest
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +28,6 @@ import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
-import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
@@ -41,7 +44,9 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 private val requiredPermissions = listOf(
     Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_FINE_LOCATION
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.BLUETOOTH_SCAN,
+    Manifest.permission.BLUETOOTH_CONNECT
 )
 
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
@@ -72,12 +77,20 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             positiveButtonText = getString(R.string.settings_dialog_positive),
             negativeButtonText = getString(R.string.settings_dialog_negative)
         )
+
+        bluetoothPermissionDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.bluetooth_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
+        )
     }
 
     @Composable
     override fun Dialogs(viewModel: HowToConnectViewModel) {
         BaseDialog(widgetModel = viewModel.cameraPermissionDialog)
         BaseDialog(widgetModel = viewModel.locationPermissionDialog)
+        BaseDialog(widgetModel = viewModel.bluetoothPermissionDialog)
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -86,9 +99,12 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         val permissions =
             rememberMultiplePermissionsState(permissions = requiredPermissions)
         val event = viewModel.event.collectAsState(initial = null).value
+        val state = viewModel.state.collectAsState().value
+        if (state.bluetoothEnabled) { requestEnableBluetooth() }
         LaunchedEffect(key1 = event) {
             if (event is PermissionEvent.Camera ||
-                event is PermissionEvent.FineLocation
+                event is PermissionEvent.FineLocation ||
+                event is PermissionEvent.Bluetooth
             ) {
                 permissions.launchMultiplePermissionRequest()
             }
@@ -96,6 +112,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 is PermissionEvent.Camera -> permissions.launchMultiplePermissionRequest()
                 is PermissionEvent.FineLocation -> permissions.launchMultiplePermissionRequest()
                 is PermissionEvent.OpenSettings -> openSettingsIntent(requireContext())
+                is PermissionEvent.Bluetooth -> permissions.launchMultiplePermissionRequest()
             }
         }
         GetLocalProperties { dimens, _, _, _, _ ->
@@ -139,7 +156,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
 
     @Composable
     private fun Title() {
-        GetLocalProperties { _, _, colors, _, types ->
+        GetLocalProperties { _, _, _, _, types ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(id = R.string.sync_how_to_connect_title),
@@ -164,5 +181,20 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 startIconColor = colors.blackBlue
             )
         }
+    }
+
+    private fun requestEnableBluetooth() {
+        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        resultLauncher.launch(intent)
+    }
+
+    private val resultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val connectAction = when (result.resultCode) {
+            Activity.RESULT_OK -> ConnectAction.Complete
+            else -> ConnectAction.RepeatConnect
+        }
+        viewModel sendAction connectAction
     }
 }

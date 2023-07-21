@@ -24,7 +24,8 @@ import javax.inject.Inject
 class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectViewState>() {
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
-            isOnBoarding = false
+            isOnBoarding = false,
+            bluetoothEnabled = false
         )
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -35,6 +36,10 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     )
 
     val locationPermissionDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
+    )
+
+    val bluetoothPermissionDialog = BaseDialogWidgetModel<Nothing>(
         positiveOnCLick = { sendEvent(PermissionEvent.OpenSettings) }
     )
 
@@ -60,15 +65,35 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
         }
     }
 
+    override fun reduceStateByAction(
+        currentState: HowToConnectViewState,
+        action: Action
+    ): HowToConnectViewState = run {
+        when (action) {
+            is ConnectAction.Complete -> {
+                state.value.copy(bluetoothEnabled = true)
+            }
+            is ConnectAction.RepeatConnect -> {
+                state.value.copy(bluetoothEnabled = false)
+            }
+            else -> currentState
+        }
+    }
+
     private fun checkPermissions(permissionStates: List<PermissionState>) {
-        if (permissionStates.all { it.status.isGranted }) {
+        if (permissionStates.all { it.status.isGranted } && state.value.bluetoothEnabled) {
             router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
         } else {
             val cameraPermission = permissionStates.component1()
             val locationPermission = permissionStates.component2()
+            val bluetoothPermission = permissionStates.component3()
+            if (bluetoothPermission.status.isGranted) {
+                reduceState { state.value.copy(bluetoothEnabled = true) }
+            }
             when {
                 !cameraPermission.status.isGranted && cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
                 !locationPermission.status.isGranted && locationPermission.status.shouldShowRationale -> locationPermissionDialog.dialogOpen()
+                !bluetoothPermission.status.isGranted -> bluetoothPermissionDialog.dialogOpen()
 
                 !cameraPermission.status.isGranted -> sendEvent(PermissionEvent.Camera())
                 !locationPermission.status.isGranted -> sendEvent(PermissionEvent.FineLocation())
