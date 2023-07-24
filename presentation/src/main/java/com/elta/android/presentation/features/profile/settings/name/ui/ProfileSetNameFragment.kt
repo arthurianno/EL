@@ -30,16 +30,14 @@ class ProfileSetNameFragment :
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
 
-        with(pm.firstNameInput) {
-            bindTo(binding.nameInputView)
-            error.bindTo { binding.nameInputView.error = it.takeUnless { it.isBlank() } }
-        }
-        with(pm.secondNameInput) {
-            bindTo(binding.surnameInputView)
-            error.bindTo { binding.surnameInputView.error = it.takeUnless { it.isBlank() } }
-        }
-        pm.saveChangesEnableState.bindTo { binding.continueButtonView.isEnabled = it }
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         binding.continueButtonView.clicks().bindTo(pm.continueAction)
+
+        pm.firstNameInput.bindTo(binding.nameInputView)
+        pm.firstNameInput.error.bindTo { binding.nameInputView.error = it.takeUnless { it.isBlank() } }
+        pm.secondNameInput.bindTo(binding.surnameInputView)
+        pm.secondNameInput.error.bindTo { binding.surnameInputView.error = it.takeUnless { it.isBlank() } }
+        pm.saveChangesEnableState.bindTo { binding.continueButtonView.isEnabled = it }
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
     }
