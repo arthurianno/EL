@@ -69,6 +69,7 @@ class FirmwarePm @Inject constructor(
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
             is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
             is NotFoundError -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
+            is BluetoothNotEnabledError -> setState(UpdateState.FirmwareUpdateError(resources))
             else -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
         }
     }
@@ -102,11 +103,11 @@ class FirmwarePm @Inject constructor(
             .subscribe {
                 when (updateState.value) {
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
-                    is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
+                    is UpdateState.Found -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
                     is UpdateState.BatteryLowLevel -> router.exit()
-                    is UpdateState.FirmwareDownloadingError -> downloadFirmwareAction.consumer.accept(Unit)
-                    is UpdateState.FirmwareUpdateError -> startUpdateAction.consumer.accept(Unit)
-                    is UpdateState.GlucometerOfflineError -> startUpdateAction.consumer.accept(Unit)
+                    is UpdateState.FirmwareDownloadingError -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
+                    is UpdateState.FirmwareUpdateError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
+                    is UpdateState.GlucometerOfflineError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
                     is UpdateState.Downloading -> {}
                     is UpdateState.Progress -> {}
                     is UpdateState.Updated -> {}
@@ -114,6 +115,18 @@ class FirmwarePm @Inject constructor(
                 }
             }
             .untilDestroy()
+    }
+
+    private fun checkBleBeforeUpdate(errorState: UpdateState, doOnSuccess: () -> Unit) {
+        btControl.requestEnableBluetooth()
+                .doAfterSuccess {
+                    if (it) {
+                        doOnSuccess.invoke()
+                    } else {
+                        setState(errorState)
+                    }
+                }
+                .subscribe()
     }
 
     private fun bindActions() {
@@ -208,7 +221,7 @@ class FirmwarePm @Inject constructor(
 
     private fun handleFirmwareDownloaded(file: FirmwareFile) {
         firmwareFileState.consumer.accept(file)
-        startUpdateAction.consumer.accept(Unit)
+        checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
     }
 
     private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
