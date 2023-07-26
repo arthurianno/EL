@@ -48,10 +48,18 @@ fun startFirmwareUpdate(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         DfuServiceInitiator.createDfuNotificationChannel(context)
     }
-    val starter = DfuServiceInitiator(deviceAddress)
-    starter.setDeviceName("SatelliteOnline")
-    starter.setZip(path)
-    starter.setForceDfu(true)
+
+    val starter = DfuServiceInitiator(deviceAddress).apply {
+        setDeviceName("Dfu")
+        setKeepBond(false)
+        setForceDfu(true)
+        setForceScanningForNewAddressInLegacyDfu(false)
+        setPrepareDataObjectDelay(400L)
+        setRebootTime(0)
+        setScanTimeout(2000)
+        setZip(path)
+    }
+
     starter.start(context, EltaDfuService::class.java)
 
     emitter.setDisposable(

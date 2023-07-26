@@ -107,6 +107,10 @@ class GlucometersManager @Inject constructor(
         ScanFilter.Builder().setDeviceName("Satellite").build()
     )
 
+    private val dfuFilters = listOf<ScanFilter>(
+        ScanFilter.Builder().setDeviceName("Dfu").build()
+    )
+
     private val connections = mutableMapOf<String, RxBleConnection>()
     private val infoCommands = listOf(
         Commands.GetDate,
@@ -292,14 +296,10 @@ class GlucometersManager @Inject constructor(
                                 checkBattery(info, connection, address)
                             }
                     }
-                    .take(1)
-                    .switchMap { response ->
-                        if (response.isOk()) {
-                            startFirmwareUpdate(context, file.path, address.toDfuAddress())
-                        } else {
-                            Observable.error(GlucometerToDfuModeError)
+                        .take(1)
+                        .switchMap { response ->
+                            firmwareUpdate(response, address, file)
                         }
-                    }
                     // we can't know when device will completely reboot after update
                     // to get actual info so we using this this hack to update glucometer
                     // version after update firmware.
@@ -312,6 +312,22 @@ class GlucometersManager @Inject constructor(
                         }
                     }
             }
+
+    private fun firmwareUpdate(
+        response: String,
+        address: String,
+        file: FirmwareFile
+    ): Observable<String> {
+        return if (response.isOk()) {
+            val dfuAddress = address.toDfuAddress()
+            scanner.startScan(dfuFilters, settings)
+                .filter { results -> results.map { it.device.address }.contains(dfuAddress) }
+                .take(1)
+                .switchMap { startFirmwareUpdate(context, file.path, dfuAddress) }
+        } else {
+            Observable.error(GlucometerToDfuModeError)
+        }
+    }
 
     private fun checkBattery(
         info: GlucometerInfoDto,

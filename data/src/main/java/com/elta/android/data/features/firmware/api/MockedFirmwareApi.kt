@@ -15,7 +15,7 @@ class MockedFirmwareApi(
 
     override fun downloadModelFirmware(id: String): Single<ResponseBody> {
         return Single.fromCallable {
-            val stream = context.resources.openRawResource(R.raw.satellite_online_30)
+            val stream = context.resources.openRawResource(R.raw.satellite_online_403)
             stream.readBytes().toResponseBody("application/octet-stream".toMediaTypeOrNull())
         }
     }
@@ -28,10 +28,10 @@ class MockedFirmwareApi(
     ): Single<NewVersionFirmwareInfoResponse> {
         return Single.just(
             NewVersionFirmwareInfoResponse(
-                id = "d1slpac01d",
-                version = "123",
-                size = 123,
-                hash = "12r12[aslc=zxkxas=cz=xaxz-zcalzc"
+                id = "047303d8-6a31-42c9-bd41-fa8ec58d75a5",
+                version = "4.0.3",
+                size = 43499,
+                hash = "873B2329ACD1BD802086D7FCEC8EB668"
             )
         )
     }
