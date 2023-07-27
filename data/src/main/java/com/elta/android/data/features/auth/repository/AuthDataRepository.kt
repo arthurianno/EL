@@ -1,5 +1,6 @@
 package com.elta.android.data.features.auth.repository
 
+import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.model.EmailStatusNetworkResponse
 import com.elta.android.data.features.auth.model.LoginNetworkResponse
@@ -7,7 +8,11 @@ import com.elta.android.data.features.auth.model.TokenOwnerNetworkResponse
 import com.elta.android.data.features.auth.model.TokensNetworkResponse
 import com.elta.android.data.features.auth.storage.TokenStorage
 import com.elta.android.data.features.common.storage.UserHolder
+import com.elta.android.data.features.user.datasource.ProfileDataSource
+import com.elta.android.data.features.user.mapper.toNetwork
 import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.user.model.GlucoseFormat
+import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
@@ -20,7 +25,8 @@ class AuthDataRepository @Inject constructor(
     private val tokenStorage: TokenStorage,
     private val source: AuthDataSource,
     private val userInfoRepository: UserInfoRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    @Cache private val cachedSource: ProfileDataSource,
 ) : AuthRepository {
 
     override fun register(email: String, password: String): Completable =
@@ -29,8 +35,10 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response, email)
             }
             .flatMapCompletable {
-                userInfoRepository.updateUserInfo(createNewUserInfo())
+                //TODO: тех долг. Функция не должна принимать на вход network data
+                cachedSource.updateProfile(Profile(email = email, glucoseFormat = GlucoseFormat.CAPILLARY).toNetwork())
             }
+            .andThen(userInfoRepository.updateUserInfo(createNewUserInfo()))
 
     override fun login(email: String, password: String): Single<Boolean> =
         source.login(email, password)
@@ -38,7 +46,7 @@ class AuthDataRepository @Inject constructor(
                 saveUserCredentials(response.tokens, email)
             }
             .map(LoginNetworkResponse::isEmailConfirmed)
-            .flatMap { isConfirm -> //TODO: Вынести получение настроек
+            .flatMap { isConfirm -> //TODO: тех долг. Вынести получение настроек
                 profileRepository.getProfileSettings(fromCache = false)
                     .map { isConfirm }
                     .onErrorReturn { isConfirm }
