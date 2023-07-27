@@ -17,7 +17,8 @@ object IiotSdkDeviceService {
             application,
             iiotSdkLogin,
             iiotSdkPassword,
-            deviceCallBack
+            deviceCallBack,
+            true //?
         )
     }
 
