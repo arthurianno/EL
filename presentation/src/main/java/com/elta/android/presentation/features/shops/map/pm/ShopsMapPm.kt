@@ -4,6 +4,7 @@ package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
 import android.location.Location
+import android.util.Log
 import com.elta.android.common.utils.takeFirst
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
@@ -197,8 +198,7 @@ class ShopsMapPm @Inject constructor(
                     else -> {}
                 }
             }
-            .map { Unit }
-            .subscribe(fetchMyLocationAction.consumer)
+            .subscribe{fetchMyLocationAction.consumer}
             .untilDestroy()
 
         myLocationState.observable
