@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
+import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.geo.GeoPoint
 import com.elta.android.presentation.core.permissions.requestStatus
 import com.elta.android.presentation.core.permissions.statusFor
@@ -27,6 +29,7 @@ import com.elta.android.presentation.features.shops.map.ui.adapter.MapAdapter
 import com.elta.android.presentation.features.shops.map.ui.widgets.ShopClusterPinProvider
 import com.elta.android.presentation.utils.applyWindowInsetsForChildrenView
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
@@ -40,9 +43,9 @@ import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hideKeyboard
 import com.tbruyelle.rxpermissions2.RxPermissions
+import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
-import javax.inject.Inject
 
 @Suppress("MagicNumber")
 class ShopsMapFragment :
@@ -53,6 +56,8 @@ class ShopsMapFragment :
 
     @Inject
     lateinit var mapSearchAdapter: MapAdapter
+
+    lateinit var locationDialog: BaseDialogWidgetModel<Nothing>
 
     override val searchAdapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { mapSearchAdapter }
     override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { mapAdapter }
@@ -89,6 +94,11 @@ class ShopsMapFragment :
             toolbarView.applyWindowInsetsForChildrenView()
         }
         with(binding) {
+            locationDialogInit()
+            locationPermissionDialog.setContent {
+                BaseDialog(widgetModel = locationDialog)
+            }
+
             itemsView.layoutManager =
                 FixedLinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL)
             itemsView.adapter = adapter
@@ -108,6 +118,18 @@ class ShopsMapFragment :
         }
     }
 
+    private fun locationDialogInit() {
+        locationDialog = BaseDialogWidgetModel(
+            positiveOnCLick = { presentationModel.openSettingsAction.consumer.accept(Unit) }
+        )
+        locationDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.map_location_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
+        )
+    }
+
     override fun onBindPresentationModel(pm: ShopsMapPm) {
         super.onBindPresentationModel(pm)
         binding.myLocationButtonView.clicks().bindTo(pm.moveToMyLocationAction)
@@ -120,10 +142,13 @@ class ShopsMapFragment :
         pm.showDefaultScreenStateCommand.bindTo(::moveToPointsInBounds)
         pm.navigateToLocationCommand.bindTo { moveTo(it.location.toPoint(), zoom = it.zoom) }
 
+        pm.openSettingsCommand.bindTo { openSettingsIntent(requireContext()) }
+
         pm.checkPermissionStatusCommand.bindTo {
             val status = rxPermissions.statusFor(LOCATION_PERMISSION)
             pm.setPermissionStatus(status)
         }
+        pm.showLocationPermissionDialog.bindTo { locationDialog.dialogOpen() }
 
         pm.requestPermissionCommand.observable
             .flatMap { rxPermissions.requestStatus(LOCATION_PERMISSION) }
