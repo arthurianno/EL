@@ -548,13 +548,6 @@ class GlucometersManager @Inject constructor(
 
                 Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
 
-                val info =
-                    glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
-                Timber.i("<<<<<<<Sync>>>>>>  Info from cache by address: $info")
-
-                val lastEvent = info?.lastSyncedEvent
-                Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
-
                 Observable.range(0, EVENTS_COUNT)
                     .map<GlucometerCommand> { index -> Commands.ReadEvent(index) }
                     .startWith(startCommands)
@@ -564,16 +557,13 @@ class GlucometersManager @Inject constructor(
                                 val input = command.toGlucometerString()
                                     .toByteArray(Charset.defaultCharset())
                                 connection.writeCharacteristic(UART_RX, input)
-                                    .map { Pair(responses, lastEvent) }
+                                    .map { responses }
                             }
                     }
             }
-            // Pair.first -> responses Observable<ByteArray>
-            // Pair.second -> last synced event
-            .concatMap { pair -> pair.first.map { Pair(it, pair.second) } }
+            .concatMap { responses -> responses }
             .compose {
-                it.switchMap { pair ->
-                    val bytes = pair.first
+                it.switchMap { bytes ->
                     val response = bytes.toString(Charset.defaultCharset())
 
                     Timber.i("<<<<<<<Sync>>>>>>  Response: $response")
@@ -581,17 +571,24 @@ class GlucometersManager @Inject constructor(
                     if (response.isError()) {
                         Observable.error(CommandError)
                     } else {
-                        Observable.just(Pair(response, pair.second))
+                        Observable.just(response)
                     }
                 }
             }
-            // Pair.first -> response
-            // Pair.second -> last synced event
-            .takeUntil { it.first.isEmptyEvent() || it.first == it.second }
-            .collectInto(SyncResponseHolder()) { holder, pair ->
-                val response = pair.first
-                holder.lastSyncedEvent = pair.second
-                if (response.isEvent() && !response.isEmptyEvent() && response != pair.second) {
+            .map { response ->
+                val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                val lastEvent = info?.lastSyncedEvent
+
+                Timber.i("<<<<<<<Sync>>>>>>  Info from cache by address: $info")
+                Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
+                response to lastEvent
+            }
+            .takeUntil { (response, lastEvent) ->
+                response.isEmptyEvent() || response == lastEvent
+            }
+            .collectInto(SyncResponseHolder()) { holder, (response, lastEvent) ->
+                holder.lastSyncedEvent = lastEvent
+                if (response.isEvent() && !response.isEmptyEvent() && response != lastEvent) {
                     holder.events.add(response)
                 } else if (!response.isOk() && !response.isError() && !response.isEmptyEvent()) {
                     holder.info.add(response)
@@ -612,22 +609,32 @@ class GlucometersManager @Inject constructor(
             .map { events ->
                 val glucometerInfo =
                     glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
-                userHolder.currentUser?.let { id ->
-                    Timber.i("<<<<<<<Sync>>>>>>  currentUser: $id")
-                    profileCache.get(CommonConditions.ById(id))?.let { profile ->
+
+                val userId = userHolder.currentUser
+                if (userId != null) {
+
+                    Timber.i("<<<<<<<Sync>>>>>>  currentUser: $userId")
+                    val profile = profileCache.get(CommonConditions.ById(userId))
+
+                    if (profile != null) {
                         Timber.i("<<<<<<<Sync>>>>>>  profile.email: ${profile.email}")
-                        profile.email?.let { userId ->
+                        profile.email?.let { email ->
                             events.map { event ->
                                 eventBuilder.buildFrom(
-                                    userId,
+                                    email,
                                     address,
                                     event,
                                     glucometerInfo?.glucometerSerialNumber
                                 )
                             }
                         }
+                    } else {
+                        emptyList()
                     }
-                } ?: emptyList()
+
+                } else {
+                    emptyList()
+                }
             }
             .map { events ->
                 Timber.i("<<<<<<<Sync>>>>>>  events: $events")
