@@ -41,6 +41,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> :
         pm.timeSelector.bind(binding.formTimeSelectorView, compositeUnbind)
         pm.bindDateSelection()
         binding.formSaveButtonView.clicks().bindTo(pm.saveReminderAction)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         pm.schedulesState.bindTo { binding.scheduleView.attachDataList(it) }
         pm.schedulesDefaultState.bindTo { binding.scheduleView.setTitle(it) }
         pm.saveChangesEnableState.bindTo { binding.formSaveButtonView.isEnabled = it }
