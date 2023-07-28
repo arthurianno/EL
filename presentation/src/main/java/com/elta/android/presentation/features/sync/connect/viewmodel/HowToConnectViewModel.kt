@@ -106,6 +106,10 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
 
     private fun buildBluetoothPermission(permissionStates: List<PermissionState>) =
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-            permissionStates.component4()
-        } else permissionStates.component3()
+            val bluetoothScanPermission = permissionStates.component4()
+            bluetoothScanPermission
+        } else {
+            val bluetoothPermissionForLowerVersion = permissionStates.component3()
+            bluetoothPermissionForLowerVersion
+        }
 }
