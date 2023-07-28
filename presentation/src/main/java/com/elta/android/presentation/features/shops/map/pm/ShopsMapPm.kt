@@ -117,8 +117,7 @@ class ShopsMapPm @Inject constructor(
             .untilDestroy()
 
         openSettingsAction.observable
-            .doOnNext { openSettingsCommand.consumer.accept(Unit) }
-            .subscribe()
+            .subscribe { openSettingsCommand.consumer.accept(Unit) }
             .untilDestroy()
 
         locationControl.locationEnabledAction.observable
@@ -159,10 +158,14 @@ class ShopsMapPm @Inject constructor(
     }
 
     override fun handleError(error: Throwable) {
-        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(
-            Unit
-        )
-        else Timber.i(error.message)
+        when (error) {
+            is LocationTurnedOffError -> locationControl.requestEnableLocationCommand.consumer.accept(
+                Unit
+            )
+
+            is SecurityException -> Timber.i(error.message)
+            else -> super.handleError(error)
+        }
     }
 
     fun setShopsType(type: Type) {
