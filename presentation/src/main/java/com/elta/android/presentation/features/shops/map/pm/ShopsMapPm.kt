@@ -4,7 +4,6 @@ package com.elta.android.presentation.features.shops.map.pm
 
 import android.annotation.SuppressLint
 import android.location.Location
-import android.util.Log
 import com.elta.android.common.utils.takeFirst
 import com.elta.android.domain.features.sale_points.interactor.GetSalePointsUseCase
 import com.elta.android.domain.features.sale_points.interactor.SearchSalePointsUseCase
@@ -49,6 +48,7 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
+import timber.log.Timber
 
 @Suppress("TooManyFunctions")
 class ShopsMapPm @Inject constructor(
@@ -162,7 +162,7 @@ class ShopsMapPm @Inject constructor(
         if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(
             Unit
         )
-        else super.handleError(error)
+        else Timber.i(error.message)
     }
 
     fun setShopsType(type: Type) {
@@ -198,7 +198,7 @@ class ShopsMapPm @Inject constructor(
                     else -> {}
                 }
             }
-            .subscribe{fetchMyLocationAction.consumer}
+            .subscribe { fetchMyLocationAction.consumer.accept(Unit) }
             .untilDestroy()
 
         myLocationState.observable
