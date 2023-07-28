@@ -42,12 +42,13 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import timber.log.Timber
 
 @Suppress("TooManyFunctions")
 class ShopsMapPm @Inject constructor(
@@ -64,7 +65,10 @@ class ShopsMapPm @Inject constructor(
 
     val checkPermissionStatusCommand = command<Unit>(bufferSize = 1)
     val requestPermissionCommand = command<Unit>(bufferSize = 1)
+    val showLocationPermissionDialog = command<Unit>(bufferSize = 1)
     val locationControl = locationControl(rxLocationManager)
+    val openSettingsAction = action<Unit>()
+    val openSettingsCommand = command<Unit>(bufferSize = 1)
 
     val addMyLocationPinCommand = command<Location>()
     val navigateToLocationCommand = command<ExtendedLocation>()
@@ -112,6 +116,10 @@ class ShopsMapPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        openSettingsAction.observable
+            .subscribe { openSettingsCommand.consumer.accept(Unit) }
+            .untilDestroy()
+
         locationControl.locationEnabledAction.observable
             .subscribe(fetchMyLocationAction.consumer)
             .untilDestroy()
@@ -137,17 +145,27 @@ class ShopsMapPm @Inject constructor(
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .checkAndRequestPermission()
             .subscribe { status ->
-                if (status == PermissionStatus.GRANTED) fetchMyLocationAction.consumer.accept(Unit)
-                else handleLocationResult(EMPTY_LOCATION)
+                when (status) {
+                    PermissionStatus.GRANTED -> fetchMyLocationAction.consumer.accept(Unit)
+                    PermissionStatus.DECLINED_NEVER_ASK -> showLocationPermissionDialog.consumer.accept(
+                        Unit
+                    )
+
+                    else -> handleLocationResult(EMPTY_LOCATION)
+                }
             }
             .untilDestroy()
     }
 
     override fun handleError(error: Throwable) {
-        if (error is LocationTurnedOffError) locationControl.requestEnableLocationCommand.consumer.accept(
-            Unit
-        )
-        else super.handleError(error)
+        when (error) {
+            is LocationTurnedOffError -> locationControl.requestEnableLocationCommand.consumer.accept(
+                Unit
+            )
+
+            is SecurityException -> Timber.i(error.message)
+            else -> super.handleError(error)
+        }
     }
 
     fun setShopsType(type: Type) {
@@ -173,10 +191,17 @@ class ShopsMapPm @Inject constructor(
 
         moveToMyLocationAction.observable
             .checkAndRequestPermission()
-            .filter { it == PermissionStatus.GRANTED }
-            .map { Unit }
-            .doOnNext { manualNavigateToUserLocation.consumer.accept(true) }
-            .subscribe(fetchMyLocationAction.consumer)
+            .doOnNext { status ->
+                when (status) {
+                    PermissionStatus.GRANTED -> manualNavigateToUserLocation.consumer.accept(true)
+                    PermissionStatus.DECLINED_NEVER_ASK -> showLocationPermissionDialog.consumer.accept(
+                        Unit
+                    )
+
+                    else -> Unit
+                }
+            }
+            .subscribe { fetchMyLocationAction.consumer.accept(Unit) }
             .untilDestroy()
 
         myLocationState.observable
@@ -319,6 +344,7 @@ class ShopsMapPm @Inject constructor(
                         searchItems.consumer.accept(emptyList())
                         searchCloseCommand.consumer.accept(Unit)
                     }
+
                     else -> searchInput.textChanges.consumer.accept("")
                 }
             }
@@ -336,6 +362,7 @@ class ShopsMapPm @Inject constructor(
         when (clicks) {
             is Clicks.ShopMakeCall ->
                 clicks.item.phone?.let { router.navigateTo(Screens.CallScreen(it)) }
+
             is Clicks.ShopMakeRoute ->
                 findGeoPointByShopItem(clicks.item).let {
                     if (!it.isEmpty())
@@ -347,13 +374,15 @@ class ShopsMapPm @Inject constructor(
                             )
                         )
                 }
+
             is Clicks.SearchResult -> {
                 searchInput.textChanges.consumer.accept("")
                 searchCloseCommand.consumer.accept(Unit)
                 searchItems.consumer.accept(emptyList())
                 searchResultSelectedAction.consumer.accept(clicks.item)
             }
-            else -> {}
+
+            else -> Unit
         }
     }
 
@@ -382,6 +411,7 @@ class ShopsMapPm @Inject constructor(
                 normal = R.drawable.ic_normal_pin_shop,
                 selected = R.drawable.ic_active_pin_shop
             )
+
             Type.SERVICE -> GeoPointIcon(
                 normal = R.drawable.ic_normal_pin_services,
                 selected = R.drawable.ic_active_pin_services

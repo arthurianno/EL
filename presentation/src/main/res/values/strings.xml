@@ -799,6 +799,7 @@
 
     <!-- Location Dialog -->
     <string name="location_dialog_message">Для подключения к глюкометру приложению необходим доступ к местоположению</string>
+    <string name="map_location_dialog_message">Приложению необходим доступ к местоположению</string>
 
     <!-- Bluetooth Dialog -->
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
