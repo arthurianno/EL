@@ -198,7 +198,7 @@ class ShopsMapPm @Inject constructor(
                         Unit
                     )
 
-                    else -> {}
+                    else -> Unit
                 }
             }
             .subscribe { fetchMyLocationAction.consumer.accept(Unit) }
@@ -382,7 +382,7 @@ class ShopsMapPm @Inject constructor(
                 searchResultSelectedAction.consumer.accept(clicks.item)
             }
 
-            else -> {}
+            else -> Unit
         }
     }
 
