@@ -45,6 +45,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 private val requiredPermissions = listOf(
     Manifest.permission.CAMERA,
     Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.BLUETOOTH,
     Manifest.permission.BLUETOOTH_SCAN,
     Manifest.permission.BLUETOOTH_CONNECT
 )

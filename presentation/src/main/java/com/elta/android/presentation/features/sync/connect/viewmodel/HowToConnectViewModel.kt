@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
+import android.os.Build
 import android.os.Bundle
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.presentation.Screens
@@ -81,12 +82,14 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     }
 
     private fun checkPermissions(permissionStates: List<PermissionState>) {
-        if (permissionStates.all { it.status.isGranted } && state.value.bluetoothEnabled) {
+        val cameraPermission = permissionStates.component1()
+        val locationPermission = permissionStates.component2()
+        val bluetoothPermission = buildBluetoothPermission(permissionStates)
+        val permissions = listOf(cameraPermission, locationPermission, bluetoothPermission)
+
+        if (permissions.all { it.status.isGranted } && state.value.bluetoothEnabled) {
             router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
         } else {
-            val cameraPermission = permissionStates.component1()
-            val locationPermission = permissionStates.component2()
-            val bluetoothPermission = permissionStates.component3()
             if (bluetoothPermission.status.isGranted) {
                 reduceState { state.value.copy(bluetoothEnabled = true) }
             }
@@ -100,4 +103,13 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
             }
         }
     }
+
+    private fun buildBluetoothPermission(permissionStates: List<PermissionState>) =
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+            val bluetoothScanPermission = permissionStates.component4()
+            bluetoothScanPermission
+        } else {
+            val bluetoothPermissionForLowerVersion = permissionStates.component3()
+            bluetoothPermissionForLowerVersion
+        }
 }
