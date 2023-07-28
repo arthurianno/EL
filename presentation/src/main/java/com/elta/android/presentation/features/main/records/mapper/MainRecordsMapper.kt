@@ -20,7 +20,9 @@ class MainRecordsMapper @Inject constructor(
 
     override fun mapFromObject(source: HomeModel): List<ListItem> =
         arrayListOf<ListItem>().apply {
-            add(source.header())
+            if (source.hasEvents) {
+                add(source.header())
+            }
             if (source.dailyGlucoseModel.hasEvents) {
                 add(source.dailyChart())
             }
