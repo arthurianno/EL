@@ -161,7 +161,7 @@ class MainProfilePm @Inject constructor(
         when (type) {
             WhereBuy -> {
                 trackEvent(AnalyticsEventType.MAP_OPEN)
-                router.startFlow(Screens.ShopsMap)
+                router.startFlow(Screens.ShopsMap())
             }
 
             MyObservers -> router.startFlow(Screens.Observers)
