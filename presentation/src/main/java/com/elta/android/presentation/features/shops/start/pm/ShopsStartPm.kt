@@ -28,7 +28,7 @@ class ShopsStartPm @Inject constructor(
     }
 
     private fun navigateToMapScreen(i: Unit) {
-        router.navigateTo(Screens.ShopsMap)
+        router.navigateTo(Screens.ShopsMap(isOnBoarding = true))
     }
 
     private fun navigateToMainScreen(i: Unit) {

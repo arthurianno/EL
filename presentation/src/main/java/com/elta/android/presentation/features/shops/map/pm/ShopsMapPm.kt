@@ -90,6 +90,7 @@ class ShopsMapPm @Inject constructor(
     private val searchResultSelectedAction = action<SearchResultItem>()
 
     private val shopsTypeState = state<Type>()
+    private val onboardingState = state<Boolean>()
     private val permissionStatusResultAction = action<PermissionStatus>()
     private val fetchMyLocationAction = action<Unit>()
     private val myLocationState = state<Location>()
@@ -170,6 +171,10 @@ class ShopsMapPm @Inject constructor(
 
     fun setShopsType(type: Type) {
         shopsTypeState.consumer.accept(type)
+    }
+
+    fun setOnboardingState(isOnboarding: Boolean) {
+        onboardingState.consumer.accept(isOnboarding)
     }
 
     fun setPermissionStatus(status: PermissionStatus) {
@@ -505,7 +510,8 @@ class ShopsMapPm @Inject constructor(
         }
 
     private fun navigateToMainScreen(i: Unit) {
-        router.newRootFlow(Screens.MainProfileScreen)
+        if (onboardingState.value) router.navigateTo(Screens.HomeFlow)
+        else router.finishFlow()
     }
 
     private companion object {

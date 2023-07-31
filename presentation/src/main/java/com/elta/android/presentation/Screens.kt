@@ -132,8 +132,11 @@ object Screens {
         override fun getFragment() = ShopsStartFragment.newInstance()
     }
 
-    object ShopsMap : SupportAppScreen() {
-        override fun getFragment() = ShopsMapFragment.newInstance(Type.SALE)
+    data class ShopsMap(val isOnBoarding: Boolean = false) : SupportAppScreen() {
+        override fun getFragment() = ShopsMapFragment.newInstance(
+            Type.SALE,
+            isOnboarding = isOnBoarding
+        )
     }
 
     object ServiceCentersMap : SupportAppScreen() {

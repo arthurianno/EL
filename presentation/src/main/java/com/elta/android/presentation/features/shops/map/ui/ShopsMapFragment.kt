@@ -85,6 +85,7 @@ class ShopsMapFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (arguments?.get(EXTRA_TYPE) as? Type)?.let { presentationModel.setShopsType(it) }
+        (arguments?.get(EXTRA_ONBOARDING) as? Boolean)?.let { presentationModel.setOnboardingState(it) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -193,11 +194,13 @@ class ShopsMapFragment :
 
     companion object {
 
-        fun newInstance(type: Type) = ShopsMapFragment().apply {
+        fun newInstance(type: Type, isOnboarding: Boolean = false) = ShopsMapFragment().apply {
             arguments = bundle(EXTRA_TYPE to type)
+            arguments = bundle(EXTRA_ONBOARDING to isOnboarding)
         }
 
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
         private const val EXTRA_TYPE = "extra_shops_type"
+        private const val EXTRA_ONBOARDING = "extra_onboarding_value"
     }
 }
