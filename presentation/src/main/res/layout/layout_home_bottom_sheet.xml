@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:overScrollMode="never"
-        android:paddingBottom="75dp" />
+        android:paddingBottom="75dp"
+        android:splitMotionEvents="false" />
 
 </LinearLayout>
