@@ -195,8 +195,10 @@ class ShopsMapFragment :
     companion object {
 
         fun newInstance(type: Type, isOnboarding: Boolean = false) = ShopsMapFragment().apply {
-            arguments = bundle(EXTRA_TYPE to type)
-            arguments = bundle(EXTRA_ONBOARDING to isOnboarding)
+            arguments = bundle(
+                EXTRA_TYPE to type,
+                EXTRA_ONBOARDING to isOnboarding
+            )
         }
 
         private const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
