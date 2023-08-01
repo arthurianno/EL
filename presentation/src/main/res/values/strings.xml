@@ -302,7 +302,7 @@
     <string name="event_form_date_in_future">Вы выбрали дату в будущем</string>
 
     <string name="google_play_rate_dialog_title">Внимание</string>
-    <string name="google_play_rate_dialog_body">Хотели бы вы оценить наше приложение в google play?</string>
+    <string name="google_play_rate_dialog_body">Хотели бы Вы оценить наше приложение в Google Play?</string>
     <string name="google_play_rate_dialog_negative_button">Нет</string>
     <string name="google_play_rate_dialog_positive_button">Да, конечно</string>
 
