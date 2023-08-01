@@ -144,6 +144,7 @@
 
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s ед</string>
+    <string name="event_type_insulin_medicament">\u0020(%s)</string>
     <string name="event_type_weight_pattern">%s кг</string>
     <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
     <string name="event_type_activity_pattern_short">%1$s мин</string>

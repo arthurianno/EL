@@ -39,13 +39,23 @@ open class BaseRecordsMapper(
             id = id,
             icon = type.toIconWithBg(),
             title = this.toTitle(),
-            type = resources.getString(type.toName()),
+            type = insulinType(),
             count = formatValue(),
             date = formatDate(),
             showLabel = note != null,
             eventType = this.type,
             labelIcon = mealTag?.toIcon()
         )
+
+    private fun Event.insulinType() =
+        if (type == EventType.INSULIN) {
+            resources.getString(type.toName()) + resources.getString(
+                R.string.event_type_insulin_medicament,
+                medicament.toString()
+            )
+        } else {
+            resources.getString(type.toName())
+        }
 
     protected fun Event.formatValue(): String? =
         when (type) {
