@@ -571,7 +571,7 @@ class HomeFlowPm @Inject constructor(
     private fun openConnectScreen() {
         stopSyncTimer()
         bus.event(Events.Sync.Glucometer.Error)
-        router.startFlow(Screens.ConnectTypeScreen(isOnBoarding = false))
+        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
     }
 
 }

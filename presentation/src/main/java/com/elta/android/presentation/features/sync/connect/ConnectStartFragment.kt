@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
@@ -27,7 +28,6 @@ internal const val PIN_ARGUMENT_NAME = "pin"
 internal const val GLUCOMETER_NAME_ARGUMENT_NAME = "glucometer_name"
 
 class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
-    override val viewModel: ConnectStartViewModel by viewModels { viewModelFactory }
 
     companion object {
         fun newInstance(isOnBoarding: Boolean): ConnectStartFragment =
@@ -36,7 +36,10 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
             }
     }
 
+    override val viewModel: ConnectStartViewModel by viewModels { viewModelFactory }
+
     override fun ConnectStartViewModel.init() {
+        appTopBar.setStartIconAction(AppAction.BackPressure)
         appTopBar.setEndIconAction(ConnectAction.SkipNextStep)
         downButton.setText(getString(R.string.sync_state_pin_dialog_button))
     }
@@ -84,10 +87,14 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
     @Composable
     fun TopAppBar(viewModel: ConnectStartViewModel) {
-        BaseAppTopBar(
-            widgetModel = viewModel.appTopBar,
-            endText = R.string.sync_start_menu_button_text
-        )
+        GetLocalProperties { _, _, colors, _, _ ->
+            BaseAppTopBar(
+                widgetModel = viewModel.appTopBar,
+                startIcon = R.drawable.ic_back,
+                startIconColor = colors.blackBlue,
+                endText = R.string.sync_start_menu_button_text
+            )
+        }
     }
 }
 
