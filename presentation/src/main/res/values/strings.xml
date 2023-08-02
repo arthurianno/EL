@@ -250,7 +250,7 @@
 
     <string name="events_options_chooser_header_tags">Доступные метки</string>
     <string name="events_options_chooser_header_variants_insulin">Доступные варианты</string>
-    <string name="events_options_chooser_header_variants_activity">Доступные виды</string>
+    <string name="events_options_chooser_header_variants_activity">Виды физической активности</string>
     <string name="events_options_chooser_button_confirm">Подтвердить</string>
 
 
