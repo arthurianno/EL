@@ -555,7 +555,7 @@
 
     <string name="profile_device_info_title">СателлитOnline</string>
     <string name="profile_device_info_description">Адрес устройства: %s</string>
-    <string name="profile_device_info_check_update_button">Проверить обновления ПО глюкометра</string>
+    <string name="profile_device_info_check_update_button">Проверить обновление ПО глюкометра</string>
     <string name="profile_device_info_delete">Удалить устройство</string>
     <string name="profile_device_info_last_sync_title_field">Последняя синхронизация:</string>
     <string name="profile_device_info_firmware_version_title_field">Версия ПО глюкометра:</string>
@@ -709,7 +709,7 @@
     <string name="firmware_version_current">Текущая версия: %s</string>
     <string name="firmware_version_new">Новая версия: %s</string>
     <string name="firmware_button_update">Обновить</string>
-    <string name="firmware_button_check_updates">Проверить обновления ПО глюкометра</string>
+    <string name="firmware_button_check_updates">Проверить обновление ПО глюкометра</string>
     <string name="firmware_button_close">Закрыть</string>
     <string name="firmware_updates_hint">При обновлении версии, сначала выполняется\nзагрузка ПО глюкометра, после этого начинается\nавтоматическое обновление системы в фоновом\nрежиме. Это может занять некоторое время.\n\nПосле завершения обновления, глюкометр\nвыполнит перезагрузку и издаст звуковой сигнал</string>
     <string name="firmware_dialog_button">Закрыть</string>
