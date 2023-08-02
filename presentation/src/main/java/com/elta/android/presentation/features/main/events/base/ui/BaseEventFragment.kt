@@ -62,6 +62,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         if (eventType != EventType.MEDICAMENTS) {
             activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         }
+        setWeightPicker()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,9 +92,6 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         observeAppBarChanges()
         if (FeatureToggles.isEnableCalculatorFeature) {
             observeBreadUnitsChanges(pm)
-        }
-        if (pm.eventTypeState.valueOrNull == EventType.WEIGHT) {
-            pm.profileState.bindTo { initializer.setPickerValue(it.weight) }
         }
         binding.formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         binding.formSaveButtonView.clicks().bindTo(pm.mainAction)
@@ -157,6 +155,12 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     }
 
     abstract fun getEventType(): EventType
+
+    private fun setWeightPicker() {
+        if (presentationModel.eventTypeState.valueOrNull == EventType.WEIGHT) {
+            presentationModel.profileState.bindTo { initializer.setPickerValue(it.weight) }
+        }
+    }
 
     private fun T.bindDateSelection() {
         showDatePickerDialog.bindTo { originalDate ->
