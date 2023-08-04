@@ -27,7 +27,6 @@ internal const val PIN_ARGUMENT_NAME = "pin"
 internal const val GLUCOMETER_NAME_ARGUMENT_NAME = "glucometer_name"
 
 class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
-    override val viewModel: ConnectStartViewModel by viewModels { viewModelFactory }
 
     companion object {
         fun newInstance(isOnBoarding: Boolean): ConnectStartFragment =
@@ -35,6 +34,8 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                 arguments = bundle(IS_ON_BOARDING_ARGUMENT_NAME to isOnBoarding)
             }
     }
+
+    override val viewModel: ConnectStartViewModel by viewModels { viewModelFactory }
 
     override fun ConnectStartViewModel.init() {
         appTopBar.setEndIconAction(ConnectAction.SkipNextStep)
