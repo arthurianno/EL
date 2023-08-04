@@ -1,7 +1,9 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
+import com.elta.android.domain.features.diary.chooser.interactor.GetAllInsulinChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
+import com.elta.android.domain.features.diary.events.model.Drug
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.Insulin
 import com.elta.android.domain.features.diary.events.model.InsulinType
@@ -31,9 +33,10 @@ private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
 
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
 class EventsOptionsChooserPm @Inject constructor(
-    private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
-    private val itemsBuilder: ChooserOptionsItemsBuilder,
-    services: ServiceFacade
+        private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
+        private val getAllInsulinChooserOptionsUseCase: GetAllInsulinChooserOptionsUseCase,
+        private val itemsBuilder: ChooserOptionsItemsBuilder,
+        services: ServiceFacade
 ) : BaseListPm(services) {
     val toolbarTitleCommand = state<String>()
     val appBarBackgroundCommand = state<Int>()
@@ -43,6 +46,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private val selectedItemIdState = state(NONE_ID)
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
+    private val chooserInsulinDefaultList = state<List<Drug>>()
 
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
@@ -83,6 +87,15 @@ class EventsOptionsChooserPm @Inject constructor(
             .untilDestroy()
 
         bindSelectionBehaviour()
+
+        configurationState.observable
+                .filter { it.chooserType == ChooserType.VARIANTS && it.eventType == EventType.INSULIN }
+                .flatMap {
+                    getAllInsulinChooserOptionsUseCase.execute()
+                }
+                .subscribe(chooserInsulinDefaultList.consumer)
+                .untilDestroy()
+
     }
 
     fun setConfiguration(configuration: ChooserConfiguration) {
@@ -168,36 +181,53 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun buildChooserResult(i: Unit): ChooserResult {
         val item = items.value.find { it is ChooserItem && it.id == selectedItemId }
         val chooserItem = item as? ChooserItem
+        val (type, insulinTypeName) = getInsulinType(chooserInsulinDefaultList.valueOrNull)
         return ChooserResult(
             id = selectedItemId,
-            name = getChooserResultName(chooserItem),
+            name = getChooserResultName(chooserItem?.title, insulinTypeName),
             iconId = chooserItem?.iconId,
-            meta = getChooserMeta(chooserItem)
+            meta = getChooserMeta(chooserItem?.title, chooserItem?.meta, type, insulinTypeName)
         )
     }
 
-    private fun getChooserMeta(chooserItem: ChooserItem?): Any? =
+    private fun getChooserMeta(title: String?, meta: Any?, type: InsulinType, insulinTypeName: String): Any? =
         if (
             configurationState.value.eventType == EventType.INSULIN &&
             configurationState.value.chooserType != ChooserType.GROUP_TAGS
         ) {
             Insulin(
-                previousName = previousSelectionState.value,
-                drug = chooserItem?.title.orEmpty(),
-                type = getInsulinTypeByString(previousSelectionState.value) ?: InsulinType.MIXED
+                previousName = insulinTypeName,
+                drug = title.orEmpty(),
+                type = type
             )
         } else {
-            chooserItem?.meta
+            meta
         }
 
-    private fun getChooserResultName(chooserItem: ChooserItem?) =
-        if (configurationState.value.eventType == EventType.INSULIN &&
-            previousSelectionState.value != NONE_ID
-        ) {
-            "${previousSelectionState.value}(${chooserItem?.title.orEmpty()})"
+    private fun getInsulinType(drugs: List<Drug>?): Pair<InsulinType, String> {
+        val prevInsulinType = getInsulinTypeByString(previousSelectionState.value)
+        val type = if (prevInsulinType == InsulinType.ALL) {
+            val insulinCode = drugs
+                    ?.find { it.name == selectedItemId }?.insulinType?.code
+                    ?: previousSelectionState.value
+            InsulinType.valueOf(insulinCode)
         } else {
-            chooserItem?.title
+            prevInsulinType
+        } ?: InsulinType.MIXED
+
+        val insulinTypeName = resources.getString(type.toName())
+        return Pair(type, insulinTypeName)
+    }
+
+    private fun getChooserResultName(title: String?, insulinTypeName: String): String? {
+        return if (configurationState.value.eventType == EventType.INSULIN &&
+                previousSelectionState.value != NONE_ID
+        ) {
+            "${insulinTypeName}(${title.orEmpty()})"
+        } else {
+            title
         }
+    }
 
     private fun createParams(chooserConfiguration: ChooserConfiguration): GetChooserOptionsUseCase.Params =
         GetChooserOptionsUseCase.Params(
@@ -246,6 +276,7 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun getInsulinTypeByString(string: String) =
         when (string) {
+            resources.getString(InsulinType.ALL.toName()) -> InsulinType.ALL
             resources.getString(InsulinType.INTERMEDIATE.toName()) -> InsulinType.INTERMEDIATE
             resources.getString(InsulinType.ULTRAFAST.toName()) -> InsulinType.ULTRAFAST
             resources.getString(InsulinType.ULTRASHORT.toName()) -> InsulinType.ULTRASHORT

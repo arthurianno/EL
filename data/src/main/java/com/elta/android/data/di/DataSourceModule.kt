@@ -11,9 +11,10 @@ import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSource
-import com.elta.android.data.features.diary.insulin.datasource.DrugCacheDataSource
-import com.elta.android.data.features.diary.insulin.datasource.DrugsDataSource
-import com.elta.android.data.features.diary.insulin.datasource.DrugsRemoteDataSource
+import com.elta.android.data.features.diary.insulin.datasource.cache.DrugCacheDataSource
+import com.elta.android.data.features.diary.insulin.datasource.cache.DrugsCacheSource
+import com.elta.android.data.features.diary.insulin.datasource.remote.DrugsRemoteSource
+import com.elta.android.data.features.diary.insulin.datasource.remote.DrugsRemoteDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
@@ -109,15 +110,13 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindTagsCachedDataSource(source: TagsCachedDataSource): TagsDataSource
 
-    @Remote
     @Binds
     @Singleton
-    abstract fun bindInsulinDrugNameRemoteDataSource(source: DrugsRemoteDataSource): DrugsDataSource
+    abstract fun bindInsulinDrugNameRemoteDataSource(source: DrugsRemoteDataSource): DrugsRemoteSource
 
-    @Cache
     @Binds
     @Singleton
-    abstract fun bindInsulinDrugNameCacheDataSource(source: DrugCacheDataSource): DrugsDataSource
+    abstract fun bindInsulinDrugNameCacheDataSource(source: DrugCacheDataSource): DrugsCacheSource
 
     @Binds
     @Singleton

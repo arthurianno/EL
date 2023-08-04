@@ -77,6 +77,7 @@ fun TagImage.toIcon(): Int =
 @StringRes
 fun InsulinType.toName(): Int =
     when (this) {
+        InsulinType.ALL -> R.string.insulin_type_all
         InsulinType.ULTRAFAST -> R.string.insulin_type_ultrafast
         InsulinType.ULTRASHORT -> R.string.insulin_type_ultrashort
         InsulinType.SHORT -> R.string.insulin_type_short
