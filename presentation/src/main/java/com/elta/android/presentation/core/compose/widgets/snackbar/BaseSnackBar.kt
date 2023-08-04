@@ -19,7 +19,7 @@ fun BaseSnackBar(
     @StringRes textId: Int,
     background: Color = eltaColors.shadeBlue3
 ) {
-    GetLocalProperties { dimens, _, colors, _, _ ->
+    GetLocalProperties { dimens, _, colors, _, types ->
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -30,7 +30,8 @@ fun BaseSnackBar(
                 text = stringResource(id = textId),
                 color = colors.white,
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                style = types.caption1
             )
         }
     }
