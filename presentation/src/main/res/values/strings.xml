@@ -158,6 +158,7 @@
     <string name="event_type_weight_no_name">Взвешивание</string>
 
     <!-- INSULIN TYPES -->
+    <string name="insulin_type_all">Все</string>
     <string name="insulin_type_ultrafast">Сверхбыстрый</string>
     <string name="insulin_type_ultrashort">Ультракороткий</string>
     <string name="insulin_type_short">Короткий</string>

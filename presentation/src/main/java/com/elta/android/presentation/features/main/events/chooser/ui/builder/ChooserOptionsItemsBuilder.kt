@@ -48,7 +48,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
             title = source.id,
             iconId = null,
             meta = meta,
-            isSelected = chooserInsulin?.insulin?.drug == meta
+            isSelected = chooserInsulin?.drug == meta
         )
     }
 
@@ -64,14 +64,13 @@ class ChooserOptionsItemsBuilder @Inject constructor(
 
     private fun mapAsInsulinItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
         val meta = source.meta as InsulinType
-        val insulin = chooserInsulin?.insulin
         return ChooserWithSubtypeItem(
             id = source.id,
             title = resourceProvider.getString(meta.toName()),
             iconId = null,
             meta = meta,
-            isSelectedType = insulin?.type == meta,
-            drug = insulin?.drug.orEmpty()
+            isSelectedType = chooserInsulin?.type == meta,
+            drug = chooserInsulin?.drug.orEmpty()
         )
     }
 

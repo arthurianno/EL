@@ -16,6 +16,7 @@ class MockedDrugNameApi : DrugNameApi {
         Observable.fromCallable {
             val type = InsulinType.valueOf(insulinType)
             when (type) {
+                InsulinType.ALL -> insulinDrugNamesUF + insulinDrugNamesUS + insulinDrugNamesS + insulinDrugNamesI + insulinDrugNamesL + insulinDrugNamesUL + insulinDrugNamesM
                 InsulinType.ULTRAFAST -> insulinDrugNamesUF
                 InsulinType.ULTRASHORT -> insulinDrugNamesUS
                 InsulinType.SHORT -> insulinDrugNamesS

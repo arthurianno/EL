@@ -1,4 +1,4 @@
-package com.elta.android.data.features.diary.insulin.datasource
+package com.elta.android.data.features.diary.insulin.datasource.cache
 
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class DrugCacheDataSource @Inject constructor(
     private val fromCacheMapper: Mapper<DrugCachedDto, DrugDto>,
     private val cache: Cache<DrugCachedDto>
-) : DrugsDataSource {
+) : DrugsCacheSource {
 
     override fun getDrugNames(type: InsulinType): Observable<List<DrugDto>> =
         Observable.fromCallable {
@@ -21,6 +21,16 @@ class DrugCacheDataSource @Inject constructor(
         }.map {
             fromCacheMapper.mapFromObjects(it)
         }
+
+    override fun getAll(): Observable<List<DrugDto>> =
+        Observable.fromCallable {
+            cache.getAll(CommonConditions.All)
+        }
+            .map { fromCacheMapper.mapFromObjects(it) }
+            .map { drugs -> drugs
+                    .filter { drug -> drug.name != OTHER }
+                    .sortedBy { drug -> drug.name }
+            }
 
     override fun clearDrugs(type: InsulinType?) {
         type?.let { insulinType ->
@@ -35,3 +45,5 @@ class DrugCacheDataSource @Inject constructor(
         cache.update(drugs)
     }
 }
+
+private const val OTHER = "Другое"
