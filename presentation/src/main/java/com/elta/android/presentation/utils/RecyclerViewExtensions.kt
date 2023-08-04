@@ -70,13 +70,20 @@ fun RecyclerView.firstVisiblePosition() =
     (this.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition() ?: 0
 
 fun RecyclerView.scrollSmooth(position: Int) {
-    if (abs(firstVisiblePosition() - position) > SMOOTH_SCROLL_THRESHOLD) {
-        scrollToPosition(position - BEFORE_SMOOTH_DIFF)
+    val currentPosition = firstVisiblePosition()
+    val diff = abs(currentPosition - position)
+    if (diff > SMOOTH_SCROLL_THRESHOLD) {
+        val nearPosition = buildNearPosition(position, currentPosition)
+        scrollToPosition(nearPosition)
         smoothScrollToPosition(position)
     } else {
         smoothScrollToPosition(position)
     }
 }
+
+private fun buildNearPosition(position: Int, currentPosition: Int) =
+    if (position > currentPosition) position - BEFORE_SMOOTH_DIFF
+    else position + BEFORE_SMOOTH_DIFF
 
 private const val SMOOTH_SCROLL_THRESHOLD = 20
 private const val BEFORE_SMOOTH_DIFF = 10
