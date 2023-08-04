@@ -337,7 +337,7 @@
 
     <string name="sync_state_title_connected">Подключено!</string>
     <string name="sync_state_subtitle_connected">Поздравляем! Глюкометр успешно\nподключен. Вы можете перейти к работе\nс приложением после завершения\nсинхронизации</string>
-    <string name="sync_state_title_progress_connected">Идет процесс синхронизации…</string>
+    <string name="sync_state_title_progress_connected">Идет процесс синхронизации с глюкометром…</string>
 
     <string name="sync_state_pin_dialog_title">Устройство найдено</string>
     <string name="sync_state_pin_dialog_description">Чтобы продолжить, введите ПИН-код,\nкоторый отобразился на экране глюкометра</string>

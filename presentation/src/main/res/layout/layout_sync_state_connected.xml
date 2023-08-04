@@ -36,7 +36,8 @@
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@+id/titleView"
         app:layout_constraintTop_toTopOf="@+id/titleView"
-        app:srcCompat="@drawable/ic_how_to_connect" />
+        app:layout_constraintBottom_toBottomOf="@id/titleView"
+        app:srcCompat="@drawable/ic_congrats" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/messageView"
