@@ -175,6 +175,15 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        bus.events<Events.EmailNotConfirmed>()
+            .doOnNext {
+                setStatus(SyncStatus.Email(resources))
+                setStatusVisibility(Visibility.Show)
+                setStatusVisibility(Visibility.HideWithDelay)
+            }
+            .subscribe()
+            .untilDestroy()
+
         bus.clicks<Clicks.ProfileAdditionalClicked>()
             .map { it.item.type }
             .filter { it is ExitFromApp }
@@ -255,5 +264,11 @@ class AppPm @Inject constructor(
                 override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
             ) : SyncStatus()
         }
+
+        data class Email(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.error_verify_your_email),
+            override val color: Int = resources.getColor(R.color.black)
+        ) : SyncStatus()
     }
 }
