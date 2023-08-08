@@ -75,6 +75,8 @@ abstract class ConnectDevicePm constructor(
     private val settingsDialogData: DialogData by lazy { Dialogs.SettingsDialogData(resources) }
     val settingsIsVisible = state(false)
     val openSettingsCloseAction = action<Unit>()
+    val showHomeButtonCommand = command<Unit>()
+    val hideHomeButtonCommand = command<Unit>()
 
     private val incorrectPinCode: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -336,8 +338,14 @@ abstract class ConnectDevicePm constructor(
         connectState.observable
             .filter { it == ViewState.SYNC_COMPLETED }
             .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
+            .doOnNext(::handleHomeButton)
             .subscribe()
             .untilDestroy()
+    }
+
+    private fun handleHomeButton(state: ViewState) {
+        if (state == ViewState.SYNC_COMPLETED) hideHomeButtonCommand.consumer.accept(Unit)
+        else showHomeButtonCommand.consumer.accept(Unit)
     }
 
     enum class ViewState {
