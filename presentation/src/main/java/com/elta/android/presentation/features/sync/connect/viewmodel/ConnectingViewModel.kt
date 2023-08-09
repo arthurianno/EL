@@ -170,6 +170,7 @@ class ConnectingViewModel @Inject constructor(
         when (state.value.stageType) {
             ConnectingStageType.Connecting -> exitDialogFromConnecting.dialogOpen()
             ConnectingStageType.Sync -> exitDialogFromSync.dialogOpen()
+            ConnectingStageType.Complete -> router.newRootScreen(Screens.HomeFlow)
             else -> super.backClick()
         }
     }
