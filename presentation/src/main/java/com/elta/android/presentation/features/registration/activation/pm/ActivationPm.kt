@@ -1,10 +1,11 @@
 package com.elta.android.presentation.features.registration.activation.pm
 
-import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.domain.features.auth.interactor.CheckEmailUseCase
 import com.elta.android.domain.features.auth.interactor.SendConfirmationLinkUseCase
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
@@ -56,26 +57,10 @@ class ActivationPm @Inject constructor(
         )
     }
 
-    override fun handleError(error: Throwable) {
-        if (error is NetworkConnectionError) {
-            showSnackBar(
-                SnackBarMessageData.SimpleTextMessage(
-                    resources.getString(R.string.no_connection_to_the_internet)
-                )
-            )
-        } else {
-            super.handleError(error)
-        }
-    }
-
     private fun handleEmailConfirmed(isConfirmed: Boolean) {
         when (isConfirmed) {
             true -> router.newRootFlow(Screens.OnBoardingFlow)
-            else -> showSnackBar(
-                SnackBarMessageData.SimpleTextMessage(
-                    resources.getString(R.string.error_verify_your_email)
-                )
-            )
+            else -> bus.event(Events.EmailNotConfirmed)
         }
     }
 }
