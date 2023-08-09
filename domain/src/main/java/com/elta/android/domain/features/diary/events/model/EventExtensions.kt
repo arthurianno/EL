@@ -40,26 +40,29 @@ fun Event.isChanged(
     note: String? = null
 ): Boolean =
     this.value != value ||
-        this.kind != kind ||
-        this.name != name ||
-        this.duration != duration ||
-        this.additionTime != date ||
-        this.tagId != tagId ||
-        this.insulinType != insulinType ||
-        this.medicament != medicament ||
-        this.activityType != activity ||
-        this.note != note
+            this.kind != kind ||
+            this.name != name ||
+            this.duration != duration ||
+            this.additionTime != date ||
+            this.tagId != tagId ||
+            this.insulinType != insulinType ||
+            this.medicament != medicament ||
+            this.activityType != activity ||
+            this.note != note
 
 fun Event.addTag(tags: List<Tag>): Event =
     this.copy(tag = tags.firstOrNull { tagId == it.id })
 
 fun Event.glucoseValue(format: GlucoseFormat): Double = run {
-    value?.let {
-        when (format) {
-            GlucoseFormat.CAPILLARY -> it
-            GlucoseFormat.PLASMA -> it * GLUCOSE_PLASMA_COEFFICIENT
-        }
-    } ?: GLUCOSE_DEFAULT_VALUE
+    value?.toGlucoseFormat(format) ?: GLUCOSE_DEFAULT_VALUE
+}
+
+fun Double.toGlucoseFormat(format: GlucoseFormat?): Double = run {
+    when (format) {
+        GlucoseFormat.CAPILLARY -> this
+        GlucoseFormat.PLASMA -> this * GLUCOSE_PLASMA_COEFFICIENT
+        else -> GLUCOSE_DEFAULT_VALUE
+    }
 }.round(1)
 
 fun Event.modifyValue(format: GlucoseFormat): Event =
