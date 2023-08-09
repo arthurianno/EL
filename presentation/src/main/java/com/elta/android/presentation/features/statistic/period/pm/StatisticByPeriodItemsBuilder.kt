@@ -4,6 +4,7 @@ package com.elta.android.presentation.features.statistic.period.pm
 
 import android.graphics.drawable.Drawable
 import com.elta.android.common.utils.toStringWithFormat
+import com.elta.android.domain.features.diary.events.model.toGlucoseFormat
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
@@ -18,9 +19,9 @@ import com.elta.android.presentation.features.statistic.period.ui.adapter.items.
 import com.elta.android.presentation.utils.NumberFormatter
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
-import org.threeten.bp.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import org.threeten.bp.LocalDate
 
 private const val ZERO = 0L
 private const val DAILY_CHART_DATE_FORMAT = "dd MMM. EEEE"
@@ -94,9 +95,10 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
     private fun GlucoseIndexItem.Type.geValue(glucose: GlucoseStatisticModel?): String =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(
-                glucose?.averageLevel
+                glucose?.averageLevel?.toGlucoseFormat(glucose.dailyGlucoseModel?.glucoseFormat)
                     ?: ZERO.toDouble()
             )
+
             GlucoseIndexItem.Type.TOTAL -> glucose?.eventsCount.toString()
             GlucoseIndexItem.Type.HIGH -> glucose?.eventsHighCount.toString()
             GlucoseIndexItem.Type.NORMAL -> glucose?.eventsNormalCount.toString()
@@ -114,14 +116,17 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
             } else {
                 resources.getString(R.string.statistic_glucose_index_total_unit)
             }
+
             GlucoseIndexItem.Type.HIGH -> resources.getString(
                 R.string.statistic_glucose_index_level_unit,
                 glucose?.eventsHighPercent.toString()
             )
+
             GlucoseIndexItem.Type.NORMAL -> resources.getString(
                 R.string.statistic_glucose_index_level_unit,
                 glucose?.eventsNormalPercent.toString()
             )
+
             GlucoseIndexItem.Type.LOW -> resources.getString(
                 R.string.statistic_glucose_index_level_unit,
                 glucose?.eventsLowPercent.toString()
@@ -176,18 +181,22 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 R.string.statistic_general_index_description_by_day_bread,
                 value
             )
+
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_by_day_insulin,
                 value
             )
+
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_by_day_bolus_insulin,
                 value
             )
+
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_by_day_basal_insulin,
                 value
             )
+
             GeneralIndexItem.Type.ACTIVITY -> resources.getString(
                 R.string.statistic_general_index_description_by_day_activity,
                 eventsCount.toString(),
@@ -204,18 +213,22 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 R.string.statistic_general_index_description_by_period_bread,
                 value
             )
+
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_by_period_insulin,
                 value
             )
+
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_by_period_bolus_insulin,
                 value
             )
+
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_by_period_basal_insulin,
                 value
             )
+
             GeneralIndexItem.Type.ACTIVITY -> resources.getString(
                 R.string.statistic_general_index_description_by_period_activity,
                 eventsCount.toString(),
@@ -238,18 +251,22 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 R.string.statistic_general_index_description_value_by_period_bread,
                 stat?.bread?.averageLevel.format()
             )
+
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.averageLevel.format()
             )
+
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.averageBolusLevel.format()
             )
+
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.averageBasalLevel.format()
             )
+
             GeneralIndexItem.Type.ACTIVITY -> stat?.activity?.averageDuration.asTimeString(resources)
         }
 
@@ -259,18 +276,22 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 R.string.statistic_general_index_description_value_by_period_bread,
                 stat?.bread?.totalLevel.format()
             )
+
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.totalLevel.format()
             )
+
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.totalBolusLevel.format()
             )
+
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_insulin,
                 stat?.insulin?.totalBasalLevel.format()
             )
+
             GeneralIndexItem.Type.ACTIVITY -> stat?.activity?.averageDuration.asTimeString(resources)
         }
 
