@@ -18,7 +18,7 @@ class FromOnBoardingConnectDeviceByPinFragment : ConnectDeviceByPinFragment<From
 
     override fun onBindPresentationModel(pm: FromOnBoardingConnectDevicePm) {
         super.onBindPresentationModel(pm)
-        pm.mstate.bindTo { state ->
+        pm.connectState.bindTo { state ->
             if (state == ConnectDevicePm.ViewState.SYNC_COMPLETED || state == ConnectDevicePm.ViewState.CONNECTED) {
                 binding.toolbar.menuButtonView.hide()
             } else {

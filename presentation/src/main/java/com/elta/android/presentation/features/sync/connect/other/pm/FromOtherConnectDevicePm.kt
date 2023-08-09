@@ -31,7 +31,7 @@ class FromOtherConnectDevicePm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        mstate.observable
+        connectState.observable
             .filter { it == ViewState.CONNECTED }
             .trackEvent(
                 AnalyticsEventType.GLUCOMETER_ADD,
@@ -43,6 +43,6 @@ class FromOtherConnectDevicePm @Inject constructor(
 
     override fun navigateToApp(i: Unit) {
         bus.event(Events.DeviceChanged)
-        router.backTo(Screens.Devices)
+        router.newRootFlow(Screens.HomeFlow)
     }
 }

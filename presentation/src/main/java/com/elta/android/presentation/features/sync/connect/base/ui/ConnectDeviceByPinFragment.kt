@@ -62,7 +62,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         binding.layoutSyncStateSyncCompleted.toAppButtonView.clicks().bindTo(pm.toAppAction)
         binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks().bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
-        pm.mstate.bindTo { state ->
+        pm.connectState.bindTo { state ->
             binding.syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)
             }
@@ -100,11 +100,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {
-            if (presentationModel.mstate.valueOrNull == ConnectDevicePm.ViewState.SYNC_COMPLETED) {
-                presentationModel.toAppAction.consumer.accept(Unit)
-            } else {
-                router.exit()
-            }
+            presentationModel.backHandleAction.consumer.accept(Unit)
         }
     }
 

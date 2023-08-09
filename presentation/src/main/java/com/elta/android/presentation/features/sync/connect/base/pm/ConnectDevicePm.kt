@@ -48,6 +48,7 @@ abstract class ConnectDevicePm constructor(
 ) : BaseListPm(services) {
 
     val skipAction = action<Unit>()
+    val backHandleAction = action<Unit>()
 
     val connectDeviceAction = action<Unit>()
     val connectDeviceEnabledState = state(false)
@@ -57,7 +58,7 @@ abstract class ConnectDevicePm constructor(
 
     val openPinCodeDialogCommand = command<String>(bufferSize = 1)
 
-    val mstate = state(ViewState.HOW_TO_CONNECT)
+    val connectState = state(ViewState.HOW_TO_CONNECT)
 
     val btControl = bluetoothControl()
 
@@ -105,7 +106,7 @@ abstract class ConnectDevicePm constructor(
         bindAnalytics()
 
         btControl.bluetoothDeniedAction.observable
-            .subscribe { mstate.consumer.accept(ViewState.HOW_TO_CONNECT) }
+            .subscribe { connectState.consumer.accept(ViewState.HOW_TO_CONNECT) }
             .untilDestroy()
 
         Observable.merge(
@@ -120,12 +121,12 @@ abstract class ConnectDevicePm constructor(
                 when {
                     permission.granted -> startScanAction.consumer.accept(Unit)
                     !permission.granted && !permission.shouldShowRequestPermissionRationale -> {
-                        mstate.consumer.accept(ViewState.HOW_TO_CONNECT)
+                        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
                         settingsDialog.showForResult(settingsDialogData)
                             .map { it == DialogResult.POSITIVE }
                             .subscribe(settingsIsVisible.consumer)
                     }
-                    !permission.granted -> mstate.consumer.accept(ViewState.HOW_TO_CONNECT)
+                    !permission.granted -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
                 }
             }
             .untilDestroy()
@@ -151,12 +152,12 @@ abstract class ConnectDevicePm constructor(
 
             is TimeoutException -> {
                 if (items.valueOrNull.isNullOrEmpty()) {
-                    mstate.consumer.accept(ViewState.NOT_FOUND)
+                    connectState.consumer.accept(ViewState.NOT_FOUND)
                 }
             }
 
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
-            is GlucometerSyncError -> mstate.consumer.accept(ViewState.SYNC_ERROR)
+            is GlucometerSyncError -> connectState.consumer.accept(ViewState.SYNC_ERROR)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
@@ -186,7 +187,7 @@ abstract class ConnectDevicePm constructor(
                     .bindProgress()
                     .doOnComplete {
                         startSyncAction.consumer.accept(Unit)
-                        mstate.consumer.accept(ViewState.CONNECTED)
+                        connectState.consumer.accept(ViewState.CONNECTED)
                     }
                     .doOnError(::handleError)
             }
@@ -200,6 +201,11 @@ abstract class ConnectDevicePm constructor(
                     .toSingleDefault(Unit)
             }
             .subscribe(::navigateToApp)
+
+        backHandleAction.observable
+            .doOnNext(::handleBack)
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun bindStartScanAction() {
@@ -207,7 +213,7 @@ abstract class ConnectDevicePm constructor(
             .flatMap {
                 findGlucometers.execute()
                     .doOnSubscribe {
-                        mstate.consumer.accept(ViewState.SEARCH)
+                        connectState.consumer.accept(ViewState.SEARCH)
                     }
                     .doOnNext(::handleSearchResults)
                     .doOnError(::handleError)
@@ -219,7 +225,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun bindStartSyncAction() {
         startSyncAction.observable
-            .doOnNext { mstate.consumer.accept(ViewState.CONNECTED) }
+            .doOnNext { connectState.consumer.accept(ViewState.CONNECTED) }
             .skipWhileInProgress(syncProgressState.observable)
             .filter { glucometer != null }
             .map { SyncWithGlucometerUseCase.Params(glucometer) }
@@ -229,7 +235,7 @@ abstract class ConnectDevicePm constructor(
                     .doOnNext { events ->
                         if (events > 0) bus.event(Events.EventsChanged(true))
                     }
-                    .doOnComplete { mstate.consumer.accept(ViewState.SYNC_COMPLETED) }
+                    .doOnComplete { connectState.consumer.accept(ViewState.SYNC_COMPLETED) }
                     .doOnError(::handleError)
             }
             .retry()
@@ -281,6 +287,11 @@ abstract class ConnectDevicePm constructor(
             .untilDestroy()
     }
 
+    private fun handleBack(i: Unit) {
+        if (connectState.valueOrNull == ViewState.SYNC_COMPLETED) toAppAction.consumer.accept(Unit)
+        else router.exit()
+    }
+
     private fun isValidDeviceChoice(
         prevItems: List<DeviceItem>,
         newItems: List<DeviceItem>
@@ -301,7 +312,7 @@ abstract class ConnectDevicePm constructor(
 
     private fun handleSearchResults(results: List<Glucometer>) {
         if (results.isNotEmpty()) {
-            mstate.consumer.accept(ViewState.FOUND)
+            connectState.consumer.accept(ViewState.FOUND)
         }
         scanResults.clear()
         scanResults.addAll(results)
@@ -322,7 +333,7 @@ abstract class ConnectDevicePm constructor(
         )
 
     private fun bindAnalytics() {
-        mstate.observable
+        connectState.observable
             .filter { it == ViewState.SYNC_COMPLETED }
             .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
             .subscribe()
