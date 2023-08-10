@@ -697,6 +697,7 @@
     <!-- SYNC WITH BACKEND -->
     <string name="sync_with_backend_in_progress">Идет процесс синхронизации с сервером…</string>
     <string name="sync_with_backend_complete">Синхронизация с сервером завершена</string>
+    <string name="sync_with_backend_error">Ошибка при синхронизации с сервером</string>
 
     <!-- FIRMWARE -->
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>
