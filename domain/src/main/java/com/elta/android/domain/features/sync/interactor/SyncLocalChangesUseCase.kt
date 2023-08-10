@@ -1,6 +1,5 @@
 package com.elta.android.domain.features.sync.interactor
 
-import com.elta.android.common.errors.InvalidRefreshTokenError
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.insulin.DrugNameRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
@@ -11,7 +10,6 @@ import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.applyScheduler
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
-import io.reactivex.functions.Predicate
 import javax.inject.Inject
 
 class SyncLocalChangesUseCase @Inject constructor(
@@ -24,23 +22,17 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
-    private val predicate = Predicate<Throwable> { error -> error !is InvalidRefreshTokenError }
-
     override fun buildUseCaseObservable(params: Unit?): Completable =
         Completable.concat(
             listOf(
-                profileRepo.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate),
-                googleFitRepo.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate),
-                eventsRepo.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate),
-                tagsRepository.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate),
-                salePointsRepository.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate),
-                drugNameRepository.sync().applyScheduler(schedulers)
-                    .onErrorComplete(predicate)
+                profileRepo.sync(),
+                eventsRepo.sync(),
+                tagsRepository.sync(),
+                salePointsRepository.sync(),
+                drugNameRepository.sync(),
+                googleFitRepo.sync()
+                    .onErrorComplete()
             )
         )
+            .applyScheduler(schedulers)
 }
