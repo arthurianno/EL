@@ -287,7 +287,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                         .onFailure {
                             viewModel sendAction ConnectAction.ScannerError
                         }
-                }
+                } else viewModel sendAction ConnectAction.ScannerError
             }
         }
     }
