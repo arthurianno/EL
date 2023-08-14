@@ -25,6 +25,8 @@ import com.elta.android.presentation.utils.openSettingsIntent
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.children
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import com.nullgr.core.ui.extensions.toggleView
 import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -62,6 +64,8 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         binding.layoutSyncStateSyncCompleted.toAppButtonView.clicks().bindTo(pm.toAppAction)
         binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks().bindTo(pm.startScanAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
+        pm.hideHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.hide() }
+        pm.showHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.show() }
         pm.connectState.bindTo { state ->
             binding.syncStateContainerView.children().forEach { view ->
                 view.toggleView(state.getId() == view.id)

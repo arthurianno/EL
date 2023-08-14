@@ -7,7 +7,8 @@ import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
 import me.dmdev.rxpm.bindTo
 
-class FromOnBoardingConnectDeviceByPinFragment : ConnectDeviceByPinFragment<FromOnBoardingConnectDevicePm>() {
+class FromOnBoardingConnectDeviceByPinFragment :
+    ConnectDeviceByPinFragment<FromOnBoardingConnectDevicePm>() {
 
     companion object {
         fun newInstance() = FromOnBoardingConnectDeviceByPinFragment()
