@@ -20,6 +20,7 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
 import com.elta.android.presentation.features.sync.connect.model.ScannerDmcViewState
 import com.elta.android.presentation.features.sync.connect.model.ScannerState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -37,6 +38,8 @@ class ScannerDmcViewModel @Inject constructor(
         )
 
     private var closeTimer: CountDownTimer? = null
+
+    private var scannerJob: Job? = null
 
     internal val connectByPinButton = DownButtonWidgetModel()
     internal val appTopBar = BaseAppTopBarWidgetModel()
@@ -76,16 +79,26 @@ class ScannerDmcViewModel @Inject constructor(
         }
     }
 
+    override fun backClick() {
+        scannerJob?.cancel()
+        super.backClick()
+    }
+
     fun setCropSize(cropRect: DpSize) {
         reduceState { state.value.copy(cropRect = cropRect) }
     }
 
     private fun setScannerError() {
-        restartCloseTime()
-        launch {
-            reduceState { state.value.copy(scannerState = ScannerState.Error) }
-            delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
-            reduceState { state.value.copy(scannerState = ScannerState.Info) }
+        if (scannerJob == null || scannerJob?.isCancelled == true) {
+            restartCloseTime()
+            scannerJob = launch {
+                reduceState { state.value.copy(scannerState = ScannerState.Error) }
+                delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
+                reduceState { state.value.copy(scannerState = ScannerState.Info) }
+                delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
+
+                scannerJob?.cancel()
+            }
         }
     }
 
