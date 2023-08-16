@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/eventFormContainerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:splitMotionEvents="false">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayoutView"
@@ -219,9 +220,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="48dp"
-                android:maxLength="120"
-                android:inputType="textCapSentences"
                 android:hint="@string/events_creation_hint_note"
+                android:inputType="textCapSentences"
+                android:maxLength="120"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp" />
         </LinearLayout>
