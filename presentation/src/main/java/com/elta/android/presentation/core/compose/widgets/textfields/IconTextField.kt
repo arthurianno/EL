@@ -151,13 +151,14 @@ fun IconTextField(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_arrow_down),
                                 contentDescription = null,
-                                modifier = Modifier.clickable { widgetModel.switchExpanded() }
                             )
                         }
                     },
+                    enabled = !isDropDown,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(paddingValues)
+                        .clickable { widgetModel.switchExpanded() }
                         .focusRequester(focusRequester)
                         .onFocusChanged {
                             if (!isDropDown) {
@@ -166,6 +167,7 @@ fun IconTextField(
                         },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = colors.blackBlue,
+                        disabledTextColor = colors.blackBlue,
                         backgroundColor = colors.white,
                         unfocusedIndicatorColor = colors.shadeBlack3,
                         focusedIndicatorColor = colors.shadeBlack0,
