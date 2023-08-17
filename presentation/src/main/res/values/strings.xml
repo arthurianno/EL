@@ -133,7 +133,7 @@
     <string name="home_bottom_sheet_title">Что бы вы хотели записать?</string>
 
     <!-- EVENT TYPES -->
-    <string name="event_type_bread">Хлебные единицы</string>
+    <string name="event_type_bread">Еда</string>
     <string name="event_type_insulin">Инсулин</string>
     <string name="event_type_medicaments">Медикаменты</string>
     <string name="event_type_weight">Вес</string>
@@ -268,7 +268,7 @@
     <string name="events_helper_text_weight">Укажите ваш текущий вес</string>
     <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
 
-    <string name="events_form_screen_title_bread">Хлебные единицы</string>
+    <string name="events_form_screen_title_bread">Еда</string>
     <string name="events_form_screen_title_insulin">Инсулин</string>
     <string name="events_form_screen_title_weight">Вес</string>
     <string name="events_form_screen_title_activity">Активность</string>
