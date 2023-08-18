@@ -363,7 +363,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
             ) {
                 Text(text = dish.name, style = types.title3)
                 Text(
-                    text = "${dish.servingAmount.toInt()} ${dish.servingSelect.servingDescription}",
+                    text = dish.servingSelect.servingDescription,
                     color = colors.shadeBlack1
                 )
                 Text(
