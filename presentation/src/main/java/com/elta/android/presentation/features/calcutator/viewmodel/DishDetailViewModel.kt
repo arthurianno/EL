@@ -30,6 +30,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 internal const val MAX_BREAD_UNITS = 99.9
+private const val CONVERSION_FACTOR = 10
+private const val ONE_DECIMAL_PLACE = 1
+private const val TWO_DECIMAL_PLACES = 2
 private const val START_AMOUNT = 1.0
 private const val ZERO_COUNT = 0.0
 private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
@@ -178,15 +181,18 @@ class DishDetailViewModel @Inject constructor(
     }
 
     private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
-        val newCarbs = carbs ?: state.value.dish.servingSelect.carbs
+        val newCarbs = carbs ?: getServingOrDefault().carbs
         val newAmount =
             amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
-        val portion =
-            state.value.dish.servingSelect.numberOfUnits.takeIf { it > ZERO_COUNT } ?: START_AMOUNT
-        val breadUnits = (newCarbs * newAmount / (10 * portion)).round(1)
+        val breadUnits = (newCarbs * newAmount / CONVERSION_FACTOR).round(ONE_DECIMAL_PLACE)
         downButton.setEnableState(breadUnits > ZERO_COUNT)
         return breadUnits
     }
+
+    private fun getServingOrDefault(): ServingUiEntity =
+        state.value.dish.servings.find {
+            it.id == state.value.dish.servingSelect.id
+        } ?: emptyServing()
 
     private fun calculateServing(amount: Double? = null): ServingUiEntity {
         val dish = state.value.dish
@@ -198,6 +204,6 @@ class DishDetailViewModel @Inject constructor(
         val amountServing =
             amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
 
-        return serving.toNewAmount(amountServing).toRoundValue()
+        return serving.toNewAmount(amountServing).toRoundValue(TWO_DECIMAL_PLACES)
     }
 }
