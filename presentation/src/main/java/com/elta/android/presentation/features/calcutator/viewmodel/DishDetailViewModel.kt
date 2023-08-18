@@ -17,8 +17,11 @@ import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFie
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
 import com.elta.android.presentation.features.calcutator.model.emptyServing
 import com.elta.android.presentation.features.calcutator.model.toDomain
+import com.elta.android.presentation.features.calcutator.model.toNewAmount
+import com.elta.android.presentation.features.calcutator.model.toRoundValue
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -71,7 +74,8 @@ class DishDetailViewModel @Inject constructor(
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingAmount = it,
-                                breadUnits = calculateBreadUnits(amount = it)
+                                breadUnits = calculateBreadUnits(amount = it),
+                                servingSelect = calculateServing(amount = it)
                             )
                         )
                     }
@@ -85,11 +89,11 @@ class DishDetailViewModel @Inject constructor(
                     state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
                 .collectLatest {
-                    portionCountTextField.setText(it.numberOfUnits.toString())
+                    portionCountTextField.setText(START_AMOUNT.toString())
                     reduceState {
                         state.value.copy(
                             dish = state.value.dish.copy(
-                                servingSelect = it,
+                                servingSelect = it.toRoundValue(),
                                 breadUnits = calculateBreadUnits(carbs = it.carbs),
                                 servingAmount = it.numberOfUnits
                             )
@@ -182,5 +186,18 @@ class DishDetailViewModel @Inject constructor(
         val breadUnits = (newCarbs * newAmount / (10 * portion)).round(1)
         downButton.setEnableState(breadUnits > ZERO_COUNT)
         return breadUnits
+    }
+
+    private fun calculateServing(amount: Double? = null): ServingUiEntity {
+        val dish = state.value.dish
+        val serving = if (dish.servingSelect != emptyServing()){
+            dish.servings.findOrFirst {
+                it.id == dish.servingSelect.id
+            }
+        } else emptyServing()
+        val amountServing =
+            amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
+
+        return serving.toNewAmount(amountServing).toRoundValue()
     }
 }
