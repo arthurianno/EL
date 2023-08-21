@@ -13,8 +13,10 @@ import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
+import com.elta.android.presentation.core.compose.widgets.dialogs.InfoDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextFieldWidgetModel
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
+import com.elta.android.presentation.features.calcutator.model.DishDetailAction
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.emptyServing
@@ -58,6 +60,8 @@ class DishDetailViewModel @Inject constructor(
     val portionCountTextField = IconTextFieldWidgetModel()
     val portionDescriptionTextField = IconTextFieldWidgetModel()
     val warningMaxBreadUnitsDialog = BaseDialogWidgetModel<Nothing>()
+
+    val viewNameDialog = InfoDialogWidgetModel<Nothing>(onCLick = {})
 
     init {
         launch {
@@ -142,6 +146,7 @@ class DishDetailViewModel @Inject constructor(
         when (action) {
             AppAction.BackPressure -> router.exit()
             DownButtonClick -> saveDish()
+            DishDetailAction.ViewName -> viewNameDialog.dialogOpen(message = state.value.dish.name)
         }
     }
 
