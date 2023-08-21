@@ -137,7 +137,7 @@ class DishDetailViewModel @Inject constructor(
                             setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
                         }
                     }
-                    portionCountTextField.setText(newDish.servingAmount.toInt().toString())
+                    portionCountTextField.setText(newDish.servingAmount.toString())
                 }
         }
     }
