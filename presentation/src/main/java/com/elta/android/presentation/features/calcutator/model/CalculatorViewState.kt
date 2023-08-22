@@ -11,7 +11,8 @@ data class CalculatorViewState(
     val searchInFocus: Boolean,
     val lastWords: List<String>,
     val findingDishes: List<DishUiEntity>,
-    val isFindDishes: Boolean
+    val isLoading: Boolean,
+    val isError: Boolean
 ) {
     fun isChanging(): Boolean = dishes != startDishes
 }

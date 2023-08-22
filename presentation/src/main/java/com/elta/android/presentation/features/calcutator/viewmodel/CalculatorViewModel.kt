@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
+import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.GetCachedDishesUseCase
@@ -48,7 +49,8 @@ class CalculatorViewModel @Inject constructor(
             searchInFocus = false,
             lastWords = emptyList(),
             findingDishes = emptyList(),
-            isFindDishes = false
+            isLoading = false,
+            isError = false
         )
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -205,15 +207,20 @@ class CalculatorViewModel @Inject constructor(
     private fun findDishes(name: String) {
         launch {
             searchDishes(name)
-                .catch { handleError(it) }
-                .onStart { reduceState { state.value.copy(isFindDishes = true) } }
-                .onCompletion { reduceState { state.value.copy(isFindDishes = false) } }
+                .catch {
+                    handleError(it)
+                    if (it is ServiceUnavailableError){
+                        reduceState { state.value.copy(isError = true, isLoading = false) }
+                    }
+                }
+                .onStart { reduceState { state.value.copy(isLoading = true, isError = false) } }
+                .onCompletion { reduceState { state.value.copy(isLoading = false) } }
                 .map { it.toUi() }
                 .collectLatest { dishes ->
                     reduceState {
                         state.value.copy(
                             findingDishes = dishes,
-                            isFindDishes = false
+                            isLoading = false
                         )
                     }
                 }

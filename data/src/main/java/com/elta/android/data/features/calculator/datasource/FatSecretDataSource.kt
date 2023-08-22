@@ -4,6 +4,7 @@ import android.util.Base64
 import com.elta.android.common.di.qualifires.FatSecret
 import com.elta.android.common.di.qualifires.FatSecretAnnotationType
 import com.elta.android.common.errors.FatSecretErrors
+import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.data.features.calculator.api.FORMAT_PARAMETER
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
@@ -164,12 +165,13 @@ class FatSecretDataSource @Inject constructor(
     private fun <T> runFlowWithCatchToken(apiMethod: () -> Flow<T>) =
         apiMethod()
             .catch {
-                if (it is FatSecretErrors.TokenError) {
-                    emitAll(
+                when (it) {
+                    is FatSecretErrors.TokenError -> emitAll(
                         refreshToken().flatMapLatest {
                             apiMethod()
                         }
                     )
+                    is ServiceUnavailableError -> emitAll(apiMethod())
                 }
             }
 

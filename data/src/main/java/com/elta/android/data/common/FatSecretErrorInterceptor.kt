@@ -2,6 +2,7 @@ package com.elta.android.data.common
 
 import com.elta.android.common.errors.FatSecretErrors
 import com.elta.android.common.errors.ServerError
+import com.elta.android.common.errors.ServiceUnavailableError
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
@@ -19,8 +20,8 @@ import javax.inject.Singleton
 private const val ACCEPT_ENCODING = "Accept-Encoding"
 private const val ACCEPT_ENCODING_VALUE = "gzip"
 private const val ERROR_BODY_LENGTH = 2048L
+private const val ERROR_CODE_500 = 500
 private const val ERROR_INVALID_TOKEN = 13
-private const val ERROR_MISSING_SCOPE = 14
 
 @Singleton
 class FatSecretErrorInterceptor @Inject constructor() : Interceptor {
@@ -54,6 +55,7 @@ class FatSecretErrorInterceptor @Inject constructor() : Interceptor {
     ): Nothing? =
         when (response.code) {
             HttpURLConnection.HTTP_BAD_REQUEST -> throw ServerError(message = response.message)
+            ERROR_CODE_500 -> throw ServiceUnavailableError(message = response.message)
             else -> error?.error?.run {
                 when (code) {
                     ERROR_INVALID_TOKEN -> throw FatSecretErrors.TokenError(message)
