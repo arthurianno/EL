@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.calcutator.model // ktlint-disabl
 
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.Serving
+import com.elta.android.domain.features.user.interactor.round
 
 internal fun Dish.toUi(): DishUiEntity =
     DishUiEntity(
@@ -60,3 +61,19 @@ internal fun List<DishUiEntity>.toDomain(): List<Dish> =
     map { it.toDomain() }
 
 internal fun emptyServing() = Serving.empty().toUi()
+
+internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity =
+    this.copy(
+        calories = calories * amount,
+        proteins = proteins * amount,
+        fats = fats * amount,
+        carbs = carbs * amount
+    )
+
+internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
+    this.copy(
+        calories = calories.round(count),
+        proteins = proteins.round(count),
+        fats = fats.round(count),
+        carbs = carbs.round(count)
+    )
