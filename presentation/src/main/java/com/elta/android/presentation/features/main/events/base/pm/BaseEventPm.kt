@@ -69,6 +69,8 @@ abstract class BaseEventPm(
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
     val breadUnitsChangeDialogControl = dialogControl<DialogData, DialogResult>()
     val userHadChangesBreadUnitsDialogControl = dialogControl<DialogData, DialogResult>()
+    val editingXEIsNotAvailableAction = action<Unit>()
+    val editingXEIsNotAvailableControl = dialogControl<DialogData, DialogResult>()
     val eventTypeState = state<EventType>()
     val dishes = state<List<Dish>>(emptyList())
     protected val formPickerValue = state<Double>()
@@ -79,6 +81,9 @@ abstract class BaseEventPm(
     }
     private val userHadChangesBreadUnitsDialogData: DialogData by lazy {
         Dialogs.UserHadChangesBreadUnitsData(resources)
+    }
+    private val editingXEIsNotAvailableData: DialogData by lazy {
+        Dialogs.EditingXEIsNotAvailableData(resources)
     }
 
     private val dateInFutureSnackBarData by lazy {
@@ -180,6 +185,12 @@ abstract class BaseEventPm(
                     userHadChangesBreadUnitsDialogControl.show(userHadChangesBreadUnitsDialogData)
                     lockedChangeFormPicker = false
                 }
+            }
+            .untilDestroy()
+
+        editingXEIsNotAvailableAction.observable
+            .subscribe {
+                editingXEIsNotAvailableControl.show(editingXEIsNotAvailableData)
             }
             .untilDestroy()
     }

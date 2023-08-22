@@ -6,8 +6,10 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.FrameLayout
+import androidx.core.view.isVisible
 import com.elta.android.presentation.R
 import com.elta.android.presentation.databinding.LayoutFormPickerBinding
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
@@ -29,7 +31,7 @@ class FormPicker @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     var config: FormMeasurementConfig? = null
         set(value) {
@@ -46,6 +48,19 @@ class FormPicker @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_form_picker, this, true)
         isSaveEnabled = true
+    }
+
+    fun enableFormPicker(isEnable: Boolean) {
+        binding.fantomLayout.isVisible = !isEnable
+    }
+
+    fun setDisableTouchCallback(callback: () -> Unit) {
+        binding.fantomLayout.setOnTouchListener { _, event ->
+            if(event.action == MotionEvent.ACTION_DOWN) {
+                callback.invoke()
+            }
+            false
+        }
     }
 
     override fun onAttachedToWindow() {
