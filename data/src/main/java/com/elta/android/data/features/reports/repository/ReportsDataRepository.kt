@@ -39,9 +39,9 @@ class ReportsDataRepository @Inject constructor(
 
     private fun Profile.createFullName(): String {
         return when {
-            firstName.isNullOrEmpty() && secondName.isNullOrEmpty() -> email ?: ""
-            firstName.isNullOrEmpty() -> secondName ?: ""
-            secondName.isNullOrEmpty() -> firstName ?: ""
+            firstName.isNullOrEmpty() && secondName.isNullOrEmpty() -> email.orEmpty()
+            firstName.isNullOrEmpty() -> secondName.orEmpty()
+            secondName.isNullOrEmpty() -> firstName.orEmpty()
             else -> "$firstName $secondName"
         }
     }

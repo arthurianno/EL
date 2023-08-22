@@ -44,7 +44,7 @@ class DevicesOptionsItemsBuilder @Inject constructor(
         with(source) {
             ActiveDeviceItem(
                 icon = if (isPrimary) R.drawable.ic_primary_device else R.drawable.ic_devices,
-                name = name ?: "",
+                name = name.orEmpty(),
                 address = address,
                 serial = serial,
                 isPrimary = isPrimary

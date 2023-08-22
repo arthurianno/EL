@@ -226,7 +226,7 @@ class FirmwarePm @Inject constructor(
 
     private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
         UpdateDeviceFirmwareUseCase.Params(
-            address = deviceAddressState.valueOrNull ?: "",
+            address = deviceAddressState.valueOrNull.orEmpty(),
             file = firmwareFileState.value
         )
 
@@ -237,7 +237,7 @@ class FirmwarePm @Inject constructor(
     private fun UpdateState?.hasUserInput(): Boolean = this?.button != null
 
     private fun getModel(): String =
-        deviceInfo.valueOrNull?.glucometerSerialNumber ?: ""
+        deviceInfo.valueOrNull?.glucometerSerialNumber.orEmpty()
 
     private fun getDeviceVersion(): String =
         deviceInfo.valueOrNull?.softwareVersion ?: "0"

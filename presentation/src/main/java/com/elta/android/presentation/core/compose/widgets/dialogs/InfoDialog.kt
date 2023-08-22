@@ -80,7 +80,7 @@ fun InfoDialog(widgetModel: InfoDialogWidgetModel<*>) {
         ) {
             DialogContent(
                 message = state.value.message,
-                buttonText = state.value.buttonText ?: ""
+                buttonText = state.value.buttonText.orEmpty()
             ) {
                 widgetModel.infoClick()
             }

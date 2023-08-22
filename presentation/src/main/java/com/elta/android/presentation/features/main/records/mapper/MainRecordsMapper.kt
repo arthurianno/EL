@@ -34,7 +34,7 @@ class MainRecordsMapper @Inject constructor(
             dailyGlucoseModel.lastEvent?.additionTime?.toStringWithFormat(CommonFormats.FORMAT_TIME)
         return RecordsDailyGlucoseItem(
             ChartItemsBuilder.build(dailyGlucoseModel),
-            resources.getString(R.string.main_records_daily_glucose_subtitle, lastEventTime ?: "")
+            resources.getString(R.string.main_records_daily_glucose_subtitle, lastEventTime.orEmpty())
         )
     }
 

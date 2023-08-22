@@ -43,7 +43,7 @@ class FeedbackPm @Inject constructor(
             .flatMapSingle {
                 getProfileUseCase.execute(Unit)
                     .bindProgress()
-                    .map { it.email ?: "" }
+                    .map { it.email.orEmpty() }
                     .doOnSuccess(emailInput.text.consumer)
                     .doOnError(::handleError)
             }

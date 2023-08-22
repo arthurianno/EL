@@ -26,7 +26,7 @@ internal object SimpleDateFormatterCache {
         timeZone: TimeZone? = null,
         locale: Locale = Locale.getDefault()
     ): SimpleDateFormat {
-        val key = "$dateFormat${locale.displayName ?: ""}${timeZone?.displayName ?: ""}"
+        val key = "$dateFormat${locale.displayName.orEmpty()}${timeZone?.displayName.orEmpty()}"
         var format = this[key]
         if (format == null) {
             format = SimpleDateFormat(dateFormat, locale).apply {

@@ -30,7 +30,7 @@ class PinDialogPm @Inject constructor(
             .untilDestroy()
 
         mainAction.observable
-            .map { pinInputControl.text.valueOrNull ?: "" }
+            .map { pinInputControl.text.valueOrNull.orEmpty() }
             .subscribe { pin ->
                 closeDialogCommand.consumer.accept(Unit)
                 bus.event(Events.PinCodeEntered(pin))
