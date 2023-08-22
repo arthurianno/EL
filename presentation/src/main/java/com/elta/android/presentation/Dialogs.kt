@@ -133,4 +133,12 @@ sealed class Dialogs : DialogData {
         override val negative: String = resourceProvider.getString(R.string.settings_dialog_negative),
         override val positive: String = resourceProvider.getString(R.string.settings_dialog_positive),
     ) : Dialogs()
+
+    data class EditingXEIsNotAvailableData(
+        val resourceProvider: ResourceProvider,
+        override val title: String? = resourceProvider.getString(R.string.event_form_dialog_title),
+        override val message: String = resourceProvider.getString(R.string.calculator_editing_XE_is_not_available),
+        override val negative: String? = null,
+        override val positive: String? = resourceProvider.getString(R.string.ok),
+    ) : Dialogs()
 }

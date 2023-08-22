@@ -769,6 +769,7 @@
     <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените добавленные блюда/продуты.</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
     <string name="calculator_view_name">Посмотреть название</string>
+    <string name="calculator_editing_XE_is_not_available">Чтобы вручную отредактировать значение ХЕ, сначала удалите добавленные продукты/блюда</string>
 
     <!-- CONSULTANT -->
     <string name="consultant_topbar_title">Онлайн консультант</string>

@@ -112,6 +112,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         pm.noteInput.bindTo(binding.formNoteView)
         pm.bindDateSelection()
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.editingXEIsNotAvailableControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.breadUnitsChangeDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.userHadChangesBreadUnitsDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
@@ -178,6 +179,15 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     private fun observeBreadUnitsChanges(pm: T) {
         if (pm.eventTypeState.valueOrNull == EventType.BREAD) {
             pm.dishes.observable.subscribe {
+
+                val formPickerEnabled = it.isNullOrEmpty()
+
+                binding.formPickerView.enableFormPicker(formPickerEnabled)
+
+                binding.formPickerView.setDisableTouchCallback {
+                    pm.editingXEIsNotAvailableAction.consumer.accept(Unit)
+                }
+
                 with(binding.formVariantSelectorView) {
                     if (it.isEmpty()) {
                         hint = context.getString(R.string.events_creation_hint_bread)
