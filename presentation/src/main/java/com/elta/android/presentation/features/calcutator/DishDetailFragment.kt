@@ -88,7 +88,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         portionDescriptionTextField.setIcon(R.drawable.ic_list)
         warningMaxBreadUnitsDialog.initDialog(
             title = getString(R.string.calculator_dialog_title_warning),
-            message = getString(R.string.calculator_max_bread_units_message),
+            message = getString(R.string.calculator_dish_detail_max_bread_units_message),
             positiveButtonText = getString(R.string.ok)
         )
 
