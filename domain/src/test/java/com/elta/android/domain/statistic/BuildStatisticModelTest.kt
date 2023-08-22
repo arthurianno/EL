@@ -179,6 +179,8 @@ class BuildStatisticModelTest {
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
                 eventsLowPercent = 1.percent(glucoseEvents.size),
 
+                glucoseFormat = GlucoseFormat.PLASMA,
+
                 dailyGlucoseModel = buildDailyGlucoseModel(glucoseEvents, settings, GlucoseFormat.PLASMA)
             ),
             insulin = DailyInsulinStatisticModel(
@@ -223,6 +225,8 @@ class BuildStatisticModelTest {
             eventsHighPercent = 2.percent(events.size),
             eventsNormalPercent = 2.percent(events.size),
             eventsLowPercent = 1.percent(events.size),
+
+            glucoseFormat = GlucoseFormat.PLASMA,
 
             dailyGlucoseModel = null
         )
