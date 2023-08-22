@@ -152,6 +152,8 @@ fun buildGlucoseStatisticModel(
         eventsNormalPercent = eventsNormalPercent,
         eventsLowPercent = eventsLowPercent,
 
+        glucoseFormat = glucoseFormat,
+
         dailyGlucoseModel = when (forPeriod) {
             true -> null
             else -> glucoseEventsPerPeriod?.let {

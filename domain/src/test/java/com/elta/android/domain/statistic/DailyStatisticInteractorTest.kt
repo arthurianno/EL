@@ -201,6 +201,8 @@ class DailyStatisticInteractorTest {
                 eventsNormalPercent = 2.percent(glucoseEvents.size),
                 eventsLowPercent = 1.percent(glucoseEvents.size),
 
+                glucoseFormat = GlucoseFormat.PLASMA,
+
                 dailyGlucoseModel = buildDailyGlucoseModel(
                     glucoseEvents,
                     settings,
