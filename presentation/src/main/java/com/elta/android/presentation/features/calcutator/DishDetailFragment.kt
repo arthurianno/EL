@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,20 +30,21 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
-import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
+import com.elta.android.presentation.core.compose.widgets.dialogs.InfoDialog
 import com.elta.android.presentation.core.compose.widgets.textfields.IconTextField
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
+import com.elta.android.presentation.features.calcutator.model.DishDetailAction
 import com.elta.android.presentation.features.calcutator.model.DishDetailViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
+import com.elta.android.presentation.features.calcutator.ui.MainHeader
 import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
@@ -91,11 +91,17 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
             message = getString(R.string.calculator_max_bread_units_message),
             positiveButtonText = getString(R.string.ok)
         )
+
+        viewNameDialog.initDialog(
+            message = getString(R.string.close),
+            buttonText = getString(R.string.close)
+        )
     }
 
     @Composable
     override fun Dialogs(viewModel: DishDetailViewModel) {
         BaseDialog(widgetModel = viewModel.warningMaxBreadUnitsDialog)
+        InfoDialog(widgetModel = viewModel.viewNameDialog)
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -113,98 +119,16 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     viewModel sendAction AppAction.FreeScreenTap
                 }
         ) {
-            MainHeader(dish = state.dish, viewModel = viewModel)
+            MainHeader(
+                dish = state.dish,
+                backClickListener = { viewModel sendAction AppAction.BackPressure },
+                viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
+            )
             MainContent(
                 viewModel = viewModel,
                 state = state,
                 descriptionFieldFocusRequester = descriptionFieldFocusRequester
             )
-        }
-    }
-
-    @Composable
-    private fun BoxScope.MainHeader(
-        dish: DishUiEntity,
-        viewModel: DishDetailViewModel
-    ) {
-        GetLocalProperties { dimens, brash, colors, _, _ ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = dimens.dishCardHeight - dimens.headerBottomDim)
-                    .align(Alignment.TopCenter)
-                    .background(brush = brash.dishHeader)
-            ) {
-                ButtonBack(
-                    color = colors.paleGray,
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(dimens.contentPadding)
-                        .align(Alignment.TopStart),
-                    onClick = {
-                        viewModel sendAction AppAction.BackPressure
-                    }
-                )
-                HeaderTitle(dish)
-                BreadUnitsValue(dish)
-            }
-        }
-    }
-
-    @Composable
-    private fun BoxScope.HeaderTitle(dish: DishUiEntity) {
-        GetLocalProperties { dimens, _, colors, _, types ->
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(dimens.dishHeaderTitle)
-            ) {
-                Text(text = dish.brandName, style = types.body1, color = colors.white)
-                Row {
-                    if (dish.isVerification) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_verify_dish),
-                            contentDescription = null,
-                            modifier = Modifier.padding(top = dimens.smallDim)
-                        )
-                    }
-                    Text(
-                        text = dish.name,
-                        style = types.h1,
-                        color = colors.white,
-                        modifier = Modifier.padding(start = dimens.verySmallDim)
-                    )
-                }
-                VSpacer(height = dimens.halfMediumDim)
-                Text(
-                    text = stringResource(id = R.string.calculator_bread_units_count),
-                    color = colors.white
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun BoxScope.BreadUnitsValue(dish: DishUiEntity) {
-        GetLocalProperties { dimens, _, colors, shapes, types ->
-            Box(
-                modifier = Modifier
-                    .padding(dimens.xeValueCard)
-                    .clip(shapes.dishCard)
-                    .background(color = colors.white)
-                    .align(Alignment.BottomEnd)
-                    .padding(dimens.xeValue)
-            ) {
-                Text(
-                    text = stringResource(
-                        id = R.string.calculator_bread_units_count_label,
-                        dish.breadUnits.toString()
-                    ),
-                    modifier = Modifier.align(Alignment.Center),
-                    color = colors.gOrangeB,
-                    style = types.title3
-                )
-            }
         }
     }
 

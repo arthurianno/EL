@@ -4,8 +4,18 @@ import android.util.Base64
 import com.elta.android.common.di.qualifires.FatSecret
 import com.elta.android.common.di.qualifires.FatSecretAnnotationType
 import com.elta.android.common.errors.FatSecretErrors
+import com.elta.android.data.features.calculator.api.FORMAT_PARAMETER
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
+import com.elta.android.data.features.calculator.api.LANGUAGE_PARAMETER
+import com.elta.android.data.features.calculator.api.METHOD_PARAMETER
+import com.elta.android.data.features.calculator.api.OAUTH_CONSUMER_KEY_PARAMETER
+import com.elta.android.data.features.calculator.api.OAUTH_NONCE_PARAMETER
+import com.elta.android.data.features.calculator.api.OAUTH_SIGNATURE_METHOD_PARAMETER
+import com.elta.android.data.features.calculator.api.OAUTH_TIMESTAMP_PARAMETER
+import com.elta.android.data.features.calculator.api.OAUTH_VERSION_PARAMETER
+import com.elta.android.data.features.calculator.api.REGION_PARAMETER
+import com.elta.android.data.features.calculator.api.SEARCH_EXPRESSION_PARAMETER
 import com.elta.android.data.features.calculator.mapper.compactFoodsToDomain
 import com.elta.android.data.features.calculator.mapper.toDomain
 import com.elta.android.data.features.calculator.storage.FatSecretStorage
@@ -24,6 +34,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 
+
 private const val FORMAT_RESPONSE = "json"
 private const val METHOD_GET_FOOD = "food.get.v2"
 private const val METHOD_SEARCH_FOOD = "foods.search"
@@ -33,16 +44,11 @@ private const val POST_METHOD = "POST"
 private const val SIGNATURE_METHOD = "HMAC-SHA1"
 private const val HMAC_SHA1_ALGORITHM = "HmacSHA1"
 private const val OAUTH_VERSION = "1.0"
+private const val REGION = "RU"
+private const val LANGUAGE = "ru"
 private const val STRING_SEPARATOR = "&"
 private const val FOOD_ID_PARAMETER = "food_id"
-private const val METHOD_PARAMETER = "method"
-private const val FORMAT_PARAMETER = "format"
-private const val SEARCH_EXPRESSION_PARAMETER = "search_expression"
-private const val OAUTH_CONSUMER_KEY_PARAMETER = "oauth_consumer_key"
-private const val OAUTH_SIGNATURE_METHOD_PARAMETER = "oauth_signature_method"
-private const val OAUTH_TIMESTAMP_PARAMETER = "oauth_timestamp"
-private const val OAUTH_NONCE_PARAMETER = "oauth_nonce"
-private const val OAUTH_VERSION_PARAMETER = "oauth_version"
+
 private const val OAUTH_BASE_URL = "https://platform.fatsecret.com/rest/server.api"
 
 class FatSecretDataSource @Inject constructor(
@@ -62,22 +68,39 @@ class FatSecretDataSource @Inject constructor(
         OAUTH_VERSION_PARAMETER to OAUTH_VERSION
     )
 
+    private val searchFoodBaseParameters = mapOf(
+        METHOD_PARAMETER to METHOD_SEARCH_FOOD,
+        REGION_PARAMETER to REGION,
+        LANGUAGE_PARAMETER to LANGUAGE,
+        FORMAT_PARAMETER to FORMAT_RESPONSE,
+    )
+
+    private val foodBaseParameters = mapOf(
+        METHOD_PARAMETER to METHOD_GET_FOOD,
+        REGION_PARAMETER to REGION,
+        LANGUAGE_PARAMETER to LANGUAGE,
+        FORMAT_PARAMETER to FORMAT_RESPONSE,
+    )
+
     fun getFood(id: String, type: DishType): Flow<Dish> {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
-        val oauthSignature = mapOf(
+
+        val parameters = foodBaseParameters + mapOf(
             FOOD_ID_PARAMETER to id,
-            METHOD_PARAMETER to METHOD_GET_FOOD,
-            FORMAT_PARAMETER to FORMAT_RESPONSE,
             OAUTH_TIMESTAMP_PARAMETER to timeStamp,
             OAUTH_NONCE_PARAMETER to nonce
-        ).createBaseString()
-            .hmacSha1Signature()
+        )
+        val baseString = parameters.createBaseString()
+        val oauthSignature = baseString.hmacSha1Signature()
+
         return when (type) {
             DishType.Generic -> runFlowWithCatchToken {
                 api.getFoodGeneric(
                     foodId = id,
                     method = METHOD_GET_FOOD,
+                    language = LANGUAGE,
+                    region = REGION,
                     format = FORMAT_RESPONSE,
                     oauthSignature = oauthSignature.takeIsAuth1(),
                     oauthConsumerKey = consumerKey.takeIsAuth1(),
@@ -92,6 +115,8 @@ class FatSecretDataSource @Inject constructor(
                 api.getFoodBrand(
                     foodId = id,
                     method = METHOD_GET_FOOD,
+                    language = LANGUAGE,
+                    region = REGION,
                     format = FORMAT_RESPONSE,
                     oauthSignature = oauthSignature,
                     oauthConsumerKey = consumerKey.takeIsAuth1(),
@@ -107,21 +132,25 @@ class FatSecretDataSource @Inject constructor(
     fun getFoods(name: String): Flow<List<Dish>> {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
-        val oauthSignature = mapOf(
-            SEARCH_EXPRESSION_PARAMETER to name,
-            METHOD_PARAMETER to METHOD_SEARCH_FOOD,
-            FORMAT_PARAMETER to FORMAT_RESPONSE,
+
+        val parameters = searchFoodBaseParameters + mapOf(
+            SEARCH_EXPRESSION_PARAMETER to name.encode(),
             OAUTH_TIMESTAMP_PARAMETER to timeStamp,
             OAUTH_NONCE_PARAMETER to nonce
         )
-            .createBaseString()
-            .hmacSha1Signature()
+
+        val baseString = parameters.createBaseString()
+
+        val oauthSignature = baseString.hmacSha1Signature()
+
         return runFlowWithCatchToken {
             api.getFoods(
-                searchWord = name,
+                searchExpression = name,
                 method = METHOD_SEARCH_FOOD,
                 format = FORMAT_RESPONSE,
-                oauthSignature = oauthSignature.takeIsAuth1(),
+                language = LANGUAGE,
+                region = REGION,
+                oauthSignature = oauthSignature,
                 oauthConsumerKey = consumerKey.takeIsAuth1(),
                 oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
                 oauthTimestamp = timeStamp.takeIsAuth1(),
