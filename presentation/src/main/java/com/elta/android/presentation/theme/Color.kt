@@ -3,6 +3,7 @@ package com.elta.android.presentation.theme
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
+internal val transparent = Color(0x0)
 internal val blue = Color(0xFF245aa7)
 internal val red = Color(0xFFd93b17)
 internal val shadeRed1 = Color(0xFFd91717)
@@ -18,6 +19,7 @@ internal val shadeGGreenA0_16 = Color(0x273ec9a8)
 internal val shadeGGreenA = Color(0xFF3ec9a8)
 internal val blackBlue = Color(0xFF3d4556)
 internal val blackBlue20 = Color(0x333D4556)
+internal val blackBlue30 = Color(0x4D3D4556)
 internal val shadeBlack1 = Color(0xFF878b93)
 internal val shadeBlack2 = Color(0xFFbbbfca)
 internal val shadeBlack3 = Color(0xFFe3e3e3)
@@ -55,6 +57,7 @@ data class EltaColors(
     val shadeGGreenA: Color,
     val blackBlue: Color,
     val blackBlue20: Color,
+    val blackBlue30: Color,
     val shadeBlack1: Color,
     val shadeBlack2: Color,
     val shadeBlack3: Color,
@@ -87,6 +90,7 @@ internal val eltaColors = EltaColors(
     shadeGGreenA = shadeGGreenA,
     blackBlue = blackBlue,
     blackBlue20 = blackBlue20,
+    blackBlue30 = blackBlue30,
     shadeBlack1 = shadeBlack1,
     shadeBlack2 = shadeBlack2,
     shadeBlack3 = shadeBlack3,

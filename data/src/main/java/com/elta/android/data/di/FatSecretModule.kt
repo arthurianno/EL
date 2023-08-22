@@ -23,8 +23,8 @@ import javax.inject.Singleton
 
 private const val CLIENT_ID = "6893a669c38f4b3c97154f721f405c9f"
 private const val CLIENT_SECRET = "f8bce065b49b42c89dc0a8af8041b790"
-private const val CONSUMER_KEY = "6893a669c38f4b3c97154f721f405c9f"
-private const val CONSUMER_SECRET = "b0876f15ad364783a1c0d721f80456e9"
+private const val CONSUMER_KEY = "a55d2498c3964d3c9414a60456f56fce"
+private const val CONSUMER_SECRET = "955e724c2aca4a5485cf3c20661ef8c1"
 private const val BASE_URL = "https://platform.fatsecret.com/rest/"
 private const val TOKEN_URL = "https://oauth.fatsecret.com/connect/"
 private const val USE_OAUTH2 = false

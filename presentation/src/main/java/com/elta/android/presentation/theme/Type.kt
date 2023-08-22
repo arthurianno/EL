@@ -104,6 +104,22 @@ private val dialogButton = TextStyle(
     color = gGreenB
 )
 
+private val infoDialog = TextStyle(
+    fontFamily = appBaseFontRegular,
+    fontSize = 16.sp
+)
+
+private val infoDialogButton = TextStyle(
+    fontFamily = appBaseFontMedium,
+    fontSize = 14.sp
+)
+
+private val moreTextButton = TextStyle(
+    fontFamily = appBaseFontMedium,
+    fontSize = 16.sp,
+    background = transparent
+)
+
 data class EltaTypes(
     val title1: TextStyle,
     val title2: TextStyle,
@@ -123,7 +139,10 @@ data class EltaTypes(
     val buttonMenuText: TextStyle,
     val textStyle2: TextStyle,
     val breadUnits: TextStyle,
-    val dialogButton: TextStyle
+    val dialogButton: TextStyle,
+    val infoDialog: TextStyle,
+    val infoDialogButton: TextStyle,
+    val moreTextButton: TextStyle,
 )
 
 internal val eltaTypes = EltaTypes(
@@ -145,7 +164,10 @@ internal val eltaTypes = EltaTypes(
     buttonMenuText = buttonLargeText,
     textStyle2 = textStyle2,
     breadUnits = breadUnits,
-    dialogButton = dialogButton
+    dialogButton = dialogButton,
+    infoDialog = infoDialog,
+    infoDialogButton = infoDialogButton,
+    moreTextButton = moreTextButton
 )
 
 val materialThemeTypography = Typography(

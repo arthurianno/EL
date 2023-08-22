@@ -766,8 +766,9 @@
     <string name="calculator_dialog_title_warning">Внимание</string>
     <string name="calculator_user_had_changed_data_message">При изменении значений ХЕ данные могут быть не точными</string>
     <string name="calculator_user_change_bread_units_message">Значение ХЕ было изменено, исходя из добавленных вами продуктов/блюд</string>
-    <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
+    <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените добавленные блюда/продуты.</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
+    <string name="calculator_view_name">Посмотреть название</string>
 
     <!-- CONSULTANT -->
     <string name="consultant_topbar_title">Онлайн консультант</string>
@@ -806,5 +807,7 @@
 
     <!-- Bluetooth Dialog -->
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
+
+    <string name="close">Закрыть</string>
 
 </resources>

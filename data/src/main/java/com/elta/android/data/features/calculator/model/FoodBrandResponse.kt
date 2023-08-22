@@ -10,7 +10,7 @@ data class FoodBrandResponse(
         @SerializedName("food_name") val foodName: String,
         @SerializedName("food_type") val foodType: String,
         @SerializedName("brand_name") val brandName: String?,
-        @SerializedName("food_url") val foodUrl: String,
+        @SerializedName("food_url") val foodUrl: String?,
         @SerializedName("servings") val servingsBrand: ServingBrand
     ) {
         data class ServingBrand(
