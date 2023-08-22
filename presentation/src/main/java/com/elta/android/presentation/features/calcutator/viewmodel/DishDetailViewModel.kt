@@ -96,13 +96,12 @@ class DishDetailViewModel @Inject constructor(
                     state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
                 .collectLatest {
-                    portionCountTextField.setText(START_AMOUNT.toString())
                     reduceState {
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingSelect = it.toRoundValue(),
                                 breadUnits = calculateBreadUnits(carbs = it.carbs),
-                                servingAmount = it.numberOfUnits
+                                servingAmount = START_AMOUNT
                             )
                         )
                     }
