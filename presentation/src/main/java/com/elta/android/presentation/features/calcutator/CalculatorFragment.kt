@@ -189,7 +189,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         } else {
             FindingDishes(
                 findingDishes = state.findingDishes,
-                isFindDishes = state.isFindDishes,
+                isLoading = state.isLoading,
+                isError = state.isError,
                 viewModel = viewModel
             )
         }
@@ -198,22 +199,32 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     private fun FindingDishes(
         findingDishes: List<DishUiEntity>,
-        isFindDishes: Boolean,
+        isLoading: Boolean,
+        isError: Boolean,
         viewModel: CalculatorViewModel
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(modifier = Modifier.fillMaxSize()) {
-                if (isFindDishes) {
+                if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 } else {
-                    if (findingDishes.isEmpty()) {
-                        Text(
-                            text = stringResource(id = R.string.calculator_search_no_result),
-                            color = colors.shadeBlack2,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    } else {
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
+                    when {
+                        isError ->
+                            Text(
+                                text = stringResource(id = R.string.calculator_search_server_unavailable),
+                                color = colors.shadeBlack2,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        findingDishes.isEmpty() -> {
+                            Text(
+                                text = stringResource(id = R.string.calculator_search_no_result),
+                                color = colors.shadeBlack2,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+
+                        else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
                             items(items = findingDishes) { dish ->
                                 Row(
                                     modifier = Modifier
