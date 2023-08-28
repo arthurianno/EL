@@ -19,7 +19,7 @@
 
     <!-- DEFAULT ERRORS -->
     <string name="error_test_error">Internal error</string>
-    <string name="error_verify_your_email">Верифицируйте email</string>
+    <string name="error_verify_your_email">Верифицируйте свой email</string>
 
     <string name="error_general_title">Ошибка</string>
     <string name="error_general_button">Повторить</string>
