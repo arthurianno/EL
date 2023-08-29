@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 
 data class EltaDimens(
     // Base Dims
+    val smallestDim: Dp,
     val verySmallDim: Dp,
     val smallDim: Dp,
     val halfMediumDim: Dp,
@@ -88,6 +89,7 @@ data class EltaDimens(
 )
 
 internal val eltaDimens = EltaDimens(
+    smallestDim = 2.dp,
     verySmallDim = 4.dp,
     smallDim = 8.dp,
     halfMediumDim = 12.dp,

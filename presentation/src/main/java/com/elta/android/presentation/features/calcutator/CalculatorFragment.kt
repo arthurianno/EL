@@ -32,15 +32,16 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.fragment.app.viewModels
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.NetworkState
+import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
-import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
@@ -238,7 +239,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                             colors.shadeBlack3,
                                             shapes.dishCard
                                         )
-                                        .padding(dimens.contentPadding),
+                                        .padding(
+                                            horizontal = dimens.contentPadding,
+                                            vertical = dimens.halfMediumDim
+                                        ),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -264,21 +268,47 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     .padding(end = dimens.contentPadding)
                     .weight(1f)
             ) {
-                Row {
-                    if (dish.isVerification) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_verify_dish),
-                            contentDescription = null
-                        )
-                    }
-                    Text(
-                        text = dish.name,
-                        style = types.title3,
-                        color = colors.blackBlue,
-                        modifier = Modifier.padding(start = dimens.verySmallDim)
+                var productLinesCount = THREE_LINES_COUNT
+                val caloriesInServingText = if (dish.servings.isNotEmpty()) {
+                    val dishServing = dish.servings.first()
+                    resources.getString(
+                        R.string.calculator_dish_serving_calories,
+                        dishServing.numberOfUnits.toString(),
+                        dishServing.calories.toString()
+                    )
+                } else {
+                    resources.getString(
+                        R.string.calculator_dish_serving_calories,
+                        ZERO_SERVING_CALORIES,
+                        ZERO_SERVING_CALORIES
                     )
                 }
-                VSpacerVerySmall()
+                if (dish.brandName.isNotEmpty()){
+                    productLinesCount = SINGLE_LINE_COUNT
+                    Text(
+                        text = dish.brandName,
+                        style = types.textStyle2,
+                        color = colors.shadeBlack1,
+                        maxLines = TWO_LINES_COUNT,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    VSpacer(height = dimens.smallestDim)
+                }
+                Text(
+                    text = dish.name,
+                    style = types.title3,
+                    color = colors.blackBlue,
+                    maxLines = productLinesCount,
+                    overflow = TextOverflow.Ellipsis
+                )
+                VSpacer(height = dimens.halfMediumDim)
+                Text(
+                    text = caloriesInServingText,
+                    style = types.textStyle2,
+                    color = colors.shadeBlack1,
+                    maxLines = SINGLE_LINE_COUNT,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
@@ -487,3 +517,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         }
     }
 }
+
+private const val ZERO_SERVING_CALORIES = "0"
+private const val SINGLE_LINE_COUNT = 1
+private const val TWO_LINES_COUNT = 2
+private const val THREE_LINES_COUNT = 3
