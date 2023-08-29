@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -118,16 +119,20 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     viewModel sendAction AppAction.FreeScreenTap
                 }
         ) {
-            MainHeader(
-                dish = state.dish,
-                backClickListener = { viewModel sendAction AppAction.BackPressure },
-                viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
-            )
-            MainContent(
-                viewModel = viewModel,
-                state = state,
-                descriptionFieldFocusRequester = descriptionFieldFocusRequester
-            )
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                MainHeader(
+                    dish = state.dish,
+                    backClickListener = { viewModel sendAction AppAction.BackPressure },
+                    viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
+                )
+                MainContent(
+                    viewModel = viewModel,
+                    state = state,
+                    descriptionFieldFocusRequester = descriptionFieldFocusRequester
+                )
+            }
         }
     }
 
