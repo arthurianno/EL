@@ -53,7 +53,6 @@ class DishDetailViewModel @Inject constructor(
                 name = "",
                 type = DishType.Brand,
                 brandName = "",
-                isVerification = false,
                 servings = emptyList(),
                 servingSelect = emptyServing(),
                 servingAmount = ZERO_COUNT,

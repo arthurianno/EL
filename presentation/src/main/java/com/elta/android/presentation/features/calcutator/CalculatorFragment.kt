@@ -321,7 +321,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     ) {
         GetLocalProperties { dimens, _, _, _, _ ->
             val keyboardController = LocalSoftwareKeyboardController.current
-            LazyColumn() {
+            LazyColumn {
                 items(items = lastWords) { word ->
                     Text(
                         text = word,

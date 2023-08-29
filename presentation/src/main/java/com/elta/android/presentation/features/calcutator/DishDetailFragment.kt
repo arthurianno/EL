@@ -31,7 +31,6 @@ import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
-import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
@@ -177,10 +176,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         color = colors.shadeBlack2,
                         modifier = Modifier.padding(start = dimens.contentPadding)
                     )
-                    if (state.dish.isVerification) {
-                        VSpacerMedium()
-                        VerifyProduct()
-                    }
                     DishChars(state.dish.servingSelect)
                 }
                 Box(modifier = Modifier.align(Alignment.TopCenter)) {
@@ -228,23 +223,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 Text(
                     text = stringResource(id = charName),
                     color = colors.shadeBlack1
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun VerifyProduct() {
-        GetLocalProperties { dimens, _, colors, _, _ ->
-            Row(modifier = Modifier.padding(horizontal = dimens.contentPadding)) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_verify_dish),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = dimens.halfMediumDim)
-                )
-                Text(
-                    text = stringResource(id = R.string.calculator_verify_product),
-                    color = colors.blackBlue
                 )
             }
         }

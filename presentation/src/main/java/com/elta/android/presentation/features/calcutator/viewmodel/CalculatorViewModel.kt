@@ -19,18 +19,22 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidg
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFiledAction
+import com.elta.android.presentation.core.ui.fragment.DEBOUNCE_MILLIS
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
+@FlowPreview
 class CalculatorViewModel @Inject constructor(
     private val searchDishes: SearchDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
@@ -77,6 +81,7 @@ class CalculatorViewModel @Inject constructor(
         }
         launch {
             searchField.state
+                .debounce(DEBOUNCE_MILLIS)
                 .map { it.textField.text }
                 .collectLatest {
                     if (it.isNotEmpty()) {
