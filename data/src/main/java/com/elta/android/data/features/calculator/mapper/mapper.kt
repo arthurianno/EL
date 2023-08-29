@@ -21,7 +21,6 @@ internal fun FoodGenericResponse.Food.toDomain(): Dish =
         servings = servingsGeneric.servings.servingToDomain(),
         servingSelect = servingsGeneric.servings.first().toDomain(),
         servingAmount = 1.0,
-        isVerification = false,
         breadUnits = 0.0
     )
 
@@ -35,7 +34,6 @@ internal fun FoodBrandResponse.Food.toDomain(): Dish =
         servings = listOf(servingsBrand.serving.toDomain()),
         servingSelect = servingsBrand.serving.toDomain(),
         servingAmount = 1.0,
-        isVerification = false,
         breadUnits = 0.0
     )
 
@@ -63,7 +61,6 @@ internal fun CompactFoodNetworkEntity.toDomain(): Dish =
         servings = emptyList(),
         servingSelect = Serving.empty(),
         servingAmount = 1.0,
-        isVerification = false,
         breadUnits = 0.0
     )
 
@@ -80,7 +77,6 @@ fun ProductResponse.toDomain(): Dish =
         servings = emptyList(),
         servingAmount = servingAmount,
         servingSelect = getServing(servingId, servingName),
-        isVerification = false,
         breadUnits = breadUnits
     )
 
@@ -112,7 +108,6 @@ internal fun DishDbEntity.toDomain(): Dish =
         servings = emptyList(),
         servingSelect = getServing(servingId, servingName),
         servingAmount = servingAmount,
-        isVerification = false,
         breadUnits = breadUnits
     )
 

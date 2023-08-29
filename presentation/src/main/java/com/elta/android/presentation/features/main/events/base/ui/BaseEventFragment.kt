@@ -191,7 +191,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
                 with(binding.formVariantSelectorView) {
                     if (it.isEmpty()) {
                         hint = context.getString(R.string.events_creation_hint_bread)
-                        icon = context.getDrawable(R.drawable.ic_tag_def)
+                        icon = null
                         iconText = null
                     } else {
                         hint = context.getString(R.string.events_creation_text_bread)

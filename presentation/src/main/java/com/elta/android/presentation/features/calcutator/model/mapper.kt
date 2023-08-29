@@ -11,7 +11,6 @@ internal fun Dish.toUi(): DishUiEntity =
         name = name,
         type = type,
         brandName = brandName,
-        isVerification = isVerification,
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
         servingAmount = servingAmount,
@@ -28,7 +27,6 @@ internal fun DishUiEntity.toDomain(): Dish =
         servings = servings.map { it.toDomain() },
         servingSelect = servingSelect.toDomain(),
         servingAmount = servingAmount,
-        isVerification = isVerification,
         breadUnits = breadUnits
     )
 

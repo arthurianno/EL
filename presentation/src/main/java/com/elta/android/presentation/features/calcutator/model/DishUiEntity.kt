@@ -14,6 +14,5 @@ data class DishUiEntity(
     val servings: List<ServingUiEntity>,
     val servingSelect: ServingUiEntity,
     val servingAmount: Double,
-    val isVerification: Boolean,
     val breadUnits: Double
 ) : Parcelable
