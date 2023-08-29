@@ -210,9 +210,9 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 DishChar(R.string.calculator_dish_calories, serving.calories)
-                DishChar(R.string.calculator_dish_proteins, serving.proteins)
-                DishChar(R.string.calculator_dish_fats, serving.fats)
-                DishChar(R.string.calculator_dish_carbs, serving.carbs)
+                DishChar(R.string.calculator_dish_proteins, serving.protein)
+                DishChar(R.string.calculator_dish_fats, serving.fat)
+                DishChar(R.string.calculator_dish_carbs, serving.carbohydrate)
             }
         }
     }

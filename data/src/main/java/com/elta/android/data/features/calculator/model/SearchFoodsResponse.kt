@@ -2,13 +2,17 @@ package com.elta.android.data.features.calculator.model
 
 import com.google.gson.annotations.SerializedName
 
-data class FoodsSearchResponse(
-    @SerializedName("foods") val foods: Foods
+data class SearchFoodsResponse(
+    @SerializedName("foods_search") val foodsSearch: FoodsSearch
 ) {
-    data class Foods(
-        @SerializedName("food") val food: List<CompactFoodNetworkEntity>?,
+    data class FoodsSearch(
         @SerializedName("max_results") val maxResults: String,
         @SerializedName("page_number") val pageNumber: String,
+        @SerializedName("results") val results: Results?,
         @SerializedName("total_results") val totalResults: String
+    )
+
+    data class Results(
+        @SerializedName("food") val food: List<CompactFoodNetworkEntity>,
     )
 }

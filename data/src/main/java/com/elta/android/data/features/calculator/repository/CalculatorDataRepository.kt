@@ -30,8 +30,8 @@ class CalculatorDataRepository @Inject constructor(
         fatSecretDataSource.getFood(id, type)
             .flowOn(dispatcher)
 
-    override fun getFatSecretDishes(name: String): Flow<List<Dish>> =
-        fatSecretDataSource.getFoods(name)
+    override fun searchDishes(name: String): Flow<List<Dish>> =
+        fatSecretDataSource.searchDishes(name)
             .flowOn(dispatcher)
 
     override fun getHistoryList(): Flow<List<String>> =

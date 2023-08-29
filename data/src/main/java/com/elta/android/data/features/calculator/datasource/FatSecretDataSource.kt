@@ -38,7 +38,7 @@ import javax.inject.Inject
 
 private const val FORMAT_RESPONSE = "json"
 private const val METHOD_GET_FOOD = "food.get.v2"
-private const val METHOD_SEARCH_FOOD = "foods.search"
+private const val METHOD_SEARCH_FOOD = "foods.search.v2"
 private const val FATSECRET_GRAND_TYPE = "client_credentials"
 private const val FATSECRET_SCOPE = "basic"
 private const val POST_METHOD = "POST"
@@ -130,7 +130,7 @@ class FatSecretDataSource @Inject constructor(
         }
     }
 
-    fun getFoods(name: String): Flow<List<Dish>> {
+    fun searchDishes(name: String): Flow<List<Dish>> {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
 
@@ -145,7 +145,7 @@ class FatSecretDataSource @Inject constructor(
         val oauthSignature = baseString.hmacSha1Signature()
 
         return runFlowWithCatchToken {
-            api.getFoods(
+            api.searchFoods(
                 searchExpression = name,
                 method = METHOD_SEARCH_FOOD,
                 format = FORMAT_RESPONSE,
@@ -159,7 +159,7 @@ class FatSecretDataSource @Inject constructor(
                 oauthVersion = OAUTH_VERSION.takeIsAuth1()
             )
                 .asFlow()
-        }.map { it.foods.food?.compactFoodsToDomain() ?: emptyList() }
+        }.map { it.foodsSearch.results?.food?.compactFoodsToDomain() ?: emptyList() }
     }
 
     private fun <T> runFlowWithCatchToken(apiMethod: () -> Flow<T>) =
