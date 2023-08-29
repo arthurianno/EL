@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 internal const val MAX_BREAD_UNITS = 99.9
@@ -58,7 +59,8 @@ class DishDetailViewModel @Inject constructor(
                 servingAmount = ZERO_COUNT,
                 breadUnits = ZERO_COUNT
             ),
-            isShowCountHelpSnack = false
+            isShowCountHelpSnack = false,
+            isLoading = true
         )
 
     val downButton = DownButtonWidgetModel()
@@ -131,6 +133,9 @@ class DishDetailViewModel @Inject constructor(
                             servingAmount = dish.servingAmount,
                             breadUnits = dish.breadUnits
                         )
+                }
+                .onCompletion {
+                    reduceState { state.value.copy(isLoading = false) }
                 }
                 .collect { newDish ->
                     reduceState { state.value.copy(dish = newDish) }
