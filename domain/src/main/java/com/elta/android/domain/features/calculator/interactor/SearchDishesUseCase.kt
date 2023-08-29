@@ -9,5 +9,5 @@ class SearchDishesUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
     operator fun invoke(name: String): Flow<List<Dish>> =
-        repository.getFatSecretDishes(name)
+        repository.searchDishes(name)
 }

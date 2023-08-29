@@ -9,7 +9,7 @@ data class ServingUiEntity(
     val servingDescription: String,
     val numberOfUnits: Double,
     val calories: Double,
-    val proteins: Double,
-    val fats: Double,
-    val carbs: Double
+    val protein: Double,
+    val fat: Double,
+    val carbohydrate: Double
 ) : Parcelable

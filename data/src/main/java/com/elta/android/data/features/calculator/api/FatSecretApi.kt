@@ -2,7 +2,7 @@ package com.elta.android.data.features.calculator.api
 
 import com.elta.android.data.features.calculator.model.FoodBrandResponse
 import com.elta.android.data.features.calculator.model.FoodGenericResponse
-import com.elta.android.data.features.calculator.model.FoodsSearchResponse
+import com.elta.android.data.features.calculator.model.SearchFoodsResponse
 import io.reactivex.Observable
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -40,7 +40,7 @@ interface FatSecretApi {
     ): Observable<FoodBrandResponse>
 
     @POST("server.api")
-    fun getFoods(
+    fun searchFoods(
         @Query(FORMAT_PARAMETER) format: String,
         @Query(METHOD_PARAMETER) method: String,
         @Query(REGION_PARAMETER) region: String,
@@ -52,7 +52,7 @@ interface FatSecretApi {
         @Query(OAUTH_VERSION_PARAMETER) oauthVersion: String? = null,
         @Query(SEARCH_EXPRESSION_PARAMETER) searchExpression: String,
         @Query("oauth_signature") oauthSignature: String?
-    ): Observable<FoodsSearchResponse>
+    ): Observable<SearchFoodsResponse>
 }
 
 const val REGION_PARAMETER = "region"

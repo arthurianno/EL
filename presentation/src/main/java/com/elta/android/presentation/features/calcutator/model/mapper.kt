@@ -33,15 +33,15 @@ internal fun DishUiEntity.toDomain(): Dish =
 internal fun List<Dish>.toUi(): List<DishUiEntity> =
     map { it.toUi() }
 
-internal fun Serving.toUi(): ServingUiEntity =
+private fun Serving.toUi(): ServingUiEntity =
     ServingUiEntity(
         id = id,
         servingDescription = servingDescription,
         numberOfUnits = numberOfUnits,
         calories = calories,
-        proteins = proteins,
-        fats = fats,
-        carbs = carbs
+        protein = proteins,
+        fat = fats,
+        carbohydrate = carbohydrate
     )
 
 internal fun ServingUiEntity.toDomain(): Serving =
@@ -50,9 +50,9 @@ internal fun ServingUiEntity.toDomain(): Serving =
         servingDescription = servingDescription,
         numberOfUnits = numberOfUnits,
         calories = calories,
-        proteins = proteins,
-        fats = fats,
-        carbs = carbs
+        proteins = protein,
+        fats = fat,
+        carbohydrate = carbohydrate
     )
 
 internal fun List<DishUiEntity>.toDomain(): List<Dish> =
@@ -63,15 +63,15 @@ internal fun emptyServing() = Serving.empty().toUi()
 internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity =
     this.copy(
         calories = calories * amount,
-        proteins = proteins * amount,
-        fats = fats * amount,
-        carbs = carbs * amount
+        protein = protein * amount,
+        fat = fat * amount,
+        carbohydrate = carbohydrate * amount
     )
 
 internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
     this.copy(
         calories = calories.round(count),
-        proteins = proteins.round(count),
-        fats = fats.round(count),
-        carbs = carbs.round(count)
+        protein = protein.round(count),
+        fat = fat.round(count),
+        carbohydrate = carbohydrate.round(count)
     )

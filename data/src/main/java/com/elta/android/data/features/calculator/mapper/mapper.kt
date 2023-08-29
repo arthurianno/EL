@@ -45,7 +45,7 @@ internal fun ServingNetworkEntity.toDomain(): Serving =
         calories = calories.toDouble(),
         proteins = protein.toDouble(),
         fats = fat.toDouble(),
-        carbs = carbohydrate.toDouble()
+        carbohydrate = carbohydrate.toDouble()
     )
 
 internal fun List<ServingNetworkEntity>.servingToDomain(): List<Serving> =
@@ -58,11 +58,27 @@ internal fun CompactFoodNetworkEntity.toDomain(): Dish =
         name = foodName,
         type = foodType.getDishType(),
         brandName = brandName.orEmpty(),
-        servings = emptyList(),
+        servings = servings.serving.toDomain(),
         servingSelect = Serving.empty(),
         servingAmount = 1.0,
         breadUnits = 0.0
     )
+
+private fun List<CompactFoodNetworkEntity.Serving>.toDomain(): List<Serving> =
+    map { serving ->
+        serving.toDomain()
+    }
+
+private fun CompactFoodNetworkEntity.Serving.toDomain(): Serving =
+    Serving(
+    id = servingId,
+    servingDescription = servingDescription,
+    calories = calories.toDoubleOrNull() ?: Double.NaN,
+    proteins = protein.toDoubleOrNull() ?: Double.NaN,
+    fats = fat.toDoubleOrNull() ?: Double.NaN,
+    carbohydrate = carbohydrate.toDoubleOrNull() ?: Double.NaN,
+    numberOfUnits = numberOfUnits.toDoubleOrNull() ?: Double.NaN
+)
 
 internal fun List<CompactFoodNetworkEntity>.compactFoodsToDomain(): List<Dish> =
     map { it.toDomain() }
@@ -138,7 +154,7 @@ private fun getServing(id: String, name: String) =
         calories = 0.0,
         proteins = 0.0,
         fats = 0.0,
-        carbs = 0.0
+        carbohydrate = 0.0
     )
 
 private fun getLocalId(): String = UUID.randomUUID().toString()

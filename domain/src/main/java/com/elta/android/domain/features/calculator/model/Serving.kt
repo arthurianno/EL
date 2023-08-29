@@ -7,7 +7,7 @@ data class Serving(
     val calories: Double,
     val proteins: Double,
     val fats: Double,
-    val carbs: Double
+    val carbohydrate: Double
 ) {
 
     companion object {
@@ -18,7 +18,7 @@ data class Serving(
             calories = 0.0,
             proteins = 0.0,
             fats = 0.0,
-            carbs = 0.0
+            carbohydrate = 0.0
         )
     }
 }

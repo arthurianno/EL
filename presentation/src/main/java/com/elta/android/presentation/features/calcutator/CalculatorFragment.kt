@@ -273,16 +273,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     val dishServing = dish.servings.first()
                     resources.getString(
                         R.string.calculator_dish_serving_calories,
-                        dishServing.numberOfUnits.toString(),
+                        dishServing.servingDescription,
                         dishServing.calories.toString()
                     )
-                } else {
-                    resources.getString(
-                        R.string.calculator_dish_serving_calories,
-                        ZERO_SERVING_CALORIES,
-                        ZERO_SERVING_CALORIES
-                    )
-                }
+                } else null
                 if (dish.brandName.isNotEmpty()){
                     productLinesCount = SINGLE_LINE_COUNT
                     Text(
@@ -303,7 +297,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 )
                 VSpacer(height = dimens.halfMediumDim)
                 Text(
-                    text = caloriesInServingText,
+                    text = caloriesInServingText.orEmpty(),
                     style = types.textStyle2,
                     color = colors.shadeBlack1,
                     maxLines = SINGLE_LINE_COUNT,
@@ -518,7 +512,6 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 }
 
-private const val ZERO_SERVING_CALORIES = "0"
 private const val SINGLE_LINE_COUNT = 1
 private const val TWO_LINES_COUNT = 2
 private const val THREE_LINES_COUNT = 3
