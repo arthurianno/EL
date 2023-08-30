@@ -60,13 +60,19 @@ internal fun List<DishUiEntity>.toDomain(): List<Dish> =
 
 internal fun emptyServing() = Serving.empty().toUi()
 
-internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity =
-    this.copy(
-        calories = calories * amount,
-        protein = protein * amount,
-        fat = fat * amount,
-        carbohydrate = carbohydrate * amount
+internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity {
+    return copy(
+        calories = calories.toCalculate(amount, numberOfUnits),
+        protein = protein.toCalculate(amount, numberOfUnits),
+        fat = fat.toCalculate(amount, numberOfUnits),
+        carbohydrate = carbohydrate.toCalculate(amount, numberOfUnits)
     )
+}
+
+fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
+    val result = (this * multiplier) / divisor
+    return if (result.isNaN()) 0.0 else result
+}
 
 internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
     this.copy(

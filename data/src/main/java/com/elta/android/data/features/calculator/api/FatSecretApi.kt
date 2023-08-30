@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface FatSecretApi {
 
-    @POST("server.api")
+    @POST("server.api") //TODO: техдолг, переписать на TypeAdapter
     fun getFoodGeneric(
         @Query("food_id") foodId: String,
         @Query("method") method: String,
@@ -24,7 +24,7 @@ interface FatSecretApi {
         @Query(LANGUAGE_PARAMETER) language: String,
     ): Observable<FoodGenericResponse>
 
-    @POST("server.api")
+    @POST("server.api") //TODO: техдолг, переписать на TypeAdapter
     fun getFoodBrand(
         @Query("food_id") foodId: String,
         @Query("method") method: String,

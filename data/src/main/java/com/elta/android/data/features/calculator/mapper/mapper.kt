@@ -1,9 +1,9 @@
 package com.elta.android.data.features.calculator.mapper // ktlint-disable filename
 
 import com.elta.android.data.features.calculator.cache.model.DishDbEntity
-import com.elta.android.data.features.calculator.model.CompactFoodNetworkEntity
 import com.elta.android.data.features.calculator.model.FoodBrandResponse
 import com.elta.android.data.features.calculator.model.FoodGenericResponse
+import com.elta.android.data.features.calculator.model.FoodNetworkEntity
 import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.calculator.model.ServingNetworkEntity
 import com.elta.android.domain.features.calculator.model.Dish
@@ -11,76 +11,88 @@ import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
 import java.util.UUID
 
-internal fun FoodGenericResponse.Food.toDomain(): Dish =
-    Dish(
+internal fun FoodGenericResponse.Food.toDomain(): Dish {
+    val dishType = foodType.getDishType()
+    val servingSelect = servingsGeneric.servings.first().toDomain(dishType)
+    return Dish(
         id = foodId,
         localId = getLocalId(),
         name = foodName,
-        type = DishType.Generic,
+        type = dishType,
         brandName = brandName.orEmpty(),
-        servings = servingsGeneric.servings.servingToDomain(),
-        servingSelect = servingsGeneric.servings.first().toDomain(),
-        servingAmount = 1.0,
-        breadUnits = 0.0
+        servings = servingsGeneric.servings.toDomain(dishType),
+        servingSelect = servingSelect,
+        servingAmount = servingSelect.numberOfUnits,
+        breadUnits = ZERO_DOUBLE
     )
+}
 
-internal fun FoodBrandResponse.Food.toDomain(): Dish =
-    Dish(
+
+internal fun FoodBrandResponse.Food.toDomain(): Dish {
+    val dishType = foodType.getDishType()
+    val servingSelect = servingsBrand.serving.toDomain(dishType)
+    return Dish(
         id = foodId,
         localId = getLocalId(),
         name = foodName,
         type = DishType.Brand,
         brandName = brandName.orEmpty(),
-        servings = listOf(servingsBrand.serving.toDomain()),
-        servingSelect = servingsBrand.serving.toDomain(),
-        servingAmount = 1.0,
-        breadUnits = 0.0
+        servings = listOf(servingsBrand.serving.toDomain(dishType)),
+        servingSelect = servingSelect,
+        servingAmount = servingSelect.numberOfUnits,
+        breadUnits = ZERO_DOUBLE
     )
+}
 
-internal fun ServingNetworkEntity.toDomain(): Serving =
-    Serving(
-        id = servingId,
-        servingDescription = servingDescription,
-        numberOfUnits = numberOfUnits.toDouble(),
-        calories = calories.toDouble(),
-        proteins = protein.toDouble(),
-        fats = fat.toDouble(),
-        carbohydrate = carbohydrate.toDouble()
-    )
 
-internal fun List<ServingNetworkEntity>.servingToDomain(): List<Serving> =
-    map { it.toDomain() }
-
-internal fun CompactFoodNetworkEntity.toDomain(): Dish =
-    Dish(
+internal fun FoodNetworkEntity.toDomain(): Dish {
+    val dishType = foodType.getDishType()
+    return Dish(
         id = foodId,
         localId = "",
         name = foodName,
-        type = foodType.getDishType(),
+        type = dishType,
         brandName = brandName.orEmpty(),
-        servings = servings.serving.toDomain(),
+        servings = servings.servings?.toDomain(dishType).orEmpty(),
         servingSelect = Serving.empty(),
-        servingAmount = 1.0,
-        breadUnits = 0.0
+        servingAmount = ONE_DOUBLE,
+        breadUnits = ZERO_DOUBLE
     )
+}
 
-private fun List<CompactFoodNetworkEntity.Serving>.toDomain(): List<Serving> =
+private fun List<ServingNetworkEntity>.toDomain(dishType: DishType): List<Serving> =
     map { serving ->
-        serving.toDomain()
+        serving.toDomain(dishType)
     }
 
-private fun CompactFoodNetworkEntity.Serving.toDomain(): Serving =
-    Serving(
-    id = servingId,
-    servingDescription = servingDescription,
-    calories = calories.toDoubleOrNull() ?: Double.NaN,
-    proteins = protein.toDoubleOrNull() ?: Double.NaN,
-    fats = fat.toDoubleOrNull() ?: Double.NaN,
-    carbohydrate = carbohydrate.toDoubleOrNull() ?: Double.NaN,
-    numberOfUnits = numberOfUnits.toDoubleOrNull() ?: Double.NaN
-)
+private fun ServingNetworkEntity.toDomain(dishType: DishType): Serving {
+    return Serving(
+        id = servingId,
+        calories = calories.toDoubleOrNull() ?: Double.NaN,
+        proteins = protein.toDoubleOrNull() ?: Double.NaN,
+        fats = fat.toDoubleOrNull() ?: Double.NaN,
+        carbohydrate = carbohydrate.toDoubleOrNull() ?: Double.NaN,
+        servingDescription = getServingDescription(dishType),
+        numberOfUnits = getNumberOfUnits(dishType),
+    )
+}
 
-internal fun List<CompactFoodNetworkEntity>.compactFoodsToDomain(): List<Dish> =
+private fun ServingNetworkEntity.getNumberOfUnits(dishType: DishType): Double {
+    return when (dishType) {
+        DishType.Generic -> numberOfUnits.toDoubleOrNull() ?: ONE_DOUBLE
+        DishType.Brand -> metricServingAmount?.toDoubleOrNull() ?: ONE_DOUBLE
+    }
+}
+
+private fun ServingNetworkEntity.getServingDescription(dishType: DishType): String {
+    return when (dishType) {
+        DishType.Generic -> measurementDescription
+        DishType.Brand -> metricServingUnit.orEmpty()
+    }
+}
+
+
+internal fun List<FoodNetworkEntity>.compactFoodsToDomain(): List<Dish> =
     map { it.toDomain() }
 
 fun ProductResponse.toDomain(): Dish =
@@ -150,14 +162,17 @@ private fun getServing(id: String, name: String) =
     Serving(
         id = id,
         servingDescription = name,
-        numberOfUnits = 1.0,
-        calories = 0.0,
-        proteins = 0.0,
-        fats = 0.0,
-        carbohydrate = 0.0
+        numberOfUnits = ONE_DOUBLE,
+        calories = ZERO_DOUBLE,
+        proteins = ZERO_DOUBLE,
+        fats = ZERO_DOUBLE,
+        carbohydrate = ZERO_DOUBLE
     )
 
 private fun getLocalId(): String = UUID.randomUUID().toString()
 
 private fun String.getDishType(): DishType =
     runCatching { DishType.valueOf(this) }.getOrNull() ?: DishType.Brand
+
+private const val ZERO_DOUBLE = 0.0
+private const val ONE_DOUBLE = 1.0

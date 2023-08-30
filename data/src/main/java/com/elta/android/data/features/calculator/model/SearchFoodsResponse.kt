@@ -8,11 +8,7 @@ data class SearchFoodsResponse(
     data class FoodsSearch(
         @SerializedName("max_results") val maxResults: String,
         @SerializedName("page_number") val pageNumber: String,
-        @SerializedName("results") val results: Results?,
+        @SerializedName("results") val results: FoodResponse?,
         @SerializedName("total_results") val totalResults: String
-    )
-
-    data class Results(
-        @SerializedName("food") val food: List<CompactFoodNetworkEntity>,
     )
 }

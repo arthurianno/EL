@@ -21,6 +21,7 @@ import com.elta.android.presentation.features.calcutator.model.DishDetailViewSta
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
 import com.elta.android.presentation.features.calcutator.model.emptyServing
+import com.elta.android.presentation.features.calcutator.model.toCalculate
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toNewAmount
 import com.elta.android.presentation.features.calcutator.model.toRoundValue
@@ -98,11 +99,12 @@ class DishDetailViewModel @Inject constructor(
                 }
                 .collectLatest {
                     reduceState {
+                        portionCountTextField.setText(it.numberOfUnits.toString())
                         state.value.copy(
                             dish = state.value.dish.copy(
                                 servingSelect = it.toRoundValue(),
                                 breadUnits = calculateBreadUnits(carbs = it.carbohydrate),
-                                servingAmount = START_AMOUNT
+                                servingAmount = it.numberOfUnits
                             )
                         )
                     }
@@ -188,11 +190,18 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
-    private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
-        val newCarbs = carbs ?: getServingOrDefault().carbohydrate
-        val newAmount =
-            amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
-        val breadUnits = (newCarbs * newAmount / CONVERSION_FACTOR).round(ONE_DECIMAL_PLACE)
+    private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null, ): Double {
+        val serving = getServingOrDefault()
+
+        val numberOfUnits = serving.numberOfUnits
+
+        val newAmount = amount
+            ?: (portionCountTextField.state.value.text.toDoubleOrNull())
+            ?: START_AMOUNT
+
+        val newCarbs = (carbs ?: serving.carbohydrate).toCalculate(newAmount, numberOfUnits)
+        val breadUnits = (newCarbs / CONVERSION_FACTOR).round(ONE_DECIMAL_PLACE)
+
         downButton.setEnableState(breadUnits > ZERO_COUNT)
         return breadUnits
     }
@@ -202,16 +211,14 @@ class DishDetailViewModel @Inject constructor(
             it.id == state.value.dish.servingSelect.id
         } ?: emptyServing()
 
-    private fun calculateServing(amount: Double? = null): ServingUiEntity {
+    private fun calculateServing(amount: Double): ServingUiEntity {
         val dish = state.value.dish
         val serving = if (dish.servingSelect != emptyServing()){
             dish.servings.findOrFirst {
                 it.id == dish.servingSelect.id
             }
         } else emptyServing()
-        val amountServing =
-            amount ?: (portionCountTextField.state.value.text.toDoubleOrNull()) ?: START_AMOUNT
 
-        return serving.toNewAmount(amountServing).toRoundValue(TWO_DECIMAL_PLACES)
+        return serving.toNewAmount(amount).toRoundValue(TWO_DECIMAL_PLACES)
     }
 }
