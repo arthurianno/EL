@@ -7,12 +7,12 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.theme.GetLocalProperties
 
 @Composable
-fun BreadUnitsLabel(breadUnitsCount: Double) {
+fun BreadUnitsLabel(breadUnitsCount: String) {
     GetLocalProperties { _, _, _, _, types ->
         Text(
             text = stringResource(
                 id = R.string.calculator_bread_units_count_label,
-                breadUnitsCount.toString()
+                breadUnitsCount
             ),
             style = types.breadUnits
         )

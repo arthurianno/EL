@@ -13,7 +13,7 @@ data class DishUiEntity(
     val brandName: String,
     val servings: List<ServingUiEntity>,
     val servingSelect: ServingUiEntity,
-    val servingAmount: Double,
-    val servingCalories: Pair<String, Double>,
-    val breadUnits: Double
+    val servingAmount: String,
+    val servingCalories: Pair<String, String>,
+    val breadUnits: String
 ) : Parcelable

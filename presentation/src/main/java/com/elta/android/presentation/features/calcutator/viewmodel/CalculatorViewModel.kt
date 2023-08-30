@@ -150,7 +150,7 @@ class CalculatorViewModel @Inject constructor(
         reduceState {
             state.value.copy(
                 dishes = dishes,
-                totalBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
+                totalBreadUnits = dishes.sumOf { it.breadUnits.toDouble() }.round(ONE_DECIMAL_PLACE)
             )
         }
         setDownButtonVisibility()

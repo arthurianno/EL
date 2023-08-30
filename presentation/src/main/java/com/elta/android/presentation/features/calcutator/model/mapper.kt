@@ -3,7 +3,12 @@ package com.elta.android.presentation.features.calcutator.model // ktlint-disabl
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.Serving
 import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT
+import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT_ALLOWED_CHAR
+import com.elta.android.presentation.features.calcutator.viewmodel.PATTERN_ZERO_AFTER_DECIMAL
+import com.elta.android.presentation.features.calcutator.viewmodel.TWO_DECIMAL_PLACES
 import com.elta.android.presentation.features.calcutator.viewmodel.ZERO_COUNT
+import java.text.DecimalFormat
 
 internal fun Dish.toUi(): DishUiEntity =
     DishUiEntity(
@@ -14,9 +19,9 @@ internal fun Dish.toUi(): DishUiEntity =
         brandName = brandName,
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
-        servingAmount = servingAmount,
+        servingAmount = servingAmount.toString(),
         servingCalories = this.selectServingCalories(),
-        breadUnits = breadUnits
+        breadUnits = breadUnits.toString()
     )
 
 internal fun DishUiEntity.toDomain(): Dish =
@@ -28,8 +33,8 @@ internal fun DishUiEntity.toDomain(): Dish =
         brandName = brandName,
         servings = servings.map { it.toDomain() },
         servingSelect = servingSelect.toDomain(),
-        servingAmount = servingAmount,
-        breadUnits = breadUnits
+        servingAmount = servingAmount.toDouble(),
+        breadUnits = breadUnits.toDouble()
     )
 
 internal fun List<Dish>.toUi(): List<DishUiEntity> =
@@ -39,22 +44,22 @@ private fun Serving.toUi(): ServingUiEntity =
     ServingUiEntity(
         id = id,
         servingDescription = servingDescription,
-        numberOfUnits = numberOfUnits,
-        calories = calories,
-        protein = proteins,
-        fat = fats,
-        carbohydrate = carbohydrate
+        numberOfUnits = numberOfUnits.toString(),
+        calories = calories.format(),
+        protein = proteins.format(),
+        fat = fats.format(),
+        carbohydrate = carbohydrate.format()
     )
 
 internal fun ServingUiEntity.toDomain(): Serving =
     Serving(
         id = id,
         servingDescription = servingDescription,
-        numberOfUnits = numberOfUnits,
-        calories = calories,
-        proteins = protein,
-        fats = fat,
-        carbohydrate = carbohydrate
+        numberOfUnits = numberOfUnits.toDouble(),
+        calories = calories.toDouble(),
+        proteins = protein.toDouble(),
+        fats = fat.toDouble(),
+        carbohydrate = carbohydrate.toDouble()
     )
 
 internal fun List<DishUiEntity>.toDomain(): List<Dish> =
@@ -71,24 +76,30 @@ internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity {
     )
 }
 
+fun String.toCalculate(amount: Double, numberOfUnits: String): String =
+    this.toDouble().toCalculate(amount, numberOfUnits.toDouble()).format()
+
 fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
     val result = (this * multiplier) / divisor
     return if (result.isNaN()) 0.0 else result
 }
 
-internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
-    this.copy(
-        calories = calories.round(count),
-        protein = protein.round(count),
-        fat = fat.round(count),
-        carbohydrate = carbohydrate.round(count)
-    )
-
-private fun Dish.selectServingCalories(): Pair<String, Double> = with(servingSelect) {
+private fun Dish.selectServingCalories(): Pair<String, String> = with(servingSelect) {
     if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
-        Pair("$numberOfUnits $servingDescription", calories)
+        Pair("$numberOfUnits $servingDescription", calories.format())
     } else {
         val firstServing = servings.first()
-        Pair("${firstServing.numberOfUnits} ${firstServing.servingDescription}", firstServing.calories)
+        Pair(
+            "${firstServing.numberOfUnits} ${firstServing.servingDescription}",
+            firstServing.calories.format()
+        )
     }
+}
+
+private fun Double.format(): String =
+    this.round(TWO_DECIMAL_PLACES).removeZero()
+
+private fun Double.removeZero(): String {
+    val format = DecimalFormat(PATTERN_ZERO_AFTER_DECIMAL)
+    return format.format(this).replace(DIGIT_DOT_ALLOWED_CHAR, DIGIT_DOT)
 }
