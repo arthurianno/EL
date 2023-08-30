@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -38,7 +37,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 
 
 @Composable
-fun BoxScope.MainHeader(
+fun MainHeader(
     dish: DishUiEntity,
     backClickListener: () -> Unit,
     viewNameClickListener: () -> Unit,
@@ -71,7 +70,7 @@ fun BoxScope.MainHeader(
 
 @Composable
 private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: () -> Unit) {
-    GetLocalProperties { dimens, _, colors, shapes, types ->
+    GetLocalProperties { _, _, colors, shapes, types ->
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -158,7 +157,7 @@ private fun Modifier.fadingEdges(
         })
 
 @Composable
-fun ColumnScope.BreadUnitsValue(dish: DishUiEntity) {
+fun BreadUnitsValue(dish: DishUiEntity) {
     GetLocalProperties { dimens, _, colors, shapes, types ->
 
         Row(
@@ -174,7 +173,7 @@ fun ColumnScope.BreadUnitsValue(dish: DishUiEntity) {
             Text(
                 text = stringResource(
                     id = R.string.calculator_bread_units_count_label,
-                    dish.breadUnits.toString(),
+                    dish.breadUnits,
                 ),
                 modifier = Modifier
                     .clip(shapes.dishCard)
@@ -194,11 +193,11 @@ fun ContentPreView() {
     val serving = ServingUiEntity(
         "r1",
         "12",
-        2.0,
-        3.0,
-        40.0,
-        2.0,
-        11.0,
+        "2.0",
+        "3.0",
+        "40.0",
+        "2.0",
+        "11.0",
     )
     val manyText = "Темно-Зеленые Листовые в Томатном Соусе"
 
@@ -210,9 +209,9 @@ fun ContentPreView() {
         "Агуша",
         listOf(serving),
         serving,
-        20.1,
-        Pair("100", 100.0),
-        2.0
+        "20.1",
+        Pair("100", "100.0"),
+        "2.0"
     )
 
 

@@ -218,11 +218,11 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     }
 
     @Composable
-    private fun DishChar(@StringRes charName: Int, charCount: Double) {
+    private fun DishChar(@StringRes charName: Int, charCount: String) {
         GetLocalProperties { _, _, colors, _, types ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = charCount.toString(),
+                    text = charCount,
                     style = types.title3
                 )
                 Text(

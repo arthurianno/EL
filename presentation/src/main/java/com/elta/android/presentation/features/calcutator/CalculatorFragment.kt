@@ -56,6 +56,7 @@ import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
+import com.elta.android.presentation.features.calcutator.viewmodel.ONE_DECIMAL_PLACE
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalNetworkState
 import kotlinx.coroutines.FlowPreview
@@ -305,7 +306,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     Text(
                         text = resources.getString(
                             R.string.calculator_dish_calories_in_serving,
-                            dish.servingCalories.second.toString()
+                            dish.servingCalories.second
                         ),
                         style = types.textStyle2,
                         color = colors.shadeBlack1,
@@ -347,7 +348,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         networkAvailable: Boolean,
         viewModel: CalculatorViewModel
     ) {
-        val totalCountBreadUnits = dishes.sumOf { it.breadUnits }.round(1)
+        val totalCountBreadUnits =
+            dishes.sumOf { it.breadUnits.toDouble() }.round(ONE_DECIMAL_PLACE).toString()
         TotalCountBreadUnits(totalCountBreadUnits)
         VSpacerSmall()
         SelectedDishes(
@@ -418,7 +420,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 
     @Composable
-    private fun TotalCountBreadUnits(totalCountBreadUnits: Double) {
+    private fun TotalCountBreadUnits(totalCountBreadUnits: String) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Row(
                 modifier = Modifier

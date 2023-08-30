@@ -7,9 +7,9 @@ import kotlinx.parcelize.Parcelize
 data class ServingUiEntity(
     val id: String,
     val servingDescription: String,
-    val numberOfUnits: Double,
-    val calories: Double,
-    val protein: Double,
-    val fat: Double,
-    val carbohydrate: Double
+    val numberOfUnits: String,
+    val calories: String,
+    val protein: String,
+    val fat: String,
+    val carbohydrate: String
 ) : Parcelable

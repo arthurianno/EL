@@ -24,7 +24,6 @@ import com.elta.android.presentation.features.calcutator.model.emptyServing
 import com.elta.android.presentation.features.calcutator.model.toCalculate
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toNewAmount
-import com.elta.android.presentation.features.calcutator.model.toRoundValue
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -35,13 +34,14 @@ import javax.inject.Inject
 
 internal const val MAX_BREAD_UNITS = 99.9
 internal const val ZERO_COUNT = 0.0
+internal const val ONE_DECIMAL_PLACE = 1
+internal const val TWO_DECIMAL_PLACES = 2
+internal const val DIGIT_DOT_ALLOWED_CHAR = ','
+internal const val DIGIT_DOT = '.'
+internal const val PATTERN_ZERO_AFTER_DECIMAL = "0.##"
 private const val CONVERSION_FACTOR = 10
-private const val ONE_DECIMAL_PLACE = 1
-private const val TWO_DECIMAL_PLACES = 2
 private const val START_AMOUNT = 1.0
 private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
-private const val DIGIT_DOT_ALLOWED_CHAR = ','
-private const val DIGIT_DOT = '.'
 
 class DishDetailViewModel @Inject constructor(
     private val getFatSecretDish: GetFatSecretDishUseCase,
@@ -57,9 +57,9 @@ class DishDetailViewModel @Inject constructor(
                 brandName = "",
                 servings = emptyList(),
                 servingSelect = emptyServing(),
-                servingAmount = ZERO_COUNT,
-                servingCalories = Pair("", ZERO_COUNT),
-                breadUnits = ZERO_COUNT
+                servingAmount = "0.0",
+                servingCalories = Pair("0", "0"),
+                breadUnits = "0.0"
             ),
             isShowCountHelpSnack = false,
             isLoading = true
@@ -83,8 +83,8 @@ class DishDetailViewModel @Inject constructor(
                     reduceState {
                         state.value.copy(
                             dish = state.value.dish.copy(
-                                servingAmount = it,
-                                breadUnits = calculateBreadUnits(amount = it),
+                                servingAmount = it.toString(),
+                                breadUnits = calculateBreadUnits(amount = it).toString(),
                                 servingSelect = calculateServing(amount = it)
                             )
                         )
@@ -100,11 +100,11 @@ class DishDetailViewModel @Inject constructor(
                 }
                 .collectLatest {
                     reduceState {
-                        portionCountTextField.setText(it.numberOfUnits.toString())
+                        portionCountTextField.setText(it.numberOfUnits)
                         state.value.copy(
                             dish = state.value.dish.copy(
-                                servingSelect = it.toRoundValue(),
-                                breadUnits = calculateBreadUnits(carbs = it.carbohydrate),
+                                servingSelect = it,
+                                breadUnits = calculateBreadUnits(carbs = it.carbohydrate.toDouble()).toString(),
                                 servingAmount = it.numberOfUnits
                             )
                         )
@@ -150,7 +150,7 @@ class DishDetailViewModel @Inject constructor(
                             setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
                         }
                     }
-                    portionCountTextField.setText(newDish.servingAmount.toString())
+                    portionCountTextField.setText(newDish.servingAmount)
                 }
         }
     }
@@ -181,7 +181,7 @@ class DishDetailViewModel @Inject constructor(
 
     private fun saveDish() {
         launch {
-            if (state.value.dish.breadUnits > MAX_BREAD_UNITS) {
+            if (state.value.dish.breadUnits.toDouble() > MAX_BREAD_UNITS) {
                 warningMaxBreadUnitsDialog.dialogOpen()
             } else {
                 addDishFragmentResult.onNext(state.value.dish.toDomain())
@@ -199,8 +199,7 @@ class DishDetailViewModel @Inject constructor(
         val newAmount = amount
             ?: (portionCountTextField.state.value.text.toDoubleOrNull())
             ?: START_AMOUNT
-
-        val newCarbs = (carbs ?: serving.carbohydrate).toCalculate(newAmount, numberOfUnits)
+        val newCarbs = (carbs ?: serving.carbohydrate.toDouble()).toCalculate(newAmount, numberOfUnits.toDouble())
         val breadUnits = (newCarbs / CONVERSION_FACTOR).round(ONE_DECIMAL_PLACE)
 
         downButton.setEnableState(breadUnits > ZERO_COUNT)
@@ -214,12 +213,12 @@ class DishDetailViewModel @Inject constructor(
 
     private fun calculateServing(amount: Double): ServingUiEntity {
         val dish = state.value.dish
-        val serving = if (dish.servingSelect != emptyServing()){
+        val serving = if (dish.servingSelect.id.isNotEmpty() && dish.servings.isNotEmpty()){
             dish.servings.findOrFirst {
                 it.id == dish.servingSelect.id
             }
         } else emptyServing()
 
-        return serving.toNewAmount(amount).toRoundValue(TWO_DECIMAL_PLACES)
+        return serving.toNewAmount(amount)
     }
 }
