@@ -211,6 +211,7 @@ fun ContentPreView() {
         listOf(serving),
         serving,
         20.1,
+        Pair("100", 100.0),
         2.0
     )
 

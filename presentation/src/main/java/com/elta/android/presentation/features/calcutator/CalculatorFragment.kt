@@ -7,12 +7,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,7 +58,9 @@ import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalNetworkState
+import kotlinx.coroutines.FlowPreview
 
+@OptIn(FlowPreview::class)
 class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
@@ -268,17 +272,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     .padding(end = dimens.contentPadding)
                     .weight(1f)
             ) {
-                var productLinesCount = THREE_LINES_COUNT
-                val caloriesInServingText = if (dish.servings.isNotEmpty()) {
-                    val dishServing = dish.servings.first()
-                    resources.getString(
-                        R.string.calculator_dish_serving_calories,
-                        dishServing.servingDescription,
-                        dishServing.calories.toString()
-                    )
-                } else null
-                if (dish.brandName.isNotEmpty()){
-                    productLinesCount = SINGLE_LINE_COUNT
+                val brandNameExist = dish.brandName.isNotEmpty()
+                if (brandNameExist) {
                     Text(
                         text = dish.brandName,
                         style = types.textStyle2,
@@ -292,17 +287,31 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                     text = dish.name,
                     style = types.title3,
                     color = colors.blackBlue,
-                    maxLines = productLinesCount,
+                    maxLines = THREE_LINES_COUNT,
                     overflow = TextOverflow.Ellipsis
                 )
                 VSpacer(height = dimens.halfMediumDim)
-                Text(
-                    text = caloriesInServingText.orEmpty(),
-                    style = types.textStyle2,
-                    color = colors.shadeBlack1,
-                    maxLines = SINGLE_LINE_COUNT,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier.weight(weight = 1F, fill = false),
+                        text = dish.servingCalories.first,
+                        style = types.textStyle2,
+                        color = colors.shadeBlack1,
+                        maxLines = SINGLE_LINE_COUNT,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = resources.getString(
+                            R.string.calculator_dish_calories_in_serving,
+                            dish.servingCalories.second.toString()
+                        ),
+                        style = types.textStyle2,
+                        color = colors.shadeBlack1,
+                        maxLines = SINGLE_LINE_COUNT
+                    )
+                }
             }
         }
     }
@@ -357,28 +366,37 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.smallDim)) {
                 items(items = dishes) { dish ->
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(IntrinsicSize.Min)
                             .clip(shape = shapes.dishCard)
-                            .clickable(
-                                enabled = networkAvailable,
-                                onClick = {
-                                    viewModel sendAction CalculatorAction.DishClick(dish)
-                                }
-                            )
+                            .clickable(enabled = networkAvailable, onClick = {
+                                viewModel sendAction CalculatorAction.DishClick(dish)
+                            })
                             .border(
                                 width = dimens.borderWidth,
                                 color = colors.shadeBlack3,
                                 shape = shapes.dishCard
                             )
-                            .padding(dimens.contentPadding)
+                            .padding(
+                                horizontal = dimens.contentPadding,
+                                vertical = dimens.halfMediumDim
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        DishInfoBlock(dish)
-                        if (networkAvailable) {
-                            CloseButton(dish = dish, viewModel = viewModel)
+                        CardBody(dish)
+                        Column(
+                            Modifier.fillMaxHeight(),
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            if (networkAvailable) {
+                                CloseButton(dish = dish, viewModel = viewModel)
+                            }
+                            BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
                         }
-                        BreadUnitLabel(dish)
                     }
                 }
             }
@@ -386,50 +404,17 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     }
 
     @Composable
-    private fun BoxScope.DishInfoBlock(
-        dish: DishUiEntity
-    ) {
-        GetLocalProperties { dimens, _, colors, _, types ->
-            Column(
-                modifier = Modifier
-                    .padding(end = dimens.dishCardTextEndPadding)
-                    .align(Alignment.CenterStart),
-                verticalArrangement = Arrangement.spacedBy(dimens.verySmallDim)
-            ) {
-                Text(text = dish.name, style = types.title3)
-                Text(
-                    text = dish.servingSelect.servingDescription,
-                    color = colors.shadeBlack1
-                )
-                Text(
-                    text = stringResource(id = R.string.calculator_dish_card_in_port),
-                    color = colors.shadeBlack1
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun BoxScope.BreadUnitLabel(dish: DishUiEntity) {
-        Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-            BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
-        }
-    }
-
-    @Composable
-    private fun BoxScope.CloseButton(
+    private fun CloseButton(
         dish: DishUiEntity,
         viewModel: CalculatorViewModel
     ) {
-        Box(modifier = Modifier.align(Alignment.TopEnd)) {
-            ButtonCircle(
-                icon = R.drawable.btn_close,
-                onClick = {
-                    viewModel sendAction CalculatorAction.DeleteDishClick(dish)
-                },
-                contentDescriptionId = R.string.content_description_close_button
-            )
-        }
+        ButtonCircle(
+            icon = R.drawable.btn_close,
+            onClick = {
+                viewModel sendAction CalculatorAction.DeleteDishClick(dish)
+            },
+            contentDescriptionId = R.string.content_description_close_button
+        )
     }
 
     @Composable
