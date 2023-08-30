@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.calcutator.model // ktlint-disabl
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.Serving
 import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.presentation.features.calcutator.viewmodel.ZERO_COUNT
 
 internal fun Dish.toUi(): DishUiEntity =
     DishUiEntity(
@@ -14,6 +15,7 @@ internal fun Dish.toUi(): DishUiEntity =
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
         servingAmount = servingAmount,
+        servingCalories = this.selectServingCalories(),
         breadUnits = breadUnits
     )
 
@@ -81,3 +83,12 @@ internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
         fat = fat.round(count),
         carbohydrate = carbohydrate.round(count)
     )
+
+private fun Dish.selectServingCalories(): Pair<String, Double> = with(servingSelect) {
+    if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
+        Pair(servingDescription, calories)
+    } else {
+        val firstServing = servings.first()
+        Pair(firstServing.servingDescription, firstServing.calories)
+    }
+}

@@ -759,7 +759,7 @@
     <string name="calculator_product_portion">Порция продукта</string>
     <string name="calculator_additional_information">Дополнительная информация</string>
     <string name="calculator_verify_product">Верифицированный продукт</string>
-    <string name="calculator_dish_serving_calories">%1$s • %2$s ккал</string>
+    <string name="calculator_dish_calories_in_serving">\u0020• %s ккал</string>
     <string name="calculator_dish_calories">Калории</string>
     <string name="calculator_dish_proteins">Белки</string>
     <string name="calculator_dish_fats">Жиры</string>

@@ -34,11 +34,11 @@ import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 internal const val MAX_BREAD_UNITS = 99.9
+internal const val ZERO_COUNT = 0.0
 private const val CONVERSION_FACTOR = 10
 private const val ONE_DECIMAL_PLACE = 1
 private const val TWO_DECIMAL_PLACES = 2
 private const val START_AMOUNT = 1.0
-private const val ZERO_COUNT = 0.0
 private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
 private const val DIGIT_DOT_ALLOWED_CHAR = ','
 private const val DIGIT_DOT = '.'
@@ -58,6 +58,7 @@ class DishDetailViewModel @Inject constructor(
                 servings = emptyList(),
                 servingSelect = emptyServing(),
                 servingAmount = ZERO_COUNT,
+                servingCalories = Pair("", ZERO_COUNT),
                 breadUnits = ZERO_COUNT
             ),
             isShowCountHelpSnack = false,
