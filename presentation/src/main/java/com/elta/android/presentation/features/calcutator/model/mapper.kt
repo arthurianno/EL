@@ -86,9 +86,9 @@ internal fun ServingUiEntity.toRoundValue(count : Int = 1): ServingUiEntity =
 
 private fun Dish.selectServingCalories(): Pair<String, Double> = with(servingSelect) {
     if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
-        Pair(servingDescription, calories)
+        Pair("$numberOfUnits $servingDescription", calories)
     } else {
         val firstServing = servings.first()
-        Pair(firstServing.servingDescription, firstServing.calories)
+        Pair("${firstServing.numberOfUnits} ${firstServing.servingDescription}", firstServing.calories)
     }
 }
