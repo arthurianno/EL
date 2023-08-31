@@ -17,7 +17,12 @@ class CalculatorMockedApi(context: Context) : CalculatorApi {
             servingAmount = Random().nextInt(it).toDouble(),
             servingId = UUID.randomUUID().toString(),
             servingName = "штук",
-            breadUnits = (it * 3).toDouble()
+            breadUnits = (it * 3).toDouble(),
+            brandName = "Производитель",
+            calories = 100.0,
+            proteins = 15.0,
+            fats = 30.0,
+            carbohydrates = 45.0
         )
     }
 

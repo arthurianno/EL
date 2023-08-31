@@ -9,5 +9,10 @@ data class ProductResponse(
     @SerializedName("servingAmount") val servingAmount: Double,
     @SerializedName("servingId") val servingId: String,
     @SerializedName("servingName") val servingName: String,
-    @SerializedName("breadUnits") val breadUnits: Double
-)
+    @SerializedName("breadUnits") val breadUnits: Double,
+    @SerializedName("brandName") val brandName: String,
+    @SerializedName("calories") val calories: Double,
+    @SerializedName("proteins") val proteins: Double,
+    @SerializedName("fats") val fats: Double,
+    @SerializedName("carbohydrates") val carbohydrates: Double,
+    )

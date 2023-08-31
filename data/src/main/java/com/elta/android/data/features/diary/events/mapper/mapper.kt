@@ -19,7 +19,12 @@ internal fun String?.toProductsList(): List<ProductResponse>? =
                         servingAmount = component4().toDouble(),
                         servingId = component5(),
                         servingName = get(5),
-                        breadUnits = get(6).toDouble()
+                        breadUnits = get(6).toDouble(),
+                        brandName = get(7),
+                        calories = get(8).toDouble(),
+                        proteins = get(9).toDouble(),
+                        fats = get(10).toDouble(),
+                        carbohydrates = get(11).toDouble()
                     )
                 }
             }
@@ -31,7 +36,9 @@ internal fun List<ProductResponse>?.toCache(): String? =
         it.run {
             id + FIELD_SEPARATOR + name + FIELD_SEPARATOR + type + FIELD_SEPARATOR +
                 servingAmount.toString() + FIELD_SEPARATOR + servingId + FIELD_SEPARATOR +
-                servingName + FIELD_SEPARATOR + breadUnits
+                servingName + FIELD_SEPARATOR + breadUnits + FIELD_SEPARATOR +
+                    brandName + FIELD_SEPARATOR + calories + FIELD_SEPARATOR +
+                    proteins + FIELD_SEPARATOR + fats + FIELD_SEPARATOR + carbohydrates
         }
     }
 

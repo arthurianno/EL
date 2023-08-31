@@ -20,7 +20,7 @@ internal fun Dish.toUi(): DishUiEntity =
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
         servingAmount = servingAmount.toString(),
-        servingCalories = this.selectServingCalories(),
+        servingCalories = selectServingCalories(),
         breadUnits = breadUnits.toString()
     )
 
@@ -86,13 +86,10 @@ fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
 
 private fun Dish.selectServingCalories(): Pair<String, String> = with(servingSelect) {
     if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
-        Pair("$numberOfUnits $servingDescription", calories.format())
+        "${servingAmount.format()} $servingDescription" to calories.format()
     } else {
-        val firstServing = servings.first()
-        Pair(
-            "${firstServing.numberOfUnits} ${firstServing.servingDescription}",
-            firstServing.calories.format()
-        )
+        val firstServing = servings.firstOrNull()
+        "${firstServing?.numberOfUnits?.format()} ${firstServing?.servingDescription}" to firstServing?.calories?.format().orEmpty()
     }
 }
 
