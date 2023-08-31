@@ -95,7 +95,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
     private fun GlucoseIndexItem.Type.geValue(glucose: GlucoseStatisticModel?): String =
         when (this) {
             GlucoseIndexItem.Type.AVERAGE -> NumberFormatter.format(
-                glucose?.averageLevel?.toGlucoseFormat(glucose?.glucoseFormat)
+                glucose?.averageLevel?.toGlucoseFormat(glucose.glucoseFormat)
                     ?: ZERO.toDouble()
             )
 

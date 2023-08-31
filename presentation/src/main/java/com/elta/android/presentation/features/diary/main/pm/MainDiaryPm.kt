@@ -9,18 +9,18 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
-import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.diary.main.DiaryEventsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
+import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
-import javax.inject.Inject
+
 
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
@@ -59,10 +59,6 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun observeEvents() {
-        bus.events<DateChangedEvent>()
-            .subscribe { todayClickedAction.consumer.accept(Unit) }
-            .untilDestroy()
-
         Observable.merge(
             selectedDateState.observable.map { Unit },
             bus.events<Events.EventsChanged>().map { Unit },
@@ -100,11 +96,15 @@ class MainDiaryPm @Inject constructor(
             .untilDestroy()
 
         dateSelectedAction.observable
-            .doOnNext(::passSelectedDate)
-            .subscribe()
+            .doOnNext {
+                datePickerDateState.consumer.accept(it)
+
+            }
+            .subscribe(::passSelectedDate)
             .untilDestroy()
 
         selectedDateState.observable
+            .doOnNext { datePickerDateState.consumer.accept(it) }
             .map {
                 todayButtonVisibilityState.consumer.accept(!it.isToday())
                 "${MONTH_NAMES[it.monthValue.minus(1)]} ${it.year}"
@@ -128,7 +128,6 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun passSelectedDate(date: LocalDate) {
-        datePickerDateState.consumer.accept(date)
         selectedDateState.consumer.accept(date)
     }
 
