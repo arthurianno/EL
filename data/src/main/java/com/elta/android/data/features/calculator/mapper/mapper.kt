@@ -1,6 +1,7 @@
 package com.elta.android.data.features.calculator.mapper // ktlint-disable filename
 
 import com.elta.android.data.features.calculator.cache.model.DishDbEntity
+import com.elta.android.data.features.calculator.cache.model.ServingDbEntity
 import com.elta.android.data.features.calculator.model.FoodBrandResponse
 import com.elta.android.data.features.calculator.model.FoodGenericResponse
 import com.elta.android.data.features.calculator.model.FoodNetworkEntity
@@ -101,10 +102,10 @@ fun ProductResponse.toDomain(): Dish =
         localId = getLocalId(),
         name = name,
         type = type.getDishType(),
-        brandName = "",
-        servings = emptyList(),
+        brandName = brandName,
+        servings = listOf(getServings()),
         servingAmount = servingAmount,
-        servingSelect = getServing(servingId, servingName),
+        servingSelect = getServings(),
         breadUnits = breadUnits
     )
 
@@ -120,7 +121,12 @@ fun Dish.toNetwork(): ProductResponse =
         servingId = servingSelect.id,
         servingName = servingSelect.servingDescription,
         servingAmount = servingAmount,
-        breadUnits = breadUnits
+        breadUnits = breadUnits,
+        brandName = brandName,
+        calories = servingSelect.calories,
+        proteins = servingSelect.proteins,
+        fats = servingSelect.fats,
+        carbohydrates = servingSelect.carbohydrate
     )
 
 fun List<Dish>.toNetwork(): List<ProductResponse> =
@@ -132,24 +138,38 @@ internal fun DishDbEntity.toDomain(): Dish =
         localId = getLocalId(),
         name = name,
         type = type.getDishType(),
-        brandName = "",
-        servings = emptyList(),
-        servingSelect = getServing(servingId, servingName),
+        brandName = brandName,
+        servings = listOf(servingSelect.getServings()),
+        servingSelect = servingSelect.getServings(),
         servingAmount = servingAmount,
         breadUnits = breadUnits
     )
 
-internal fun Dish.toDb(): DishDbEntity =
-    DishDbEntity(
-        id = localId.hashCode().toLong(),
+private fun Serving.toDb(dbId: Long) = ServingDbEntity(
+    id = dbId,
+    servingId = id,
+    calories = calories,
+    proteins = proteins,
+    carbohydrate = carbohydrate,
+    fats = fats,
+    servingDescription = servingDescription,
+    numberOfUnits = numberOfUnits
+)
+
+internal fun Dish.toDb(): DishDbEntity {
+    val dbId = localId.hashCode().toLong()
+    return DishDbEntity(
+        id = dbId,
         dishId = id,
         name = name,
         type = type.name,
-        servingId = servingSelect.id,
-        servingName = servingSelect.servingDescription,
+        brandName = brandName,
+        servingSelect = servingSelect.toDb(dbId),
         servingAmount = servingAmount,
-        breadUnits = breadUnits
-    )
+        breadUnits = breadUnits,
+        )
+}
+
 
 internal fun List<Dish>.toDb(): List<DishDbEntity> =
     map { it.toDb() }
@@ -158,16 +178,25 @@ internal fun List<Dish>.toDb(): List<DishDbEntity> =
 internal fun List<DishDbEntity>.toDomain(): List<Dish> =
     map { it.toDomain() }
 
-private fun getServing(id: String, name: String) =
-    Serving(
-        id = id,
-        servingDescription = name,
-        numberOfUnits = ONE_DOUBLE,
-        calories = ZERO_DOUBLE,
-        proteins = ZERO_DOUBLE,
-        fats = ZERO_DOUBLE,
-        carbohydrate = ZERO_DOUBLE
-    )
+private fun ServingDbEntity.getServings() = Serving(
+    id = servingId,
+    calories = calories,
+    proteins = proteins,
+    fats = fats,
+    carbohydrate = carbohydrate,
+    servingDescription = servingDescription,
+    numberOfUnits = numberOfUnits
+)
+
+private fun ProductResponse.getServings() = Serving(
+    id = id,
+    calories = calories,
+    proteins = proteins,
+    fats = fats,
+    carbohydrate = carbohydrates,
+    servingDescription = servingName,
+    numberOfUnits = servingAmount
+)
 
 private fun getLocalId(): String = UUID.randomUUID().toString()
 
