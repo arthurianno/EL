@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.diary.main.ui
 
+import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,9 +17,9 @@ import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.toggleVisibilityState
+import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
 import org.threeten.bp.LocalDate
-import javax.inject.Inject
 
 class MainDiaryFragment @Inject constructor() :
     BaseRecyclerViewFragment<MainDiaryPm, FragmentMainDiaryBinding>(FragmentMainDiaryBinding::inflate) {
@@ -39,9 +40,13 @@ class MainDiaryFragment @Inject constructor() :
 
     override val backgroundColor = R.color.pale_gray
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        presentationModel.datePickerDateState.bindTo(binding.datePickerView.date())
+    }
+
     override fun onBindPresentationModel(pm: MainDiaryPm) {
         super.onBindPresentationModel(pm)
-        pm.datePickerDateState.bindTo(binding.datePickerView.date())
         binding.datePickerView.dateChanged().bindTo(pm.dateSelectedAction)
         binding.selectDateButtonView.clicks().bindTo(pm.selectDateInDialogAction)
         pm.monthTitleState.bindTo(binding.selectedMonthTitleView.text())
