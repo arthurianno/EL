@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
 import com.github.terrakok.cicerone.Router
@@ -97,8 +98,18 @@ abstract class BaseViewModel<ST> : ViewModel() {
         _state.tryEmit(reduceBlock())
     }
 
-    protected open fun reduceStateByAction(currentState: ST, action: Action): ST = currentState
-    protected open fun handleUserAction(action: Action) {}
+    protected open fun reduceStateByAction(currentState: ST, action: Action): ST {
+        when (action) {
+            is AppAction.BackPressure -> backClick()
+        }
+        return currentState
+    }
+
+    protected open fun handleUserAction(action: Action) {
+        when (action) {
+            is AppAction.BackPressure -> backClick()
+        }
+    }
 
     protected fun List<BaseWidgetModel<*>>.actionObserve() = this.also { widgets ->
         widgets.map { it.action }
