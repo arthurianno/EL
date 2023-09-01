@@ -753,12 +753,11 @@
     <string name="calculator_search_result">Результаты поиска</string>
     <string name="calculator_search_no_result">Этот поиск не дал результатов</string>
     <string name="calculator_search_server_unavailable">Каталог продуктов временно недоступен. Можете добавить значение ХЕ вручную.</string>
-    <string name="calculator_dish_card_in_port">В порции:</string>
     <string name="calculator_bread_units_count">Количество хлебных единиц:</string>
     <string name="calculator_bread_units_count_label">%s XE</string>
     <string name="calculator_product_portion">Порция продукта</string>
+    <string name="calculator_serving_count_hint">Количество</string>
     <string name="calculator_additional_information">Дополнительная информация</string>
-    <string name="calculator_verify_product">Верифицированный продукт</string>
     <string name="calculator_dish_calories_in_serving">\u0020• %s ккал</string>
     <string name="calculator_dish_calories">Калории</string>
     <string name="calculator_dish_proteins">Белки</string>

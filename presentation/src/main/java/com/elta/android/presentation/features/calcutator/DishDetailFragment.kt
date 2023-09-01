@@ -156,7 +156,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     VSpacerVerySmall()
                     IconTextField(
                         widgetModel = viewModel.portionCountTextField,
-                        paddingValues = PaddingValues(horizontal = dimens.contentPadding)
+                        paddingValues = PaddingValues(horizontal = dimens.contentPadding),
+                        hint = resources.getString(R.string.calculator_serving_count_hint)
                     )
                     IconTextField(
                         widgetModel = viewModel.portionDescriptionTextField,

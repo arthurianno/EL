@@ -118,7 +118,8 @@ fun IconTextField(
     paddingValues: PaddingValues = PaddingValues(),
     keyboardType: KeyboardType = KeyboardType.Decimal,
     imeAction: ImeAction = ImeAction.Go,
-    focusRequester: FocusRequester = FocusRequester()
+    focusRequester: FocusRequester = FocusRequester(),
+    hint: String = ""
 ) {
     val state = widgetModel.state.collectAsState()
     val isDropDown = state.value.isDropDown
@@ -182,7 +183,13 @@ fun IconTextField(
                         onAny = { keyboardController?.hide() }
                     ),
                     singleLine = true,
-                    readOnly = isDropDown
+                    readOnly = isDropDown,
+                    placeholder = {
+                        Text(
+                            text = hint,
+                            color = colors.shadeBlack2
+                        )
+                    }
                 )
                 if (isDropDown) {
                     DropdownMenu(
