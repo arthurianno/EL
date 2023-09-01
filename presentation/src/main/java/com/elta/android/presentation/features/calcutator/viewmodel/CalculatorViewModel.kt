@@ -119,7 +119,7 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorAction.LastWordClick -> searchField.setTextAndCursorToEnd(action.word)
             is CalculatorAction.DishClick -> dishClick(action.dish)
             is CalculatorAction.DeleteDishClick -> dishDeleteConfirmDialog.dialogOpen(action.dish)
-            AppAction.BackPressure -> backPressure()
+            is AppAction.BackPressure -> backClick()
             DownButtonClick -> saveDishes()
         }
     }
@@ -138,11 +138,11 @@ class CalculatorViewModel @Inject constructor(
             else -> currentState
         }
 
-    private fun backPressure() {
+    override fun backClick() {
         if (state.value.isChanging()) {
             exitDialog.dialogOpen()
         } else {
-            router.exit()
+            super.backClick()
         }
     }
 

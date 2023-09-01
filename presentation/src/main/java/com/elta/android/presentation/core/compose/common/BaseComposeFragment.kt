@@ -3,6 +3,7 @@ package com.elta.android.presentation.core.compose.common
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -28,6 +29,7 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
         super.onCreate(savedInstanceState)
         viewModel.init()
         arguments?.let { viewModel.handleFragmentArguments(it) }
+        addOnBackPressedCallback()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,5 +66,13 @@ abstract class BaseComposeFragment<VM : BaseViewModel<*>> :
             viewModel.setRouter(((parentFragment ?: requireActivity()) as RouterProvider).router)
         }
         super.onAttach(context)
+    }
+
+    private fun addOnBackPressedCallback() {
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                viewModel.sendAction(AppAction.BackPressure)
+            }
+        })
     }
 }
