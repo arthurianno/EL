@@ -22,7 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -110,12 +112,14 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         val state = viewModel.state.collectAsState().value
         val keyboardController = LocalSoftwareKeyboardController.current
         val descriptionFieldFocusRequester = FocusRequester()
+        val focusManager = LocalFocusManager.current
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clickableWithNoRipple {
                     keyboardController?.hide()
                     descriptionFieldFocusRequester.requestFocus()
+                    focusManager.clearFocus()
                     viewModel sendAction AppAction.FreeScreenTap
                 }
         ) {
@@ -130,7 +134,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 MainContent(
                     viewModel = viewModel,
                     state = state,
-                    descriptionFieldFocusRequester = descriptionFieldFocusRequester
+                    descriptionFieldFocusRequester = descriptionFieldFocusRequester,
+                    focusManager = focusManager
                 )
             }
         }
@@ -140,7 +145,8 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     private fun BoxScope.MainContent(
         viewModel: DishDetailViewModel,
         state: DishDetailViewState,
-        descriptionFieldFocusRequester: FocusRequester
+        descriptionFieldFocusRequester: FocusRequester,
+        focusManager: FocusManager
     ) {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             Box(
@@ -157,6 +163,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                     IconTextField(
                         widgetModel = viewModel.portionCountTextField,
                         paddingValues = PaddingValues(horizontal = dimens.contentPadding),
+                        focusManager = focusManager,
                         hint = resources.getString(R.string.calculator_serving_count_hint)
                     )
                     IconTextField(

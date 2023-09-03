@@ -23,10 +23,12 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -119,6 +121,7 @@ fun IconTextField(
     keyboardType: KeyboardType = KeyboardType.Decimal,
     imeAction: ImeAction = ImeAction.Go,
     focusRequester: FocusRequester = FocusRequester(),
+    focusManager: FocusManager = LocalFocusManager.current,
     hint: String = ""
 ) {
     val state = widgetModel.state.collectAsState()
@@ -159,7 +162,10 @@ fun IconTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(paddingValues)
-                        .clickable { widgetModel.switchExpanded() }
+                        .clickable {
+                            widgetModel.switchExpanded()
+                            focusManager.clearFocus()
+                        }
                         .focusRequester(focusRequester)
                         .onFocusChanged {
                             if (!isDropDown) {
@@ -180,7 +186,10 @@ fun IconTextField(
                         imeAction = imeAction
                     ),
                     keyboardActions = KeyboardActions(
-                        onAny = { keyboardController?.hide() }
+                        onAny = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
                     ),
                     singleLine = true,
                     readOnly = isDropDown,
