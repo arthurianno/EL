@@ -189,7 +189,9 @@ fun IconTextField(
                         unfocusedIndicatorColor = colors.shadeBlack3,
                         focusedIndicatorColor = colors.shadeBlack0,
                         errorIndicatorColor = colors.gOrangeB,
-                        cursorColor = colors.blackBlue
+                        cursorColor = colors.blackBlue,
+                        disabledIndicatorColor = if (state.value.isError) colors.gOrangeB
+                        else colors.shadeBlack3
                     ),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = keyboardType,
