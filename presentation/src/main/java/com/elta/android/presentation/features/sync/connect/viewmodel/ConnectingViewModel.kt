@@ -132,7 +132,7 @@ class ConnectingViewModel @Inject constructor(
     private fun repeatConnectDevice(currentState: ConnectingViewState) = run {
         connectDevice()
         currentState.copy(
-            requestBluetoothActivation = false,
+            requestBluetoothActivation = true,
             stageType = ConnectingStageType.Connecting
         )
     }
