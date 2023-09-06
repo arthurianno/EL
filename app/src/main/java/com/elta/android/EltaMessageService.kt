@@ -8,9 +8,6 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-private const val TITLE = "title"
-private const val BODY = "body"
-private const val DATA = "data"
 private const val CHANNEL_ID = "ELTA_MAIN_CHANNEL"
 private const val NOTIFICATION_ID = 37
 
@@ -20,6 +17,7 @@ class EltaMessageService : FirebaseMessagingService() {
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createNotificationChannel(
+
                     NotificationChannel(
                         CHANNEL_ID,
                         getString(R.string.push_channel_name),
@@ -31,8 +29,8 @@ class EltaMessageService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        val title = message.data[TITLE]
-        val body = message.data[BODY]
+        val title = message.notification?.title
+        val body = message.notification?.body
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setContentTitle(title)
             setContentText(body)

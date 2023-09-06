@@ -24,7 +24,7 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import timber.log.Timber
 
-class BluetoothControl(pm: PresentationModel) {
+class PermissionsControl(pm: PresentationModel) {
 
     val requestEnableBluetoothCommand = pm.command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = pm.command<Unit>(bufferSize = 1)
@@ -41,9 +41,9 @@ class BluetoothControl(pm: PresentationModel) {
     }
 }
 
-fun PresentationModel.bluetoothControl(): BluetoothControl = BluetoothControl(this)
+fun PresentationModel.bluetoothControl(): PermissionsControl = PermissionsControl(this)
 
-fun BluetoothControl.bindTo(
+fun PermissionsControl.bindTo(
     compositeUnbind: CompositeDisposable,
     permissions: RxPermissions,
     fragment: Fragment
@@ -54,7 +54,7 @@ fun BluetoothControl.bindTo(
             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 .launchForResult(
                     fragment.requireActivity(),
-                    BluetoothControl.REQUEST_CODE_ENABLE_BLUETOOTH
+                    PermissionsControl.REQUEST_CODE_ENABLE_BLUETOOTH
                 )
         }
         .addTo(compositeUnbind)
@@ -74,12 +74,12 @@ fun BluetoothControl.bindTo(
         .addTo(compositeUnbind)
 }
 
-fun BluetoothControl.resolveResults(requestCode: Int, resultCode: Int) {
-    if (requestCode == BluetoothControl.REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
+fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
+    if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
         locationEnabledAction.consumer.accept(Unit)
     }
 
-    if (requestCode == BluetoothControl.REQUEST_CODE_ENABLE_BLUETOOTH) {
+    if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_BLUETOOTH) {
         if (resultCode == Activity.RESULT_OK) {
             bluetoothEnabledAction.consumer.accept(Unit)
         } else {
@@ -105,7 +105,7 @@ fun enableLocation(fragment: Fragment) {
                     try {
                         (e as? ResolvableApiException)?.startResolutionForResult(
                             fragment.requireActivity(),
-                            BluetoothControl.REQUEST_CODE_ENABLE_LOCATION
+                            PermissionsControl.REQUEST_CODE_ENABLE_LOCATION
                         )
                     } catch (e1: IntentSender.SendIntentException) {
                         Timber.e(e1)
