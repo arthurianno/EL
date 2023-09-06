@@ -2,11 +2,13 @@
 
 package com.elta.android.presentation.features.sync.control
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.ApiException
@@ -26,7 +28,7 @@ import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
 import timber.log.Timber
 
-class BluetoothControl2 {
+class PermissionsControl2 {
 
     internal val bluetoothRequestRelay = PublishRelay.create<Unit>()
     internal val bluetoothRequestResultRelay = PublishRelay.create<Boolean>()
@@ -61,9 +63,9 @@ class BluetoothControl2 {
     }
 }
 
-fun PresentationModel.bluetoothControl2(): BluetoothControl2 = BluetoothControl2()
+fun PresentationModel.bluetoothControl2(): PermissionsControl2 = PermissionsControl2()
 
-fun BluetoothControl2.bindTo(
+fun PermissionsControl2.bindTo(
     compositeUnbind: CompositeDisposable,
     permissions: RxPermissions,
     fragment: Fragment
@@ -74,7 +76,7 @@ fun BluetoothControl2.bindTo(
             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 .launchForResult(
                     fragment.requireActivity(),
-                    BluetoothControl2.REQUEST_CODE_ENABLE_BLUETOOTH
+                    PermissionsControl2.REQUEST_CODE_ENABLE_BLUETOOTH
                 )
         }
         .addTo(compositeUnbind)
@@ -94,12 +96,12 @@ fun BluetoothControl2.bindTo(
         .addTo(compositeUnbind)
 }
 
-fun BluetoothControl2.resolveResults(requestCode: Int, resultCode: Int) {
-    if (requestCode == BluetoothControl2.REQUEST_CODE_ENABLE_LOCATION) {
+fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
+    if (requestCode == PermissionsControl2.REQUEST_CODE_ENABLE_LOCATION) {
         locationRequestResultRelay.accept(resultCode == Activity.RESULT_OK)
     }
 
-    if (requestCode == BluetoothControl2.REQUEST_CODE_ENABLE_BLUETOOTH) {
+    if (requestCode == PermissionsControl2.REQUEST_CODE_ENABLE_BLUETOOTH) {
         bluetoothRequestResultRelay.accept(resultCode == Activity.RESULT_OK)
     }
 }
@@ -121,7 +123,7 @@ fun enableLocation2(fragment: Fragment) {
                     try {
                         (e as? ResolvableApiException)?.startResolutionForResult(
                             fragment.requireActivity(),
-                            BluetoothControl2.REQUEST_CODE_ENABLE_LOCATION
+                            PermissionsControl2.REQUEST_CODE_ENABLE_LOCATION
                         )
                     } catch (e1: IntentSender.SendIntentException) {
                         Timber.e(e1)
@@ -131,21 +133,52 @@ fun enableLocation2(fragment: Fragment) {
     }
 }
 
-fun checkBluetoothPermissions(activity: Activity) {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-        val bluetoothScanName = android.Manifest.permission.BLUETOOTH_SCAN
-        val bluetoothConnectName = android.Manifest.permission.BLUETOOTH_CONNECT
-
-        if (ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
-            PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(bluetoothScanName, bluetoothConnectName),
-                1
-            )
-        }
+fun checkPermissions(activity: Activity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        checkNotificationAndBluetooth(activity)
     }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        checkBluetooth(activity)
+    }
+}
+
+private fun checkBluetooth(activity: Activity) {
+    val bluetoothScanName = Manifest.permission.BLUETOOTH_SCAN
+    val bluetoothConnectName = Manifest.permission.BLUETOOTH_CONNECT
+
+    if (ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
+        PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
+        PackageManager.PERMISSION_GRANTED
+    ) {
+        requestPermissions(
+            activity,
+            arrayOf(bluetoothScanName, bluetoothConnectName),
+            1
+        )
+    }
+}
+
+private fun checkNotificationAndBluetooth(activity: Activity) {
+    val bluetoothScanName = Manifest.permission.BLUETOOTH_SCAN
+    val bluetoothConnectName = Manifest.permission.BLUETOOTH_CONNECT
+    val notificationName = Manifest.permission.POST_NOTIFICATIONS
+
+    if (ActivityCompat.checkSelfPermission(activity, notificationName) !=
+        PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
+        PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
+        PackageManager.PERMISSION_GRANTED
+    ) {
+        requestPermissions(
+            activity,
+            arrayOf(notificationName, bluetoothScanName, bluetoothConnectName),
+            100
+        )
+    }
+}
+
+private fun requestPermissions(activity: Activity, permissions: Array<String>, requestCode: Int) {
+    ActivityCompat.requestPermissions(activity, permissions, requestCode)
 }

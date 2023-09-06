@@ -12,7 +12,7 @@ import com.elta.android.presentation.core.ui.activity.BaseActivity
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
-import com.elta.android.presentation.features.sync.control.checkBluetoothPermissions
+import com.elta.android.presentation.features.sync.control.checkPermissions
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
@@ -40,7 +40,7 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        checkBluetoothPermissions(this)
+        checkPermissions(this)
         DynamicLinkProcessor.from(intent)
             .ignoreColdStart(false)
             .withSavedState(savedInstanceState)
@@ -89,7 +89,7 @@ class AppActivity : BaseActivity<AppPm>() {
         val nestedFragment = parentFragment
             ?.childFragmentManager
             ?.findFragmentById(R.id.containerView)
-            as? BaseFragment<*, *>
+                as? BaseFragment<*, *>
 
         if (nestedFragment == null) {
             parentFragment?.javaClass?.simpleName?.passTo(presentationModel.onStopAction)
