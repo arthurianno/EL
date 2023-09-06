@@ -3,8 +3,11 @@ package com.elta.android.presentation.core.compose.widgets.textfields
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,13 +23,16 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -111,7 +117,7 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun IconTextField(
     widgetModel: IconTextFieldWidgetModel,
@@ -119,6 +125,7 @@ fun IconTextField(
     keyboardType: KeyboardType = KeyboardType.Decimal,
     imeAction: ImeAction = ImeAction.Go,
     focusRequester: FocusRequester = FocusRequester(),
+    focusManager: FocusManager = LocalFocusManager.current,
     hint: String = ""
 ) {
     val state = widgetModel.state.collectAsState()
@@ -130,9 +137,15 @@ fun IconTextField(
     )
     val configuration = LocalConfiguration.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val imeIsHide = !WindowInsets.isImeVisible
     MaterialTheme(
         shapes = localMaterialShapes
     ) {
+        LaunchedEffect(key1 = imeIsHide){
+            if (imeIsHide){
+                focusManager.clearFocus()
+            }
+        }
         GetLocalProperties { dimens, _, colors, _, _ ->
             Column {
                 TextField(
@@ -159,7 +172,10 @@ fun IconTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(paddingValues)
-                        .clickable { widgetModel.switchExpanded() }
+                        .clickable {
+                            widgetModel.switchExpanded()
+                            focusManager.clearFocus()
+                        }
                         .focusRequester(focusRequester)
                         .onFocusChanged {
                             if (!isDropDown) {
@@ -180,7 +196,10 @@ fun IconTextField(
                         imeAction = imeAction
                     ),
                     keyboardActions = KeyboardActions(
-                        onAny = { keyboardController?.hide() }
+                        onAny = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
                     ),
                     singleLine = true,
                     readOnly = isDropDown,
