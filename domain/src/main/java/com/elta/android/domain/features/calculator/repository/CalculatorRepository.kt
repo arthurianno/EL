@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.calculator.repository
 
+import androidx.paging.PagingData
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
@@ -12,7 +13,7 @@ interface CalculatorRepository : BaseRepository {
     val calculatorFragmentResult: ReturnDataHandler<List<Dish>>
 
     fun getFatSecretDish(id: String, type: DishType): Flow<Dish>
-    fun searchDishes(name: String): Flow<List<Dish>>
+    fun searchDishes(name: String): Flow<PagingData<Dish>>
     fun getHistoryList(): Flow<List<String>>
     suspend fun saveWordToHistory(word: String)
     fun getEventProducts(eventId: String): Flow<List<Dish>>

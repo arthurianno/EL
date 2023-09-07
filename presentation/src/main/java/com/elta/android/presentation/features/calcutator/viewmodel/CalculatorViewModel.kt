@@ -1,5 +1,9 @@
 package com.elta.android.presentation.features.calcutator.viewmodel
 
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
@@ -26,7 +30,10 @@ import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.toDomain
 import com.elta.android.presentation.features.calcutator.model.toUi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
@@ -52,10 +59,12 @@ class CalculatorViewModel @Inject constructor(
             helpText = "",
             searchInFocus = false,
             lastWords = emptyList(),
-            findingDishes = emptyList(),
             isLoading = false,
             isError = false
         )
+
+    private var _findingDishesState: MutableStateFlow<PagingData<DishUiEntity>> = MutableStateFlow(PagingData.empty())
+    val findingPager: Flow<PagingData<DishUiEntity>> get() = _findingDishesState
 
     val appTopBar = BaseAppTopBarWidgetModel()
     val searchField = SearchFieldWidgetModel()
@@ -206,7 +215,7 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun clearFindingDishes() {
-        reduceState { state.value.copy(findingDishes = emptyList()) }
+        _findingDishesState.tryEmit(PagingData.empty())
     }
 
     private fun findDishes(name: String) {
@@ -214,21 +223,15 @@ class CalculatorViewModel @Inject constructor(
             searchDishes(name)
                 .catch {
                     handleError(it)
-                    if (it is ServiceUnavailableError){
+                    if (it is ServiceUnavailableError) {
                         reduceState { state.value.copy(isError = true, isLoading = false) }
                     }
                 }
                 .onStart { reduceState { state.value.copy(isLoading = true, isError = false) } }
                 .onCompletion { reduceState { state.value.copy(isLoading = false) } }
-                .map { it.toUi() }
-                .collectLatest { dishes ->
-                    reduceState {
-                        state.value.copy(
-                            findingDishes = dishes,
-                            isLoading = false
-                        )
-                    }
-                }
+                .map { pagingData -> pagingData.map { dish -> dish.toUi() } }
+                .cachedIn(viewModelScope)
+                .collect { _findingDishesState.value = it }
         }
     }
 }

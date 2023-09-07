@@ -25,19 +25,24 @@ object Dependencies {
         private const val coreVersion = "1.8.0"
         private const val fragmentVersion = "1.4.1"
         private const val lifeCycleVersion = "2.5.0"
-        private const val pagingVersion = "3.1.1"
         private const val constraintLayoutVersion = "2.1.4"
         private const val appcompatVersion = "1.4.2"
         private const val mutlidexVersion = "2.0.1"
         private const val recyclerViewVersion = "1.2.1"
         private const val annotationsVersion = "1.5.0"
         private const val browserVersion = "1.4.0"
+        private const val pagingVersion = "3.2.0"
+
+
+        object Paging {
+            const val pagingRuntime = "androidx.paging:paging-runtime:$pagingVersion"
+            const val pagingCompose = "androidx.paging:paging-compose:$pagingVersion"
+        }
 
         const val core = "androidx.core:core-ktx:$coreVersion"
         const val fragment = "androidx.fragment:fragment-ktx:$fragmentVersion"
         const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifeCycleVersion"
         const val lifeCycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifeCycleVersion"
-        const val paging = "androidx.paging:paging-runtime:$pagingVersion"
         const val appCompat = "androidx.appcompat:appcompat:$appcompatVersion"
         const val constraintLayout =
             "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
