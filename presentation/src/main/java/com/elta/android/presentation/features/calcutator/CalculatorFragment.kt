@@ -38,8 +38,10 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.NetworkState
+import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
+import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
@@ -99,7 +101,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     override fun Content(viewModel: CalculatorViewModel) {
         val state = viewModel.state.collectAsState().value
 
-        val findingDishesState = viewModel.findingPager.collectAsLazyPagingItems()
+        val findingDishesState = viewModel.findingDishesState.collectAsLazyPagingItems()
 
         val searchState = viewModel.searchField.state.collectAsState().value
         val dishes = state.dishes
@@ -134,7 +136,11 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                 color = colors.white,
                                 shape = if (searchInFocus) RectangleShape else shapes.sheet
                             )
-                            .padding(dimens.contentPadding)
+                            .padding(
+                                start = dimens.contentPadding,
+                                top = dimens.contentPadding,
+                                end = dimens.contentPadding
+                            )
                     ) {
                         if (networkAvailable) {
                             SearchField(
@@ -149,7 +155,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             searchInFocus
                         )
                         VSpacerSmall()
-                        if (searchInFocus) {
+                        if (findingDishesState.itemCount != 0 || searchInFocus) {
                             SearchView(
                                 state = state,
                                 searchText = searchText,
@@ -199,7 +205,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 viewModel = viewModel
             )
         } else {
-            FindingDishes(findingDishes = findingDishesState, resources) { dish ->
+            FindingDishes(findingDishes = findingDishesState) { dish ->
                 dish?.let { viewModel sendAction CalculatorAction.DishClick(dish) }
             }
         }
@@ -289,6 +295,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                         }
                     }
                 }
+                item { VSpacerVerySmall() }
             }
         }
     }

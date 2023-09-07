@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.calcutator.model
 
 import androidx.compose.runtime.Immutable
-import androidx.paging.PagingData
 
 @Immutable
 data class CalculatorViewState(
@@ -12,7 +11,8 @@ data class CalculatorViewState(
     val searchInFocus: Boolean,
     val lastWords: List<String>,
     val isLoading: Boolean,
-    val isError: Boolean
+    val isError: Boolean,
+    val downButtonIsVisible: Boolean,
 ) {
     fun isChanging(): Boolean = dishes != startDishes
 }

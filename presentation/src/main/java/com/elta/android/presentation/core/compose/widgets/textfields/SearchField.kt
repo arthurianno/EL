@@ -66,7 +66,6 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
     }
 
     fun focusChanged(focusState: FocusState) {
-        if (!focusState.isFocused) setText(TextFieldValue(""))
         setState { state.value.copy(isFocused = focusState.isFocused) }
         sendAction(SearchFiledAction.FocusChanged(focusState))
     }

@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.calcutator.component
 
-import android.content.res.Resources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,13 +29,13 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.widgets.VSpacer
+import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties
 
 @Composable
 internal fun FindingDishes(
     findingDishes: LazyPagingItems<DishUiEntity>,
-    resources: Resources,
     dishesClick: (DishUiEntity?) -> Unit,
 ) {
     GetLocalProperties { dimens, _, colors, shapes, _ ->
@@ -61,7 +60,7 @@ internal fun FindingDishes(
                                 CircularProgressIndicator(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(10.dp)
+                                        .padding(bottom = dimens.contentPadding)
                                         .wrapContentWidth(Alignment.CenterHorizontally)
                                 )
                             }
@@ -70,6 +69,7 @@ internal fun FindingDishes(
                     }
                 }
             }
+            VSpacerMedium()
         }
     }
 

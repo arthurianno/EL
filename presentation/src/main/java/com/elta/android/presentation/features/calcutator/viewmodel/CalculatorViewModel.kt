@@ -33,9 +33,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
@@ -60,11 +60,12 @@ class CalculatorViewModel @Inject constructor(
             searchInFocus = false,
             lastWords = emptyList(),
             isLoading = false,
-            isError = false
+            isError = false,
+            downButtonIsVisible = true
         )
 
     private var _findingDishesState: MutableStateFlow<PagingData<DishUiEntity>> = MutableStateFlow(PagingData.empty())
-    val findingPager: Flow<PagingData<DishUiEntity>> get() = _findingDishesState
+    val findingDishesState: Flow<PagingData<DishUiEntity>> get() = _findingDishesState
 
     val appTopBar = BaseAppTopBarWidgetModel()
     val searchField = SearchFieldWidgetModel()
@@ -90,8 +91,9 @@ class CalculatorViewModel @Inject constructor(
         }
         launch {
             searchField.state
-                .debounce(DEBOUNCE_MILLIS)
                 .map { it.textField.text }
+                .distinctUntilChanged()
+                .debounce(DEBOUNCE_MILLIS)
                 .collectLatest {
                     if (it.isNotEmpty()) {
                         findDishes(it)
@@ -140,7 +142,7 @@ class CalculatorViewModel @Inject constructor(
         when (action) {
             is SearchFiledAction.FocusChanged -> {
                 val inFocusState = action.focusState.isFocused
-                downButton.visibilityState(!inFocusState)
+                downButton.visibilityState(!inFocusState && state.value.downButtonIsVisible)
                 currentState.copy(searchInFocus = inFocusState)
             }
 
@@ -159,9 +161,11 @@ class CalculatorViewModel @Inject constructor(
         reduceState {
             state.value.copy(
                 dishes = dishes,
-                totalBreadUnits = dishes.sumOf { it.breadUnits.toDouble() }.round(ONE_DECIMAL_PLACE)
+                totalBreadUnits = dishes.sumOf { it.breadUnits.toDouble() }.round(ONE_DECIMAL_PLACE),
+                downButtonIsVisible = true
             )
         }
+        clearFindingDishes()
         setDownButtonVisibility()
     }
 
@@ -216,6 +220,7 @@ class CalculatorViewModel @Inject constructor(
 
     private fun clearFindingDishes() {
         _findingDishesState.tryEmit(PagingData.empty())
+        searchField.clear()
     }
 
     private fun findDishes(name: String) {
@@ -231,7 +236,10 @@ class CalculatorViewModel @Inject constructor(
                 .onCompletion { reduceState { state.value.copy(isLoading = false) } }
                 .map { pagingData -> pagingData.map { dish -> dish.toUi() } }
                 .cachedIn(viewModelScope)
-                .collect { _findingDishesState.value = it }
+                .collect {
+                    reduceState { state.value.copy(downButtonIsVisible = false) }
+                    _findingDishesState.value = it
+                }
         }
     }
 }
