@@ -2,7 +2,6 @@ package com.elta.android.data.common
 
 import com.elta.android.common.errors.FatSecretErrors
 import com.elta.android.common.errors.ServerError
-import com.elta.android.common.errors.ServiceUnavailableError
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
@@ -13,14 +12,12 @@ import okhttp3.ResponseBody
 import okio.GzipSource
 import okio.buffer
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val ACCEPT_ENCODING = "Accept-Encoding"
 private const val ACCEPT_ENCODING_VALUE = "gzip"
 private const val ERROR_BODY_LENGTH = 2048L
-private const val ERROR_CODE_500 = 500
 private const val ERROR_INVALID_TOKEN = 13
 
 @Singleton
@@ -29,7 +26,7 @@ class FatSecretErrorInterceptor @Inject constructor() : Interceptor {
         val request = chain.request()
         val response = chain.proceed(request)
         val error = getErrorBody(request, response.peekBody(ERROR_BODY_LENGTH))
-        handleError(response, error)
+        handleError(error)
         return response
     }
 
@@ -49,18 +46,11 @@ class FatSecretErrorInterceptor @Inject constructor() : Interceptor {
         }
     }.getOrNull()
 
-    private fun handleError(
-        response: Response,
-        error: FatSecretErrorBody?
-    ): Nothing? =
-        when (response.code) {
-            HttpURLConnection.HTTP_BAD_REQUEST -> throw ServerError(message = response.message)
-            ERROR_CODE_500 -> throw ServiceUnavailableError(message = response.message)
-            else -> error?.error?.run {
-                when (code) {
-                    ERROR_INVALID_TOKEN -> throw FatSecretErrors.TokenError(message)
-                    else -> throw ServerError(message)
-                }
+    private fun handleError(error: FatSecretErrorBody?): Nothing? =
+        error?.error?.run {
+            when (code) {
+                ERROR_INVALID_TOKEN -> throw FatSecretErrors.TokenError(message)
+                else -> throw ServerError(message)
             }
         }
 
