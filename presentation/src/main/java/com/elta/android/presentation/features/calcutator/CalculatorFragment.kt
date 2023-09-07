@@ -1,7 +1,6 @@
 package com.elta.android.presentation.features.calcutator
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -31,17 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.fragment.app.viewModels
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.NetworkState
-import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
@@ -52,6 +48,8 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
+import com.elta.android.presentation.features.calcutator.component.CardBody
+import com.elta.android.presentation.features.calcutator.component.FindingDishes
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -100,14 +98,21 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     @Composable
     override fun Content(viewModel: CalculatorViewModel) {
         val state = viewModel.state.collectAsState().value
+
+        val findingDishesState = viewModel.findingPager.collectAsLazyPagingItems()
+
         val searchState = viewModel.searchField.state.collectAsState().value
         val dishes = state.dishes
+
         val searchText = searchState.textField.text
         val searchInFocus = state.searchInFocus
+
         val networkAvailable = LocalNetworkState.current == NetworkState.Available
+
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
-                targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB
+                targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB,
+                label = ""
             )
             Box(
                 modifier = Modifier
@@ -117,6 +122,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 Scaffold(
                     scaffoldState = rememberScaffoldState(),
                     topBar = { CalculatorTopBar(viewModel.appTopBar, searchInFocus) },
+                    bottomBar = { DownButton(widgetModel = viewModel.downButton) },
                     backgroundColor = colors.gOrangeB,
                     modifier = Modifier.statusBarsPadding()
                 ) {
@@ -128,7 +134,6 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                 color = colors.white,
                                 shape = if (searchInFocus) RectangleShape else shapes.sheet
                             )
-                            .padding(bottom = dimens.downButtonHeight)
                             .padding(dimens.contentPadding)
                     ) {
                         if (networkAvailable) {
@@ -148,7 +153,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             SearchView(
                                 state = state,
                                 searchText = searchText,
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                findingDishesState = findingDishesState
                             )
                         } else {
                             MainContent(
@@ -159,7 +165,6 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                         }
                     }
                 }
-                DownButton(widgetModel = viewModel.downButton)
             }
         }
     }
@@ -185,7 +190,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     private fun SearchView(
         state: CalculatorViewState,
         searchText: String,
-        viewModel: CalculatorViewModel
+        viewModel: CalculatorViewModel,
+        findingDishesState: LazyPagingItems<DishUiEntity>
     ) {
         if (searchText.isEmpty()) {
             LastWords(
@@ -193,126 +199,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 viewModel = viewModel
             )
         } else {
-            FindingDishes(
-                findingDishes = state.findingDishes,
-                isLoading = state.isLoading,
-                isError = state.isError,
-                viewModel = viewModel
-            )
-        }
-    }
-
-    @Composable
-    private fun FindingDishes(
-        findingDishes: List<DishUiEntity>,
-        isLoading: Boolean,
-        isError: Boolean,
-        viewModel: CalculatorViewModel
-    ) {
-        GetLocalProperties { dimens, _, colors, shapes, _ ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    when {
-                        isError ->
-                            Text(
-                                text = stringResource(id = R.string.calculator_search_server_unavailable),
-                                color = colors.shadeBlack2,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        findingDishes.isEmpty() -> {
-                            Text(
-                                text = stringResource(id = R.string.calculator_search_no_result),
-                                color = colors.shadeBlack2,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-
-                        else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
-                            items(items = findingDishes) { dish ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(shapes.dishCard)
-                                        .clickable {
-                                            viewModel sendAction CalculatorAction.DishClick(dish)
-                                        }
-                                        .border(
-                                            dimens.borderWidth,
-                                            colors.shadeBlack3,
-                                            shapes.dishCard
-                                        )
-                                        .padding(
-                                            horizontal = dimens.contentPadding,
-                                            vertical = dimens.halfMediumDim
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    CardBody(dish)
-                                    Image(
-                                        painter = painterResource(id = R.drawable.btn_plus),
-                                        contentDescription = null
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun RowScope.CardBody(dish: DishUiEntity) {
-        GetLocalProperties { dimens, _, colors, _, types ->
-            Column(
-                modifier = Modifier
-                    .padding(end = dimens.contentPadding)
-                    .weight(1f)
-            ) {
-                val brandNameExist = dish.brandName.isNotEmpty()
-                if (brandNameExist) {
-                    Text(
-                        text = dish.brandName,
-                        style = types.textStyle2,
-                        color = colors.shadeBlack1,
-                        maxLines = TWO_LINES_COUNT,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    VSpacer(height = dimens.smallestDim)
-                }
-                Text(
-                    text = dish.name,
-                    style = types.title3,
-                    color = colors.blackBlue,
-                    maxLines = THREE_LINES_COUNT,
-                    overflow = TextOverflow.Ellipsis
-                )
-                VSpacer(height = dimens.halfMediumDim)
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        modifier = Modifier.weight(weight = 1F, fill = false),
-                        text = dish.servingCalories.first,
-                        style = types.textStyle2,
-                        color = colors.shadeBlack1,
-                        maxLines = SINGLE_LINE_COUNT,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = resources.getString(
-                            R.string.calculator_dish_calories_in_serving,
-                            dish.servingCalories.second
-                        ),
-                        style = types.textStyle2,
-                        color = colors.shadeBlack1,
-                        maxLines = SINGLE_LINE_COUNT
-                    )
-                }
+            FindingDishes(findingDishes = findingDishesState, resources) { dish ->
+                dish?.let { viewModel sendAction CalculatorAction.DishClick(dish) }
             }
         }
     }
@@ -498,7 +386,3 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         }
     }
 }
-
-private const val SINGLE_LINE_COUNT = 1
-private const val TWO_LINES_COUNT = 2
-private const val THREE_LINES_COUNT = 3

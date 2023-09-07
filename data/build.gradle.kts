@@ -84,5 +84,7 @@ dependencies {
 
     implementation(Dependencies.Webim.core)
 
+    implementation(Dependencies.Jetpack.Paging.pagingRuntime)
+
     testBaseDependencies()
 }

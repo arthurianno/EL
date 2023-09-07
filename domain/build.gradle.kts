@@ -47,6 +47,7 @@ dependencies {
 
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Utils.jsr310)
+    implementation(Dependencies.Jetpack.Paging.pagingRuntime)
 
     testBaseDependencies()
     testImplementation(Dependencies.Test.jsr310) {

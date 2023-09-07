@@ -168,6 +168,9 @@ dependencies {
     implementation(Dependencies.CustomView.cardView)
     implementation(Dependencies.Webim.core)
 
+    implementation(Dependencies.Jetpack.Paging.pagingRuntime)
+    implementation(Dependencies.Jetpack.Paging.pagingCompose)
+
     testBaseDependencies()
     testImplementation(Dependencies.Test.kotlinJUnit)
     androidTestImplementation(Dependencies.Jetpack.WorkManager.test)

@@ -9,16 +9,18 @@ import com.elta.android.data.features.calculator.api.FORMAT_PARAMETER
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
 import com.elta.android.data.features.calculator.api.LANGUAGE_PARAMETER
+import com.elta.android.data.features.calculator.api.MAX_RESULTS_PARAMETER
 import com.elta.android.data.features.calculator.api.METHOD_PARAMETER
 import com.elta.android.data.features.calculator.api.OAUTH_CONSUMER_KEY_PARAMETER
 import com.elta.android.data.features.calculator.api.OAUTH_NONCE_PARAMETER
 import com.elta.android.data.features.calculator.api.OAUTH_SIGNATURE_METHOD_PARAMETER
 import com.elta.android.data.features.calculator.api.OAUTH_TIMESTAMP_PARAMETER
 import com.elta.android.data.features.calculator.api.OAUTH_VERSION_PARAMETER
+import com.elta.android.data.features.calculator.api.PAGE_NUMBER_PARAMETER
 import com.elta.android.data.features.calculator.api.REGION_PARAMETER
 import com.elta.android.data.features.calculator.api.SEARCH_EXPRESSION_PARAMETER
-import com.elta.android.data.features.calculator.mapper.compactFoodsToDomain
 import com.elta.android.data.features.calculator.mapper.toDomain
+import com.elta.android.data.features.calculator.model.SearchFoodsResponse
 import com.elta.android.data.features.calculator.storage.FatSecretStorage
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
@@ -130,36 +132,41 @@ class FatSecretDataSource @Inject constructor(
         }
     }
 
-    fun searchDishes(name: String): Flow<List<Dish>> {
+    suspend fun searchDishes(
+        name: String,
+        pageNumber: Int,
+        maxResults: Int
+    ): SearchFoodsResponse {
         val timeStamp = getTimeStamp()
         val nonce = UUID.randomUUID().toString()
 
         val parameters = searchFoodBaseParameters + mapOf(
             SEARCH_EXPRESSION_PARAMETER to name.encode(),
             OAUTH_TIMESTAMP_PARAMETER to timeStamp,
-            OAUTH_NONCE_PARAMETER to nonce
+            OAUTH_NONCE_PARAMETER to nonce,
+            PAGE_NUMBER_PARAMETER to pageNumber.toString(),
+            MAX_RESULTS_PARAMETER to maxResults.toString(),
         )
 
         val baseString = parameters.createBaseString()
 
         val oauthSignature = baseString.hmacSha1Signature()
 
-        return runFlowWithCatchToken {
-            api.searchFoods(
-                searchExpression = name,
-                method = METHOD_SEARCH_FOOD,
-                format = FORMAT_RESPONSE,
-                language = LANGUAGE,
-                region = REGION,
-                oauthSignature = oauthSignature,
-                oauthConsumerKey = consumerKey.takeIsAuth1(),
-                oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
-                oauthTimestamp = timeStamp.takeIsAuth1(),
-                oauthNonce = nonce.takeIsAuth1(),
-                oauthVersion = OAUTH_VERSION.takeIsAuth1()
-            )
-                .asFlow()
-        }.map { it.foodsSearch.results?.food?.compactFoodsToDomain() ?: emptyList() }
+        return api.searchFoods(
+            pageNumber = pageNumber,
+            maxResults = maxResults,
+            format = FORMAT_RESPONSE,
+            method = METHOD_SEARCH_FOOD,
+            region = REGION,
+            language = LANGUAGE,
+            oauthConsumerKey = consumerKey.takeIsAuth1(),
+            oauthNonce = nonce.takeIsAuth1(),
+            oauthSignatureMethod = SIGNATURE_METHOD.takeIsAuth1(),
+            oauthTimestamp = timeStamp.takeIsAuth1(),
+            oauthVersion = OAUTH_VERSION.takeIsAuth1(),
+            searchExpression = name,
+            oauthSignature = oauthSignature
+        )
     }
 
     private fun <T> runFlowWithCatchToken(apiMethod: () -> Flow<T>) =
@@ -175,6 +182,7 @@ class FatSecretDataSource @Inject constructor(
                 }
             }
 
+    //for auth 2
     private fun refreshToken(): Flow<String> =
         tokenApi.getNewToken(
             grantType = FATSECRET_GRAND_TYPE,

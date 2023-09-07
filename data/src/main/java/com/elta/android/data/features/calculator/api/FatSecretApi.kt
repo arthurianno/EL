@@ -40,7 +40,9 @@ interface FatSecretApi {
     ): Observable<FoodBrandResponse>
 
     @POST("server.api")
-    fun searchFoods(
+    suspend fun searchFoods(
+        @Query(PAGE_NUMBER_PARAMETER) pageNumber: Int,
+        @Query(MAX_RESULTS_PARAMETER) maxResults: Int,
         @Query(FORMAT_PARAMETER) format: String,
         @Query(METHOD_PARAMETER) method: String,
         @Query(REGION_PARAMETER) region: String,
@@ -52,7 +54,7 @@ interface FatSecretApi {
         @Query(OAUTH_VERSION_PARAMETER) oauthVersion: String? = null,
         @Query(SEARCH_EXPRESSION_PARAMETER) searchExpression: String,
         @Query("oauth_signature") oauthSignature: String?
-    ): Observable<SearchFoodsResponse>
+    ): SearchFoodsResponse
 }
 
 const val REGION_PARAMETER = "region"
@@ -65,4 +67,7 @@ const val OAUTH_SIGNATURE_METHOD_PARAMETER = "oauth_signature_method"
 const val OAUTH_TIMESTAMP_PARAMETER = "oauth_timestamp"
 const val OAUTH_VERSION_PARAMETER = "oauth_version"
 const val SEARCH_EXPRESSION_PARAMETER = "search_expression"
+
+const val PAGE_NUMBER_PARAMETER = "page_number"
+const val MAX_RESULTS_PARAMETER = "max_results"
 

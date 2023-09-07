@@ -1,11 +1,15 @@
 package com.elta.android.data.di
 
+import androidx.paging.PagingSource
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
+import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
+import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
@@ -44,8 +48,10 @@ import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoCachedDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.domain.features.calculator.model.Dish
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import javax.inject.Singleton
 
 @Suppress("TooManyFunctions")
@@ -161,4 +167,9 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindReportsDataSources(source: ReportsRemoteDataSource): ReportsDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDishesPagingSource(source: DishesPagingSource): BasePagingSource
+
 }
