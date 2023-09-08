@@ -765,7 +765,6 @@
     <string name="calculator_dish_carbs">Углеводы</string>
     <string name="calculator_total_bread_units">Общее количество ХЕ:</string>
     <string name="calculator_dialog_title_warning">Внимание</string>
-    <string name="calculator_user_had_changed_data_message">При изменении значений ХЕ данные могут быть не точными</string>
     <string name="calculator_user_change_bread_units_message">Значение ХЕ было изменено, исходя из добавленных вами продуктов/блюд</string>
     <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените добавленные продуты/блюда.</string>
     <string name="calculator_dish_detail_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
