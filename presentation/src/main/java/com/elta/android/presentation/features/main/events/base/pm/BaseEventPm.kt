@@ -79,9 +79,6 @@ abstract class BaseEventPm(
     private val breadUnitsChangeNotifyDialogData: DialogData by lazy {
         Dialogs.ChangeBreadUnitsData(resources)
     }
-    private val userHadChangesBreadUnitsDialogData: DialogData by lazy {
-        Dialogs.UserHadChangesBreadUnitsData(resources)
-    }
     private val editingXEIsNotAvailableData: DialogData by lazy {
         Dialogs.EditingXEIsNotAvailableData(resources)
     }
@@ -182,7 +179,6 @@ abstract class BaseEventPm(
             .subscribe {
                 formPickerValue.consumer.accept(it)
                 if (lockedChangeFormPicker) {
-                    userHadChangesBreadUnitsDialogControl.show(userHadChangesBreadUnitsDialogData)
                     lockedChangeFormPicker = false
                 }
             }
