@@ -3,11 +3,8 @@ package com.elta.android.presentation.core.compose.widgets.textfields
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.clearFocusOnKeyboardDismiss
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.nullgr.core.collections.isNotNullOrEmpty
@@ -117,7 +115,7 @@ class IconTextFieldWidgetModel : BaseWidgetModel<IconTextFieldWidgetState>() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun IconTextField(
     widgetModel: IconTextFieldWidgetModel,
@@ -137,13 +135,12 @@ fun IconTextField(
     )
     val configuration = LocalConfiguration.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val imeIsHide = !WindowInsets.isImeVisible
     MaterialTheme(
         shapes = localMaterialShapes
     ) {
-        LaunchedEffect(key1 = imeIsHide){
-            if (imeIsHide){
-                focusManager.clearFocus()
+        LaunchedEffect(key1 = Unit) {
+            if (!isDropDown){
+                focusRequester.requestFocus()
             }
         }
         GetLocalProperties { dimens, _, colors, _, _ ->
@@ -181,7 +178,8 @@ fun IconTextField(
                             if (!isDropDown) {
                                 widgetModel.focusChanged(it.isFocused)
                             }
-                        },
+                        }
+                        .clearFocusOnKeyboardDismiss(),
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = colors.blackBlue,
                         disabledTextColor = colors.blackBlue,
