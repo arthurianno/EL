@@ -49,8 +49,7 @@ class CalculatorViewModel @Inject constructor(
     private val getCachedDishes: GetCachedDishesUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler,
     private val calculatorFragmentResult: CalculatorFragmentResultHandler
-) :
-    BaseViewModel<CalculatorViewState>() {
+) : BaseViewModel<CalculatorViewState>() {
     override fun createInitState(): CalculatorViewState =
         CalculatorViewState(
             dishes = emptyList(),
@@ -64,7 +63,8 @@ class CalculatorViewModel @Inject constructor(
             downButtonIsVisible = true
         )
 
-    private var _findingDishesState: MutableStateFlow<PagingData<DishUiEntity>> = MutableStateFlow(PagingData.empty())
+    private var _findingDishesState: MutableStateFlow<PagingData<DishUiEntity>> =
+        MutableStateFlow(PagingData.empty())
     val findingDishesState: Flow<PagingData<DishUiEntity>> get() = _findingDishesState
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -145,15 +145,14 @@ class CalculatorViewModel @Inject constructor(
                 downButton.visibilityState(!inFocusState && state.value.downButtonIsVisible)
                 currentState.copy(searchInFocus = inFocusState)
             }
-
             else -> currentState
         }
 
     override fun backClick() {
-        if (state.value.isChanging()) {
-            exitDialog.dialogOpen()
-        } else {
-            super.backClick()
+        when {
+            state.value.searchInFocus -> reduceState { state.value.copy(searchInFocus = false) }
+            state.value.isChanging() -> exitDialog.dialogOpen()
+            else -> super.backClick()
         }
     }
 

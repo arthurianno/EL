@@ -41,10 +41,10 @@ abstract class BaseViewModel<ST> : ViewModel() {
     private val _state = MutableStateFlow(initState)
     val state: StateFlow<ST>
         get() = _state.asStateFlow()
+
     private val action = MutableSharedFlow<Action>()
 
     private val _event = MutableSharedFlow<Event?>()
-
     val event: SharedFlow<Event?>
         get() = _event.asSharedFlow()
 

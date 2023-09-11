@@ -115,6 +115,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
 
+        if (!state.searchInFocus){
+            focusManager.clearFocus()
+        }
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
                 targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB,
