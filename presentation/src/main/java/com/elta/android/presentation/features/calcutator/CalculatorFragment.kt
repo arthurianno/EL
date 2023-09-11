@@ -27,6 +27,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,10 +36,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.common.NetworkState
-import com.elta.android.presentation.core.compose.widgets.VSpacerLarge
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
@@ -61,7 +62,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalNetworkState
 import kotlinx.coroutines.FlowPreview
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalComposeUiApi::class)
 class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     override val viewModel: CalculatorViewModel by viewModels { viewModelFactory }
@@ -111,6 +112,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
         val networkAvailable = LocalNetworkState.current == NetworkState.Available
 
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current
+
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             val systemBarColor = animateColorAsState(
                 targetValue = if (searchInFocus) colors.shadeBlack3 else colors.gOrangeB,
@@ -120,6 +124,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = systemBarColor.value)
+                    .clickableWithNoRipple {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    }
             ) {
                 Scaffold(
                     scaffoldState = rememberScaffoldState(),
