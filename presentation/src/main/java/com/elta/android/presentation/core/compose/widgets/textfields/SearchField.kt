@@ -42,6 +42,14 @@ data class SearchFieldWidgetState(
 )
 
 class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
+    override fun createInitState(): SearchFieldWidgetState =
+        SearchFieldWidgetState(
+            textField = TextFieldValue(""),
+            hint = "",
+            isFocused = false,
+            icon = R.drawable.ic_search
+        )
+
     fun setHint(hint: String?) {
         setState { state.value.copy(hint = hint.orEmpty()) }
     }
@@ -69,14 +77,6 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
     fun clear() {
         setTextAndCursorToEnd(null)
     }
-
-    override fun createInitState(): SearchFieldWidgetState =
-        SearchFieldWidgetState(
-            textField = TextFieldValue(""),
-            hint = "",
-            isFocused = false,
-            icon = R.drawable.ic_search
-        )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
