@@ -9,6 +9,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 private const val SCAN_TIMEOUT_SECOND = 60L
@@ -55,6 +56,7 @@ fun BluetoothLeScannerCompat.startScan(
         results.distinctBy(ScanResult::getDevice).toMutableSet()
     }
     .map(MutableSet<ScanResult>::toList)
+    .doOnNext { Timber.i("<<<<<<<ScanResults>>>>>>  ScanResults: $this") }
     .distinctUntilChanged { r1, r2 -> !r1.isResultChanged(r2) }
     .skip(1)
     .timeout(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, Schedulers.computation())
