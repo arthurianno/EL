@@ -61,10 +61,6 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
         }
     }
 
-    fun setIcon(@DrawableRes icon: Int?) {
-        setState { state.value.copy(icon = icon) }
-    }
-
     fun focusChanged(focusState: FocusState) {
         setState { state.value.copy(isFocused = focusState.isFocused) }
         sendAction(SearchFiledAction.FocusChanged(focusState))
@@ -129,12 +125,14 @@ fun SearchField(
                     }
                 },
                 trailingIcon = {
-                    HorizontallyAnimation(visualState = searchInFocus, toLeft = false) {
-                        ButtonCircle(
-                            icon = R.drawable.ic_search_clean,
-                            onClick = widgetModel::clear,
-                            contentDescriptionId = R.string.content_description_close_button
-                        )
+                    if (state.value.textField.text.isNotEmpty()){
+                        HorizontallyAnimation(visualState = searchInFocus, toLeft = false) {
+                            ButtonCircle(
+                                icon = R.drawable.ic_search_clean,
+                                onClick = widgetModel::clear,
+                                contentDescriptionId = R.string.content_description_close_button
+                            )
+                        }
                     }
                 },
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
