@@ -6,16 +6,16 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
-import com.elta.android.presentation.databinding.FregmentInviteObserverBinding
+import com.elta.android.presentation.databinding.FragmentInviteObserverBinding
 import com.elta.android.presentation.features.observers.invite.pm.InviteObserverPm
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 
 class InviteObserverFragment :
-    BaseFragment<InviteObserverPm, FregmentInviteObserverBinding>(FregmentInviteObserverBinding::inflate) {
+    BaseFragment<InviteObserverPm, FragmentInviteObserverBinding>(FragmentInviteObserverBinding::inflate) {
 
-    override val screenLayout: Int = R.layout.fregment_invite_observer
+    override val screenLayout: Int = R.layout.fragment_invite_observer
     override val classToken: Class<InviteObserverPm> = InviteObserverPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
