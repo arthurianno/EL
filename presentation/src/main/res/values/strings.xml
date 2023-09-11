@@ -47,6 +47,7 @@
     <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
     <string name="registration_error_same_email">Данный пользователь уже является вашим наблюдателем</string>
     <string name="registration_error_same_email_awaiting">Данному пользователю уже отправлено приглашение</string>
+    <string name="registration_error_current_user_email">Невозможно отправить на свой email</string>
     <string name="registration_error_input_password">Некорректный пароль</string>
     <string name="registration_password_pattern">Не менее 8 символов (A–Z, a–z, 0–9)</string>
     <string name="registration_password_the_same">Придумайте новый пароль</string>
