@@ -266,6 +266,7 @@ class GlucometersManager @Inject constructor(
                             .contains(address)
                     }
                     .take(1)
+                    .doOnNext { Timber.i("<<<<<<<StartSyncInternal>>>>>>  ScanResults: $it") }
                     .flatMap {
                         Observable.just(Unit)
                             .delay(SYNC_DELAY, TimeUnit.MILLISECONDS)
@@ -274,6 +275,7 @@ class GlucometersManager @Inject constructor(
             }
         }
             ?.onErrorResumeNext { exception: Throwable ->
+                Timber.i("<<<<<<<syncWithDeviceError>>>>>>  syncWithDevice: $exception")
                 val error = when (exception) {
                     is BleException -> GlucometerOfflineError
                     is TimeoutException -> GlucometerSyncError(exception)
@@ -443,9 +445,10 @@ class GlucometersManager @Inject constructor(
                                     Observable.error(BluetoothNotEnabledError)
                                 }
 
-                                throwable is BleDisconnectedException -> Observable.error(
-                                    GlucometerOfflineError
-                                )
+                                throwable is BleDisconnectedException -> {
+                                    Timber.i("<<<<<<<findConnectionError>>>>>>  findConnection: $throwable")
+                                    Observable.error(GlucometerOfflineError)
+                                }
 
                                 else -> Observable.error(throwable)
                             }
@@ -648,6 +651,7 @@ class GlucometersManager @Inject constructor(
             .onErrorResumeNext { exception: Throwable ->
                 Timber.e(exception, "<<<<<<<Sync>>>>>> error ${exception.message}")
                 if (exception is BleException) {
+                    Timber.i("<<<<<<<syncInternalError>>>>>>  syncInternal: $exception")
                     Observable.error(GlucometerSyncError(GlucometerOfflineError))
                 } else {
                     Observable.error(GlucometerSyncError(exception))
