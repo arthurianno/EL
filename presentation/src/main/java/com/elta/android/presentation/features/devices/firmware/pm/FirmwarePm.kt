@@ -267,6 +267,7 @@ class FirmwarePm @Inject constructor(
                 when (error) {
                     is BluetoothNotEnabledError ->
                         btControl.requestEnableBluetooth()
+                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
                             .flatMapObservable {
                                 if (it) updateFirmware(params)
                                 else Observable.fromCallable {
@@ -275,6 +276,7 @@ class FirmwarePm @Inject constructor(
                             }
                     is LocationPermissionNotGrantedError ->
                         btControl.requestLocationPermissions()
+                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
                             .flatMapObservable {
                                 if (it) updateFirmware(params)
                                 else Observable.fromCallable {
@@ -283,6 +285,7 @@ class FirmwarePm @Inject constructor(
                             }
                     is LocationNotEnabledError ->
                         btControl.requestEnableLocation()
+                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
                             .flatMapObservable {
                                 if (it) updateFirmware(params)
                                 else Observable.fromCallable {
@@ -299,3 +302,5 @@ class FirmwarePm @Inject constructor(
         private const val NEXT_STATE_DELAY = 1500L
     }
 }
+
+const val DELAY_MILLISECONDS = 1000L
