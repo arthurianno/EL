@@ -15,6 +15,7 @@ import com.elta.android.data.features.googlefit.repository.GoogleFitDataReposito
 import com.elta.android.data.features.observers.repository.ObserverDataRepository
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
 import com.elta.android.data.features.reports.repository.ReportsDataRepository
+import com.elta.android.data.features.rostech.RosTechDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
@@ -33,6 +34,7 @@ import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.elta.android.domain.features.reports.repository.ReportsRepository
+import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
@@ -87,6 +89,10 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindFirmwareRepository(repo: FirmwareDataRepository): FirmwareRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRosTechRepository(repo: RosTechDataRepository): RosTechRepository
 
     @Binds
     @Singleton

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.base.pm
 
+import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
@@ -176,7 +177,7 @@ abstract class ConnectDevicePm constructor(
         connectDeviceAction.observable
             .skipWhileInProgress()
             .debounceAction()
-            .map { glucometer?.name ?: "SatelliteOnline" }
+            .map { glucometer?.name ?: GLUCOMETER_MODEL }
             .subscribe(openPinCodeDialogCommand.consumer)
             .untilDestroy()
 

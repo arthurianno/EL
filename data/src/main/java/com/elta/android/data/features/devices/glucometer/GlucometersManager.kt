@@ -1,7 +1,7 @@
 package com.elta.android.data.features.devices.glucometer
 
-import android.app.Application
 import android.content.Context
+import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.CommandError
@@ -15,7 +15,6 @@ import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.common.datasource.PersonalDataStorage
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.common.storage.UserHolder
@@ -89,8 +88,6 @@ class GlucometersManager @Inject constructor(
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
     private val client: RxBleClient,
-    private val application: Application,
-    private val personalData: PersonalDataStorage,
     private val context: Context
 ) {
 
@@ -179,10 +176,16 @@ class GlucometersManager @Inject constructor(
                 ?: GlucometerInfoCachedDto(id = id, secondaryId = address)
         }.map(glucometersInfoFromCacheMapper::mapFromObject)
 
-    fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> =
-        client.findConnection(address)
+    fun getGlucometerEvents(address: String): Single<List<GlucometerEventDto>> {
+        val glucometerInfo =
+            glucometersInfoCache.get(
+                CommonConditions.ById(
+                    address.hashCode().toLong()
+                )
+            )
+
+        return client.findConnection(address)
             .checkPinAndSend(address)
-            .deviceServiceConnect(address)
             .switchMap { connection ->
                 Observable.range(0, EVENTS_COUNT)
                     .concatMap {
@@ -190,6 +193,15 @@ class GlucometersManager @Inject constructor(
                     }
             }
             .takeUntil { it.isEmptyEvent() }
+            .doOnNext { event ->
+                if (FeatureToggles.isEnableIiotSdkFeature && event.isEvent() && !event.isEmptyEvent()) {
+                    IiotSdkDeviceService.sendEvent(
+                        event = eventBuilder.getTimeAndValue(event),
+                        serial = glucometerInfo?.glucometerSerialNumber.orEmpty(),
+                        model = GLUCOMETER_MODEL
+                    )
+                }
+            }
             .collectInto(mutableListOf<String>()) { responses, response ->
                 if (!response.isEmptyEvent()) {
                     responses.add(response)
@@ -202,12 +214,6 @@ class GlucometersManager @Inject constructor(
                 userHolder.currentUser?.let { id ->
                     profileCache.get(CommonConditions.ById(id))?.let { profile ->
                         profile.email?.let { userId ->
-                            val glucometerInfo =
-                                glucometersInfoCache.get(
-                                    CommonConditions.ById(
-                                        address.hashCode().toLong()
-                                    )
-                                )
                             events.map { event ->
                                 eventBuilder.buildFrom(
                                     userId = userId,
@@ -220,6 +226,7 @@ class GlucometersManager @Inject constructor(
                     }
                 } ?: emptyList()
             }
+    }
 
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
         client.findConnection(device.address)
@@ -471,24 +478,6 @@ class GlucometersManager @Inject constructor(
             }
         }
 
-    private fun <T> Observable<T>.deviceServiceConnect(address: String): Observable<T> =
-        doOnNext {
-            if (FeatureToggles.isEnableIiotSdkFeature) {
-                pinStorage.getPin(address).takeIf { !it.isNullOrEmpty() }?.let { pin ->
-                    personalData.getIiotLogin()
-                        .zipWith(personalData.getIiotPassword()) { iiotSdkLogin, iiotSdkPassword ->
-                            IiotSdkDeviceService.init(
-                                application = application,
-                                iiotSdkLogin = iiotSdkLogin,
-                                iiotSdkPassword = iiotSdkPassword,
-                            )
-                            IiotSdkDeviceService.connect(pin = pin, address = address)
-                        }
-                        .subscribe()
-                }
-            }
-        }
-
     private fun String.isPinError(): Boolean = this == "pin.error"
     private fun String.isPinCommand(): Boolean = startsWith("pin")
     private fun String.isEmptyEvent(): Boolean = contains("rd000000000000000000")
@@ -525,7 +514,6 @@ class GlucometersManager @Inject constructor(
 
     private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
         checkBluetoothClientState()
-            .deviceServiceConnect(address)
             .switchMap { client.findConnection(address) }
             .switchMap { connection ->
                 connection.setupNotification(UART_TX).map { Pair(connection, it) }
@@ -599,14 +587,23 @@ class GlucometersManager @Inject constructor(
             }
             .toObservable()
             .take(1)
-            // Glucometers memory organized like stack, so the most recent event will be on the top
-            // or in holder if there are no new events
             .doOnNext { holder ->
                 updateGlucometerInfo(
                     address,
                     holder.info,
                     holder.events.firstOrNull() ?: holder.lastSyncedEvent
                 )
+            }
+            .doOnNext { holder ->
+                if (FeatureToggles.isEnableIiotSdkFeature) {
+                    holder.events.forEach { event ->
+                        IiotSdkDeviceService.sendEvent(
+                            event = eventBuilder.getTimeAndValue(event),
+                            serial = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))?.glucometerSerialNumber.orEmpty(),
+                            model = GLUCOMETER_MODEL
+                        )
+                    }
+                }
             }
             .map(SyncResponseHolder::events)
             .map { events ->

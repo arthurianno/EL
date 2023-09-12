@@ -10,4 +10,6 @@ interface GlucometerEventBuilder {
         response: String,
         glucometerSerialNumber: String?
     ): GlucometerEventDto
+
+    fun getTimeAndValue(response: String): Pair<String, Double>
 }

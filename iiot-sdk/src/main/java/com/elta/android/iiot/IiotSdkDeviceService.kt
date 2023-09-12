@@ -18,12 +18,23 @@ object IiotSdkDeviceService {
             iiotSdkLogin,
             iiotSdkPassword,
             deviceCallBack,
-            true //?
+            BuildConfig.DEBUG
         )
     }
 
     fun connect(pin: String, address: String) {
         DeviceService.connect(ELTAConnect::class.java, address, pin)
+    }
+
+    fun sendEvent(serial: String, model: String, event: Pair<String, Double>) {
+        val (time, value) = event
+        Timber.tag(LOG_TAG).d("Rosrech start sync: serial = $serial, model = $model, time = $time, value = $value")
+        try {
+            ELTAConnect.sendData(serial, model, time, value)
+            Timber.tag(LOG_TAG).d("RosTech SDK has been successfully called: serial = $serial, model = $model, time = $time, value = $value")
+        } catch (ex: Exception) {
+            Timber.tag(LOG_TAG).e(ex)
+        }
     }
 
     private val deviceCallBack = object : DeviceCallBack {

@@ -30,6 +30,6 @@ android {
 dependencies {
     implementation(Dependencies.Timber.core)
 
-    //api(fileTree(baseDir = "libs"))
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+    api(fileTree(baseDir = "libs"))
+//    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 }

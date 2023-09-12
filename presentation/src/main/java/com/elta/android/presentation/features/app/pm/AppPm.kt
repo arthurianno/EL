@@ -4,6 +4,7 @@ import android.net.Uri
 import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
+import com.elta.android.domain.features.rostech.RosTechUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
@@ -29,6 +30,7 @@ import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -40,6 +42,7 @@ class AppPm @Inject constructor(
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val firebaseStorage: FirebaseStorage,
+    private val rosTech: RosTechUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -115,6 +118,15 @@ class AppPm @Inject constructor(
                     AnalyticsEventType.APP_EXIT,
                     hashMapOf(AnalyticsEventParam.SCREEN_NAME to it)
                 )
+            }
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit }
+            .take(1)
+            .flatMapCompletable {
+                rosTech.execute()
+                    .doOnError { Timber.d("RosTech init Error") }
             }
             .subscribe()
             .untilDestroy()
