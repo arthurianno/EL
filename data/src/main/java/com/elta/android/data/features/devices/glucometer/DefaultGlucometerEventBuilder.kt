@@ -41,7 +41,14 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         )
     }
 
-    protected open fun getTokens(response: String): Pair<String, String> {
+    override fun getTimeAndValue(response: String): Pair<String, Double> {
+        val token = getTokens(response)
+        val dateToken = token.first
+        val value = extractValue(token.second) ?: 0.0
+        return dateToken to value
+    }
+
+    private fun getTokens(response: String): Pair<String, String> {
         val cleaned = response.replace("rd", "")
         val dateToken = cleaned.substring(0, 12)
         val temperatureAndValueToken = cleaned.substring(12, cleaned.length)

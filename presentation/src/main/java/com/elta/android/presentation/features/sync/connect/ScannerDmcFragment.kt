@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -74,7 +75,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val NUMBER_SUFFIX = "D"
-private const val GLUCOMETER_NAME_SUFFIX = "SatelliteOnline"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
 private enum class CropCornerType(val degrees: Float, val align: Alignment) {
@@ -278,7 +278,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                     runCatching {
                         val pin = value.extractPinCode()
                         val name =
-                            "$GLUCOMETER_NAME_SUFFIX${
+                            "$GLUCOMETER_MODEL${
                                 value.drop(1).takeLast(NUMBERS_COUNT_FOR_NAME)
                             }"
                         viewModel sendAction ConnectAction.StartConnecting(pin, name)

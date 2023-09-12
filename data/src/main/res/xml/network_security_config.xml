@@ -12,4 +12,8 @@
             <certificates src="@raw/vdiabete_test4" />
         </trust-anchors>
     </debug-overrides>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">test.ppma.ru</domain>
+    </domain-config>
 </network-security-config>
