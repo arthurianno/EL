@@ -39,6 +39,8 @@ internal const val TWO_DECIMAL_PLACES = 2
 internal const val DIGIT_DOT_ALLOWED_CHAR = ','
 internal const val DIGIT_DOT = '.'
 internal const val PATTERN_ZERO_AFTER_DECIMAL = "0.##"
+internal const val NOTHING_DASH = "—"
+internal const val DIGIT_ZERO_STRING = "0"
 private const val CONVERSION_FACTOR = 10
 private const val START_AMOUNT = 1.0
 private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
@@ -55,6 +57,7 @@ class DishDetailViewModel @Inject constructor(
                 name = "",
                 type = DishType.Brand,
                 brandName = "",
+                isVerification = false,
                 servings = emptyList(),
                 servingSelect = emptyServing(),
                 servingAmount = "0.0",
@@ -191,7 +194,7 @@ class DishDetailViewModel @Inject constructor(
         }
     }
 
-    private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null, ): Double {
+    private fun calculateBreadUnits(carbs: Double? = null, amount: Double? = null): Double {
         val serving = getServingOrDefault()
 
         val numberOfUnits = serving.numberOfUnits

@@ -5,6 +5,7 @@ import com.elta.android.domain.features.calculator.model.Serving
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT
 import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT_ALLOWED_CHAR
+import com.elta.android.presentation.features.calcutator.viewmodel.NOTHING_DASH
 import com.elta.android.presentation.features.calcutator.viewmodel.PATTERN_ZERO_AFTER_DECIMAL
 import com.elta.android.presentation.features.calcutator.viewmodel.TWO_DECIMAL_PLACES
 import com.elta.android.presentation.features.calcutator.viewmodel.ZERO_COUNT
@@ -17,6 +18,8 @@ internal fun Dish.toUi(): DishUiEntity =
         name = name,
         type = type,
         brandName = brandName,
+        // FIXME :: delete stub, change on right value
+        isVerification = true,
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
         servingAmount = servingAmount.toString(),
@@ -56,9 +59,9 @@ internal fun ServingUiEntity.toDomain(): Serving =
         id = id,
         servingDescription = servingDescription,
         numberOfUnits = numberOfUnits.toDouble(),
-        calories = calories.toDouble(),
-        proteins = protein.toDouble(),
-        fats = fat.toDouble(),
+        calories = calories.toDoubleOrNull() ?: ZERO_COUNT,
+        proteins = protein.toDoubleOrNull() ?: ZERO_COUNT,
+        fats = fat.toDoubleOrNull() ?: ZERO_COUNT,
         carbohydrate = carbohydrate.toDouble()
     )
 
@@ -69,9 +72,9 @@ internal fun emptyServing() = Serving.empty().toUi()
 
 internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity {
     return copy(
-        calories = calories.toCalculate(amount, numberOfUnits),
-        protein = protein.toCalculate(amount, numberOfUnits),
-        fat = fat.toCalculate(amount, numberOfUnits),
+        calories = calories.toCalculate(amount, numberOfUnits).replaceEmpty(),
+        protein = protein.toCalculate(amount, numberOfUnits).replaceEmpty(),
+        fat = fat.toCalculate(amount, numberOfUnits).replaceEmpty(),
         carbohydrate = carbohydrate.toCalculate(amount, numberOfUnits)
     )
 }
@@ -100,3 +103,7 @@ private fun Double.removeZero(): String {
     val format = DecimalFormat(PATTERN_ZERO_AFTER_DECIMAL)
     return format.format(this).replace(DIGIT_DOT_ALLOWED_CHAR, DIGIT_DOT)
 }
+
+private fun String.replaceEmpty(): String =
+    if (this.toDouble() == ZERO_COUNT) NOTHING_DASH
+    else this
