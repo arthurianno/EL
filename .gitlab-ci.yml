@@ -4,7 +4,7 @@ cache:
   key: ${CI_PROJECT_ID}
   paths:
   - .gradle/
-
+ 
 before_script:
 - export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
@@ -12,9 +12,12 @@ before_script:
 
 stages:
 - check
+- build
 - beta
 - uat
 - rc
+- test
+
 
 complexCheck:
   stage: check
@@ -28,7 +31,37 @@ complexCheck:
   - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
   variables:
     COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-  
+
+build: # Собираем артефакт
+  stage: build
+  only:
+    - merge_requests  # Только при мердж реквесте
+  when: on_success
+  script:
+    - ./gradlew clean build -x lint  # Собираем проект
+    - echo JOB_ID="$CI_JOB_ID" >> build.env  # Создаём файл, в который помещаем номер сборки для последующей загрузки артефактов
+    - echo PLATFORM=Android >> build.env # Так же помещаем переменную с типом платформы
+  artifacts:
+    reports:
+      dotenv: build.env
+    paths:
+      - app/build/outputs/apk/debug/app-universal-debug.apk # Публикуем артефакты в Gitlab
+  variables:
+    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
+
+test:  # Делегируем артефакты в другой репозиторий для тестов
+  stage: test
+  variables: 
+    JOB_ID: $JOB_ID # Пробрасываем переменные в другой репозиторий
+    PLATFORM: $PLATFORM
+  needs:
+    - job: build
+  trigger: 
+    project: qa/ELTA-automation   # Репозиторий, в который мы делегируем джобу
+    branch: master     # Ветка из этого репозитория
+  only:
+    - merge_requests
+
 # For tag v0.0.0-beta
 beta:
   stage: beta
