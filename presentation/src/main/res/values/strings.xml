@@ -756,6 +756,7 @@
     <string name="calculator_search_server_unavailable">Каталог продуктов временно недоступен. Можете добавить значение ХЕ вручную.</string>
     <string name="calculator_bread_units_count">Количество хлебных единиц:</string>
     <string name="calculator_bread_units_count_label">%s XE</string>
+    <string name="calculator_verify_product">Одобрено Минздравом РФ</string>
     <string name="calculator_product_portion">Порция продукта</string>
     <string name="calculator_serving_count_hint">Количество</string>
     <string name="calculator_additional_information">Дополнительная информация</string>

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.calcutator.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,12 +25,14 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonBack
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.model.ServingUiEntity
@@ -70,7 +73,7 @@ fun MainHeader(
 
 @Composable
 private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: () -> Unit) {
-    GetLocalProperties { _, _, colors, shapes, types ->
+    GetLocalProperties { dimens, _, colors, shapes, types ->
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -101,6 +104,14 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                         .fillMaxWidth()
 
                 ) {
+                    if (dish.isVerification) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_verify_dish),
+                            contentDescription = null,
+                            modifier = Modifier.padding(top = dimens.smallDim)
+                        )
+                        HSpacerVerySmall()
+                    }
                     Text(
                         text = dish.name,
                         style = types.h1,
@@ -207,6 +218,7 @@ fun ContentPreView() {
         manyText,
         DishType.Brand,
         "Агуша",
+        true,
         listOf(serving),
         serving,
         "20.1",

@@ -24,13 +24,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_ZERO_STRING
 import com.elta.android.presentation.theme.GetLocalProperties
 
 @Composable
@@ -38,7 +38,7 @@ internal fun FindingDishes(
     findingDishes: LazyPagingItems<DishUiEntity>,
     dishesClick: (DishUiEntity?) -> Unit,
 ) {
-    GetLocalProperties { dimens, _, colors, shapes, _ ->
+    GetLocalProperties { dimens, _, _, _, _ ->
 
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -131,13 +131,22 @@ internal fun RowScope.CardBody(dish: DishUiEntity) {
                 )
                 VSpacer(height = dimens.smallestDim)
             }
-            Text(
-                text = dish.name,
-                style = types.title3,
-                color = colors.blackBlue,
-                maxLines = THREE_LINES_COUNT,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row {
+                if (dish.isVerification) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_verify_dish),
+                        modifier = Modifier.padding(end = dimens.verySmallDim),
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = dish.name,
+                    style = types.title3,
+                    color = colors.blackBlue,
+                    maxLines = THREE_LINES_COUNT,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             VSpacer(height = dimens.halfMediumDim)
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -150,12 +159,14 @@ internal fun RowScope.CardBody(dish: DishUiEntity) {
                     maxLines = SINGLE_LINE_COUNT,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = stringResource(id = R.string.calculator_dish_calories_in_serving, dish.servingCalories.second),
-                    style = types.textStyle2,
-                    color = colors.shadeBlack1,
-                    maxLines = SINGLE_LINE_COUNT
-                )
+                if (dish.servingCalories.second != DIGIT_ZERO_STRING){
+                    Text(
+                        text = stringResource(id = R.string.calculator_dish_calories_in_serving, dish.servingCalories.second),
+                        style = types.textStyle2,
+                        color = colors.shadeBlack1,
+                        maxLines = SINGLE_LINE_COUNT
+                    )
+                }
             }
         }
     }
