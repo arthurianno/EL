@@ -23,7 +23,8 @@ class CalculatorMockedApi(context: Context) : CalculatorApi {
             calories = 100.0,
             proteins = 15.0,
             fats = 30.0,
-            carbohydrates = 45.0
+            carbohydrates = 45.0,
+            isVerified = false
         )
     }
 

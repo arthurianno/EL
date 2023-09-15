@@ -90,11 +90,17 @@ fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
 }
 
 private fun Dish.selectServingCalories(): Pair<String, String> = with(servingSelect) {
-    if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
-        "${servingAmount.format()} $servingDescription" to calories?.format().orEmpty()
-    } else {
-        val firstServing = servings.firstOrNull()
-        "${firstServing?.numberOfUnits?.format()} ${firstServing?.servingDescription}" to firstServing?.calories?.format().replaceZero()
+    when {
+        servingDescription.isNotEmpty() && calories != ZERO_COUNT -> {
+            "${servingAmount.format()} $servingDescription" to calories?.format().orEmpty()
+        }
+        servingDescription.isNotEmpty() && isVerified -> {
+            "${servingAmount.format()} $servingDescription" to EMPTY_STRING
+        }
+        else -> {
+            val firstServing = servings.firstOrNull()
+            "${firstServing?.numberOfUnits?.format()} ${firstServing?.servingDescription}" to firstServing?.calories?.format().replaceZero()
+        }
     }
 }
 
@@ -111,5 +117,5 @@ private fun String?.replaceEmpty(): String =
     else this
 
 private fun String?.replaceZero(): String =
-    if (this == DIGIT_ZERO_STRING) EMPTY_STRING
+    if (this in listOf(DIGIT_ZERO_STRING, ZERO_COUNT.toString())) EMPTY_STRING
     else this.orEmpty()

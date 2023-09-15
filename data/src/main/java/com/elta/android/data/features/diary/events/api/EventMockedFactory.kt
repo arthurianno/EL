@@ -49,7 +49,7 @@ object EventMockedFactory {
             data = EventDataDto(
                 temperature = 0.0,
                 value = value,
-                name = "Test foodName",
+                name = "Test name",
                 kind = "Test kind",
                 duration = 2 * 60 * 60 + 30 * 60, // 2h 30m
                 activityType = activityType,

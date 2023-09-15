@@ -5,7 +5,7 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.google.gson.annotations.SerializedName
 
 data class SalePointDto(
-    @SerializedName("foodName") val name: String,
+    @SerializedName("name") val name: String,
     @SerializedName("type") val type: TypeDto,
     @SerializedName("region") val region: String,
     @SerializedName("city") val city: String,

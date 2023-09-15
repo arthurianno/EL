@@ -12,7 +12,7 @@ fun ObserverNetworkResponse.toDomain(): Observer =
     Observer(
         id = id,
         email = email,
-        // for some reason server returns empty foodName instead of null, so we make null explicitly
+        // for some reason server returns empty name instead of null, so we make null explicitly
         name = name?.takeIf { it.isNotBlank() },
         customName = customName,
         status = ObserverStatus.valueOf(status.name),

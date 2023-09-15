@@ -18,4 +18,6 @@ data class DishDbEntity(
 
     val servingAmount: Double,
     val breadUnits: Double,
+
+    val isVerified: Boolean,
 )

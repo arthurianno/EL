@@ -134,7 +134,8 @@ fun Dish.toNetwork(): ProductResponse =
         calories = servingSelect.calories ?: ZERO_DOUBLE,
         proteins = servingSelect.proteins ?: ZERO_DOUBLE,
         fats = servingSelect.fats ?: ZERO_DOUBLE,
-        carbohydrates = servingSelect.carbohydrate
+        carbohydrates = servingSelect.carbohydrate,
+        isVerified = isVerified
     )
 
 fun List<VerifiedProductResponse>.verifiedProductToDish(): List<Dish> =
@@ -172,15 +173,15 @@ fun List<Dish>.toVerifiedDB(): List<VerifiedProductDbEntity> =
 
 private fun Dish.toVerifiedDb(dbId: Long): VerifiedProductDbEntity =
     VerifiedProductDbEntity(
-            id = dbId,
-            dishId = id,
-            foodName = name,
-            type = type.name,
-            brandName = brandName,
-            servings = servings.map { it.toDb(dbId) },
-            servingSelect = servingSelect.toDb(dbId),
-            servingAmount = servingAmount,
-            breadUnits = breadUnits,
+        id = dbId,
+        dishId = id,
+        foodName = name,
+        type = type.name,
+        brandName = brandName,
+        servings = servings.map { it.toDb(dbId) },
+        servingSelect = servingSelect.toDb(dbId),
+        servingAmount = servingAmount,
+        breadUnits = breadUnits
     )
 
 fun VerifiedProductDbEntity.toDomain(): Dish = Dish(
@@ -235,7 +236,8 @@ internal fun Dish.toDb(): DishDbEntity {
         servingSelect = servingSelect.toDb(dbId),
         servingAmount = servingAmount,
         breadUnits = breadUnits,
-        )
+        isVerified = isVerified
+    )
 }
 
 
