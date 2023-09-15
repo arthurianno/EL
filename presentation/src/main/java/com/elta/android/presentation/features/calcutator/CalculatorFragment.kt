@@ -106,6 +106,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
         val searchState = viewModel.searchField.state.collectAsState().value
         val dishes = state.dishes
+        val verifiedDishes = state.verifiedDishes
 
         val searchText = searchState.textField.text
         val searchInFocus = state.searchInFocus
@@ -171,7 +172,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                 state = state,
                                 searchText = searchText,
                                 viewModel = viewModel,
-                                findingDishesState = findingDishesState
+                                findingDishesState = findingDishesState,
+                                verifiedDishes = verifiedDishes
                             )
                         } else {
                             MainContent(
@@ -208,7 +210,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         state: CalculatorViewState,
         searchText: String,
         viewModel: CalculatorViewModel,
-        findingDishesState: LazyPagingItems<DishUiEntity>
+        findingDishesState: LazyPagingItems<DishUiEntity>,
+        verifiedDishes: List<DishUiEntity>
     ) {
         if (searchText.isEmpty()) {
             LastWords(
@@ -216,7 +219,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 viewModel = viewModel
             )
         } else {
-            FindingDishes(findingDishes = findingDishesState) { dish ->
+            FindingDishes(
+                findingDishes = findingDishesState,
+                verifiedDishes = verifiedDishes
+            ) { dish ->
                 dish?.let { viewModel sendAction CalculatorAction.DishClick(dish) }
             }
         }

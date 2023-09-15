@@ -2,8 +2,10 @@ package com.elta.android.data.di
 
 import com.elta.android.data.features.calculator.cache.DishCache
 import com.elta.android.data.features.calculator.cache.SearchHistoryCache
+import com.elta.android.data.features.calculator.cache.VerifiedProductCache
 import com.elta.android.data.features.calculator.cache.model.DishDbEntity
 import com.elta.android.data.features.calculator.cache.model.SearchHistoryDbEntity
+import com.elta.android.data.features.calculator.cache.model.VerifiedProductDbEntity
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.devices.cache.DbGlucometersCache
 import com.elta.android.data.features.devices.cache.DbGlucometersInfoCache
@@ -94,5 +96,9 @@ class CacheModule {
         @Binds
         @Singleton
         fun bindDishCache(cached: DishCache): Cache<DishDbEntity>
+
+        @Binds
+        @Singleton
+        fun bingVerifiedProductCache(cached: VerifiedProductCache): Cache<VerifiedProductDbEntity>
     }
 }

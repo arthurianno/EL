@@ -8,7 +8,7 @@ data class EventDataDto(
     @SerializedName("duration") val duration: Long?,
     @SerializedName("value") val value: Double?,
     @SerializedName("kind") val kind: String?,
-    @SerializedName("name") val name: String?,
+    @SerializedName("foodName") val name: String?,
     @SerializedName("activityType") val activityType: ActivityTypeDto?,
     @SerializedName("mealTagging") val mealTag: MealTagDto?,
     @SerializedName("insulinType") val insulinType: InsulinTypeDto?,

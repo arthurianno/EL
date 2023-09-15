@@ -4,6 +4,7 @@ import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
+import com.elta.android.domain.features.calculator.interactor.UpdateVerifiedProductUseCase
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetLastInsulinEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -34,10 +35,11 @@ class EventCreationPm @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val clearCachedDishes: ClearCachedDishesUseCase,
     private val getLastInsulinEventUseCase: GetLastInsulinEventUseCase,
+    updateVerifiedProductUseCase: UpdateVerifiedProductUseCase,
     cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
-) : BaseEventPm(services, calculatorFragmentResult, cachedDishes) {
+) : BaseEventPm(services, calculatorFragmentResult, cachedDishes, updateVerifiedProductUseCase) {
 
     private val isFormNotEmptyState = state(false)
     private val eventFormHolderState = state(EventFormModel())

@@ -10,18 +10,18 @@ import retrofit2.http.Path
 
 interface SocialApi {
 
-    @POST("api/auth/v1/socialnetworks/{name}/link")
+    @POST("api/auth/v1/socialnetworks/{foodName}/link")
     fun linkSocialNetwork(
-        @Path("name") name: String,
+        @Path("foodName") name: String,
         @Body request: SocialNetworkRequest
     ): Completable
 
-    @POST("api/auth/v1/socialnetworks/{name}/unlink")
-    fun unLinkSocialNetwork(@Path("name") name: String): Completable
+    @POST("api/auth/v1/socialnetworks/{foodName}/unlink")
+    fun unLinkSocialNetwork(@Path("foodName") name: String): Completable
 
-    @POST("api/auth/v1/socialnetworks/{name}/login")
+    @POST("api/auth/v1/socialnetworks/{foodName}/login")
     fun loginSocialNetwork(
-        @Path("name") name: String,
+        @Path("foodName") name: String,
         @Body request: SocialNetworkRequest
     ): Single<LoginNetworkResponse>
 }

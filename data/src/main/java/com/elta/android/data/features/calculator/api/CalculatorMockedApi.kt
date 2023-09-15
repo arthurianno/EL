@@ -2,6 +2,7 @@ package com.elta.android.data.features.calculator.api
 
 import android.content.Context
 import com.elta.android.data.features.calculator.model.ProductResponse
+import com.elta.android.data.features.calculator.model.VerifiedProductResponse
 import com.elta.android.domain.features.calculator.model.DishType
 import io.reactivex.Observable
 import java.util.Random
@@ -27,4 +28,37 @@ class CalculatorMockedApi(context: Context) : CalculatorApi {
     }
 
     override fun getEventProducts(eventId: String) = Observable.just(products)
+
+    override suspend fun getVerifiedProducts(): List<VerifiedProductResponse> {
+        return listOf(
+            VerifiedProductResponse(
+                foodId = "12dw-qwdqw-fqe-wf-wgewr-3r2",
+                foodName = "Банан",
+                servings = listOf(
+                    VerifiedProductResponse.Serving(
+                        carbohydrate = 12.0,
+                        fat = null,
+                        calories = null,
+                        protein = null,
+                        metricServingAmount = 100.0,
+                        metricServingUnit = "гр"
+                    )
+                )
+            ),
+            VerifiedProductResponse(
+                foodId = "12dw-qwdqw-fqe-wf-wgewr-3r2",
+                foodName = "Банан спелый и умелый",
+                servings = listOf(
+                    VerifiedProductResponse.Serving(
+                        carbohydrate = 12.0,
+                        fat = null,
+                        calories = null,
+                        protein = null,
+                        metricServingAmount = 2.0,
+                        metricServingUnit = "штуки по 100-150 гр"
+                    )
+                )
+            )
+        )
+    }
 }

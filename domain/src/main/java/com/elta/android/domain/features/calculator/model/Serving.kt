@@ -2,9 +2,9 @@ package com.elta.android.domain.features.calculator.model
 
 data class Serving(
     val id: String,
-    val calories: Double,
-    val proteins: Double,
-    val fats: Double,
+    val calories: Double?,
+    val proteins: Double?,
+    val fats: Double?,
     val carbohydrate: Double,
     val servingDescription: String,
     val numberOfUnits: Double,

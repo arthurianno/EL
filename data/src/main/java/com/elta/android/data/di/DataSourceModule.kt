@@ -1,6 +1,5 @@
 package com.elta.android.data.di
 
-import androidx.paging.PagingSource
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.data.core.paging.BasePagingSource
@@ -8,7 +7,6 @@ import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
-import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource

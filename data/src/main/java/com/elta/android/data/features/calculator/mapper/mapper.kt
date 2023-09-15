@@ -2,11 +2,13 @@ package com.elta.android.data.features.calculator.mapper // ktlint-disable filen
 
 import com.elta.android.data.features.calculator.cache.model.DishDbEntity
 import com.elta.android.data.features.calculator.cache.model.ServingDbEntity
+import com.elta.android.data.features.calculator.cache.model.VerifiedProductDbEntity
 import com.elta.android.data.features.calculator.model.FoodBrandResponse
 import com.elta.android.data.features.calculator.model.FoodGenericResponse
 import com.elta.android.data.features.calculator.model.FoodNetworkEntity
 import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.calculator.model.ServingNetworkEntity
+import com.elta.android.data.features.calculator.model.VerifiedProductResponse
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
@@ -24,7 +26,8 @@ internal fun FoodGenericResponse.Food.toDomain(): Dish {
         servings = servingsGeneric.servings.toDomain(dishType),
         servingSelect = servingSelect,
         servingAmount = servingSelect.numberOfUnits,
-        breadUnits = ZERO_DOUBLE
+        breadUnits = ZERO_DOUBLE,
+        isVerified = false
     )
 }
 
@@ -41,7 +44,8 @@ internal fun FoodBrandResponse.Food.toDomain(): Dish {
         servings = listOf(servingsBrand.serving.toDomain(dishType)),
         servingSelect = servingSelect,
         servingAmount = servingSelect.numberOfUnits,
-        breadUnits = ZERO_DOUBLE
+        breadUnits = ZERO_DOUBLE,
+        isVerified = false
     )
 }
 
@@ -57,7 +61,8 @@ internal fun FoodNetworkEntity.toDomain(): Dish {
         servings = servings.servings?.toDomain(dishType).orEmpty(),
         servingSelect = Serving.empty(),
         servingAmount = ONE_DOUBLE,
-        breadUnits = ZERO_DOUBLE
+        breadUnits = ZERO_DOUBLE,
+        isVerified = false
     )
 }
 
@@ -82,6 +87,7 @@ private fun ServingNetworkEntity.getNumberOfUnits(dishType: DishType): Double {
     return when (dishType) {
         DishType.Generic -> numberOfUnits.toDoubleOrNull() ?: ONE_DOUBLE
         DishType.Brand -> metricServingAmount?.toDoubleOrNull() ?: ONE_DOUBLE
+        DishType.Verified -> ONE_DOUBLE
     }
 }
 
@@ -89,6 +95,7 @@ private fun ServingNetworkEntity.getServingDescription(dishType: DishType): Stri
     return when (dishType) {
         DishType.Generic -> measurementDescription
         DishType.Brand -> metricServingUnit.orEmpty()
+        DishType.Verified -> ""
     }
 }
 
@@ -106,7 +113,8 @@ fun ProductResponse.toDomain(): Dish =
         servings = listOf(getServings()),
         servingAmount = servingAmount,
         servingSelect = getServings(),
-        breadUnits = breadUnits
+        breadUnits = breadUnits,
+        isVerified = false
     )
 
 @JvmName("toDomainProductResponse")
@@ -123,10 +131,69 @@ fun Dish.toNetwork(): ProductResponse =
         servingAmount = servingAmount,
         breadUnits = breadUnits,
         brandName = brandName,
-        calories = servingSelect.calories,
-        proteins = servingSelect.proteins,
-        fats = servingSelect.fats,
+        calories = servingSelect.calories ?: ZERO_DOUBLE,
+        proteins = servingSelect.proteins ?: ZERO_DOUBLE,
+        fats = servingSelect.fats ?: ZERO_DOUBLE,
         carbohydrates = servingSelect.carbohydrate
+    )
+
+fun List<VerifiedProductResponse>.verifiedProductToDish(): List<Dish> =
+    map { it.toDomain() }
+
+private fun VerifiedProductResponse.toDomain(): Dish {
+    val dishServings = servings.map { it.toDomain() }
+    return Dish(
+        id = foodId,
+        localId = getLocalId(),
+        name = foodName,
+        type = DishType.Verified,
+        brandName = "",
+        servings = dishServings,
+        servingSelect = Serving.empty(),
+        servingAmount = ONE_DOUBLE,
+        breadUnits = ZERO_DOUBLE,
+        isVerified = true
+    )
+}
+
+
+private fun VerifiedProductResponse.Serving.toDomain(): Serving = Serving(
+    id = getLocalId(),
+    calories = calories,
+    proteins = protein,
+    fats = fat,
+    carbohydrate = carbohydrate,
+    servingDescription = metricServingUnit,
+    numberOfUnits = metricServingAmount
+)
+
+fun List<Dish>.toVerifiedDB(): List<VerifiedProductDbEntity> =
+    map { it.toVerifiedDb(it.localId.hashCode().toLong()) }
+
+private fun Dish.toVerifiedDb(dbId: Long): VerifiedProductDbEntity =
+    VerifiedProductDbEntity(
+            id = dbId,
+            dishId = id,
+            foodName = name,
+            type = type.name,
+            brandName = brandName,
+            servings = servings.map { it.toDb(dbId) },
+            servingSelect = servingSelect.toDb(dbId),
+            servingAmount = servingAmount,
+            breadUnits = breadUnits,
+    )
+
+fun VerifiedProductDbEntity.toDomain(): Dish = Dish(
+        id = dishId,
+        localId = getLocalId(),
+        name = foodName,
+        type = type.getDishType(),
+        brandName = brandName,
+        servings = servings.map { it.getServings() },
+        servingSelect = servingSelect.getServings(),
+        servingAmount = servingAmount,
+        breadUnits = breadUnits,
+        isVerified = true
     )
 
 fun List<Dish>.toNetwork(): List<ProductResponse> =
@@ -142,7 +209,8 @@ internal fun DishDbEntity.toDomain(): Dish =
         servings = listOf(servingSelect.getServings()),
         servingSelect = servingSelect.getServings(),
         servingAmount = servingAmount,
-        breadUnits = breadUnits
+        breadUnits = breadUnits,
+        isVerified = false
     )
 
 private fun Serving.toDb(dbId: Long) = ServingDbEntity(

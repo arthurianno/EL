@@ -1,8 +1,9 @@
-package com.elta.android.data.features.calculator.datasource
+package com.elta.android.data.features.calculator.datasource.fatsecret
 
 import android.util.Base64
 import com.elta.android.common.di.qualifires.FatSecret
 import com.elta.android.common.di.qualifires.FatSecretAnnotationType
+import com.elta.android.common.errors.DishError
 import com.elta.android.common.errors.FatSecretErrors
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.data.features.calculator.api.FORMAT_PARAMETER
@@ -129,6 +130,8 @@ class FatSecretDataSource @Inject constructor(
                     oauthVersion = OAUTH_VERSION.takeIsAuth1()
                 ).asFlow()
             }.map { it.food.toDomain() }
+
+            DishType.Verified -> throw DishError.NotMatchType
         }
     }
 

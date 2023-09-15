@@ -104,7 +104,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                         .fillMaxWidth()
 
                 ) {
-                    if (dish.isVerification) {
+                    if (dish.isVerified) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_verify_dish),
                             contentDescription = null,
