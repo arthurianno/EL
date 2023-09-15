@@ -4,10 +4,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.elta.android.common.utils.takeFirst
-import com.elta.android.data.features.calculator.datasource.CalculatorCacheDataSource
-import com.elta.android.data.features.calculator.datasource.CalculatorRemoteDataSource
-import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
+import com.elta.android.data.features.calculator.datasource.calculator.CalculatorCacheDataSource
+import com.elta.android.data.features.calculator.datasource.calculator.CalculatorRemoteDataSource
+import com.elta.android.data.features.calculator.datasource.fatsecret.FatSecretDataSource
 import com.elta.android.data.core.paging.BasePagingSource
+import com.elta.android.data.features.calculator.datasource.verified.VerifiedCacheDataSource
+import com.elta.android.data.features.calculator.datasource.verified.VerifiedRemoteDataSource
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
@@ -24,6 +26,8 @@ class CalculatorDataRepository @Inject constructor(
     private val fatSecretDataSource: FatSecretDataSource,
     private val remote: CalculatorRemoteDataSource,
     private val cache: CalculatorCacheDataSource,
+    private val verifiedCacheDataSource: VerifiedCacheDataSource,
+    private val verifiedRemoteDataSource: VerifiedRemoteDataSource,
     override val dispatcher: CoroutineDispatcher,
     private val dishesPagingSource: BasePagingSource,
 ) : CalculatorRepository {
@@ -31,13 +35,21 @@ class CalculatorDataRepository @Inject constructor(
     override val addDishFragmentResult = ReturnDataHandler.resultObject<Dish>()
     override val calculatorFragmentResult = ReturnDataHandler.resultObject<List<Dish>>()
 
-    override fun getFatSecretDish(id: String, type: DishType): Flow<Dish> =
-        fatSecretDataSource.getFood(id, type)
-            .flowOn(dispatcher)
+    override fun getDish(id: String, type: DishType): Flow<Dish> {
+        return when (type) {
+            DishType.Verified -> {
+                verifiedCacheDataSource.getProduct(id)
+            }
+            else -> {
+                fatSecretDataSource.getFood(id, type)
+                    .flowOn(dispatcher)
+            }
+        }
+    }
+
 
     override fun searchDishes(name: String): Flow<PagingData<Dish>> {
         dishesPagingSource.setQuery(name)
-
         return Pager(
             config = PagingConfig(
                 pageSize = DEFAULT_PAGE_SIZE,
@@ -63,6 +75,17 @@ class CalculatorDataRepository @Inject constructor(
     override fun getEventProducts(eventId: String): Flow<List<Dish>> =
         remote.getProducts(eventId)
             .flowOn(dispatcher)
+
+    override suspend fun updateVerifiedProducts() {
+        val products = verifiedRemoteDataSource.getProducts()
+        verifiedCacheDataSource.saveProducts(products)
+    }
+
+    override suspend fun getVerifiedProducts(name: String): Flow<List<Dish>> {
+        return verifiedCacheDataSource.getProducts(name)
+            .flowOn(dispatcher)
+
+    }
 
     override fun getLocalDishes(): Flow<List<Dish>> =
         cache.getDishesFromCache()

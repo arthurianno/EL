@@ -11,7 +11,7 @@ data class DishUiEntity(
     val name: String,
     val type: DishType,
     val brandName: String,
-    val isVerification: Boolean,
+    val isVerified: Boolean,
     val servings: List<ServingUiEntity>,
     val servingSelect: ServingUiEntity,
     val servingAmount: String,

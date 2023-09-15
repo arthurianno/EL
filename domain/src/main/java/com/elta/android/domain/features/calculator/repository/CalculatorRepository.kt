@@ -12,11 +12,13 @@ interface CalculatorRepository : BaseRepository {
     val addDishFragmentResult: ReturnDataHandler<Dish>
     val calculatorFragmentResult: ReturnDataHandler<List<Dish>>
 
-    fun getFatSecretDish(id: String, type: DishType): Flow<Dish>
+    fun getDish(id: String, type: DishType): Flow<Dish>
     fun searchDishes(name: String): Flow<PagingData<Dish>>
     fun getHistoryList(): Flow<List<String>>
     suspend fun saveWordToHistory(word: String)
     fun getEventProducts(eventId: String): Flow<List<Dish>>
+    suspend fun updateVerifiedProducts()
+    suspend fun getVerifiedProducts(name: String): Flow<List<Dish>>
     fun getLocalDishes(): Flow<List<Dish>>
     suspend fun saveLocalDishes(dishes: List<Dish>)
     suspend fun clearLocalDishes()

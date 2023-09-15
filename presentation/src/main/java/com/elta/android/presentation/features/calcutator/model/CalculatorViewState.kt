@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class CalculatorViewState(
     val dishes: List<DishUiEntity>,
     val startDishes: List<DishUiEntity>,
+    val verifiedDishes: List<DishUiEntity>,
     val totalBreadUnits: Double,
     val helpText: String,
     val searchInFocus: Boolean,

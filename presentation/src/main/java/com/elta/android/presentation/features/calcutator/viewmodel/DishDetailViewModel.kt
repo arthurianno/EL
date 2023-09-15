@@ -3,7 +3,7 @@ package com.elta.android.presentation.features.calcutator.viewmodel
 import com.elta.android.common.utils.findOrFirst
 import com.elta.android.domain.common.mapDistinct
 import com.elta.android.domain.features.calculator.interactor.AddDishFragmentResultHandler
-import com.elta.android.domain.features.calculator.interactor.GetFatSecretDishUseCase
+import com.elta.android.domain.features.calculator.interactor.GetDishUseCase
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.core.compose.common.Action
@@ -41,12 +41,13 @@ internal const val DIGIT_DOT = '.'
 internal const val PATTERN_ZERO_AFTER_DECIMAL = "0.##"
 internal const val NOTHING_DASH = "—"
 internal const val DIGIT_ZERO_STRING = "0"
+internal const val EMPTY_STRING = ""
 private const val CONVERSION_FACTOR = 10
 private const val START_AMOUNT = 1.0
 private const val PORTION_COUNT_REGEX = "^(\\d{1,4})(?:[.|,]\\d{0,2})?"
 
 class DishDetailViewModel @Inject constructor(
-    private val getFatSecretDish: GetFatSecretDishUseCase,
+    private val getDish: GetDishUseCase,
     private val addDishFragmentResult: AddDishFragmentResultHandler
 ) : BaseViewModel<DishDetailViewState>() {
     override fun createInitState(): DishDetailViewState =
@@ -57,7 +58,7 @@ class DishDetailViewModel @Inject constructor(
                 name = "",
                 type = DishType.Brand,
                 brandName = "",
-                isVerification = false,
+                isVerified = false,
                 servings = emptyList(),
                 servingSelect = emptyServing(),
                 servingAmount = "0.0",
@@ -128,7 +129,7 @@ class DishDetailViewModel @Inject constructor(
 
     fun setDish(dish: DishUiEntity) {
         launch {
-            getFatSecretDish(dish.id, dish.type)
+            getDish(dish.id, dish.type)
                 .catch { handleError(it) }
                 .map { it.toUi() }
                 .map {

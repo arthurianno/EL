@@ -1,4 +1,4 @@
-package com.elta.android.data.features.calculator.datasource
+package com.elta.android.data.features.calculator.datasource.calculator
 
 import com.elta.android.data.features.calculator.cache.model.DishDbEntity
 import com.elta.android.data.features.calculator.cache.model.SearchHistoryDbEntity

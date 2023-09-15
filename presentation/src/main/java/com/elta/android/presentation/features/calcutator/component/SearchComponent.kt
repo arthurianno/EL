@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,12 +31,12 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
-import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_ZERO_STRING
 import com.elta.android.presentation.theme.GetLocalProperties
 
 @Composable
 internal fun FindingDishes(
     findingDishes: LazyPagingItems<DishUiEntity>,
+    verifiedDishes: List<DishUiEntity>,
     dishesClick: (DishUiEntity?) -> Unit,
 ) {
     GetLocalProperties { dimens, _, _, _, _ ->
@@ -51,8 +52,12 @@ internal fun FindingDishes(
                 else -> {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
 
+                        items(verifiedDishes) { item ->
+                            DishesItem(item, dishesClick)
+                        }
+
                         items(findingDishes.itemCount) { index ->
-                            DishesItem(findingDishes, index, dishesClick)
+                            DishesItem(findingDishes[index], dishesClick)
                         }
 
                         if (loadState.append is LoadState.Loading) {
@@ -77,11 +82,9 @@ internal fun FindingDishes(
 
 @Composable
 private fun DishesItem(
-    findingDishes: LazyPagingItems<DishUiEntity>,
-    index: Int,
+    dish: DishUiEntity?,
     dishesClick: (DishUiEntity?) -> Unit
 ) {
-    val dish = findingDishes[index]
     GetLocalProperties { dimens, _, colors, shapes, _ ->
 
         Row(
@@ -132,7 +135,7 @@ internal fun RowScope.CardBody(dish: DishUiEntity) {
                 VSpacer(height = dimens.smallestDim)
             }
             Row {
-                if (dish.isVerification) {
+                if (dish.isVerified) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_verify_dish),
                         modifier = Modifier.padding(end = dimens.verySmallDim),
@@ -159,7 +162,7 @@ internal fun RowScope.CardBody(dish: DishUiEntity) {
                     maxLines = SINGLE_LINE_COUNT,
                     overflow = TextOverflow.Ellipsis
                 )
-                if (dish.servingCalories.second != DIGIT_ZERO_STRING){
+                if (dish.servingCalories.second.isNotEmpty()){
                     Text(
                         text = stringResource(id = R.string.calculator_dish_calories_in_serving, dish.servingCalories.second),
                         style = types.textStyle2,

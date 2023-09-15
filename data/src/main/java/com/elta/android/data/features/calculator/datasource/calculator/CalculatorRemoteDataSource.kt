@@ -1,4 +1,4 @@
-package com.elta.android.data.features.calculator.datasource
+package com.elta.android.data.features.calculator.datasource.calculator
 
 import com.elta.android.data.features.calculator.api.CalculatorApi
 import com.elta.android.data.features.calculator.mapper.toDomain

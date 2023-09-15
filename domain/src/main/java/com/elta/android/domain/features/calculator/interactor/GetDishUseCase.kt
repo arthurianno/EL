@@ -6,9 +6,9 @@ import com.elta.android.domain.features.calculator.repository.CalculatorReposito
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetFatSecretDishUseCase @Inject constructor(
+class GetDishUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
     operator fun invoke(dishId: String, dishType: DishType): Flow<Dish> =
-        repository.getFatSecretDish(dishId, dishType)
+        repository.getDish(dishId, dishType)
 }

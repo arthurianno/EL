@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.core.paging.DEFAULT_PAGING_STEP
 import com.elta.android.data.core.paging.DEFAULT_POSITION
-import com.elta.android.data.features.calculator.datasource.FatSecretDataSource
+import com.elta.android.data.features.calculator.datasource.fatsecret.FatSecretDataSource
 import com.elta.android.data.features.calculator.mapper.compactFoodsToDomain
 import com.elta.android.domain.features.calculator.model.Dish
 import javax.inject.Inject

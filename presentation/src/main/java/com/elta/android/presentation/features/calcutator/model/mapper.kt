@@ -5,6 +5,8 @@ import com.elta.android.domain.features.calculator.model.Serving
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT
 import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_DOT_ALLOWED_CHAR
+import com.elta.android.presentation.features.calcutator.viewmodel.DIGIT_ZERO_STRING
+import com.elta.android.presentation.features.calcutator.viewmodel.EMPTY_STRING
 import com.elta.android.presentation.features.calcutator.viewmodel.NOTHING_DASH
 import com.elta.android.presentation.features.calcutator.viewmodel.PATTERN_ZERO_AFTER_DECIMAL
 import com.elta.android.presentation.features.calcutator.viewmodel.TWO_DECIMAL_PLACES
@@ -18,8 +20,7 @@ internal fun Dish.toUi(): DishUiEntity =
         name = name,
         type = type,
         brandName = brandName,
-        // FIXME :: delete stub, change on right value
-        isVerification = true,
+        isVerified = isVerified,
         servings = servings.map { it.toUi() },
         servingSelect = servingSelect.toUi(),
         servingAmount = servingAmount.toString(),
@@ -37,7 +38,8 @@ internal fun DishUiEntity.toDomain(): Dish =
         servings = servings.map { it.toDomain() },
         servingSelect = servingSelect.toDomain(),
         servingAmount = servingAmount.toDouble(),
-        breadUnits = breadUnits.toDouble()
+        breadUnits = breadUnits.toDouble(),
+        isVerified = isVerified
     )
 
 internal fun List<Dish>.toUi(): List<DishUiEntity> =
@@ -48,9 +50,9 @@ private fun Serving.toUi(): ServingUiEntity =
         id = id,
         servingDescription = servingDescription,
         numberOfUnits = numberOfUnits.toString(),
-        calories = calories.format(),
-        protein = proteins.format(),
-        fat = fats.format(),
+        calories = calories?.format().replaceEmpty(),
+        protein = proteins?.format().replaceEmpty(),
+        fat = fats?.format().replaceEmpty(),
         carbohydrate = carbohydrate.format()
     )
 
@@ -72,15 +74,15 @@ internal fun emptyServing() = Serving.empty().toUi()
 
 internal fun ServingUiEntity.toNewAmount(amount: Double): ServingUiEntity {
     return copy(
-        calories = calories.toCalculate(amount, numberOfUnits).replaceEmpty(),
-        protein = protein.toCalculate(amount, numberOfUnits).replaceEmpty(),
-        fat = fat.toCalculate(amount, numberOfUnits).replaceEmpty(),
+        calories = calories.toCalculate(amount, numberOfUnits),
+        protein = protein.toCalculate(amount, numberOfUnits),
+        fat = fat.toCalculate(amount, numberOfUnits),
         carbohydrate = carbohydrate.toCalculate(amount, numberOfUnits)
     )
 }
 
 fun String.toCalculate(amount: Double, numberOfUnits: String): String =
-    this.toDouble().toCalculate(amount, numberOfUnits.toDouble()).format()
+    this.toDoubleOrNull()?.toCalculate(amount, numberOfUnits.toDouble())?.format() ?: NOTHING_DASH
 
 fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
     val result = (this * multiplier) / divisor
@@ -89,10 +91,10 @@ fun Double.toCalculate(multiplier: Double, divisor: Double): Double {
 
 private fun Dish.selectServingCalories(): Pair<String, String> = with(servingSelect) {
     if (servingDescription.isNotEmpty() && calories != ZERO_COUNT) {
-        "${servingAmount.format()} $servingDescription" to calories.format()
+        "${servingAmount.format()} $servingDescription" to calories?.format().orEmpty()
     } else {
         val firstServing = servings.firstOrNull()
-        "${firstServing?.numberOfUnits?.format()} ${firstServing?.servingDescription}" to firstServing?.calories?.format().orEmpty()
+        "${firstServing?.numberOfUnits?.format()} ${firstServing?.servingDescription}" to firstServing?.calories?.format().replaceZero()
     }
 }
 
@@ -104,6 +106,10 @@ private fun Double.removeZero(): String {
     return format.format(this).replace(DIGIT_DOT_ALLOWED_CHAR, DIGIT_DOT)
 }
 
-private fun String.replaceEmpty(): String =
-    if (this.toDouble() == ZERO_COUNT) NOTHING_DASH
+private fun String?.replaceEmpty(): String =
+    if (this?.toDoubleOrNull() == null) NOTHING_DASH
     else this
+
+private fun String?.replaceZero(): String =
+    if (this == DIGIT_ZERO_STRING) EMPTY_STRING
+    else this.orEmpty()

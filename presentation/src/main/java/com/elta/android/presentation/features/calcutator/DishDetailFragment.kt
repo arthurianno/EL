@@ -190,7 +190,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         color = colors.shadeBlack2,
                         modifier = Modifier.padding(start = dimens.contentPadding)
                     )
-                    if (state.dish.isVerification) {
+                    if (state.dish.isVerified) {
                         VSpacerMedium()
                         VerifyProduct()
                     }

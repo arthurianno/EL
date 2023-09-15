@@ -11,6 +11,7 @@ import com.elta.android.domain.features.calculator.interactor.GetCachedDishesUse
 import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseCase
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesUseCase
+import com.elta.android.domain.features.calculator.interactor.SearchVerifiedDishesUseCase
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
@@ -44,6 +45,7 @@ import javax.inject.Inject
 @FlowPreview
 class CalculatorViewModel @Inject constructor(
     private val searchDishes: SearchDishesUseCase,
+    private val searchVerifiedDishes: SearchVerifiedDishesUseCase,
     private val getHistoryList: GetHistoryListUseCase,
     private val saveWordToHistory: SaveWordToHistoryUseCase,
     private val getCachedDishes: GetCachedDishesUseCase,
@@ -54,6 +56,7 @@ class CalculatorViewModel @Inject constructor(
         CalculatorViewState(
             dishes = emptyList(),
             startDishes = emptyList(),
+            verifiedDishes = emptyList(),
             totalBreadUnits = 0.0,
             helpText = "",
             searchInFocus = false,
@@ -97,6 +100,7 @@ class CalculatorViewModel @Inject constructor(
                 .collectLatest {
                     if (it.isNotEmpty()) {
                         findDishes(it)
+                        findVerifiedDishes(it)
                     } else {
                         clearFindingDishes()
                     }
@@ -238,6 +242,23 @@ class CalculatorViewModel @Inject constructor(
                 .collect {
                     reduceState { state.value.copy(downButtonIsVisible = false) }
                     _findingDishesState.value = it
+                }
+        }
+    }
+
+    private fun findVerifiedDishes(name: String) {
+        launch {
+            searchVerifiedDishes(name)
+                .catch {
+                    handleError(it)
+                }
+                .map { dishes -> dishes.map { it.toUi() } }
+                .collectLatest {
+                    reduceState {
+                        state.value.copy(
+                            verifiedDishes = it
+                        )
+                    }
                 }
         }
     }
