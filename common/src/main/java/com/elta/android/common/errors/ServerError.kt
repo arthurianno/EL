@@ -1,3 +1,5 @@
 package com.elta.android.common.errors
 
-open class ServerError(message: String) : RuntimeException(message)
+import java.io.IOException
+
+open class ServerError(message: String) : IOException(message)
