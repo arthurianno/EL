@@ -19,7 +19,6 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.core.pm.widgets.errorHandler
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
@@ -34,6 +33,10 @@ import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx2.asFlow
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -108,7 +111,7 @@ abstract class BaseEventPm(
             observeDishesResult()
             observeDishesChanges()
         }
-        observeEventType()
+        updateVerifiedProduct()
     }
 
     fun setEventType(eventType: EventType) {
@@ -163,21 +166,15 @@ abstract class BaseEventPm(
         }
     }
 
-    private fun observeEventType() {
-        eventTypeState
-            .observable
-            .filter { it == EventType.BREAD }
-            .subscribe { _ ->
-                launch {
-                    try {
-                        updateVerifiedProductUseCase()
-                    } catch (ex: Exception) {
-                        Timber.e(ex)
-                    }
-                }
-
-            }
-            .untilDestroy()
+    private fun updateVerifiedProduct() {
+        launch {
+            eventTypeState.observable
+                .asFlow()
+                .filter { it == EventType.BREAD }
+                .onEach { updateVerifiedProductUseCase() }
+                .catch { error -> Timber.e(error) }
+                .collect()
+        }
     }
 
     private fun observeHandleBack() {

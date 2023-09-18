@@ -1,3 +1,5 @@
 package com.elta.android.common.errors
 
-class NetworkConnectionError : Exception()
+import java.io.IOException
+
+class NetworkConnectionError : IOException()
