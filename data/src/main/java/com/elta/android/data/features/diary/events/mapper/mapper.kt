@@ -24,7 +24,8 @@ internal fun String?.toProductsList(): List<ProductResponse>? =
                         calories = get(8).toDouble(),
                         proteins = get(9).toDouble(),
                         fats = get(10).toDouble(),
-                        carbohydrates = get(11).toDouble()
+                        carbohydrates = get(11).toDouble(),
+                        isVerified = get(12).toBooleanStrictOrNull() ?: false
                     )
                 }
             }
@@ -38,7 +39,7 @@ internal fun List<ProductResponse>?.toCache(): String? =
                 servingAmount.toString() + FIELD_SEPARATOR + servingId + FIELD_SEPARATOR +
                 servingName + FIELD_SEPARATOR + breadUnits + FIELD_SEPARATOR +
                     brandName + FIELD_SEPARATOR + calories + FIELD_SEPARATOR +
-                    proteins + FIELD_SEPARATOR + fats + FIELD_SEPARATOR + carbohydrates
+                    proteins + FIELD_SEPARATOR + fats + FIELD_SEPARATOR + carbohydrates + FIELD_SEPARATOR + isVerified
         }
     }
 

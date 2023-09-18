@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ProductResponse(
     @SerializedName("productId") val id: String,
-    @SerializedName("foodName") val name: String,
+    @SerializedName("name") val name: String,
     @SerializedName("productType") val type: String,
     @SerializedName("servingAmount") val servingAmount: Double,
     @SerializedName("servingId") val servingId: String,
@@ -15,4 +15,5 @@ data class ProductResponse(
     @SerializedName("proteins") val proteins: Double,
     @SerializedName("fats") val fats: Double,
     @SerializedName("carbohydrates") val carbohydrates: Double,
+    @SerializedName("isVerified") val isVerified: Boolean?,
     )
