@@ -72,7 +72,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 setDish(dish)
                 downButton.setText(
                     getString(
-                        if (dish.localId.isEmpty()) {
+                        if (dish.localId.isEmpty() || dish.isVerified) {
                             R.string.calculator_add_text
                         } else {
                             R.string.calculator_save_text
