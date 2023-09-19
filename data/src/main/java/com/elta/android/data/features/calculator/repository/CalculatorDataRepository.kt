@@ -39,6 +39,7 @@ class CalculatorDataRepository @Inject constructor(
         return when (type) {
             DishType.Verified -> {
                 verifiedCacheDataSource.getProduct(id)
+                    .flowOn(dispatcher)
             }
             else -> {
                 fatSecretDataSource.getFood(id, type)

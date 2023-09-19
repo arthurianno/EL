@@ -99,7 +99,6 @@ class DishDetailViewModel @Inject constructor(
             portionDescriptionTextField.state
                 .mapDistinct { it.text }
                 .filter { it.isNotEmpty() }
-                .filter { state.value.dish.servingSelect.servingDescription != it }
                 .map {
                     state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
@@ -147,15 +146,14 @@ class DishDetailViewModel @Inject constructor(
                 }
                 .collect { newDish ->
                     reduceState { state.value.copy(dish = newDish) }
-                    with(portionDescriptionTextField) {
-                        setDropDownList(newDish.servings.map { it.servingDescription })
-                        val selectServing =
-                            newDish.servingSelect.takeIf { it.servingDescription.isNotEmpty() }
-                        selectServing?.let { saveServing ->
-                            setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
-                        }
+                    portionDescriptionTextField.setDropDownList(newDish.servings.map { it.servingDescription })
+                    val selectServing =
+                        newDish.servingSelect.takeIf { it.servingDescription.isNotEmpty() }
+                    selectServing?.let { saveServing ->
+                        portionDescriptionTextField.setText(saveServing.servingDescription)
                     }
-                    portionCountTextField.setText(dish.servingAmount)
+                    val count = selectServing?.numberOfUnits ?: dish.servings.first().numberOfUnits
+                    portionCountTextField.setText(count)
                 }
         }
     }
@@ -204,7 +202,10 @@ class DishDetailViewModel @Inject constructor(
         val newAmount = amount
             ?: (portionCountTextField.state.value.text.toDoubleOrNull())
             ?: START_AMOUNT
-        val newCarbs = (carbs ?: serving.carbohydrate.toDouble()).toCalculate(newAmount, numberOfUnits.toDouble())
+        val newCarbs = (carbs ?: serving.carbohydrate.toDouble()).toCalculate(
+            newAmount,
+            numberOfUnits.toDouble()
+        )
         val breadUnits = (newCarbs / CONVERSION_FACTOR).round(ONE_DECIMAL_PLACE)
 
         downButton.setEnableState(breadUnits > ZERO_COUNT)
@@ -218,7 +219,7 @@ class DishDetailViewModel @Inject constructor(
 
     private fun calculateServing(amount: Double): ServingUiEntity {
         val dish = state.value.dish
-        val serving = if (dish.servingSelect.id.isNotEmpty() && dish.servings.isNotEmpty()){
+        val serving = if (dish.servingSelect.id.isNotEmpty() && dish.servings.isNotEmpty()) {
             dish.servings.findOrFirst {
                 it.id == dish.servingSelect.id
             }
