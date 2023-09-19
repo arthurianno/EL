@@ -4,6 +4,8 @@ package com.elta.android.data.features.calculator.model
 import com.google.gson.annotations.SerializedName
 
 data class VerifiedProductResponse(
+    @SerializedName("isVerified")
+    val isVerified: Boolean,
     @SerializedName("food_id")
     val foodId: String,
     @SerializedName("food_name")
@@ -12,6 +14,9 @@ data class VerifiedProductResponse(
     val servings: List<Serving>
 ) {
     data class Serving(
+        @SerializedName("serving_id")
+        val servingId: String,
+
         @SerializedName("calories")
         val calories: Double?,
 
