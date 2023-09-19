@@ -99,6 +99,7 @@ class DishDetailViewModel @Inject constructor(
             portionDescriptionTextField.state
                 .mapDistinct { it.text }
                 .filter { it.isNotEmpty() }
+                .filter { state.value.dish.servingSelect.servingDescription != it }
                 .map {
                     state.value.dish.servings.first { servingUi -> servingUi.servingDescription == it }
                 }
@@ -133,7 +134,7 @@ class DishDetailViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .map { it.toUi() }
                 .map {
-                    it.takeIf { dish.localId.isEmpty() }
+                    it.takeIf { dish.localId.isEmpty() || dish.servingSelect.id.isBlank() }
                         ?: it.copy(
                             localId = dish.localId,
                             servingSelect = dish.servingSelect,
@@ -154,7 +155,7 @@ class DishDetailViewModel @Inject constructor(
                             setText(newDish.servings.findOrFirst { saveServing.id == it.id }.servingDescription)
                         }
                     }
-                    portionCountTextField.setText(newDish.servingAmount)
+                    portionCountTextField.setText(dish.servingAmount)
                 }
         }
     }

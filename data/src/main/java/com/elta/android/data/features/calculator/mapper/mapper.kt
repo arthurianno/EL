@@ -114,7 +114,7 @@ fun ProductResponse.toDomain(): Dish =
         servingAmount = servingAmount,
         servingSelect = getServings(),
         breadUnits = breadUnits,
-        isVerified = false
+        isVerified = isVerified ?: false
     )
 
 @JvmName("toDomainProductResponse")
@@ -153,13 +153,13 @@ private fun VerifiedProductResponse.toDomain(): Dish {
         servingSelect = Serving.empty(),
         servingAmount = ONE_DOUBLE,
         breadUnits = ZERO_DOUBLE,
-        isVerified = true
+        isVerified = isVerified
     )
 }
 
 
 private fun VerifiedProductResponse.Serving.toDomain(): Serving = Serving(
-    id = getLocalId(),
+    id = servingId,
     calories = calories,
     proteins = protein,
     fats = fat,
@@ -211,7 +211,7 @@ internal fun DishDbEntity.toDomain(): Dish =
         servingSelect = servingSelect.getServings(),
         servingAmount = servingAmount,
         breadUnits = breadUnits,
-        isVerified = false
+        isVerified = isVerified
     )
 
 private fun Serving.toDb(dbId: Long) = ServingDbEntity(

@@ -33,10 +33,12 @@ class CalculatorMockedApi(context: Context) : CalculatorApi {
     override suspend fun getVerifiedProducts(): List<VerifiedProductResponse> {
         return listOf(
             VerifiedProductResponse(
+                isVerified = true,
                 foodId = "12dw-qwdqw-fqe-wf-wgewr-3r2",
                 foodName = "Банан",
                 servings = listOf(
                     VerifiedProductResponse.Serving(
+                        servingId = "12d0-qwd-f1f0-saf",
                         carbohydrate = 12.0,
                         fat = null,
                         calories = null,
@@ -47,10 +49,12 @@ class CalculatorMockedApi(context: Context) : CalculatorApi {
                 )
             ),
             VerifiedProductResponse(
+                isVerified = true,
                 foodId = "12dw-qwdqw-fqe-wf-wgewr-3r2",
                 foodName = "Банан спелый и умелый",
                 servings = listOf(
                     VerifiedProductResponse.Serving(
+                        servingId = "1-w-d1-d-afsafq1-1f",
                         carbohydrate = 12.0,
                         fat = null,
                         calories = null,
