@@ -34,7 +34,9 @@ import com.elta.android.presentation.features.calcutator.model.DishUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties
 
 @Composable
-internal fun FindingDishes(
+//don't delete it.
+//stopped by the customer
+internal fun FindingDishesWithFatSecret(
     findingDishes: LazyPagingItems<DishUiEntity>,
     verifiedDishes: List<DishUiEntity>,
     dishesClick: (DishUiEntity?) -> Unit,
@@ -71,6 +73,33 @@ internal fun FindingDishes(
                             }
                         }
 
+                    }
+                }
+            }
+            VSpacerMedium()
+        }
+    }
+
+}
+
+@Composable
+internal fun FindingVerifiedDishes(
+    verifiedDishes: List<DishUiEntity>,
+    isLoading: Boolean,
+    isError: Boolean,
+    dishesClick: (DishUiEntity?) -> Unit,
+) {
+    GetLocalProperties { dimens, _, _, _, _ ->
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            when {
+                isError -> SearchError()
+                isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                verifiedDishes.isEmpty() -> NotResult()
+                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
+                    items(verifiedDishes) { item ->
+                        DishesItem(item, dishesClick)
                     }
                 }
             }

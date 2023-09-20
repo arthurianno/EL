@@ -52,7 +52,7 @@ import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.features.calcutator.component.CardBody
-import com.elta.android.presentation.features.calcutator.component.FindingDishes
+import com.elta.android.presentation.features.calcutator.component.FindingVerifiedDishes
 import com.elta.android.presentation.features.calcutator.model.CalculatorAction
 import com.elta.android.presentation.features.calcutator.model.CalculatorViewState
 import com.elta.android.presentation.features.calcutator.model.DishUiEntity
@@ -169,7 +169,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                         VSpacerSmall()
                         if (findingDishesState.itemCount != 0 || searchInFocus) {
                             SearchView(
-                                state = state,
+                                lastWords = state.lastWords,
+                                isLoading = state.isLoading,
+                                isError = state.isError,
                                 searchText = searchText,
                                 viewModel = viewModel,
                                 findingDishesState = findingDishesState,
@@ -207,7 +209,9 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
 
     @Composable
     private fun SearchView(
-        state: CalculatorViewState,
+        lastWords: List<String>,
+        isLoading: Boolean,
+        isError: Boolean,
         searchText: String,
         viewModel: CalculatorViewModel,
         findingDishesState: LazyPagingItems<DishUiEntity>,
@@ -215,13 +219,14 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
     ) {
         if (searchText.isEmpty()) {
             LastWords(
-                lastWords = state.lastWords,
+                lastWords = lastWords,
                 viewModel = viewModel
             )
         } else {
-            FindingDishes(
-                findingDishes = findingDishesState,
-                verifiedDishes = verifiedDishes
+            FindingVerifiedDishes(
+                verifiedDishes = verifiedDishes,
+                isLoading,
+                isError
             ) { dish ->
                 dish?.let { viewModel sendAction CalculatorAction.DishClick(dish) }
             }

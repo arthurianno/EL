@@ -99,7 +99,7 @@ class CalculatorViewModel @Inject constructor(
                 .debounce(DEBOUNCE_MILLIS)
                 .collectLatest {
                     if (it.isNotEmpty()) {
-                        findDishes(it)
+//                        findDishes(it) //not remove, stopped by the customer
                         findVerifiedDishes(it)
                     } else {
                         clearFindingDishes()
@@ -251,7 +251,11 @@ class CalculatorViewModel @Inject constructor(
             searchVerifiedDishes(name)
                 .catch {
                     handleError(it)
+                    reduceState { state.value.copy(isError = true, isLoading = false) }
                 }
+                .onStart { reduceState { state.value.copy(isLoading = true, isError = false) } }
+                .onCompletion {
+                    reduceState { state.value.copy(isLoading = false) } }
                 .map { dishes -> dishes.map { it.toUi() } }
                 .collectLatest {
                     reduceState {
