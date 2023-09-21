@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.clickableWithNoRipple
@@ -249,15 +250,20 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     @Composable
     private fun VerifyProduct() {
         GetLocalProperties { dimens, _, colors, _, _ ->
-            Row(modifier = Modifier.padding(horizontal = dimens.contentPadding)) {
+            Row(
+                modifier = Modifier.padding(horizontal = dimens.contentPadding),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_verify_dish),
                     contentDescription = null,
-                    modifier = Modifier.padding(end = dimens.smallDim)
+                    modifier = Modifier.padding(end = dimens.smallDim),
                 )
                 Text(
                     text = stringResource(id = R.string.calculator_verify_product),
-                    color = colors.blackBlue
+                    color = colors.blackBlue,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
                 )
             }
         }
