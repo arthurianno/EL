@@ -26,13 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.viewModels
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.R
@@ -174,8 +174,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                                 isError = state.isError,
                                 searchText = searchText,
                                 viewModel = viewModel,
-                                findingDishesState = findingDishesState,
-                                verifiedDishes = verifiedDishes
+                                verifiedDishes = verifiedDishes,
+                                focusManager = focusManager
                             )
                         } else {
                             MainContent(
@@ -214,8 +214,8 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         isError: Boolean,
         searchText: String,
         viewModel: CalculatorViewModel,
-        findingDishesState: LazyPagingItems<DishUiEntity>,
-        verifiedDishes: List<DishUiEntity>
+        verifiedDishes: List<DishUiEntity>,
+        focusManager: FocusManager
     ) {
         if (searchText.isEmpty()) {
             LastWords(
@@ -228,7 +228,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                 isLoading,
                 isError
             ) { dish ->
-                dish?.let { viewModel sendAction CalculatorAction.DishClick(dish) }
+                dish?.let {
+                    focusManager.clearFocus()
+                    viewModel sendAction CalculatorAction.DishClick(dish)
+                }
             }
         }
     }
