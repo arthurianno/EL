@@ -36,7 +36,7 @@ internal fun DishUiEntity.toDomain(): Dish =
         type = type,
         brandName = brandName,
         servings = servings.map { it.toDomain() },
-        servingSelect = servingSelect.toDomain(),
+        servingSelect = servingSelect.toDomain(servingAmount.toDouble()),
         servingAmount = servingAmount.toDouble(),
         breadUnits = breadUnits.toDouble(),
         isVerified = isVerified
@@ -56,11 +56,11 @@ private fun Serving.toUi(): ServingUiEntity =
         carbohydrate = carbohydrate.format()
     )
 
-internal fun ServingUiEntity.toDomain(): Serving =
+internal fun ServingUiEntity.toDomain(servingAmount: Double? = null): Serving =
     Serving(
         id = id,
         servingDescription = servingDescription,
-        numberOfUnits = numberOfUnits.toDouble(),
+        numberOfUnits = servingAmount ?: numberOfUnits.toDouble(),
         calories = calories.toDoubleOrNull() ?: ZERO_COUNT,
         proteins = protein.toDoubleOrNull() ?: ZERO_COUNT,
         fats = fat.toDoubleOrNull() ?: ZERO_COUNT,
