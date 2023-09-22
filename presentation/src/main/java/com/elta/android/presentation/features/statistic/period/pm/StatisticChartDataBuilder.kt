@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.statistic.period.pm
 
 import com.elta.android.common.utils.atStartOfDay
 import com.elta.android.common.utils.toStringWithFormat
+import com.elta.android.domain.features.diary.events.model.toGlucoseFormat
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
 import com.elta.android.domain.features.statistics.model.Periods
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
@@ -20,11 +21,12 @@ private const val DEFAULT_MAX_LEVEL = 35.0
 private const val STEP_SEVEN_DAYS = 7
 private const val STEP_SIX_DAYS = 6
 private const val DATE_FORMAT = "dd.MM"
-private val stubDate = DateModel(null, null, false, true)
+private val stubDate =
+    DateModel(date = null, formattedDate = null, needDrawDateTile = false, isStub = true)
 
 fun StatisticByPeriodModel.toChartModel(selectedDate: LocalDate?): StatisticsChartDataModel {
-    var minLevel = dayWithMinLevel?.glucose.minLevel()
-    var maxLevel = dayWithMaxLevel?.glucose.maxLevel()
+    var minLevel = dayWithMinLevel?.glucose.minLevel().toGlucoseFormat(glucose.glucoseFormat)
+    var maxLevel = dayWithMaxLevel?.glucose.maxLevel().toGlucoseFormat(glucose.glucoseFormat)
 
     if (minLevel == maxLevel) {
         val settings = glucose.settings
@@ -84,8 +86,8 @@ private fun LocalDateTime.toDateModel(period: StatisticPeriod) =
         }
     )
 
-private fun StatisticPeriod.datesStep() = when {
-    this is Periods.FourteenDays -> STEP_SEVEN_DAYS
+private fun StatisticPeriod.datesStep() = when (this) {
+    is Periods.FourteenDays -> STEP_SEVEN_DAYS
     else -> STEP_SIX_DAYS
 }
 
@@ -105,6 +107,16 @@ private fun GlucoseStatisticModel?.maxLevel(): Double {
 
 private fun DailyStatisticModel?.glucose(): GlucoseStatisticModel? =
     when {
-        this != null && glucose.eventsCount > 0 -> glucose
+        this != null && glucose.eventsCount > 0 -> glucose.copy(
+            maxLevel = glucose.maxLevel.toGlucoseFormat(glucose.glucoseFormat),
+            minLevel = glucose.minLevel.toGlucoseFormat(glucose.glucoseFormat),
+            maxHighLevel = glucose.maxHighLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            minHighLevel = glucose.minHighLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            maxNormalLevel = glucose.maxNormalLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            minNormalLevel = glucose.minNormalLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            maxLowLevel = glucose.maxLowLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            minLowLevel = glucose.minLowLevel?.toGlucoseFormat(glucose.glucoseFormat),
+            averageLevel = glucose.averageLevel.toGlucoseFormat(glucose.glucoseFormat)
+        )
         else -> null
     }
