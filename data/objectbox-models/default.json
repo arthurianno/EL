@@ -615,7 +615,7 @@
     },
     {
       "id": "20:1786868864747897978",
-      "lastPropertyId": "8:8073629635375847669",
+      "lastPropertyId": "11:8650996660083002323",
       "name": "DishDbEntity",
       "properties": [
         {
@@ -645,19 +645,24 @@
           "type": 8
         },
         {
-          "id": "6:6565051160202822801",
-          "name": "servingId",
-          "type": 9
-        },
-        {
-          "id": "7:9199500226441517629",
-          "name": "servingName",
-          "type": 9
-        },
-        {
           "id": "8:8073629635375847669",
           "name": "breadUnits",
           "type": 8
+        },
+        {
+          "id": "9:1717370531607912074",
+          "name": "brandName",
+          "type": 9
+        },
+        {
+          "id": "10:576658827659489338",
+          "name": "servingSelect",
+          "type": 9
+        },
+        {
+          "id": "11:8650996660083002323",
+          "name": "isVerified",
+          "type": 1
         }
       ],
       "relations": []
@@ -802,9 +807,112 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "25:788264880638394151",
+      "lastPropertyId": "8:5880910850449890012",
+      "name": "ServingDbEntity",
+      "properties": [
+        {
+          "id": "1:4775736604423636706",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3192948993474159573",
+          "name": "servingId",
+          "type": 9
+        },
+        {
+          "id": "3:8484795285411335944",
+          "name": "calories",
+          "type": 8
+        },
+        {
+          "id": "4:6622010227231752768",
+          "name": "proteins",
+          "type": 8
+        },
+        {
+          "id": "5:1204233711871491501",
+          "name": "fats",
+          "type": 8
+        },
+        {
+          "id": "6:5830747586312600609",
+          "name": "carbohydrate",
+          "type": 8
+        },
+        {
+          "id": "7:7344290328451027541",
+          "name": "servingDescription",
+          "type": 9
+        },
+        {
+          "id": "8:5880910850449890012",
+          "name": "numberOfUnits",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "26:5512400423647477519",
+      "lastPropertyId": "9:3024308277204722538",
+      "name": "VerifiedProductDbEntity",
+      "properties": [
+        {
+          "id": "1:4888968055165211583",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2259337956408318383",
+          "name": "dishId",
+          "type": 9
+        },
+        {
+          "id": "3:865005781502950123",
+          "name": "foodName",
+          "type": 9
+        },
+        {
+          "id": "4:580052287362262973",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "5:2776046236755868508",
+          "name": "brandName",
+          "type": 9
+        },
+        {
+          "id": "6:1355779073303914286",
+          "name": "servings",
+          "type": 9
+        },
+        {
+          "id": "7:6762686061409342495",
+          "name": "servingSelect",
+          "type": 9
+        },
+        {
+          "id": "8:4355162365622892272",
+          "name": "servingAmount",
+          "type": 8
+        },
+        {
+          "id": "9:3024308277204722538",
+          "name": "breadUnits",
+          "type": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "24:8446772766371998384",
+  "lastEntityId": "26:5512400423647477519",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
@@ -873,7 +981,9 @@
     259882331440132405,
     3237283968184737773,
     389016516142161600,
-    3983104656624443690
+    3983104656624443690,
+    6565051160202822801,
+    9199500226441517629
   ],
   "retiredRelationUids": [
     5224261980992438077,
