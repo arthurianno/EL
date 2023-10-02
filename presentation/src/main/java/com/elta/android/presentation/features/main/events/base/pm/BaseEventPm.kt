@@ -33,10 +33,6 @@ import com.elta.android.presentation.utils.toEventTime
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.rx2.asFlow
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -167,14 +163,14 @@ abstract class BaseEventPm(
     }
 
     private fun updateVerifiedProduct() {
-        launch {
             eventTypeState.observable
-                .asFlow()
                 .filter { it == EventType.BREAD }
-                .onEach { updateVerifiedProductUseCase() }
-                .catch { error -> Timber.e(error) }
-                .collect()
-        }
+                .flatMapCompletable {
+                    updateVerifiedProductUseCase.execute()
+                }
+                .doOnError { Timber.e(it) }
+                .subscribe()
+                .untilDestroy()
     }
 
     private fun observeHandleBack() {

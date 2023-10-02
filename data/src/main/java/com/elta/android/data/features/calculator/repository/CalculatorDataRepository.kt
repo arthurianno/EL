@@ -4,16 +4,17 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.elta.android.common.utils.takeFirst
+import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.calculator.datasource.calculator.CalculatorCacheDataSource
 import com.elta.android.data.features.calculator.datasource.calculator.CalculatorRemoteDataSource
 import com.elta.android.data.features.calculator.datasource.fatsecret.FatSecretDataSource
-import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.calculator.datasource.verified.VerifiedCacheDataSource
 import com.elta.android.data.features.calculator.datasource.verified.VerifiedRemoteDataSource
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
+import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -77,9 +78,13 @@ class CalculatorDataRepository @Inject constructor(
         remote.getProducts(eventId)
             .flowOn(dispatcher)
 
-    override suspend fun updateVerifiedProducts() {
-        val products = verifiedRemoteDataSource.getProducts()
-        verifiedCacheDataSource.saveProducts(products)
+    override fun updateVerifiedProducts(): Completable {
+        return verifiedRemoteDataSource.getProducts()
+            .flatMapCompletable {
+                Completable.fromAction {
+                    verifiedCacheDataSource.saveProducts(it)
+                }
+            }
     }
 
     override suspend fun getVerifiedProducts(name: String): Flow<List<Dish>> {

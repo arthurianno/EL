@@ -14,5 +14,5 @@ interface CalculatorApi {
     ): Observable<List<ProductResponse>>
 
     @GET("api/diary/v1/products")
-    suspend fun getVerifiedProducts(): List<VerifiedProductResponse>
+    fun getVerifiedProducts(): Observable<List<VerifiedProductResponse>>
 }
