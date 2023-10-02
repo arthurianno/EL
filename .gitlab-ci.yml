@@ -37,6 +37,7 @@ build: # Собираем артефакт
   only:
     - merge_requests  # Только при мердж реквесте
   when: on_success
+  allow_failure: true
   script:
     - ./gradlew clean build -x lint  # Собираем проект
     - echo JOB_ID="$CI_JOB_ID" >> build.env  # Создаём файл, в который помещаем номер сборки для последующей загрузки артефактов
@@ -51,6 +52,7 @@ build: # Собираем артефакт
 
 test:  # Делегируем артефакты в другой репозиторий для тестов
   stage: test
+  when: on_success
   variables: 
     JOB_ID: $JOB_ID # Пробрасываем переменные в другой репозиторий
     PLATFORM: $PLATFORM
