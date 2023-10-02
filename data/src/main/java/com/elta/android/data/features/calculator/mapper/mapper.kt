@@ -12,6 +12,7 @@ import com.elta.android.data.features.calculator.model.VerifiedProductResponse
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
+import io.reactivex.Observable
 import java.util.UUID
 
 internal fun FoodGenericResponse.Food.toDomain(): Dish {
@@ -138,8 +139,8 @@ fun Dish.toNetwork(): ProductResponse =
         isVerified = isVerified
     )
 
-fun List<VerifiedProductResponse>.verifiedProductToDish(): List<Dish> =
-    map { it.toDomain() }
+fun Observable<List<VerifiedProductResponse>>.verifiedProductToDish(): Observable<List<Dish>> =
+    map { it.map { product -> product.toDomain() } }
 
 private fun VerifiedProductResponse.toDomain(): Dish {
     val dishServings = servings.map { it.toDomain() }
