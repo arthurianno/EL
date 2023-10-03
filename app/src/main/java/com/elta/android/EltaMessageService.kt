@@ -34,7 +34,7 @@ class EltaMessageService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setContentTitle(title)
             setContentText(body)
-            setSmallIcon(R.drawable.ic_firmware_logo)
+            setSmallIcon(R.drawable.ic_notification_reminder)
             setStyle(
                 NotificationCompat.BigTextStyle()
                     .setBigContentTitle(title)
