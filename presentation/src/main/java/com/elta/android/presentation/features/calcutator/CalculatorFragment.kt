@@ -7,14 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
@@ -116,7 +114,7 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
 
-        if (!state.searchInFocus){
+        if (!state.searchInFocus) {
             focusManager.clearFocus()
         }
         GetLocalProperties { dimens, _, colors, shapes, _ ->
@@ -287,10 +285,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         GetLocalProperties { dimens, _, colors, shapes, _ ->
             LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.smallDim)) {
                 items(items = dishes) { dish ->
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(IntrinsicSize.Min)
+                            .wrapContentHeight()
                             .clip(shape = shapes.dishCard)
                             .clickable(enabled = networkAvailable, onClick = {
                                 viewModel sendAction CalculatorAction.DishClick(dish)
@@ -303,21 +301,20 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
                             .padding(
                                 horizontal = dimens.contentPadding,
                                 vertical = dimens.halfMediumDim
-                            ),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            )
                     ) {
-                        CardBody(dish)
-                        Column(
-                            Modifier.fillMaxHeight(),
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            if (networkAvailable) {
-                                CloseButton(dish = dish, viewModel = viewModel)
+                        CardBody(dish, trailingIcon = { modifier ->
+                            Column(
+                                modifier = modifier,
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                if (networkAvailable) {
+                                    CloseButton(dish = dish, viewModel = viewModel)
+                                }
+                                BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
                             }
-                            BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
-                        }
+                        })
                     }
                 }
                 item { VSpacerVerySmall() }
