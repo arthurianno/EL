@@ -14,6 +14,8 @@ import com.elta.android.presentation.features.observers.all.pm.ObserversPm
 import com.elta.android.presentation.features.observers.all.ui.adapter.ObserverAdapter
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.adapter.items.ListItem
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
 import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
@@ -21,9 +23,9 @@ class ObserversFragment :
     BaseRecyclerViewFragment<ObserversPm, FragmentObserversBinding>(FragmentObserversBinding::inflate) {
 
     @Inject
-    lateinit var obseverAdapter: ObserverAdapter
+    lateinit var observerAdapter: ObserverAdapter
 
-    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { obseverAdapter }
+    override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { observerAdapter }
 
     override val screenLayout: Int = R.layout.fragment_observers
     override val classToken: Class<ObserversPm> = ObserversPm::class.java
@@ -40,9 +42,15 @@ class ObserversFragment :
         bindProgressDialog(pm)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.inviteObserverAction)
         pm.emptyControl.bind(binding.emptyStateView, compositeUnbind)
+        pm.progressState.bindTo(binding.itemsView::toggleView)
     }
 
     companion object {
         fun newInstance() = ObserversFragment()
     }
+}
+
+private fun RecyclerView.toggleView(state: Boolean) {
+    if (state) hide()
+    else show()
 }
