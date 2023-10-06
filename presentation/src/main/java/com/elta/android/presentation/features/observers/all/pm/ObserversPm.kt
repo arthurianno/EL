@@ -40,6 +40,7 @@ class ObserversPm @Inject constructor(
             .untilDestroy()
 
         getObserversAction.observable
+            .skipWhileInProgress()
             .flatMap {
                 getObserverInvitesUseCase.execute()
                     .hideErrorContainer()
