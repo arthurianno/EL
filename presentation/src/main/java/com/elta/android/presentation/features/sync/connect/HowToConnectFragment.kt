@@ -100,8 +100,6 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         val permissions =
             rememberMultiplePermissionsState(permissions = requiredPermissions)
         val event = viewModel.event.collectAsState(initial = null).value
-        val state = viewModel.state.collectAsState().value
-        if (state.bluetoothEnabled) { requestEnableBluetooth() }
         LaunchedEffect(key1 = event) {
             if (event is PermissionEvent.Camera ||
                 event is PermissionEvent.FineLocation ||
@@ -113,7 +111,13 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 is PermissionEvent.Camera -> permissions.launchMultiplePermissionRequest()
                 is PermissionEvent.FineLocation -> permissions.launchMultiplePermissionRequest()
                 is PermissionEvent.OpenSettings -> openSettingsIntent(requireContext())
-                is PermissionEvent.Bluetooth -> permissions.launchMultiplePermissionRequest()
+                is PermissionEvent.Bluetooth.RequestEnable -> {
+                    permissions.launchMultiplePermissionRequest()
+                    requestEnableBluetooth()
+                }
+                is PermissionEvent.Bluetooth.OnAllow -> {
+                    viewModel sendAction ConnectAction.OpenConnectingScreen(permissions.permissions)
+                }
             }
         }
         GetLocalProperties { dimens, _, _, _, _ ->
