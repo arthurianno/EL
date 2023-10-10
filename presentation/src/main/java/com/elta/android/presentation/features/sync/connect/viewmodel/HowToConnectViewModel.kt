@@ -26,7 +26,7 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
             isOnBoarding = false,
-            bluetoothEnabled = false
+            isBluetoothEnabled = false
         )
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -72,10 +72,11 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     ): HowToConnectViewState = run {
         when (action) {
             is ConnectAction.Complete -> {
-                state.value.copy(bluetoothEnabled = true)
+                sendEvent(PermissionEvent.Bluetooth.OnAllow)
+                state.value.copy(isBluetoothEnabled = true)
             }
             is ConnectAction.RepeatConnect -> {
-                state.value.copy(bluetoothEnabled = false)
+                state.value.copy(isBluetoothEnabled = false)
             }
             else -> currentState
         }
@@ -87,11 +88,12 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
         val bluetoothPermission = buildBluetoothPermission(permissionStates)
         val permissions = listOf(cameraPermission, locationPermission, bluetoothPermission)
 
-        if (permissions.all { it.status.isGranted } && state.value.bluetoothEnabled) {
+        if (permissions.all { it.status.isGranted } && state.value.isBluetoothEnabled) {
             router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
+            reduceState { state.value.copy(isBluetoothEnabled = false) }
         } else {
             if (bluetoothPermission.status.isGranted) {
-                reduceState { state.value.copy(bluetoothEnabled = true) }
+                sendEvent(PermissionEvent.Bluetooth.RequestEnable)
             }
             when {
                 !cameraPermission.status.isGranted && cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
