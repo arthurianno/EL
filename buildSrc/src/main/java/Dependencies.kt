@@ -110,7 +110,7 @@ object Dependencies {
     object Yandex {
         private const val liteVersion = "4.0.0-lite"
         private const val fullVersion = "4.0.0-full"
-        private const val mapKitVersion = "3.3.1"
+        private const val mapKitVersion = "3.5.0"
         private const val mapKitClusteringVersion = "0.2"
 
         const val lite = "com.yandex.android:maps.mobile:$liteVersion"

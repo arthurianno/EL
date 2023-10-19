@@ -16,7 +16,6 @@ import com.a65apps.clustering.yandex.view.ClusterPinProvider
 import com.a65apps.clustering.yandex.view.TapListener
 import com.a65apps.clustering.yandex.view.YandexRenderConfig
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.ConflictResolvingMode
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectCollection
@@ -34,9 +33,7 @@ class YandexClusterRenderer(
     name: String = DEFAULT_MAP_OBJECT_NAME
 ) : ClusterRenderer<YandexRenderConfig> {
 
-    private val layer: MapObjectCollection = map.addMapObjectLayer(name).apply {
-        setConflictResolvingMode(ConflictResolvingMode.IGNORE)
-    }
+    private val layer: MapObjectCollection = map.addMapObjectLayer(name)
     private val currentClusters = mutableSetOf<Cluster>()
     private val mapObjects = mutableMapOf<Cluster, PlacemarkMapObject>()
     private var clusterAnimator = AnimatorSet()
