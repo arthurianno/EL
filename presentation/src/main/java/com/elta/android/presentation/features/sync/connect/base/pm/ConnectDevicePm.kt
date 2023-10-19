@@ -154,9 +154,12 @@ abstract class ConnectDevicePm constructor(
             )
 
             is TimeoutException -> {
-                if (items.valueOrNull.isNullOrEmpty()) {
-                    connectState.consumer.accept(ViewState.NOT_FOUND)
+                val syncState = if (items.valueOrNull.isNullOrEmpty()) {
+                    ViewState.NOT_FOUND
+                } else {
+                    ViewState.SYNC_ERROR
                 }
+                connectState.consumer.accept(syncState)
             }
 
             is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)

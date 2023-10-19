@@ -56,7 +56,7 @@ fun BluetoothLeScannerCompat.startScan(
         results.distinctBy(ScanResult::getDevice).toMutableSet()
     }
     .map(MutableSet<ScanResult>::toList)
-    .doOnNext { Timber.i("<<<<<<<ScanResults>>>>>>  ScanResults: $this") }
+    .doOnNext { Timber.i("<<<<<<<ScanResults>>>>>>  ScanResults: $it") }
     .distinctUntilChanged { r1, r2 -> !r1.isResultChanged(r2) }
     .skip(1)
     .timeout(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, Schedulers.computation())
