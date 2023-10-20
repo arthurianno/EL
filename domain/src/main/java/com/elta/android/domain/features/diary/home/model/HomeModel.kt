@@ -1,14 +1,14 @@
 package com.elta.android.domain.features.diary.home.model
 
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.user.model.GlucoseFormat
 
 data class HomeModel(
     val isFirstEntrance: Boolean,
     val dayPeriod: DayPeriod,
-    val lastBreadEvent: Event?,
-    val lastInsulinEvent: Event?,
-    val lastGlucoseEvent: Event?,
+    val lastBreadEvent: EventV2?,
+    val lastInsulinEvent: EventV2?,
+    val lastGlucoseEvent: EventV2?,
     val glucoseLevel: GlucoseLevel?,
     val glucoseLevelDirection: GlucoseLevelDirection?,
     val glucoseLevelDifference: Double?,

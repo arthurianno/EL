@@ -11,6 +11,7 @@ import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
 import com.elta.android.data.di.MappersModule
+import com.elta.android.data.di.MigrationModule
 import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
 import com.elta.android.data.di.StorageModule
@@ -44,6 +45,7 @@ import javax.inject.Singleton
         TokenModule::class,
         DataSourceModule::class,
         MappersModule::class,
+        MigrationModule::class,
         CacheModule::class,
         StorageModule::class,
         GlucometerModule::class,

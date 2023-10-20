@@ -1,12 +1,11 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
-import com.elta.android.domain.features.diary.chooser.interactor.GetAllInsulinChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
+import com.elta.android.domain.features.diary.chooser.interactor.GetMedicinesChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
-import com.elta.android.domain.features.diary.events.model.Drug
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -18,9 +17,10 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
+import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
+import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
-import com.elta.android.presentation.utils.toName
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -33,10 +33,10 @@ private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
 
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
 class EventsOptionsChooserPm @Inject constructor(
-        private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
-        private val getAllInsulinChooserOptionsUseCase: GetAllInsulinChooserOptionsUseCase,
-        private val itemsBuilder: ChooserOptionsItemsBuilder,
-        services: ServiceFacade
+    private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
+    private val getMedicinesChooserOptionsUseCase: GetMedicinesChooserOptionsUseCase,
+    private val itemsBuilder: ChooserOptionsItemsBuilder,
+    services: ServiceFacade
 ) : BaseListPm(services) {
     val toolbarTitleCommand = state<String>()
     val appBarBackgroundCommand = state<Int>()
@@ -46,7 +46,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private val selectedItemIdState = state(NONE_ID)
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
-    private val chooserInsulinDefaultList = state<List<Drug>>()
+    private val chooserInsulinDefaultList = state<List<Medicament>>()
 
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
@@ -90,8 +90,17 @@ class EventsOptionsChooserPm @Inject constructor(
 
         configurationState.observable
                 .filter { it.chooserType == ChooserType.VARIANTS && it.eventType == EventType.INSULIN }
-                .flatMap {
-                    getAllInsulinChooserOptionsUseCase.execute()
+                .flatMap { chooserConfiguration ->
+                    val insulinType = chooserConfiguration.medicament?.let { medicamentChooser ->
+                        GetMedicinesChooserOptionsUseCase.Params(
+                            MedicamentInsulinType(
+                                id = medicamentChooser.insulinId,
+                                code = medicamentChooser.insulinCode,
+                                name = medicamentChooser.insulinName,
+                            )
+                        )
+                    }
+                    getMedicinesChooserOptionsUseCase.execute(insulinType)
                 }
                 .subscribe(chooserInsulinDefaultList.consumer)
                 .untilDestroy()
@@ -125,12 +134,7 @@ class EventsOptionsChooserPm @Inject constructor(
         bus.clicks<Clicks.ChooserWithSubtypesOptionClicked>()
             .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map {
-                ChooserConfiguration(
-                    ChooserType.VARIANTS,
-                    EventType.INSULIN,
-                    it.item.title,
-                    configurationState.valueOrNull?.chooserInsulin
-                )
+                it.item.getConfigurator()
             }
             .subscribe {
                 router.navigateTo(Screens.EventsChooserScreen(it))
@@ -144,9 +148,7 @@ class EventsOptionsChooserPm @Inject constructor(
                     when (configurationState.value.chooserType) {
                         ChooserType.VARIANTS -> Events.ChooserVariantSelected(it)
                         ChooserType.GROUP_TAGS -> Events.ChooserTagSelected(it)
-                        ChooserType.VARIANTS_WITH_SUBTYPE -> Events.ChooserVariantWithSubtypesSelected(
-                            it
-                        )
+                        ChooserType.VARIANTS_WITH_SUBTYPE -> Events.ChooserVariantWithSubtypesSelected(it)
                     }
                 )
             }
@@ -181,49 +183,23 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun buildChooserResult(i: Unit): ChooserResult {
         val item = items.value.find { it is ChooserItem && it.id == selectedItemId }
         val chooserItem = item as? ChooserItem
-        val (type, insulinTypeName) = getInsulinType(chooserInsulinDefaultList.valueOrNull)
+        val medicinesInsulinType = getInsulinType(chooserInsulinDefaultList.valueOrNull)
         return ChooserResult(
             id = selectedItemId,
-            name = getChooserResultName(chooserItem?.title, insulinTypeName),
+            name = getChooserResultName(chooserItem?.title, medicinesInsulinType),
             iconId = chooserItem?.iconId,
-            meta = getChooserMeta(chooserItem?.title, chooserItem?.meta, type, insulinTypeName)
+            meta = chooserItem?.meta
         )
     }
 
-    private fun getChooserMeta(title: String?, meta: Any?, type: InsulinType, insulinTypeName: String): Any? =
-        if (
-            configurationState.value.eventType == EventType.INSULIN &&
-            configurationState.value.chooserType != ChooserType.GROUP_TAGS
-        ) {
-            Insulin(
-                previousName = insulinTypeName,
-                drug = title.orEmpty(),
-                type = type
-            )
-        } else {
-            meta
-        }
-
-    private fun getInsulinType(drugs: List<Drug>?): Pair<InsulinType, String> {
-        val prevInsulinType = getInsulinTypeByString(previousSelectionState.value)
-        val type = if (prevInsulinType == InsulinType.ALL) {
-            val insulinCode = drugs
-                    ?.find { it.name == selectedItemId }?.insulinType?.code
-                    ?: previousSelectionState.value
-            InsulinType.valueOf(insulinCode)
-        } else {
-            prevInsulinType
-        } ?: InsulinType.MIXED
-
-        val insulinTypeName = resources.getString(type.toName())
-        return Pair(type, insulinTypeName)
+    private fun getInsulinType(medicines: List<Medicament>?): MedicamentInsulinType {
+        val type = medicines?.find { it.id.toString() == selectedItemId }?.insulinType
+        return type ?: MedicamentInsulinType.nullMedicament()
     }
 
-    private fun getChooserResultName(title: String?, insulinTypeName: String): String? {
-        return if (configurationState.value.eventType == EventType.INSULIN &&
-                previousSelectionState.value != NONE_ID
-        ) {
-            "${insulinTypeName}(${title.orEmpty()})"
+    private fun getChooserResultName(title: String?, insulinTypeName: MedicamentInsulinType): String? {
+        return if (configurationState.value.eventType == EventType.INSULIN) {
+            "${insulinTypeName.name}(${title.orEmpty()})"
         } else {
             title
         }
@@ -233,32 +209,31 @@ class EventsOptionsChooserPm @Inject constructor(
         GetChooserOptionsUseCase.Params(
             chooserConfiguration.eventType,
             chooserConfiguration.chooserType,
-            getInsulinTypeByString(previousSelectionState.value)
+            configurationState.valueOrNull?.medicament?.toInsulinType()
         )
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
-        toolbarTitleCommand.consumer.accept(
-            when {
-                configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
-                        configuration.eventType == EventType.INSULIN -> {
-                    resources.getString(R.string.events_options_chooser_title_insulin)
-                }
-
-                configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == EventType.ACTIVITY -> {
-                    resources.getString(R.string.events_options_chooser_title_activities)
-                }
-
-                configuration.chooserType == ChooserType.VARIANTS &&
-                        configuration.eventType == EventType.INSULIN -> {
-                    previousSelectionState.valueOrNull
-                        ?: resources.getString(R.string.events_options_chooser_title_tags)
-                }
-
-                else ->
-                    resources.getString(R.string.events_options_chooser_title_tags)
+        val accept = when {
+            configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
+                    configuration.eventType == EventType.INSULIN -> {
+                resources.getString(R.string.events_options_chooser_title_insulin)
             }
-        )
+
+            configuration.chooserType == ChooserType.VARIANTS &&
+                    configuration.eventType == EventType.ACTIVITY -> {
+                resources.getString(R.string.events_options_chooser_title_activities)
+            }
+
+            configuration.chooserType == ChooserType.VARIANTS &&
+                    configuration.eventType == EventType.INSULIN -> {
+                configurationState.valueOrNull?.medicament?.insulinName
+                    ?: resources.getString(R.string.events_options_chooser_title_tags)
+            }
+
+            else ->
+                resources.getString(R.string.events_options_chooser_title_tags)
+        }
+        toolbarTitleCommand.consumer.accept(accept)
     }
 
     private fun setUpAppBarBackground(configuration: ChooserConfiguration) {
@@ -274,26 +249,38 @@ class EventsOptionsChooserPm @Inject constructor(
         )
     }
 
-    private fun getInsulinTypeByString(string: String) =
-        when (string) {
-            resources.getString(InsulinType.ALL.toName()) -> InsulinType.ALL
-            resources.getString(InsulinType.INTERMEDIATE.toName()) -> InsulinType.INTERMEDIATE
-            resources.getString(InsulinType.ULTRAFAST.toName()) -> InsulinType.ULTRAFAST
-            resources.getString(InsulinType.ULTRASHORT.toName()) -> InsulinType.ULTRASHORT
-            resources.getString(InsulinType.LONG.toName()) -> InsulinType.LONG
-            resources.getString(InsulinType.MIXED.toName()) -> InsulinType.MIXED
-            resources.getString(InsulinType.ULTRALONG.toName()) -> InsulinType.ULTRALONG
-            resources.getString(InsulinType.SHORT.toName()) -> InsulinType.SHORT
-            else -> null
+    private fun setPreviousSelection(configuration: ChooserConfiguration) {
+        val accept = if (configuration.chooserType == ChooserType.VARIANTS) {
+            configuration.medicament?.medicamentId?.toString() ?: NONE_ID
+        } else {
+            NONE_ID
         }
 
-    private fun setPreviousSelection(configuration: ChooserConfiguration) {
-        previousSelectionState.consumer.accept(
-            if (configuration.chooserType == ChooserType.VARIANTS) {
-                configuration.id
-            } else {
-                NONE_ID
-            }
+        previousSelectionState.consumer.accept(accept)
+    }
+
+    private fun MedicamentChooser.toInsulinType() = MedicamentInsulinType(
+        code = insulinCode,
+        id = insulinId,
+        name = insulinName
+    )
+
+    private fun ChooserWithSubtypeItem.getConfigurator(): ChooserConfiguration {
+        val insulinType = meta as MedicamentInsulinType
+        val medicamentChooser =  if (medicament?.insulinCode == insulinType.code)
+            medicament
+        else
+            MedicamentChooser(
+                insulinCode = insulinType.code,
+                insulinName = insulinType.name,
+                insulinId = insulinType.id
+            )
+
+        return ChooserConfiguration(
+            chooserType = ChooserType.VARIANTS,
+            eventType = EventType.INSULIN,
+            id = insulinType.code,
+            medicament = medicamentChooser
         )
     }
 }

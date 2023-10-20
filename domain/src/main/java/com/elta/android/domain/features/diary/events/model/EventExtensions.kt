@@ -4,7 +4,7 @@ import com.elta.android.domain.features.diary.events.model.form.ActivityValidato
 import com.elta.android.domain.features.diary.events.model.form.BreadValidator
 import com.elta.android.domain.features.diary.events.model.form.FormValidator
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
-import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
+import com.elta.android.domain.features.diary.events.model.form.MedicinesValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -18,7 +18,7 @@ const val GLUCOSE_PLASMA_COEFFICIENT = 1.12
 fun EventType.getValidator(): FormValidator =
     when (this) {
         EventType.BREAD -> BreadValidator
-        EventType.INSULIN -> InsulinValidator
+        EventType.INSULIN -> MedicinesValidator
         EventType.MEDICAMENTS -> MedicamentsValidator
         EventType.ACTIVITY -> ActivityValidator
         EventType.WEIGHT -> WeightValidator
@@ -27,15 +27,14 @@ fun EventType.getValidator(): FormValidator =
     }
 
 @Suppress("LongParameterList")
-fun Event.isChanged(
+fun EventV2.isChanged(
     value: Double? = null,
     kind: String? = null,
     name: String? = null,
     duration: Long? = null,
     date: ZonedDateTime? = null,
     tagId: String? = null,
-    insulinType: InsulinType? = null,
-    medicament: String? = null,
+    medicament: Medicament? = null,
     activity: ActivityType? = null,
     note: String? = null
 ): Boolean =
@@ -45,15 +44,14 @@ fun Event.isChanged(
             this.duration != duration ||
             this.additionTime != date ||
             this.tagId != tagId ||
-            this.insulinType != insulinType ||
             this.medicament != medicament ||
             this.activityType != activity ||
             this.note != note
 
-fun Event.addTag(tags: List<Tag>): Event =
+fun EventV2.addTag(tags: List<Tag>): EventV2 =
     this.copy(tag = tags.firstOrNull { tagId == it.id })
 
-fun Event.glucoseValue(format: GlucoseFormat): Double = run {
+fun EventV2.glucoseValue(format: GlucoseFormat): Double = run {
     value?.toGlucoseFormat(format) ?: GLUCOSE_DEFAULT_VALUE
 }
 
@@ -65,12 +63,12 @@ fun Double.toGlucoseFormat(format: GlucoseFormat?): Double = run {
     }
 }.round(1)
 
-fun Event.modifyValue(format: GlucoseFormat): Event =
+fun EventV2.modifyValue(format: GlucoseFormat): EventV2 =
     if (type == EventType.GLUCOSE) {
         copy(value = glucoseValue(format))
     } else {
         this
     }
 
-fun List<Event>.modifyValues(format: GlucoseFormat): List<Event> =
+fun List<EventV2>.modifyValues(format: GlucoseFormat): List<EventV2> =
     map { it.modifyValue(format) }

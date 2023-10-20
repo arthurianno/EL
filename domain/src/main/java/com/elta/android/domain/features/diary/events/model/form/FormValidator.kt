@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.diary.events.model.form
 
-import com.elta.android.domain.features.diary.events.model.Insulin
+import com.elta.android.domain.features.diary.events.model.Medicament
 import org.threeten.bp.ZonedDateTime
 
 private const val NOTE_MAX_LENGTH = 120
@@ -13,7 +13,7 @@ interface FormValidator {
         kind: String? = null,
         name: String? = null,
         duration: Long? = null,
-        insulin: Insulin? = null,
+        medicament: Medicament? = null,
         date: ZonedDateTime? = null,
         note: String? = null
     ): Boolean

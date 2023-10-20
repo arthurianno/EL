@@ -1,12 +1,12 @@
 package com.elta.android.data.features.googlefit.repository
 
 import com.elta.android.data.features.common.cache.CommonConditions
-import com.elta.android.data.features.diary.events.cache.DbEventsCache
+import com.elta.android.data.features.diary.events.cache.dto.v1.DbEventsCache
 import com.elta.android.data.features.googlefit.builder.EventsBuilder
 import com.elta.android.data.features.googlefit.datasource.HealthAppDataSource
 import com.elta.android.data.features.googlefit.datasource.errors.GoogleFitPermissionNotGranted
 import com.elta.android.data.features.googlefit.datasource.errors.GoogleFitSyncNotAllowed
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
@@ -68,7 +68,7 @@ class GoogleFitDataRepository @Inject constructor(
                     .applyScheduler(schedulersFacade)
             }
 
-    private fun filterExistingEvents(fromFit: List<Event>): List<Event> =
+    private fun filterExistingEvents(fromFit: List<EventV2>): List<EventV2> =
         if (!eventsCache.contains(CommonConditions.All)) fromFit
         else fromFit.filter { !eventsCache.contains(CommonConditions.ById(it.id.hashCode().toLong())) }
 

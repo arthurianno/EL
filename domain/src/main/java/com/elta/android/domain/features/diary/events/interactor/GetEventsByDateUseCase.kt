@@ -38,9 +38,9 @@ class GetEventsByDateUseCase @Inject constructor(
                     .map { it.addTag(tags) }
                 Pair(eventsWithTags, tags)
             }
-            .map {
-                val sortedEvents = it.first.sortAndFilter()
-                getEventsBlocks(sortedEvents, it.second)
+            .map { (events, tags) ->
+                val sortedEvents = events.sortAndFilter()
+                getEventsBlocks(sortedEvents, tags)
             }
             .applyScheduler(schedulers)
     }

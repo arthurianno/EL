@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class GetStatisticByPeriodUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     private val userRepo: ProfileRepository,
+    private val medicinesRepository: MedicinesRepository,
     schedulers: SchedulersFacade
 ) : SingleUseCase<StatisticByPeriodModel, GetStatisticByPeriodUseCase.Params>(schedulers) {
 
@@ -20,12 +22,14 @@ class GetStatisticByPeriodUseCase @Inject constructor(
         val p = checkNotNull(params)
         return Singles.zip(
             eventsRepo.getEvents(p.period.start, p.period.end).single(emptyList()),
-            userRepo.getProfile()
+            userRepo.getProfile(),
+            Single.fromObservable(medicinesRepository.getBasalAndBolusTypes())
         )
-            .map { (events, profile) ->
+            .map { (events, profile, medicamentInsulinStatistic) ->
                 buildStatisticModel(
                     period = p.period,
                     events = events,
+                    medicamentInsulinStatistic = medicamentInsulinStatistic,
                     settings = profile.glucoseLevelSettings,
                     glucoseFormat = profile.glucoseFormat
                 )

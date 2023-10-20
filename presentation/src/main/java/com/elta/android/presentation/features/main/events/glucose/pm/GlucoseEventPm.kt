@@ -6,7 +6,7 @@ import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseC
 import com.elta.android.domain.features.diary.events.interactor.GetShareEventUriUseCase
 import com.elta.android.domain.features.diary.events.interactor.SaveEventBitmapUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
@@ -94,7 +94,7 @@ class GlucoseEventPm @Inject constructor(
     private val eventIdState = state<String>()
     private val glucoseLevelSettingsState = state<GlucoseLevelSettings>()
 
-    private val eventState = state<Event>()
+    private val eventState = state<EventV2>()
 
     private val eventFormHolderState = state(GlucoseFormModel())
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
@@ -201,13 +201,13 @@ class GlucoseEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun handleScreenLoading(data: Pair<Event, Profile>) {
+    private fun handleScreenLoading(data: Pair<EventV2, Profile>) {
         glucoseFormatState.consumer.accept(data.second.glucoseFormat)
         glucoseLevelSettingsState.consumer.accept(data.second.glucoseLevelSettings)
         eventState.consumer.accept(data.first)
     }
 
-    private fun bindEvent(event: Event) {
+    private fun bindEvent(event: EventV2) {
         glucoseValueState.consumer.accept(NumberFormatter.format(event.glucoseValue(glucoseFormatState.value)))
         glucoseInfoState.consumer.accept(
             resources.getString(
@@ -378,7 +378,7 @@ class GlucoseEventPm @Inject constructor(
         glucoseLevelSettings = glucoseLevelSettingsState.value
     )
 
-    private fun Event.isGlucoseEventChanged(
+    private fun EventV2.isGlucoseEventChanged(
         tagId: String?,
         note: String?,
         mealTag: MealTag?

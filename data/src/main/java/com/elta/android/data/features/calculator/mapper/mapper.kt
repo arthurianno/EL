@@ -9,6 +9,7 @@ import com.elta.android.data.features.calculator.model.FoodNetworkEntity
 import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.calculator.model.ServingNetworkEntity
 import com.elta.android.data.features.calculator.model.VerifiedProductResponse
+import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.Serving
@@ -198,8 +199,12 @@ fun VerifiedProductDbEntity.toDomain(): Dish = Dish(
         isVerified = true
     )
 
-fun List<Dish>.toNetwork(): List<ProductResponse> =
-    map { it.toNetwork() }
+fun List<Dish>.toNetwork(eventType: EventTypeDto?): List<ProductResponse>? {
+    return when (eventType) {
+        EventTypeDto.BREAD -> map { it.toNetwork() }
+        else -> null
+    }
+}
 
 internal fun DishDbEntity.toDomain(): Dish =
     Dish(

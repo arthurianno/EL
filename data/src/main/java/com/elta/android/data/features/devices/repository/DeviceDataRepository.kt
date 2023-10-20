@@ -9,7 +9,7 @@ import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import io.reactivex.Completable
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
     private val eventsRepository: EventsRepository,
-    private val eventsFromGlucometerMapper: Mapper<GlucometerEventDto, Event>,
+    private val eventsFromGlucometerMapper: Mapper<GlucometerEventDto, EventV2>,
     private val glucometerToDtoMapper: Mapper<Glucometer, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,

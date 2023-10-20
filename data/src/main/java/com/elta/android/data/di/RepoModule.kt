@@ -7,7 +7,7 @@ import com.elta.android.data.features.consultant.repository.ConsultantDataReposi
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
-import com.elta.android.data.features.diary.insulin.repository.DrugNameDataRepository
+import com.elta.android.data.features.diary.insulin.repository.MedicinesDataRepository
 import com.elta.android.data.features.diary.tags.repository.TagsDataRepository
 import com.elta.android.data.features.feedback.repository.FeedbackDataRepository
 import com.elta.android.data.features.firmware.repository.FirmwareDataRepository
@@ -26,7 +26,7 @@ import com.elta.android.domain.features.calculator.repository.CalculatorReposito
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.insulin.DrugNameRepository
+import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
@@ -76,10 +76,6 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindInsulinDrugNameRepository(repo: DrugNameDataRepository): DrugNameRepository
-
-    @Binds
-    @Singleton
     abstract fun bindDeviceRepository(repo: DeviceDataRepository): DeviceRepository
 
     @Binds
@@ -121,4 +117,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindMediaRepository(repo: MediaDataRepository): MediaRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMedicineRepository(repo: MedicinesDataRepository): MedicinesRepository
 }

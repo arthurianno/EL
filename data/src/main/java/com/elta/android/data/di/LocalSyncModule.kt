@@ -5,7 +5,7 @@ import com.elta.android.data.features.sync.configuration.ClassConfiguration
 import com.elta.android.data.features.sync.configuration.LocalSyncConfig
 import com.elta.android.data.features.sync.mappers.EventsSyncMapper
 import com.elta.android.data.features.sync.mappers.ProfileSyncMapper
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.user.model.Profile
 import dagger.Module
 import dagger.Provides
@@ -25,7 +25,7 @@ class LocalSyncModule {
 
     @Provides
     @Singleton
-    fun provideEventsConfiguration(): ClassConfiguration<Event> =
+    fun provideEventsConfiguration(): ClassConfiguration<EventV2> =
         ClassConfiguration(
             supportedState = arrayListOf(StateDto.UPDATED, StateDto.CREATED, StateDto.DELETED),
             mapper = EventsSyncMapper()
@@ -34,11 +34,11 @@ class LocalSyncModule {
     @Provides
     @Singleton
     fun provideSyncConfiguration(
-        eventsConfiguration: ClassConfiguration<Event>,
+        eventsConfiguration: ClassConfiguration<EventV2>,
         profileConfiguration: ClassConfiguration<Profile>
     ): LocalSyncConfig = LocalSyncConfig(
         hashMapOf(
-            Event::class.java to eventsConfiguration,
+            EventV2::class.java to eventsConfiguration,
             Profile::class.java to profileConfiguration
         )
     )

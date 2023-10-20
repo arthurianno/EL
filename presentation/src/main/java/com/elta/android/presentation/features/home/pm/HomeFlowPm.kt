@@ -322,7 +322,7 @@ class HomeFlowPm @Inject constructor(
             .filter { it }
             .map { Unit }
             .skipWhileInProgress(syncProgressState.observable)
-            .subscribe(startSyncWithBackendAction.consumer)
+            .subscribe { startSyncWithBackendAction.consumer.accept(it) }
             .untilDestroy()
     }
 

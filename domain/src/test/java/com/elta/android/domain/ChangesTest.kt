@@ -22,7 +22,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -40,7 +40,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -58,7 +58,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -76,7 +76,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -94,7 +94,7 @@ class ChangesTest {
                 duration = null,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -112,7 +112,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = ZonedDateTime.now().atEndOfDay(),
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -130,7 +130,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = "new tag id",
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -148,7 +148,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = InsulinType.SHORT,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = event.note
             )
@@ -166,7 +166,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = ActivityType.ANOTHER,
                 note = event.note
             )
@@ -184,7 +184,7 @@ class ChangesTest {
                 duration = event.duration,
                 date = event.additionTime,
                 tagId = event.tagId,
-                insulinType = event.insulinType,
+                medicament = event.medicament,
                 activity = event.activityType,
                 note = null
             )

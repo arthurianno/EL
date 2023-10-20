@@ -121,7 +121,7 @@ abstract class BaseEventPm(
             kind = form.kind,
             name = form.name,
             duration = form.duration,
-            insulin = form.insulin,
+            medicament = form.medicament,
             date = form.date,
             note = form.note
         )

@@ -25,7 +25,7 @@ import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.diary.events.cache.EventsConditions
-import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
+import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.FeatureToggles

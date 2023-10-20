@@ -165,16 +165,29 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         value: String,
         date: LocalDate?
     ): String {
-        return if (date != null) getDescriptionByDay(
-            stat.allDays[date]?.activity?.eventsCount,
-            value
-        )
-        else getDescriptionByPeriod(stat.activity.eventsCount, value)
+
+        return if (date != null) {
+            getDescriptionByDay(
+                eventsCount = stat.allDays[date]?.activity?.eventsCount,
+                value = value,
+                stat.insulin.statisticBasal,
+                stat.insulin.statisticBolus
+            )
+        } else {
+            getDescriptionByPeriod(
+                eventsCount = stat.activity.eventsCount,
+                value = value,
+                stat.insulin.statisticBasal,
+                stat.insulin.statisticBolus
+            )
+        }
     }
 
     private fun GeneralIndexItem.Type.getDescriptionByDay(
         eventsCount: Int?,
-        value: String
+        value: String,
+        statisticBasal: List<String>,
+        statisticBolus: List<String>
     ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
@@ -184,17 +197,20 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_by_day_insulin,
+                (statisticBasal + statisticBolus).statisticString(),
                 value
             )
 
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_by_day_bolus_insulin,
+                statisticBolus.statisticString(),
                 value
             )
 
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_by_day_basal_insulin,
-                value
+                statisticBasal.statisticString(),
+                value,
             )
 
             GeneralIndexItem.Type.ACTIVITY -> resources.getString(
@@ -206,7 +222,9 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
     private fun GeneralIndexItem.Type.getDescriptionByPeriod(
         eventsCount: Int?,
-        value: String
+        value: String,
+        statisticBasal: List<String>,
+        statisticBolus: List<String>
     ): String =
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
@@ -216,17 +234,20 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
             GeneralIndexItem.Type.TOTAL -> resources.getString(
                 R.string.statistic_general_index_description_by_period_insulin,
+                (statisticBasal + statisticBolus).statisticString(),
                 value
             )
 
             GeneralIndexItem.Type.BOLUS -> resources.getString(
                 R.string.statistic_general_index_description_by_period_bolus_insulin,
-                value
+                statisticBolus.statisticString(),
+                value,
             )
 
             GeneralIndexItem.Type.BASAL -> resources.getString(
                 R.string.statistic_general_index_description_by_period_basal_insulin,
-                value
+                statisticBasal.statisticString(),
+                value,
             )
 
             GeneralIndexItem.Type.ACTIVITY -> resources.getString(
@@ -235,6 +256,9 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 value
             )
         }
+
+    private fun List<String>.statisticString() =
+        joinToString(separator = " + ",  prefix = "(", postfix = ")")
 
     private fun GeneralIndexItem.Type.getValueByDate(
         model: StatisticByPeriodModel,

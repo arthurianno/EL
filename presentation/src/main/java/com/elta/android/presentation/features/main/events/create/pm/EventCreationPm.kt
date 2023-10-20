@@ -186,8 +186,7 @@ class EventCreationPm @Inject constructor(
             date = form.date,
             tag = form.tag,
             activity = form.activityType,
-            insulin = form.insulin?.type,
-            medicament = form.insulin?.drug,
+            medicament = form.medicament,
             note = form.note,
             eventType = checkNotNull(form.eventType),
             glucometerSerialNumber = null,
@@ -207,7 +206,7 @@ class EventCreationPm @Inject constructor(
             }
 
             EventType.INSULIN -> {
-                data[AnalyticsEventParam.TYPE] = checkNotNull(params.insulin).name
+                data[AnalyticsEventParam.TYPE] = checkNotNull(params.medicament).insulinType.name
                 AnalyticsEventType.EVENT_INSULIN_ADD
             }
 

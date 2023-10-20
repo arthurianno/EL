@@ -7,7 +7,7 @@ import com.elta.android.domain.features.calculator.interactor.UpdateVerifiedProd
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.events.model.isChanged
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -44,7 +44,7 @@ class EditEventPm @Inject constructor(
 
     private val loadScreenAction = action<Unit>()
     private val eventIdState = state<String>()
-    private val eventState = state<Event>()
+    private val eventState = state<EventV2>()
     private val isFormChangedState = state(false)
     private val eventFormHolderState = state(EventFormModel())
 
@@ -130,7 +130,7 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun bindEvent(event: Event) {
+    private fun bindEvent(event: EventV2) {
         event.getPickerValues()?.let { updateFormPickerValueCommand.consumer.accept(it) }
         event.getFormInputText()?.let { formInput.text.consumer.accept(it) }
         event.getSelectorOption(resources)?.let { formSelector.option.consumer.accept(it) }
@@ -155,8 +155,7 @@ class EditEventPm @Inject constructor(
                 tagId = form.tag?.id,
                 tag = form.tag,
                 activityType = form.activityType,
-                insulinType = form.insulin?.type,
-                medicament = form.insulin?.drug,
+                medicament = form.medicament,
                 note = form.note,
                 type = checkNotNull(form.eventType),
                 dishes = dishes.value
@@ -172,8 +171,7 @@ class EditEventPm @Inject constructor(
             duration = eventFormModel.duration,
             date = eventFormModel.date,
             tagId = eventFormModel.tag?.id,
-            insulinType = eventFormModel.insulin?.type,
-            medicament = eventFormModel.insulin?.drug,
+            medicament = eventFormModel.medicament,
             activity = eventFormModel.activityType,
             note = eventFormModel.note
         ) ?: false
@@ -219,6 +217,6 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun createDeleteEventUseCaseParams(event: Event) =
+    private fun createDeleteEventUseCaseParams(event: EventV2) =
         DeleteEventUseCase.Params(event)
 }

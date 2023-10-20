@@ -11,10 +11,16 @@ import com.elta.android.data.features.devices.cache.DbGlucometersCache
 import com.elta.android.data.features.devices.cache.DbGlucometersInfoCache
 import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
-import com.elta.android.data.features.diary.events.cache.DbEventsCache
-import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
-import com.elta.android.data.features.diary.insulin.cache.DbDrugsCache
-import com.elta.android.data.features.diary.insulin.cache.DrugCachedDto
+import com.elta.android.data.features.diary.events.cache.dto.v1.DbEventsCache
+import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
+import com.elta.android.data.features.diary.events.cache.dto.v2.DbEventsV2Cache
+import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
+import com.elta.android.data.features.diary.insulin.cache.medicines.DbMedicinesCache
+import com.elta.android.data.features.diary.insulin.cache.insulin.DbInsulinTypeCache
+import com.elta.android.data.features.diary.insulin.cache.insulin.InsulinTypeDbEntity
+import com.elta.android.data.features.diary.insulin.cache.medicines.MedicamentDbEntity
+import com.elta.android.data.features.diary.insulin.cache.statistic.DbInsulinStatisticCache
+import com.elta.android.data.features.diary.insulin.cache.statistic.InsulinStatisticDbEntity
 import com.elta.android.data.features.diary.tags.cache.DbTagsCache
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.observers.cache.DbObserverCache
@@ -47,6 +53,10 @@ class CacheModule {
 
         @Binds
         @Singleton
+        fun bindEventsV2Cache(cache: DbEventsV2Cache): Cache<EventV2CachedDto>
+
+        @Binds
+        @Singleton
         fun bindEventsCache(cache: DbEventsCache): Cache<EventCachedDto>
 
         @Binds
@@ -55,7 +65,15 @@ class CacheModule {
 
         @Binds
         @Singleton
-        fun bindDrugsCache(cache: DbDrugsCache): Cache<DrugCachedDto>
+        fun bingMedicinesCache(cache: DbMedicinesCache): Cache<MedicamentDbEntity>
+
+        @Binds
+        @Singleton
+        fun bingInsulinTypeCache(cache: DbInsulinTypeCache): Cache<InsulinTypeDbEntity>
+
+        @Binds
+        @Singleton
+        fun bingInsulinStatisticCache(cache: DbInsulinStatisticCache): Cache<InsulinStatisticDbEntity>
 
         @Binds
         @Singleton

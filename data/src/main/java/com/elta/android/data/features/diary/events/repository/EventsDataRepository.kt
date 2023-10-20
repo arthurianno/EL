@@ -8,55 +8,66 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
-import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
 import com.elta.android.data.features.diary.events.mapper.toDb
+import com.elta.android.data.features.diary.events.mapper.toDomain
+import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheSource
+import com.elta.android.data.features.diary.insulin.mapper.toDomain
 import com.elta.android.data.features.sync.manger.LocalSyncManager
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import javax.inject.Inject
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
+import javax.inject.Inject
 
-// TODO: CRUD logic should be improved
 @Suppress("MaxLineLength")
 class EventsDataRepository @Inject constructor(
-    private val toDtoMapper: Mapper<Event, EventDto>,
-    private val toDomainMapper: Mapper<EventDto, Event>,
+    private val toDtoMapper: Mapper<EventV2, EventV2Dto>,
     @Remote private val remoteSource: EventsDataSource,
-    @Cache private val cacheSource: EventsDataSource,
+    @Cache private val cacheSource: EventsCacheDataSource,
     private val syncManager: LocalSyncManager,
     private val fileStorage: FileStorage
 ) : EventsRepository {
 
-    override fun getEvents(): Observable<List<Event>> =
+    override fun getEvents(): Observable<List<EventV2>> =
         cacheSource.getEvents()
-            .map(toDomainMapper::mapFromObjects)
+            .map{ events ->
+            events.map { it.toDomain() }
+        }
 
-    override fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<Event>> =
+    override fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventV2>> =
         cacheSource.getEvents(start, end)
-            .map(toDomainMapper::mapFromObjects)
+            .map { events ->
+            events.map { it.toDomain() }
+        }
 
-    override fun getEventById(id: String): Single<Event> =
+    override fun getEventById(id: String): Single<EventV2> =
         cacheSource.getEventById(id)
-            .map(toDomainMapper::mapFromObject)
+            .map { event ->
+            event.toDomain()
+        }
 
-    override fun getLastEvent(eventType: EventType): Single<Event> =
+    override fun getLastEvent(eventType: EventType): Single<EventV2> =
         cacheSource.getLastEvent(eventType.toDb())
-            .map(toDomainMapper::mapFromObject)
+            .map{ event ->
+            event.toDomain()
+        }
 
     override fun countEvents(): Single<Long> =
         cacheSource.countEvents()
 
-    override fun addEvent(event: Event): Completable =
+    override fun addEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
                 cacheSource.addEvents(it)
@@ -69,7 +80,7 @@ class EventsDataRepository @Inject constructor(
                     )
             }
 
-    override fun addEvents(events: List<Event>): Completable =
+    override fun addEvents(events: List<EventV2>): Completable =
         Single.fromCallable { toDtoMapper.mapFromObjects(events) }
             .flatMapCompletable {
                 cacheSource.addEvents(it)
@@ -82,7 +93,7 @@ class EventsDataRepository @Inject constructor(
                     )
             }
 
-    override fun updateEvent(event: Event): Completable =
+    override fun updateEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }
             .flatMapCompletable {
                 cacheSource.updateEvents(it)
@@ -95,7 +106,7 @@ class EventsDataRepository @Inject constructor(
                     )
             }
 
-    override fun deleteEvent(event: Event): Completable =
+    override fun deleteEvent(event: EventV2): Completable =
         Single.fromCallable {
             listOf(
                 SimpleEventDto(
@@ -115,10 +126,10 @@ class EventsDataRepository @Inject constructor(
     override fun sync(): Completable =
         remoteSource.getEvents()
             .flatMap {
-                syncManager.needToSync<Event>()
+                syncManager.needToSync<EventV2>()
                     .flatMapObservable { needToSync ->
                         if (needToSync) {
-                            syncManager.getNotSynced<Event>()
+                            syncManager.getNotSynced<EventV2>()
                         } else {
                             Observable.empty()
                         }
@@ -137,7 +148,7 @@ class EventsDataRepository @Inject constructor(
                     Observable.just(toSync)
                 } else {
                     remoteSource.deleteEvents(toDelete)
-                        .andThen(syncManager.setAllSynced<Event>(StateDto.DELETED))
+                        .andThen(syncManager.setAllSynced<EventV2>(StateDto.DELETED))
                         .andThen(Observable.just(toSync))
                 }
             }
@@ -150,7 +161,7 @@ class EventsDataRepository @Inject constructor(
                 } else {
                     cacheSource.getEventsById(toCreate)
                         .flatMapCompletable { remoteSource.addEvents(it) }
-                        .andThen(syncManager.setAllSynced<Event>(StateDto.CREATED))
+                        .andThen(syncManager.setAllSynced<EventV2>(StateDto.CREATED))
                         .andThen(Observable.just(toSync))
                 }
             }
@@ -163,7 +174,7 @@ class EventsDataRepository @Inject constructor(
                 } else {
                     cacheSource.getEventsById(toUpdate)
                         .flatMapCompletable { remoteSource.updateEvents(it) }
-                        .andThen(syncManager.setAllSynced<Event>(StateDto.UPDATED))
+                        .andThen(syncManager.setAllSynced<EventV2>(StateDto.UPDATED))
                 }
             }
 

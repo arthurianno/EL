@@ -4,6 +4,7 @@ import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.tags.model.Tag
 import org.threeten.bp.ZonedDateTime
 
+@Deprecated("use EventV2")
 data class Event(
     val id: String,
     val additionTime: ZonedDateTime,

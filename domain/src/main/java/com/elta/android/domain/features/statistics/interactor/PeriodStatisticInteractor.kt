@@ -1,7 +1,9 @@
 package com.elta.android.domain.features.statistics.interactor
 
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
@@ -17,9 +19,10 @@ import timber.log.Timber
 
 fun buildStatisticModel(
     period: StatisticPeriod,
-    events: List<Event>,
+    events: List<EventV2>,
     settings: GlucoseLevelSettings,
-    glucoseFormat: GlucoseFormat
+    glucoseFormat: GlucoseFormat,
+    medicamentInsulinStatistic: MedicamentInsulinStatistic
 ): StatisticByPeriodModel {
     val eventsContainer = events.toEventsContainer()
 
@@ -38,7 +41,8 @@ fun buildStatisticModel(
             date = day,
             eventsPerDay = eventsPerDay,
             settings = settings,
-            glucoseFormat = glucoseFormat
+            glucoseFormat = glucoseFormat,
+            medicamentInsulinStatistic = medicamentInsulinStatistic
         )
 
         dayWithMaxLevel = dayWithMaxLevel?.let { dayStatistic.checkMax(it) } ?: dayStatistic
@@ -58,7 +62,10 @@ fun buildStatisticModel(
             settings,
             glucoseFormat
         ),
-        insulin = buildInsulinStatisticModelByPeriod(eventsByType[EventType.INSULIN]),
+        insulin = buildInsulinStatisticModelByPeriod(
+            eventsByType[EventType.INSULIN],
+            medicamentInsulinStatistic
+        ),
         bread = buildBreadStatisticModelByPeriod(eventsByType[EventType.BREAD]),
         activity = buildActivityStatisticModel(eventsByType[EventType.ACTIVITY])
     )
@@ -66,7 +73,7 @@ fun buildStatisticModel(
 
 @Suppress("LongMethod")
 fun buildGlucoseStatisticModel(
-    glucoseEventsPerPeriod: List<Event>?,
+    glucoseEventsPerPeriod: List<EventV2>?,
     settings: GlucoseLevelSettings,
     glucoseFormat: GlucoseFormat,
     forPeriod: Boolean = true
@@ -167,7 +174,10 @@ fun buildGlucoseStatisticModel(
     )
 }
 
-fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): InsulinStatisticModelByPeriod {
+fun buildInsulinStatisticModelByPeriod(
+    insulinEventsPerPeriod: List<EventV2>?,
+    medicamentInsulinStatistic: MedicamentInsulinStatistic
+): InsulinStatisticModelByPeriod {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
     var totalLevel = 0.0
@@ -179,31 +189,50 @@ fun buildInsulinStatisticModelByPeriod(insulinEventsPerPeriod: List<Event>?): In
     insulinEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
-            if (event.isBolusInsulin()) {
+            if (event.isBolusInsulin(medicamentInsulinStatistic)) {
                 totalBolusLevel += value
                 daysWithBolusEvents.add(event.additionTime.toLocalDate())
             }
 
-            if (event.isBasalInsulin()) {
+            if (event.isBasalInsulin(medicamentInsulinStatistic)) {
                 totalBasalLevel += value
                 daysWithBasalEvents.add(event.additionTime.toLocalDate())
             }
 
-            if (event.isNotMixedInsulin()) {
+            if (event.isBasalOrBolus(medicamentInsulinStatistic)) {
                 totalLevel += value
                 daysWithEvents.add(event.additionTime.toLocalDate())
             }
         }
     }
 
+    val statisticBasal = medicamentInsulinStatistic.basalInsulinTypes
+        .convertToStatistic()
+
+
+    val statisticBolus = medicamentInsulinStatistic.bolusInsulinTypes
+        .convertToStatistic()
+
+
     return InsulinStatisticModelByPeriod(
         averageBolusLevel = totalBolusLevel.average(daysWithBolusEvents.size),
         averageBasalLevel = totalBasalLevel.average(daysWithBasalEvents.size),
-        averageLevel = totalLevel.average(daysWithEvents.size)
+        averageLevel = totalLevel.average(daysWithEvents.size),
+        statisticBasal = statisticBasal,
+        statisticBolus = statisticBolus
     )
 }
 
-fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadStatisticModelByPeriod {
+private fun List<MedicamentInsulinType>.convertToStatistic() =
+    map { insulinType -> insulinType.name.lowercase() }
+
+//private fun getInsulinTypeForStatistic(lambda: (EventV2) -> List<MedicamentInsulinType>?) =
+//    this?.mapNotNull { event -> lambda.invoke(event)?.map { type -> type.name.lowercase() } }
+//        ?.flatten()
+//        ?.distinct()
+//        .orEmpty()
+
+fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<EventV2>?): BreadStatisticModelByPeriod {
     var totalLevel = 0.0
     val daysWithEvents = mutableSetOf<LocalDate>()
 
@@ -220,7 +249,7 @@ fun buildBreadStatisticModelByPeriod(breadEventsPerPeriod: List<Event>?): BreadS
     )
 }
 
-fun buildActivityStatisticModel(activityEventsPerPeriod: List<Event>?): ActivityStatisticModel {
+fun buildActivityStatisticModel(activityEventsPerPeriod: List<EventV2>?): ActivityStatisticModel {
     var totalDuration = 0L
     var count = 0
 

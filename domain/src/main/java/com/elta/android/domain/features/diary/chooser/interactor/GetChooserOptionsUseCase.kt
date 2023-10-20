@@ -3,8 +3,8 @@ package com.elta.android.domain.features.diary.chooser.interactor
 import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
-import com.elta.android.domain.features.diary.insulin.DrugNameRepository
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.nullgr.core.interactor.ObservableListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -13,18 +13,18 @@ import javax.inject.Inject
 
 class GetChooserOptionsUseCase @Inject constructor(
     private val tagsRepo: TagsRepository,
-    private val insulinRepo: DrugNameRepository,
+    private val medicinesRepository: MedicinesRepository,
     schedulers: SchedulersFacade
 ) : ObservableListUseCase<ChooserOptionModel, GetChooserOptionsUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<List<ChooserOptionModel>> {
         val p = checkNotNull(params)
-        return buildChooserOptions(p, tagsRepo, insulinRepo)
+        return buildChooserOptions(p, tagsRepo, medicinesRepository)
     }
 
     data class Params(
         val eventType: EventType,
         val chooserType: ChooserType,
-        val insulinType: InsulinType? = null
+        val medicamentInsulinType: MedicamentInsulinType? = null
     )
 }

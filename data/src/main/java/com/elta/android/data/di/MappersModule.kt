@@ -16,19 +16,22 @@ import com.elta.android.data.features.devices.mapper.GlucometerToCacheMapper
 import com.elta.android.data.features.devices.mapper.GlucometerToDomainMapper
 import com.elta.android.data.features.devices.mapper.GlucometerToDtoMapper
 import com.elta.android.data.features.devices.mapper.ScanResultToGlucometerDtoMapper
-import com.elta.android.data.features.diary.events.cache.dto.EventCachedDto
-import com.elta.android.data.features.diary.events.dto.EventDto
+import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
+import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
+import com.elta.android.data.features.diary.events.dto.v1.EventDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
-import com.elta.android.data.features.diary.events.mapper.EventFromCacheMapper
-import com.elta.android.data.features.diary.events.mapper.EventFromGlucometerMapper
-import com.elta.android.data.features.diary.events.mapper.EventToCacheMapper
-import com.elta.android.data.features.diary.events.mapper.EventToDomainMapper
-import com.elta.android.data.features.diary.events.mapper.EventToDtoMapper
-import com.elta.android.data.features.diary.events.mapper.EventToSimpleMapper
-import com.elta.android.data.features.diary.insulin.cache.DrugCachedDto
-import com.elta.android.data.features.diary.insulin.dto.DrugDto
-import com.elta.android.data.features.diary.insulin.mapper.DrugFromCacheMapper
-import com.elta.android.data.features.diary.insulin.mapper.DrugToCacheMapper
+import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.mapper.v1.EventFromCacheMapper
+import com.elta.android.data.features.diary.events.mapper.v1.EventFromGlucometerMapper
+import com.elta.android.data.features.diary.events.mapper.v1.EventToCacheMapper
+import com.elta.android.data.features.diary.events.mapper.v1.EventToDomainMapper
+import com.elta.android.data.features.diary.events.mapper.v1.EventToDtoMapper
+import com.elta.android.data.features.diary.events.mapper.v1.EventToSimpleMapper
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2FromCacheMapper
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2FromGlucometerMapper
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2ToCacheMapper
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2ToDtoMapper
+import com.elta.android.data.features.diary.events.mapper.v2.EventV2ToSimpleMapper
 import com.elta.android.data.features.diary.tags.cache.dto.TagCachedDto
 import com.elta.android.data.features.diary.tags.dto.TagDto
 import com.elta.android.data.features.diary.tags.mapper.TagFromCacheMapper
@@ -68,6 +71,7 @@ import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.reminder.model.Reminder
 import com.elta.android.domain.features.sale_points.model.Coordinates
@@ -113,6 +117,11 @@ abstract class MappersModule {
     ): Mapper<EventDto, EventCachedDto>
 
     @Binds
+    abstract fun bindEventV2ToCacheMapper(
+        mapper: EventV2ToCacheMapper
+    ): Mapper<EventV2Dto, EventV2CachedDto>
+
+    @Binds
     abstract fun bindEventToDomainMapper(
         mapper: EventToDomainMapper
     ): Mapper<EventDto, Event>
@@ -123,9 +132,19 @@ abstract class MappersModule {
     ): Mapper<EventCachedDto, EventDto>
 
     @Binds
+    abstract fun bindEventV2FromCacheMapper(
+        mapper: EventV2FromCacheMapper
+    ): Mapper<EventV2CachedDto, EventV2Dto>
+
+    @Binds
     abstract fun bindEventFromGlucometerMapper(
         mapper: EventFromGlucometerMapper
     ): Mapper<GlucometerEventDto, Event>
+
+    @Binds
+    abstract fun bindEventV2FromGlucometerMapper(
+        mapper: EventV2FromGlucometerMapper
+    ): Mapper<GlucometerEventDto, EventV2>
 
     @Binds
     abstract fun bindEventToSimpleMapper(
@@ -133,9 +152,19 @@ abstract class MappersModule {
     ): Mapper<EventDto, SimpleEventDto>
 
     @Binds
+    abstract fun bindEventV2ToSimpleMapper(
+        mapper: EventV2ToSimpleMapper
+    ): Mapper<EventV2Dto, SimpleEventDto>
+
+    @Binds
     abstract fun bindEventToDtoMapper(
         mapper: EventToDtoMapper
     ): Mapper<Event, EventDto>
+
+    @Binds
+    abstract fun bindEventV2ToDtoMapper(
+        mapper: EventV2ToDtoMapper
+    ): Mapper<EventV2, EventV2Dto>
 
     @Binds
     abstract fun bindTagToCacheMapper(
@@ -151,16 +180,6 @@ abstract class MappersModule {
     abstract fun bindTagFromCacheMapper(
         mapper: TagFromCacheMapper
     ): Mapper<TagCachedDto, TagDto>
-
-    @Binds
-    abstract fun bindDrugToCacheMapper(
-        mapper: DrugToCacheMapper
-    ): Mapper<DrugDto, DrugCachedDto>
-
-    @Binds
-    abstract fun bindDrugFromCacheMapper(
-        mapper: DrugFromCacheMapper
-    ): Mapper<DrugCachedDto, DrugDto>
 
     @Binds
     abstract fun bindProfileFromCacheMapper(
