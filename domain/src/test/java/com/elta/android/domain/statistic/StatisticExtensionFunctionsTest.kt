@@ -2,14 +2,13 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.statistics.interactor.average
 import com.elta.android.domain.features.statistics.interactor.checkMax
 import com.elta.android.domain.features.statistics.interactor.checkMin
 import com.elta.android.domain.features.statistics.interactor.isBasalInsulin
 import com.elta.android.domain.features.statistics.interactor.isBolusInsulin
-import com.elta.android.domain.features.statistics.interactor.isNotMixedInsulin
+import com.elta.android.domain.features.statistics.interactor.isBasalOrBolus
 import com.elta.android.domain.features.statistics.interactor.percent
 import org.junit.Test
 
@@ -82,20 +81,22 @@ class StatisticExtensionFunctionsTest {
     @Test
     fun eventIsBolusInsulin_ultraShort_true() {
         val event = EventTestFactory.create(
-            type = EventType.INSULIN,
-            insulin = Insulin("", "", InsulinType.ULTRASHORT)
+            type = EventType.INSULIN
         )
-        assert(event.isBolusInsulin())
+        assert(event.isBolusInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
     fun eventIsBolusInsulin_short_true() {
         val event =
             EventTestFactory.create(
-                type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.SHORT)
+                type = EventType.INSULIN
             )
-        assert(event.isBolusInsulin())
+        assert(event.isBolusInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
@@ -103,24 +104,28 @@ class StatisticExtensionFunctionsTest {
         val event =
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRAFAST)
             )
-        assert(event.isBolusInsulin())
+        assert(event.isBolusInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
     fun eventIsBolusInsulin_notInsulinEvent_false() {
         val event = EventTestFactory.create(type = EventType.ACTIVITY)
-        assert(!event.isBolusInsulin())
+        assert(!event.isBolusInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
     fun eventIsBasalInsulin_intermediate_true() {
         val event = EventTestFactory.create(
             type = EventType.INSULIN,
-            insulin = Insulin("", "", InsulinType.INTERMEDIATE)
         )
-        assert(event.isBasalInsulin())
+        assert(event.isBasalInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
@@ -128,9 +133,10 @@ class StatisticExtensionFunctionsTest {
         val event =
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG)
             )
-        assert(event.isBasalInsulin())
+        assert(event.isBasalInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
@@ -138,15 +144,18 @@ class StatisticExtensionFunctionsTest {
         val event =
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.LONG)
             )
-        assert(event.isBasalInsulin())
+        assert(event.isBasalInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
     fun eventIsBasalInsulin_notInsulinEvent_false() {
         val event = EventTestFactory.create(type = EventType.ACTIVITY)
-        assert(!event.isBasalInsulin())
+        assert(!event.isBasalInsulin(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
@@ -154,9 +163,10 @@ class StatisticExtensionFunctionsTest {
         val event =
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.MIXED)
             )
-        assert(!event.isNotMixedInsulin())
+        assert(!event.isBasalOrBolus(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
@@ -164,14 +174,17 @@ class StatisticExtensionFunctionsTest {
         val event =
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG)
             )
-        assert(event.isNotMixedInsulin())
+        assert(event.isBasalOrBolus(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 
     @Test
     fun eventIsNotMixedInsulin_notInsulinEvent_true() {
         val event = EventTestFactory.create(type = EventType.ACTIVITY)
-        assert(event.isNotMixedInsulin())
+        assert(event.isBasalOrBolus(
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        ))
     }
 }

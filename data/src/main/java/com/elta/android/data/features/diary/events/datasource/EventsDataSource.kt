@@ -1,30 +1,20 @@
 package com.elta.android.data.features.diary.events.datasource
 
-import com.elta.android.data.features.diary.events.dto.EventDto
-import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import org.threeten.bp.LocalDateTime
 
 interface EventsDataSource {
 
-    fun getEvents(): Observable<List<EventDto>>
+    fun getEvents(): Observable<List<EventV2Dto>>
 
-    fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventDto>>
+    fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventV2Dto>>
 
-    fun getEventById(id: String): Single<EventDto>
+    fun addEvents(events: List<EventV2Dto>): Completable
 
-    fun getEventsById(ids: List<Long>): Observable<List<EventDto>>
-
-    fun getLastEvent(eventType: EventTypeDto): Single<EventDto>
-
-    fun countEvents(): Single<Long>
-
-    fun addEvents(events: List<EventDto>): Completable
-
-    fun updateEvents(events: List<EventDto>): Completable
+    fun updateEvents(events: List<EventV2Dto>): Completable
 
     fun deleteEvents(events: List<SimpleEventDto>): Completable
 }

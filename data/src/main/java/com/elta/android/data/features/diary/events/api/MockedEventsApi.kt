@@ -1,26 +1,25 @@
 package com.elta.android.data.features.diary.events.api
 
-import android.content.Context
 import com.elta.android.common.utils.log
 import com.elta.android.data.features.common.dto.MetaDto
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.getPage
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
-import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
-import com.elta.android.data.features.diary.events.dto.EventsDto
-import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.EventsV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import com.elta.android.data.features.diary.tags.api.TagMockedFactory
 import io.reactivex.Observable
 
 @Suppress("MagicNumber", "ForEachOnRange", "MaxLineLength")
-class MockedEventsApi(private val context: Context) : EventsApi {
+class MockedEventsApi : EventsV2Api {
 
-    private val list: MutableList<EventDto> = mutableListOf()
+    private val list: MutableList<EventV2Dto> = mutableListOf()
 
-    override fun getEvents(lastSync: Long?, page: Int, pageSize: Int): Observable<EventsDto> =
+    override fun getEvents(touchedAfter: Long?, ignoreDeleted: Boolean, page: Int, pageSize: Int): Observable<EventsV2Dto> =
         Observable.fromCallable {
             if (list.isEmpty()) {
                 (0..3).forEach { inner ->
@@ -39,11 +38,15 @@ class MockedEventsApi(private val context: Context) : EventsApi {
                                 } else {
                                     MealTagDto.BEFOREMEAL
                                 },
-                                insulinType = if (type == EventTypeDto.INSULIN) {
-                                    InsulinTypeDto.values().random()
-                                } else {
-                                    null
-                                },
+                                medicament = if (type == EventTypeDto.INSULIN) MedicamentDto(
+                                    id = 0,
+                                    name = "",
+                                    insulinType = MedicamentDto.MedicamentInsulinTypeDto(
+                                        code = "123",
+                                        id = 0,
+                                        name = "name"
+                                    )
+                                ) else null,
                                 tagId = if (inner == 0) {
                                     TagMockedFactory.nextId
                                 } else {
@@ -59,15 +62,20 @@ class MockedEventsApi(private val context: Context) : EventsApi {
             }
 
             val pageOfData = list.getPage(page, pageSize)
-            EventsDto(pageOfData, MetaDto(list.size, page, pageSize))
+            EventsV2Dto(pageOfData, MetaDto(list.size, page, pageSize))
         }.log("Events", "meta") { it.meta.toString() }
 
-    override fun addEvents(sendToRostech: Boolean, events: List<EventDto>): Observable<List<EventDto>> =
+    override fun addEvents(
+        sendToRostech: Boolean,
+        events: List<EventV2Dto>
+    ): Observable<List<EventV2Dto>> =
         Observable.just(events)
 
-    override fun updateEvents(events: List<EventDto>): Observable<List<EventDto>> =
-        Observable.just(events)
+    override fun updateEvents(events: List<EventV2Dto>): Observable<List<EventV2Dto>> {
+        return Observable.just(events)
+    }
 
-    override fun deleteEvents(events: List<SimpleEventDto>): Observable<List<EventDto>> =
+
+    override fun deleteEvents(events: List<SimpleEventDto>): Observable<List<EventV2Dto>> =
         Observable.empty()
 }

@@ -1,21 +1,21 @@
 package com.elta.android.domain.features.user.interactor
 
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.user.isNameValid
 import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.domain.features.user.model.Profile
 
-fun buildProfile(original: Profile, events: List<Event>): Profile {
+fun buildProfile(original: Profile, events: List<EventV2>): Profile {
     if (events.isEmpty()) {
         return original
     }
 
     val sortedEvents = events.sortedByDescending { it.additionTime }
 
-    var lastWeightEvent: Event? = null
-    var lastHbA1cEvent: Event? = null
+    var lastWeightEvent: EventV2? = null
+    var lastHbA1cEvent: EventV2? = null
 
     sortedEvents.forEach { event ->
         if (lastWeightEvent == null && event.type == EventType.WEIGHT) {

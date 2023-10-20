@@ -4,12 +4,11 @@ import com.elta.android.common.utils.toIsoString
 import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
-import com.elta.android.data.features.diary.events.dto.EventDataDto
-import com.elta.android.data.features.diary.events.dto.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
-import com.elta.android.data.features.diary.events.dto.InsulinMedicamentDataDto
-import com.elta.android.data.features.diary.events.dto.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
+import com.elta.android.data.features.diary.events.dto.v2.EventDataV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import com.elta.android.data.features.diary.events.extensions.countOrZero
 import org.threeten.bp.ZonedDateTime
 import java.util.Date
@@ -32,21 +31,20 @@ object EventMockedFactory {
         value: Double? = null,
         activityType: ActivityTypeDto? = null,
         mealTag: MealTagDto? = null,
-        insulinType: InsulinTypeDto? = null,
-        medicament: String? = null,
+        medicament: MedicamentDto? = null,
         tagId: String? = null,
         note: String? = null,
         state: StateDto = StateDto.CREATED,
         products: List<ProductResponse>? = null
-    ): EventDto =
-        EventDto(
+    ): EventV2Dto =
+        EventV2Dto(
             id = id,
             additionTime = ZonedDateTime.now().toIsoString(),
             tagId = tagId,
             note = note,
             modificationTime = Date().time,
             state = state,
-            data = EventDataDto(
+            data = EventDataV2Dto(
                 temperature = 0.0,
                 value = value,
                 name = "Test name",
@@ -54,8 +52,7 @@ object EventMockedFactory {
                 duration = 2 * 60 * 60 + 30 * 60, // 2h 30m
                 activityType = activityType,
                 mealTag = mealTag,
-                insulinType = insulinType,
-                insulinMedicament = InsulinMedicamentDataDto(medicament = medicament),
+                insulinMedicament = medicament,
                 type = type,
                 glucometerSerialNumber = null,
                 products = products,

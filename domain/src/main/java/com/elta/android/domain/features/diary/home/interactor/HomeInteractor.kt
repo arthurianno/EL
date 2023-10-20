@@ -1,7 +1,7 @@
 package com.elta.android.domain.features.diary.home.interactor
 
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.modifyValues
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.DayPeriodHolder.day
@@ -21,7 +21,7 @@ import kotlin.math.abs
 private const val DOUBLE_ZERO: Double = 0.0
 
 fun buildHomeModel(
-    events: List<Event>,
+    events: List<EventV2>,
     tags: List<Tag>,
     settings: GlucoseLevelSettings,
     userInfo: UserInfo,
@@ -34,10 +34,10 @@ fun buildHomeModel(
         Timber.i("<<<<<<< GetHomeModelUseCase >>>>>>  Event: id = ${event.id} , additionTime = ${event.additionTime} , value = ${event.value} , type = ${event.type}, state = ${event.state}")
     }
 
-    var lastBreadEvent: Event? = null
-    var lastInsulinEvent: Event? = null
-    var lastGlucoseEvent: Event? = null
-    var preLastGlucoseEvent: Event? = null
+    var lastBreadEvent: EventV2? = null
+    var lastInsulinEvent: EventV2? = null
+    var lastGlucoseEvent: EventV2? = null
+    var preLastGlucoseEvent: EventV2? = null
 
     sortedEvents.forEach { event ->
         if (lastBreadEvent == null && event.type == EventType.BREAD) {
@@ -66,7 +66,7 @@ fun buildHomeModel(
     )
 }
 
-fun List<Event>.sortAndFilter(): List<Event> = sortedByDescending { it.additionTime }
+fun List<EventV2>.sortAndFilter(): List<EventV2> = sortedByDescending { it.additionTime }
     .filter { it.type != EventType.GLYCATEDHEMOGLOBIN }
 
 fun getDayPeriod(now: Long): DayPeriod =
@@ -76,14 +76,14 @@ fun getDayPeriod(now: Long): DayPeriod =
         else -> DayPeriod.EVENING
     }
 
-fun Event.glucoseLevel(settings: GlucoseLevelSettings): GlucoseLevel =
+fun EventV2.glucoseLevel(settings: GlucoseLevelSettings): GlucoseLevel =
     when (value.orZero()) {
         in settings.low -> GlucoseLevel.LOW
         in settings.normal -> GlucoseLevel.NORMAL
         else -> GlucoseLevel.HIGH
     }
 
-fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection? =
+fun EventV2.glucoseLevelDirection(preLastEvent: EventV2?): GlucoseLevelDirection? =
     when {
         preLastEvent == null -> null
         (this.value.orZero()) > (preLastEvent.value.orZero()) -> GlucoseLevelDirection.UP
@@ -91,19 +91,19 @@ fun Event.glucoseLevelDirection(preLastEvent: Event?): GlucoseLevelDirection? =
         else -> GlucoseLevelDirection.STABLE
     }
 
-fun Event.glucoseLevelDifference(preLastEvent: Event?): Double? {
+fun EventV2.glucoseLevelDifference(preLastEvent: EventV2?): Double? {
     return preLastEvent?.let {
         abs(this.value?.minus(preLastEvent.value.orZero()).orZero())
     }
 }
 
-fun getEventsBlocks(events: List<Event>, tags: List<Tag>): List<EventsBlock> {
+fun getEventsBlocks(events: List<EventV2>, tags: List<Tag>): List<EventsBlock> {
     if (events.isEmpty()) {
         return emptyList()
     }
 
     val nullTagId = "null_tag_id"
-    val blocksMap = mutableMapOf<String, MutableList<Event>>()
+    val blocksMap = mutableMapOf<String, MutableList<EventV2>>()
     events.forEach { event ->
         val tagId = event.tagId ?: nullTagId
         blocksMap.getOrDefault(tagId, mutableListOf())

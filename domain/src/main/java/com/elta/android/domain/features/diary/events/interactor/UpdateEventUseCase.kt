@@ -1,6 +1,6 @@
 package com.elta.android.domain.features.diary.events.interactor
 
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -15,5 +15,5 @@ class UpdateEventUseCase @Inject constructor(
     override fun buildUseCaseObservable(params: Params?): Completable =
         repo.updateEvent(checkNotNull(params).event)
 
-    data class Params(val event: Event)
+    data class Params(val event: EventV2)
 }

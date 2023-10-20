@@ -10,13 +10,14 @@ import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
-import com.elta.android.data.features.diary.events.datasource.EventsCachedDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
-import com.elta.android.data.features.diary.events.datasource.EventsRemoteDataSource
-import com.elta.android.data.features.diary.insulin.datasource.cache.DrugCacheDataSource
-import com.elta.android.data.features.diary.insulin.datasource.cache.DrugsCacheSource
-import com.elta.android.data.features.diary.insulin.datasource.remote.DrugsRemoteSource
-import com.elta.android.data.features.diary.insulin.datasource.remote.DrugsRemoteDataSource
+import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
+import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
+import com.elta.android.data.features.diary.events.datasource.remote.EventsRemoteDataSource
+import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheDataSource
+import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheSource
+import com.elta.android.data.features.diary.insulin.datasource.remote.MedicinesRemoteDataSource
+import com.elta.android.data.features.diary.insulin.datasource.remote.MedicinesRemoteSource
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
@@ -46,10 +47,8 @@ import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoCachedDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
-import com.elta.android.domain.features.calculator.model.Dish
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import javax.inject.Singleton
 
 @Suppress("TooManyFunctions")
@@ -102,7 +101,7 @@ abstract class DataSourceModule {
     @Cache
     @Binds
     @Singleton
-    abstract fun bindEventsCachedDataSource(source: EventsCachedDataSource): EventsDataSource
+    abstract fun bindEventsCachedDataSource(source: EventsCachedCacheDataSource): EventsCacheDataSource
 
     @Remote
     @Binds
@@ -116,11 +115,7 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindInsulinDrugNameRemoteDataSource(source: DrugsRemoteDataSource): DrugsRemoteSource
-
-    @Binds
-    @Singleton
-    abstract fun bindInsulinDrugNameCacheDataSource(source: DrugCacheDataSource): DrugsCacheSource
+    abstract fun bindMedicinesCacheDataSource(source: MedicinesCacheDataSource): MedicinesCacheSource
 
     @Binds
     @Singleton
@@ -170,4 +165,7 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindDishesPagingSource(source: DishesPagingSource): BasePagingSource
 
+    @Binds
+    @Singleton
+    abstract fun bindMedicineRemoteDataSource(source: MedicinesRemoteDataSource): MedicinesRemoteSource
 }

@@ -1,8 +1,9 @@
 package com.elta.android.domain.features.statistics.interactor
 
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
 import org.threeten.bp.LocalDate
@@ -15,17 +16,23 @@ internal fun Int.percent(total: Int): Int =
 
 internal fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal fun Double.checkMin(min: Double): Double = if (min > this) this else min
-internal fun Event.isBolusInsulin(): Boolean =
-    insulinType == InsulinType.ULTRASHORT ||
-        insulinType == InsulinType.SHORT ||
-        insulinType == InsulinType.ULTRAFAST
+internal fun EventV2.isBolusInsulin(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
+    val list = medicamentInsulinStatistic.bolusInsulinTypes.getCode()
+    return medicament?.insulinType?.code in list
+}
 
-internal fun Event.isBasalInsulin(): Boolean =
-    insulinType == InsulinType.INTERMEDIATE ||
-        insulinType == InsulinType.LONG ||
-        insulinType == InsulinType.ULTRALONG
+internal fun EventV2.isBasalInsulin(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
+    val list = medicamentInsulinStatistic.basalInsulinTypes.getCode()
+    return medicament?.insulinType?.code in list
+}
 
-internal fun Event.isNotMixedInsulin(): Boolean = insulinType != InsulinType.MIXED
+internal fun EventV2.isBasalOrBolus(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
+    val basal = medicamentInsulinStatistic.basalInsulinTypes.getCode()
+    val bolus = medicamentInsulinStatistic.bolusInsulinTypes.getCode()
+    return medicament?.insulinType?.code in (basal + bolus)
+}
+
+private fun List<MedicamentInsulinType>.getCode() = map { it.code }
 
 internal fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatisticModel =
     if (max.glucose.maxLevel < this.glucose.maxLevel) this else max
@@ -33,9 +40,9 @@ internal fun DailyStatisticModel.checkMax(max: DailyStatisticModel): DailyStatis
 internal fun DailyStatisticModel.checkMin(min: DailyStatisticModel): DailyStatisticModel =
     if (min.glucose.minLevel > this.glucose.minLevel) this else min
 
-internal fun List<Event>.toEventsContainer(): EventsContainer {
-    val byType = hashMapOf<EventType, List<Event>>()
-    val byTypePerDay = hashMapOf<LocalDate, Map<EventType, List<Event>>>()
+internal fun List<EventV2>.toEventsContainer(): EventsContainer {
+    val byType = hashMapOf<EventType, List<EventV2>>()
+    val byTypePerDay = hashMapOf<LocalDate, Map<EventType, List<EventV2>>>()
 
     for (element in this) {
         // split by type
@@ -67,6 +74,6 @@ internal fun List<Event>.toEventsContainer(): EventsContainer {
 }
 
 data class EventsContainer(
-    val byType: Map<EventType, List<Event>>,
-    val byTypePerDay: Map<LocalDate, Map<EventType, List<Event>>>
+    val byType: Map<EventType, List<EventV2>>,
+    val byTypePerDay: Map<LocalDate, Map<EventType, List<EventV2>>>
 )

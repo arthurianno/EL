@@ -4,11 +4,12 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
-import com.elta.android.presentation.features.main.events.chooser.models.ChooserInsulin
+import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
@@ -34,43 +35,44 @@ class ChooserOptionsItemsBuilder @Inject constructor(
 
     private fun mapFromObject(source: ChooserOptionModel, config: ChooserConfiguration): ListItem =
         when (source.meta) {
-            is ActivityType -> mapAsActivityItem(source)
-            is InsulinType -> mapAsInsulinItem(source, config.chooserInsulin)
+            is ActivityType -> mapAsActivityItem(source, config.id)
+            is MedicamentInsulinType -> mapAsInsulinItem(source, config.medicament)
             is Tag -> mapAsTagItem(source)
-            is String -> mapAsInsulinNameItem(source, config.chooserInsulin)
+            is Medicament -> mapAsInsulinNameItem(source, config.medicament?.medicamentId)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
 
-    private fun mapAsInsulinNameItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
-        val meta = source.meta as String
+    private fun mapAsInsulinNameItem(source: ChooserOptionModel, medicamentId: Int?): ListItem {
+        val medicament = source.meta as Medicament
         return ChooserItem(
             id = source.id,
-            title = source.id,
+            title = medicament.name,
             iconId = null,
-            meta = meta,
-            isSelected = chooserInsulin?.drug == meta
+            meta = source.meta,
+            isSelected = medicamentId == medicament.id
         )
     }
 
-    private fun mapAsActivityItem(source: ChooserOptionModel): ListItem {
-        val meta = source.meta as ActivityType
+    private fun mapAsActivityItem(source: ChooserOptionModel, id: String?): ListItem {
+        val activity = source.meta as ActivityType
         return ChooserItem(
             id = source.id,
-            title = resourceProvider.getString(meta.toName()),
-            iconId = meta.toIcon(),
-            meta = meta
+            title = resourceProvider.getString(activity.toName()),
+            iconId = activity.toIcon(),
+            meta = activity,
+            isSelected = activity.name == id
         )
     }
 
-    private fun mapAsInsulinItem(source: ChooserOptionModel, chooserInsulin: ChooserInsulin?): ListItem {
-        val meta = source.meta as InsulinType
+    private fun mapAsInsulinItem(source: ChooserOptionModel, medicament: MedicamentChooser?): ListItem {
+        val insulinType = source.meta as MedicamentInsulinType
         return ChooserWithSubtypeItem(
             id = source.id,
-            title = resourceProvider.getString(meta.toName()),
+            title = insulinType.name,
             iconId = null,
-            meta = meta,
-            isSelectedType = chooserInsulin?.type == meta,
-            drug = chooserInsulin?.drug.orEmpty()
+            meta = insulinType,
+            medicament = medicament,
+            isSelectedType = insulinType.id == medicament?.insulinId,
         )
     }
 

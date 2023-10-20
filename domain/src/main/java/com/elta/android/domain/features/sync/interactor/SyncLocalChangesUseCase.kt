@@ -1,7 +1,8 @@
 package com.elta.android.domain.features.sync.interactor
 
+import com.elta.android.domain.features.diary.events.migration.EventsMigration
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.insulin.DrugNameRepository
+import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
@@ -18,20 +19,22 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val googleFitRepo: GoogleFitRepository,
     private val tagsRepository: TagsRepository,
     private val salePointsRepository: SalePointsRepository,
-    private val drugNameRepository: DrugNameRepository,
+    private val migration: EventsMigration,
+    private val medicinesRepository: MedicinesRepository,
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
     override fun buildUseCaseObservable(params: Unit?): Completable =
         Completable.concat(
             listOf(
+                migration.migrationEventsToEventsV2(),
                 profileRepo.sync(),
                 eventsRepo.sync(),
                 tagsRepository.sync(),
                 salePointsRepository.sync(),
-                drugNameRepository.sync(),
+                medicinesRepository.sync(),
                 googleFitRepo.sync()
-                    .onErrorComplete()
+                    .onErrorComplete(),
             )
         )
             .applyScheduler(schedulers)

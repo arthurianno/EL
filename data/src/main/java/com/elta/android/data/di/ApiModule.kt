@@ -13,10 +13,10 @@ import com.elta.android.data.features.calculator.api.CalculatorApi
 import com.elta.android.data.features.calculator.api.CalculatorMockedApi
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
-import com.elta.android.data.features.diary.events.api.EventsApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
-import com.elta.android.data.features.diary.insulin.api.DrugNameApi
-import com.elta.android.data.features.diary.insulin.api.MockedDrugNameApi
+import com.elta.android.data.features.diary.events.api.EventsV2Api
+import com.elta.android.data.features.diary.insulin.api.MedicinesApi
+import com.elta.android.data.features.diary.insulin.api.MockMedicinesApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.feedback.api.FeedbackApi
@@ -37,14 +37,14 @@ import retrofit2.Retrofit
 import javax.inject.Singleton
 
 private const val USE_MOCKED_SALE_POINTS_API = false
-private const val USE_MOCKED_EVENTS_API = false
+private const val USE_MOCKED_EVENTS_V2_API = false
 private const val USE_MOCKED_TAGS_API = false
 private const val USE_MOCKED_SETTINGS_API = false
 private const val USE_MOCKED_OBSERVER_API = false
 private const val USE_MOCKED_FIRMWARE_API = false
 private const val USE_MOCKED_FEEDBACK_API = false
 private const val USE_MOCKED_REPORTS_API = false
-private const val USE_MOCKED_INSULIN_DRUG_API = false
+private const val USE_MOCKED_MEDICINES_API = false
 private const val USE_MOCKED_CALCULATOR_API = false
 private const val USE_MOCKED_PERSONAL_DATA_API = true
 
@@ -106,15 +106,13 @@ class ApiModule {
 
     @Provides
     @Singleton
-    fun provideEventsApi(
+    fun provideEventsV2Api(
         context: Context,
         retrofit: Retrofit
-    ): EventsApi =
-        if (USE_MOCKED_EVENTS_API) {
-            MockedEventsApi(context)
-        } else {
-            retrofit.create(EventsApi::class.java)
-        }
+    ): EventsV2Api = if (USE_MOCKED_EVENTS_V2_API)
+        MockedEventsApi()
+    else
+        retrofit.create(EventsV2Api::class.java)
 
     @Provides
     @Singleton
@@ -126,17 +124,6 @@ class ApiModule {
             MockedTagsApi(context)
         } else {
             retrofit.create(TagsApi::class.java)
-        }
-
-    @Provides
-    @Singleton
-    fun provideInsulinApi(
-        retrofit: Retrofit
-    ): DrugNameApi =
-        if (USE_MOCKED_INSULIN_DRUG_API) {
-            MockedDrugNameApi()
-        } else {
-            retrofit.create(DrugNameApi::class.java)
         }
 
     @Provides
@@ -207,5 +194,16 @@ class ApiModule {
             PersonalDataMockedApi()
         } else {
             retrofit.create(PersonalDataApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideMedicinesApi(
+        retrofit: Retrofit
+    ): MedicinesApi =
+        if (USE_MOCKED_MEDICINES_API) {
+            MockMedicinesApi()
+        } else {
+            retrofit.create(MedicinesApi::class.java)
         }
 }

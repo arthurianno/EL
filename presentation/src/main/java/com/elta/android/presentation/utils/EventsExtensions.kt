@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.model.TagImage
@@ -72,19 +71,6 @@ fun TagImage.toIcon(): Int =
         TagImage.TRAINING -> R.drawable.ic_tag_training
         TagImage.NIGHT -> R.drawable.ic_tag_night
         TagImage.SPECIALEVENT -> R.drawable.ic_tag_specialevent
-    }
-
-@StringRes
-fun InsulinType.toName(): Int =
-    when (this) {
-        InsulinType.ALL -> R.string.insulin_type_all
-        InsulinType.ULTRAFAST -> R.string.insulin_type_ultrafast
-        InsulinType.ULTRASHORT -> R.string.insulin_type_ultrashort
-        InsulinType.SHORT -> R.string.insulin_type_short
-        InsulinType.INTERMEDIATE -> R.string.insulin_type_intermediate
-        InsulinType.LONG -> R.string.insulin_type_long
-        InsulinType.ULTRALONG -> R.string.insulin_type_ultralong
-        InsulinType.MIXED -> R.string.insulin_type_mixed
     }
 
 @StringRes
@@ -177,7 +163,7 @@ fun ActivityType.toIcon(): Int =
         ActivityType.DANCING -> R.drawable.ic_dancing
         ActivityType.HORSEBACKRIDING -> R.drawable.ic_horseback_riding
         ActivityType.SHOOTING -> R.drawable.ic_shooting
-        ActivityType.SKATEBOARDING -> R.drawable.ic_surfing // TODO cahnge
+        ActivityType.SKATEBOARDING -> R.drawable.ic_surfing
         ActivityType.SURFING -> R.drawable.ic_surfing
         ActivityType.MARTIALARTS -> R.drawable.ic_martial_arts
         ActivityType.ANOTHER -> R.drawable.ic_another

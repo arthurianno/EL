@@ -2,7 +2,7 @@ package com.elta.android.domain
 
 import com.elta.android.common.utils.isSortedBy
 import com.elta.android.domain.factory.EventTestFactory
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -42,7 +42,7 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_differentEvents_hasOnlyGlucose() {
-        val events = arrayListOf<Event>()
+        val events = arrayListOf<EventV2>()
         events.add(EventTestFactory.create(type = EventType.GLUCOSE, value = 4.4))
         events.add(EventTestFactory.create(type = EventType.BREAD, value = 4.4))
         events.add(EventTestFactory.create(type = EventType.INSULIN, value = 4.4))
@@ -65,7 +65,7 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_fewNormalEvents_noMinAndMax() {
-        val events = arrayListOf<Event>()
+        val events = arrayListOf<EventV2>()
         for (a in 4..9) {
             events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
         }
@@ -81,7 +81,7 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_fewEventsInDifferentRanges_hasMinAndMax() {
-        val events = arrayListOf<Event>()
+        val events = arrayListOf<EventV2>()
         for (a in 4..9) {
             events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
         }
@@ -103,7 +103,7 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_fewEventsInDifferentRanges_correctOrder() {
-        val events = arrayListOf<Event>()
+        val events = arrayListOf<EventV2>()
         for (a in 4..9) {
             events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
         }

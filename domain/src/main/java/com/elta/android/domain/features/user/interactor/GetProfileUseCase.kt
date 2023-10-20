@@ -20,5 +20,5 @@ class GetProfileUseCase @Inject constructor(
         Singles.zip(
             userRepo.getProfile().applyScheduler(schedulers),
             eventsRepo.getEvents().singleOrError().onErrorReturn { emptyList() }.applyScheduler(schedulers)
-        ).map { buildProfile(it.first, it.second) }
+        ).map { (profile, events) -> buildProfile(profile, events) }
 }

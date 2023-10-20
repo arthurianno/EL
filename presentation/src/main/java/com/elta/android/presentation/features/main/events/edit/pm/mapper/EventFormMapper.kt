@@ -1,10 +1,9 @@
 package com.elta.android.presentation.features.main.events.edit.pm.mapper
 
 import com.elta.android.domain.features.diary.events.model.ActivityType
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.Medicament
 import com.elta.android.presentation.features.main.events.mapper.toPickerValues
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toIcon
@@ -12,26 +11,26 @@ import com.elta.android.presentation.utils.toName
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import com.nullgr.core.resources.ResourceProvider
 
-fun Event.getPickerValues(): Pair<Int, Int>? =
+fun EventV2.getPickerValues(): Pair<Int, Int>? =
     when (type) {
         EventType.ACTIVITY -> duration.toPickerValues()
         EventType.MEDICAMENTS -> null
         else -> value.toPickerValues()
     }
 
-fun Event.getValue(): Double = value ?: 0.0
+fun EventV2.getValue(): Double = value ?: 0.0
 
-fun Event.getFormattedTemperature(): String =
+fun EventV2.getFormattedTemperature(): String =
     temperature?.let { NumberFormatter.format(it) } ?: "-"
 
-fun Event.getFormInputText(): String? =
+fun EventV2.getFormInputText(): String? =
     when (type) {
         EventType.BREAD -> kind
         EventType.MEDICAMENTS -> name
         else -> null
     }
 
-fun Event.getTag(res: ResourceProvider): SelectorOption? {
+fun EventV2.getTag(res: ResourceProvider): SelectorOption? {
     if (tag == null) return null
     return SelectorOption(
         text = tag.toName(res),
@@ -40,10 +39,10 @@ fun Event.getTag(res: ResourceProvider): SelectorOption? {
     )
 }
 
-fun Event.getSelectorOption(res: ResourceProvider): SelectorOption? =
+fun EventV2.getSelectorOption(res: ResourceProvider): SelectorOption? =
     when (type) {
         EventType.ACTIVITY -> activityType.toSelectorOption(res)
-        EventType.INSULIN -> insulinType.toSelectorOption(medicament, res)
+        EventType.INSULIN -> medicament?.toSelectorOption()
         else -> null
     }
 
@@ -56,13 +55,8 @@ private fun ActivityType?.toSelectorOption(res: ResourceProvider): SelectorOptio
     )
 }
 
-private fun InsulinType?.toSelectorOption(
-    medicament: String?,
-    res: ResourceProvider
-): SelectorOption? =
-    this?.let {
-        SelectorOption(
-            text = "${res.getString(it.toName())}($medicament)",
-            meta = Insulin(previousName = "", drug = medicament.orEmpty(), type = it)
-        )
-    }
+private fun Medicament.toSelectorOption(): SelectorOption =
+    SelectorOption(
+        text = "${insulinType.name}($name)",
+        meta = this
+    )

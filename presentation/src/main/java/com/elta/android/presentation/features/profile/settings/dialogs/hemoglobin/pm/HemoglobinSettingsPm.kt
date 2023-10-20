@@ -3,7 +3,7 @@ package com.elta.android.presentation.features.profile.settings.dialogs.hemoglob
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetGlycatedHemoglobinEventsUseCase
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.DEFAULT_VALUE
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
@@ -50,7 +50,7 @@ class HemoglobinSettingsPm @Inject constructor(
     private val profileState = state<Profile>()
     private val inputValueState = state(DEFAULT_VALUE)
     private val loadScreeAction = action<Unit>()
-    private val hemoglobinEventsState = state<List<Event>>()
+    private val hemoglobinEventsState = state<List<EventV2>>()
 
     override fun onCreate() {
         super.onCreate()
@@ -119,7 +119,7 @@ class HemoglobinSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-    private fun handleSuccess(result: Pair<Profile, List<Event>>) {
+    private fun handleSuccess(result: Pair<Profile, List<EventV2>>) {
         profileState.consumer.accept(result.first)
         hemoglobinItemsState.consumer.accept(hemoglobinItemsBuilder.buildItems(result.second))
         hemoglobinEventsState.consumer.accept(result.second)
@@ -175,6 +175,6 @@ class HemoglobinSettingsPm @Inject constructor(
             glucometerSerialNumber = null
         )
 
-    private fun createDeleteEventParams(event: Event): DeleteEventUseCase.Params =
+    private fun createDeleteEventParams(event: EventV2): DeleteEventUseCase.Params =
         DeleteEventUseCase.Params(event)
 }

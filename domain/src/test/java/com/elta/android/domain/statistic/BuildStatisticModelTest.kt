@@ -1,10 +1,9 @@
 package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildStatisticModel
@@ -42,44 +41,36 @@ class BuildStatisticModelTest {
         val insulinEvents = arrayListOf(
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 0.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.SHORT),
                 value = 10.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.LONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 0.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.MIXED),
                 value = 10.0
             )
         )
@@ -97,7 +88,7 @@ class BuildStatisticModelTest {
             EventTestFactory.create(type = EventType.ACTIVITY, duration = 100)
         )
 
-        val allEvents = arrayListOf<Event>().apply {
+        val allEvents = arrayListOf<EventV2>().apply {
             addAll(glucoseEvents)
             addAll(insulinEvents)
             addAll(breadEvents)
@@ -117,14 +108,20 @@ class BuildStatisticModelTest {
             activity = getExpectedActivityStatistic()
         )
 
-        val model = buildStatisticModel(period, allEvents, settings, GlucoseFormat.PLASMA)
+        val model = buildStatisticModel(
+            period,
+            allEvents,
+            settings,
+            GlucoseFormat.PLASMA,
+            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+        )
 
         assert(model == expected)
     }
 
     private fun getExpectedDayWithMaxLevel(
         day: LocalDate,
-        glucoseEvents: List<Event>,
+        glucoseEvents: List<EventV2>,
         settings: GlucoseLevelSettings
     ): DailyStatisticModel {
         return getExpectedDailyStatisticModel(day, glucoseEvents, settings)
@@ -132,7 +129,7 @@ class BuildStatisticModelTest {
 
     private fun getExpectedDayWithMinLevel(
         day: LocalDate,
-        glucoseEvents: List<Event>,
+        glucoseEvents: List<EventV2>,
         settings: GlucoseLevelSettings
     ): DailyStatisticModel {
         return getExpectedDailyStatisticModel(day, glucoseEvents, settings)
@@ -140,7 +137,7 @@ class BuildStatisticModelTest {
 
     private fun getExpectedAllDays(
         day: LocalDate,
-        glucoseEvents: List<Event>,
+        glucoseEvents: List<EventV2>,
         settings: GlucoseLevelSettings
     ): Map<LocalDate, DailyStatisticModel> {
         val dailyStatisticModel = getExpectedDailyStatisticModel(day, glucoseEvents, settings)
@@ -149,7 +146,7 @@ class BuildStatisticModelTest {
 
     private fun getExpectedDailyStatisticModel(
         day: LocalDate,
-        glucoseEvents: List<Event>,
+        glucoseEvents: List<EventV2>,
         settings: GlucoseLevelSettings
     ): DailyStatisticModel {
         return DailyStatisticModel(
@@ -199,7 +196,7 @@ class BuildStatisticModelTest {
     }
 
     private fun getExpectedGlucoseStatistic(
-        events: List<Event>,
+        events: List<EventV2>,
         settings: GlucoseLevelSettings
     ): GlucoseStatisticModel {
         return GlucoseStatisticModel(
@@ -236,7 +233,9 @@ class BuildStatisticModelTest {
         return InsulinStatisticModelByPeriod(
             averageBolusLevel = 20.0,
             averageBasalLevel = 30.0,
-            averageLevel = 50.0
+            averageLevel = 50.0,
+            statisticBasal = emptyList(),
+            statisticBolus = emptyList()
         )
     }
 

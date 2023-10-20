@@ -2,9 +2,10 @@ package com.elta.android.domain.features.diary.events.interactor
 
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.ActivityType
-import com.elta.android.domain.features.diary.events.model.Event
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.diary.events.model.State
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -24,7 +25,7 @@ class AddNewEventUseCase @Inject constructor(
         val p = checkNotNull(params)
         val date = checkNotNull(p.date)
         return repo.addEvent(
-            Event(
+            EventV2(
                 id = UUID.randomUUID().toString(),
                 additionTime = date,
                 tagId = p.tag?.id,
@@ -37,7 +38,6 @@ class AddNewEventUseCase @Inject constructor(
                 temperature = null,
                 duration = p.duration,
                 activityType = p.activity,
-                insulinType = p.insulin,
                 medicament = p.medicament,
                 type = p.eventType,
                 mealTag = null,
@@ -55,8 +55,7 @@ class AddNewEventUseCase @Inject constructor(
         val duration: Long? = null,
         val date: ZonedDateTime? = null,
         val tag: Tag? = null,
-        val insulin: InsulinType? = null,
-        val medicament: String? = null,
+        val medicament: Medicament? = null,
         val activity: ActivityType? = null,
         val note: String? = null,
         val glucometerSerialNumber: String?,

@@ -1,32 +1,20 @@
 package com.elta.android.presentation.features.main.events.base.mapper
 
-import com.elta.android.domain.features.diary.events.model.InsulinType
-import com.elta.android.presentation.features.main.events.chooser.models.ChooserInsulin
+import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 
-private const val START_OF_DRUG = "drug="
-private const val END_OF_VALUE = ","
-private const val START_OF_TYPE = "type="
-private const val END_OF_TYPE = ")"
-private const val START_OF_PREVIOUS_NAME = "previousName="
 
-internal fun SelectorOption?.toChooserInsulin(): ChooserInsulin? {
+internal fun SelectorOption?.toChooserInsulin(): MedicamentChooser? {
     return if (!this?.meta.toString().contains("null")
     ) {
-        ChooserInsulin(
-            previousName = this?.meta.toString().toPreviousName(),
-            drug = this?.meta.toString().toDrugName(),
-            type = this?.meta.toString().toInsulinType()
+        val medicament = this?.meta as Medicament
+        return MedicamentChooser(
+            medicamentId = medicament.id,
+            medicamentName = medicament.name,
+            insulinCode = medicament.insulinType.code,
+            insulinName = medicament.insulinType.name,
+            insulinId = medicament.insulinType.id,
         )
     } else null
 }
-
-private fun String.toPreviousName() =
-    this.substringAfter(START_OF_PREVIOUS_NAME).substringBefore(END_OF_VALUE)
-
-private fun String.toDrugName() =
-    this.substringAfter(START_OF_DRUG).substringBefore(END_OF_VALUE)
-
-private fun String.toInsulinType() = InsulinType.valueOf(
-    this.substringAfter(START_OF_TYPE).substringBefore(END_OF_TYPE)
-)

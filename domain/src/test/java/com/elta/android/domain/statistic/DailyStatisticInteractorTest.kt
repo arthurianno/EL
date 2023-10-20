@@ -2,8 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildDailyBreadStatisticModel
@@ -42,44 +41,36 @@ class DailyStatisticInteractorTest {
         val events = arrayListOf(
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 0.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.SHORT),
                 value = 10.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.LONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 0.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.MIXED),
                 value = 10.0
             )
         )
@@ -90,7 +81,13 @@ class DailyStatisticInteractorTest {
             totalLevel = 50.0
         )
 
-        val model = buildDailyInsulinStatisticModel(events)
+        val model = buildDailyInsulinStatisticModel(
+            events,
+            MedicamentInsulinStatistic(
+                bolusInsulinTypes = emptyList(),
+                basalInsulinTypes = emptyList()
+            )
+        )
 
         assert(model == expected)
     }
@@ -110,44 +107,36 @@ class DailyStatisticInteractorTest {
         val insulinEvents = arrayListOf(
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRASHORT),
                 value = 0.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.SHORT),
                 value = 10.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.INTERMEDIATE),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.LONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 10.0
             ),
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.ULTRALONG),
                 value = 0.0
             ),
 
             EventTestFactory.create(
                 type = EventType.INSULIN,
-                insulin = Insulin("", "", InsulinType.MIXED),
                 value = 10.0
             )
         )
@@ -223,7 +212,16 @@ class DailyStatisticInteractorTest {
             )
         )
 
-        val model = buildDailyStatisticModel(day, eventsPerDay, settings, GlucoseFormat.PLASMA)
+        val model = buildDailyStatisticModel(
+            day,
+            eventsPerDay,
+            settings,
+            GlucoseFormat.PLASMA,
+            MedicamentInsulinStatistic(
+                bolusInsulinTypes = emptyList(),
+                basalInsulinTypes = emptyList()
+            )
+        )
 
         assert(model == expected)
     }

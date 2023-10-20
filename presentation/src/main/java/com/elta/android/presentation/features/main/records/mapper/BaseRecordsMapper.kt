@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.main.records.mapper
 
 import com.elta.android.common.utils.CommonFormats
 import com.elta.android.common.utils.toStringWithFormat
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.R
@@ -34,7 +34,7 @@ open class BaseRecordsMapper(
             isExpanded = expand
         )
 
-    protected fun Event.record(): ListItem =
+    private fun EventV2.record(): ListItem =
         RecordItem(
             id = id,
             icon = type.toIconWithBg(),
@@ -47,17 +47,17 @@ open class BaseRecordsMapper(
             labelIcon = mealTag?.toIcon()
         )
 
-    private fun Event.insulinType() =
+    private fun EventV2.insulinType() =
         if (type == EventType.INSULIN) {
             resources.getString(type.toName()) + resources.getString(
                 R.string.event_type_insulin_medicament,
-                medicament.toString()
+                medicament?.name.orEmpty()
             )
         } else {
             resources.getString(type.toName())
         }
 
-    protected fun Event.formatValue(): String? =
+    private fun EventV2.formatValue(): String? =
         when (type) {
             EventType.INSULIN -> resources.getString(
                 R.string.event_type_insulin_pattern,
@@ -83,11 +83,11 @@ open class BaseRecordsMapper(
             else -> null
         }
 
-    protected fun Event.formatDuration(resources: ResourceProvider): String =
+    private fun EventV2.formatDuration(resources: ResourceProvider): String =
         checkNotNull(duration).asTimeString(resources)
 
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
-    protected fun Event.formatDate(): String {
+    private fun EventV2.formatDate(): String {
         return try {
             val time = additionTime.toStringWithFormat(CommonFormats.FORMAT_TIME)
             val offset = additionTime.offset?.toString().orEmpty()
@@ -97,9 +97,9 @@ open class BaseRecordsMapper(
         }
     }
 
-    protected fun Event.toTitle(): String =
+    private fun EventV2.toTitle(): String =
         when (type) {
-            EventType.INSULIN -> resources.getString(checkNotNull(insulinType).toName())
+            EventType.INSULIN -> medicament?.insulinType?.name.orEmpty()
             EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) }
                 ?: resources.getString(R.string.event_type_activity_no_name)
 
@@ -110,7 +110,7 @@ open class BaseRecordsMapper(
             else -> ""
         }
 
-    protected fun Long.asTimeString(resources: ResourceProvider): String {
+    private fun Long.asTimeString(resources: ResourceProvider): String {
         val days = TimeUnit.SECONDS.toDays(this)
         val hours = TimeUnit.SECONDS.toHours(this) - days * HOURS_IN_DAY
         val minutes =

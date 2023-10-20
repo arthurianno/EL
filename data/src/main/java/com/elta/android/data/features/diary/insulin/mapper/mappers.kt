@@ -1,20 +1,66 @@
 package com.elta.android.data.features.diary.insulin.mapper
 
-import com.elta.android.data.features.diary.insulin.dto.DrugDto
-import com.elta.android.domain.features.diary.events.model.Drug
+import com.elta.android.data.features.diary.insulin.cache.insulin.InsulinTypeDbEntity
+import com.elta.android.data.features.diary.insulin.cache.medicines.MedicamentDbEntity
+import com.elta.android.data.features.diary.insulin.cache.statistic.InsulinStatisticDbEntity
+import com.elta.android.data.features.diary.insulin.dto.MedicinesNetworkResponse
+import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 
-fun List<DrugDto>.toDrug(): List<Drug> =
-        map {
-            Drug(
-                    id = it.id,
-                    insulinType = it.insulinType.toDomain(),
-                    name = it.name
+fun MedicinesNetworkResponse.toDb(): Triple<List<MedicamentDbEntity>, List<InsulinTypeDbEntity>, InsulinStatisticDbEntity> {
+    val list = insulinMedicamentsByType
+        .values
+        .flatten()
+
+    val medicamentDb = list
+        .map {
+            MedicamentDbEntity(
+                id = it.id.toLong(),
+                name = it.name,
+                insulinType = it.insulinType.toDb()
             )
         }
+    val insulinTypeDb = list
+        .map { it.insulinType.toDb() }
+        .distinct()
 
-private fun DrugDto.InsulinTypeDto.toDomain(): Drug.InsulinType =
-        Drug.InsulinType(
-                code = code,
-                id = id,
-                name = name
-        )
+    val statisticTypeDb = InsulinStatisticDbEntity(
+        bolusInsulinTypes = bolusInsulinTypes,
+        basalInsulinTypes = basalInsulinTypes
+    )
+
+
+    return Triple(medicamentDb, insulinTypeDb, statisticTypeDb)
+}
+
+
+fun MedicamentInsulinType.toDb(): InsulinTypeDbEntity = InsulinTypeDbEntity(
+    id = id.toLong(),
+    name = name,
+    code = code
+)
+
+fun List<MedicamentDbEntity>.toDomainMedicines(): List<Medicament> = map { it.toDomain() }
+
+private fun MedicamentDbEntity.toDomain() =
+    Medicament(
+        id = id.toInt(),
+        name = name,
+        insulinType = insulinType.toDomain(),
+    )
+
+fun List<InsulinTypeDbEntity>.toDomain(): List<MedicamentInsulinType> = map { it.toDomain() }
+
+private fun InsulinTypeDbEntity.toDomain(): MedicamentInsulinType = MedicamentInsulinType(
+    id = id.toInt(),
+    code = code,
+    name = name
+)
+
+private fun MedicinesNetworkResponse.InsulinType.toDb(): InsulinTypeDbEntity =
+    InsulinTypeDbEntity(
+        code = code,
+        id = id.toLong(),
+        name = name,
+    )
+

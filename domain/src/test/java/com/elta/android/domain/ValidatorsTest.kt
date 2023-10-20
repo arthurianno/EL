@@ -1,11 +1,9 @@
 package com.elta.android.domain
 
-import com.elta.android.domain.features.diary.events.model.Insulin
-import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator
 import com.elta.android.domain.features.diary.events.model.form.BreadValidator
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
-import com.elta.android.domain.features.diary.events.model.form.InsulinValidator
+import com.elta.android.domain.features.diary.events.model.form.MedicinesValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
 import org.junit.Test
@@ -63,10 +61,9 @@ class ValidatorsTest {
     @Test
     fun insulin_LowerBoundAndDate_True() {
         assert(
-            InsulinValidator.isValid(
+            MedicinesValidator.isValid(
                 value = 0.1,
                 date = ZonedDateTime.now(),
-                insulin = Insulin("", "", InsulinType.SHORT)
             )
         )
     }
@@ -74,10 +71,9 @@ class ValidatorsTest {
     @Test
     fun insulin_TopBoundAndDate_True() {
         assert(
-            InsulinValidator.isValid(
+            MedicinesValidator.isValid(
                 value = 99.9,
                 date = ZonedDateTime.now(),
-                insulin = Insulin("", "", InsulinType.SHORT)
             )
         )
     }
@@ -85,24 +81,22 @@ class ValidatorsTest {
     @Test
     fun insulin_OutOfBoundAndDate_False() {
         assert(
-            !InsulinValidator.isValid(
+            !MedicinesValidator.isValid(
                 value = 0.0,
                 date = ZonedDateTime.now(),
-                insulin = Insulin("", "", InsulinType.SHORT)
             )
         )
         assert(
-            !InsulinValidator.isValid(
+            !MedicinesValidator.isValid(
                 value = 100.0,
                 date = ZonedDateTime.now(),
-                insulin = Insulin("", "", InsulinType.SHORT)
             )
         )
     }
 
     @Test
     fun insulin_EmptyInsulinType_False() {
-        assert(!InsulinValidator.isValid(value = 0.1, date = ZonedDateTime.now()))
+        assert(!MedicinesValidator.isValid(value = 0.1, date = ZonedDateTime.now()))
     }
 
     @Test
