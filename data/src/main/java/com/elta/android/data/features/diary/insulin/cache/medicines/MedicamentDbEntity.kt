@@ -11,5 +11,6 @@ data class MedicamentDbEntity(
     @Id(assignable = true) var id: Long,
     val name: String,
     @Convert(converter = InsulinTypeDbEntityConverter::class, dbType = String::class)
-    val insulinType: InsulinTypeDbEntity
+    val insulinType: InsulinTypeDbEntity,
+    val deleted: Boolean
 )

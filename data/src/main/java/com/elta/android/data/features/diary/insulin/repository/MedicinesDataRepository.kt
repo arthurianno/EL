@@ -26,7 +26,11 @@ class MedicinesDataRepository @Inject constructor(
 
             else -> medicinesCacheSource.getMedicines(type.toDb())
 
-        }.map { it.toDomainMedicines() }
+        }
+            .map {
+                it.filterNot { medicament -> medicament.deleted }
+                    .toDomainMedicines()
+            }
     }
 
     override fun getInsulinTypes(): Observable<List<MedicamentInsulinType>> {

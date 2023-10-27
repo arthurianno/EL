@@ -69,8 +69,8 @@ fun toMedicament(medicament: String?, insulinType: String?): MedicamentDto? {
             code = insulinType.convertCode().name,
             id = insulinType.hashCode(),
             name = insulinType.getName()
-        )
-
+        ),
+        deleted = false
     )
 }
 

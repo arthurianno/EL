@@ -1041,7 +1041,7 @@
     },
     {
       "id": "30:8999350013555102540",
-      "lastPropertyId": "3:3711023675863001889",
+      "lastPropertyId": "4:4379323195446670924",
       "name": "MedicamentDbEntity",
       "properties": [
         {
@@ -1059,6 +1059,11 @@
           "id": "3:3711023675863001889",
           "name": "insulinType",
           "type": 9
+        },
+        {
+          "id": "4:4379323195446670924",
+          "name": "deleted",
+          "type": 1
         }
       ],
       "relations": []
