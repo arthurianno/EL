@@ -18,7 +18,9 @@ data class MedicinesNetworkResponse(
         @SerializedName("insulinType")
         val insulinType: InsulinType,
         @SerializedName("name")
-        val name: String
+        val name: String,
+        @SerializedName("deleted")
+        val deleted: Boolean
     )
 
     data class InsulinType(

@@ -58,7 +58,8 @@ fun Medicament.toDto(): MedicamentDto {
     return MedicamentDto(
         id = id,
         name = name,
-        insulinType = insulinType.toDto()
+        insulinType = insulinType.toDto(),
+        deleted = deleted
     )
 }
 private fun MedicamentInsulinType.toDto(): MedicamentDto.MedicamentInsulinTypeDto = MedicamentDto.MedicamentInsulinTypeDto(
@@ -92,7 +93,8 @@ fun MedicamentDto.toDomain(): Medicament {
     return Medicament(
         id = id,
         name = name,
-        insulinType = insulinType.toDomain()
+        insulinType = insulinType.toDomain(),
+        deleted = deleted
     )
 }
 

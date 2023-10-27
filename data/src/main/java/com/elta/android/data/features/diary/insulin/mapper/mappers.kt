@@ -17,10 +17,12 @@ fun MedicinesNetworkResponse.toDb(): Triple<List<MedicamentDbEntity>, List<Insul
             MedicamentDbEntity(
                 id = it.id.toLong(),
                 name = it.name,
-                insulinType = it.insulinType.toDb()
+                insulinType = it.insulinType.toDb(),
+                deleted = it.deleted
             )
         }
     val insulinTypeDb = list
+        .filterNot { it.deleted }
         .map { it.insulinType.toDb() }
         .distinct()
 
@@ -47,6 +49,7 @@ private fun MedicamentDbEntity.toDomain() =
         id = id.toInt(),
         name = name,
         insulinType = insulinType.toDomain(),
+        deleted = deleted
     )
 
 fun List<InsulinTypeDbEntity>.toDomain(): List<MedicamentInsulinType> = map { it.toDomain() }

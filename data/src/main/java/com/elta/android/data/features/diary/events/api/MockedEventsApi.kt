@@ -45,7 +45,8 @@ class MockedEventsApi : EventsV2Api {
                                         code = "123",
                                         id = 0,
                                         name = "name"
-                                    )
+                                    ),
+                                    deleted = false
                                 ) else null,
                                 tagId = if (inner == 0) {
                                     TagMockedFactory.nextId
