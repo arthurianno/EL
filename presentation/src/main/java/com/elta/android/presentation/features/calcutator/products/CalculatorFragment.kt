@@ -475,10 +475,10 @@ class CalculatorFragment : BaseComposeFragment<CalculatorViewModel>() {
         return remember(this) {
             derivedStateOf {
                 when {
-                    firstVisibleItemIndex == 0 -> true
+                    firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0 -> true
                     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1 -> false
                     previousIndex != firstVisibleItemIndex -> previousIndex > firstVisibleItemIndex
-                    else -> previousScrollOffset >= firstVisibleItemScrollOffset
+                    else -> previousScrollOffset > firstVisibleItemScrollOffset
                 }.also {
                     previousIndex = firstVisibleItemIndex
                     previousScrollOffset = firstVisibleItemScrollOffset
