@@ -7,7 +7,7 @@ import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCa
 import com.elta.android.domain.features.firebase.interactor.TokenUseCase
 import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
 import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.HealthApp
 import com.elta.android.domain.features.user.model.HealthAppType
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 class ProfileSettingsPm @Inject constructor(
     private val tokenUseCase: TokenUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val deleteProfileUseCase: DeleteProfileUseCase,
     private val linkSocialNetworkUseCase: LinkSocialNetworkUseCase,

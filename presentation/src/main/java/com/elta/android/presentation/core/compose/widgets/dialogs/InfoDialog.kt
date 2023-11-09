@@ -129,7 +129,7 @@ private fun DialogContent(
 
 @Preview
 @Composable
-private fun Test() {
+private fun PreviewDialogContent() {
     DialogContent(
         message = "Курица и индейка A La King с овощами в сливках, белый или суповой соус (включает морковку, брокколи и/или салат, без картофеля) на основе куриного бульона",
         buttonText = "Закрыть"

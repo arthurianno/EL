@@ -48,6 +48,7 @@ sealed class Events : Event {
         sealed class Server : Sync() {
             object Started : Server()
             object Error : Server()
+            object ErrorWithMessage : Server()
             object Success : Server()
         }
     }

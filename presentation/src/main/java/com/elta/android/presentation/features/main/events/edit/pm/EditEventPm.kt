@@ -3,7 +3,6 @@ package com.elta.android.presentation.features.main.events.edit.pm
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
-import com.elta.android.domain.features.calculator.interactor.UpdateVerifiedProductUseCase
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
@@ -35,10 +34,9 @@ class EditEventPm @Inject constructor(
     private val updateEventUseCase: UpdateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val cachedDishes: CachedDishesUseCase,
-    updateVerifiedProductUseCase: UpdateVerifiedProductUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
-) : BaseEventPm(services, calculatorFragmentResult, cachedDishes, updateVerifiedProductUseCase) {
+) : BaseEventPm(services, calculatorFragmentResult, cachedDishes) {
 
     val deleteEventAction = action<Unit>()
 

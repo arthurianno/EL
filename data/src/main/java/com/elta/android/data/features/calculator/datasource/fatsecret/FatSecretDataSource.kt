@@ -131,7 +131,7 @@ class FatSecretDataSource @Inject constructor(
                 ).asFlow()
             }.map { it.food.toDomain() }
 
-            DishType.Verified -> throw DishError.NotMatchType
+            DishType.Verified, DishType.Custom -> throw DishError.NotMatchType
         }
     }
 

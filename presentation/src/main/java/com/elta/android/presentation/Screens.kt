@@ -12,9 +12,11 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
-import com.elta.android.presentation.features.calcutator.CalculatorFragment
-import com.elta.android.presentation.features.calcutator.DishDetailFragment
-import com.elta.android.presentation.features.calcutator.model.DishUiEntity
+import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
+import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
+import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
+import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.consultant.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
@@ -38,6 +40,7 @@ import com.elta.android.presentation.features.observers.invite.ui.InviteObserver
 import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseSettingFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
@@ -258,6 +261,10 @@ object Screens {
         override fun getFragment() = MainProfileFragment.newInstance()
     }
 
+    object GlucoseSettingScreen: SupportAppScreen() {
+        override fun getFragment(): Fragment = GlucoseSettingFragment.newInstance()
+    }
+
     object ProfileSettings : SupportAppScreen() {
         override fun getFragment() = ProfileSettingsFragment.newInstance()
     }
@@ -377,7 +384,18 @@ object Screens {
     }
 
     object CalculatorScreen : SupportAppScreen() {
-        override fun getFragment() = CalculatorFragment()
+        override fun getFragment() = CalculatorFragment.newInstance()
+    }
+
+    object CustomProductsScreen : SupportAppScreen() {
+        override fun getFragment() = CustomProductsFragment.newInstance()
+    }
+
+    data class CreateCustomProductScreen(
+        val dish: DishUiEntity? = null,
+        val productName: String? = null,
+    ) : SupportAppScreen() {
+        override fun getFragment() = CreateCustomProductFragment.newInstance(dish, productName)
     }
 
     data class AddDishScreen(val dish: DishUiEntity) : SupportAppScreen() {

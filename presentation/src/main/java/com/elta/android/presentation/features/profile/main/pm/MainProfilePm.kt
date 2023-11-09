@@ -3,7 +3,7 @@ package com.elta.android.presentation.features.profile.main.pm
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.AdditionalFunction
 import com.elta.android.domain.features.user.model.ExitFromApp
@@ -41,7 +41,7 @@ import kotlin.math.min
 class MainProfilePm @Inject constructor(
     private val remindersManager: RemindersManager,
     private val logOutUseCase: LogOutUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val itemsBuilder: MainProfileOptionsItemsBuilder,
     private val resourceProvider: ResourceProvider,
@@ -52,7 +52,6 @@ class MainProfilePm @Inject constructor(
     val profileSettingsAction = action<Unit>()
     val openDiabetesTypeDialogCommand = command<Unit>(bufferSize = 1)
     val openHemoglobinTypeDialogCommand = command<Unit>(bufferSize = 1)
-    val openGlucoseRangeDialogCommand = command<Unit>(bufferSize = 1)
 
     private val getProfileSettingsAction = action<Unit>()
     private val updateProfileByEventAction = action<Unit>()
@@ -127,7 +126,7 @@ class MainProfilePm @Inject constructor(
     private fun navigateIndicatorScreen(type: MainProfileIndicatorItem.Type) =
         when (type) {
             MainProfileIndicatorItem.Type.GLUCOSE_LEVEL ->
-                openGlucoseRangeDialogCommand.consumer.accept(Unit)
+                router.startFlow(Screens.GlucoseSettingScreen)
 
             MainProfileIndicatorItem.Type.DIABETES ->
                 openDiabetesTypeDialogCommand.consumer.accept(Unit)

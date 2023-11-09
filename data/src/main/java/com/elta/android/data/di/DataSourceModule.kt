@@ -2,12 +2,15 @@ package com.elta.android.data.di
 
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.common.di.qualifires.Paging
+import com.elta.android.common.di.qualifires.PagingType
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
+import com.elta.android.data.features.calculator.paging.ProductsPagingSource
 import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
@@ -161,9 +164,15 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindReportsDataSources(source: ReportsRemoteDataSource): ReportsDataSource
 
+    @Paging(PagingType.FatSecret)
     @Binds
     @Singleton
     abstract fun bindDishesPagingSource(source: DishesPagingSource): BasePagingSource
+
+    @Paging(PagingType.Products)
+    @Binds
+    @Singleton
+    abstract fun bindProductsPagingSource(source: ProductsPagingSource): BasePagingSource
 
     @Binds
     @Singleton

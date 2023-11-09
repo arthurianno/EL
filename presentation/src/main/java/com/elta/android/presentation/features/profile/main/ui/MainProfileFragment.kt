@@ -10,7 +10,6 @@ import com.elta.android.presentation.databinding.FragmentMainProfileBinding
 import com.elta.android.presentation.features.profile.main.pm.MainProfilePm
 import com.elta.android.presentation.features.profile.main.ui.adapter.MainProfileAdapter
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
-import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.jakewharton.rxbinding2.view.clicks
@@ -47,9 +46,6 @@ class MainProfileFragment :
         }
         pm.openHemoglobinTypeDialogCommand.bindTo {
             childFragmentManager.showDialog(HemoglobinSettingsFragment.newInstance())
-        }
-        pm.openGlucoseRangeDialogCommand.bindTo {
-            childFragmentManager.showDialog(GlucoseRangeDialogFragment.newInstance())
         }
     }
 

@@ -3,18 +3,18 @@ package com.elta.android.data.features.calculator.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.elta.android.common.di.qualifires.Paging
+import com.elta.android.common.di.qualifires.PagingType
 import com.elta.android.common.utils.takeFirst
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.calculator.datasource.calculator.CalculatorCacheDataSource
-import com.elta.android.data.features.calculator.datasource.calculator.CalculatorRemoteDataSource
 import com.elta.android.data.features.calculator.datasource.fatsecret.FatSecretDataSource
-import com.elta.android.data.features.calculator.datasource.verified.VerifiedCacheDataSource
-import com.elta.android.data.features.calculator.datasource.verified.VerifiedRemoteDataSource
+import com.elta.android.data.features.calculator.datasource.verified.ProductsDataSource
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
+import com.elta.android.domain.features.calculator.model.MetricServingLink
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
-import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -25,12 +25,11 @@ private const val HISTORY_LIST_LENGTH = 5
 
 class CalculatorDataRepository @Inject constructor(
     private val fatSecretDataSource: FatSecretDataSource,
-    private val remote: CalculatorRemoteDataSource,
     private val cache: CalculatorCacheDataSource,
-    private val verifiedCacheDataSource: VerifiedCacheDataSource,
-    private val verifiedRemoteDataSource: VerifiedRemoteDataSource,
     override val dispatcher: CoroutineDispatcher,
-    private val dishesPagingSource: BasePagingSource,
+    private val productsDataSource: ProductsDataSource,
+    @Paging(PagingType.FatSecret) private val dishesPagingSource: BasePagingSource,
+    @Paging(PagingType.Products) private val productsPagingSource: BasePagingSource,
 ) : CalculatorRepository {
 
     override val addDishFragmentResult = ReturnDataHandler.resultObject<Dish>()
@@ -38,11 +37,11 @@ class CalculatorDataRepository @Inject constructor(
 
     override fun getDish(id: String, type: DishType): Flow<Dish> {
         return when (type) {
-            DishType.Verified -> {
-                verifiedCacheDataSource.getProduct(id)
+            DishType.Verified, DishType.Custom -> {
+                productsDataSource.getProduct(id)
                     .flowOn(dispatcher)
             }
-            else -> {
+            DishType.Generic, DishType.Brand -> {
                 fatSecretDataSource.getFood(id, type)
                     .flowOn(dispatcher)
             }
@@ -62,6 +61,7 @@ class CalculatorDataRepository @Inject constructor(
             pagingSourceFactory = { dishesPagingSource.pagingSource }
         )
             .flow
+            .flowOn(dispatcher)
     }
 
 
@@ -74,23 +74,25 @@ class CalculatorDataRepository @Inject constructor(
         cache.saveWordToHistory(word)
     }
 
-    override fun getEventProducts(eventId: String): Flow<List<Dish>> =
-        remote.getProducts(eventId)
+    override suspend fun getProducts(name: String, onlyCustom: Boolean): Flow<PagingData<Dish>> {
+        productsPagingSource.setQuery(name, onlyCustom)
+        return Pager(
+            config = PagingConfig(
+                pageSize = DEFAULT_PAGE_SIZE,
+                prefetchDistance = DEFAULT_PREFETCH_DISTANCE,
+                initialLoadSize = DEFAULT_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { productsPagingSource.pagingSource }
+        )
+            .flow
             .flowOn(dispatcher)
 
-    override fun updateVerifiedProducts(): Completable {
-        return verifiedRemoteDataSource.getProducts()
-            .flatMapCompletable {
-                Completable.fromAction {
-                    verifiedCacheDataSource.saveProducts(it)
-                }
-            }
     }
 
-    override suspend fun getVerifiedProducts(name: String): Flow<List<Dish>> {
-        return verifiedCacheDataSource.getProducts(name)
+    override fun getServingsProduct(): Flow<List<MetricServingLink>> {
+        return productsDataSource.getServingsProduct()
             .flowOn(dispatcher)
-
     }
 
     override fun getLocalDishes(): Flow<List<Dish>> =
@@ -106,5 +108,5 @@ class CalculatorDataRepository @Inject constructor(
     }
 }
 
-const val DEFAULT_PAGE_SIZE = 20
+const val DEFAULT_PAGE_SIZE = 50
 const val DEFAULT_PREFETCH_DISTANCE = 2

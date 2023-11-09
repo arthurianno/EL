@@ -98,12 +98,7 @@ abstract class BaseViewModel<ST> : ViewModel() {
         _state.tryEmit(reduceBlock())
     }
 
-    protected open fun reduceStateByAction(currentState: ST, action: Action): ST {
-        when (action) {
-            is AppAction.BackPressure -> backClick()
-        }
-        return currentState
-    }
+    protected open fun reduceStateByAction(currentState: ST, action: Action): ST = currentState
 
     protected open fun handleUserAction(action: Action) {
         when (action) {

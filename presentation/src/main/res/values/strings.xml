@@ -10,6 +10,7 @@
     <string name="gender_not_specified">Пол не указан</string>
     <string name="yes_text">Да</string>
     <string name="no_text">Нет</string>
+    <string name="ok_text">Ок</string>
     <string name="cancel_text">Отмена</string>
     <string name="list_numbering_1_dot">1.</string>
     <string name="list_numbering_2_dot">2.</string>
@@ -17,7 +18,13 @@
     <string name="list_numbering_4_dot">4.</string>
     <string name="list_numbering_5_dot">5.</string>
 
+    <string name="exit_dialog_title">Выйти?</string>
+    <string name="exit_dialog_message">Введённые данные не будут сохранены</string>
+
+
     <!-- ERROR VIEW ERRORS -->
+    <string name="error_not_connection">Нет соединения</string>
+
     <string name="error_server_not_responding_title">Сервер недоступен</string>
     <string name="error_server_not_responding_subtitle">Приносим свои извинения за принесенные неудобства</string>
     <string name="error_server_not_responding_retry_button">Повторить</string>
@@ -455,13 +462,17 @@
     <string name="profile_settings_dialog_diabetes_description">Если вам нужно изменить тип диабета, выберите нужный тип из списка</string>
     <string name="profile_settings_dialog_diabetes_action_button">Выбрать</string>
 
-    <string name="profile_settings_dialog_glucose_title">Целевой диапазон</string>
-    <string name="profile_settings_dialog_glucose_subtitle">Уровень глюкозы</string>
-    <string name="profile_settings_dialog_glucose_description">Задайте свой целевой диапазон измерений глюкозы</string>
-    <string name="profile_settings_dialog_glucose_action_button">Установить</string>
-    <string name="profile_settings_dialog_glucose_hint">Диапазон определяется лечащим врачом.\nМы возьмем минимальное и максимальное значения и отобразим усредненный диапазон на графиках.</string>
-    <string name="before_eat">До еды</string>
-    <string name="after_eat">После еды</string>
+    <string name="profile_settings_glucose_range_dash">—</string>
+    <string name="profile_settings_glucose_action_button">Установить</string>
+    <string name="profile_settings_glucose_title">Целевой диапазон</string>
+    <string name="profile_settings_glucose_subtitle">Уровень глюкозы, ммоль/л</string>
+    <string name="profile_settings_glucose_description">Задайте целевой диапазон измерений глюкозы</string>
+    <string name="profile_settings_glucose_remark">Диапазон определяется лечащим врачом. Мы возьмем минимальное и максимальное значения и отобразим общий диапазон на графиках.</string>
+    <string name="profile_settings_glucose_level_before_meal">До еды</string>
+    <string name="profile_settings_glucose_level_after_meal">После еды</string>
+    <string name="profile_settings_glucose_out_of_range_error">Доступный диапазон значений: от 1,0 до 20,0</string>
+    <string name="profile_settings_glucose_different_between_values_error">Разница между значениями должна быть не менее 2 ммоль/л</string>
+    <string name="profile_settings_glucose_max_must_be_higher_than_min_error">Нижняя граница должна быть меньше верхней границы диапазона</string>
 
     <string name="profile_settings_dialog_hba1c_title">HbA1c</string>
     <string name="profile_settings_dialog_hba1c_subtitle">Гликированный гемоглобин</string>
@@ -691,6 +702,7 @@
     <string name="sync_with_backend_in_progress">Идет процесс синхронизации с сервером…</string>
     <string name="sync_with_backend_complete">Синхронизация с сервером завершена</string>
     <string name="sync_with_backend_error">Ошибка при синхронизации с сервером</string>
+    <string name="sync_with_backend_error_try_later">Ошибка соединения. Попробуйте позже.</string>
 
     <!-- FIRMWARE -->
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>
@@ -734,13 +746,13 @@
     <string name="push_channel_description">Главный канал уведомлений</string>
 
     <!-- CALCULATOR -->
-    <string name="calculator_appbar_title">Добавить блюдо/продукт</string>
-    <string name="calculator_empty_list_text">Вы еще не внесли ни одно блюдо.\nВоспользуйтесь поиском, чтобы найти необходимый продукт.</string>
-    <string name="calculator_search_hint">Найти блюдо/продукт</string>
-    <string name="calculator_help_text_add_dishes">Добавленное блюдо/продукт</string>
+    <string name="calculator_appbar_title">Добавить продукты</string>
+    <string name="calculator_empty_list_text">Вы ещё не добавили ни одного продукта.\nВоспользуйтесь поиском или создайте новый продукт.</string>
+    <string name="calculator_search_hint_product">Найти продукт</string>
+    <string name="calculator_search_hint">Найти</string>
     <string name="calculator_help_text_recent_search">Недавние поиски</string>
-    <string name="calculator_help_text_serach_result">Результаты поиска</string>
     <string name="calculator_save_text">Сохранить</string>
+    <string name="calculator_save_list">Сохранить список</string>
     <string name="calculator_add_text">Добавить</string>
     <string name="calculator_last_search">Недавние поиски</string>
     <string name="calculator_search_result">Результаты поиска</string>
@@ -752,19 +764,61 @@
     <string name="calculator_product_portion">Порция продукта</string>
     <string name="calculator_serving_count_hint">Количество</string>
     <string name="calculator_additional_information">Дополнительная информация</string>
-    <string name="calculator_dish_calories_in_serving">\u0020• %s ккал</string>
+    <string name="calculator_dish_bread_units_in_serving">\u0020• %s ХЕ</string>
     <string name="calculator_dish_calories">Калории</string>
     <string name="calculator_dish_proteins">Белки</string>
     <string name="calculator_dish_fats">Жиры</string>
     <string name="calculator_dish_carbs">Углеводы</string>
-    <string name="calculator_total_bread_units">Общее количество ХЕ:</string>
+    <string name="calculator_total_products_title">Вы добавили в список</string>
+    <string name="calculator_total_products_clear_list">Очистить список</string>
     <string name="calculator_dialog_title_warning">Внимание</string>
+    <string name="calculator_max_bread_units_title">Значение ХЕ превышает 99,9</string>>
+    <string name="calculator_dish_detail_max_bread_units_message">Проверьте и измените количество продукта</string>
     <string name="calculator_user_change_bread_units_message">Значение ХЕ было изменено, исходя из добавленных вами продуктов/блюд</string>
-    <string name="calculator_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените добавленные продуты/блюда.</string>
-    <string name="calculator_dish_detail_max_bread_units_message">Значение ХЕ превышает 99,9. Проверьте и измените вес/количество/объем выбранного блюда/продукта.</string>
+    <string name="calculator_max_bread_units_message">Проверьте и измените количество или меру продуктов</string>
     <string name="calculator_dish_delete_request">Вы уверены, что хотите удалить этот продукт/блюдо?</string>
     <string name="calculator_view_name">Посмотреть название</string>
     <string name="calculator_editing_XE_is_not_available">Чтобы вручную отредактировать значение ХЕ, сначала удалите добавленные продукты/блюда</string>
+    <string name="calculator_clear_list_title">Очистить список?</string>
+    <string name="calculator_clear_list_message">Все продукты будут удалены</string>
+    <string name="calculator_portion_count_and_serving_help_snack">Укажите количество и меру\nпотребляемого продукта</string>
+    <string name="calculator_portion_count_help_snack">Укажите количество\nпотребляемого продукта</string>
+
+    <!--    Custom Products -->
+    <string name="custom_products_save_and_add">Сохранить и добавить в список</string>
+    <string name="custom_products_add">Добавить в приём пищи</string>
+    <string name="custom_products_non_editable">Продукт нельзя отредактировать</string>
+
+    <string name="custom_products_new_product">Новый продукт</string>
+    <string name="custom_products_my_products">Мои продукты</string>
+    <string name="custom_products_create_product">Создать продукт</string>
+    <string name="custom_product_empty_list">Вы ещё не создали ни одного продукта.</string>
+
+    <string name="custom_product_name">Название продукта</string>
+    <string name="custom_product_input_name">Введите название продукта</string>
+
+    <string name="custom_product_xe">Хлебные единицы</string>
+    <string name="custom_product_xe_description">Доступный диапазон ввода ХЕ: от 0,1 до 99,9</string>
+    <string name="custom_product_input_quantity_xe">Введите количество ХЕ</string>
+    <string name="custom_product_input_units_more_zero">Порция должна быть больше 0</string>
+
+    <string name="custom_product_delete_dialog_title">Удалить продукт?</string>
+    <string name="custom_product_delete_dialog_description">Вы больше не сможете добавлять его в новые приёмы пищи.\nВ прошлых приёмах он сохранится.</string>
+
+    <string name="custom_product_count_xe">Количество ХЕ</string>
+
+    <string name="custom_product_list_offline_error">Не удалось загрузить список.\nПроверьте соединение с Интернетом и попробуйте ещё раз.</string>
+    <string name="custom_product_list_server_error">Не удалось загрузить список.\nПопробуйте ещё раз позже.</string>
+    <string name="create_custom_product_offline_error">Ошибка загрузки.\nПроверьте соединение с Интернетом и попробуйте ещё раз.</string>
+    <string name="create_custom_product_server_error">Ошибка загрузки.\nПопробуйте ещё раз позже.</string>
+
+    <string name="custom_product_list_is_empty">Вы ещё не создали ни одного продукта.</string>
+
+    <string name="custom_product_search_hint">Найти продукт</string>
+
+    <string name="custom_product_save_error_title">Не удалось сохранить продукт</string>
+    <string name="custom_product_save_error_message">Пожалуйста, попробуйте снова</string>
+
 
     <!-- CONSULTANT -->
     <string name="consultant_topbar_title">Онлайн консультант</string>
@@ -782,6 +836,7 @@
     <string name="content_description_bluetooth_icon">значок блютуза</string>
     <string name="content_description_close_button">кнопка Закрыть</string>
     <string name="content_description_clear_button">кнопка Очистить</string>
+    <string name="content_description_action_button">кнопка Действия</string>
     <string name="content_description_question_button">кнопка Вопрос</string>
     <string name="content_description_back_button">кнопка Назад</string>
 
@@ -805,5 +860,8 @@
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
 
     <string name="close">Закрыть</string>
+
+    <string name="refresh_button">Обновить</string>
+    <string name="repeat_button">Повторить</string>
 
 </resources>

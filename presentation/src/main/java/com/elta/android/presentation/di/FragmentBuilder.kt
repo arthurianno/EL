@@ -5,8 +5,10 @@ import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
-import com.elta.android.presentation.features.calcutator.CalculatorFragment
-import com.elta.android.presentation.features.calcutator.DishDetailFragment
+import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
+import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
+import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
 import com.elta.android.presentation.features.consultant.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
@@ -32,7 +34,7 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
-import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseRangeDialogFragment
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseSettingFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
@@ -229,7 +231,7 @@ abstract class FragmentBuilder {
 
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun bindGlucoseRangeDialogFragment(): GlucoseRangeDialogFragment
+    abstract fun bindGlucoseSettingFragment(): GlucoseSettingFragment
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -300,6 +302,14 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindCalculatorFragment(): CalculatorFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindCustomDishesFragment(): CustomProductsFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindCreateCustomDishFragment(): CreateCustomProductFragment
 
     @FragmentScope
     @ContributesAndroidInjector

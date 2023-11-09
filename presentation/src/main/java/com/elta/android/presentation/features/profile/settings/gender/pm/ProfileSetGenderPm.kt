@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.gender.pm
 
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.Profile
@@ -23,7 +23,7 @@ import java.util.Date
 import javax.inject.Inject
 
 class ProfileSetGenderPm @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {

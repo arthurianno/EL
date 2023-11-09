@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.dialogs.diabetes.pm
 
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
@@ -13,7 +13,7 @@ import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class DiabetesSettingDialogPm @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 

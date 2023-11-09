@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <plurals name="calculator_total_products" tools:ignore="MissingTranslation">
+        <item quantity="zero">нет продуктов</item>
+        <item quantity="one">%1$d продукт</item>
+        <item quantity="two">%1$d продукта</item>
+        <item quantity="few">%1$d продукта</item>
+        <item quantity="many">%1$d продуктов</item>
+        <item quantity="other">%1$d продуктов</item>
+    </plurals>
+</resources>

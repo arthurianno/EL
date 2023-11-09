@@ -9,8 +9,8 @@ import com.elta.android.data.common.api.PersonalDataMockedApi
 import com.elta.android.data.features.auth.api.AuthApi
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
-import com.elta.android.data.features.calculator.api.CalculatorApi
-import com.elta.android.data.features.calculator.api.CalculatorMockedApi
+import com.elta.android.data.features.calculator.api.ProductApi
+import com.elta.android.data.features.calculator.api.ProductMockedApi
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
@@ -45,7 +45,7 @@ private const val USE_MOCKED_FIRMWARE_API = false
 private const val USE_MOCKED_FEEDBACK_API = false
 private const val USE_MOCKED_REPORTS_API = false
 private const val USE_MOCKED_MEDICINES_API = false
-private const val USE_MOCKED_CALCULATOR_API = false
+private const val USE_MOCKED_PRODUCT_API = false
 private const val USE_MOCKED_PERSONAL_DATA_API = true
 
 @Module
@@ -163,14 +163,14 @@ class ApiModule {
 
     @Provides
     @Singleton
-    fun provideCalculatorApi(
+    fun provideProductApi(
         context: Context,
         retrofit: Retrofit
-    ): CalculatorApi =
-        if (USE_MOCKED_CALCULATOR_API) {
-            CalculatorMockedApi(context)
+    ): ProductApi =
+        if (USE_MOCKED_PRODUCT_API) {
+            ProductMockedApi(context)
         } else {
-            retrofit.create(CalculatorApi::class.java)
+            retrofit.create(ProductApi::class.java)
         }
 
     @Provides
