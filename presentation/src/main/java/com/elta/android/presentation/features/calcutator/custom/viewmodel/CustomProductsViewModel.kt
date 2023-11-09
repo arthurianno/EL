@@ -76,17 +76,13 @@ class CustomProductsViewModel @Inject constructor(
     }
 
     init {
-        findProducts()
-
         launch {
             searchField.state
                 .map { it.textField.text }
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_MILLIS)
                 .collectLatest {
-                    if (it.isNotEmpty()) {
-                        findProducts(it)
-                    }
+                    findProducts(it)
                 }
         }
     }
@@ -115,7 +111,7 @@ class CustomProductsViewModel @Inject constructor(
             else -> currentState
         }
 
-    private fun findProducts(name: String = "") {
+    private fun findProducts(name: String) {
         launch {
             searchProducts(name, true)
                 .catch {
