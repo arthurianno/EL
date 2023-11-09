@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 import android.os.Bundle
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
+import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonClick
@@ -40,5 +41,6 @@ class ConnectStartViewModel @Inject constructor() : BaseViewModel<ConnectStartVi
             is DownButtonClick -> router.navigateTo(Screens.ConnectTypeScreen(state.value.isOnBoarding))
             is ConnectAction.SkipNextStep -> router.navigateTo(Screens.ShopsStart)
         }
+        super.handleUserAction(action)
     }
 }
