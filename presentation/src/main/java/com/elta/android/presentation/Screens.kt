@@ -69,7 +69,6 @@ import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoar
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
 import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
-import com.elta.android.presentation.utils.navigationIntent
 import com.elta.android.presentation.utils.pdfActionIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
@@ -146,15 +145,6 @@ object Screens {
     class CallScreen(private val phoneNumber: String) : SupportAppScreen() {
         override fun getActivityIntent(context: Context) =
             callIntent(phoneNumber)
-    }
-
-    class NavigationScreen(
-        private val lat: Double,
-        private val lng: Double,
-        private val address: String
-    ) : SupportAppScreen() {
-        override fun getActivityIntent(context: Context) =
-            navigationIntent(lat, lng, address)
     }
 
     // HOME FLOW

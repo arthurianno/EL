@@ -122,6 +122,8 @@
     <string name="shops_map_call">Позвонить</string>
     <string name="shops_map_distance_km_pattern">%d км</string>
     <string name="shops_map_distance_m_pattern">%d м</string>
+    <string name="shops_map_geo_point_for_nav_apps">geo:%1$s,%2$s?q=%3$s</string>
+    <string name="shops_map_geo_address_for_web_map">https://yandex.ru/maps/?text=%1$s&amp;z=11</string>
     <string name="shops_search_hint">Найти точку продаж</string>
     <string name="shops_search_hint_services">Найти сервисный центр</string>
     <string name="shops_search_header">Результат поиска</string>

@@ -7,10 +7,10 @@ import android.provider.Settings
 import com.elta.android.presentation.R
 import com.nullgr.core.intents.launch
 
-fun navigationIntent(lat: Double, lng: Double, address: String): Intent =
-    Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse("geo:$lat,$lng?q=$address")
-    }
+fun startNavigationActivity(context: Context, uriString: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+    context.startActivity(intent)
+}
 
 fun shareIntent(uri: Uri, title: String): Intent =
     Intent.createChooser(
