@@ -11,6 +11,7 @@ data class ServingDbEntity(
     val proteins: Double?,
     val fats: Double?,
     val carbohydrate: Double,
-    val servingDescription: String,
+    val idServingMetrics: Int,
+    val nameServingMetrics: String,
     val numberOfUnits: Double,
 )

@@ -5,7 +5,7 @@ import com.elta.android.common.repository.BaseRepository
 import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
-import io.reactivex.Completable
+import com.elta.android.domain.features.calculator.model.MetricServingLink
 import kotlinx.coroutines.flow.Flow
 
 interface CalculatorRepository : BaseRepository {
@@ -17,9 +17,8 @@ interface CalculatorRepository : BaseRepository {
     fun searchDishes(name: String): Flow<PagingData<Dish>>
     fun getHistoryList(): Flow<List<String>>
     suspend fun saveWordToHistory(word: String)
-    fun getEventProducts(eventId: String): Flow<List<Dish>>
-    fun updateVerifiedProducts(): Completable
-    suspend fun getVerifiedProducts(name: String): Flow<List<Dish>>
+    suspend fun getProducts(name: String, onlyCustom: Boolean): Flow<PagingData<Dish>>
+    fun getServingsProduct(): Flow<List<MetricServingLink>>
     fun getLocalDishes(): Flow<List<Dish>>
     suspend fun saveLocalDishes(dishes: List<Dish>)
     suspend fun clearLocalDishes()

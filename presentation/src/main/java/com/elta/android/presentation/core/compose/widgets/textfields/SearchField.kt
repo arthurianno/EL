@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -29,8 +30,8 @@ import com.elta.android.presentation.core.compose.widgets.animation.Horizontally
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
 import com.elta.android.presentation.theme.GetLocalProperties
 
-sealed class SearchFiledAction : Action {
-    data class FocusChanged(val focusState: FocusState) : SearchFiledAction()
+sealed class SearchFieldAction : Action {
+    data class FocusChanged(val focusState: FocusState) : SearchFieldAction()
 }
 
 @Immutable
@@ -71,7 +72,7 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
 
     fun focusChanged(focusState: FocusState) {
         setState { state.value.copy(isFocused = focusState.isFocused) }
-        sendAction(SearchFiledAction.FocusChanged(focusState))
+        sendAction(SearchFieldAction.FocusChanged(focusState))
     }
 
     fun clear() {
@@ -83,6 +84,7 @@ class SearchFieldWidgetModel : BaseWidgetModel<SearchFieldWidgetState>() {
 @Composable
 fun SearchField(
     widgetModel: SearchFieldWidgetModel,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     searchInFocus: Boolean
 ) {
     val state = widgetModel.state.collectAsState()
@@ -126,7 +128,7 @@ fun SearchField(
                 },
                 trailingIcon = {
                     if (state.value.textField.text.isNotEmpty()){
-                        HorizontallyAnimation(visualState = searchInFocus, toLeft = false) {
+                        HorizontallyAnimation(visualState = state.value.isFocused, toLeft = false) {
                             ButtonCircle(
                                 icon = R.drawable.ic_search_clean,
                                 onClick = widgetModel::clear,
@@ -136,6 +138,7 @@ fun SearchField(
                     }
                 },
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                keyboardOptions = keyboardOptions,
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged(widgetModel::focusChanged)

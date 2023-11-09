@@ -6,14 +6,17 @@ data class Serving(
     val proteins: Double?,
     val fats: Double?,
     val carbohydrate: Double,
-    val servingDescription: String,
+    val metricServingLink: MetricServingLink,
     val numberOfUnits: Double,
 ) {
 
     companion object {
         fun empty(): Serving = Serving(
             id = "",
-            servingDescription = "",
+            metricServingLink = MetricServingLink(
+                id = 0,
+                name = ""
+            ),
             numberOfUnits = 0.0,
             calories = 0.0,
             proteins = 0.0,

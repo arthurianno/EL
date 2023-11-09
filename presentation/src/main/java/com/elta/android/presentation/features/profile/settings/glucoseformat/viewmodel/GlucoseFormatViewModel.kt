@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel
 
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
@@ -21,7 +21,7 @@ import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
 class GlucoseFormatViewModel @Inject constructor(
-    private val getProfile: GetProfileUseCase,
+    private val getProfile: GetUpdatedProfileUseCase,
     private val updateProfile: UpdateProfileUseCase,
     private val bus: RxBus
 ) : BaseViewModel<GlucoseFormatViewState>() {

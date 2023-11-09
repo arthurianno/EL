@@ -13,12 +13,14 @@ data class EltaDimens(
     val smallDim: Dp,
     val halfMediumDim: Dp,
     val mediumDim: Dp,
+    val halfBigDim: Dp,
     val bigDim: Dp,
     val veryBugDim: Dp,
     val contentPadding: Dp,
     val downButtonHeight: Dp,
     val textFieldPopupOffset: DpOffset,
     val borderWidth: Dp,
+    val borderWidthMedium: Dp,
     val dialogPaddings: PaddingValues,
     val zero: Dp,
     val progressSmallWidth: Dp,
@@ -37,7 +39,7 @@ data class EltaDimens(
     val dishHeaderTitle: PaddingValues,
     val xeValueCard: PaddingValues,
     val xeValue: PaddingValues,
-    val verifyIconSize: Dp,
+    val dishIconSize: Dp,
     val dishChars: PaddingValues,
     val portionCountHelpPadding: PaddingValues,
     // SearchGlucometer Dims
@@ -85,7 +87,9 @@ data class EltaDimens(
     val glucoseFormatRadioGroupTopSpacer: Dp,
     val glucoseFormatRadioGroupSpacer: Dp,
     val glucoseFormatTextTopPadding: Dp,
-    val glucoseFormatTextBetweenPadding: Dp
+    val glucoseFormatTextBetweenPadding: Dp,
+    val glucoseRangeTextPadding: Dp,
+    val glucoseRangeCardPadding: PaddingValues
 )
 
 internal val eltaDimens = EltaDimens(
@@ -94,12 +98,14 @@ internal val eltaDimens = EltaDimens(
     smallDim = 8.dp,
     halfMediumDim = 12.dp,
     mediumDim = 16.dp,
+    halfBigDim = 20.dp,
     bigDim = 24.dp,
     veryBugDim = 32.dp,
     contentPadding = 16.dp,
     downButtonHeight = 52.dp,
     textFieldPopupOffset = DpOffset(16.dp, 0.dp),
     borderWidth = 1.dp,
+    borderWidthMedium = 2.dp,
     dialogPaddings = PaddingValues(top = 24.dp, start = 24.dp, end = 8.dp, bottom = 8.dp),
     zero = 0.dp,
     progressSmallWidth = 1.dp,
@@ -116,7 +122,7 @@ internal val eltaDimens = EltaDimens(
     dishHeaderTitle = PaddingValues(top = 12.dp, bottom = 56.dp, start = 16.dp, end = 86.dp),
     xeValueCard = PaddingValues(bottom = 52.dp, end = 16.dp),
     xeValue = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-    verifyIconSize = 20.dp,
+    dishIconSize = 20.dp,
     dishChars = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
     portionCountHelpPadding = PaddingValues(horizontal = 76.dp),
     searchDeviceItemPadding = PaddingValues(
@@ -186,4 +192,6 @@ internal val eltaDimens = EltaDimens(
     glucoseFormatRadioGroupSpacer = 32.dp,
     glucoseFormatTextTopPadding = 40.dp,
     glucoseFormatTextBetweenPadding = 24.dp,
+    glucoseRangeTextPadding = 20.dp,
+    glucoseRangeCardPadding = PaddingValues(top = 8.dp, start = 16.dp, bottom = 12.dp, end = 16.dp)
 )

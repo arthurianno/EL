@@ -6,7 +6,7 @@ import com.elta.android.domain.features.diary.events.interactor.GetGlycatedHemog
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.user.interactor.DEFAULT_VALUE
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.decrement
 import com.elta.android.domain.features.user.interactor.getHemoglobinLevel
 import com.elta.android.domain.features.user.interactor.increment
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class HemoglobinSettingsPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val getHemoglobinEventsUseCase: GetGlycatedHemoglobinEventsUseCase,
     private val hemoglobinItemsBuilder: HemoglobinItemsBuilder,
     services: ServiceFacade

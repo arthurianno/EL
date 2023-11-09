@@ -786,7 +786,7 @@
     },
     {
       "id": "25:788264880638394151",
-      "lastPropertyId": "8:5880910850449890012",
+      "lastPropertyId": "10:7015808028703677085",
       "name": "ServingDbEntity",
       "properties": [
         {
@@ -821,14 +821,19 @@
           "type": 8
         },
         {
-          "id": "7:7344290328451027541",
-          "name": "servingDescription",
-          "type": 9
-        },
-        {
           "id": "8:5880910850449890012",
           "name": "numberOfUnits",
           "type": 8
+        },
+        {
+          "id": "9:2800254538257833747",
+          "name": "idServingMetrics",
+          "type": 5
+        },
+        {
+          "id": "10:7015808028703677085",
+          "name": "nameServingMetrics",
+          "type": 9
         }
       ],
       "relations": []
@@ -1041,7 +1046,7 @@
     },
     {
       "id": "30:8999350013555102540",
-      "lastPropertyId": "3:3711023675863001889",
+      "lastPropertyId": "4:4379323195446670924",
       "name": "MedicamentDbEntity",
       "properties": [
         {
@@ -1059,6 +1064,11 @@
           "id": "3:3711023675863001889",
           "name": "insulinType",
           "type": 9
+        },
+        {
+          "id": "4:4379323195446670924",
+          "name": "deleted",
+          "type": 1
         }
       ],
       "relations": []
@@ -1139,7 +1149,8 @@
     9199500226441517629,
     2841035726035728889,
     8767816429107199539,
-    3690420022137743030
+    3690420022137743030,
+    7344290328451027541
   ],
   "retiredRelationUids": [
     5224261980992438077,

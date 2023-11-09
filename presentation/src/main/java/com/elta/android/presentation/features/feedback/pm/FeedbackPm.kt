@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.feedback.pm
 
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.feedback.interactor.SendFeedbackUseCase
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.R
@@ -15,7 +15,7 @@ import me.dmdev.rxpm.widget.inputControl
 import javax.inject.Inject
 
 class FeedbackPm @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val sendFeedbackUseCase: SendFeedbackUseCase,
     serviceFacade: ServiceFacade

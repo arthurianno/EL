@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelFactory
 import com.elta.android.presentation.core.compose.viewmodel.ViewModelKey
-import com.elta.android.presentation.features.calcutator.viewmodel.CalculatorViewModel
-import com.elta.android.presentation.features.calcutator.viewmodel.DishDetailViewModel
+import com.elta.android.presentation.features.calcutator.custom.viewmodel.CreateCustomProductViewModel
+import com.elta.android.presentation.features.calcutator.products.viewmodel.CalculatorViewModel
+import com.elta.android.presentation.features.calcutator.custom.viewmodel.CustomProductsViewModel
+import com.elta.android.presentation.features.calcutator.products.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
@@ -20,6 +23,7 @@ import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcV
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.FlowPreview
 
 @Module
 abstract class ViewModelModule {
@@ -27,10 +31,23 @@ abstract class ViewModelModule {
     @Binds
     abstract fun bindsViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
+    @OptIn(FlowPreview::class)
     @Binds
     @IntoMap
     @ViewModelKey(CalculatorViewModel::class)
     abstract fun bindCalculatorViewModel(viewModel: CalculatorViewModel): ViewModel
+
+    @OptIn(FlowPreview::class)
+    @Binds
+    @IntoMap
+    @ViewModelKey(CustomProductsViewModel::class)
+    abstract fun bindCustomDishesViewModel(viewModel: CustomProductsViewModel): ViewModel
+
+    @OptIn(FlowPreview::class)
+    @Binds
+    @IntoMap
+    @ViewModelKey(CreateCustomProductViewModel::class)
+    abstract fun bindCreateCustomDishViewModel(viewModel: CreateCustomProductViewModel): ViewModel
 
     @Binds
     @IntoMap
@@ -87,4 +104,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(RemindersViewModel::class)
     abstract fun bindRemindersViewModel(viewModel: RemindersViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(GlucoseSettingViewModel::class)
+    abstract fun bindGlucoseSettingViewModel(viewModel: GlucoseSettingViewModel): ViewModel
 }

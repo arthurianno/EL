@@ -16,7 +16,7 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import com.elta.android.domain.features.diary.tags.model.Tag
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
@@ -58,7 +58,7 @@ private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val getShareEventUriUseCase: GetShareEventUriUseCase,

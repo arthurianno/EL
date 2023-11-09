@@ -19,8 +19,18 @@ fun VSpacerSmall() {
 }
 
 @Composable
+fun VSpacerHalfMedium() {
+    Spacer(modifier = Modifier.height(12.dp))
+}
+
+@Composable
 fun VSpacerMedium() {
     Spacer(modifier = Modifier.height(16.dp))
+}
+
+@Composable
+fun VSpacerHalfLarge() {
+    Spacer(modifier = Modifier.height(24.dp))
 }
 
 @Composable
@@ -46,6 +56,11 @@ fun HSpacerVerySmall() {
 @Composable
 fun HSpacerSmall() {
     Spacer(modifier = Modifier.width(8.dp))
+}
+
+@Composable
+fun HSpacerHalfMedium() {
+    Spacer(modifier = Modifier.width(16.dp))
 }
 
 @Composable

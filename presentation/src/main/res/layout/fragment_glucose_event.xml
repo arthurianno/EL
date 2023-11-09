@@ -227,7 +227,7 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/before_eat" />
+                        android:text="@string/profile_settings_glucose_level_before_meal" />
 
                 </LinearLayout>
 
@@ -253,7 +253,7 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/after_eat" />
+                        android:text="@string/profile_settings_glucose_level_after_meal" />
 
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>

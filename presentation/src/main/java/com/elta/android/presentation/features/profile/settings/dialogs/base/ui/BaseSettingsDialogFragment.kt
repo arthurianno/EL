@@ -48,28 +48,28 @@ abstract class BaseSettingsDialogFragment<T : BaseSettingsDialogPm> :
     private fun DialogType.toTitle(): Int =
         when (this) {
             DialogType.DIABETES -> R.string.profile_settings_dialog_diabetes_title
-            DialogType.GLUCOSE -> R.string.profile_settings_dialog_glucose_title
+            DialogType.GLUCOSE -> R.string.profile_settings_glucose_title
             DialogType.HbA1C -> R.string.profile_settings_dialog_hba1c_title
         }
 
     private fun DialogType.toSubTitle(): Int =
         when (this) {
             DialogType.DIABETES -> R.string.profile_settings_dialog_diabetes_subtitle
-            DialogType.GLUCOSE -> R.string.profile_settings_dialog_glucose_subtitle
+            DialogType.GLUCOSE -> R.string.profile_settings_glucose_subtitle
             DialogType.HbA1C -> R.string.profile_settings_dialog_hba1c_subtitle
         }
 
     private fun DialogType.toDescription(): Int =
         when (this) {
             DialogType.DIABETES -> R.string.profile_settings_dialog_diabetes_description
-            DialogType.GLUCOSE -> R.string.profile_settings_dialog_glucose_description
+            DialogType.GLUCOSE -> R.string.profile_settings_glucose_description
             DialogType.HbA1C -> R.string.profile_settings_dialog_hba1c_description
         }
 
     private fun DialogType.toActionButtonTitle(): Int =
         when (this) {
             DialogType.DIABETES -> R.string.profile_settings_dialog_diabetes_action_button
-            DialogType.GLUCOSE -> R.string.profile_settings_dialog_glucose_action_button
+            DialogType.GLUCOSE -> R.string.profile_settings_glucose_action_button
             DialogType.HbA1C -> R.string.profile_settings_dialog_hba1c_action_button
         }
 

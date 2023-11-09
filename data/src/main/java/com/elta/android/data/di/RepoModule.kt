@@ -3,6 +3,7 @@ package com.elta.android.data.di
 import com.elta.android.data.features.auth.repository.AuthDataRepository
 import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.calculator.repository.CalculatorDataRepository
+import com.elta.android.data.features.calculator.repository.CustomProductDataRepository
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
@@ -23,6 +24,7 @@ import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
+import com.elta.android.domain.features.calculator.repository.CustomProductRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
@@ -109,6 +111,10 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindCalculatorRepository(repo: CalculatorDataRepository): CalculatorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCustomProductRepository(repo: CustomProductDataRepository): CustomProductRepository
 
     @Binds
     @Singleton

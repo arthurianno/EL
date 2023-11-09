@@ -4,7 +4,6 @@ import com.elta.android.common.utils.atEndOfDay
 import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
-import com.elta.android.domain.features.calculator.interactor.UpdateVerifiedProductUseCase
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -39,7 +38,6 @@ import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 private const val OPEN_SCREEN_DELAY_MILLIS = 300L
@@ -48,8 +46,7 @@ private const val LOCKED_FORM_PICKER_DELAY_MILLIS = 500L
 abstract class BaseEventPm(
     services: ServiceFacade,
     private val calculatorFragmentResultHandler: CalculatorFragmentResultHandler,
-    private val cachedDishes: CachedDishesUseCase,
-    private val updateVerifiedProductUseCase: UpdateVerifiedProductUseCase,
+    private val cachedDishes: CachedDishesUseCase
 ) : BasePm(services) {
     val formPickerValueChangedAction = action<Double>()
     val updateFormPickerValueCommand = command<Pair<Int, Int>>()
@@ -107,7 +104,6 @@ abstract class BaseEventPm(
             observeDishesResult()
             observeDishesChanges()
         }
-        updateVerifiedProduct()
     }
 
     fun setEventType(eventType: EventType) {
@@ -160,17 +156,6 @@ abstract class BaseEventPm(
                 }
             }
         }
-    }
-
-    private fun updateVerifiedProduct() {
-            eventTypeState.observable
-                .filter { it == EventType.BREAD }
-                .flatMapCompletable {
-                    updateVerifiedProductUseCase.execute()
-                }
-                .doOnError { Timber.e(it) }
-                .subscribe()
-                .untilDestroy()
     }
 
     private fun observeHandleBack() {

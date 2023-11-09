@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.name.pm
 
 import com.elta.android.domain.features.user.hasWrongChars
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.interactor.isNameValid
 import com.elta.android.domain.features.user.isTooLong
@@ -26,7 +26,7 @@ import java.util.Date
 import javax.inject.Inject
 
 class ProfileSetNamePm @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {

@@ -4,13 +4,12 @@ import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
-import com.elta.android.domain.features.calculator.interactor.UpdateVerifiedProductUseCase
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetLastInsulinEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.tags.model.Tag
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.presentation.R
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
@@ -32,14 +31,13 @@ private val EMPTY_SELECTOR_OPTION = SelectorOption(text = null)
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val clearCachedDishes: ClearCachedDishesUseCase,
     private val getLastInsulinEventUseCase: GetLastInsulinEventUseCase,
-    updateVerifiedProductUseCase: UpdateVerifiedProductUseCase,
     cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
-) : BaseEventPm(services, calculatorFragmentResult, cachedDishes, updateVerifiedProductUseCase) {
+) : BaseEventPm(services, calculatorFragmentResult, cachedDishes) {
 
     private val isFormNotEmptyState = state(false)
     private val eventFormHolderState = state(EventFormModel())

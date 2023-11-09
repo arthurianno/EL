@@ -34,6 +34,7 @@ dependencies {
     implementation(project(Module.core_rx))
     implementation(project(Module.common))
 
+    implementation(Dependencies.Kotlin.coroutinesRx2)
     implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.RxJava2.rxKotlin)
 

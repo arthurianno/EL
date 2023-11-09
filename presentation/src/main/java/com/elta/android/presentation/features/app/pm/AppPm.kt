@@ -3,8 +3,8 @@ package com.elta.android.presentation.features.app.pm
 import android.net.Uri
 import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
-import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.rostech.RosTechUseCase
+import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
@@ -141,6 +141,7 @@ class AppPm @Inject constructor(
                 val delay = when {
                     !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth
                     event is Events.Sync.Glucometer.Error ||
+                    event is Events.Sync.Server.ErrorWithMessage ||
                     event is Events.Sync.Glucometer.Started ||
                     event is Events.Sync.Glucometer.Nothing -> 0L
                     else -> STATUS_DELAY_MILLIS
@@ -167,6 +168,12 @@ class AppPm @Inject constructor(
 
                     is Events.Sync.Server.Error -> {
                         setStatus(SyncStatus.Server.Error(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
+                    }
+
+                    is Events.Sync.Server.ErrorWithMessage -> {
+                        setStatus(SyncStatus.Server.ErrorWithMessage(resources))
+                        setStatusVisibility(Visibility.Show)
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
 
@@ -281,6 +288,12 @@ class AppPm @Inject constructor(
                 val resources: ResourceProvider,
                 override val text: String = resources.getString(R.string.sync_with_backend_error),
                 override val color: Int = resources.getColor(R.color.color_background_sync_error)
+            ) : SyncStatus()
+
+            data class ErrorWithMessage(
+                val resources: ResourceProvider,
+                override val text: String = resources.getString(R.string.sync_with_backend_error_try_later),
+                override val color: Int = resources.getColor(R.color.black)
             ) : SyncStatus()
         }
 

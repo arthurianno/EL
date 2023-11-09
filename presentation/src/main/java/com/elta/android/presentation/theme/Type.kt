@@ -67,6 +67,19 @@ private val caption2 = TextStyle(
     fontSize = 12.sp
 )
 
+private val descriptionError = TextStyle(
+    fontFamily = appBaseFontRegular,
+    fontSize = 12.sp,
+    color = red
+)
+
+private val description = TextStyle(
+    fontFamily = appBaseFontRegular,
+    fontSize = 12.sp,
+    color = shadeBlack2
+)
+
+
 private val snackBar = TextStyle(
     fontFamily = appBaseFontRegular,
     fontSize = 15.sp
@@ -143,6 +156,8 @@ data class EltaTypes(
     val infoDialog: TextStyle,
     val infoDialogButton: TextStyle,
     val moreTextButton: TextStyle,
+    val descriptionError: TextStyle,
+    val description: TextStyle,
 )
 
 internal val eltaTypes = EltaTypes(
@@ -157,6 +172,8 @@ internal val eltaTypes = EltaTypes(
     h3 = h3,
     caption1 = caption1,
     caption2 = caption2,
+    descriptionError = descriptionError,
+    description = description,
     snackBar = snackBar,
     toolBar = toolBar,
     buttonLargeText = buttonMenuText,

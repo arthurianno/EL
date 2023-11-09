@@ -94,7 +94,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
 @Preview
 @Composable
-fun ContentPreView() {
+private fun PreviewContent() {
     val viewModel = ConnectStartViewModel().apply {
         downButton.setText(stringResource(id = R.string.sync_connect_start_title))
     }

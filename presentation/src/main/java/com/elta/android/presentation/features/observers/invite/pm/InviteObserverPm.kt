@@ -5,7 +5,7 @@ import com.elta.android.domain.features.observers.interactor.GetObserverInvitesU
 import com.elta.android.domain.features.observers.interactor.SendObserverInviteUseCase
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.observers.model.ObserverStatus
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
@@ -22,7 +22,7 @@ private const val EMPTY_STRING = ""
 class InviteObserverPm @Inject constructor(
     private val getObserverInvitesUseCase: GetObserverInvitesUseCase,
     private val sendObserverInviteUseCase: SendObserverInviteUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getProfileUseCase: GetUpdatedProfileUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
