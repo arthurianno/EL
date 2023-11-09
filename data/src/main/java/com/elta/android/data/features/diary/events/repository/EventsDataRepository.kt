@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.common.errors.NotFoundItemError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
@@ -16,14 +17,13 @@ import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
 import com.elta.android.data.features.diary.events.mapper.toDb
 import com.elta.android.data.features.diary.events.mapper.toDomain
-import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheSource
-import com.elta.android.data.features.diary.insulin.mapper.toDomain
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
+import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -36,6 +36,7 @@ class EventsDataRepository @Inject constructor(
     private val toDtoMapper: Mapper<EventV2, EventV2Dto>,
     @Remote private val remoteSource: EventsDataSource,
     @Cache private val cacheSource: EventsCacheDataSource,
+    private val medicinesRepository: MedicinesRepository,
     private val syncManager: LocalSyncManager,
     private val fileStorage: FileStorage
 ) : EventsRepository {
@@ -58,11 +59,22 @@ class EventsDataRepository @Inject constructor(
             event.toDomain()
         }
 
-    override fun getLastEvent(eventType: EventType): Single<EventV2> =
-        cacheSource.getLastEvent(eventType.toDb())
-            .map{ event ->
-            event.toDomain()
+    override fun getLastEvent(eventType: EventType): Single<EventV2> {
+        return Single.zip(
+            cacheSource.getLastEvent(eventType.toDb())
+                .map { event ->
+                    event.toDomain()
+                },
+            Single.fromObservable(
+                medicinesRepository.getMedicines(MedicamentInsulinType.allMedicament())
+            )
+        )
+        { event, medicines ->
+            if (event.medicament == null || medicines.contains(event.medicament))
+                event
+            else throw NotFoundItemError
         }
+    }
 
     override fun countEvents(): Single<Long> =
         cacheSource.countEvents()
