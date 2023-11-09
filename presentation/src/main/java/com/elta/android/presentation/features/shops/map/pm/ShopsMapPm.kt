@@ -42,13 +42,13 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.inputControl
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
 class ShopsMapPm @Inject constructor(
@@ -85,6 +85,7 @@ class ShopsMapPm @Inject constructor(
     val searchClearAction = action<Unit>()
     val searchCloseCommand = command<Unit>()
     val showDefaultScreenStateCommand = command<List<Point>>()
+    val routeToNavigationCommand = command<GeoPoint>()
 
     private val searchAction = action<String>()
     private val searchResultSelectedAction = action<SearchResultItem>()
@@ -370,14 +371,7 @@ class ShopsMapPm @Inject constructor(
 
             is Clicks.ShopMakeRoute ->
                 findGeoPointByShopItem(clicks.item).let {
-                    if (!it.isEmpty())
-                        router.navigateTo(
-                            Screens.NavigationScreen(
-                                it.latitude,
-                                it.longitude,
-                                it.meta as String
-                            )
-                        )
+                    if (!it.isEmpty()) routeToNavigationCommand.consumer.accept(it)
                 }
 
             is Clicks.SearchResult -> {

@@ -140,8 +140,9 @@ class AppPm @Inject constructor(
             .concatMap { event ->
                 val delay = when {
                     !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth
-                    event is Events.Sync.Glucometer.Error -> 0L
-                    event is Events.Sync.Glucometer.Started -> 0L
+                    event is Events.Sync.Glucometer.Error ||
+                    event is Events.Sync.Glucometer.Started ||
+                    event is Events.Sync.Glucometer.Nothing -> 0L
                     else -> STATUS_DELAY_MILLIS
                 }
                 Observable.just(event).delay(delay, TimeUnit.MILLISECONDS)

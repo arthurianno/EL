@@ -34,6 +34,7 @@ import com.elta.android.presentation.utils.pageScrolled
 import com.elta.android.presentation.utils.scrollSmooth
 import com.elta.android.presentation.utils.scrollStateChanges
 import com.elta.android.presentation.utils.setEmojiFilter
+import com.elta.android.presentation.utils.startNavigationActivity
 import com.elta.android.presentation.utils.toPoint
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.elta.android.presentation.widgets.decoration.MarginItemDecoration
@@ -43,9 +44,9 @@ import com.jakewharton.rxbinding2.widget.textChanges
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hideKeyboard
 import com.tbruyelle.rxpermissions2.RxPermissions
-import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
+import javax.inject.Inject
 
 @Suppress("MagicNumber")
 class ShopsMapFragment :
@@ -85,7 +86,11 @@ class ShopsMapFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (arguments?.get(EXTRA_TYPE) as? Type)?.let { presentationModel.setShopsType(it) }
-        (arguments?.get(EXTRA_ONBOARDING) as? Boolean)?.let { presentationModel.setOnboardingState(it) }
+        (arguments?.get(EXTRA_ONBOARDING) as? Boolean)?.let {
+            presentationModel.setOnboardingState(
+                it
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,6 +153,21 @@ class ShopsMapFragment :
         pm.checkPermissionStatusCommand.bindTo {
             val status = rxPermissions.statusFor(LOCATION_PERMISSION)
             pm.setPermissionStatus(status)
+        }
+        pm.routeToNavigationCommand.bindTo { point ->
+            try {
+                val uri = getString(
+                    R.string.shops_map_geo_point_for_nav_apps,
+                    point.latitude.toString(),
+                    point.longitude.toString(),
+                    point.meta as String
+                )
+                startNavigationActivity(requireContext(), uri)
+            } catch (e: Exception) {
+                val uri =
+                    getString(R.string.shops_map_geo_address_for_web_map, point.meta as String)
+                startNavigationActivity(requireContext(), uri)
+            }
         }
         pm.showLocationPermissionDialog.bindTo { locationDialog.dialogOpen() }
 

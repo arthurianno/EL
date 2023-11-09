@@ -42,7 +42,9 @@ class ProfileSetNamePm @Inject constructor(
     private val getProfileAction = action<Unit>()
     private val isNameNotEmptyState = state(false)
     private val isNameChangedState = state(false)
-    private val changedFullNameSate = state(PersonNameModel(firstName = "", secondName = ""))
+    private val isFirstNameChangedState = state(false)
+    private val isSecondNameChangedState = state(false)
+    private val changedFullNameState = state(PersonNameModel(firstName = "", secondName = ""))
     private val originalFullNameState = state(PersonNameModel(firstName = "", secondName = ""))
     private val profileState = state<Profile>()
 
@@ -72,14 +74,14 @@ class ProfileSetNamePm @Inject constructor(
         ) { firstName, secondName ->
             PersonNameModel(firstName, secondName)
         }
-            .doOnNext(changedFullNameSate.consumer)
+            .doOnNext(changedFullNameState.consumer)
             .doOnNext(::checkIsEmpty)
             .doOnNext(::checkIsChanged)
             .doOnNext(::checkIsValid)
             .map { personalName ->
                 isNameValid(personalName.firstName) &&
-                    isNameValid(personalName.secondName) &&
-                    isNameChangedState.value
+                        isNameValid(personalName.secondName) &&
+                        isNameChangedState.value
             }
             .subscribe(saveChangesEnableState.consumer)
             .untilDestroy()
@@ -131,8 +133,8 @@ class ProfileSetNamePm @Inject constructor(
 
     private fun createUpdateProfileUseCase(i: Unit) = UpdateProfileUseCase.Params(
         profileState.value.copy(
-            firstName = changedFullNameSate.value.firstName,
-            secondName = changedFullNameSate.value.secondName,
+            firstName = changedFullNameState.value.firstName,
+            secondName = changedFullNameState.value.secondName,
             timeStamp = Date().toTimestamp()
         )
     )
@@ -158,23 +160,25 @@ class ProfileSetNamePm @Inject constructor(
 
     private fun checkIsEmpty(name: PersonNameModel) {
         isNameNotEmptyState.consumer.accept(
-            name.firstName.isNotEmpty() ||
-                name.secondName.isNotEmpty()
+            name.firstName.isNotEmpty() || name.secondName.isNotEmpty()
         )
     }
 
     private fun checkIsChanged(name: PersonNameModel) {
         val profileName = originalFullNameState.value
-        isNameChangedState.consumer.accept(
-            profileName.firstName != name.firstName ||
-                profileName.secondName != name.secondName
-        )
+        isFirstNameChangedState.consumer.accept(profileName.firstName != name.firstName)
+        isSecondNameChangedState.consumer.accept(profileName.secondName != name.secondName)
+        isNameChangedState.consumer.accept(isFirstNameChangedState.value || isSecondNameChangedState.value)
     }
 
     private fun checkIsValid(name: PersonNameModel) {
-        if (profileState.hasValue()) {
-            firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
-            secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
+        if (profileState.hasValue() && isNameChangedState.value) {
+            if (isFirstNameChangedState.value) {
+                firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
+            }
+            if (isSecondNameChangedState.value) {
+                secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
+            }
         }
     }
 
