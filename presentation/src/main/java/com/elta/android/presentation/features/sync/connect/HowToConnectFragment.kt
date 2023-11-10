@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -120,10 +121,11 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 }
             }
         }
-        GetLocalProperties { dimens, _, _, _, _ ->
+        GetLocalProperties { dimens, _, colors, _, _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(color = colors.white)
                     .systemBarsPadding()
             ) {
                 TopAppBar(viewModel)

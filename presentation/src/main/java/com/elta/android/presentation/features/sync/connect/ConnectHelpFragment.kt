@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,10 +35,11 @@ class ConnectHelpFragment : BaseComposeFragment<ConnectHelpViewModel>() {
 
     @Composable
     override fun Content(viewModel: ConnectHelpViewModel) {
-        GetLocalProperties { dimens, _, _, _, _ ->
+        GetLocalProperties { dimens, _, colors, _, _ ->
             Column(
                 Modifier
                     .fillMaxSize()
+                    .background(color = colors.white)
                     .systemBarsPadding()
             ) {
                 AppTopBar(viewModel)

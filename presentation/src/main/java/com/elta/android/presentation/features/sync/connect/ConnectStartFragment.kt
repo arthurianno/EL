@@ -1,16 +1,19 @@
 package com.elta.android.presentation.features.sync.connect
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
@@ -39,15 +42,18 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
     override fun ConnectStartViewModel.init() {
         appTopBar.setEndIconAction(ConnectAction.SkipNextStep)
+        appTopBar.setStartIconAction(AppAction.BackPressure)
+
         downButton.setText(getString(R.string.sync_state_pin_dialog_button))
     }
 
     @Composable
     override fun Content(viewModel: ConnectStartViewModel) {
-        GetLocalProperties { dimens, brash, colors, shapes, types ->
+        GetLocalProperties { dimens, _, colors, _, _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(color = colors.white)
                     .systemBarsPadding()
             ) {
                 TopAppBar(viewModel)
@@ -85,10 +91,21 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
 
     @Composable
     fun TopAppBar(viewModel: ConnectStartViewModel) {
-        BaseAppTopBar(
-            widgetModel = viewModel.appTopBar,
-            endText = R.string.sync_start_menu_button_text
-        )
+        val state = viewModel.state.collectAsState()
+        val isOnboarding = state.value.isOnBoarding
+        
+        val endTextId = if (isOnboarding) R.string.sync_start_menu_button_text else null
+        val startIconId = if (!isOnboarding) R.drawable.ic_dialog_close else null
+
+        GetLocalProperties { _, _, colors, _, _ ->
+            BaseAppTopBar(
+                widgetModel = viewModel.appTopBar,
+                backgroundColor = colors.white,
+                startIcon = startIconId,
+                startIconColor = colors.blackBlue,
+                endText = endTextId
+            )
+        }
     }
 }
 
