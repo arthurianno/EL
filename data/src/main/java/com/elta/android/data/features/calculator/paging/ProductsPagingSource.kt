@@ -1,15 +1,18 @@
 package com.elta.android.data.features.calculator.paging
 
-import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import androidx.paging.rxjava2.RxPagingSource
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.calculator.datasource.verified.ProductsDataSource
 import com.elta.android.data.features.calculator.mapper.toDish
 import com.elta.android.domain.features.calculator.model.Dish
+import com.nullgr.core.rx.schedulers.SchedulersFacade
+import io.reactivex.Single
 import javax.inject.Inject
 
 class ProductsPagingSource @Inject constructor(
-    private val productsDataSource: ProductsDataSource
+    private val productsDataSource: ProductsDataSource,
+    private val schedulersFacade: SchedulersFacade
 ) : BasePagingSource() {
 
     override val defaultPosition: Int = DEFAULT_POSITION
@@ -23,34 +26,30 @@ class ProductsPagingSource @Inject constructor(
         onlyCustom = query[CUSTOM_INDEX] as Boolean
     }
 
-    override val pagingSource: PagingSource<Int, Dish> = object : PagingSource<Int, Dish>() {
+    override val pagingSource: RxPagingSource<Int, Dish> = object : RxPagingSource<Int, Dish>() {
 
-        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Dish> {
-
+        override fun loadSingle(params: LoadParams<Int>): Single<LoadResult<Int, Dish>> {
             val currentPage = params.key ?: DEFAULT_POSITION
             val pageSize = params.loadSize
 
-            return try {
-                val productsResponse = productsDataSource.getProducts(
-                    customOnly = onlyCustom,
-                    foodName = name,
-                    pageSize = pageSize,
-                    pageIndex = currentPage,
-                )
-
-                val dishes = productsResponse.toDish()
-                val totalPage = productsResponse.meta.totalItems
-
-                returnResult(
-                    dishes,
-                    currentPage,
-                    totalPage,
-                    pageSize
-                )
-
-            } catch (ex: Exception) {
-                LoadResult.Error(ex)
-            }
+            return productsDataSource.getProducts(
+                customOnly = onlyCustom,
+                foodName = name,
+                pageSize = pageSize,
+                pageIndex = currentPage,
+            )
+                .map { productsResponse ->
+                    val dishes = productsResponse.toDish()
+                    val totalPage = productsResponse.meta.totalItems
+                    returnResult(
+                        dishes,
+                        currentPage,
+                        totalPage,
+                        pageSize
+                    )
+                }
+                .onErrorReturn { ex -> LoadResult.Error(ex) }
+                .subscribeOn(schedulersFacade.subscribeOn)
         }
 
         override fun getRefreshKey(state: PagingState<Int, Dish>): Int? {

@@ -6,7 +6,7 @@ import com.elta.android.domain.features.calculator.model.Product
 import kotlinx.coroutines.flow.Flow
 
 interface CustomProductRepository : BaseRepository {
-    suspend fun deleteCustomProducts(productId: String)
+    suspend fun deleteCustomProducts(productId: String): Flow<String>
     suspend fun addCustomProducts(product: Product): Flow<Dish>
 
 }
