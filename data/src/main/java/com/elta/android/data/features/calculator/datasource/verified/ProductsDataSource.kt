@@ -7,38 +7,37 @@ import com.elta.android.data.features.calculator.model.ProductsResponse
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.MetricServingLink
 import com.elta.android.domain.features.calculator.model.Product
+import io.reactivex.Observable
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
 class ProductsDataSource @Inject constructor(
-    private val api: ProductApi
+    private val api: ProductApi,
 ) {
-    suspend fun getProducts(
+    fun getProducts(
         customOnly: Boolean, foodName: String?, pageIndex: Int, pageSize: Int
-    ): ProductsResponse = api.getProducts(
+    ): Single<ProductsResponse> = api.getProducts(
         customOnly = customOnly, foodName = foodName, pageIndex = pageIndex, pageSize = pageSize
     )
 
-    fun getProduct(foodId: String): Flow<Dish> = flow {
-        val product = api.getProduct(foodId).toDomain()
-        emit(product)
-    }
+    fun getProduct(foodId: String): Flow<Dish> =
+        api.getProduct(foodId)
+            .map { it.toDomain() }
+            .asFlow()
 
 
-    fun getServingsProduct(): Flow<List<MetricServingLink>> = flow {
-        val serving = api.getServingsProduct().map { servingResponse -> servingResponse.toDomain() }
-        emit(serving)
-    }
+    fun getServingsProduct(): Flow<List<MetricServingLink>> =
+        api.getServingsProduct().map { servingResponse -> servingResponse.map { it.toDomain() } }
+            .asFlow()
 
-    suspend fun removeProduct(productId: String) {
-        api.removeProduct(productId)
-    }
+    fun removeProduct(productId: String) =
+        api.removeProduct(productId).andThen(Observable.just(productId))
+            .asFlow()
 
-    suspend fun addProduct(product: Product) = flow {
-        val productNM = product.toNM()
-        val result = api.addProduct(productNM).toDomain()
-        emit(result)
-    }
+    fun addProduct(product: Product) =
+        api.addProduct(product.toNM()).map { it.toDomain() }
+            .asFlow()
 
 }

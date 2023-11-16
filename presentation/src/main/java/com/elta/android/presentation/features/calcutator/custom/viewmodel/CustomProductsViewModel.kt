@@ -54,13 +54,14 @@ class CustomProductsViewModel @Inject constructor(
 
     private fun deleteProduct(dish: DishUiEntity) {
         launch {
-            try {
-                deleteProductUseCase(dish.id)
-                findProducts(searchField.state.value.textField.text)
-            } catch (ex: Exception) {
-                handleError(ex)
-                bus.event(Events.Sync.Server.ErrorWithMessage)
-            }
+            deleteProductUseCase(dish.id)
+                .catch { ex ->
+                    handleError(ex)
+                    bus.event(Events.Sync.Server.ErrorWithMessage)
+                }
+                .collect {
+                    findProducts(searchField.state.value.textField.text)
+                }
         }
     }
 
@@ -96,7 +97,12 @@ class CustomProductsViewModel @Inject constructor(
         when (action) {
             AppAction.BackPressure -> router.exit()
             is CustomProductAction.DeleteProductClicked -> confirmDialog.dialogOpen(action.dish)
-            is CustomProductAction.ProductClicked -> router.navigateTo(Screens.CreateCustomProductScreen(action.dish))
+            is CustomProductAction.ProductClicked -> router.navigateTo(
+                Screens.CreateCustomProductScreen(
+                    action.dish
+                )
+            )
+
             is CustomProductAction.CreateProduct -> router.navigateTo(Screens.CreateCustomProductScreen())
             is SearchFieldAction.FocusChanged -> reduceState { state.value.copy(searchInFocus = action.focusState.isFocused) }
         }

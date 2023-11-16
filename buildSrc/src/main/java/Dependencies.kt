@@ -37,6 +37,7 @@ object Dependencies {
         object Paging {
             const val pagingRuntime = "androidx.paging:paging-runtime:$pagingVersion"
             const val pagingCompose = "androidx.paging:paging-compose:$pagingVersion"
+            const val rxPaging = "androidx.paging:paging-rxjava2:$pagingVersion"
         }
 
         const val core = "androidx.core:core-ktx:$coreVersion"
@@ -331,7 +332,7 @@ object Dependencies {
     }
 
     object OkHttp {
-        private const val version = "5.0.0-alpha.10"
+        private const val version = "4.12.0"
 
         const val core = "com.squareup.okhttp3:okhttp:$version"
         const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$version"

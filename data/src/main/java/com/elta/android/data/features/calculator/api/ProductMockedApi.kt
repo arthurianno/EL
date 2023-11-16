@@ -7,13 +7,15 @@ import com.elta.android.data.features.calculator.model.MetricServingUnitResponse
 import com.elta.android.data.features.calculator.model.ServingResponse
 import com.elta.android.data.features.calculator.model.StoredProductNetworkEntity
 import com.elta.android.data.features.common.dto.MetaDto
-import kotlinx.coroutines.delay
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Single
 import timber.log.Timber
 import kotlin.random.Random
 
 class ProductMockedApi(context: Context) : ProductApi {
 
-    override suspend fun addProduct(storedProduct: StoredProductNetworkEntity): ProductItemResponse {
+    override fun addProduct(storedProduct: StoredProductNetworkEntity): Observable<ProductItemResponse> {
         Timber.d("MOCK: product saved")
         val servings = storedProduct.servings.map {
             ServingResponse(
@@ -26,49 +28,52 @@ class ProductMockedApi(context: Context) : ProductApi {
                 protein = it.protein
             )
         }
-        return ProductItemResponse(
-            isVerified = false,
-            foodId = storedProduct.foodId,
-            foodName = storedProduct.foodName,
-            servings = servings
-        )
+        return Observable.fromCallable {
+            ProductItemResponse(
+                isVerified = false,
+                foodId = storedProduct.foodId,
+                foodName = storedProduct.foodName,
+                servings = servings
+            )
+        }
     }
 
-    override suspend fun getProducts(
+    override fun getProducts(
         customOnly: Boolean,
         foodName: String?,
         pageIndex: Int,
         pageSize: Int
-    ): ProductsResponse {
-        delay(1000L)
+    ): Single<ProductsResponse> {
 
         val items = generateProduct(customOnly, foodName, pageIndex, pageSize)
-        return ProductsResponse(
-            items = items,
-            meta = MetaDto(
-                totalItems = 100,
-                currentPage = pageIndex,
-                pageSize = pageSize
+        return Single.fromCallable {
+            ProductsResponse(
+                items = items,
+                meta = MetaDto(
+                    totalItems = 100,
+                    currentPage = pageIndex,
+                    pageSize = pageSize
+                )
             )
-        )
+        }
     }
 
-    override suspend fun getProduct(foodId: String): ProductItemResponse {
-        delay(1000L)
-        return generateProduct(false, "", 1, 1).first()
+    override fun getProduct(foodId: String): Observable<ProductItemResponse> {
+        return Observable.fromCallable { generateProduct(false, "", 1, 1).first() }
     }
 
-    override suspend fun removeProduct(foodId: String) {
-        Timber.d("MOCK: product removed")
+    override fun removeProduct(foodId: String): Completable {
+        return Completable.fromCallable {
+            Timber.d("MOCK: product removed")
+        }
     }
 
-    override suspend fun getServingsProduct(): List<MetricServingUnitResponse> {
-        delay(1000L)
+    override fun getServingsProduct(): Observable<List<MetricServingUnitResponse>> {
         val list = mutableListOf<MetricServingUnitResponse>()
         repeat(3) {
             list.add(generateMetricServingUnit(it))
         }
-        return list
+        return Observable.fromCallable { list }
     }
 
     private fun generateProduct(
