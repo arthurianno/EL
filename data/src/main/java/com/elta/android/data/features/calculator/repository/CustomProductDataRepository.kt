@@ -14,8 +14,9 @@ class CustomProductDataRepository @Inject constructor(
     private val productsDataSource: ProductsDataSource
 ) : CustomProductRepository {
 
-    override suspend fun deleteCustomProducts(productId: String) {
-        productsDataSource.removeProduct(productId)
+    override suspend fun deleteCustomProducts(productId: String): Flow<String> {
+        return productsDataSource.removeProduct(productId)
+            .flowOn(dispatcher)
     }
 
     override suspend fun addCustomProducts(product: Product): Flow<Dish> {
