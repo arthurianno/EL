@@ -64,7 +64,7 @@
                     android:id="@+id/emailInputView"
                     style="@style/InputStyle.Email"
                     android:layout_width="match_parent"
-                    android:maxLength="189"
+                    android:maxLength="254"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:hint="@string/registration_main_email_hint" />
