@@ -44,9 +44,9 @@ class ShopClusterPinView @JvmOverloads constructor(
         initDefaults()
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.let {
+        canvas.let {
             val center = sideSize / 2f
             val radius = center + bgSecondaryMargin + textPadding
             it.drawCircle(radius, radius, radius, primaryBackgroundPaint)

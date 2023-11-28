@@ -6,6 +6,8 @@ sealed class RemindersAction : Action {
     object CreateReminder : RemindersAction()
     object OpenCreateReminder : RemindersAction()
     data class OpenReminder(val id: String) : RemindersAction()
-    data class PermissionResult(val isGranted: Boolean) : RemindersAction()
-    object OpenSettingsDialog : RemindersAction()
+    data class NotificationPermissionResult(val isGranted: Boolean) : RemindersAction()
+    data class AlarmsAndRemindersPermissionResult(val isGranted: Boolean) : RemindersAction()
+    object OpenNotificationSettingsDialog : RemindersAction()
+    object OpenAlarmsAndRemindersSettingsDialog : RemindersAction()
 }

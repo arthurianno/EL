@@ -847,7 +847,9 @@
 
 
     <!-- Notifications Dialog -->
-    <string name="notification_dialog_message">Для отправки напоминаний, необходимо включить уведомления</string>
+    <string name="settings_dialog_settings_reminder">Включить напоминания?</string>
+    <string name="notification_dialog_message">Для отправки напоминаний необходимо включить уведомления</string>
+    <string name="alarms_and_reminders_dialog_message">Для отправки напоминаний необходимо включить \"Будильник и напоминания\"</string>
 
     <!-- Camera Dialog -->
     <string name="camera_dialog_message">Для подключения к глюкометру приложению необходим доступ к камере устройства</string>
