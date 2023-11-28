@@ -4,6 +4,7 @@ import com.elta.android.data.features.common.cache.BoxScope
 import com.elta.android.data.features.common.cache.BoxStoreFactory
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
+import io.reactivex.Completable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,4 +60,8 @@ class DbSyncStorage @Inject constructor(
                     ?: SyncInfoDto(lastGoogleFitSync = value)
             )
         }
+
+    override fun deleteDbFiles() =
+        Completable
+            .fromCallable { factory.deleteDbFiles() }
 }

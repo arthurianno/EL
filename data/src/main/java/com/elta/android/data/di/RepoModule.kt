@@ -1,5 +1,6 @@
 package com.elta.android.data.di
 
+import com.elta.android.data.features.appsettings.AppSettingsDataRepository
 import com.elta.android.data.features.auth.repository.AuthDataRepository
 import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.calculator.repository.CalculatorDataRepository
@@ -21,6 +22,7 @@ import com.elta.android.data.features.sale_points.repository.SalePointsDataRepos
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
 import com.elta.android.domain.common.repository.MediaRepository
+import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
@@ -127,4 +129,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindMedicineRepository(repo: MedicinesDataRepository): MedicinesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAppSettingsDataRepository(source: AppSettingsDataRepository): AppSettingsRepository
 }

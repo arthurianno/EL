@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.global.ui.builder
 
+import com.elta.android.domain.features.appsettings.model.BackendVariant
 import com.elta.android.domain.features.user.interactor.googleFitApp
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
+import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingRadioButtonItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHeaderItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsHealthAppItem
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem
@@ -17,7 +19,7 @@ class ProfileSettingsItemsBuilder @Inject constructor(
     private val resources: ResourceProvider
 ) {
 
-    fun buildItems(profile: Profile) = arrayListOf<ListItem>().apply {
+    fun buildItems(profile: Profile, backendVariant: BackendVariant) = arrayListOf<ListItem>().apply {
         with(profile) {
             add(ProfileSettingsHeaderItem(resources.getString(R.string.profile_personal_information)))
             add(
@@ -57,6 +59,11 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                         icon = R.drawable.ic_mail,
                         title = "Copy Token",
                         type = ProfileSettingsItem.Type.TOKEN
+                    )
+                )
+                add(
+                    ProfileSettingRadioButtonItem(
+                        type = backendVariant
                     )
                 )
             }

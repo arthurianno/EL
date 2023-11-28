@@ -1,5 +1,7 @@
 package com.elta.android.data.features.common.storage
 
+import io.reactivex.Completable
+
 interface SyncStorage {
 
     var lastSalePointsSync: Long?
@@ -9,4 +11,6 @@ interface SyncStorage {
     var lastTagsSync: Long?
 
     var lastGoogleFitSync: Long?
+
+    fun deleteDbFiles(): Completable
 }

@@ -22,8 +22,6 @@ android {
         viewBinding = true
     }
     buildTypes {
-        create("debugDev")
-        create("debugStage")
         create("releaseDev")
         create("releaseStage")
     }

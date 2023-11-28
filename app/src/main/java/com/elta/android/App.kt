@@ -12,6 +12,7 @@ import com.elta.android.presentation.di.AnalyticsModule
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nullgr.core.preferences.defaultPrefs
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -70,7 +71,13 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
             .builder()
             .context(this)
             .appModule(AppModule(this, BuildConfig.IS_LOG_ENABLED, BuildConfig.DEBUG))
-            .apiConstantsModule(ApiConstantsModule(BuildConfig.SERVER_URL))
+            .apiConstantsModule(
+                ApiConstantsModule(
+                    defaultPrefs(this),
+                    BuildConfig.SERVER_URL,
+                    BuildConfig.DEBUG
+                )
+            )
             .interceptorModule(
                 InterceptorModule(
                     App::class.java.simpleName,
