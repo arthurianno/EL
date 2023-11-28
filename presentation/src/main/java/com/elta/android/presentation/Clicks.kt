@@ -1,5 +1,6 @@
 package com.elta.android.presentation
 
+import com.elta.android.domain.features.appsettings.model.BackendVariant
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.presentation.core.bus.Click
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
@@ -37,4 +38,5 @@ sealed class Clicks : Click {
     object PrimaryDeviceItemClicked : Clicks()
     object DeviceSearchItemClicked : Clicks()
     data class SupportActionClicked(val action: SupportAction) : Clicks()
+    data class ChangeBackendVariant(val type: BackendVariant) : Clicks()
 }
