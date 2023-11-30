@@ -162,6 +162,7 @@ dependencies {
     api(project(Module.presentation))
     api(project(Module.data))
     implementation(fileTree(baseDir = "libs"))
+    implementation(Dependencies.IIOT.JacsonDatabind)
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)

@@ -5,6 +5,7 @@ import com.elta.android.domain.features.user.interactor.round
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeParseException
 import timber.log.Timber
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,11 +42,15 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         )
     }
 
-    override fun getTimeAndValue(response: String): Pair<String, Double> {
+    override fun getDate(response: String): Date {
+        val dateFromGlucometer = getTokens(response).first
+        val mills = extractDate(dateFromGlucometer)?.toInstant()?.toEpochMilli() ?: 0L
+        return Date(mills)
+    }
+
+    override fun getValue(response: String): Double {
         val token = getTokens(response)
-        val dateToken = token.first
-        val value = extractValue(token.second) ?: 0.0
-        return dateToken to value
+        return extractValue(token.second) ?: 0.0
     }
 
     private fun getTokens(response: String): Pair<String, String> {

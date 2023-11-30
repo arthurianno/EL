@@ -1,6 +1,7 @@
 package com.elta.android.data.features.devices.glucometer
 
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
+import java.util.Date
 
 interface GlucometerEventBuilder {
 
@@ -11,5 +12,7 @@ interface GlucometerEventBuilder {
         glucometerSerialNumber: String?
     ): GlucometerEventDto
 
-    fun getTimeAndValue(response: String): Pair<String, Double>
+    fun getDate(response: String): Date
+
+    fun getValue(response: String): Double
 }

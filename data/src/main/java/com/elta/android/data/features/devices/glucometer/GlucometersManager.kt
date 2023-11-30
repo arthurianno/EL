@@ -196,9 +196,10 @@ class GlucometersManager @Inject constructor(
             .doOnNext { event ->
                 if (FeatureToggles.isEnableIiotSdkFeature && event.isEvent() && !event.isEmptyEvent()) {
                     IiotSdkDeviceService.sendEvent(
-                        event = eventBuilder.getTimeAndValue(event),
                         serial = glucometerInfo?.glucometerSerialNumber.orEmpty(),
-                        model = GLUCOMETER_MODEL
+                        model = GLUCOMETER_MODEL,
+                        date = eventBuilder.getDate(event),
+                        value = eventBuilder.getValue(event)
                     )
                 }
             }
@@ -598,9 +599,10 @@ class GlucometersManager @Inject constructor(
                 if (FeatureToggles.isEnableIiotSdkFeature) {
                     holder.events.forEach { event ->
                         IiotSdkDeviceService.sendEvent(
-                            event = eventBuilder.getTimeAndValue(event),
                             serial = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))?.glucometerSerialNumber.orEmpty(),
-                            model = GLUCOMETER_MODEL
+                            model = GLUCOMETER_MODEL,
+                            date = eventBuilder.getDate(event),
+                            value = eventBuilder.getValue(event)
                         )
                     }
                 }

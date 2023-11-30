@@ -372,4 +372,10 @@ object Dependencies {
 
         const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
     }
+
+    object IIOT {
+        private const val jacsonVersion = "2.16.0"
+
+        const val JacsonDatabind = "com.fasterxml.jackson.core:jackson-databind:$jacsonVersion"
+    }
 }
