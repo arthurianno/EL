@@ -67,7 +67,7 @@ import javax.inject.Singleton
 private const val MIN_BATTERY_LEVEL = 1
 private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
 private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-private const val EVENTS_COUNT = 1000
+private const val EVENTS_COUNT = 999
 private const val SYNC_DELAY = 1000L
 private const val COMMAND_DELAY = 20L
 private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
