@@ -67,7 +67,7 @@ import javax.inject.Singleton
 private const val MIN_BATTERY_LEVEL = 1
 private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
 private val UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-private const val EVENTS_COUNT = 999
+private const val EVENTS_COUNT = 1000
 private const val SYNC_DELAY = 1000L
 private const val COMMAND_DELAY = 20L
 private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
@@ -512,8 +512,9 @@ class GlucometersManager @Inject constructor(
                     }
             }
 
-    private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
-        checkBluetoothClientState()
+    private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> {
+        var numberOfEventsRead = 0
+        return checkBluetoothClientState()
             .switchMap { client.findConnection(address) }
             .switchMap { connection ->
                 connection.setupNotification(UART_TX).map { Pair(connection, it) }
@@ -574,9 +575,9 @@ class GlucometersManager @Inject constructor(
                 Timber.i("<<<<<<<Sync>>>>>>  LastEvent: $lastEvent")
                 response to lastEvent
             }
-            .take(EVENTS_COUNT.toLong())
             .takeUntil { (response, lastEvent) ->
-                response.isEmptyEvent() || response == lastEvent
+                if (response.isEvent()) numberOfEventsRead++
+                response.isEmptyEvent() || response == lastEvent || numberOfEventsRead == EVENTS_COUNT
             }
             .collectInto(SyncResponseHolder()) { holder, (response, lastEvent) ->
                 holder.lastSyncedEvent = lastEvent
@@ -655,6 +656,7 @@ class GlucometersManager @Inject constructor(
                     Observable.error(GlucometerSyncError(exception))
                 }
             }
+    }
 
     private fun filterConnectedDevices(
         connected: List<GlucometerCachedDto>,
