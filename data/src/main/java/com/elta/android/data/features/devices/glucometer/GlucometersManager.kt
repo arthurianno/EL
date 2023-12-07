@@ -512,8 +512,9 @@ class GlucometersManager @Inject constructor(
                     }
             }
 
-    private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> =
-        checkBluetoothClientState()
+    private fun syncInternal(address: String): Observable<List<GlucometerEventDto>> {
+        var numberOfEventsRead = 0
+        return checkBluetoothClientState()
             .switchMap { client.findConnection(address) }
             .switchMap { connection ->
                 connection.setupNotification(UART_TX).map { Pair(connection, it) }
@@ -575,7 +576,8 @@ class GlucometersManager @Inject constructor(
                 response to lastEvent
             }
             .takeUntil { (response, lastEvent) ->
-                response.isEmptyEvent() || response == lastEvent
+                if (response.isEvent()) numberOfEventsRead++
+                response.isEmptyEvent() || response == lastEvent || numberOfEventsRead == EVENTS_COUNT
             }
             .collectInto(SyncResponseHolder()) { holder, (response, lastEvent) ->
                 holder.lastSyncedEvent = lastEvent
@@ -654,6 +656,7 @@ class GlucometersManager @Inject constructor(
                     Observable.error(GlucometerSyncError(exception))
                 }
             }
+    }
 
     private fun filterConnectedDevices(
         connected: List<GlucometerCachedDto>,
