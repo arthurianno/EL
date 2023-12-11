@@ -6,7 +6,6 @@ import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.reminder.model.ScheduleType
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -32,6 +31,7 @@ abstract class BaseRemindPm constructor(
     services: ServiceFacade
 ) : BasePm(services) {
 
+    val wrongTimeDialogControl = dialogControl<DialogData, DialogResult>()
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
     val formInput = inputControl()
     val dateSelector = formSelectorControl()
@@ -53,6 +53,7 @@ abstract class BaseRemindPm constructor(
     protected val reminderFormHolderState = state(ReminderFormModel())
 
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
+    private val wrongTimeDialogData: DialogData by lazy { Dialogs.ReminderWrongTime(resources) }
 
     abstract fun handleBack(i: Unit)
 
@@ -66,7 +67,7 @@ abstract class BaseRemindPm constructor(
     }
 
     protected fun handleSuccess(i: Unit) {
-        hideKeyBoardCommand.consumer.accept(Unit)
+        hideKeyBoardCommand.consumer.accept(i)
         bus.event(Events.ReminderChanged)
         router.exit()
     }
@@ -128,9 +129,10 @@ abstract class BaseRemindPm constructor(
     override fun handleError(error: Throwable) {
         when (error) {
             is ReminderAlreadyExistsError -> showExistingReminderDialog.consumer.accept(Unit)
-            is ReminderTimeInPastError -> showToastCommand.consumer.accept(R.string.profile_reminders_wrong_time)
+            is ReminderTimeInPastError -> wrongTimeDialogControl.show(wrongTimeDialogData)
             else -> super.handleError(error)
         }
+        saveChangesEnableState.consumer.accept(false)
     }
 
     private fun String.toSimpleSelectorOption() = SelectorOption(this)
