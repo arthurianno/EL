@@ -4,100 +4,71 @@ cache:
   key: ${CI_PROJECT_ID}
   paths:
   - .gradle/
- 
+
 before_script:
 - export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
 - chmod +x ./gradlew
 
 stages:
-- check
 - build
-- beta
-- uat
-- rc
-- test
+- deploy
 
-
-complexCheck:
-  stage: check
-  script:
-  # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
-  - ./gradlew ktlintCheck testDebugUnitTest -x lint
-  only:
-  - merge_requests
-  - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-build: # Собираем артефакт
+debug-build:
   stage: build
-  only:
-    - merge_requests  # Только при мердж реквесте
-  when: on_success
-  allow_failure: true
-  script:
-    - ./gradlew clean build -x lint  # Собираем проект
-    - echo JOB_ID="$CI_JOB_ID" >> build.env  # Создаём файл, в который помещаем номер сборки для последующей загрузки артефактов
-    - echo PLATFORM=Android >> build.env # Так же помещаем переменную с типом платформы
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-debug$/'
+  tags:
+    - android,docker
   artifacts:
-    reports:
-      dotenv: build.env
-    paths:
-      - app/build/outputs/apk/debug/app-universal-debug.apk # Публикуем артефакты в Gitlab
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-test:  # Делегируем артефакты в другой репозиторий для тестов
-  stage: test
-  when: on_success
-  variables: 
-    JOB_ID: $JOB_ID # Пробрасываем переменные в другой репозиторий
-    PLATFORM: $PLATFORM
-  needs:
-    - job: build
-  trigger: 
-    project: qa/ELTA-automation   # Репозиторий, в который мы делегируем джобу
-    branch: master     # Ветка из этого репозитория
-  only:
-    - merge_requests
-
-# For tag v0.0.0-beta
-beta:
-  stage: beta
-  only:
-    - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
-  when: on_success
-  script:
-    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-# For tag v0.0.0-uat
-uat:
-  stage: uat
-  only:
-    - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
-  when: on_success
-  script:
-    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
-  artifacts:
-    paths:
-      - app/build/outputs/apk/debug/app-universal-debug.apk
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-# For tag v0.0.0-rc
-rc:
-  stage: rc
-  only:
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
-  when: on_success
-  script:
-  - ./gradlew clean build crashlyticsUploadDistributionRelease -x lint
-  artifacts:
+    when: on_success
     expire_in: 1 week
     paths:
-    - app/build/outputs/
+      - build_apks/
+  script:
+    - ./gradlew assembleDebug
+    - mkdir build_apks
+    - mv app/build/outputs/apk/debug/app-universal-debug.apk build_apks/
+
+deploy-debug:
+  image: node:latest
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-debug$/'
+  needs: [debug-build]
+  script:
+    - npm install -g firebase-tools
+    - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+    - firebase appdistribution:distribute build_apks/app-universal-debug.apk --app $FIREBASE_APP_ID
+      --release-notes "$TAG_MESSAGE"
+      --groups "testGroup"
+
+release-build:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-release$/'
+  tags:
+    - android,docker
+  artifacts:
+    when: on_success
+    expire_in: 1 week
+    paths:
+      - build_apks/
+  script:
+    - ./gradlew assembleRelease
+    - mkdir build_apks
+    - mv app/build/outputs/apk/debug/app-universal-release.apk build_apks/
+
+deploy-release:
+  image: node:latest
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-release$/'
+  needs: [release-build]
+  script:
+    - npm install -g firebase-tools
+    - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+    - firebase appdistribution:distribute build_apks/app-universal-release.apk --app $FIREBASE_APP_ID
+      --release-notes "$TAG_MESSAGE"
+      --groups "testGroup"
+
