@@ -27,13 +27,16 @@ fun getPropertiesFromFile(filename: String): Properties =
 android {
     compileSdk = AppConfig.completeSdk
 
+    val version = getTagInfo()
+    print(version.toString())
+
     defaultConfig {
         applicationId = AppConfig.applicationId
         minSdk = AppConfig.minSdk
         targetSdk = AppConfig.targetSdk
 
-        versionCode = Version.versionCode
-        versionName = Version.versionName
+        versionCode = version.buildNumber
+        versionName = version.versionName
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -77,7 +80,7 @@ android {
         debug {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
-            versionNameSuffix = Version.prodNameSuffix
+            versionNameSuffix = "-debug(${version.buildNumber})"
             signingConfig = signingConfigs["debug"]
             isDebuggable = true
         }

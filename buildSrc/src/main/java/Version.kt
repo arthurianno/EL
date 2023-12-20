@@ -35,23 +35,4 @@ object Version {
     val devNameSuffix: String = getDebugSuffix(BackendVariant.dev)
     private fun getDebugSuffix(equipement: BackendVariant): String =
         ".$developCode-${equipement.name}($versionCode)"
-
-    private fun readCurrentBranch(): String =
-        commandExec("git name-rev --name-only HEAD", File(".")).orEmpty()
-
-    private fun commandExec(command: String, workingDir: File): String? {
-        try {
-            val proc = ProcessBuilder(*command.split("\\s".toRegex()).toTypedArray())
-                .directory(workingDir)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
-
-            proc.waitFor(WAIT_EXECUTE_COMMAND_TIME, TimeUnit.MILLISECONDS)
-            return proc.inputStream.bufferedReader().readText()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return null
-        }
-    }
 }
