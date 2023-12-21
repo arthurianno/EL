@@ -2,8 +2,8 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
 import org.threeten.bp.LocalDate
@@ -16,20 +16,20 @@ internal fun Int.percent(total: Int): Int =
 
 internal fun Double.checkMax(max: Double): Double = if (max < this) this else max
 internal fun Double.checkMin(min: Double): Double = if (min > this) this else min
-internal fun EventV2.isBolusInsulin(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
-    val list = medicamentInsulinStatistic.bolusInsulinTypes.getCode()
-    return medicament?.insulinType?.code in list
+internal fun EventV2.isBolusInsulin(insulinMedicamentStatistic: InsulinMedicamentStatistic): Boolean {
+    val list = insulinMedicamentStatistic.bolusInsulinTypes.getCode()
+    return insulinMedicament?.insulinType?.code in list
 }
 
-internal fun EventV2.isBasalInsulin(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
-    val list = medicamentInsulinStatistic.basalInsulinTypes.getCode()
-    return medicament?.insulinType?.code in list
+internal fun EventV2.isBasalInsulin(insulinMedicamentStatistic: InsulinMedicamentStatistic): Boolean {
+    val list = insulinMedicamentStatistic.basalInsulinTypes.getCode()
+    return insulinMedicament?.insulinType?.code in list
 }
 
-internal fun EventV2.isBasalOrBolus(medicamentInsulinStatistic: MedicamentInsulinStatistic): Boolean {
-    val basal = medicamentInsulinStatistic.basalInsulinTypes.getCode()
-    val bolus = medicamentInsulinStatistic.bolusInsulinTypes.getCode()
-    return medicament?.insulinType?.code in (basal + bolus)
+internal fun EventV2.isBasalOrBolus(insulinMedicamentStatistic: InsulinMedicamentStatistic): Boolean {
+    val basal = insulinMedicamentStatistic.basalInsulinTypes.getCode()
+    val bolus = insulinMedicamentStatistic.bolusInsulinTypes.getCode()
+    return insulinMedicament?.insulinType?.code in (basal + bolus)
 }
 
 private fun List<MedicamentInsulinType>.getCode() = map { it.code }

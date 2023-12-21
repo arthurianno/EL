@@ -19,3 +19,5 @@ sealed class PermissionEvent : Event {
         object OnAllow : Bluetooth()
     }
 }
+
+object ClearEvent : Event

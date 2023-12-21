@@ -15,8 +15,8 @@ import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
 import com.elta.android.data.features.diary.events.api.MockedEventsApi
 import com.elta.android.data.features.diary.events.api.EventsV2Api
-import com.elta.android.data.features.diary.insulin.api.MedicinesApi
-import com.elta.android.data.features.diary.insulin.api.MockMedicinesApi
+import com.elta.android.data.features.diary.medicines.api.MedicinesApi
+import com.elta.android.data.features.diary.medicines.api.MockMedicinesApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
 import com.elta.android.data.features.feedback.api.FeedbackApi

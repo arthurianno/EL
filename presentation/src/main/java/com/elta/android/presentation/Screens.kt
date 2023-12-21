@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
@@ -32,6 +33,7 @@ import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptio
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
+import com.elta.android.presentation.features.main.events.selector.ui.EventSelectorFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
@@ -183,13 +185,17 @@ object Screens {
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
         override fun getFragment() = when (eventType) {
-            EventType.GLUCOSE -> GlucoseEventFragment.newInstance(eventId)
+            EventType.Glucose -> GlucoseEventFragment.newInstance(eventId)
             else -> EditEventFragment.newInstance(eventId, eventType)
         }
     }
 
     data class EventsChooserScreen(val config: ChooserConfiguration) : SupportAppScreen() {
         override fun getFragment() = EventsOptionsChooserFragment.newInstance(config)
+    }
+
+    data class EventSelectorScreen(val config: ChooserConfiguration) : SupportAppScreen() {
+        override fun getFragment() = EventSelectorFragment.newInstance(config)
     }
 
     data class ShareEventScreen(val uri: Uri, val title: String) : SupportAppScreen() {
@@ -383,22 +389,23 @@ object Screens {
             webIntent("market://details?id=com.elta.android")
     }
 
-    object CalculatorScreen : SupportAppScreen() {
-        override fun getFragment() = CalculatorFragment.newInstance()
+    data class CalculatorScreen(val calculatorFlow: CalculatorFlow) : SupportAppScreen() {
+        override fun getFragment() = CalculatorFragment.newInstance(calculatorFlow)
     }
 
-    object CustomProductsScreen : SupportAppScreen() {
-        override fun getFragment() = CustomProductsFragment.newInstance()
+    data class CustomProductsScreen(val calculatorFlow: CalculatorFlow) : SupportAppScreen() {
+        override fun getFragment() = CustomProductsFragment.newInstance(calculatorFlow)
     }
 
     data class CreateCustomProductScreen(
         val dish: DishUiEntity? = null,
         val productName: String? = null,
+        val calculatorFlow: CalculatorFlow,
     ) : SupportAppScreen() {
-        override fun getFragment() = CreateCustomProductFragment.newInstance(dish, productName)
+        override fun getFragment() = CreateCustomProductFragment.newInstance(dish, productName, calculatorFlow)
     }
 
-    data class AddDishScreen(val dish: DishUiEntity) : SupportAppScreen() {
-        override fun getFragment() = DishDetailFragment.newInstance(dish)
+    data class AddDishScreen(val dish: DishUiEntity, val calculatorFlow: CalculatorFlow) : SupportAppScreen() {
+        override fun getFragment() = DishDetailFragment.newInstance(dish, calculatorFlow)
     }
 }

@@ -9,7 +9,8 @@ import com.elta.android.data.features.consultant.repository.ConsultantDataReposi
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
-import com.elta.android.data.features.diary.insulin.repository.MedicinesDataRepository
+import com.elta.android.data.features.diary.medicines.repository.InsulinMedicamentDataRepository
+import com.elta.android.data.features.diary.medicines.repository.MedicamentDataRepository
 import com.elta.android.data.features.diary.tags.repository.TagsDataRepository
 import com.elta.android.data.features.feedback.repository.FeedbackDataRepository
 import com.elta.android.data.features.firmware.repository.FirmwareDataRepository
@@ -30,7 +31,8 @@ import com.elta.android.domain.features.calculator.repository.CustomProductRepos
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.insulin.MedicinesRepository
+import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
+import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
@@ -128,7 +130,11 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindMedicineRepository(repo: MedicinesDataRepository): MedicinesRepository
+    abstract fun bindInsulinMedicamentRepository(repo: InsulinMedicamentDataRepository): InsulinMedicamentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMedicamentRepository(repo: MedicamentDataRepository): MedicamentRepository
 
     @Binds
     @Singleton

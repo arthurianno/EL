@@ -4,6 +4,7 @@ import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.interactor.ClearCachedDishesUseCase
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetLastInsulinEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
@@ -15,10 +16,15 @@ import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
+import com.elta.android.presentation.features.main.events.base.model.MedicamentModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormAdditionalText
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getMedicament
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toDoubleFormat
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
@@ -27,7 +33,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val MAIN_ACTON_BUTTON_DEBOUNCE = 100L
-private val EMPTY_SELECTOR_OPTION = SelectorOption(text = null)
+private val emptySelectorOption = SelectorOption(text = null)
 
 class EventCreationPm @Inject constructor(
     private val addNewEventUseCase: AddNewEventUseCase,
@@ -65,9 +71,9 @@ class EventCreationPm @Inject constructor(
             .subscribe(getProfileAction.consumer)
             .untilDestroy()
 
-        mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_new_entry_title))
+        mainActionTitleState.consumer.accept(resources.getString(R.string.events_creation_save_button))
         observeSaveEventAction()
-        loadLastInsulinEvent()
+        loadLastEvent()
 
         launch {
             clearCachedDishes()
@@ -86,15 +92,18 @@ class EventCreationPm @Inject constructor(
             eventTypeState.observable,
             formPickerValue.observable,
             formInput.text.observable,
+            additionalInput.text.observable,
             formSelector.option.observable,
             tagSelector.option.observable,
             selectedDateState.observable,
-            noteInput.text.observable
-        ) { eventType, pickerValue, inputValue, variant, tag, date, note ->
+            noteInput.text.observable,
+            dishes.observable
+        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, dishes ->
             eventFormHolderState.value.apply {
                 this.eventType = eventType
                 this.pickerValue = pickerValue
-                this.inputValue = inputValue
+                this.inputValue = inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
@@ -103,15 +112,15 @@ class EventCreationPm @Inject constructor(
             }
         }
             .debounce(MAIN_ACTON_BUTTON_DEBOUNCE, TimeUnit.MILLISECONDS)
-            .doOnNext(::checkIsEmpty)
+            .doOnNext { checkIsEmpty(it, dishes.valueOrNull) }
             .map(::isFormValid)
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
     }
 
-    private fun checkIsEmpty(eventFormModel: EventFormModel) {
+    private fun checkIsEmpty(eventFormModel: EventFormModel, dishes: List<Dish>?) {
         val isSpecialChanged = when (eventTypeState.valueOrNull) {
-            EventType.WEIGHT -> {
+            EventType.Weight -> {
                 eventFormModel.pickerValue != (
                         profileState.valueOrNull?.weight
                             ?: WeightFormInitializer.WEIGHT_DEFAULT_VALUE
@@ -119,18 +128,24 @@ class EventCreationPm @Inject constructor(
                         eventFormModel.meta != null
             }
 
-            EventType.INSULIN -> {
+            EventType.Insulin -> {
                 eventFormModel.meta != selectorInsulinState.valueOrNull?.meta ||
                         eventFormModel.pickerValue != ZERO_PICKER_VALUE
             }
 
+            EventType.Medicaments -> {
+                eventFormModel.meta != medicamentState.valueOrNull?.medicament ||
+                        eventFormModel.additionalValue != medicamentState.valueOrNull?.otherName.orEmpty() ||
+                        eventFormModel.inputValue != null
+            }
+
             else -> {
                 eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
-                        eventFormModel.meta != null
+                        eventFormModel.meta != null || !dishes.isNullOrEmpty() ||
+                        eventFormModel.inputValue != null
             }
         }
-        val isCommonChanged = !eventFormModel.inputValue.isNullOrEmpty() ||
-                eventFormModel.tag != null ||
+        val isCommonChanged = eventFormModel.tag != null ||
                 !eventFormModel.note.isNullOrEmpty() ||
                 eventFormModel.isDateChanged
 
@@ -145,7 +160,6 @@ class EventCreationPm @Inject constructor(
             .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)
                     .hideErrorContainer()
-                    .bindProgress()
                     .trackEvent { createCreationEvent(params) }
                     .andThen(Single.just(true))
                     .doOnSuccess(::handleSuccess)
@@ -156,19 +170,46 @@ class EventCreationPm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun loadLastInsulinEvent() {
+    private fun loadLastEvent() {
         eventTypeState.observable
+            .filter { it is EventType.Medicaments || it is EventType.Insulin }
             .flatMapSingle { type ->
-                if (type == EventType.INSULIN) {
-                    getLastInsulinEventUseCase.execute()
-                        .hideErrorContainer()
-                        .bindProgress()
-                        .map { event -> event.getSelectorOption(resources) }
-                        .onErrorReturn { EMPTY_SELECTOR_OPTION }
-                        .doOnSuccess { formSelector.option.consumer.accept(it) }
-                        .doOnSuccess { selectorInsulinState.consumer.accept(it) }
-                        .doOnError(::handleError)
-                } else Single.just(type)
+                getLastInsulinEventUseCase.execute(GetLastInsulinEventUseCase.Params(type))
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnSuccess { event ->
+                        when {
+                            type is EventType.Insulin -> {
+                                val option = event.getSelectorOption(resources)
+                                formSelector.option.consumer.accept(option)
+                                selectorInsulinState.consumer.accept(option)
+                            }
+
+                            type is EventType.Medicaments && event.medicament != null -> {
+                                event.getFormAdditionalText()
+                                    ?.let { additionalInput.text.consumer.accept(it) }
+                                event.getSelectorOption(resources)
+                                    ?.let { formSelector.option.consumer.accept(it) }
+                                event.getMedicament()
+                                    ?.let { medicament ->
+                                        medicamentState.consumer.accept(
+                                            MedicamentModel(
+                                                medicament = medicament,
+                                                fromEvent = false,
+                                                otherName =
+                                                if (medicament.isOther) event.getFormAdditionalText()
+                                                else null
+                                            )
+                                        )
+                                    }
+                            }
+
+                            else -> {}
+                        }
+                    }
+                    .map { event -> event.getSelectorOption(resources) }
+                    .onErrorReturn { emptySelectorOption }
+                    .doOnError(::handleError)
             }
             .subscribe()
             .untilDestroy()
@@ -184,7 +225,9 @@ class EventCreationPm @Inject constructor(
             date = form.date,
             tag = form.tag,
             activity = form.activityType,
+            insulinMedicament = form.insulinMedicament,
             medicament = form.medicament,
+            tabletsNumber = form.tabletsNumber,
             note = form.note,
             eventType = checkNotNull(form.eventType),
             glucometerSerialNumber = null,
@@ -195,16 +238,17 @@ class EventCreationPm @Inject constructor(
     private fun createCreationEvent(params: AddNewEventUseCase.Params): AnalyticsEvent? {
         val data = hashMapOf<String, String>()
         val name = when (params.eventType) {
-            EventType.BREAD -> AnalyticsEventType.EVENT_BREAD_ADD
-            EventType.WEIGHT -> AnalyticsEventType.EVENT_WEIGHT_ADD
-            EventType.MEDICAMENTS -> AnalyticsEventType.EVENT_MEDICAMENTS_ADD
-            EventType.ACTIVITY -> {
+            is EventType.Bread -> AnalyticsEventType.EVENT_BREAD_ADD
+            EventType.Weight -> AnalyticsEventType.EVENT_WEIGHT_ADD
+            EventType.Medicaments -> AnalyticsEventType.EVENT_MEDICAMENTS_ADD
+            EventType.Activity -> {
                 params.activity?.let { data[AnalyticsEventParam.TYPE] = it.name }
                 AnalyticsEventType.EVENT_ACTIVITY_ADD
             }
 
-            EventType.INSULIN -> {
-                data[AnalyticsEventParam.TYPE] = checkNotNull(params.medicament).insulinType.name
+            EventType.Insulin -> {
+                data[AnalyticsEventParam.TYPE] =
+                    checkNotNull(params.insulinMedicament).insulinType.name
                 AnalyticsEventType.EVENT_INSULIN_ADD
             }
 

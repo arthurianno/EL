@@ -8,7 +8,6 @@ import javax.inject.Inject
 class GetCachedDishesUseCase @Inject constructor(
     private val repository: CalculatorRepository
 ) {
-
     operator fun invoke(): Flow<List<Dish>> =
         repository.getLocalDishes()
 }

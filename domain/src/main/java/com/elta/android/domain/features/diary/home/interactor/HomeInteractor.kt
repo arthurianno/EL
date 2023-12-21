@@ -3,6 +3,7 @@ package com.elta.android.domain.features.diary.home.interactor
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.modifyValues
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.DayPeriodHolder.day
 import com.elta.android.domain.features.diary.home.model.DayPeriodHolder.morning
@@ -25,7 +26,8 @@ fun buildHomeModel(
     tags: List<Tag>,
     settings: GlucoseLevelSettings,
     userInfo: UserInfo,
-    glucoseFormat: GlucoseFormat
+    glucoseFormat: GlucoseFormat,
+    calculatorFlow: CalculatorFlow
 ): HomeModel {
     val sortedEvents = events
         .modifyValues(glucoseFormat)
@@ -40,13 +42,13 @@ fun buildHomeModel(
     var preLastGlucoseEvent: EventV2? = null
 
     sortedEvents.forEach { event ->
-        if (lastBreadEvent == null && event.type == EventType.BREAD) {
+        if (lastBreadEvent == null && event.type is EventType.Bread) {
             lastBreadEvent = event
-        } else if (lastInsulinEvent == null && event.type == EventType.INSULIN) {
+        } else if (lastInsulinEvent == null && event.type is EventType.Insulin) {
             lastInsulinEvent = event
-        } else if (lastGlucoseEvent == null && event.type == EventType.GLUCOSE) {
+        } else if (lastGlucoseEvent == null && event.type is EventType.Glucose) {
             lastGlucoseEvent = event
-        } else if (preLastGlucoseEvent == null && event.type == EventType.GLUCOSE) {
+        } else if (preLastGlucoseEvent == null && event.type is EventType.Glucose) {
             preLastGlucoseEvent = event
         }
     }
@@ -54,20 +56,21 @@ fun buildHomeModel(
     return HomeModel(
         isFirstEntrance = userInfo.isFirstHomeEntrance ?: true,
         dayPeriod = getDayPeriod(Date().time),
-        lastBreadEvent = lastBreadEvent,
+        lastFoodEvent = lastBreadEvent,
         lastInsulinEvent = lastInsulinEvent,
         lastGlucoseEvent = lastGlucoseEvent,
         glucoseLevel = lastGlucoseEvent?.glucoseLevel(settings),
         glucoseLevelDirection = lastGlucoseEvent?.glucoseLevelDirection(preLastGlucoseEvent),
         glucoseLevelDifference = lastGlucoseEvent?.glucoseLevelDifference(preLastGlucoseEvent),
-        eventsBlocks = getEventsBlocks(sortedEvents, tags),
+        eventsBlocks = getEventsBlocks(sortedEvents, tags, calculatorFlow),
         dailyGlucoseModel = buildDailyGlucoseModel(events, settings, glucoseFormat),
-        glucoseFormat = glucoseFormat
+        glucoseFormat = glucoseFormat,
+        calculatorFlow = calculatorFlow
     )
 }
 
 fun List<EventV2>.sortAndFilter(): List<EventV2> = sortedByDescending { it.additionTime }
-    .filter { it.type != EventType.GLYCATEDHEMOGLOBIN }
+    .filter { it.type != EventType.Glycatedhemoglobin }
 
 fun getDayPeriod(now: Long): DayPeriod =
     when (now) {
@@ -97,7 +100,11 @@ fun EventV2.glucoseLevelDifference(preLastEvent: EventV2?): Double? {
     }
 }
 
-fun getEventsBlocks(events: List<EventV2>, tags: List<Tag>): List<EventsBlock> {
+fun getEventsBlocks(
+    events: List<EventV2>,
+    tags: List<Tag>,
+    calculatorFlow: CalculatorFlow
+): List<EventsBlock> {
     if (events.isEmpty()) {
         return emptyList()
     }
@@ -115,7 +122,11 @@ fun getEventsBlocks(events: List<EventV2>, tags: List<Tag>): List<EventsBlock> {
     blocksMap.forEach { entry ->
         val tagId = entry.key
         val tag = tags.firstOrNull { it.id == tagId }
-        val newBlock = EventsBlock(tag, entry.value)
+        val newBlock = EventsBlock(
+            tag = tag,
+            events = entry.value,
+            calculatorFlow = calculatorFlow
+        )
         blocks.add(newBlock)
     }
 

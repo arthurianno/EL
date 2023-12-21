@@ -2,10 +2,10 @@ package com.elta.android.presentation.features.main.events.base.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -22,7 +22,6 @@ import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
 import com.elta.android.presentation.utils.WindowBottomInsetsForViewListenerFactory.instance
 import com.elta.android.presentation.utils.appbar.collapseProgress
 import com.elta.android.presentation.utils.applyWindowBottomInsetsListener
-import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.removeWindowBottomInsetsListener
 import com.elta.android.presentation.utils.scrollToBottom
@@ -32,7 +31,10 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
 import com.jakewharton.rxbinding2.widget.text
 import com.jakewharton.rxbinding2.widget.textChanges
-import com.nullgr.core.ui.extensions.hideKeyboard
+import com.nullgr.core.ui.extensions.hide
+import com.nullgr.core.ui.extensions.show
+import com.nullgr.core.ui.extensions.toggleVisibilityState
+import io.reactivex.android.schedulers.AndroidSchedulers
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 import me.dmdev.rxpm.widget.bindTo
@@ -59,9 +61,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         val eventType = getEventType()
         initializer = eventType.makeFormInitializer()
         presentationModel.setEventType(eventType)
-        if (eventType != EventType.MEDICAMENTS) {
-            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-        }
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         setWeightPicker()
     }
 
@@ -89,10 +89,15 @@ abstract class BaseEventFragment<T : BaseEventPm> :
 
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
-        observeAppBarChanges()
-        if (FeatureToggles.isEnableCalculatorFeature) {
-            observeBreadUnitsChanges(pm)
+        pm.progressState.bindTo {
+            binding.progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
+            binding.scrollableView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
+        observeAppBarChanges(pm)
+        observeFoodChanges(pm)
+        observeMedicamentChanges(pm)
+        observeFormKeyEvent(pm)
+
         binding.formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
         binding.formSaveButtonView.clicks().bindTo(pm.mainAction)
         binding.homeButtonView.clicks().bindTo(pm.backHandleAction)
@@ -105,6 +110,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         pm.mainActionTitleState.bindTo(binding.formSaveButtonView.text())
         pm.mainActionVisibilityState.bindTo(binding.formSaveButtonView.visibility())
         pm.formInput.bindTo(binding.formInputView)
+        pm.additionalInput.bindTo(binding.additionalInput)
         pm.formSelector.bind(binding.formVariantSelectorView, compositeUnbind)
         pm.tagSelector.bind(binding.formTagSelectorView, compositeUnbind)
         pm.dateSelector.bind(binding.formDateSelectorView, compositeUnbind)
@@ -150,6 +156,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
         }
     }
+
     override fun onDetach() {
         super.onDetach()
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -158,7 +165,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
     abstract fun getEventType(): EventType
 
     private fun setWeightPicker() {
-        if (presentationModel.eventTypeState.valueOrNull == EventType.WEIGHT) {
+        if (presentationModel.eventTypeState.valueOrNull is EventType.Weight) {
             presentationModel.profileState.bindTo { initializer.setPickerValue(it.weight) }
         }
     }
@@ -176,41 +183,78 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         }
     }
 
-    private fun observeBreadUnitsChanges(pm: T) {
-        if (pm.eventTypeState.valueOrNull == EventType.BREAD) {
-            pm.dishes.observable.subscribe {
+    private fun observeMedicamentChanges(pm: T) {
 
-                val formPickerEnabled = it.isNullOrEmpty()
+        if (pm.eventTypeState.valueOrNull is EventType.Medicaments) {
 
-                binding.formPickerView.enableFormPicker(formPickerEnabled)
+            pm.medicamentState.observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { medicamentModel ->
+                    val medicament = medicamentModel.medicament
+                    with(binding) {
+                        if (medicament != null) {
+                            formInputView.show()
+                            formVariantSelectorView.show()
 
-                binding.formPickerView.setDisableTouchCallback {
-                    pm.editingXEIsNotAvailableAction.consumer.accept(Unit)
-                }
+                            formVariantSelectorView.hint = medicament.name
+                            formVariantSelectorView.iconText = medicament.name
 
-                with(binding.formVariantSelectorView) {
-                    if (it.isEmpty()) {
-                        hint = context.getString(R.string.events_creation_hint_bread)
-                        icon = null
-                        iconText = null
-                    } else {
-                        hint = context.getString(R.string.events_creation_text_bread)
-                        icon = context.getDrawable(R.drawable.ic_record_label)
-                        iconText = it.count().toString()
+
+                            if (medicament.isOther) {
+                                medicamentModel.otherName?.let { additionalInput.setText(it) }
+                                additionalInput.show()
+                            } else {
+                                binding.additionalInput.setText("")
+                                binding.additionalInput.hide()
+                            }
+                        } else {
+                            binding.formInputView.hide()
+                            binding.formVariantSelectorView.hide()
+                            binding.additionalInput.show()
+                        }
                     }
                 }
-            }
+        }
+    }
+
+    private fun observeFoodChanges(pm: T) {
+        if (pm.eventTypeState.valueOrNull is EventType.Bread) {
+            pm.dishes.observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+
+                    val formPickerEnabled = it.isNullOrEmpty()
+
+                    binding.formPickerView.enableFormPicker(formPickerEnabled)
+
+                    binding.formPickerView.setDisableTouchCallback {
+                        pm.editingXEIsNotAvailableAction.consumer.accept(Unit)
+                    }
+
+                    with(binding.formVariantSelectorView) {
+                        if (it.isEmpty()) {
+                            hint = context.getString(R.string.events_creation_hint_bread)
+                            icon = null
+                            iconText = null
+                        } else {
+                            hint = context.getString(R.string.events_creation_text_bread)
+                            icon = context.getDrawable(R.drawable.ic_record_label)
+                            iconText = it.count().toString()
+                        }
+                    }
+                }
         }
     }
 
     @Suppress("MagicNumber")
-    private fun observeAppBarChanges() {
+    private fun observeAppBarChanges(pm: T) {
         binding.apply {
             formPickerView.valueChangesFormatted().subscribe(binding.toolbarSubTitleView.text())
 
             scrollableView.setOnTouchListener { _, me ->
                 isTouchingScroll = me.action == MotionEvent.ACTION_MOVE
                 isTouchingAppBar = isTouchingScroll
+                pm.hideKeyboardAction.consumer.accept(Unit)
                 false
             }
 
@@ -230,11 +274,26 @@ abstract class BaseEventFragment<T : BaseEventPm> :
                 toolbarSubTitleView.alpha = 1 - alpha
                 toolbarSubTitleView.translationY = translation
                 if (isTouchingScroll || isTouchingAppBar) {
-                    view?.hideKeyboard()
-                    requireActivity().findAndClearFocus()
+                    pm.hideKeyboardAction.consumer.accept(Unit)
                 }
             }
         }
+    }
+
+    private fun observeFormKeyEvent(pm: T) {
+        binding.formInputView.setOnKeyListener { _, _, keyEvent ->
+            onKeyEventAction(keyEvent, pm)
+        }
+        binding.formNoteView.setOnKeyListener { _, _, keyEvent ->
+            onKeyEventAction(keyEvent, pm)
+        }
+    }
+
+    private fun onKeyEventAction(keyEvent: KeyEvent, pm: T): Boolean {
+        if (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+            pm.hideKeyboardAction.consumer.accept(Unit)
+        }
+        return false
     }
 
     private data class ViewsState(

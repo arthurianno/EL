@@ -5,7 +5,6 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.click
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
 import com.elta.android.presentation.databinding.ItemChooserBinding
-import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleView

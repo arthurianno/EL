@@ -49,9 +49,12 @@ abstract class BasePm(
     val progressDialogState = state(false)
 
     val hideKeyBoardCommand = command<Unit>()
+    val hideKeyboardAction = action<Unit>()
+
     val showKeyBoardCommand = command<Unit>()
     val showSnackBarCommand = command<SnackBarData>(bufferSize = 1)
     val showToastCommand = command<Int>()
+    val clearFocusCommand = command<Unit>()
 
     val retryAction = action<Unit>()
 
@@ -90,6 +93,12 @@ abstract class BasePm(
                 .subscribe()
                 .untilDestroy()
         }
+
+        hideKeyboardAction.observable
+            .doOnNext(hideKeyBoardCommand.consumer::accept)
+            .doOnNext(clearFocusCommand.consumer::accept)
+            .subscribe()
+            .untilDestroy()
     }
 
     internal fun sendDateChangedEvent() {

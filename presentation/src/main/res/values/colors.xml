@@ -151,7 +151,7 @@
     <color name="color_chooser_bg_bread">@color/g_orange_a</color>
     <color name="color_chooser_bg_activity">@color/g_purpur_b</color>
     <color name="color_chooser_bg_weight">@color/g_green_b</color>
-    <color name="color_chooser_bg_medicaments">@color/shade_blue3</color>
+    <color name="color_chooser_bg_medicaments">@color/g_purpur_b</color>
     <color name="color_chooser_bg_insulin">@color/shade_g_purpur_a</color>
 
     <color name="color_black_transparent">#10000000</color>
@@ -175,6 +175,8 @@
 
     <color name="chart_time_text_color">@color/shade_black1</color>
     <color name="chart_future_time_text_color">@color/shade_black2</color>
+
+    <color name="diary_divider_color">#eaeaea</color>
 
     <!-- CLUSTER -->
     <color name="cluster_background_primary">#4c4580d4</color>

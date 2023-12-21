@@ -11,19 +11,19 @@ import com.elta.android.data.features.common.storage.FileStorage
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto.Companion.toEventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
-import com.elta.android.data.features.diary.events.mapper.toDb
 import com.elta.android.data.features.diary.events.mapper.toDomain
 import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
-import com.elta.android.domain.features.diary.insulin.MedicinesRepository
+import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -36,7 +36,7 @@ class EventsDataRepository @Inject constructor(
     private val toDtoMapper: Mapper<EventV2, EventV2Dto>,
     @Remote private val remoteSource: EventsDataSource,
     @Cache private val cacheSource: EventsCacheDataSource,
-    private val medicinesRepository: MedicinesRepository,
+    private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
     private val fileStorage: FileStorage
 ) : EventsRepository {
@@ -60,19 +60,24 @@ class EventsDataRepository @Inject constructor(
         }
 
     override fun getLastEvent(eventType: EventType): Single<EventV2> {
-        return Single.zip(
-            cacheSource.getLastEvent(eventType.toDb())
-                .map { event ->
-                    event.toDomain()
-                },
-            Single.fromObservable(
-                medicinesRepository.getMedicines(MedicamentInsulinType.allMedicament())
-            )
-        )
-        { event, medicines ->
-            if (event.medicament == null || medicines.contains(event.medicament))
-                event
-            else throw NotFoundItemError
+
+        val eventObservable = cacheSource.getLastEvent(eventType.toEventTypeDto())
+            .map { event ->
+                event.toDomain()
+            }
+
+        return when(eventType) {
+            EventType.Medicaments -> Single.zip(
+                eventObservable,
+                Single.fromObservable(
+                    insulinMedicamentRepository.getInsulinMedicaments(MedicamentInsulinType.allMedicament()))
+                ) { event, insulin ->
+                    if (event.insulinMedicament == null || insulin.contains(event.insulinMedicament))
+                        event
+                    else throw NotFoundItemError
+
+                }
+            else -> eventObservable
         }
     }
 
@@ -123,7 +128,7 @@ class EventsDataRepository @Inject constructor(
             listOf(
                 SimpleEventDto(
                     event.id,
-                    EventTypeDto.valueOf(event.type.name)
+                    event.type.toEventTypeDto()
                 )
             )
         }

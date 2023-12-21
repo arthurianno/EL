@@ -4,6 +4,7 @@ import com.elta.android.data.features.calculator.model.MetricServingUnitResponse
 import com.elta.android.data.features.calculator.model.ProductItemResponse
 import com.elta.android.data.features.calculator.model.ProductsResponse
 import com.elta.android.data.features.calculator.model.StoredProductNetworkEntity
+import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,8 +22,14 @@ interface ProductApi {
         @Body storedProduct: StoredProductNetworkEntity
     ): Observable<ProductItemResponse>
 
+    @POST("api/diary/products/v2/replace")
+    fun replaceProduct(
+        @Body storedProduct: StoredProductNetworkEntity
+    ): Observable<ProductItemResponse>
+
     @GET("api/diary/products/v2")
     fun getProducts(
+        @Query("forDiabetesType") diabetesType: DiabetesTypeNetworkEntity?,
         @Query("customOnly") customOnly: Boolean,
         @Query("foodName") foodName: String?,
         @Query("pageIndex") pageIndex: Int,

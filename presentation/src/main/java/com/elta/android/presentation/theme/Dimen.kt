@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 
 data class EltaDimens(
     // Base Dims
+    val oneDim: Dp,
     val smallestDim: Dp,
     val verySmallDim: Dp,
     val smallDim: Dp,
@@ -17,6 +18,7 @@ data class EltaDimens(
     val bigDim: Dp,
     val veryBugDim: Dp,
     val contentPadding: Dp,
+    val contentListPadding: PaddingValues,
     val downButtonHeight: Dp,
     val textFieldPopupOffset: DpOffset,
     val borderWidth: Dp,
@@ -28,6 +30,7 @@ data class EltaDimens(
     val roundedButton: Dp,
     val elevationDefault: Dp,
     val snackBarHeight: Dp,
+    val letterIcon: PaddingValues,
     // Calculator Dims
     val lastWordVertical: Dp,
     val dishCardVerticalSpace: Dp,
@@ -39,6 +42,8 @@ data class EltaDimens(
     val dishHeaderTitle: PaddingValues,
     val xeValueCard: PaddingValues,
     val xeValue: PaddingValues,
+    val breadUnitsValue : PaddingValues,
+    val dishCheckProduct : PaddingValues,
     val dishIconSize: Dp,
     val dishChars: PaddingValues,
     val portionCountHelpPadding: PaddingValues,
@@ -89,10 +94,15 @@ data class EltaDimens(
     val glucoseFormatTextTopPadding: Dp,
     val glucoseFormatTextBetweenPadding: Dp,
     val glucoseRangeTextPadding: Dp,
-    val glucoseRangeCardPadding: PaddingValues
-)
+    val glucoseRangeCardPadding: PaddingValues,
+    // Event
+    val recentlySelection: PaddingValues,
+    val selectionValue: PaddingValues
+
+    )
 
 internal val eltaDimens = EltaDimens(
+    oneDim = 1.dp,
     smallestDim = 2.dp,
     verySmallDim = 4.dp,
     smallDim = 8.dp,
@@ -102,6 +112,7 @@ internal val eltaDimens = EltaDimens(
     bigDim = 24.dp,
     veryBugDim = 32.dp,
     contentPadding = 16.dp,
+    contentListPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
     downButtonHeight = 52.dp,
     textFieldPopupOffset = DpOffset(16.dp, 0.dp),
     borderWidth = 1.dp,
@@ -113,6 +124,7 @@ internal val eltaDimens = EltaDimens(
     roundedButton = 38.dp,
     elevationDefault = 2.dp,
     snackBarHeight = 24.dp,
+    letterIcon = PaddingValues(start = 8.dp, end = 32.dp, top = 16.dp),
     lastWordVertical = 12.dp,
     dishCardVerticalSpace = 8.dp,
     dishNameSpace = 12.dp,
@@ -122,6 +134,8 @@ internal val eltaDimens = EltaDimens(
     dishHeaderTitle = PaddingValues(top = 12.dp, bottom = 56.dp, start = 16.dp, end = 86.dp),
     xeValueCard = PaddingValues(bottom = 52.dp, end = 16.dp),
     xeValue = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+    breadUnitsValue = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 48.dp),
+    dishCheckProduct = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
     dishIconSize = 20.dp,
     dishChars = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
     portionCountHelpPadding = PaddingValues(horizontal = 76.dp),
@@ -193,5 +207,7 @@ internal val eltaDimens = EltaDimens(
     glucoseFormatTextTopPadding = 40.dp,
     glucoseFormatTextBetweenPadding = 24.dp,
     glucoseRangeTextPadding = 20.dp,
-    glucoseRangeCardPadding = PaddingValues(top = 8.dp, start = 16.dp, bottom = 12.dp, end = 16.dp)
+    glucoseRangeCardPadding = PaddingValues(top = 8.dp, start = 16.dp, bottom = 12.dp, end = 16.dp),
+    recentlySelection = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+    selectionValue = PaddingValues(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 12.dp)
 )

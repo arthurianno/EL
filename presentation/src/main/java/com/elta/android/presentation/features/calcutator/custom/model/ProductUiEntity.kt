@@ -7,5 +7,8 @@ data class ProductUiEntity(
     val metricServingLink: MetricServingLink? = null,
     val numberOfUnits: Double? = null,
     val carbohydrate: Int? = null,
+    val fat: Int? = null,
+    val calories: Int? = null,
+    val protein: Int? = null,
     val breadUnits: Double? = null
 )

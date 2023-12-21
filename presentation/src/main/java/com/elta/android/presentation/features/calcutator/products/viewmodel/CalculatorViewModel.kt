@@ -12,6 +12,7 @@ import com.elta.android.domain.features.calculator.interactor.GetHistoryListUseC
 import com.elta.android.domain.features.calculator.interactor.SaveWordToHistoryUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchDishesInFatSecretUseCase
 import com.elta.android.domain.features.calculator.interactor.SearchProductUseCase
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.compose.common.Action
@@ -26,6 +27,8 @@ import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
 import com.elta.android.presentation.core.ui.fragment.DEBOUNCE_MILLIS
 import com.elta.android.presentation.features.calcutator.mappers.ONE_DECIMAL_PLACE
+import com.elta.android.presentation.features.calcutator.mappers.addFirstServing
+import com.elta.android.presentation.features.calcutator.mappers.breadUnitsIsMax
 import com.elta.android.presentation.features.calcutator.mappers.toDomain
 import com.elta.android.presentation.features.calcutator.mappers.toUi
 import com.elta.android.presentation.features.calcutator.products.model.CalculatorAction
@@ -37,9 +40,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
@@ -60,6 +63,7 @@ class CalculatorViewModel @Inject constructor(
             totalBreadUnits = 0.0,
             searchInFocus = false,
             lastWords = emptyList(),
+            calculatorFlow = CalculatorFlow.BREAD_UNITS,
             isLoading = false,
             isError = false
         )
@@ -93,22 +97,37 @@ class CalculatorViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .collectLatest { reduceState { state.value.copy(lastWords = it) } }
         }
+
+        launch {
+            getCachedDishes()
+                .catch { handleError(it) }
+                .onEach { dishes ->
+                    val dishesUi = dishes.toUi()
+                    reduceState {
+                        state.value.copy(
+                            dishes = dishesUi,
+                            startDishes = dishesUi
+                        )
+                    }
+                    setDownButtonVisibility()
+                }
+        }
+
         launch {
             searchField.state
                 .map { it.textField.text }
-                .distinctUntilChanged()
                 .debounce(DEBOUNCE_MILLIS)
-                .collectLatest {
-                    if (it.isNotEmpty()) {
-                        findDishes(it)
+                .collect { searchText ->
+                    if (searchText.isNotEmpty()) {
+                        findDishes(searchText, state.value.calculatorFlow)
                     } else {
                         clearFindingDishes()
                     }
                 }
         }
+
         launch {
             getCachedDishes()
-                .catch { handleError(it) }
                 .map { it.toUi() }
                 .collect {
                     reduceState {
@@ -149,6 +168,7 @@ class CalculatorViewModel @Inject constructor(
                 downButton.visibilityState(!inFocusState && isSearchEmpty)
                 currentState.copy(searchInFocus = inFocusState)
             }
+
             else -> currentState
         }
 
@@ -162,9 +182,11 @@ class CalculatorViewModel @Inject constructor(
 
     private fun setDishes(dishes: List<DishUiEntity>) {
         reduceState {
+            val breadUnits = dishes.mapNotNull { it.breadUnits?.toDoubleOrNull() }
             state.value.copy(
                 dishes = dishes,
-                totalBreadUnits = dishes.sumOf { it.breadUnits.toDouble() }.round(ONE_DECIMAL_PLACE)
+                totalBreadUnits = if (breadUnits.isEmpty()) null else breadUnits.sumOf { it }
+                    .round(ONE_DECIMAL_PLACE)
             )
         }
         clearFindingDishes()
@@ -197,7 +219,15 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun saveDishes() {
-        if (state.value.totalBreadUnits > MAX_BREAD_UNITS) {
+
+        val breadIsMax = if (state.value.calculatorFlow == CalculatorFlow.BREAD_UNITS) {
+            state.value.totalBreadUnits.breadUnitsIsMax()
+        } else {
+            false
+        }
+
+
+        if (breadIsMax) {
             warningMaxBreadUnitsDialog.dialogOpen()
         } else {
             launch {
@@ -215,18 +245,21 @@ class CalculatorViewModel @Inject constructor(
                 .catch { handleError(it) }
                 .collectLatest {
                     reduceState { state.value.copy(lastWords = it) }
-                    router.navigateTo(Screens.AddDishScreen(dish))
+                    router.navigateTo(Screens.AddDishScreen(dish, state.value.calculatorFlow))
                 }
         }
     }
 
     private fun customDishesClick() {
-        router.navigateTo(Screens.CustomProductsScreen)
+        router.navigateTo(Screens.CustomProductsScreen(state.value.calculatorFlow))
     }
 
     private fun createDishClick() {
         router.navigateTo(
-            Screens.CreateCustomProductScreen(productName = searchField.state.value.textField.text)
+            Screens.CreateCustomProductScreen(
+                productName = searchField.state.value.textField.text,
+                calculatorFlow = state.value.calculatorFlow
+            )
         )
     }
 
@@ -235,9 +268,9 @@ class CalculatorViewModel @Inject constructor(
         searchField.clear()
     }
 
-    private fun findDishes(name: String) {
+    private fun findDishes(name: String, calculatorFlow: CalculatorFlow) {
         launch {
-            searchProducts(name, false)
+            searchProducts(name = name, calculatorFlow = calculatorFlow)
                 .catch {
                     handleError(it)
                     if (it is ServiceUnavailableError) {
@@ -247,6 +280,7 @@ class CalculatorViewModel @Inject constructor(
                 .onStart { reduceState { state.value.copy(isLoading = true, isError = false) } }
                 .onCompletion { reduceState { state.value.copy(isLoading = false) } }
                 .map { pagingData -> pagingData.map { dish -> dish.toUi() } }
+                .map { pagingData -> pagingData.map { dish -> dish.addFirstServing() } }
                 .cachedIn(viewModelScope)
                 .collect {
                     _findingDishesState.value = it
@@ -254,4 +288,11 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun setCalculatorFlow(calculatorFlow: CalculatorFlow) {
+        reduceState {
+            state.value.copy(
+                calculatorFlow = calculatorFlow
+            )
+        }
+    }
 }

@@ -3,7 +3,7 @@ package com.elta.android.domain.statistic
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildStatisticModel
@@ -18,6 +18,7 @@ import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatist
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyStatisticModel
 import com.elta.android.domain.features.user.interactor.round
+import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.junit.Test
 import org.threeten.bp.LocalDate
@@ -105,8 +106,9 @@ class BuildStatisticModelTest {
             allDays = getExpectedAllDays(day, glucoseEvents, settings),
             glucose = getExpectedGlucoseStatistic(glucoseEvents, settings),
             insulin = getExpectedInsulinStatistic(),
-            bread = getExpectedBreadStatistic(),
-            activity = getExpectedActivityStatistic()
+            food = getExpectedBreadStatistic(),
+            activity = getExpectedActivityStatistic(),
+            diabetes = Diabetes.FIRST
         )
 
         val model = buildStatisticModel(
@@ -114,7 +116,7 @@ class BuildStatisticModelTest {
             allEvents,
             settings,
             GlucoseFormat.PLASMA,
-            MedicamentInsulinStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList())
+            InsulinMedicamentStatistic(bolusInsulinTypes = emptyList(), basalInsulinTypes = emptyList()),
         )
 
         assert(true)

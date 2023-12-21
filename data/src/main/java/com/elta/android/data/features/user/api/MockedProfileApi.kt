@@ -4,7 +4,7 @@ package com.elta.android.data.features.user.api
 
 import com.elta.android.common.utils.log
 import com.elta.android.common.utils.timestamp
-import com.elta.android.data.features.user.dto.DiabeteTypeNetworkEntity
+import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GlucoseFormatNetworkEntity
 import com.elta.android.data.features.user.dto.GlucoseLevelNetworkEntity
@@ -27,7 +27,7 @@ class MockedProfileApi : ProfileApi {
     override fun getProfile(): Single<ProfileNetworkResponse> =
         Observable.fromCallable {
             ProfileNetworkResponse(
-                diabetes = DiabeteTypeNetworkEntity.LADA,
+                diabetes = DiabetesTypeNetworkEntity.FIRST,
                 weight = 80.0,
                 gender = GenderTypeNetworkEntity.MALE,
                 person = PersonNetworkEntity(

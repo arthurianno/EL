@@ -27,6 +27,8 @@ class EventV2ToCacheMapper @Inject constructor() : Mapper<EventV2Dto, EventV2Cac
                 activityType = data.activityType?.name,
                 mealTag = data.mealTag?.name,
                 medicament = data.insulinMedicament,
+                medicamentDto = data.medicament,
+                tabletsNumber = data.tabletsNumber,
                 temperature = data.temperature,
                 state = state.name,
                 glucometerSerialNumber = data.glucometerSerialNumber,

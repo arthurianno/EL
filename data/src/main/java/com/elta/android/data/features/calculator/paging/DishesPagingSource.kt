@@ -3,6 +3,7 @@ package com.elta.android.data.features.calculator.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.elta.android.data.core.paging.BasePagingSource
+import com.elta.android.data.core.paging.QueryPaging
 import com.elta.android.data.features.calculator.datasource.fatsecret.FatSecretDataSource
 import com.elta.android.data.features.calculator.mapper.compactFoodsToDomain
 import com.elta.android.domain.features.calculator.model.Dish
@@ -14,9 +15,10 @@ class DishesPagingSource @Inject constructor(
 
     override val defaultPosition: Int = DEFAULT_POSITION
 
-    private var name = ""
-    override fun setQuery(vararg query: Any) {
-        name = query[0] as String
+    private var query: QueryPaging.Dishes = QueryPaging.Dishes()
+
+    override fun setQuery(queryPaging: QueryPaging) {
+        this.query = (queryPaging as? QueryPaging.Dishes) ?: QueryPaging.Dishes()
     }
 
     override val pagingSource: PagingSource<Int, Dish> = object : PagingSource<Int, Dish>() {
@@ -27,11 +29,9 @@ class DishesPagingSource @Inject constructor(
             val pageSize = params.loadSize
 
             return try {
-                val foodsSearch =
-                    fatSecretDataSource.searchDishes(name, currentPage, pageSize).foodsSearch
+                val foodsSearch = fatSecretDataSource.searchDishes(query.name, currentPage, pageSize).foodsSearch
                 val dishes = foodsSearch.results?.food?.compactFoodsToDomain() ?: emptyList()
                 val totalPage = foodsSearch.totalResults.toIntOrNull() ?: dishes.size
-
 
                 returnResult(
                     dishes,

@@ -12,5 +12,7 @@ interface SyncStorage {
 
     var lastGoogleFitSync: Long?
 
+    var lastMedicamentSync: Long?
+
     fun deleteDbFiles(): Completable
 }

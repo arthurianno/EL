@@ -34,6 +34,7 @@ import io.reactivex.Single
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
@@ -132,7 +133,7 @@ class MainProfilePm @Inject constructor(
                 openDiabetesTypeDialogCommand.consumer.accept(Unit)
 
             MainProfileIndicatorItem.Type.WEIGHT ->
-                router.startFlow(Screens.EventsCreationScreen(EventType.WEIGHT))
+                router.startFlow(Screens.EventsCreationScreen(EventType.Weight))
 
             MainProfileIndicatorItem.Type.HEMOGLOBIN ->
                 openHemoglobinTypeDialogCommand.consumer.accept(Unit)

@@ -26,7 +26,9 @@ class MainRecordsMapper @Inject constructor(
             if (source.dailyGlucoseModel.hasEvents) {
                 add(source.dailyChart())
             }
-            addAll(source.eventsBlocks.mapIndexed { index, event -> event.group(index == 0) })
+            addAll(source.eventsBlocks.flatMapIndexed { index, event ->
+                event.ungroup(index == 0, source.calculatorFlow)
+            })
         }
 
     private fun HomeModel.dailyChart(): RecordsDailyGlucoseItem {
@@ -44,9 +46,10 @@ class MainRecordsMapper @Inject constructor(
             glucoseLevel = lastGlucoseEvent?.value.format(),
             glucoseLevelIndex = glucoseLevelDifference.format(),
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
-            breadLevel = lastBreadEvent?.value.format(),
+            breadLevel = lastFoodEvent?.value.format(),
             insulinLevel = lastInsulinEvent?.value.format(),
-            glucoseFormat = glucoseFormat
+            glucoseFormat = glucoseFormat,
+            calculatorFlow = calculatorFlow
         )
 
     private fun GlucoseLevelDirection.icon(): Int? =

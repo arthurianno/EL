@@ -2,8 +2,9 @@ package com.elta.android.presentation.features.main.records.mapper
 
 import com.elta.android.common.utils.CommonFormats
 import com.elta.android.common.utils.toStringWithFormat
-import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
@@ -14,6 +15,7 @@ import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.resources.ResourceProvider
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 private const val HOURS_IN_DAY = 24
@@ -24,67 +26,104 @@ private const val ZERO = 0
 open class BaseRecordsMapper(
     protected val resources: ResourceProvider
 ) {
-
-    protected fun EventsBlock.group(expand: Boolean): ListItem =
+    protected fun EventsBlock.group(expand: Boolean, calculatorFlow: CalculatorFlow): ListItem =
         RecordsGroupItem(
             id = tag?.id ?: "tag",
             icon = tag.toIcon(),
             name = tag.toName(resources),
-            items = events.map { it.record() },
+            items = events.map { it.record(calculatorFlow = calculatorFlow) },
             isExpanded = expand
         )
 
-    private fun EventV2.record(): ListItem =
+    protected fun EventsBlock.ungroup(expand: Boolean, calculatorFlow: CalculatorFlow): List<ListItem> {
+        val id = tag?.id ?: UUID.randomUUID().toString()
+        return listOf(
+            RecordsGroupItem(
+                id = id,
+                icon = tag.toIcon(),
+                name = tag.toName(resources),
+                items = emptyList(),
+                isExpanded = expand
+            )
+        ) + this.events.map { it.record(expand, id, calculatorFlow) }
+    }
+
+    protected fun EventV2.record(isVisible: Boolean = true, groupId: String? = null, calculatorFlow: CalculatorFlow): ListItem =
         RecordItem(
             id = id,
             icon = type.toIconWithBg(),
             title = this.toTitle(),
-            type = insulinType(),
-            count = formatValue(),
+            type = formatType(),
+            count = formatValue(calculatorFlow),
             date = formatDate(),
             showLabel = note != null,
             eventType = this.type,
-            labelIcon = mealTag?.toIcon()
+            labelIcon = mealTag?.toIcon(),
+            isVisible = isVisible,
+            groupId = groupId
         )
 
-    private fun EventV2.insulinType() =
-        if (type == EventType.INSULIN) {
-            resources.getString(type.toName()) + resources.getString(
-                R.string.event_type_insulin_medicament,
-                medicament?.name.orEmpty()
-            )
-        } else {
-            resources.getString(type.toName())
+    private fun EventV2.formatType() =
+        when (type) {
+            EventType.Insulin ->
+                resources.getString(type.toName()) + resources.getString(
+                    R.string.event_type_insulin_medicament,
+                    insulinMedicament?.name.orEmpty()
+                )
+
+            EventType.Medicaments -> (name ?: medicament?.name).orEmpty()
+            else -> resources.getString(type.toName())
         }
 
-    private fun EventV2.formatValue(): String? =
+    private fun EventV2.formatValue(calculatorFlow: CalculatorFlow): String? =
         when (type) {
-            EventType.INSULIN -> resources.getString(
+            EventType.Insulin -> resources.getString(
                 R.string.event_type_insulin_pattern,
                 value.format().orEmpty()
             )
 
-            EventType.BREAD -> resources.getString(
-                R.string.event_type_bread_pattern,
-                value.format().orEmpty()
-            )
+            is EventType.Bread -> this.formatBread(resources, calculatorFlow)
 
-            EventType.WEIGHT -> resources.getString(
+            EventType.Weight -> resources.getString(
                 R.string.event_type_weight_pattern,
                 value.format().orEmpty()
             )
 
-            EventType.GLUCOSE -> resources.getString(
+            EventType.Glucose -> resources.getString(
                 R.string.event_type_glucose_pattern,
                 value.format().orEmpty()
             )
 
-            EventType.ACTIVITY -> this.formatDuration(resources)
+            EventType.Medicaments -> tabletsNumber.formatNumber()
+
+            EventType.Activity -> this.formatDuration(resources)
             else -> null
         }
 
     private fun EventV2.formatDuration(resources: ResourceProvider): String =
         checkNotNull(duration).asTimeString(resources)
+
+    private fun EventV2.formatBread(
+        resources: ResourceProvider,
+        calculatorFlow: CalculatorFlow
+    ): String {
+        val dishesSize = dishes.size
+
+        return when {
+            calculatorFlow == CalculatorFlow.PRODUCT_ONLY && dishesSize == 0 -> ""
+            calculatorFlow == CalculatorFlow.PRODUCT_ONLY || value == null ->
+                resources.getQuantityString(
+                    R.plurals.calculator_total_products,
+                    dishesSize,
+                    dishesSize
+                )
+
+            else -> resources.getString(
+                R.string.event_type_bread_pattern,
+                value.format().orEmpty()
+            )
+        }
+    }
 
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     private fun EventV2.formatDate(): String {
@@ -97,16 +136,23 @@ open class BaseRecordsMapper(
         }
     }
 
+    private fun Double?.formatNumber(): String? =
+        if (this != null && this != 0.0) resources.getString(
+            R.string.event_type_medicament_pattern,
+            this.format().orEmpty()
+        )
+        else null
+
     private fun EventV2.toTitle(): String =
         when (type) {
-            EventType.INSULIN -> medicament?.insulinType?.name.orEmpty()
-            EventType.ACTIVITY -> activityType?.let { resources.getString(it.toName()) }
+            EventType.Insulin -> insulinMedicament?.insulinType?.name.orEmpty()
+            EventType.Activity -> activityType?.let { resources.getString(it.toName()) }
                 ?: resources.getString(R.string.event_type_activity_no_name)
 
-            EventType.BREAD -> kind ?: resources.getString(R.string.event_type_bread_no_name)
-            EventType.MEDICAMENTS -> checkNotNull(name)
-            EventType.WEIGHT -> resources.getString(R.string.event_type_weight_no_name)
-            EventType.GLUCOSE -> resources.getString(R.string.event_type_glucose_no_name)
+            is EventType.Bread -> kind ?: resources.getString(R.string.event_type_bread_no_name)
+            EventType.Medicaments -> resources.getString(type.toName())
+            EventType.Weight -> resources.getString(R.string.event_type_weight_no_name)
+            EventType.Glucose -> resources.getString(R.string.event_type_glucose_no_name)
             else -> ""
         }
 

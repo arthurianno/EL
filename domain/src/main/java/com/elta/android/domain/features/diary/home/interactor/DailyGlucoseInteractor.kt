@@ -24,7 +24,7 @@ fun buildDailyGlucoseModel(
 }
 
 fun List<EventV2>.sortGlucoseOnly(): List<EventV2> = sortedBy { it.additionTime }
-    .filter { it.type == EventType.GLUCOSE && it.value != null }
+    .filter { it.type == EventType.Glucose && it.value != null }
 
 private fun List<EventV2>.max(highRange: DoubleRange): EventV2? =
     maxByOrNull { it.nonNullValue() }?.takeIf { it.nonNullValue() in highRange }

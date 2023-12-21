@@ -28,6 +28,8 @@ class EventV2FromCacheMapper @Inject constructor() : Mapper<EventV2CachedDto, Ev
                     activityType = activityType?.let { ActivityTypeDto.valueOf(it) },
                     mealTag = mealTag?.let { MealTagDto.valueOf(it) },
                     insulinMedicament = medicament,
+                    medicament = medicamentDto,
+                    tabletsNumber = tabletsNumber,
                     type = EventTypeDto.valueOf(type),
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = productsList,

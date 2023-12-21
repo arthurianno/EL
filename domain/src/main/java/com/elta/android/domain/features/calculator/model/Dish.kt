@@ -9,6 +9,6 @@ data class Dish(
     val servings: List<Serving>,
     val servingSelect: Serving,
     val servingAmount: Double,
-    val breadUnits: Double,
+    val breadUnits: Double?,
     val isVerified: Boolean,
 )

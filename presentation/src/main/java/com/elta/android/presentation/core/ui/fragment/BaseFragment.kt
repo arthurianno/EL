@@ -19,6 +19,7 @@ import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.stateview.StateView
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.utils.applyInsetsToContentView
+import com.elta.android.presentation.utils.findAndClearFocus
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.makeSnackBar
 import com.elta.android.presentation.utils.visibility
@@ -123,6 +124,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         pm.showSnackBarCommand.bindTo { showSnackbar(it) }
         pm.showToastCommand.bindTo { showToast(it) }
         pm.hideKeyBoardCommand.bindTo { requireActivity().hideKeyboard() }
+        pm.clearFocusCommand.bindTo { requireActivity().findAndClearFocus() }
     }
 
     override fun providePresentationModel(): T {
