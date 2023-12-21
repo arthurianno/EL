@@ -53,20 +53,6 @@ android {
             buildConfigField("boolean", "DEBUG", "true")
 
         }
-        create("releaseDev") {
-            buildConfigField(
-                "String",
-                "APP_VERSION",
-                "\"${Version.versionName}-${BackendVariant.dev.name}\""
-            )
-        }
-        create("releaseStage") {
-            buildConfigField(
-                "String",
-                "APP_VERSION",
-                "\"${Version.versionName}-${BackendVariant.stage.name}\""
-            )
-        }
     }
 }
 
