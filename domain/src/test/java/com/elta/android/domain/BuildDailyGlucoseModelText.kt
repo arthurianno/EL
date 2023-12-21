@@ -5,6 +5,7 @@ import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import org.junit.Test
@@ -13,10 +14,10 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_OneNormalEvent_hasEvent() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.4)
+        val event = EventTestFactory.create(type = EventType.Glucose, value = 4.4)
 
         val model = buildDailyGlucoseModel(
-            arrayListOf(event),
+            listOf(event),
             GlucoseLevelSettings(),
             GlucoseFormat.CAPILLARY
         )
@@ -27,8 +28,8 @@ class BuildDailyGlucoseModelText {
 
     @Test
     fun buildDailyGlucoseModel_fewNotValidEvents_empty() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE, value = null)
-        val event2 = EventTestFactory.create(type = EventType.BREAD, value = 3.1)
+        val event = EventTestFactory.create(type = EventType.Glucose, value = null)
+        val event2 = EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS), value = 3.1)
 
         val model = buildDailyGlucoseModel(
             arrayListOf(event, event2),
@@ -43,15 +44,15 @@ class BuildDailyGlucoseModelText {
     @Test
     fun buildDailyGlucoseModel_differentEvents_hasOnlyGlucose() {
         val events = arrayListOf<EventV2>()
-        events.add(EventTestFactory.create(type = EventType.GLUCOSE, value = 4.4))
-        events.add(EventTestFactory.create(type = EventType.BREAD, value = 4.4))
-        events.add(EventTestFactory.create(type = EventType.INSULIN, value = 4.4))
-        events.add(EventTestFactory.create(type = EventType.GLUCOSE, value = 3.9))
+        events.add(EventTestFactory.create(type = EventType.Glucose, value = 4.4))
+        events.add(EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS), value = 4.4))
+        events.add(EventTestFactory.create(type = EventType.Insulin, value = 4.4))
+        events.add(EventTestFactory.create(type = EventType.Glucose, value = 3.9))
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings(), GlucoseFormat.CAPILLARY)
 
         assert(model.hasEvents)
-        assert(model.glucoseEvents.all { it.type == EventType.GLUCOSE })
+        assert(model.glucoseEvents.all { it.type == EventType.Glucose })
         assert(model.lastEvent != null)
     }
 
@@ -67,9 +68,9 @@ class BuildDailyGlucoseModelText {
     fun buildDailyGlucoseModel_fewNormalEvents_noMinAndMax() {
         val events = arrayListOf<EventV2>()
         for (a in 4..9) {
-            events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
+            events.add(EventTestFactory.create(EventType.Glucose, value = a.toDouble()))
         }
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 3.9))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 3.9))
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings(), GlucoseFormat.CAPILLARY)
 
@@ -83,13 +84,13 @@ class BuildDailyGlucoseModelText {
     fun buildDailyGlucoseModel_fewEventsInDifferentRanges_hasMinAndMax() {
         val events = arrayListOf<EventV2>()
         for (a in 4..9) {
-            events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
+            events.add(EventTestFactory.create(EventType.Glucose, value = a.toDouble()))
         }
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 3.9))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 1.8))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 1.1))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 12.2))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 12.7))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 3.9))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 1.8))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 1.1))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 12.2))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 12.7))
 
         val model = buildDailyGlucoseModel(events, GlucoseLevelSettings(), GlucoseFormat.CAPILLARY)
 
@@ -105,13 +106,13 @@ class BuildDailyGlucoseModelText {
     fun buildDailyGlucoseModel_fewEventsInDifferentRanges_correctOrder() {
         val events = arrayListOf<EventV2>()
         for (a in 4..9) {
-            events.add(EventTestFactory.create(EventType.GLUCOSE, value = a.toDouble()))
+            events.add(EventTestFactory.create(EventType.Glucose, value = a.toDouble()))
         }
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 3.9))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 1.8))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 1.1))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 12.2))
-        events.add(EventTestFactory.create(EventType.GLUCOSE, value = 12.7))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 3.9))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 1.8))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 1.1))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 12.2))
+        events.add(EventTestFactory.create(EventType.Glucose, value = 12.7))
 
         val model = buildDailyGlucoseModel(
             events.shuffled(),

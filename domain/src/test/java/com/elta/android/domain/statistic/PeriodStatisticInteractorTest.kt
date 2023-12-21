@@ -2,7 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.interactor.buildActivityStatisticModel
 import com.elta.android.domain.features.statistics.interactor.buildBreadStatisticModelByPeriod
@@ -148,7 +148,7 @@ class PeriodStatisticInteractorTest {
 
         val model = buildInsulinStatisticModelByPeriod(
             events,
-            MedicamentInsulinStatistic(
+            InsulinMedicamentStatistic(
                 bolusInsulinTypes = emptyList(),
                 basalInsulinTypes = emptyList()
             )

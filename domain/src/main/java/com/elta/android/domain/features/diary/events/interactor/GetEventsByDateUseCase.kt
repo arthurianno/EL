@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.events.model.modifyValues
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.interactor.getEventsBlocks
 import com.elta.android.domain.features.diary.home.interactor.sortAndFilter
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
 import com.elta.android.domain.features.diary.home.model.EventsBlock
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -36,11 +37,8 @@ class GetEventsByDateUseCase @Inject constructor(
                 val eventsWithTags = events
                     .modifyValues(profile.glucoseFormat)
                     .map { it.addTag(tags) }
-                Pair(eventsWithTags, tags)
-            }
-            .map { (events, tags) ->
-                val sortedEvents = events.sortAndFilter()
-                getEventsBlocks(sortedEvents, tags)
+                val sortedEvents = eventsWithTags.sortAndFilter()
+                getEventsBlocks(sortedEvents, tags, profile.diabetes.toCalculatorFlow(sortedEvents))
             }
             .applyScheduler(schedulers)
     }

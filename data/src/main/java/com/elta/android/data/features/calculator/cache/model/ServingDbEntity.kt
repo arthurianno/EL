@@ -10,7 +10,7 @@ data class ServingDbEntity(
     val calories: Double?,
     val proteins: Double?,
     val fats: Double?,
-    val carbohydrate: Double,
+    val carbohydrate: Double?,
     val idServingMetrics: Int,
     val nameServingMetrics: String,
     val numberOfUnits: Double,

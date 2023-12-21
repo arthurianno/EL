@@ -97,9 +97,9 @@ class GlucoseRangesOverlayView @JvmOverloads constructor(
         super.onMeasure(newWidthMeasureSpec, newHeightMeasureSpec)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.run {
+        canvas.run {
             drawRect(highRangeStartRect, highRangePaint)
             drawRect(highRangeEndRect, highRangePaint)
             drawRect(normalRangeStartRect, normalRangePaint)

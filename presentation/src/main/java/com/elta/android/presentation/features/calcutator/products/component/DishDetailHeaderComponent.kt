@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
+import com.elta.android.presentation.core.compose.widgets.VSpacer
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.products.model.ServingUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties
@@ -40,6 +42,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 @Composable
 fun MainHeader(
     dish: DishUiEntity,
+    calculatorFlow: CalculatorFlow,
     viewNameClickListener: () -> Unit
 ) {
     GetLocalProperties { dimens, brash, _, _, _ ->
@@ -50,7 +53,11 @@ fun MainHeader(
             verticalArrangement = Arrangement.Bottom
         ) {
             HeaderTitle(dish, viewNameClickListener)
-            BreadUnitsValue(dish)
+            if (calculatorFlow == CalculatorFlow.BREAD_UNITS) {
+                BreadUnitsValue(dish)
+            } else {
+                VSpacer(height = dimens.dishCardTextEndPadding)
+            }
         }
     }
 }
@@ -62,14 +69,13 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = dimens.contentPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
             var didOverflowHeight by remember { mutableStateOf(false) }
 
             Column(
-                modifier = Modifier
-                    .weight(1f),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Bottom
             ) {
                 if (dish.brandName.isNotEmpty()) {
@@ -78,7 +84,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                         style = types.body1,
                         color = colors.white,
                         modifier = Modifier
-                            .padding(bottom = 4.dp)
+                            .padding(bottom = dimens.verySmallDim)
                             .fillMaxWidth()
                     )
                 }
@@ -112,7 +118,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
             if (didOverflowHeight) {
                 Box(
                     modifier = Modifier
-                        .padding(top = 8.dp)
+                        .padding(top = dimens.smallDim)
                         .clip(shape = shapes.textButton)
                         .background(color = colors.blackBlue30)
                 ) {
@@ -122,7 +128,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                         color = colors.white,
                         modifier = Modifier
                             .clickable { viewNameClickListener.invoke() }
-                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                            .padding(dimens.dishCheckProduct),
                     )
                 }
             }
@@ -146,7 +152,8 @@ private fun Modifier.fadingEdges(
                         colors = bottomColors,
                         startY = bottomEndY - bottomEdgeHeight.toPx(),
                         endY = bottomEndY
-                    ), blendMode = BlendMode.DstIn
+                    ),
+                    blendMode = BlendMode.DstIn
                 )
             }
         })
@@ -156,8 +163,9 @@ fun BreadUnitsValue(dish: DishUiEntity) {
     GetLocalProperties { dimens, _, colors, shapes, types ->
         Row(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 48.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                .padding(dimens.breadUnitsValue)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = stringResource(id = R.string.calculator_bread_units_count),
@@ -165,19 +173,15 @@ fun BreadUnitsValue(dish: DishUiEntity) {
             )
 
             Text(
-                text = stringResource(
-                    id = R.string.calculator_bread_units_count_label,
-                    dish.breadUnits,
-                ),
+                text = stringResource(id = R.string.calculator_bread_units_count_label, dish.breadUnits.orEmpty()),
+                color = colors.gOrangeB,
+                style = types.title3,
                 modifier = Modifier
                     .clip(shapes.dishCard)
                     .background(color = colors.white)
                     .padding(dimens.xeValue),
-                color = colors.gOrangeB,
-                style = types.title3,
             )
         }
-
     }
 }
 
@@ -210,11 +214,10 @@ private fun PreviewContent() {
         "2.0"
     )
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         MainHeader(
             dish = dishUiEntity,
+            calculatorFlow = CalculatorFlow.BREAD_UNITS,
             viewNameClickListener = { }
         )
     }

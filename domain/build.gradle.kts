@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
+    id("kotlin-parcelize")
 }
 android {
 
@@ -22,8 +23,6 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
     buildTypes {
-        create("debugDev")
-        create("debugStage")
         create("releaseDev")
         create("releaseStage")
     }

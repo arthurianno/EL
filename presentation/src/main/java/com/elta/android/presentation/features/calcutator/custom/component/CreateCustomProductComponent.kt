@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
-
 package com.elta.android.presentation.features.calcutator.custom.component
 
 import androidx.compose.foundation.background
@@ -9,9 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,28 +48,30 @@ import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.NetworkState
 import com.elta.android.presentation.core.compose.widgets.HSpacerHalfMedium
+import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.common.ErrorScreen
+import com.elta.android.presentation.core.compose.widgets.common.LoadingScreen
 import com.elta.android.presentation.core.compose.widgets.textfields.InputText
-import com.elta.android.presentation.features.calcutator.component.ErrorScreen
-import com.elta.android.presentation.features.calcutator.component.LoadingScreen
+import com.elta.android.presentation.core.compose.widgets.textfields.InputTextFieldWidgetModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.features.calcutator.component.PortionHelper
 import com.elta.android.presentation.features.calcutator.component.PortionProductContent
 import com.elta.android.presentation.features.calcutator.component.PortionProductHeader
 import com.elta.android.presentation.features.calcutator.custom.model.CreateCustomProductAction
+import com.elta.android.presentation.features.calcutator.custom.model.CreateCustomProductFlow
+import com.elta.android.presentation.features.calcutator.custom.model.CreateCustomProductFlow.Companion.isCreating
 import com.elta.android.presentation.features.calcutator.custom.viewmodel.CreateCustomProductViewModel
+import com.elta.android.presentation.features.calcutator.products.component.DishChars
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.theme.LocalNetworkState
-import kotlinx.coroutines.FlowPreview
 
-@OptIn(FlowPreview::class)
 @ExperimentalComposeUiApi
 @Composable
-fun CreateCustomDishes(
-    viewModel: CreateCustomProductViewModel,
-) {
+fun CreateCustomDishes(viewModel: CreateCustomProductViewModel) {
     val state = viewModel.state.collectAsState().value
     val networkAvailable = LocalNetworkState.current == NetworkState.Available
 
@@ -76,10 +80,12 @@ fun CreateCustomDishes(
     val focusManager = LocalFocusManager.current
 
     GetLocalProperties { dimens, _, colors, shapes, _ ->
-        Box(
+        Scaffold(
+            scaffoldState = rememberScaffoldState(),
+            topBar = { TopBar(viewModel.appTopBar) },
+            bottomBar = { DownButton(widgetModel = viewModel.downButton) },
+            backgroundColor = colors.gOrangeA,
             modifier = Modifier
-                .fillMaxSize()
-                .background(color = colors.gOrangeA)
                 .focusRequester(focusRequester)
                 .clickableWithNoRipple {
                     keyboardController?.hide()
@@ -87,47 +93,34 @@ fun CreateCustomDishes(
                     focusManager.clearFocus()
                     viewModel sendAction AppAction.FreeScreenTap
                 }
-        ) {
-            Scaffold(
-                scaffoldState = rememberScaffoldState(),
-                topBar = { TopBar(viewModel.appTopBar) },
-                backgroundColor = colors.gOrangeA,
-                modifier = Modifier.statusBarsPadding()
-            ) { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .background(
-                            color = colors.white, shape = shapes.sheet
-                        )
-                        .padding(
-                            start = dimens.contentPadding,
-                            top = dimens.contentPadding,
-                            end = dimens.contentPadding
-                        )
-                ) {
+                .background(color = colors.gOrangeA)
+                .statusBarsPadding()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(color = colors.white, shape = shapes.sheet)
+                    .padding(dimens.contentListPadding)
+                    .verticalScroll(rememberScrollState())
+                    .imePadding(),
+                verticalArrangement = if (state.isLoading || state.isError) Arrangement.Center else Arrangement.Top
+            ) {
 
-                    when {
-                        state.isLoading -> Box(modifier = Modifier.fillMaxSize()) { LoadingScreen() }
-                        state.isError -> {
-                            val textId = if (networkAvailable)
-                                R.string.create_custom_product_server_error
-                            else
-                                R.string.create_custom_product_offline_error
+                when {
+                    state.isLoading -> LoadingScreen(color = colors.shadeBlack1)
+                    state.isError -> {
+                        val textId =
+                            if (networkAvailable) R.string.create_custom_product_server_error
+                            else R.string.create_custom_product_offline_error
 
-                            ErrorScreen(textId = textId) {
-                                viewModel.sendAction(CreateCustomProductAction.Retry)
-                            }
+                        ErrorScreen(titleTextId = textId) {
+                            viewModel.sendAction(CreateCustomProductAction.Retry)
                         }
-                        else -> Content(viewModel, focusManager)
                     }
 
+                    else -> Content(viewModel, focusManager)
                 }
-
-            }
-            if (!state.isLoading && !state.isError) {
-                DownButton(widgetModel = viewModel.downButton)
             }
         }
     }
@@ -139,56 +132,149 @@ private fun Content(viewModel: CreateCustomProductViewModel, focusManager: Focus
     val state = viewModel.state.collectAsState().value
     val numberOfUnitsIsError = viewModel.portionCountTextField.state.collectAsState().value.isError
 
-    InputText(
-        widgetModel = viewModel.productNameField,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done
-        ),
-        focusManager = focusManager,
-        isFocusRequested = true
-    )
+    GetLocalProperties { dimens, _, _, _, _ ->
+        InputText(
+            widgetModel = viewModel.productNameField,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            focusManager = focusManager,
+            isFocusRequested = true
+        )
+        VSpacer(height = dimens.halfBigDim)
+        PortionProductHeader(isQuestionButtonVisible = state.createCustomProductFlow.isCreating()) {
+            viewModel sendAction CreateCustomProductAction.PortionHelpClick
+        }
+        if (!state.createCustomProductFlow.isCreating()) VSpacerMedium()
+        PortionProductContent(
+            portionWidgetModel = viewModel.portionCountTextField,
+            portionDescriptionWidgetModel = viewModel.portionDescriptionTextField,
+            focusManager = focusManager,
+            isError = numberOfUnitsIsError,
+            isFocusRequested = false
+        )
 
-    PortionProductHeader { viewModel sendAction CreateCustomProductAction.PortionHelpClick }
-    PortionProductContent(
-        portionWidgetModel = viewModel.portionCountTextField,
-        portionDescriptionWidgetModel = viewModel.portionDescriptionTextField,
-        focusManager = focusManager,
-        isError = numberOfUnitsIsError,
-        isFocusRequested = false
-    )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Column {
+                VSpacerMedium()
+                if (state.calculatorFlow == CalculatorFlow.BREAD_UNITS) {
+                    InputText(
+                        widgetModel = viewModel.specialCarbohydrateField,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done,
+                        ),
+                        focusManager = focusManager,
+                        isFocusRequested = false
+                    )
+                }
+                if (state.createCustomProductFlow.isCreating()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        ExtraInfo(
+                            carbohydrateField = viewModel.carbohydrateField,
+                            caloriesField = viewModel.caloriesField,
+                            fatField = viewModel.fatField,
+                            proteinField = viewModel.proteinField,
+                            calculatorFlow = state.calculatorFlow
+                        )
+                        PortionHelper(
+                            isShowCountHelpSnack = state.isShowCarbohydrateCountHelpSnack,
+                            message = stringResource(id = R.string.custom_product_input_units_must_be_add)
+                        )
+                    }
+                } else {
+                    Column {
+                        VSpacerMedium()
+                        state.dish?.servingSelect?.let { DishChars(it) }
+                    }
+                }
+            }
 
-
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Column {
-            VSpacerMedium()
-            InputText(
-                widgetModel = viewModel.breadUnitsField,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done,
-                ),
-                focusManager = focusManager,
-                isFocusRequested = false
+            PortionHelper(
+                isShowCountHelpSnack = state.isShowServingCountHelpSnack,
+                message = stringResource(id = R.string.calculator_portion_count_and_serving_help_snack)
             )
         }
 
-        PortionHelper(
-            isShowCountHelpSnack = state.isShowCountHelpSnack,
-            message = stringResource(id = R.string.calculator_portion_count_and_serving_help_snack)
-        )
-    }
-
-    VSpacerMedium()
-    if (state.dish != null) {
-        NonEditable()
+        VSpacerMedium()
+        if (!state.createCustomProductFlow.isCreating()) {
+            NonEditable()
+        }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun ExtraInfo(
+    carbohydrateField: InputTextFieldWidgetModel,
+    caloriesField: InputTextFieldWidgetModel,
+    proteinField: InputTextFieldWidgetModel,
+    fatField: InputTextFieldWidgetModel,
+    calculatorFlow: CalculatorFlow
+) {
+    GetLocalProperties { dimens, _, colors, _, types ->
+        Column {
+            VSpacer(dimens.halfBigDim)
+            Text(
+                text = stringResource(id = R.string.custom_product_extra_info),
+                style = types.body2,
+                color = colors.black
+            )
+            if (calculatorFlow == CalculatorFlow.PRODUCT_ONLY) {
+                InputText(
+                    widgetModel = carbohydrateField,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    leadingIcon = {
+                        LetterIcon(stringResource(id = R.string.custom_product_extra_letter_for_carbohydrate))
+                    }
+                )
+            }
+            InputText(
+                widgetModel = caloriesField,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                leadingIcon = {
+                    LetterIcon(stringResource(id = R.string.custom_product_extra_letter_for_calories))
+                }
+            )
+            InputText(
+                widgetModel = proteinField,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                leadingIcon = {
+                    LetterIcon(stringResource(id = R.string.custom_product_extra_letter_for_protein))
+                }
+            )
+            InputText(
+                widgetModel = fatField,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                leadingIcon = {
+                    LetterIcon(stringResource(id = R.string.custom_product_extra_letter_for_fat))
+                }
+            )
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
 @Composable
 private fun NonEditable() {
     GetLocalProperties { dimens, _, colors, shapes, types ->
@@ -224,7 +310,6 @@ private fun NonEditable() {
 
 @ExperimentalComposeUiApi
 @Composable
-
 fun Modifier.bottomBorder(strokeWidth: Dp, color: Color) = composed(factory = {
     val density = LocalDensity.current
     val strokeWidthPx = density.run { strokeWidth.toPx() }
@@ -242,10 +327,9 @@ fun Modifier.bottomBorder(strokeWidth: Dp, color: Color) = composed(factory = {
     }
 })
 
+@ExperimentalComposeUiApi
 @Composable
-private fun TopBar(
-    appTopBarWidgetModel: BaseAppTopBarWidgetModel
-) {
+private fun TopBar(appTopBarWidgetModel: BaseAppTopBarWidgetModel) {
     GetLocalProperties { _, _, colors, _, types ->
         BaseAppTopBar(
             widgetModel = appTopBarWidgetModel,
@@ -257,7 +341,28 @@ private fun TopBar(
     }
 }
 
-@OptIn(FlowPreview::class)
+@ExperimentalComposeUiApi
+@Composable
+private fun LetterIcon(letter: String) {
+    GetLocalProperties { dimens, _, colors, _, types ->
+        Text(
+            modifier = Modifier
+                .padding(dimens.letterIcon)
+                .drawBehind {
+                    drawCircle(
+                        color = colors.gGreenB,
+                        radius = this.size.maxDimension * 0.75f
+                    )
+                },
+            text = letter,
+            color = colors.white,
+            style = types.title3,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 private fun PreviewCreateCustomDish() {

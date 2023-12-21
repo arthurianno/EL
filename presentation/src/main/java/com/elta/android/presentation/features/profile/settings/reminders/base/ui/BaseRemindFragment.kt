@@ -47,6 +47,7 @@ abstract class BaseRemindFragment<T : BaseRemindPm> :
         pm.saveChangesEnableState.bindTo { binding.formSaveButtonView.isEnabled = it }
         binding.scheduleView.spinnerClicks().bindTo(pm.selectedScheduleAction)
         pm.exitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.wrongTimeDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
         pm.showExistingReminderDialog.bindTo { activity.showToast(getString(R.string.reminder_is_exists)) }
     }

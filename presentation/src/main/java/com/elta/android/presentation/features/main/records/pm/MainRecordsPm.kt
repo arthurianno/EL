@@ -15,14 +15,18 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.pm.ExpandableListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.features.main.records.mapper.MainRecordsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.nullgr.core.adapter.items.ListItem
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
@@ -30,7 +34,7 @@ class MainRecordsPm @Inject constructor(
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
     services: ServiceFacade
-) : BaseListPm(services) {
+) : ExpandableListPm(services) {
 
     val mainScreenState = stateControl()
 
@@ -72,6 +76,28 @@ class MainRecordsPm @Inject constructor(
             .untilDestroy()
     }
 
+    override fun onItemExpandCollapse(
+        clickedItem: ListItem,
+        allItems: List<ListItem>
+    ): List<ListItem> {
+        if (clickedItem !is RecordsGroupItem) return allItems
+        var expanded = false
+        return allItems.map {
+            when {
+                it is RecordsGroupItem && it.id == clickedItem.id -> {
+                    expanded = !it.isExpanded
+                    it.copy(isExpanded = expanded)
+                }
+                it is RecordItem && it.groupId == clickedItem.id -> {
+                    it.copy(isVisible = expanded)
+                }
+                else -> {
+                    it
+                }
+            }
+        }
+    }
+
     override fun onBind() {
         super.onBind()
 
@@ -89,7 +115,7 @@ class MainRecordsPm @Inject constructor(
     private fun handleSuccess(model: HomeModel) {
         bus.event(Events.HomeModelChanged(model))
         model.launchState()
-        items.consumer.accept(recordsMapper.mapFromObject(model))
+        listItems.consumer.accept(recordsMapper.mapFromObject(model))
     }
 
     private fun HomeModel.launchState() {

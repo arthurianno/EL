@@ -1,11 +1,11 @@
 package com.elta.android.presentation.features.main.events.chooser.pm
 
 import com.elta.android.domain.features.diary.chooser.interactor.GetChooserOptionsUseCase
-import com.elta.android.domain.features.diary.chooser.interactor.GetMedicinesChooserOptionsUseCase
+import com.elta.android.domain.features.diary.chooser.interactor.GetInsulinMedicamentsChooserOptionsUseCase
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Medicament
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
@@ -17,7 +17,7 @@ import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
-import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
+import com.elta.android.presentation.features.main.events.chooser.models.InsulinMedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
@@ -34,7 +34,7 @@ private const val TIMES_EXIT_TO_LEAVE_CHOOSER = 2
 @Suppress("MagicNumber", "ForEachOnRange", "LabeledExpression")
 class EventsOptionsChooserPm @Inject constructor(
     private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
-    private val getMedicinesChooserOptionsUseCase: GetMedicinesChooserOptionsUseCase,
+    private val getInsulinMedicamentsChooserOptionsUseCase: GetInsulinMedicamentsChooserOptionsUseCase,
     private val itemsBuilder: ChooserOptionsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -46,7 +46,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private val selectedItemIdState = state(NONE_ID)
     private val previousSelectionState = state<String>()
     private val configurationState = state<ChooserConfiguration>()
-    private val chooserInsulinDefaultList = state<List<Medicament>>()
+    private val chooserInsulinDefaultList = state<List<InsulinMedicament>>()
 
     private val loadChooserOptionsAction = action<ChooserConfiguration>()
 
@@ -89,10 +89,10 @@ class EventsOptionsChooserPm @Inject constructor(
         bindSelectionBehaviour()
 
         configurationState.observable
-                .filter { it.chooserType == ChooserType.VARIANTS && it.eventType == EventType.INSULIN }
+                .filter { it.chooserType == ChooserType.VARIANTS && it.eventType is EventType.Insulin }
                 .flatMap { chooserConfiguration ->
-                    val insulinType = chooserConfiguration.medicament?.let { medicamentChooser ->
-                        GetMedicinesChooserOptionsUseCase.Params(
+                    val insulinType = chooserConfiguration.insulinMedicament?.let { medicamentChooser ->
+                        GetInsulinMedicamentsChooserOptionsUseCase.Params(
                             MedicamentInsulinType(
                                 id = medicamentChooser.insulinId,
                                 code = medicamentChooser.insulinCode,
@@ -100,7 +100,7 @@ class EventsOptionsChooserPm @Inject constructor(
                             )
                         )
                     }
-                    getMedicinesChooserOptionsUseCase.execute(insulinType)
+                    getInsulinMedicamentsChooserOptionsUseCase.execute(insulinType)
                 }
                 .subscribe(chooserInsulinDefaultList.consumer)
                 .untilDestroy()
@@ -154,7 +154,7 @@ class EventsOptionsChooserPm @Inject constructor(
             }
             .doOnNext {
                 val configuration = configurationState.value
-                if (configuration.eventType == EventType.INSULIN &&
+                if (configuration.eventType is EventType.Insulin &&
                     configuration.chooserType == ChooserType.VARIANTS
                 ) {
                     router.leaveChooser()
@@ -192,13 +192,13 @@ class EventsOptionsChooserPm @Inject constructor(
         )
     }
 
-    private fun getInsulinType(medicines: List<Medicament>?): MedicamentInsulinType {
+    private fun getInsulinType(medicines: List<InsulinMedicament>?): MedicamentInsulinType {
         val type = medicines?.find { it.id.toString() == selectedItemId }?.insulinType
         return type ?: MedicamentInsulinType.nullMedicament()
     }
 
     private fun getChooserResultName(title: String?, insulinTypeName: MedicamentInsulinType): String? {
-        return if (configurationState.value.eventType == EventType.INSULIN) {
+        return if (configurationState.value.eventType is EventType.Insulin) {
             "${insulinTypeName.name}(${title.orEmpty()})"
         } else {
             title
@@ -209,24 +209,24 @@ class EventsOptionsChooserPm @Inject constructor(
         GetChooserOptionsUseCase.Params(
             chooserConfiguration.eventType,
             chooserConfiguration.chooserType,
-            configurationState.valueOrNull?.medicament?.toInsulinType()
+            configurationState.valueOrNull?.insulinMedicament?.toInsulinType()
         )
 
     private fun setUpToolbarTitle(configuration: ChooserConfiguration) {
         val accept = when {
             configuration.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE &&
-                    configuration.eventType == EventType.INSULIN -> {
+                    configuration.eventType is EventType.Insulin -> {
                 resources.getString(R.string.events_options_chooser_title_insulin)
             }
 
             configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.ACTIVITY -> {
+                    configuration.eventType is EventType.Activity -> {
                 resources.getString(R.string.events_options_chooser_title_activities)
             }
 
             configuration.chooserType == ChooserType.VARIANTS &&
-                    configuration.eventType == EventType.INSULIN -> {
-                configurationState.valueOrNull?.medicament?.insulinName
+                    configuration.eventType is EventType.Insulin -> {
+                configurationState.valueOrNull?.insulinMedicament?.insulinName
                     ?: resources.getString(R.string.events_options_chooser_title_tags)
             }
 
@@ -239,11 +239,11 @@ class EventsOptionsChooserPm @Inject constructor(
     private fun setUpAppBarBackground(configuration: ChooserConfiguration) {
         appBarBackgroundCommand.consumer.accept(
             when (configuration.eventType) {
-                EventType.BREAD -> R.color.color_chooser_bg_bread
-                EventType.ACTIVITY -> R.color.color_chooser_bg_activity
-                EventType.WEIGHT -> R.color.color_chooser_bg_weight
-                EventType.MEDICAMENTS -> R.color.color_chooser_bg_medicaments
-                EventType.INSULIN -> R.color.color_chooser_bg_insulin
+                is EventType.Bread -> R.color.color_chooser_bg_bread
+                EventType.Activity -> R.color.color_chooser_bg_activity
+                EventType.Weight -> R.color.color_chooser_bg_weight
+                EventType.Medicaments -> R.color.color_chooser_bg_medicaments
+                EventType.Insulin -> R.color.color_chooser_bg_insulin
                 else -> R.color.color_chooser_bg_insulin
             }
         )
@@ -251,7 +251,7 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun setPreviousSelection(configuration: ChooserConfiguration) {
         val accept = if (configuration.chooserType == ChooserType.VARIANTS) {
-            configuration.medicament?.medicamentId?.toString() ?: NONE_ID
+            configuration.insulinMedicament?.medicamentId?.toString() ?: NONE_ID
         } else {
             NONE_ID
         }
@@ -259,7 +259,7 @@ class EventsOptionsChooserPm @Inject constructor(
         previousSelectionState.consumer.accept(accept)
     }
 
-    private fun MedicamentChooser.toInsulinType() = MedicamentInsulinType(
+    private fun InsulinMedicamentChooser.toInsulinType() = MedicamentInsulinType(
         code = insulinCode,
         id = insulinId,
         name = insulinName
@@ -267,10 +267,10 @@ class EventsOptionsChooserPm @Inject constructor(
 
     private fun ChooserWithSubtypeItem.getConfigurator(): ChooserConfiguration {
         val insulinType = meta as MedicamentInsulinType
-        val medicamentChooser =  if (medicament?.insulinCode == insulinType.code)
+        val insulinMedicamentChooser =  if (medicament?.insulinCode == insulinType.code)
             medicament
         else
-            MedicamentChooser(
+            InsulinMedicamentChooser(
                 insulinCode = insulinType.code,
                 insulinName = insulinType.name,
                 insulinId = insulinType.id
@@ -278,9 +278,9 @@ class EventsOptionsChooserPm @Inject constructor(
 
         return ChooserConfiguration(
             chooserType = ChooserType.VARIANTS,
-            eventType = EventType.INSULIN,
+            eventType = EventType.Insulin,
             id = insulinType.code,
-            medicament = medicamentChooser
+            insulinMedicament = insulinMedicamentChooser
         )
     }
 }

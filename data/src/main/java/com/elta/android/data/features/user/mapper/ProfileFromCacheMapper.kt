@@ -4,7 +4,7 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.user.cache.dto.HealthAppCacheDto
 import com.elta.android.data.features.user.cache.dto.NetworkCacheDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
-import com.elta.android.data.features.user.dto.DiabeteTypeNetworkEntity
+import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GlucoseLevelNetworkEntity
 import com.elta.android.data.features.user.dto.HealthAppNetworkEntity
@@ -20,7 +20,7 @@ class ProfileFromCacheMapper @Inject constructor(
     override fun mapFromObject(source: ProfileCacheDto): ProfileNetworkResponse =
         with(source) {
             ProfileNetworkResponse(
-                diabetes = diabetes?.let { DiabeteTypeNetworkEntity.valueOf(it) },
+                diabetes = diabetes?.let { DiabetesTypeNetworkEntity.valueOf(it) },
                 weight = weight,
                 gender = gender?.let { GenderTypeNetworkEntity.valueOf(it) },
                 person = PersonNetworkEntity(

@@ -5,6 +5,7 @@ package com.elta.android.presentation.features.statistic.period.pm
 import android.graphics.drawable.Drawable
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.diary.events.model.toGlucoseFormat
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.DailyGlucoseModel
 import com.elta.android.domain.features.diary.home.model.DoubleRange
 import com.elta.android.domain.features.statistics.model.GlucoseStatisticModel
@@ -53,7 +54,13 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
 
         items.add(GlucoseIndexesItem(glucoseIndexItems))
         glucoseStatisticModel?.dailyGlucoseModel?.dailyChart(date)?.let { items.add(it) }
-        val types = GeneralIndexItem.Type.values()
+
+        val types = if (model.calculatorFlow == CalculatorFlow.PRODUCT_ONLY) {
+            GeneralIndexItem.Type.values()
+                .filterNot { it == GeneralIndexItem.Type.BREAD }
+                .toTypedArray()
+        } else GeneralIndexItem.Type.values()
+
         types.forEachIndexed { index, type ->
             val value = type.getValueByDate(model, date)
             items.add(
@@ -66,6 +73,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
                 )
             )
         }
+
         return items
     }
 
@@ -258,7 +266,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         }
 
     private fun List<String>.statisticString() =
-        joinToString(separator = " + ",  prefix = "(", postfix = ")")
+        joinToString(separator = " + ", prefix = "(", postfix = ")")
 
     private fun GeneralIndexItem.Type.getValueByDate(
         model: StatisticByPeriodModel,
@@ -273,7 +281,7 @@ class StatisticByPeriodItemsBuilder @Inject constructor(
         when (this) {
             GeneralIndexItem.Type.BREAD -> resources.getString(
                 R.string.statistic_general_index_description_value_by_period_bread,
-                stat?.bread?.averageLevel.format()
+                stat?.food?.averageLevel.format()
             )
 
             GeneralIndexItem.Type.TOTAL -> resources.getString(

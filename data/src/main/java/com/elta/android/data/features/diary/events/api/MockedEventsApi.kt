@@ -10,7 +10,7 @@ import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventsV2Dto
-import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
+import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.tags.api.TagMockedFactory
 import io.reactivex.Observable
 
@@ -38,10 +38,10 @@ class MockedEventsApi : EventsV2Api {
                                 } else {
                                     MealTagDto.BEFOREMEAL
                                 },
-                                medicament = if (type == EventTypeDto.INSULIN) MedicamentDto(
+                                insulinMedicament = if (type == EventTypeDto.INSULIN) InsulinMedicamentDto(
                                     id = 0,
                                     name = "",
-                                    insulinType = MedicamentDto.MedicamentInsulinTypeDto(
+                                    insulinType = InsulinMedicamentDto.MedicamentInsulinTypeDto(
                                         code = "123",
                                         id = 0,
                                         name = "name"

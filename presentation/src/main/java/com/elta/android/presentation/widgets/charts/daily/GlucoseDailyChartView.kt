@@ -173,13 +173,13 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         return true
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.let {
-            it.drawSections()
-            it.drawSectionDividers()
-            it.drawTimeLine()
-            it.drawPoints()
+        with(canvas) {
+            drawSections()
+            drawSectionDividers()
+            drawTimeLine()
+            drawPoints()
         }
     }
 

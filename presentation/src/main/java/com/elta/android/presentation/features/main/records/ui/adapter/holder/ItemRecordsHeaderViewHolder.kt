@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.holder
 
 import androidx.annotation.StringRes
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.adapter.BaseListItemViewHolder
@@ -39,6 +40,7 @@ class ItemRecordsHeaderViewHolder(
     }
 
     private fun bindBread(item: RecordsHeaderItem) {
+        binding.breadUnitsLabelView.toggleView(item.calculatorFlow == CalculatorFlow.BREAD_UNITS)
         binding.breadValueView.text =
             item.breadLevel formatAsValueOrEmpty R.string.main_records_mask_value_he
     }

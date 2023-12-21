@@ -32,8 +32,12 @@ class RemindersViewModel @Inject constructor(
         )
     }
 
-    val settingsDialog = BaseDialogWidgetModel<Nothing>(
-        positiveOnCLick = { sendEvent(RemindersEvent.OpenSettings) }
+    val notificationSettingsDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(RemindersEvent.OpenNotificationSettings) }
+    )
+
+    val alarmsAndRemindersSettingsDialog = BaseDialogWidgetModel<Nothing>(
+        positiveOnCLick = { sendEvent(RemindersEvent.OpenAlarmAndRemindersSettings) }
     )
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -48,8 +52,10 @@ class RemindersViewModel @Inject constructor(
             is RemindersAction.CreateReminder -> sendEvent(RemindersEvent.CheckNotificationPermission)
             is RemindersAction.OpenCreateReminder -> router.navigateTo(Screens.CreateRemind)
             is RemindersAction.OpenReminder -> router.navigateTo(Screens.EditRemind(action.id))
-            is RemindersAction.PermissionResult -> permissionResult(action.isGranted)
-            is RemindersAction.OpenSettingsDialog -> settingsDialog.dialogOpen()
+            is RemindersAction.NotificationPermissionResult -> notificationPermissionResult(action.isGranted)
+            is RemindersAction.AlarmsAndRemindersPermissionResult -> alarmsAndRemindersPermissionResult(action.isGranted)
+            is RemindersAction.OpenNotificationSettingsDialog -> notificationSettingsDialog.dialogOpen()
+            is RemindersAction.OpenAlarmsAndRemindersSettingsDialog -> alarmsAndRemindersSettingsDialog.dialogOpen()
         }
     }
 
@@ -93,11 +99,24 @@ class RemindersViewModel @Inject constructor(
         }
     }
 
-    private fun permissionResult(isGranted: Boolean) {
-        if (isGranted)
+    private fun notificationPermissionResult(isGranted: Boolean) {
+        if (isGranted) {
             sendAction(RemindersAction.OpenCreateReminder)
-        else
-            settingsDialog.dialogOpen()
+        }
+        else {
+            notificationSettingsDialog.dialogOpen()
+        }
+
+    }
+
+    private fun alarmsAndRemindersPermissionResult(isGranted: Boolean) {
+        if (isGranted) {
+            sendEvent(RemindersEvent.CheckNotificationPermission)
+        }
+        else {
+            alarmsAndRemindersSettingsDialog.dialogOpen()
+        }
+
     }
 
 }

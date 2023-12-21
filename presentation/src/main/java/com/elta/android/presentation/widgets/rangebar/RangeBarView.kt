@@ -195,16 +195,16 @@ class RangeBarView @JvmOverloads constructor(
         return true
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.let {
-            it.drawRangeBar()
-            it.drawStartValueText()
-            it.drawEndValueText()
-            it.drawStartDragIndicators()
-            it.drawEndDragIndicators()
-            it.drawStartTriangle()
-            it.drawEndTriangle()
+        with(canvas) {
+            drawRangeBar()
+            drawStartValueText()
+            drawEndValueText()
+            drawStartDragIndicators()
+            drawEndDragIndicators()
+            drawStartTriangle()
+            drawEndTriangle()
         }
     }
 

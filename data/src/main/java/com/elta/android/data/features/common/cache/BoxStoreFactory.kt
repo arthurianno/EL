@@ -33,9 +33,24 @@ class BoxStoreFactory @Inject constructor(
         }
     }
 
-    private fun createOrGetStore(id: Long): BoxStore = stores[id]
-        ?: createBoxStore(id).also { stores[id] = it }
+    fun deleteDbFiles(): Boolean {
+        val user = userHolder.currentUser
+        stores[commonId]?.close()
+        stores[user]?.close()
+
+        val isUserFilesDeleted = BoxStore.deleteAllFiles(context, "boxStore_$user")
+        val isCommonFilesDeleted = BoxStore.deleteAllFiles(context, "boxStore_$commonId")
+        return isCommonFilesDeleted && isUserFilesDeleted
+    }
+
+    private fun createOrGetStore(id: Long): BoxStore {
+        return stores[id]?.let { store ->
+            if (!store.isClosed) stores[id]
+            else createBoxStore(id).also { stores[id] = it }
+        } ?: createBoxStore(id).also { stores[id] = it }
+    }
 
     private fun createBoxStore(id: Long): BoxStore =
         MyObjectBox.builder().androidContext(context).name("boxStore_$id").build()
 }
+

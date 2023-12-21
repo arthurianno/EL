@@ -2,7 +2,8 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.daily.DailyBreadStatisticModel
 import com.elta.android.domain.features.statistics.model.daily.DailyInsulinStatisticModel
@@ -15,25 +16,26 @@ fun buildDailyStatisticModel(
     eventsPerDay: Map<EventType, List<EventV2>>,
     settings: GlucoseLevelSettings,
     glucoseFormat: GlucoseFormat,
-    medicamentInsulinStatistic: MedicamentInsulinStatistic
+    insulinMedicamentStatistic: InsulinMedicamentStatistic,
+    calculatorFlow: CalculatorFlow
 ): DailyStatisticModel {
     return DailyStatisticModel(
         date = date,
         glucose = buildGlucoseStatisticModel(
-            glucoseEventsPerPeriod = eventsPerDay[EventType.GLUCOSE],
+            glucoseEventsPerPeriod = eventsPerDay[EventType.Glucose],
             settings = settings,
             glucoseFormat = glucoseFormat,
             forPeriod = false
         ),
-        insulin = buildDailyInsulinStatisticModel(eventsPerDay[EventType.INSULIN], medicamentInsulinStatistic),
-        bread = buildDailyBreadStatisticModel(eventsPerDay[EventType.BREAD]),
-        activity = buildActivityStatisticModel(eventsPerDay[EventType.ACTIVITY])
+        insulin = buildDailyInsulinStatisticModel(eventsPerDay[EventType.Insulin], insulinMedicamentStatistic),
+        bread = buildDailyBreadStatisticModel(eventsPerDay[EventType.Bread(calculatorFlow)]),
+        activity = buildActivityStatisticModel(eventsPerDay[EventType.Activity])
     )
 }
 
 fun buildDailyInsulinStatisticModel(
     insulinEventsPerDay: List<EventV2>?,
-    medicamentInsulinStatistic: MedicamentInsulinStatistic,
+    insulinMedicamentStatistic: InsulinMedicamentStatistic,
 ): DailyInsulinStatisticModel {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
@@ -42,15 +44,15 @@ fun buildDailyInsulinStatisticModel(
     insulinEventsPerDay?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
-            if (event.isBolusInsulin(medicamentInsulinStatistic)) {
+            if (event.isBolusInsulin(insulinMedicamentStatistic)) {
                 totalBolusLevel += value
             }
 
-            if (event.isBasalInsulin(medicamentInsulinStatistic)) {
+            if (event.isBasalInsulin(insulinMedicamentStatistic)) {
                 totalBasalLevel += value
             }
 
-            if (event.isBasalOrBolus(medicamentInsulinStatistic)) {
+            if (event.isBasalOrBolus(insulinMedicamentStatistic)) {
                 totalLevel += value
             }
         }

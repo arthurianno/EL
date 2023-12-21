@@ -6,7 +6,7 @@ data class ServingResponse(
     @SerializedName("servingId")
     val servingId: String,
     @SerializedName("carbohydrate")
-    val carbohydrate: Int,
+    val carbohydrate: Int?,
     @SerializedName("metricServingUnit")
     val metricServingUnit: MetricServingUnitResponse,
     @SerializedName("metricServingAmount")

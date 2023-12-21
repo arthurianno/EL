@@ -2,9 +2,10 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.statistics.model.ActivityStatisticModel
 import com.elta.android.domain.features.statistics.model.BreadStatisticModelByPeriod
@@ -22,7 +23,8 @@ fun buildStatisticModel(
     events: List<EventV2>,
     settings: GlucoseLevelSettings,
     glucoseFormat: GlucoseFormat,
-    medicamentInsulinStatistic: MedicamentInsulinStatistic
+    insulinMedicamentStatistic: InsulinMedicamentStatistic,
+    calculatorFlow: CalculatorFlow
 ): StatisticByPeriodModel {
     val eventsContainer = events.toEventsContainer()
 
@@ -42,7 +44,8 @@ fun buildStatisticModel(
             eventsPerDay = eventsPerDay,
             settings = settings,
             glucoseFormat = glucoseFormat,
-            medicamentInsulinStatistic = medicamentInsulinStatistic
+            insulinMedicamentStatistic = insulinMedicamentStatistic,
+            calculatorFlow = calculatorFlow
         )
 
         dayWithMaxLevel = dayWithMaxLevel?.let { dayStatistic.checkMax(it) } ?: dayStatistic
@@ -57,17 +60,18 @@ fun buildStatisticModel(
         dayWithMaxLevel = dayWithMaxLevel,
         dayWithMinLevel = dayWithMinLevel,
         allDays = statisticByDay,
+        calculatorFlow = calculatorFlow,
         glucose = buildGlucoseStatisticModel(
-            eventsByType[EventType.GLUCOSE],
+            eventsByType[EventType.Glucose],
             settings,
             glucoseFormat
         ),
         insulin = buildInsulinStatisticModelByPeriod(
-            eventsByType[EventType.INSULIN],
-            medicamentInsulinStatistic
+            eventsByType[EventType.Insulin],
+            insulinMedicamentStatistic
         ),
-        bread = buildBreadStatisticModelByPeriod(eventsByType[EventType.BREAD]),
-        activity = buildActivityStatisticModel(eventsByType[EventType.ACTIVITY])
+        food = buildBreadStatisticModelByPeriod(eventsByType[EventType.Bread(calculatorFlow)]),
+        activity = buildActivityStatisticModel(eventsByType[EventType.Activity])
     )
 }
 
@@ -176,7 +180,7 @@ fun buildGlucoseStatisticModel(
 
 fun buildInsulinStatisticModelByPeriod(
     insulinEventsPerPeriod: List<EventV2>?,
-    medicamentInsulinStatistic: MedicamentInsulinStatistic
+    insulinMedicamentStatistic: InsulinMedicamentStatistic
 ): InsulinStatisticModelByPeriod {
     var totalBolusLevel = 0.0
     var totalBasalLevel = 0.0
@@ -189,28 +193,28 @@ fun buildInsulinStatisticModelByPeriod(
     insulinEventsPerPeriod?.forEach { event ->
         val value = event.value
         if (value != null && value != 0.0) {
-            if (event.isBolusInsulin(medicamentInsulinStatistic)) {
+            if (event.isBolusInsulin(insulinMedicamentStatistic)) {
                 totalBolusLevel += value
                 daysWithBolusEvents.add(event.additionTime.toLocalDate())
             }
 
-            if (event.isBasalInsulin(medicamentInsulinStatistic)) {
+            if (event.isBasalInsulin(insulinMedicamentStatistic)) {
                 totalBasalLevel += value
                 daysWithBasalEvents.add(event.additionTime.toLocalDate())
             }
 
-            if (event.isBasalOrBolus(medicamentInsulinStatistic)) {
+            if (event.isBasalOrBolus(insulinMedicamentStatistic)) {
                 totalLevel += value
                 daysWithEvents.add(event.additionTime.toLocalDate())
             }
         }
     }
 
-    val statisticBasal = medicamentInsulinStatistic.basalInsulinTypes
+    val statisticBasal = insulinMedicamentStatistic.basalInsulinTypes
         .convertToStatistic()
 
 
-    val statisticBolus = medicamentInsulinStatistic.bolusInsulinTypes
+    val statisticBolus = insulinMedicamentStatistic.bolusInsulinTypes
         .convertToStatistic()
 
 
