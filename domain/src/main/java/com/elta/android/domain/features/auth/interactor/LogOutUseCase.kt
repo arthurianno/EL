@@ -23,4 +23,4 @@ class LogOutUseCase @Inject constructor(
                         socialRepo.logout(type)
                     }
             )
-}
+    }

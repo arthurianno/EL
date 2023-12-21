@@ -11,6 +11,7 @@ import com.elta.android.presentation.features.calcutator.custom.viewmodel.Custom
 import com.elta.android.presentation.features.calcutator.products.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
+import com.elta.android.presentation.features.main.events.selector.viewmodel.EventSelectorViewModel
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
@@ -43,7 +44,6 @@ abstract class ViewModelModule {
     @ViewModelKey(CustomProductsViewModel::class)
     abstract fun bindCustomDishesViewModel(viewModel: CustomProductsViewModel): ViewModel
 
-    @OptIn(FlowPreview::class)
     @Binds
     @IntoMap
     @ViewModelKey(CreateCustomProductViewModel::class)
@@ -109,4 +109,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(GlucoseSettingViewModel::class)
     abstract fun bindGlucoseSettingViewModel(viewModel: GlucoseSettingViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(EventSelectorViewModel::class)
+    abstract fun bindEventSelectorViewModel(viewModel: EventSelectorViewModel): ViewModel
 }

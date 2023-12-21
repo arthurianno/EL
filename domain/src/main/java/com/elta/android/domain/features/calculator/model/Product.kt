@@ -6,7 +6,7 @@ data class Product(
     val servingId: String,
     val metricServingAmount: Double,
     val metricServingLink: MetricServingLink,
-    val carbohydrate: Int,
+    val carbohydrate: Int?,
     val fat: Int?,
     val calories: Int?,
     val protein: Int?

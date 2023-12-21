@@ -4,7 +4,7 @@ import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.MealTag
-import com.elta.android.domain.features.diary.events.model.Medicament
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.events.model.State
 import org.threeten.bp.ZonedDateTime
 import java.util.UUID
@@ -17,7 +17,7 @@ object EventTestFactory {
         duration: Long = 2 * 60 * 60 + 30 * 60,
         activityType: ActivityType? = null,
         mealTag: MealTag = MealTag.BEFOREMEAL,
-        medicament: Medicament? = null,
+        insulinMedicament: InsulinMedicament? = null,
         tagId: String? = null,
         date: ZonedDateTime = ZonedDateTime.now()
     ): EventV2 =
@@ -35,7 +35,7 @@ object EventTestFactory {
             duration = duration,
             activityType = activityType,
             mealTag = mealTag,
-            medicament = medicament,
+            insulinMedicament = insulinMedicament,
             type = type,
             state = State.CREATED,
             glucometerSerialNumber = null,

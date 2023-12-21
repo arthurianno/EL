@@ -8,5 +8,6 @@ sealed class RemindersEvent: Event {
 
     object ShowDeleteReminder : RemindersEvent()
     object CheckNotificationPermission : RemindersEvent()
-    object OpenSettings : RemindersEvent()
+    object OpenNotificationSettings : RemindersEvent()
+    object OpenAlarmAndRemindersSettings : RemindersEvent()
 }

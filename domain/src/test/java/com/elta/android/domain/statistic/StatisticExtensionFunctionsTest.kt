@@ -2,13 +2,7 @@ package com.elta.android.domain.statistic
 
 import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
 import com.elta.android.domain.features.statistics.interactor.average
-import com.elta.android.domain.features.statistics.interactor.checkMax
-import com.elta.android.domain.features.statistics.interactor.checkMin
-import com.elta.android.domain.features.statistics.interactor.isBasalInsulin
-import com.elta.android.domain.features.statistics.interactor.isBolusInsulin
-import com.elta.android.domain.features.statistics.interactor.isBasalOrBolus
 import com.elta.android.domain.features.statistics.interactor.percent
 import org.junit.Test
 

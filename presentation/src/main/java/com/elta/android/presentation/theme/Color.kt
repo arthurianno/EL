@@ -26,8 +26,10 @@ internal val shadeBlack3 = Color(0xFFe3e3e3)
 internal val shadeBlack4 = Color(0xFFf5f6fa)
 internal val shadeBlue = Color(0xFF1c7aff)
 internal val shadeBlue_10 = Color(0x1A1C7AFF)
+internal val shadeBlue2 = Color(0xFF334480)
 internal val shadeBlue3 = Color(0xFF4480d4)
 internal val shadeBlue3_20 = Color(0x334480d4)
+internal val lightBlue = Color(0xFFDFE4FB)
 internal val black = Color(0xFF17191f)
 internal val shadeBlack0 = Color(0xFF626a7c)
 internal val white = Color(0xFFffffff)
@@ -66,8 +68,10 @@ data class EltaColors(
     val shadeBlack4: Color,
     val shadeBlue: Color,
     val shadeBlue_10: Color,
+    val shadeBlue2: Color,
     val shadeBlue3: Color,
     val shadeBlue3_20: Color,
+    val lightBlue: Color,
     val black: Color,
     val shadeBlack0: Color,
     val white: Color,
@@ -101,8 +105,10 @@ internal val eltaColors = EltaColors(
     shadeBlack4 = shadeBlack4,
     shadeBlue = shadeBlue,
     shadeBlue_10 = shadeBlue_10,
+    shadeBlue2 = shadeBlue2,
     shadeBlue3 = shadeBlue3,
     shadeBlue3_20 = shadeBlue3_20,
+    lightBlue = lightBlue,
     black = black,
     shadeBlack0 = shadeBlack0,
     white = white,

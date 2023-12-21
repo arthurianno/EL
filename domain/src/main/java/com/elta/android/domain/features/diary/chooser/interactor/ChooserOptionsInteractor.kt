@@ -4,9 +4,9 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Medicament
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
-import com.elta.android.domain.features.diary.insulin.MedicinesRepository
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.tags.interactor.TagsComparator
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
@@ -15,21 +15,21 @@ import io.reactivex.Observable
 internal fun buildChooserOptions(
     param: GetChooserOptionsUseCase.Params,
     tagsRepository: TagsRepository,
-    medicinesRepository: MedicinesRepository
+    insulinMedicamentRepository: InsulinMedicamentRepository
 ) = when {
 
     param.chooserType == ChooserType.GROUP_TAGS ->
         tagsRepository.getTags().map(::mapTags)
 
-    param.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE && param.eventType == EventType.INSULIN ->
-        medicinesRepository.getInsulinTypes().map { it.mapInsulinTypes() }
+    param.chooserType == ChooserType.VARIANTS_WITH_SUBTYPE && param.eventType == EventType.Insulin ->
+        insulinMedicamentRepository.getInsulinTypes().map { it.mapInsulinTypes() }
 
-    param.chooserType == ChooserType.VARIANTS && param.eventType == EventType.ACTIVITY ->
+    param.chooserType == ChooserType.VARIANTS && param.eventType == EventType.Activity ->
         Observable.just(ActivityType.values()).map(::mapActivityTypes)
 
-    param.chooserType == ChooserType.VARIANTS && param.eventType == EventType.INSULIN ->
+    param.chooserType == ChooserType.VARIANTS && param.eventType == EventType.Insulin ->
         param.medicamentInsulinType?.let {
-            medicinesRepository.getMedicines(it).map { medicineInsulinTypes ->
+            insulinMedicamentRepository.getInsulinMedicaments(it).map { medicineInsulinTypes ->
                 medicineInsulinTypes.toChooserOption()
             }
         }
@@ -60,7 +60,7 @@ internal fun mapActivityTypes(types: Array<ActivityType>): List<ChooserOptionMod
         )
     }
 
-internal fun List<Medicament>.toChooserOption(): List<ChooserOptionModel> =
+internal fun List<InsulinMedicament>.toChooserOption(): List<ChooserOptionModel> =
     map {
         ChooserOptionModel(
             id = it.id.toString(),

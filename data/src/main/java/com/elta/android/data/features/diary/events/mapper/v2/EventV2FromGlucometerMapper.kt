@@ -14,7 +14,7 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
         with(source) {
             EventV2(
                 id = id,
-                type = EventType.GLUCOSE,
+                type = EventType.Glucose,
                 additionTime = checkNotNull(date).toStorageDateTime(),
                 tagId = null,
                 tag = null,
@@ -27,7 +27,9 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
                 duration = null,
                 activityType = null,
                 mealTag = null,
+                insulinMedicament = null,
                 medicament = null,
+                tabletsNumber = null,
                 state = State.CREATED,
                 glucometerSerialNumber = glucometerSerialNumber,
                 dishes = emptyList()

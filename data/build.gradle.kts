@@ -20,8 +20,6 @@ android {
         targetCompatibility = AppConfig.javaVersion
     }
     buildTypes {
-        create("debugDev")
-        create("debugStage")
         create("releaseDev")
         create("releaseStage")
     }

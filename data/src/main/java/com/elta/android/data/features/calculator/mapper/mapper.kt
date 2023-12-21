@@ -174,7 +174,7 @@ fun ServingResponse.toDomain(): Serving {
         calories = calories?.toDouble(),
         proteins = protein?.toDouble(),
         fats = fat?.toDouble(),
-        carbohydrate = carbohydrate.toDouble(),
+        carbohydrate = carbohydrate?.toDouble(),
         metricServingLink = metricServingUnit.toDomain(),
         numberOfUnits = metricServingAmount
     )
@@ -220,7 +220,7 @@ private fun Dish.toVerifiedDb(dbId: Long): VerifiedProductDbEntity =
         servings = servings.map { it.toDb(dbId) },
         servingSelect = servingSelect.toDb(dbId),
         servingAmount = servingAmount,
-        breadUnits = breadUnits
+        breadUnits = breadUnits ?: ZERO_DOUBLE
     )
 
 fun VerifiedProductDbEntity.toDomain(): Dish = Dish(

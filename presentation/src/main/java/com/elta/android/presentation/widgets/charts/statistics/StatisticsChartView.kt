@@ -151,14 +151,14 @@ class StatisticsChartView @JvmOverloads constructor(
         return true
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.let {
-            it.drawBottomLine()
-            it.drawSections()
-            it.drawSelected()
-            it.drawGlucose()
-            it.drawAverageLevel()
+        with(canvas) {
+            drawBottomLine()
+            drawSections()
+            drawSelected()
+            drawGlucose()
+            drawAverageLevel()
         }
     }
 

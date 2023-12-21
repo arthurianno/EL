@@ -1,12 +1,15 @@
 package com.elta.android.domain.features.diary.events.model
 
+import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator
 import com.elta.android.domain.features.diary.events.model.form.BreadValidator
 import com.elta.android.domain.features.diary.events.model.form.FormValidator
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
-import com.elta.android.domain.features.diary.events.model.form.MedicinesValidator
+import com.elta.android.domain.features.diary.events.model.form.InsulinMedicamentValidator
 import com.elta.android.domain.features.diary.events.model.form.MedicamentsValidator
 import com.elta.android.domain.features.diary.events.model.form.WeightValidator
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.GlucoseFormat
@@ -17,13 +20,13 @@ const val GLUCOSE_PLASMA_COEFFICIENT = 1.12
 
 fun EventType.getValidator(): FormValidator =
     when (this) {
-        EventType.BREAD -> BreadValidator
-        EventType.INSULIN -> MedicinesValidator
-        EventType.MEDICAMENTS -> MedicamentsValidator
-        EventType.ACTIVITY -> ActivityValidator
-        EventType.WEIGHT -> WeightValidator
-        EventType.GLUCOSE -> GlucoseValidator
-        else -> throw IllegalArgumentException("${this.name} doesn't support validation.")
+        is EventType.Bread -> BreadValidator(calculatorFlow)
+        EventType.Insulin -> InsulinMedicamentValidator
+        EventType.Medicaments -> MedicamentsValidator
+        EventType.Activity -> ActivityValidator
+        EventType.Weight -> WeightValidator
+        EventType.Glucose -> GlucoseValidator
+        EventType.Glycatedhemoglobin -> throw IllegalArgumentException("$this doesn't support validation.")
     }
 
 @Suppress("LongParameterList")
@@ -34,9 +37,12 @@ fun EventV2.isChanged(
     duration: Long? = null,
     date: ZonedDateTime? = null,
     tagId: String? = null,
+    insulinMedicament: InsulinMedicament? = null,
+    dishes: List<Dish>? = null,
     medicament: Medicament? = null,
     activity: ActivityType? = null,
-    note: String? = null
+    note: String? = null,
+    tabletsNumber: Double?
 ): Boolean =
     this.value != value ||
             this.kind != kind ||
@@ -44,7 +50,10 @@ fun EventV2.isChanged(
             this.duration != duration ||
             this.additionTime != date ||
             this.tagId != tagId ||
+            this.insulinMedicament != insulinMedicament ||
             this.medicament != medicament ||
+            this.tabletsNumber != tabletsNumber ||
+            this.dishes != dishes ||
             this.activityType != activity ||
             this.note != note
 
@@ -64,7 +73,7 @@ fun Double.toGlucoseFormat(format: GlucoseFormat?): Double = run {
 }.round(1)
 
 fun EventV2.modifyValue(format: GlucoseFormat): EventV2 =
-    if (type == EventType.GLUCOSE) {
+    if (type == EventType.Glucose) {
         copy(value = glucoseValue(format))
     } else {
         this

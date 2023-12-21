@@ -1,7 +1,8 @@
 package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.diary.insulin.MedicinesRepository
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
+import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.statistics.model.StatisticByPeriodModel
 import com.elta.android.domain.features.statistics.model.StatisticPeriod
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -14,7 +15,7 @@ import javax.inject.Inject
 class GetStatisticByPeriodUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     private val userRepo: ProfileRepository,
-    private val medicinesRepository: MedicinesRepository,
+    private val insulinMedicamentRepository: InsulinMedicamentRepository,
     schedulers: SchedulersFacade
 ) : SingleUseCase<StatisticByPeriodModel, GetStatisticByPeriodUseCase.Params>(schedulers) {
 
@@ -23,15 +24,16 @@ class GetStatisticByPeriodUseCase @Inject constructor(
         return Singles.zip(
             eventsRepo.getEvents(p.period.start, p.period.end).single(emptyList()),
             userRepo.getProfile(),
-            Single.fromObservable(medicinesRepository.getBasalAndBolusTypes())
+            Single.fromObservable(insulinMedicamentRepository.getBasalAndBolusTypes())
         )
             .map { (events, profile, medicamentInsulinStatistic) ->
                 buildStatisticModel(
                     period = p.period,
                     events = events,
-                    medicamentInsulinStatistic = medicamentInsulinStatistic,
+                    insulinMedicamentStatistic = medicamentInsulinStatistic,
                     settings = profile.glucoseLevelSettings,
-                    glucoseFormat = profile.glucoseFormat
+                    glucoseFormat = profile.glucoseFormat,
+                    calculatorFlow = profile.diabetes.toCalculatorFlow()
                 )
             }
     }

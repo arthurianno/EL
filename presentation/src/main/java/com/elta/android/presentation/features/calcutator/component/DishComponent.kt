@@ -1,25 +1,21 @@
 package com.elta.android.presentation.features.calcutator.component
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -30,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.NetworkState
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
@@ -51,12 +49,12 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerHalfLarge
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
-import com.elta.android.presentation.core.compose.widgets.common.RefreshButton
 import com.elta.android.presentation.core.compose.widgets.text.BreadUnitsLabel
 import com.elta.android.presentation.core.compose.widgets.textfields.DropdownField
 import com.elta.android.presentation.core.compose.widgets.textfields.DropdownFieldWidgetModel
 import com.elta.android.presentation.core.compose.widgets.textfields.IconOutlinedTextField
 import com.elta.android.presentation.core.compose.widgets.textfields.IconOutlinedTextFieldWidgetModel
+import com.elta.android.presentation.features.calcutator.mappers.isCarbohydrateValid
 import com.elta.android.presentation.features.calcutator.products.component.DishChars
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.theme.GetLocalProperties
@@ -69,18 +67,10 @@ sealed class TrailingIcon {
 }
 
 @Composable
-fun BoxScope.LoadingScreen() {
-    GetLocalProperties { _, _, colors, _, _ ->
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-            color = colors.shadeBlack1
-        )
-    }
-}
-
-@Composable
 fun DishesItem(
     dish: DishUiEntity?,
+    calculatorFlow: CalculatorFlow,
+    isSelectedDish: Boolean,
     trailingIcon: TrailingIcon,
     dishesClick: (DishUiEntity) -> Unit,
     deleteClick: (DishUiEntity) -> Unit
@@ -102,7 +92,13 @@ fun DishesItem(
                 )
         ) {
             dish?.let { dish ->
-                CardBody(dish, trailingIcon, deleteClick)
+                CardBody(
+                    dish = dish,
+                    calculatorFlow = calculatorFlow,
+                    isSelectedDish = isSelectedDish,
+                    trailingIcon = trailingIcon,
+                    deleteClick = deleteClick
+                )
             }
         }
     }
@@ -111,6 +107,8 @@ fun DishesItem(
 @Composable
 internal fun CardBody(
     dish: DishUiEntity,
+    isSelectedDish: Boolean,
+    calculatorFlow: CalculatorFlow,
     trailingIcon: TrailingIcon,
     deleteClick: (DishUiEntity) -> Unit
 ) {
@@ -126,21 +124,36 @@ internal fun CardBody(
         ) {
             Brand(dish.brandName)
             TitleDish(dish)
-            Spacer(
-                modifier = Modifier
-                    .height(16.dp)
-                    .weight(1f)
-            )
-            ServingInfo(dish)
+            if (
+                calculatorFlow == CalculatorFlow.BREAD_UNITS ||
+                (calculatorFlow == CalculatorFlow.PRODUCT_ONLY && isSelectedDish)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(16.dp)
+                        .weight(1f)
+                )
+                ServingInfo(
+                    dish = dish,
+                    isSelectedDish = isSelectedDish,
+                    calculatorFlow = calculatorFlow
+                )
+            }
         }
         HSpacerMedium()
-        SetIcon(dish = dish, trailingIcon = trailingIcon, deleteClick = deleteClick)
+        SetIcon(
+            dish = dish,
+            calculatorFlow = calculatorFlow,
+            trailingIcon = trailingIcon,
+            deleteClick = deleteClick
+        )
     }
 }
 
 @Composable
 fun SetIcon(
     dish: DishUiEntity,
+    calculatorFlow: CalculatorFlow,
     trailingIcon: TrailingIcon,
     deleteClick: (DishUiEntity) -> Unit
 ) {
@@ -170,7 +183,9 @@ fun SetIcon(
                         contentDescriptionId = R.string.content_description_close_button
                     )
                 }
-                BreadUnitsLabel(breadUnitsCount = dish.breadUnits)
+                if (calculatorFlow == CalculatorFlow.BREAD_UNITS) {
+                    BreadUnitsLabel(breadUnitsCount = dish.breadUnits.orEmpty())
+                }
             }
         }
 
@@ -240,28 +255,26 @@ private fun Brand(name: String) {
 }
 
 @Composable
-private fun ServingInfo(dish: DishUiEntity) {
+private fun ServingInfo(
+    dish: DishUiEntity,
+    isSelectedDish: Boolean,
+    calculatorFlow: CalculatorFlow
+) {
     GetLocalProperties { _, _, colors, _, types ->
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier.weight(weight = 1F, fill = false),
-                text = dish.servingCalories.first,
-                style = types.textStyle2,
-                color = colors.shadeBlack1,
-                maxLines = SINGLE_LINE_COUNT,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (dish.servingCalories.second.isNotEmpty()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            if (!dish.servingSelect.isCarbohydrateValid() && calculatorFlow == CalculatorFlow.BREAD_UNITS) {
                 Text(
-                    text = stringResource(
-                        id = R.string.calculator_dish_bread_units_in_serving,
-                        dish.servingCalories.second
-                    ),
+                    modifier = Modifier.Companion.weight(weight = 1F, fill = false),
+                    text = stringResource(id = R.string.calculator_no_carbohydrate),
                     style = types.textStyle2,
-                    color = colors.shadeBlack1,
-                    maxLines = SINGLE_LINE_COUNT
+                    color = colors.gOrangeB,
+                    maxLines = SINGLE_LINE_COUNT,
+                    overflow = TextOverflow.Ellipsis
+                )
+            } else {
+                CaloriesAndBreadUnitRow(
+                    servingCalories = dish.servingCalories,
+                    isSelectedDish = isSelectedDish
                 )
             }
         }
@@ -269,11 +282,38 @@ private fun ServingInfo(dish: DishUiEntity) {
 }
 
 @Composable
-fun PortionProductHeader(callback: () -> Unit) {
+private fun RowScope.CaloriesAndBreadUnitRow(
+    servingCalories: Pair<String, String>,
+    isSelectedDish: Boolean
+) {
+    GetLocalProperties { _, _, colors, _, types ->
+        Text(
+            modifier = Modifier.Companion.weight(weight = 1F, fill = false),
+            text = servingCalories.first,
+            style = types.textStyle2,
+            color = colors.shadeBlack1,
+            maxLines = SINGLE_LINE_COUNT,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (servingCalories.second.isNotEmpty() && !isSelectedDish) {
+            Text(
+                text = stringResource(
+                    id = R.string.calculator_dish_bread_units_in_serving,
+                    servingCalories.second
+                ),
+                style = types.textStyle2,
+                color = colors.shadeBlack1,
+                maxLines = SINGLE_LINE_COUNT
+            )
+        }
+    }
+}
+
+@Composable
+fun PortionProductHeader(isQuestionButtonVisible: Boolean = true, callback: () -> Unit) {
     GetLocalProperties { _, _, colors, _, types ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -282,11 +322,13 @@ fun PortionProductHeader(callback: () -> Unit) {
                 style = types.subtitle1,
                 color = colors.shadeBlack2
             )
-            ButtonCircle(
-                icon = R.drawable.btn_query_in_circle,
-                onClick = { callback() },
-                contentDescriptionId = R.string.content_description_question_button
-            )
+            if (isQuestionButtonVisible) {
+                ButtonCircle(
+                    icon = R.drawable.btn_query_in_circle,
+                    onClick = { callback() },
+                    contentDescriptionId = R.string.content_description_question_button
+                )
+            }
         }
     }
 }
@@ -377,28 +419,22 @@ fun PortionProductFooter(dish: DishUiEntity, isShowCountHelpSnack: Boolean) {
 
     val snackAlignment = if (isSingleServing) Alignment.TopStart else Alignment.TopCenter
 
-    GetLocalProperties { _, _, colors, _, _ ->
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = snackAlignment
-        ) {
-            Column {
-                VSpacerHalfLarge()
-                Text(
-                    text = stringResource(id = R.string.calculator_additional_information),
-                    color = colors.shadeBlack2,
-                )
-                DishChars(dish.servingSelect)
-                if (dish.isVerified) {
-                    VSpacerMedium()
-                    VerifyProduct()
-                }
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = snackAlignment
+    ) {
+        Column {
+            VSpacerHalfLarge()
+            DishChars(dish.servingSelect)
+            if (dish.isVerified) {
+                VSpacerMedium()
+                VerifyProduct()
             }
-            PortionHelper(
-                isShowCountHelpSnack = isShowCountHelpSnack,
-                message = stringResource(id = textHelpId)
-            )
         }
+        PortionHelper(
+            isShowCountHelpSnack = isShowCountHelpSnack,
+            message = stringResource(id = textHelpId)
+        )
     }
 }
 
@@ -411,7 +447,10 @@ fun PortionHelper(
         VerticallyAnimation(visualState = isShowCountHelpSnack) {
             Box(
                 modifier = Modifier
-                    .paint(painterResource(id = R.drawable.bg_portion_count_help_snack)),
+                    .paint(
+                        painter = painterResource(id = R.drawable.bg_portion_count_help_snack),
+                        contentScale = ContentScale.FillBounds
+                    ),
                 contentAlignment = Alignment.TopCenter
             ) {
                 Text(
@@ -450,40 +489,6 @@ private fun VerifyProduct() {
             )
         }
     }
-}
-
-@Composable
-internal fun ErrorScreen(@StringRes textId: Int, retryCallback: () -> Unit) {
-    GetLocalProperties { dimens, _, colors, _, types ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
-        ) {
-            Text(
-                text = stringResource(id = textId),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(dimens.bigDim),
-                style = types.body1,
-                color = colors.shadeBlack1,
-                textAlign = TextAlign.Center
-            )
-
-            RefreshButton(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            ) {
-                retryCallback()
-            }
-        }
-    }
-}
-
-
-@Preview
-@Composable
-private fun PreviewErrorScreen() {
-    ErrorScreen(textId = R.string.custom_product_list_server_error) {}
 }
 
 private const val SINGLE_LINE_COUNT = 1

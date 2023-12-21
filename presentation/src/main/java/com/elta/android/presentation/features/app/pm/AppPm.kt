@@ -302,5 +302,11 @@ class AppPm @Inject constructor(
             override val text: String = resources.getString(R.string.error_verify_your_email),
             override val color: Int = resources.getColor(R.color.black)
         ) : SyncStatus()
+
+        data class SomethingWentWrong(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.error_something_went_wrong),
+            override val color: Int = resources.getColor(R.color.black)
+        ) : SyncStatus()
     }
 }

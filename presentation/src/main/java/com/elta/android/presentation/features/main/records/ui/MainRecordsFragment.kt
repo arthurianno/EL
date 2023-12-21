@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.events
@@ -11,6 +12,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentMainRecordsBinding
+import com.elta.android.presentation.features.diary.main.ui.adapter.OutlineItemDecoration
 import com.elta.android.presentation.features.main.records.pm.MainRecordsPm
 import com.elta.android.presentation.features.main.records.ui.adapter.MainRecordsAdapter
 import com.elta.android.presentation.features.main.records.ui.status_bar.MainScreenLightStatusBarConfigProvider
@@ -48,12 +50,14 @@ class MainRecordsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (itemsView?.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         itemsView?.addItemDecoration(
             MainScreenMarginItemDecoration(
                 requireContext(),
                 R.dimen.overlap_first_item_margin
             )
         )
+        itemsView?.addItemDecoration(OutlineItemDecoration(requireContext()))
     }
 
     override fun onBindPresentationModel(pm: MainRecordsPm) {

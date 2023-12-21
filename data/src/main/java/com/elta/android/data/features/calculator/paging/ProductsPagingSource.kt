@@ -3,6 +3,7 @@ package com.elta.android.data.features.calculator.paging
 import androidx.paging.PagingState
 import androidx.paging.rxjava2.RxPagingSource
 import com.elta.android.data.core.paging.BasePagingSource
+import com.elta.android.data.core.paging.QueryPaging
 import com.elta.android.data.features.calculator.datasource.verified.ProductsDataSource
 import com.elta.android.data.features.calculator.mapper.toDish
 import com.elta.android.domain.features.calculator.model.Dish
@@ -17,13 +18,10 @@ class ProductsPagingSource @Inject constructor(
 
     override val defaultPosition: Int = DEFAULT_POSITION
 
-    private var name = ""
+    private var query: QueryPaging.Product = QueryPaging.Product()
 
-    private var onlyCustom = false
-
-    override fun setQuery(vararg query: Any) {
-        name = query[NAME_INDEX] as String
-        onlyCustom = query[CUSTOM_INDEX] as Boolean
+    override fun setQuery(queryPaging: QueryPaging) {
+        this.query = (queryPaging as? QueryPaging.Product) ?: QueryPaging.Product()
     }
 
     override val pagingSource: RxPagingSource<Int, Dish> = object : RxPagingSource<Int, Dish>() {
@@ -33,10 +31,11 @@ class ProductsPagingSource @Inject constructor(
             val pageSize = params.loadSize
 
             return productsDataSource.getProducts(
-                customOnly = onlyCustom,
-                foodName = name,
-                pageSize = pageSize,
+                customOnly = query.onlyCustom,
+                foodName = query.name,
                 pageIndex = currentPage,
+                pageSize = pageSize,
+                diabetesType = query.diabetesType,
             )
                 .map { productsResponse ->
                     val dishes = productsResponse.toDish()
@@ -59,6 +58,4 @@ class ProductsPagingSource @Inject constructor(
 
 }
 
-private const val NAME_INDEX = 0
-private const val CUSTOM_INDEX = 1
 private const val DEFAULT_POSITION = 1

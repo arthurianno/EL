@@ -17,10 +17,12 @@ import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.remote.EventsRemoteDataSource
-import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheDataSource
-import com.elta.android.data.features.diary.insulin.datasource.cache.MedicinesCacheSource
-import com.elta.android.data.features.diary.insulin.datasource.remote.MedicinesRemoteDataSource
-import com.elta.android.data.features.diary.insulin.datasource.remote.MedicinesRemoteSource
+import com.elta.android.data.features.diary.medicines.datasource.cache.InsulinMedicamentCacheDataSource
+import com.elta.android.data.features.diary.medicines.datasource.cache.InsulinMedicamentCacheSource
+import com.elta.android.data.features.diary.medicines.datasource.cache.MedicamentCacheDataSource
+import com.elta.android.data.features.diary.medicines.datasource.cache.MedicamentCacheSource
+import com.elta.android.data.features.diary.medicines.datasource.remote.InsulinMedicamentRemoteDataSource
+import com.elta.android.data.features.diary.medicines.datasource.remote.InsulinMedicamentRemoteSource
 import com.elta.android.data.features.diary.tags.datasource.TagsCachedDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsDataSource
 import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
@@ -118,7 +120,12 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindMedicinesCacheDataSource(source: MedicinesCacheDataSource): MedicinesCacheSource
+    abstract fun bindInsulinMedicamentCacheDataSource(source: InsulinMedicamentCacheDataSource): InsulinMedicamentCacheSource
+
+    @Binds
+    @Singleton
+    abstract fun bindMedicamentCacheDataSource(source: MedicamentCacheDataSource): MedicamentCacheSource
+
 
     @Binds
     @Singleton
@@ -176,5 +183,5 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindMedicineRemoteDataSource(source: MedicinesRemoteDataSource): MedicinesRemoteSource
+    abstract fun bindMedicineRemoteDataSource(source: InsulinMedicamentRemoteDataSource): InsulinMedicamentRemoteSource
 }

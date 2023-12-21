@@ -24,6 +24,7 @@ import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptio
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
 import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEventFragment
+import com.elta.android.presentation.features.main.events.selector.ui.EventSelectorFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
@@ -157,6 +158,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindEventsOptionsChooserFragment(): EventsOptionsChooserFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEventSelectorFragment(): EventSelectorFragment
 
     @FragmentScope
     @ContributesAndroidInjector

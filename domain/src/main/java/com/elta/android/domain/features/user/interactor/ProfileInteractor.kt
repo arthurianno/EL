@@ -18,9 +18,9 @@ fun buildProfile(original: Profile, events: List<EventV2>): Profile {
     var lastHbA1cEvent: EventV2? = null
 
     sortedEvents.forEach { event ->
-        if (lastWeightEvent == null && event.type == EventType.WEIGHT) {
+        if (lastWeightEvent == null && event.type == EventType.Weight) {
             lastWeightEvent = event
-        } else if (lastHbA1cEvent == null && event.type == EventType.GLYCATEDHEMOGLOBIN) {
+        } else if (lastHbA1cEvent == null && event.type == EventType.Glycatedhemoglobin) {
             lastHbA1cEvent = event
         }
     }

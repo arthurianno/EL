@@ -20,7 +20,6 @@ import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
 class MainRecordsAdapter @Inject constructor(
-    private val viewPool: RecyclerView.RecycledViewPool,
     private val bus: RxBus
 ) : BaseListAdapter() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -32,8 +31,7 @@ class MainRecordsAdapter @Inject constructor(
             )
             RecordsGroupItem::class.hashCode() -> ItemRecordsGroupViewHolder(
                 ItemRecordsGroupBinding.inflate(inflater, parent, false),
-                viewPool,
-                RecordItemGroupAdapter(bus)
+                bus
             )
 
             RecordsHeaderItem::class.hashCode() -> ItemRecordsHeaderViewHolder(

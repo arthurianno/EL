@@ -37,11 +37,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.NetworkState
@@ -50,11 +50,11 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.animation.VerticallyAnimation
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
+import com.elta.android.presentation.core.compose.widgets.common.ErrorScreen
+import com.elta.android.presentation.core.compose.widgets.common.LoadingScreen
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchField
 import com.elta.android.presentation.core.compose.widgets.textfields.SearchFieldWidgetModel
 import com.elta.android.presentation.features.calcutator.component.DishesItem
-import com.elta.android.presentation.features.calcutator.component.ErrorScreen
-import com.elta.android.presentation.features.calcutator.component.LoadingScreen
 import com.elta.android.presentation.features.calcutator.component.TrailingIcon
 import com.elta.android.presentation.features.calcutator.custom.model.CustomProductAction
 import com.elta.android.presentation.features.calcutator.custom.viewmodel.CustomProductsViewModel
@@ -110,7 +110,13 @@ fun CustomDishes(viewModel: CustomProductsViewModel) {
                             end = dimens.contentPadding
                         )
                 ) {
-                    Content(viewModel, searchInFocus, customProducts, networkAvailable)
+                    Content(
+                        viewModel = viewModel,
+                        searchInFocus = searchInFocus,
+                        customProducts = customProducts,
+                        networkAvailable = networkAvailable,
+                        calculatorFlow = state.calculatorFlow
+                    )
                 }
             }
         }
@@ -123,11 +129,11 @@ private fun Content(
     searchInFocus: Boolean,
     customProducts: LazyPagingItems<DishUiEntity>,
     networkAvailable: Boolean,
+    calculatorFlow: CalculatorFlow
 ) {
     val searchState = viewModel.searchField.state.collectAsState().value
     val searchText = searchState.textField.text
-
-    GetLocalProperties { dimens, _, _, _, _ ->
+    GetLocalProperties { dimens, _, colors, _, _ ->
 
         val loadState = customProducts.loadState
 
@@ -144,9 +150,7 @@ private fun Content(
 
         Box(modifier = Modifier.fillMaxSize()) {
             when {
-                loadState.refresh is LoadState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize()) { LoadingScreen() }
-                }
+                loadState.refresh is LoadState.Loading -> LoadingScreen(color = colors.shadeBlack1)
 
                 loadState.refresh is LoadState.Error -> {
                     viewModel.sendAction(CustomProductAction.ErrorResult)
@@ -155,7 +159,7 @@ private fun Content(
                     } else {
                         R.string.custom_product_list_offline_error
                     }
-                    ErrorScreen(textId = textId) {
+                    ErrorScreen(titleTextId = textId) {
                         customProducts.retry()
                     }
                 }
@@ -173,8 +177,11 @@ private fun Content(
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
 
                         items(customProducts.itemCount) { index ->
-                            DishesItem(dish = customProducts[index],
+                            DishesItem(
+                                dish = customProducts[index],
                                 trailingIcon = TrailingIcon.CustomDish,
+                                calculatorFlow = calculatorFlow,
+                                isSelectedDish = false,
                                 dishesClick = { dishClicked ->
                                     viewModel sendAction CustomProductAction.ProductClicked(
                                         dishClicked
@@ -184,7 +191,8 @@ private fun Content(
                                     viewModel sendAction CustomProductAction.DeleteProductClicked(
                                         deletedDish
                                     )
-                                })
+                                }
+                            )
                         }
 
                         if (loadState.append is LoadState.Loading) {
@@ -195,7 +203,7 @@ private fun Content(
                                         .padding(bottom = dimens.contentPadding)
                                         .wrapContentWidth(Alignment.CenterHorizontally)
                                 ) {
-                                    LoadingScreen()
+                                    LoadingScreen(color = colors.shadeBlack1)
                                 }
                             }
                         }

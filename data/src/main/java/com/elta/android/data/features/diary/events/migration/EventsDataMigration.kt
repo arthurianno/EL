@@ -4,7 +4,7 @@ import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
 import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
-import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
+import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.domain.features.diary.events.migration.EventsMigration
 import io.reactivex.Completable
 import javax.inject.Inject
@@ -55,17 +55,19 @@ private fun EventCachedDto.toV2(): EventV2CachedDto {
         mealTag = mealTag,
         state = state,
         glucometerSerialNumber = glucometerSerialNumber,
-        medicament = toMedicament(medicament, insulinType)
+        medicament = toInsulinMedicament(medicament, insulinType),
+        medicamentDto = null,
+        tabletsNumber = null
     )
 }
 
-fun toMedicament(medicament: String?, insulinType: String?): MedicamentDto? {
+fun toInsulinMedicament(medicament: String?, insulinType: String?): InsulinMedicamentDto? {
     if (medicament == null || insulinType == null) return null
 
-    return MedicamentDto(
+    return InsulinMedicamentDto(
         id = medicament.hashCode(),
         name = medicament,
-        insulinType = MedicamentDto.MedicamentInsulinTypeDto(
+        insulinType = InsulinMedicamentDto.MedicamentInsulinTypeDto(
             code = insulinType.convertCode().name,
             id = insulinType.hashCode(),
             name = insulinType.getName()

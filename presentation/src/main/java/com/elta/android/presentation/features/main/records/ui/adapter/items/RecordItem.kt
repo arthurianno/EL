@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.main.records.ui.adapter.items
 
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.presentation.core.ui.adapter.HideableItem
 import com.nullgr.core.adapter.items.ListItem
 
 data class RecordItem(
@@ -12,8 +13,10 @@ data class RecordItem(
     val date: String,
     val showLabel: Boolean,
     val eventType: EventType,
-    val labelIcon: Int? = null
-) : ListItem {
+    val labelIcon: Int? = null,
+    override val isVisible: Boolean = true,
+    val groupId: String? = null
+) : HideableItem {
 
     override fun getUniqueProperty(): Any = id
 

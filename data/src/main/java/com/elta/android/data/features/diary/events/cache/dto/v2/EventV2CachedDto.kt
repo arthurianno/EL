@@ -1,6 +1,8 @@
 package com.elta.android.data.features.diary.events.cache.dto.v2
 
+import com.elta.android.data.features.diary.events.cache.converter.InsulinMedicamentDtoConverter
 import com.elta.android.data.features.diary.events.cache.converter.MedicamentDtoConverter
+import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
@@ -24,8 +26,15 @@ data class EventV2CachedDto(
     val duration: Long?,
     val activityType: String?,
     val mealTag: String?,
+
+    @Convert(converter = InsulinMedicamentDtoConverter::class, dbType = String::class)
+    val medicament: InsulinMedicamentDto?,
+    //incorrect named field. Correct entity InsulinMedicament
+
     @Convert(converter = MedicamentDtoConverter::class, dbType = String::class)
-    val medicament: MedicamentDto?,
+    val medicamentDto: MedicamentDto?,
+    val tabletsNumber: Double?,
+
     val state: String,
     val glucometerSerialNumber: String?
 )

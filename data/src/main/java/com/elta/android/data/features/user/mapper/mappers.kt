@@ -1,7 +1,7 @@
 package com.elta.android.data.features.user.mapper // ktlint-disable filename
 
 import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
-import com.elta.android.data.features.user.dto.DiabeteTypeNetworkEntity
+import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GlucoseFormatNetworkEntity
 import com.elta.android.data.features.user.dto.GlucoseLevelNetworkEntity
@@ -44,7 +44,7 @@ internal fun ProfileSettingsNetworkResponse.toDomain(): ProfileSettings =
 
 internal fun Profile.toNetwork(): ProfileNetworkResponse =
     ProfileNetworkResponse(
-        diabetes = diabetes?.let { DiabeteTypeNetworkEntity.valueOf(it.name) },
+        diabetes = diabetes?.let { DiabetesTypeNetworkEntity.valueOf(it.name) },
         weight = weight,
         gender = gender.toNetwork(),
         person = if (firstName == null && secondName == null) {
@@ -83,7 +83,7 @@ internal fun ProfileNetworkResponse.toDomain(glucoseFormat: GlucoseFormatNetwork
         glucoseLevelBeforeEatSettings = glucoseLevelsBeforeEating.toSettings(),
         glucoseLevelAfterEatSettings = glucoseLevelsAfterEating.toSettings(),
         glucoseFormat = glucoseFormat.toDomain(),
-        diabetes = diabetes?.toDomain(),
+        diabetes = diabetes?.name?.let { Diabetes.valueOf(it) },
         weight = weight,
         socialNetworks = socialNetworks?.map { it.toDomain() },
         healthApps = healthApps?.map { it.toDomain() },
@@ -130,16 +130,6 @@ private fun GlucoseLevelNetworkEntity?.toSettings(): GlucoseLevelSettings {
         GlucoseLevelSettings.fromNormalValues(this.minValue, this.maxValue)
     }
 }
-
-private fun DiabeteTypeNetworkEntity.toDomain(): Diabetes =
-    when (this) {
-        DiabeteTypeNetworkEntity.FIRST -> Diabetes.FIRST
-        DiabeteTypeNetworkEntity.SECOND -> Diabetes.SECOND
-        DiabeteTypeNetworkEntity.LADA -> Diabetes.LADA
-        DiabeteTypeNetworkEntity.GESTATIONAL -> Diabetes.GESTATIONAL
-        DiabeteTypeNetworkEntity.PREDIABETES -> Diabetes.PREDIABETES
-        DiabeteTypeNetworkEntity.OTHER -> Diabetes.OTHER
-    }
 
 private fun HealthAppNetworkEntity.toDomain(): HealthApp =
     HealthApp(
