@@ -7,6 +7,7 @@ import com.elta.android.data.features.calculator.model.MetricServingUnitResponse
 import com.elta.android.data.features.calculator.model.ServingResponse
 import com.elta.android.data.features.calculator.model.StoredProductNetworkEntity
 import com.elta.android.data.features.common.dto.MetaDto
+import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -38,7 +39,12 @@ class ProductMockedApi(context: Context) : ProductApi {
         }
     }
 
+    override fun replaceProduct(storedProduct: StoredProductNetworkEntity): Observable<ProductItemResponse> {
+        return addProduct(storedProduct)
+    }
+
     override fun getProducts(
+        diabetesType: DiabetesTypeNetworkEntity?,
         customOnly: Boolean,
         foodName: String?,
         pageIndex: Int,

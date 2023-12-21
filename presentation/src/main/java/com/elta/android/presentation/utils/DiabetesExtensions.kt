@@ -9,10 +9,7 @@ fun Diabetes.toString(resource: ResourceProvider): String =
     when (this) {
         Diabetes.FIRST -> resource.getString(R.string.diabetes_type_first)
         Diabetes.SECOND -> resource.getString(R.string.diabetes_type_second)
-        Diabetes.LADA -> resource.getString(R.string.diabetes_type_lada)
-        Diabetes.GESTATIONAL -> resource.getString(R.string.diabetes_type_gestational)
-        Diabetes.PREDIABETES -> resource.getString(R.string.diabetes_type_prediabetes)
-        Diabetes.OTHER -> resource.getString(R.string.diabetes_type_other)
+        Diabetes.SECOND_TABLETS -> resource.getString(R.string.diabetes_type_second_tablets)
     }
 
 @StringRes
@@ -20,8 +17,5 @@ fun Diabetes.toStringRes(): Int =
     when (this) {
         Diabetes.FIRST -> R.string.diabetes_type_first
         Diabetes.SECOND -> R.string.diabetes_type_second
-        Diabetes.LADA -> R.string.diabetes_type_lada
-        Diabetes.GESTATIONAL -> R.string.diabetes_type_gestational
-        Diabetes.PREDIABETES -> R.string.diabetes_type_prediabetes
-        Diabetes.OTHER -> R.string.diabetes_type_other
+        Diabetes.SECOND_TABLETS -> R.string.diabetes_type_second_tablets
     }

@@ -15,7 +15,6 @@ import com.nullgr.core.rx.RxBus
 import javax.inject.Inject
 
 class MainDiaryAdapter @Inject constructor(
-    private val viewPool: RecyclerView.RecycledViewPool,
     private val bus: RxBus
 ) : BaseListAdapter() {
 
@@ -28,8 +27,7 @@ class MainDiaryAdapter @Inject constructor(
             RecordsGroupItem::class.java.hashCode() -> {
                 ItemRecordsGroupViewHolder(
                     ItemRecordsGroupBinding.inflate(inflater, parent, false),
-                    viewPool,
-                    RecordItemGroupAdapter(bus)
+                    bus
                 )
             }
             else -> {

@@ -4,12 +4,12 @@ import com.elta.android.domain.features.diary.chooser.model.ChooserOptionModel
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
-import com.elta.android.domain.features.diary.events.model.Medicament
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
-import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
+import com.elta.android.presentation.features.main.events.chooser.models.InsulinMedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
@@ -36,20 +36,20 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     private fun mapFromObject(source: ChooserOptionModel, config: ChooserConfiguration): ListItem =
         when (source.meta) {
             is ActivityType -> mapAsActivityItem(source, config.id)
-            is MedicamentInsulinType -> mapAsInsulinItem(source, config.medicament)
+            is MedicamentInsulinType -> mapAsInsulinItem(source, config.insulinMedicament)
             is Tag -> mapAsTagItem(source)
-            is Medicament -> mapAsInsulinNameItem(source, config.medicament?.medicamentId)
+            is InsulinMedicament -> mapAsInsulinNameItem(source, config.insulinMedicament?.medicamentId)
             else -> throw IllegalStateException("Unsupported type ${source::class.java}")
         }
 
     private fun mapAsInsulinNameItem(source: ChooserOptionModel, medicamentId: Int?): ListItem {
-        val medicament = source.meta as Medicament
+        val insulinMedicament = source.meta as InsulinMedicament
         return ChooserItem(
             id = source.id,
-            title = medicament.name,
+            title = insulinMedicament.name,
             iconId = null,
             meta = source.meta,
-            isSelected = medicamentId == medicament.id
+            isSelected = medicamentId == insulinMedicament.id
         )
     }
 
@@ -64,7 +64,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
         )
     }
 
-    private fun mapAsInsulinItem(source: ChooserOptionModel, medicament: MedicamentChooser?): ListItem {
+    private fun mapAsInsulinItem(source: ChooserOptionModel, medicament: InsulinMedicamentChooser?): ListItem {
         val insulinType = source.meta as MedicamentInsulinType
         return ChooserWithSubtypeItem(
             id = source.id,
@@ -89,9 +89,9 @@ class ChooserOptionsItemsBuilder @Inject constructor(
     private fun ChooserConfiguration.toHeaderTitle(): String =
         resourceProvider.getString(
             when {
-                (chooserType == ChooserType.VARIANTS || chooserType == ChooserType.VARIANTS_WITH_SUBTYPE) && eventType == EventType.INSULIN ->
+                (chooserType == ChooserType.VARIANTS || chooserType == ChooserType.VARIANTS_WITH_SUBTYPE) && eventType is EventType.Insulin ->
                     R.string.events_options_chooser_header_variants_insulin
-                chooserType == ChooserType.VARIANTS && eventType == EventType.ACTIVITY ->
+                chooserType == ChooserType.VARIANTS && eventType is EventType.Activity ->
                     R.string.events_options_chooser_header_variants_activity
                 else -> R.string.events_options_chooser_header_tags
             }

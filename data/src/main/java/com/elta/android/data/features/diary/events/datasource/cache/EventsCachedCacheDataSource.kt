@@ -4,17 +4,15 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.diary.events.cache.EventsConditions
-import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
 import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.SimpleEventDto
-import com.elta.android.data.features.diary.events.dto.v1.EventDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import javax.inject.Inject
 import org.threeten.bp.LocalDateTime
+import javax.inject.Inject
 
 class EventsCachedCacheDataSource @Inject constructor(
     private val toCacheMapper: Mapper<EventV2Dto, EventV2CachedDto>,

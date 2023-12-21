@@ -3,6 +3,7 @@ package com.elta.android.presentation
 import com.elta.android.domain.features.appsettings.model.BackendVariant
 import com.elta.android.domain.features.user.model.HealthAppType
 import com.elta.android.presentation.core.bus.Click
+import com.elta.android.presentation.core.ui.adapter.GroupItem
 import com.elta.android.presentation.features.devices.all.ui.adapter.items.ActiveDeviceItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
@@ -24,6 +25,7 @@ sealed class Clicks : Click {
     data class SearchResult(val item: SearchResultItem) : Clicks()
     data class AddUserEvent(val meta: Any) : Clicks()
     data class RecordClicked(val item: RecordItem) : Clicks()
+    data class ExpandCollapse(val item: GroupItem) : Clicks()
     data class ChooserOptionClicked(val item: ChooserItem) : Clicks()
     data class ChooserWithSubtypesOptionClicked(val item: ChooserWithSubtypeItem) : Clicks()
     data class DeviceClicked(val item: DeviceItem) : Clicks()

@@ -9,5 +9,6 @@ data class SyncInfoDto(
     val lastSalePointsSync: Long? = null,
     val lastEventsSync: Long? = null,
     val lastTagsSync: Long? = null,
-    val lastGoogleFitSync: Long? = null
+    val lastGoogleFitSync: Long? = null,
+    val lastMedicamentSync: Long? = null,
 )

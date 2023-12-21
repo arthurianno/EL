@@ -58,10 +58,22 @@
         <item name="android:inputType">textCapSentences</item>
     </style>
 
+    <style name="EventFormInputDigitsStyle" parent="InputStyle.Text">
+        <item name="met_helperText">@null</item>
+        <item name="android:inputType">numberDecimal</item>
+        <item name="android:digits">0123456789., табл/мл</item>
+    </style>
+
     <style name="EventFormInputStyle.Note" parent="EventFormInputStyle">
         <item name="met_helperText">@null</item>
         <item name="met_baseColor">@color/white</item>
         <item name="android:maxLength">120</item>
+        <item name="android:inputType">textMultiLine|textCapSentences</item>
+    </style>
+
+    <style name="EventFormInputStyle.AdditionalInput" parent="EventFormInputStyle">
+        <item name="android:maxLength">50</item>
+        <item name="android:maxLines">2</item>
         <item name="android:inputType">textMultiLine|textCapSentences</item>
     </style>
 

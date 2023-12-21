@@ -61,6 +61,16 @@ class DbSyncStorage @Inject constructor(
             )
         }
 
+    override var lastMedicamentSync: Long?
+        get() = userSyncInfo?.lastMedicamentSync
+        set(value) {
+            userBox.put(
+                userSyncInfo?.copy(lastMedicamentSync = value)
+                    ?: SyncInfoDto(lastMedicamentSync = value)
+            )
+        }
+
+
     override fun deleteDbFiles() =
         Completable
             .fromCallable { factory.deleteDbFiles() }

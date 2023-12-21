@@ -4,6 +4,7 @@ import com.elta.android.common.utils.atEndOfDay
 import com.elta.android.common.utils.atStartOfDay
 import com.elta.android.domain.features.diary.events.model.addTag
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
 import com.elta.android.domain.features.diary.home.model.HomeModel
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -36,7 +37,8 @@ class GetHomeModelUseCase @Inject constructor(
                 tags = tags,
                 settings = profile.glucoseLevelSettings,
                 userInfo = userInfo,
-                glucoseFormat = profile.glucoseFormat
+                glucoseFormat = profile.glucoseFormat,
+                calculatorFlow = profile.diabetes.toCalculatorFlow(events)
             )
         }
     }

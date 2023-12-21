@@ -1,9 +1,7 @@
 package com.elta.android.data.di
 
 import com.elta.android.data.features.diary.events.migration.EventsDataMigration
-import com.elta.android.data.features.diary.insulin.repository.MedicinesDataRepository
 import com.elta.android.domain.features.diary.events.migration.EventsMigration
-import com.elta.android.domain.features.diary.insulin.MedicinesRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton

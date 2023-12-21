@@ -13,37 +13,37 @@ import com.nullgr.core.resources.ResourceProvider
 @StringRes
 fun EventType.toName(): Int =
     when (this) {
-        EventType.BREAD -> R.string.event_type_bread
-        EventType.INSULIN -> R.string.event_type_insulin
-        EventType.MEDICAMENTS -> R.string.event_type_medicaments
-        EventType.WEIGHT -> R.string.event_type_weight
-        EventType.ACTIVITY -> R.string.event_type_activity
-        EventType.GLUCOSE -> R.string.event_type_glucose
-        EventType.GLYCATEDHEMOGLOBIN -> R.string.event_type_hba1c
+        is EventType.Bread -> R.string.event_type_bread
+        EventType.Insulin -> R.string.event_type_insulin
+        EventType.Medicaments -> R.string.event_type_medicaments
+        EventType.Weight -> R.string.event_type_weight
+        EventType.Activity -> R.string.event_type_activity
+        EventType.Glucose -> R.string.event_type_glucose
+        EventType.Glycatedhemoglobin -> R.string.event_type_hba1c
     }
 
 @DrawableRes
 fun EventType.toIcon(): Int =
     when (this) {
-        EventType.BREAD -> R.drawable.ic_event_bread
-        EventType.INSULIN -> R.drawable.ic_event_insulin
-        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments
-        EventType.WEIGHT -> R.drawable.ic_event_weight
-        EventType.ACTIVITY -> R.drawable.ic_event_activity
-        EventType.GLUCOSE -> R.drawable.ic_event_glucose
-        else -> throw IllegalArgumentException("${this.name} doesn't support icon resource.")
+        is EventType.Bread -> R.drawable.ic_event_bread
+        EventType.Insulin -> R.drawable.ic_event_insulin
+        EventType.Medicaments -> R.drawable.ic_event_medicaments
+        EventType.Weight -> R.drawable.ic_event_weight
+        EventType.Activity -> R.drawable.ic_event_activity
+        EventType.Glucose -> R.drawable.ic_event_glucose
+        else -> throw IllegalArgumentException("$this doesn't support icon resource.")
     }
 
 @DrawableRes
 fun EventType.toIconWithBg(): Int =
     when (this) {
-        EventType.BREAD -> R.drawable.ic_event_bread_with_bg
-        EventType.INSULIN -> R.drawable.ic_event_insulin_with_bg
-        EventType.MEDICAMENTS -> R.drawable.ic_event_medicaments_with_bg
-        EventType.WEIGHT -> R.drawable.ic_event_weight_with_bg
-        EventType.ACTIVITY -> R.drawable.ic_event_activity_with_bg
-        EventType.GLUCOSE -> R.drawable.ic_event_glucose_with_bg
-        else -> throw IllegalArgumentException("${this.name} doesn't support icon resource.")
+        is EventType.Bread -> R.drawable.ic_event_bread_with_bg
+        EventType.Insulin -> R.drawable.ic_event_insulin_with_bg
+        EventType.Medicaments -> R.drawable.ic_event_medicaments_with_bg
+        EventType.Weight -> R.drawable.ic_event_weight_with_bg
+        EventType.Activity -> R.drawable.ic_event_activity_with_bg
+        EventType.Glucose -> R.drawable.ic_event_glucose_with_bg
+        else -> throw IllegalArgumentException("$this doesn't support icon resource.")
     }
 
 @DrawableRes

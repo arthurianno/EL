@@ -8,8 +8,10 @@ import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.v2.EventDataV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
+import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import com.elta.android.data.features.diary.events.extensions.countOrZero
+import com.elta.android.domain.features.diary.medicines.model.Medicament
 import org.threeten.bp.ZonedDateTime
 import java.util.Date
 
@@ -31,7 +33,9 @@ object EventMockedFactory {
         value: Double? = null,
         activityType: ActivityTypeDto? = null,
         mealTag: MealTagDto? = null,
+        insulinMedicament: InsulinMedicamentDto? = null,
         medicament: MedicamentDto? = null,
+        tabletsNumber: Double? = null,
         tagId: String? = null,
         note: String? = null,
         state: StateDto = StateDto.CREATED,
@@ -52,7 +56,9 @@ object EventMockedFactory {
                 duration = 2 * 60 * 60 + 30 * 60, // 2h 30m
                 activityType = activityType,
                 mealTag = mealTag,
-                insulinMedicament = medicament,
+                insulinMedicament = insulinMedicament,
+                medicament = medicament,
+                tabletsNumber = tabletsNumber,
                 type = type,
                 glucometerSerialNumber = null,
                 products = products,

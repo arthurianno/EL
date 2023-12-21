@@ -11,6 +11,7 @@
     <string name="yes_text">Да</string>
     <string name="no_text">Нет</string>
     <string name="ok_text">Ок</string>
+    <string name="add_text">Добавить</string>
     <string name="cancel_text">Отмена</string>
     <string name="list_numbering_1_dot">1.</string>
     <string name="list_numbering_2_dot">2.</string>
@@ -20,6 +21,7 @@
 
     <string name="exit_dialog_title">Выйти?</string>
     <string name="exit_dialog_message">Введённые данные не будут сохранены</string>
+    <string name="exit_dialog_message_changes">Изменения не будут сохранены</string>
 
 
     <!-- ERROR VIEW ERRORS -->
@@ -29,6 +31,8 @@
     <string name="error_server_not_responding_subtitle">Приносим свои извинения за принесенные неудобства</string>
     <string name="error_server_not_responding_retry_button">Повторить</string>
     <string name="error_server_not_responding_snackbar_message">Сервер временно недоступен</string>
+
+    <string name="error_something_went_wrong">Что-по пошло не так, попробуйте позже</string>
 
     <string name="greeting_registration">Зарегистрироваться</string>
     <string name="greeting_title">Добро пожаловать</string>
@@ -101,11 +105,10 @@
     <string name="on_boarding_next_button_title">Далее</string>
 
     <string name="diabetes_type_first">1 тип</string>
-    <string name="diabetes_type_second">2 тип</string>
-    <string name="diabetes_type_lada">LADA</string>
-    <string name="diabetes_type_gestational">Гестационный</string>
-    <string name="diabetes_type_prediabetes">Предиабет</string>
-    <string name="diabetes_type_other">Другой</string>
+    <string name="diabetes_type_second">2 тип (лечение инсулином)</string>
+    <string name="diabetes_type_second_tablets">2 тип (лечение таблетками)</string>
+    <string name="diabetes_type_second_short">2 тип (Инсулин)</string>
+    <string name="diabetes_type_second_tablets_short">2 тип (Таблетки)</string>
     <string name="coma">,</string>
     <string name="on_boarding_glucose_format_help_header">Обратите внимание!</string>
     <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны в цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
@@ -155,6 +158,7 @@
     <string name="event_type_bread_pattern">%s ХЕ</string>
     <string name="event_type_insulin_pattern">%s Ед.</string>
     <string name="event_type_insulin_medicament">\u0020(%s)</string>
+    <string name="event_type_medicament_pattern">%s табл/мл</string>
     <string name="event_type_weight_pattern">%s кг</string>
     <string name="event_type_activity_pattern_full">%1$s ч %2$s мин</string>
     <string name="event_type_activity_pattern_short">%1$s мин</string>
@@ -166,6 +170,10 @@
     <string name="event_type_glucose_no_name">Измерение глюкозы</string>
     <string name="tag_name_no_tag">Без метки</string>
     <string name="event_type_weight_no_name">Взвешивание</string>
+
+    <!--    MEDICAMENT TYPES-->
+    <string name="medicament_type_toolbar">Добавить препарат</string>
+    <string name="medicament_type_search_hint">Найти препарат</string>
 
     <!-- ACTIVITY TYPES -->
     <string name="activity_type_running">Бег</string>
@@ -259,10 +267,13 @@
     <string name="events_creation_hint_activities">Вид активности</string>
     <string name="events_creation_hint_insulin">Тип инсулина *</string>
     <string name="events_creation_hint_note">Добавить заметку</string>
-    <string name="events_creation_save_button">Сохранить запись</string>
-    <string name="events_creation_hint_bread">Добавить блюдо/продукт</string>
+    <string name="events_creation_save_button">Сохранить</string>
+    <string name="events_creation_save_record_button">Сохранить запись</string>
+    <string name="events_creation_hint_bread">Добавить продукты</string>
     <string name="events_creation_text_bread">Блюдо/продукт</string>
-    <string name="events_creation_hint_medicine">Заметка о приеме лекарства *</string>
+    <string name="events_creation_hint_add_medicine">Добавить препарат <font color='#FF505D'>*</font></string>
+    <string name="events_creation_hint_count_medicine">Количество препарата <font color='#FF505D'>*</font></string>
+    <string name="events_creation_hint_name_medicine">Название препарата <font color='#FF505D'>*</font></string>
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_weight">Укажите ваш текущий вес</string>
@@ -317,10 +328,14 @@
     <string name="feedback_dialog_negative_button">Нет</string>
     <string name="feedback_dialog_positive_button">Да, конечно</string>
 
-    <string name="event_form_save_new_entry_title">Сохранить запись</string>
     <string name="event_form_save_updated_entry_title">Сохранить изменения</string>
     <string name="event_menu_remove">Удалить</string>
     <string name="event_share_dialog_title">Поделиться с помощью</string>
+
+    <string name="event_selector_recent_search_subtitle">Недавно использовали</string>
+    <string name="event_selector_medicine_subtitle">Список препаратов (доза, мг)</string>
+    <string name="event_selector_medicine_select_other">Выберите «Другое», если вашего препарата нет в списке</string>
+    <string name="event_selector_medicine_not_found">Этот поиск не дал результатов. Попробуйте изменить запрос или добавьте препарат вручную.</string>
 
     <!-- SYNC -->
     <string name="sync_start_title">Подключение</string>
@@ -751,10 +766,8 @@
     <string name="calculator_empty_list_text">Вы ещё не добавили ни одного продукта.\nВоспользуйтесь поиском или создайте новый продукт.</string>
     <string name="calculator_search_hint_product">Найти продукт</string>
     <string name="calculator_search_hint">Найти</string>
-    <string name="calculator_help_text_recent_search">Недавние поиски</string>
     <string name="calculator_save_text">Сохранить</string>
     <string name="calculator_save_list">Сохранить список</string>
-    <string name="calculator_add_text">Добавить</string>
     <string name="calculator_last_search">Недавние поиски</string>
     <string name="calculator_search_result">Результаты поиска</string>
     <string name="calculator_search_no_result">Этот поиск не дал результатов</string>
@@ -766,10 +779,12 @@
     <string name="calculator_serving_count_hint">Количество</string>
     <string name="calculator_additional_information">Дополнительная информация</string>
     <string name="calculator_dish_bread_units_in_serving">\u0020• %s ХЕ</string>
+    <string name="calculator_no_carbohydrate">Не указано значение углеводов</string>
     <string name="calculator_dish_calories">Калории</string>
     <string name="calculator_dish_proteins">Белки</string>
     <string name="calculator_dish_fats">Жиры</string>
     <string name="calculator_dish_carbs">Углеводы</string>
+    <string name="calculator_dish_gram_value">%s г</string>
     <string name="calculator_total_products_title">Вы добавили в список</string>
     <string name="calculator_total_products_clear_list">Очистить список</string>
     <string name="calculator_dialog_title_warning">Внимание</string>
@@ -786,11 +801,13 @@
     <string name="calculator_portion_count_help_snack">Укажите количество\nпотребляемого продукта</string>
 
     <!--    Custom Products -->
-    <string name="custom_products_save_and_add">Сохранить и добавить в список</string>
+    <string name="custom_products_save_and_add_to_list">Сохранить и добавить в список</string>
     <string name="custom_products_add">Добавить в приём пищи</string>
+    <string name="custom_products_add_and_save">Сохранить и продолжить</string>
     <string name="custom_products_non_editable">Продукт нельзя отредактировать</string>
 
     <string name="custom_products_new_product">Новый продукт</string>
+    <string name="custom_products_product">Продукт</string>
     <string name="custom_products_my_products">Мои продукты</string>
     <string name="custom_products_create_product">Создать продукт</string>
     <string name="custom_product_empty_list">Вы ещё не создали ни одного продукта.</string>
@@ -798,15 +815,24 @@
     <string name="custom_product_name">Название продукта</string>
     <string name="custom_product_input_name">Введите название продукта</string>
 
-    <string name="custom_product_xe">Хлебные единицы</string>
-    <string name="custom_product_xe_description">Доступный диапазон ввода ХЕ: от 0,1 до 99,9</string>
-    <string name="custom_product_input_quantity_xe">Введите количество ХЕ</string>
+    <string name="custom_product_carbohydrates_hint">0</string>
+    <string name="custom_product_carbohydrates_description">Доступный диапазон ввода: от 1 до 999</string>
     <string name="custom_product_input_units_more_zero">Порция должна быть больше 0</string>
-
+    <string name="custom_product_input_units_must_be_add">Обязательно укажите\nколичество углеводов в порции</string>
     <string name="custom_product_delete_dialog_title">Удалить продукт?</string>
     <string name="custom_product_delete_dialog_description">Вы больше не сможете добавлять его в новые приёмы пищи.\nВ прошлых приёмах он сохранится.</string>
 
-    <string name="custom_product_count_xe">Количество ХЕ</string>
+    <string name="custom_product_count_carbohydrates">Количество углеводов</string>
+    <string name="custom_product_extra_info">Дополнительная информация</string>
+    <string name="custom_product_range_description">Доступный диапазон ввода: от 1 до 999</string>
+    <string name="custom_product_extra_letter_for_carbohydrate">У</string>
+    <string name="custom_product_extra_carbohydrate_hint">Углеводы</string>
+    <string name="custom_product_extra_letter_for_calories">К</string>
+    <string name="custom_product_extra_calories_hint">Калории</string>
+    <string name="custom_product_extra_letter_for_protein">Б</string>
+    <string name="custom_product_extra_protein">Белки</string>
+    <string name="custom_product_extra_letter_for_fat">Ж</string>
+    <string name="custom_product_extra_fat_hint">Жиры</string>
 
     <string name="custom_product_list_offline_error">Не удалось загрузить список.\nПроверьте соединение с Интернетом и попробуйте ещё раз.</string>
     <string name="custom_product_list_server_error">Не удалось загрузить список.\nПопробуйте ещё раз позже.</string>

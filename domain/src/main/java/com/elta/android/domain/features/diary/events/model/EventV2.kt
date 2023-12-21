@@ -1,6 +1,8 @@
 package com.elta.android.domain.features.diary.events.model
 
 import com.elta.android.domain.features.calculator.model.Dish
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
 import org.threeten.bp.ZonedDateTime
 
@@ -18,7 +20,9 @@ data class EventV2(
     val duration: Long?,
     val activityType: ActivityType?,
     val mealTag: MealTag?,
+    val insulinMedicament: InsulinMedicament?,
     val medicament: Medicament?,
+    val tabletsNumber: Double?,
     val type: EventType,
     val state: State,
     val glucometerSerialNumber: String?,

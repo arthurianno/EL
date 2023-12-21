@@ -1,9 +1,11 @@
 package com.elta.android.presentation.features.calcutator.products.model
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import com.elta.android.domain.features.calculator.model.DishType
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class DishUiEntity(
     val id: String,
@@ -16,5 +18,5 @@ data class DishUiEntity(
     val servingSelect: ServingUiEntity,
     val servingAmount: String,
     val servingCalories: Pair<String, String>,
-    val breadUnits: String
+    val breadUnits: String?
 ) : Parcelable

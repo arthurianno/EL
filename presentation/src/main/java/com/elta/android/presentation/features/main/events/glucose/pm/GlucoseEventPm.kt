@@ -235,7 +235,7 @@ class GlucoseEventPm @Inject constructor(
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
-                    EventType.GLUCOSE,
+                    EventType.Glucose,
                     (tagSelector.option.value.meta as? Tag)?.id
                 )
             }

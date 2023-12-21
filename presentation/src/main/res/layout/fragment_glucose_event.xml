@@ -307,7 +307,7 @@
         android:id="@+id/formSaveButtonView"
         style="@style/Button.Large"
         android:layout_gravity="bottom"
-        android:text="@string/events_creation_save_button"
+        android:text="@string/events_creation_save_record_button"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

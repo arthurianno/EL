@@ -4,10 +4,10 @@ import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.model.Medicament
-import com.elta.android.domain.features.diary.events.model.MedicamentInsulinStatistic
+import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.events.model.State
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
+import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -38,7 +38,9 @@ class AddNewEventUseCase @Inject constructor(
                 temperature = null,
                 duration = p.duration,
                 activityType = p.activity,
+                insulinMedicament = p.insulinMedicament,
                 medicament = p.medicament,
+                tabletsNumber = p.tabletsNumber,
                 type = p.eventType,
                 mealTag = null,
                 state = State.CREATED,
@@ -55,7 +57,9 @@ class AddNewEventUseCase @Inject constructor(
         val duration: Long? = null,
         val date: ZonedDateTime? = null,
         val tag: Tag? = null,
+        val insulinMedicament: InsulinMedicament? = null,
         val medicament: Medicament? = null,
+        val tabletsNumber: Double? = null,
         val activity: ActivityType? = null,
         val note: String? = null,
         val glucometerSerialNumber: String?,
