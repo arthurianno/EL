@@ -10,23 +10,27 @@ import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.pm.ExpandableListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.diary.main.DiaryEventsMapper
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
+import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
+import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindEmpty
 import io.reactivex.Observable
-import javax.inject.Inject
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
+import timber.log.Timber
+import javax.inject.Inject
 
 
 class MainDiaryPm @Inject constructor(
     private val mapper: DiaryEventsMapper,
     private val getEventsByDateUseCase: GetEventsByDateUseCase,
     services: ServiceFacade
-) : BaseListPm(services) {
+) : ExpandableListPm(services) {
 
     override val isEmptyScreen = false
 
@@ -47,10 +51,13 @@ class MainDiaryPm @Inject constructor(
         observeDates()
         observeActions()
         observeEvents()
+
     }
+
 
     override fun onBind() {
         super.onBind()
+
         bus.clicks<Clicks.RecordClicked>()
             .map { it.item }
             .doOnNext(::navigateToEventScreen)
@@ -62,10 +69,33 @@ class MainDiaryPm @Inject constructor(
         Observable.merge(
             selectedDateState.observable.map { Unit },
             bus.events<Events.EventsChanged>().map { Unit },
+            bus.events<Events.ProfileUpdated>().map { Unit }
         )
             .map { selectedDateState.value }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
+    }
+
+    override fun onItemExpandCollapse(
+        clickedItem: ListItem,
+        allItems: List<ListItem>
+    ): List<ListItem> {
+        if (clickedItem !is RecordsGroupItem) return allItems
+        var expanded = false
+        return allItems.map {
+            when {
+                it is RecordsGroupItem && it.id == clickedItem.id -> {
+                    expanded = !it.isExpanded
+                    it.copy(isExpanded = expanded)
+                }
+                it is RecordItem && it.groupId == clickedItem.id -> {
+                    it.copy(isVisible = expanded)
+                }
+                else -> {
+                    it
+                }
+            }
+        }
     }
 
     private fun observeActions() {
@@ -120,9 +150,9 @@ class MainDiaryPm @Inject constructor(
     }
 
     private fun handleSuccess(blocks: List<EventsBlock>) {
-        items.consumer.accept(
-            blocks.mapIndexed { index, event ->
-                mapper.apply { expand = index == 0 }.mapFromObject(event)
+        listItems.consumer.accept(
+            blocks.flatMapIndexed { index, event ->
+                mapper.mapFromObject((index == 0) to event)
             }
         )
     }

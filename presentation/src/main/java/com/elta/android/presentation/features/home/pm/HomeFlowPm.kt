@@ -14,9 +14,12 @@ import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
@@ -43,18 +46,20 @@ import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.rx.bindProgress
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Singles
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
-import javax.inject.Inject
+import kotlinx.coroutines.flow.map
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import javax.inject.Inject
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
@@ -72,6 +77,7 @@ class HomeFlowPm @Inject constructor(
     private val syncWithBackendUseCase: SyncLocalChangesUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val getGlucoseFormat: GetGlucoseFormatUseCase,
+    private val getUpdatedProfileUseCase: GetUpdatedProfileUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
@@ -240,7 +246,37 @@ class HomeFlowPm @Inject constructor(
             .map { it.meta }
             .doOnNext { closeBottomSheetCommand.consumer.accept(Unit) }
             .delay(OPEN_EVENT_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
-            .doOnNext(::handleAddEventClick)
+            .flatMapCompletable { meta ->
+                when (meta) {
+                    is EventType -> {
+                        if (meta is EventType.Bread) {
+                            getUpdatedProfileUseCase.execute()
+                                .map { events -> events.diabetes.toCalculatorFlow() }
+                                .map { EventType.Bread(it) }
+                                .doOnSuccess {
+                                    router.startFlow(Screens.EventsCreationScreen(it))
+                                }
+                                .ignoreElement()
+                        } else {
+                            Completable.fromCallable {
+                                router.startFlow(Screens.EventsCreationScreen(meta))
+                            }
+                        }
+                    }
+                    META_SYNC -> {
+                        Completable.fromCallable {
+                            if (isFirstSync.valueOrNull == true) {
+                                showHelpBottomSheetCommand.consumer.accept(Unit)
+                            } else {
+                                startSyncAction.consumer.accept(Unit)
+                            }
+                        }
+                    }
+                    else -> Completable.complete()
+
+                }
+
+            }
             .subscribe()
             .untilDestroy()
 
@@ -380,18 +416,6 @@ class HomeFlowPm @Inject constructor(
             .doOnNext(router::startFlow)
             .subscribe()
             .untilDestroy()
-    }
-
-    private fun handleAddEventClick(meta: Any) {
-        if (meta is EventType) {
-            router.startFlow(Screens.EventsCreationScreen(meta))
-        } else if (meta == META_SYNC) {
-            if (isFirstSync.valueOrNull == true) {
-                showHelpBottomSheetCommand.consumer.accept(Unit)
-            } else {
-                startSyncAction.consumer.accept(Unit)
-            }
-        }
     }
 
     private fun handleBottomMenuClick(id: Int) =

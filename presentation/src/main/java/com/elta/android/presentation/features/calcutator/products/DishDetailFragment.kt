@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.clickableWithNoRipple
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -34,10 +35,10 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
+import com.elta.android.presentation.core.compose.widgets.common.ErrorScreen
+import com.elta.android.presentation.core.compose.widgets.common.LoadingScreen
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.dialogs.InfoDialog
-import com.elta.android.presentation.features.calcutator.component.ErrorScreen
-import com.elta.android.presentation.features.calcutator.component.LoadingScreen
 import com.elta.android.presentation.features.calcutator.component.PortionProductContent
 import com.elta.android.presentation.features.calcutator.component.PortionProductFooter
 import com.elta.android.presentation.features.calcutator.component.PortionProductHeader
@@ -48,14 +49,19 @@ import com.elta.android.presentation.features.calcutator.products.model.DishDeta
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.products.viewmodel.DishDetailViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
-import com.elta.android.presentation.utils.bundle
 
 class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
     companion object {
-        fun newInstance(dish: DishUiEntity): DishDetailFragment =
+        fun newInstance(dish: DishUiEntity, calculatorFlow: CalculatorFlow): DishDetailFragment =
             DishDetailFragment().apply {
-                arguments = bundle(EXTRA_DISH to dish)
+                arguments = Bundle().apply {
+                    putParcelable(EXTRA_DISH, dish)
+                    putParcelable(EXTRA_CALCULATOR_FLOW_DATA, calculatorFlow)
+                }
             }
+
+        private const val EXTRA_CALCULATOR_FLOW_DATA = "extra_calculator_flow_data"
+        private const val EXTRA_DISH = "extra_dish"
     }
 
     override val viewModel: DishDetailViewModel by viewModels { viewModelFactory }
@@ -68,7 +74,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 downButton.setText(
                     getString(
                         if (dish.localId.isEmpty() || dish.servingSelect.id.isBlank()) {
-                            R.string.calculator_add_text
+                            R.string.add_text
                         } else {
                             R.string.calculator_save_text
                         }
@@ -76,6 +82,10 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 )
             }
         }
+        arguments?.getParcelable<CalculatorFlow>(EXTRA_CALCULATOR_FLOW_DATA)
+            ?.let { calculatorFlow ->
+                viewModel.setCalculatorFlow(calculatorFlow)
+            }
     }
 
     override fun DishDetailViewModel.init() {
@@ -137,15 +147,17 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         }
                 ) {
                     when {
-                        state.isLoading -> LoadingScreen()
+                        state.isLoading -> LoadingScreen(color = colors.shadeBlack1)
                         state.isError -> ErrorScreen(
-                            textId = R.string.create_custom_product_server_error
+                            titleTextId = R.string.create_custom_product_server_error
                         ) {
                             viewModel.sendAction(DishDetailAction.Retry)
                         }
+
                         else -> {
                             MainHeader(
                                 dish = state.dish,
+                                calculatorFlow = state.calculatorFlow,
                                 viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
                             )
                             MainContent(
@@ -219,4 +231,3 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
 }
 
 private const val PORTION_INIT_TEXT = "1"
-private const val EXTRA_DISH = "extra_dish"

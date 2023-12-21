@@ -1,8 +1,11 @@
 package com.elta.android.presentation.features.profile.settings.global.pm
 
 import android.util.Log
+import com.elta.android.domain.features.appsettings.interactor.ChangeBackendVariantUseCase
+import com.elta.android.domain.features.appsettings.interactor.GetBackendVariantUseCase
 import com.elta.android.domain.features.auth.interactor.DeleteProfileUseCase
 import com.elta.android.domain.features.auth.interactor.LinkSocialNetworkUseCase
+import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.auth.interactor.UnLinkSocialNetworkUseCase
 import com.elta.android.domain.features.firebase.interactor.TokenUseCase
 import com.elta.android.domain.features.googlefit.interactor.CheckGoogleFitAuthUseCase
@@ -43,6 +46,9 @@ class ProfileSettingsPm @Inject constructor(
     private val linkSocialNetworkUseCase: LinkSocialNetworkUseCase,
     private val unlinkSocialNetworkUseCase: UnLinkSocialNetworkUseCase,
     private val checkGoogleFitAuthUseCase: CheckGoogleFitAuthUseCase,
+    private val getBackendVariantUseCase: GetBackendVariantUseCase,
+    private val changeBackendVariantUseCase: ChangeBackendVariantUseCase,
+    private val logOutUseCase: LogOutUseCase,
     private val itemsBuilder: ProfileSettingsItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -61,6 +67,7 @@ class ProfileSettingsPm @Inject constructor(
     private val unlinkSocialUserAction = action<Unit>()
     private val profileState = state<Profile>()
     private val checkGoogleFitAuthAction = action<Unit>()
+    private val logoutAction = action<Unit>()
 
     private val unlinkNetworkDialogData: DialogData by lazy { Dialogs.EventUnlinkNetwork(resources) }
     private val googleFitActivatedDialogData: DialogData by lazy {
@@ -87,6 +94,14 @@ class ProfileSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        logoutAction.observable
+            .flatMapCompletable {
+                logOutUseCase.execute()
+            }
+            .doOnError(::handleError)
+            .subscribe()
+            .untilDestroy()
+
         Observable.merge(
             lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit },
             bus.events<Events.ProfileDataChanged>().map { Unit }
@@ -109,8 +124,21 @@ class ProfileSettingsPm @Inject constructor(
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.TOKEN -> copyToken()
                     Type.APP_VERSION, Type.EMAIL -> {}
-                    else -> Log.e(javaClass.simpleName, "This type:$type haven`t implemented yet...")
+                    else -> Log.e(
+                        javaClass.simpleName,
+                        "This type:$type haven`t implemented yet..."
+                    )
                 }
+            }
+            .doOnError(::handleError)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ChangeBackendVariant>()
+            .map(::createBackendVariantParams)
+            .flatMapCompletable {
+                changeBackendVariantUseCase.execute(it)
+                    .doOnComplete { logoutAction.consumer.accept(Unit) }
             }
             .doOnError(::handleError)
             .subscribe()
@@ -146,6 +174,9 @@ class ProfileSettingsPm @Inject constructor(
             .subscribe()
             .untilDestroy()
     }
+
+    private fun createBackendVariantParams(backendVariant: Clicks.ChangeBackendVariant) =
+        ChangeBackendVariantUseCase.Params(backendVariant.type)
 
     private fun copyToken() {
         tokenUseCase()
@@ -207,7 +238,12 @@ class ProfileSettingsPm @Inject constructor(
 
     private fun Single<Profile>.handleProfileUseCase() =
         doOnSuccess(profileState.consumer)
-            .map { itemsBuilder.buildItems(it) }
+            .flatMap {
+                getBackendVariantUseCase.execute()
+            }
+            .map { backendVariant ->
+                itemsBuilder.buildItems(profileState.value, backendVariant)
+            }
             .doOnSuccess { items.consumer.accept(it) }
 
     private fun createLinkSocialUserParams(network: SocialNetworkType) =
@@ -236,3 +272,4 @@ class ProfileSettingsPm @Inject constructor(
         googleFitAuthResult is GoogleFitAuthResult.Access && !isActive
 
 }
+

@@ -54,10 +54,10 @@ abstract class FormInitializer {
 
 fun EventType.makeFormInitializer() =
     when (this) {
-        EventType.BREAD -> BreadFormInitializer
-        EventType.INSULIN -> InsulinFormInitializer
-        EventType.MEDICAMENTS -> MedicamentsFormInitializer
-        EventType.ACTIVITY -> ActivityFormInitializer
-        EventType.WEIGHT -> WeightFormInitializer
-        else -> throw IllegalArgumentException("No form initializer for GLUCOSE type")
+        is EventType.Bread -> CalculatorFormInitializer(calculatorFlow)
+        EventType.Insulin -> InsulinFormInitializer
+        EventType.Medicaments -> MedicamentsFormInitializer
+        EventType.Activity -> ActivityFormInitializer
+        EventType.Weight -> WeightFormInitializer
+        EventType.Glucose, EventType.Glycatedhemoglobin -> throw IllegalArgumentException("No form initializer for $this type")
     }

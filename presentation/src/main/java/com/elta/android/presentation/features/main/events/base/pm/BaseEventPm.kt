@@ -7,7 +7,10 @@ import com.elta.android.domain.features.calculator.interactor.CalculatorFragment
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.getValidator
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
@@ -21,8 +24,11 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.mapper.toChooserInsulin
+import com.elta.android.presentation.features.main.events.base.mapper.toChooserMedicament
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
+import com.elta.android.presentation.features.main.events.base.model.MedicamentModel
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserResult
 import com.elta.android.presentation.features.main.events.mapper.toPickerValues
@@ -46,11 +52,12 @@ private const val LOCKED_FORM_PICKER_DELAY_MILLIS = 500L
 abstract class BaseEventPm(
     services: ServiceFacade,
     private val calculatorFragmentResultHandler: CalculatorFragmentResultHandler,
-    private val cachedDishes: CachedDishesUseCase
+    private val cachedDishes: CachedDishesUseCase,
 ) : BasePm(services) {
     val formPickerValueChangedAction = action<Double>()
     val updateFormPickerValueCommand = command<Pair<Int, Int>>()
     val formInput = inputControl()
+    val additionalInput = inputControl()
     val formSelector = formSelectorControl()
     val tagSelector = formSelectorControl()
     val dateSelector = formSelectorControl()
@@ -73,6 +80,9 @@ abstract class BaseEventPm(
     val editingXEIsNotAvailableControl = dialogControl<DialogData, DialogResult>()
     val eventTypeState = state<EventType>()
     val dishes = state<List<Dish>>(emptyList())
+    val medicamentState = state<MedicamentModel>()
+    val eventState = state<EventV2>()
+    private val calculatorFlowState = state<CalculatorFlow>()
     protected val formPickerValue = state<Double>()
     protected val selectedDateState = state(ZonedDateTime.now())
     private val exitDialogData: DialogData by lazy { Dialogs.ExitAndLoseData(resources) }
@@ -100,10 +110,18 @@ abstract class BaseEventPm(
         observeDateSelectors()
         observeHandleBack()
         observeEventChanges()
-        if (FeatureToggles.isEnableCalculatorFeature) {
-            observeDishesResult()
-            observeDishesChanges()
-        }
+        observableCalculatorFlow()
+        observeDishesResult()
+        observeDishesChanges()
+    }
+
+    private fun observableCalculatorFlow() {
+        eventTypeState.observable
+            .doOnNext { eventType ->
+                if (eventType is EventType.Bread) calculatorFlowState.consumer.accept(eventType.calculatorFlow)
+            }
+            .subscribe()
+            .untilDestroy()
     }
 
     fun setEventType(eventType: EventType) {
@@ -117,7 +135,11 @@ abstract class BaseEventPm(
             kind = form.kind,
             name = form.name,
             duration = form.duration,
+            insulinMedicament = form.insulinMedicament,
             medicament = form.medicament,
+            tabletsNumber = form.tabletsNumber,
+            dishes = dishes.valueOrNull,
+            flowIsEdit = eventState.valueOrNull != null,
             date = form.date,
             note = form.note
         )
@@ -132,16 +154,27 @@ abstract class BaseEventPm(
         launch {
             calculatorFragmentResultHandler.resultAsFlow()
                 .catch { handleError(it) }
-                .collect {
-                    dishes.consumer.accept(it)
-                    cachedDishes(it)
-                    val breadUnits = it.sumOf { dish -> dish.breadUnits }
-                    val currentBreadUnits = formPickerValue.valueOrNull
-                    if (currentBreadUnits != breadUnits) {
-                        if (currentBreadUnits != 0.0) {
-                            breadUnitsChangeDialogControl.show(breadUnitsChangeNotifyDialogData)
+                .collect { list ->
+                    dishes.consumer.accept(list)
+                    cachedDishes(list)
+
+                    when (calculatorFlowState.value) {
+                        CalculatorFlow.BREAD_UNITS -> {
+                            val breadUnits = list.sumOf { dish -> dish.breadUnits ?: 0.0 }
+                            val currentBreadUnits = formPickerValue.valueOrNull
+                            if (currentBreadUnits != breadUnits) {
+                                if (currentBreadUnits != 0.0) {
+                                    breadUnitsChangeDialogControl.show(
+                                        breadUnitsChangeNotifyDialogData
+                                    )
+                                }
+                                updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
+                            }
                         }
-                        updateFormPickerValueCommand.consumer.accept(breadUnits.toPickerValues())
+
+                        CalculatorFlow.PRODUCT_ONLY -> {
+
+                        }
                     }
                 }
         }
@@ -197,34 +230,58 @@ abstract class BaseEventPm(
             .doOnNext { hideKeyBoardCommand.consumer.accept(Unit) }
             .delay(OPEN_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .map { createChooserConfiguration() }
-            .subscribe {
-                if (it.eventType == EventType.BREAD && FeatureToggles.isEnableCalculatorFeature) {
-                    lockedChangeFormPicker = false
-                    router.navigateTo(Screens.CalculatorScreen)
-                } else {
-                    router.navigateTo(Screens.EventsChooserScreen(it))
+            .subscribe { configurator ->
+                when (configurator.eventType) {
+                    is EventType.Bread -> {
+                        lockedChangeFormPicker = false
+                        router.navigateTo(Screens.CalculatorScreen(calculatorFlowState.value))
+                    }
+
+                    EventType.Medicaments -> router.navigateTo(
+                        Screens.EventSelectorScreen(configurator)
+                    )
+
+                    else -> router.navigateTo(Screens.EventsChooserScreen(configurator))
                 }
             }
             .untilDestroy()
         bus.events<Events.ChooserVariantSelected>()
             .map { it.chooserResult.toSelectorOption() }
+            .doOnNext {
+                val option = it.meta
+                if (option is Pair<*, *>)
+                    medicamentState.consumer.accept(
+                        MedicamentModel(
+                            medicament = option.first as Medicament,
+                            fromEvent = false,
+                            otherName = option.second as String?
+                        )
+                    )
+            }
             .subscribe(formSelector.option.consumer)
             .untilDestroy()
     }
 
     private fun createChooserConfiguration() =
         when (eventTypeState.value) {
-            EventType.INSULIN -> ChooserConfiguration(
-                ChooserType.VARIANTS_WITH_SUBTYPE,
-                eventTypeState.value,
-                generateChooserId(),
-                formSelector.option.valueOrNull.toChooserInsulin()
+            EventType.Insulin -> ChooserConfiguration(
+                chooserType = ChooserType.VARIANTS_WITH_SUBTYPE,
+                eventType = eventTypeState.value,
+                id = generateChooserId(),
+                insulinMedicament = formSelector.option.valueOrNull.toChooserInsulin()
             )
 
-            EventType.BREAD -> ChooserConfiguration(
-                ChooserType.VARIANTS_WITH_SUBTYPE,
-                eventTypeState.value,
-                generateChooserId()
+            is EventType.Bread -> ChooserConfiguration(
+                chooserType = ChooserType.VARIANTS_WITH_SUBTYPE,
+                eventType = eventTypeState.value,
+                id = generateChooserId()
+            )
+
+            EventType.Medicaments -> ChooserConfiguration(
+                chooserType = ChooserType.VARIANTS,
+                eventType = eventTypeState.value,
+                id = generateChooserId(),
+                medicament = formSelector.option.valueOrNull.toChooserMedicament()
             )
 
             else ->
@@ -276,10 +333,24 @@ abstract class BaseEventPm(
             .filter(::validateSelectedDate)
             .subscribe(selectedDateState.consumer)
             .untilDestroy()
+
+        formInput.focusChanges
+            .observable
+            .subscribe { focus ->
+                val textInField = formInput.text.valueOrNull.orEmpty()
+
+                val text = when {
+                    focus && textInField.isNotBlank() -> textInField.removeSuffix(MEDICAMENT_MEASURE_SUFFIX)
+                    !textInField.contains(MEDICAMENT_MEASURE_SUFFIX) -> textInField + MEDICAMENT_MEASURE_SUFFIX
+                    else -> textInField
+                }
+                formInput.text.consumer.accept(text)
+            }
+            .untilDestroy()
     }
 
     private fun generateChooserId() = when (eventTypeState.value) {
-        EventType.INSULIN, EventType.ACTIVITY -> formSelector.option.value.meta.toString()
+        EventType.Insulin, EventType.Activity, EventType.Medicaments -> formSelector.option.value.meta.toString()
         else -> null
     }
 

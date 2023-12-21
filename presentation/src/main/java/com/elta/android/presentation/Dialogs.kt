@@ -133,4 +133,12 @@ sealed class Dialogs : DialogData {
         override val negative: String? = null,
         override val positive: String? = resourceProvider.getString(R.string.ok),
     ) : Dialogs()
+
+    data class ReminderWrongTime(
+        val resourceProvider: ResourceProvider,
+        override val title: String? = null,
+        override val message: String = resourceProvider.getString(R.string.profile_reminders_wrong_time),
+        override val negative: String? = null,
+        override val positive: String? = resourceProvider.getString(R.string.ok),
+    ) : Dialogs()
 }

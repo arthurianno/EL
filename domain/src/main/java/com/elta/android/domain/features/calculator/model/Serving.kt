@@ -5,7 +5,7 @@ data class Serving(
     val calories: Double?,
     val proteins: Double?,
     val fats: Double?,
-    val carbohydrate: Double,
+    val carbohydrate: Double?,
     val metricServingLink: MetricServingLink,
     val numberOfUnits: Double,
 ) {

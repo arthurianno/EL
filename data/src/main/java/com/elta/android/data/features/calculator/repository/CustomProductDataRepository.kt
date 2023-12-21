@@ -23,4 +23,9 @@ class CustomProductDataRepository @Inject constructor(
         return productsDataSource.addProduct(product)
             .flowOn(dispatcher)
     }
+
+    override suspend fun replaceProduct(product: Product): Flow<Dish> {
+        return productsDataSource.replaceProduct(product)
+            .flowOn(dispatcher)
+    }
 }

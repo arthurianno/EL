@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -11,6 +12,7 @@ import com.elta.android.presentation.core.ui.system_ui.TransparentStatusBarConfi
 import com.elta.android.presentation.databinding.FragmentMainDiaryBinding
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.features.diary.main.ui.adapter.MainDiaryAdapter
+import com.elta.android.presentation.features.diary.main.ui.adapter.OutlineItemDecoration
 import com.elta.android.presentation.utils.showDatePickerDialog
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
@@ -42,6 +44,8 @@ class MainDiaryFragment @Inject constructor() :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        itemsView?.addItemDecoration(OutlineItemDecoration(requireContext()))
+        (itemsView?.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         presentationModel.datePickerDateState.bindTo(binding.datePickerView.date())
     }
 

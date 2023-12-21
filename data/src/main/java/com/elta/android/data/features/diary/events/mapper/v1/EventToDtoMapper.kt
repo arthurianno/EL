@@ -8,6 +8,7 @@ import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.v1.EventDataDto
 import com.elta.android.data.features.diary.events.dto.v1.EventDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.EventTypeDto.Companion.toEventTypeDto
 import com.elta.android.data.features.diary.events.dto.v1.InsulinMedicamentDataDto
 import com.elta.android.data.features.diary.events.dto.v1.InsulinTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
@@ -19,7 +20,7 @@ class EventToDtoMapper @Inject constructor() : Mapper<Event, EventDto> {
 
     override fun mapFromObject(source: Event): EventDto =
         with(source) {
-            val eventType = EventTypeDto.valueOf(type.name)
+            val eventType = type.toEventTypeDto()
             EventDto(
                 id = id,
                 state = StateDto.valueOf(state.name),

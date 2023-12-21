@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.diary.home.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.nullgr.core.interactor.SingleListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
@@ -12,11 +13,11 @@ class GetAddableEventsUseCase @Inject constructor(
     override fun buildUseCaseObservable(params: Unit?): Single<List<EventType>> =
         Single.fromCallable {
             arrayListOf(
-                EventType.BREAD,
-                EventType.INSULIN,
-                EventType.MEDICAMENTS,
-                EventType.WEIGHT,
-                EventType.ACTIVITY
+                EventType.Bread(CalculatorFlow.BREAD_UNITS),
+                EventType.Insulin,
+                EventType.Medicaments,
+                EventType.Weight,
+                EventType.Activity
             )
         }
 }

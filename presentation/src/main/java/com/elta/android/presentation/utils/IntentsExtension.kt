@@ -53,3 +53,10 @@ fun openNotificationSettingsIntent(context: Context) {
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
         .launch(context)
 }
+
+fun openAlarmsAndRemindersSettingsIntent(context: Context) {
+    Intent().apply {
+        action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+    }
+        .launch(context)
+}

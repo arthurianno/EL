@@ -6,6 +6,7 @@ import com.elta.android.domain.features.calculator.interactor.CalculatorFragment
 import com.elta.android.domain.features.diary.events.interactor.DeleteEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.events.model.isChanged
@@ -15,12 +16,17 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.model.EventFormModel
+import com.elta.android.presentation.features.main.events.base.model.MedicamentModel
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormAdditionalText
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormInputText
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getMedicament
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getPickerValues
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
+import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toDoubleFormat
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
@@ -42,7 +48,6 @@ class EditEventPm @Inject constructor(
 
     private val loadScreenAction = action<Unit>()
     private val eventIdState = state<String>()
-    private val eventState = state<EventV2>()
     private val isFormChangedState = state(false)
     private val eventFormHolderState = state(EventFormModel())
 
@@ -69,15 +74,18 @@ class EditEventPm @Inject constructor(
             eventTypeState.observable,
             formPickerValue.observable,
             formInput.text.observable,
+            additionalInput.text.observable,
             formSelector.option.observable,
             tagSelector.option.observable,
             selectedDateState.observable,
-            noteInput.text.observable
-        ) { eventType, pickerValue, inputValue, variant, tag, date, note ->
+            noteInput.text.observable,
+            dishes.observable
+        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, dishes ->
             eventFormHolderState.value.apply {
                 this.eventType = eventType
                 this.pickerValue = pickerValue
-                this.inputValue = inputValue
+                this.inputValue = inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
@@ -98,7 +106,6 @@ class EditEventPm @Inject constructor(
 
     private fun loadEvent() {
         loadScreenAction.observable
-            .skipWhileInProgress()
             .map(::createGetEventUseCaseParams)
             .flatMapSingle {
                 getEventByIdUseCase.execute(it)
@@ -131,8 +138,17 @@ class EditEventPm @Inject constructor(
     private fun bindEvent(event: EventV2) {
         event.getPickerValues()?.let { updateFormPickerValueCommand.consumer.accept(it) }
         event.getFormInputText()?.let { formInput.text.consumer.accept(it) }
+        event.getFormAdditionalText()?.let { additionalInput.text.consumer.accept(it) }
         event.getSelectorOption(resources)?.let { formSelector.option.consumer.accept(it) }
         event.getTag(resources)?.let { tagSelector.option.consumer.accept(it) }
+        event.getMedicament().let { medicament ->
+            medicamentState.consumer.accept(
+                MedicamentModel(
+                    medicament = medicament,
+                    fromEvent = true,
+                )
+            )
+        }
         dateTimeSelectedAction.consumer.accept(event.additionTime)
         event.note?.let { noteInput.text.consumer.accept(it) }
         dishes.consumer.accept(event.dishes)
@@ -147,13 +163,18 @@ class EditEventPm @Inject constructor(
             eventState.value.copy(
                 value = form.value,
                 kind = form.kind,
-                name = form.name,
+                name = if (form.medicament == null
+                    || form.medicament?.isOther == true
+                    || form.eventType !is EventType.Medicaments
+                ) form.name else null,
                 duration = form.duration,
                 additionTime = checkNotNull(form.date),
                 tagId = form.tag?.id,
                 tag = form.tag,
                 activityType = form.activityType,
+                insulinMedicament = form.insulinMedicament,
                 medicament = form.medicament,
+                tabletsNumber = form.tabletsNumber,
                 note = form.note,
                 type = checkNotNull(form.eventType),
                 dishes = dishes.value
@@ -169,7 +190,10 @@ class EditEventPm @Inject constructor(
             duration = eventFormModel.duration,
             date = eventFormModel.date,
             tagId = eventFormModel.tag?.id,
+            insulinMedicament = eventFormModel.insulinMedicament,
+            dishes = dishes.valueOrNull,
             medicament = eventFormModel.medicament,
+            tabletsNumber = eventFormModel.tabletsNumber,
             activity = eventFormModel.activityType,
             note = eventFormModel.note
         ) ?: false

@@ -11,9 +11,13 @@ import javax.inject.Inject
 class GetLastInsulinEventUseCase @Inject constructor(
     private val eventsRepo: EventsRepository,
     schedulers: SchedulersFacade
-) : SingleUseCase<EventV2, Unit>(schedulers) {
+) : SingleUseCase<EventV2, GetLastInsulinEventUseCase.Params>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Unit?): Single<EventV2> {
-        return eventsRepo.getLastEvent(EventType.INSULIN)
+    override fun buildUseCaseObservable(params: Params?): Single<EventV2> {
+        checkNotNull(params)
+        return eventsRepo.getLastEvent(params.type)
     }
+
+    data class Params(val type: EventType)
+
 }

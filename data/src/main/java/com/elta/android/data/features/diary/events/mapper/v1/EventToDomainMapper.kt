@@ -3,10 +3,10 @@ package com.elta.android.data.features.diary.events.mapper.v1
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.utils.toIsoDate
 import com.elta.android.data.features.calculator.mapper.toDomain
+import com.elta.android.data.features.diary.events.dto.EventTypeDto.Companion.toEventType
 import com.elta.android.data.features.diary.events.dto.v1.EventDto
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
-import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.InsulinType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.State
@@ -18,7 +18,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
         with(source) {
             Event(
                 id = id,
-                type = EventType.valueOf(data.type.name),
+                type = data.type.toEventType(data.value),
                 additionTime = additionTime.toIsoDate(),
                 tagId = tagId,
                 tag = null,

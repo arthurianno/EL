@@ -1,110 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+    android:layout_height="64dp"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/divider" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="?selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/record_icon_view"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_event_medicaments" />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/record_icon_view"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_event_medicaments" />
 
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/record_label_view"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="36dp"
-            android:layout_marginBottom="6dp"
-            android:background="@drawable/ic_white_circle"
-            android:padding="4dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_skiing" />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/record_label_view"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/ic_white_circle"
+        android:padding="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_skiing" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/record_icon_view"
-            app:layout_constraintEnd_toStartOf="@id/barrier_view"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.appcompat.widget.AppCompatTextView
-
-                android:id="@+id/record_title_view"
-                style="@style/New.Body2.BlackBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-                android:lines="1"
-                app:layout_constraintBottom_toTopOf="@+id/record_type_view"
-                tools:text="Короткий" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-
-                android:id="@+id/record_type_view"
-                style="@style/New.Caption1.ShadeBlack2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-                android:lines="1"
-                tools:text="Инсулин" />
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="start"
-            app:constraint_referenced_ids="record_count_view,record_date_view" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/record_icon_view"
+        app:layout_constraintEnd_toStartOf="@id/barrier_view"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/record_count_view"
-            style="@style/New.Body2.ShadeGreen"
+
+            android:id="@+id/record_title_view"
+            style="@style/New.Body2.BlackBlue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/record_date_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="3 ед" />
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lines="1"
+            app:layout_constraintBottom_toTopOf="@+id/record_type_view"
+            tools:text="Короткий" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/record_date_view"
+
+            android:id="@+id/record_type_view"
             style="@style/New.Caption1.ShadeBlack2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_count_view"
-            tools:text="в 11:30 (UTC +4)" />
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lines="1"
+            tools:text="Инсулин" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="record_count_view,record_date_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/record_count_view"
+        style="@style/New.Body2.ShadeGreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/record_date_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="3 ед" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/record_date_view"
+        style="@style/New.Caption1.ShadeBlack2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/record_count_view"
+        tools:text="в 11:30 (UTC +4)" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

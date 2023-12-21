@@ -6,6 +6,7 @@ import com.elta.android.domain.common.ReturnDataHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.DishType
 import com.elta.android.domain.features.calculator.model.MetricServingLink
+import com.elta.android.domain.features.user.model.Diabetes
 import kotlinx.coroutines.flow.Flow
 
 interface CalculatorRepository : BaseRepository {
@@ -17,7 +18,11 @@ interface CalculatorRepository : BaseRepository {
     fun searchDishes(name: String): Flow<PagingData<Dish>>
     fun getHistoryList(): Flow<List<String>>
     suspend fun saveWordToHistory(word: String)
-    suspend fun getProducts(name: String, onlyCustom: Boolean): Flow<PagingData<Dish>>
+    suspend fun getProducts(
+        name: String,
+        onlyCustom: Boolean = false,
+        diabetes: Diabetes? = null
+    ): Flow<PagingData<Dish>>
     fun getServingsProduct(): Flow<List<MetricServingLink>>
     fun getLocalDishes(): Flow<List<Dish>>
     suspend fun saveLocalDishes(dishes: List<Dish>)

@@ -41,9 +41,9 @@ class TextView : AppCompatTextView {
         }
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         if (translateToBottom) {
-            canvas?.translate(0f, paint.fontMetrics.bottom)
+            canvas.translate(0f, paint.fontMetrics.bottom)
         }
         super.onDraw(canvas)
     }

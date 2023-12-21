@@ -4,6 +4,7 @@ import com.elta.android.domain.factory.EventTestFactory
 import com.elta.android.domain.factory.TagTestFactory
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.buildHomeModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.user.model.GlucoseFormat
@@ -14,38 +15,40 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_OneGlucoseEvent_HasGlucoseEvent() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE)
+        val event = EventTestFactory.create(type = EventType.Glucose)
         val model =
             buildHomeModel(
-                arrayListOf(event),
+                listOf(event),
                 emptyList(),
                 GlucoseLevelSettings(),
                 UserInfo(),
-                GlucoseFormat.CAPILLARY
+                GlucoseFormat.CAPILLARY,
+                CalculatorFlow.BREAD_UNITS
             )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
         assert(model.lastGlucoseEvent != null)
         assert(model.lastInsulinEvent == null)
     }
 
     @Test
     fun buildHomeModel_OneGlucoseEvent_DirectionNull() {
-        val event = EventTestFactory.create(type = EventType.GLUCOSE)
+        val event = EventTestFactory.create(type = EventType.Glucose)
         val model =
             buildHomeModel(
-                arrayListOf(event),
+                listOf(event),
                 emptyList(),
                 GlucoseLevelSettings(),
                 UserInfo(),
-                GlucoseFormat.CAPILLARY
+                GlucoseFormat.CAPILLARY,
+                CalculatorFlow.BREAD_UNITS
             )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
         assert(model.lastGlucoseEvent != null)
         assert(model.glucoseLevelDirection == null)
         assert(model.lastInsulinEvent == null)
@@ -53,39 +56,41 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_OneBreadEvent_HasBreadEvent() {
-        val event = EventTestFactory.create(type = EventType.BREAD)
+        val event = EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS))
         val model =
             buildHomeModel(
-                arrayListOf(event),
+                listOf(event),
                 emptyList(),
                 GlucoseLevelSettings(),
                 UserInfo(),
-                GlucoseFormat.CAPILLARY
+                GlucoseFormat.CAPILLARY,
+                CalculatorFlow.BREAD_UNITS
             )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
-        assert(model.lastBreadEvent != null)
-        assert(model.lastBreadEvent == event)
+        assert(model.lastFoodEvent != null)
+        assert(model.lastFoodEvent == event)
         assert(model.lastGlucoseEvent == null)
         assert(model.lastInsulinEvent == null)
     }
 
     @Test
     fun buildHomeModel_OneInsulinEvent_HasInsulinEvent() {
-        val event = EventTestFactory.create(type = EventType.INSULIN)
+        val event = EventTestFactory.create(type = EventType.Insulin)
         val model =
             buildHomeModel(
-                arrayListOf(event),
+                listOf(event),
                 emptyList(),
                 GlucoseLevelSettings(),
                 UserInfo(),
-                GlucoseFormat.CAPILLARY
+                GlucoseFormat.CAPILLARY,
+                CalculatorFlow.BREAD_UNITS
             )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
         assert(model.lastGlucoseEvent == null)
         assert(model.lastInsulinEvent != null)
         assert(model.lastInsulinEvent == event)
@@ -93,22 +98,23 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_ThreeEvents_HasAllLastEvents() {
-        val event1 = EventTestFactory.create(type = EventType.BREAD)
-        val event2 = EventTestFactory.create(type = EventType.GLUCOSE)
-        val event3 = EventTestFactory.create(type = EventType.INSULIN)
+        val event1 = EventTestFactory.create(type = EventType.Bread(CalculatorFlow.BREAD_UNITS))
+        val event2 = EventTestFactory.create(type = EventType.Glucose)
+        val event3 = EventTestFactory.create(type = EventType.Insulin)
         val model = buildHomeModel(
             arrayListOf(event1, event2, event3),
             emptyList(),
             GlucoseLevelSettings(),
             UserInfo(),
-            GlucoseFormat.CAPILLARY
+            GlucoseFormat.CAPILLARY,
+            CalculatorFlow.BREAD_UNITS
         )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
 
-        assert(model.lastBreadEvent != null)
-        assert(model.lastBreadEvent == event1)
+        assert(model.lastFoodEvent != null)
+        assert(model.lastFoodEvent == event1)
 
         assert(model.lastGlucoseEvent != null)
 
@@ -118,21 +124,22 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionUp() {
-        val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 5.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 5.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
             GlucoseLevelSettings(),
             UserInfo(),
-            GlucoseFormat.CAPILLARY
+            GlucoseFormat.CAPILLARY,
+            CalculatorFlow.BREAD_UNITS
         )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
 
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
 
         assert(model.lastGlucoseEvent != null)
         assert(model.glucoseLevelDirection == GlucoseLevelDirection.UP)
@@ -142,21 +149,22 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionDown() {
-        val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 3.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 3.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
             GlucoseLevelSettings(),
             UserInfo(),
-            GlucoseFormat.CAPILLARY
+            GlucoseFormat.CAPILLARY,
+            CalculatorFlow.BREAD_UNITS
         )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
 
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
 
         assert(model.lastGlucoseEvent != null)
         assert(model.lastGlucoseEvent == event2)
@@ -167,21 +175,22 @@ class BuildHomeModelTest {
 
     @Test
     fun buildHomeModel_TwoGlucoseEvents_DirectionStable() {
-        val event1 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
+        val event1 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
         Thread.sleep(50)
-        val event2 = EventTestFactory.create(type = EventType.GLUCOSE, value = 4.0)
+        val event2 = EventTestFactory.create(type = EventType.Glucose, value = 4.0)
         val model = buildHomeModel(
             arrayListOf(event1, event2),
             emptyList(),
             GlucoseLevelSettings(),
             UserInfo(),
-            GlucoseFormat.CAPILLARY
+            GlucoseFormat.CAPILLARY,
+            CalculatorFlow.BREAD_UNITS
         )
 
         assert(model.isFirstEntrance)
         assert(model.hasEvents)
 
-        assert(model.lastBreadEvent == null)
+        assert(model.lastFoodEvent == null)
 
         assert(model.lastGlucoseEvent != null)
         assert(model.lastGlucoseEvent == event2)
@@ -193,18 +202,19 @@ class BuildHomeModelTest {
     @Test
     fun buildHomeModel_TwoEvents_OneTag_SortedCorrect() {
         val tagId1 = TagTestFactory.nextId
-        val event1 = EventTestFactory.create(type = EventType.GLUCOSE, tagId = tagId1)
+        val event1 = EventTestFactory.create(type = EventType.Glucose, tagId = tagId1)
         val tag1 = TagTestFactory.create(tagId1)
 
         Thread.sleep(50)
 
-        val event2 = EventTestFactory.create(type = EventType.GLUCOSE)
+        val event2 = EventTestFactory.create(type = EventType.Glucose)
         val model = buildHomeModel(
             arrayListOf(event1, event2).shuffled(),
             arrayListOf(tag1),
             GlucoseLevelSettings(),
             UserInfo(),
-            GlucoseFormat.CAPILLARY
+            GlucoseFormat.CAPILLARY,
+            CalculatorFlow.BREAD_UNITS
         )
 
         assert(model.isFirstEntrance)

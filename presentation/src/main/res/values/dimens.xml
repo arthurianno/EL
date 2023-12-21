@@ -65,4 +65,9 @@
 
     <dimen name="calendar_day_padding">2dp</dimen>
     <dimen name="calendar_day_radius">10dp</dimen>
+
+    <dimen name="divider_height">1dp</dimen>
+
+    <dimen name="small_padding">4dp</dimen>
+
 </resources>

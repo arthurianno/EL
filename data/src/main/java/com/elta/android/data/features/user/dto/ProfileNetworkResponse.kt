@@ -3,7 +3,7 @@ package com.elta.android.data.features.user.dto
 import com.google.gson.annotations.SerializedName
 
 data class ProfileNetworkResponse(
-    @SerializedName("diabet") val diabetes: DiabeteTypeNetworkEntity?,
+    @SerializedName("diabet") val diabetes: DiabetesTypeNetworkEntity?,
     @SerializedName("weight") val weight: Double?,
     @SerializedName("gender") val gender: GenderTypeNetworkEntity?,
     @SerializedName("person") val person: PersonNetworkEntity?,

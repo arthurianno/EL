@@ -34,7 +34,7 @@ class FormSelectorView @JvmOverloads constructor(
             field = value
             bindIcon()
         }
-    var hint: String? = null
+    var hint: CharSequence? = null
         set(value) {
             field = value
             bindValue()

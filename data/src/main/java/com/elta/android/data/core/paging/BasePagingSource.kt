@@ -2,12 +2,14 @@ package com.elta.android.data.core.paging
 
 import androidx.paging.PagingSource
 import com.elta.android.domain.features.calculator.model.Dish
+import com.elta.android.domain.features.user.model.Diabetes
 
 abstract class BasePagingSource {
 
     abstract val defaultPosition: Int
     abstract val pagingSource: PagingSource<Int, Dish>
-    abstract fun setQuery(vararg query: Any)
+
+    abstract fun setQuery(queryPaging: QueryPaging)
 
     fun <T : Any> returnResult(
         data: List<T>,
@@ -38,5 +40,18 @@ abstract class BasePagingSource {
     private fun countResults(currentPage: Int, pageSize: Int) =
         ((currentPage + DEFAULT_PAGING_STEP) - defaultPosition) * pageSize
 }
+
+sealed class QueryPaging {
+    data class Dishes(
+        val name: String = EMPTY_STRING
+    ) : QueryPaging()
+    data class Product(
+        val name: String = EMPTY_STRING,
+        val onlyCustom: Boolean = false,
+        val diabetesType: Diabetes? = null
+    ) : QueryPaging()
+}
+
+private const val EMPTY_STRING = ""
 
 const val DEFAULT_PAGING_STEP = 1

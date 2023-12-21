@@ -6,12 +6,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.features.calcutator.custom.component.CustomDishes
 import com.elta.android.presentation.features.calcutator.custom.viewmodel.CustomProductsViewModel
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
+import com.elta.android.presentation.utils.bundle
 import kotlinx.coroutines.FlowPreview
 
 @OptIn(ExperimentalComposeUiApi::class, FlowPreview::class)
@@ -20,6 +23,11 @@ class CustomProductsFragment : BaseComposeFragment<CustomProductsViewModel>() {
     override val viewModel: CustomProductsViewModel by viewModels { viewModelFactory }
 
     override fun CustomProductsViewModel.init() {
+
+        arguments?.getParcelable<CalculatorFlow>(EXTRA_CALCULATOR_FLOW_DATA)?.let {
+            viewModel.setCalculatorFlow(it)
+        }
+
         appTopBar.setTitle(resources.getString(R.string.custom_products_my_products))
         appTopBar.setStartIconAction(AppAction.BackPressure)
         searchField.setHint(getString(R.string.custom_product_search_hint))
@@ -49,8 +57,12 @@ class CustomProductsFragment : BaseComposeFragment<CustomProductsViewModel>() {
     }
 
     companion object {
-        fun newInstance(): Fragment {
-            return CustomProductsFragment()
+        fun newInstance(calculatorFlow: CalculatorFlow): Fragment {
+            return CustomProductsFragment().apply {
+                arguments = bundle(EXTRA_CALCULATOR_FLOW_DATA to calculatorFlow)
+            }
         }
+
+        private const val EXTRA_CALCULATOR_FLOW_DATA = "extra_calculator_flow_data"
     }
 }

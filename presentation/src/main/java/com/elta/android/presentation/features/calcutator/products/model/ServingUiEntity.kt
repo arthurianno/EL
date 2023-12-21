@@ -12,5 +12,5 @@ data class ServingUiEntity(
     val calories: String,
     val protein: String,
     val fat: String,
-    val carbohydrate: String
+    val carbohydrate: String?
 ) : Parcelable

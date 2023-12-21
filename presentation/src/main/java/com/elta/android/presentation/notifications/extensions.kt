@@ -1,5 +1,6 @@
 package com.elta.android.presentation.notifications
 
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
@@ -14,4 +15,11 @@ fun areNotificationsEnabled(notificationManager: NotificationManagerCompat): Boo
                 } == null
         }
         else -> true
+    }
+
+fun areAlarmsAndRemindersEnabled(alarmManager: AlarmManager): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        alarmManager.canScheduleExactAlarms()
+    } else {
+        true
     }

@@ -313,7 +313,7 @@
     },
     {
       "id": "6:5390790228794287044",
-      "lastPropertyId": "5:7421900256969611969",
+      "lastPropertyId": "6:983361416409824812",
       "name": "SyncInfoDto",
       "properties": [
         {
@@ -340,6 +340,11 @@
         {
           "id": "5:7421900256969611969",
           "name": "lastGoogleFitSync",
+          "type": 6
+        },
+        {
+          "id": "6:983361416409824812",
+          "name": "lastMedicamentSync",
           "type": 6
         }
       ],
@@ -894,7 +899,7 @@
     },
     {
       "id": "27:3900211914005807584",
-      "lastPropertyId": "19:7299652215678768928",
+      "lastPropertyId": "21:5540657784539879993",
       "name": "EventV2CachedDto",
       "properties": [
         {
@@ -992,6 +997,16 @@
           "id": "19:7299652215678768928",
           "name": "glucometerSerialNumber",
           "type": 9
+        },
+        {
+          "id": "20:8295628468919019373",
+          "name": "medicamentDto",
+          "type": 9
+        },
+        {
+          "id": "21:5540657784539879993",
+          "name": "tabletsNumber",
+          "type": 8
         }
       ],
       "relations": []
@@ -1047,7 +1062,7 @@
     {
       "id": "30:8999350013555102540",
       "lastPropertyId": "4:4379323195446670924",
-      "name": "MedicamentDbEntity",
+      "name": "InsulinMedicamentDbEntity",
       "properties": [
         {
           "id": "1:630844044078788550",
@@ -1072,9 +1087,48 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "31:3282265351876994341",
+      "lastPropertyId": "6:5726612670656249490",
+      "name": "MedicamentDBEntity",
+      "properties": [
+        {
+          "id": "1:8842321215619367050",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:588468453697268701",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3799428893228926423",
+          "name": "other",
+          "type": 1
+        },
+        {
+          "id": "4:7699979508033583948",
+          "name": "deleted",
+          "type": 1
+        },
+        {
+          "id": "5:8292379161288887373",
+          "name": "touchedAt",
+          "type": 6
+        },
+        {
+          "id": "6:5726612670656249490",
+          "name": "lastUsed",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "30:8999350013555102540",
+  "lastEntityId": "31:3282265351876994341",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",
