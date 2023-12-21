@@ -71,4 +71,13 @@ deploy-release:
     - firebase appdistribution:distribute build_apks/app-universal-release.apk --app $FIREBASE_APP_ID
       --release-notes "$TAG_MESSAGE"
       --groups "testGroup"
-
+  after_script:
+    - >
+        if [ "$CI_JOB_STATUS" == "success" ]; then
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+          curl -X POST -H 'Content-type: application/json' --data "{
+                    \"text\": \"*Собран билд:* $CI_COMMIT_TAG\n*Инициатор сборки билда:* $GITLAB_USER_NAME\n*Release Notes:* $TAG_MESSAGE\n*Детали билда:* <$CI_JOB_URL|ссылка>\",
+                    \"mrkdwn\": true
+                  }" $CHANNEL_WEB_HOOK;
+        fi
+        
