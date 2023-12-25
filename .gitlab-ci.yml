@@ -25,11 +25,10 @@ debug-build:
     when: on_success
     expire_in: 1 week
     paths:
-      - build_apks/
+      - $CI_COMMIT_TAG.apk
   script:
     - ./gradlew assembleDebug
-    - mkdir build_apks
-    - mv app/build/outputs/apk/debug/app-universal-debug.apk build_apks/
+    - mv app/build/outputs/apk/debug/app-universal-debug.apk $CI_COMMIT_TAG.apk
 
 debug-test:
   stage: test
@@ -52,7 +51,7 @@ deploy-debug:
   script:
     - npm install -g firebase-tools
     - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
-    - firebase appdistribution:distribute build_apks/app-universal-debug.apk --app $FIREBASE_APP_ID
+    - firebase appdistribution:distribute $CI_COMMIT_TAG.apk --app $FIREBASE_APP_ID
       --release-notes "$TAG_MESSAGE"
       --groups "testGroup"
   after_script:
@@ -75,11 +74,10 @@ release-build:
     when: on_success
     expire_in: 1 week
     paths:
-      - build_apks/
+      - $CI_COMMIT_TAG.apk
   script:
     - ./gradlew assembleRelease
-    - mkdir build_apks
-    - mv app/build/outputs/apk/release/app-universal-release.apk build_apks/
+    - mv app/build/outputs/apk/release/app-universal-release.apk $CI_COMMIT_TAG.apk
 
 release-test:
   stage: test
@@ -102,7 +100,7 @@ deploy-release:
   script:
     - npm install -g firebase-tools
     - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
-    - firebase appdistribution:distribute build_apks/app-universal-release.apk --app $FIREBASE_APP_ID
+    - firebase appdistribution:distribute $CI_COMMIT_TAG.apk --app $FIREBASE_APP_ID
       --release-notes "$TAG_MESSAGE"
       --groups "testGroup"
   after_script:
@@ -114,4 +112,4 @@ deploy-release:
                     \"mrkdwn\": true
                   }" $CHANNEL_WEB_HOOK;
         fi
-        
+
