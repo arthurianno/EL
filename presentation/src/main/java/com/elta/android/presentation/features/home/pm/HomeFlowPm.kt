@@ -18,7 +18,6 @@ import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companio
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
@@ -50,7 +49,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Singles
-import kotlinx.coroutines.flow.map
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
@@ -528,7 +526,6 @@ class HomeFlowPm @Inject constructor(
     private fun handleManualSyncError(error: Throwable) {
         bus.event(Events.Sync.Glucometer.Nothing)
         stopSyncTimer()
-
         when (error) {
             is PrimaryGlucometerNotFoundError -> {
                 openConnectScreen()
@@ -548,6 +545,8 @@ class HomeFlowPm @Inject constructor(
                 this.manualSyncError.accept(manualSyncError)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
+
+            is BluetoothNotEnabledError -> bus.event(Events.Sync.Glucometer.ErrorWithMessage)
 
             else -> handleError(error)
         }

@@ -154,6 +154,7 @@ class AppPm @Inject constructor(
                     is Events.Sync.Glucometer.ErrorWithMessage -> {
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
+                        setStatusVisibility(Visibility.HideWithDelay)
                     }
 
                     is Events.Sync.Glucometer.Started -> {
