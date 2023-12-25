@@ -63,6 +63,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         binding.layoutSyncStateSyncError.actionButtonView.clicks().bindTo(pm.startSyncAction)
         binding.layoutSyncStateSyncCompleted.toAppButtonView.clicks().bindTo(pm.toAppAction)
         binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks().bindTo(pm.startScanAction)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
         pm.hideHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.hide() }
         pm.showHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.show() }
