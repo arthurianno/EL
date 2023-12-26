@@ -70,6 +70,7 @@ private fun SendStatus.toDomain(): WebimMessageSendStatus =
     when (this) {
         SendStatus.SENDING -> WebimMessageSendStatus.Sending
         SendStatus.SENT -> WebimMessageSendStatus.Sent
+        SendStatus.FAILED -> WebimMessageSendStatus.Error("Send status is Failed")
     }
 
 private fun Message.Type.toDomainOwner(): WebimOwner =
