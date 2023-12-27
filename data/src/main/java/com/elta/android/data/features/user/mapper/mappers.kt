@@ -44,7 +44,7 @@ internal fun ProfileSettingsNetworkResponse.toDomain(): ProfileSettings =
 
 internal fun Profile.toNetwork(): ProfileNetworkResponse =
     ProfileNetworkResponse(
-        diabetes = diabetes?.let { DiabetesTypeNetworkEntity.valueOf(it.name) },
+        diabetes = diabetes?.toNM(),
         weight = weight,
         gender = gender.toNetwork(),
         person = if (firstName == null && secondName == null) {
@@ -83,13 +83,25 @@ internal fun ProfileNetworkResponse.toDomain(glucoseFormat: GlucoseFormatNetwork
         glucoseLevelBeforeEatSettings = glucoseLevelsBeforeEating.toSettings(),
         glucoseLevelAfterEatSettings = glucoseLevelsAfterEating.toSettings(),
         glucoseFormat = glucoseFormat.toDomain(),
-        diabetes = diabetes?.name?.let { Diabetes.valueOf(it) },
+        diabetes = diabetes?.toDomain(),
         weight = weight,
         socialNetworks = socialNetworks?.map { it.toDomain() },
         healthApps = healthApps?.map { it.toDomain() },
         timeStamp = timeStamp
 
     )
+
+private fun DiabetesTypeNetworkEntity.toDomain(): Diabetes = when (this) {
+    DiabetesTypeNetworkEntity.FIRST -> Diabetes.FIRST
+    DiabetesTypeNetworkEntity.SECOND -> Diabetes.SECOND
+    DiabetesTypeNetworkEntity.SECOND_TABLETS -> Diabetes.SECOND_TABLETS
+}
+
+internal fun Diabetes.toNM(): DiabetesTypeNetworkEntity = when (this) {
+    Diabetes.FIRST -> DiabetesTypeNetworkEntity.FIRST
+    Diabetes.SECOND -> DiabetesTypeNetworkEntity.SECOND
+    Diabetes.SECOND_TABLETS -> DiabetesTypeNetworkEntity.SECOND_TABLETS
+}
 
 private fun GlucoseFormatNetworkEntity.toDomain(): GlucoseFormat =
     when (this) {
