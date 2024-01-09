@@ -5,6 +5,7 @@ import com.elta.android.data.features.calculator.mapper.toDomain
 import com.elta.android.data.features.calculator.mapper.toNM
 import com.elta.android.data.features.calculator.model.ProductsResponse
 import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
+import com.elta.android.data.features.user.mapper.toNM
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.calculator.model.MetricServingLink
 import com.elta.android.domain.features.calculator.model.Product
@@ -27,7 +28,7 @@ class ProductsDataSource @Inject constructor(
     ): Single<ProductsResponse> = api.getProducts(
         customOnly = customOnly,
         foodName = foodName,
-        diabetesType = diabetesType?.name?.let { DiabetesTypeNetworkEntity.valueOf(it) },
+        diabetesType = diabetesType?.toNM(),
         pageIndex = pageIndex,
         pageSize = pageSize
     )

@@ -22,6 +22,7 @@ private const val PNG_TYPE = "image/png"
 private const val HEIF_TYPE = "image/heif"
 private const val PDF_TYPE = "application/pdf"
 private const val VOICE_TYPE = "audio/x-hx-aac-adts"
+private const val WEBIM_MESSAGE_SEND_STATUS_EXCEPTION = "WebimMessageSendStatus exception"
 
 internal fun Message.toDomain(): WebimMessage =
     WebimMessage(
@@ -66,10 +67,12 @@ private fun WebimUser.toAuth(key: String): WebimUserAuthEntity =
         hash = this.toString().hmacSha1Signature(key)
     )
 
+
 private fun SendStatus.toDomain(): WebimMessageSendStatus =
     when (this) {
         SendStatus.SENDING -> WebimMessageSendStatus.Sending
         SendStatus.SENT -> WebimMessageSendStatus.Sent
+        SendStatus.FAILED -> WebimMessageSendStatus.Error(WEBIM_MESSAGE_SEND_STATUS_EXCEPTION)
     }
 
 private fun Message.Type.toDomainOwner(): WebimOwner =

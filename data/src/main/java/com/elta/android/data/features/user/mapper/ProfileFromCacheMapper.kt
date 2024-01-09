@@ -20,7 +20,7 @@ class ProfileFromCacheMapper @Inject constructor(
     override fun mapFromObject(source: ProfileCacheDto): ProfileNetworkResponse =
         with(source) {
             ProfileNetworkResponse(
-                diabetes = diabetes?.let { DiabetesTypeNetworkEntity.valueOf(it) },
+                diabetes = diabetes?.let { DiabetesTypeNetworkEntity.getByItemName(it) },
                 weight = weight,
                 gender = gender?.let { GenderTypeNetworkEntity.valueOf(it) },
                 person = PersonNetworkEntity(
