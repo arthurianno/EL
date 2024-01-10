@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.datasource
 
+import android.bluetooth.le.ScanResult
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
@@ -10,7 +11,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
-import no.nordicsemi.android.support.v18.scanner.ScanResult
 import javax.inject.Inject
 
 @Suppress("MagicNumber")

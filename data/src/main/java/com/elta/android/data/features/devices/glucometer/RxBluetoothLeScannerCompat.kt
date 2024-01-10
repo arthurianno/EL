@@ -1,22 +1,27 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
-import no.nordicsemi.android.support.v18.scanner.ScanCallback
-import no.nordicsemi.android.support.v18.scanner.ScanFilter
-import no.nordicsemi.android.support.v18.scanner.ScanResult
-import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 private const val SCAN_TIMEOUT_SECOND = 60L
 
-fun BluetoothLeScannerCompat.startScan(
+fun BluetoothLeScanner.startScan(
     filters: List<ScanFilter> = emptyList(),
-    settings: ScanSettings
+    settings: ScanSettings,
+    context: Context
 ): Observable<List<ScanResult>> = Observable.create<ScanResult> { emitter ->
     val callback = object : ScanCallback() {
 
@@ -41,8 +46,14 @@ fun BluetoothLeScannerCompat.startScan(
         }
     }
 
-    // pass empty list to organize own filter
-    startScan(emptyList(), settings, callback)
+    val permission = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.BLUETOOTH
+    ) == PackageManager.PERMISSION_GRANTED
+    if (permission) {
+        // pass empty list to organize own filter //TODO: Проверить зачем так сделано
+        startScan(emptyList(), settings, callback)
+    }
 
     emitter.setDisposable(
         Disposables.fromAction {
@@ -50,7 +61,7 @@ fun BluetoothLeScannerCompat.startScan(
         }
     )
 }
-    .filter { it.isFiltered(filters) }
+    .filter { it.isFiltered(filters) } //TODO: Проверить зачем так сделано
     .scan(mutableSetOf<ScanResult>()) { results, result ->
         results.add(result)
         results.distinctBy(ScanResult::getDevice).toMutableSet()

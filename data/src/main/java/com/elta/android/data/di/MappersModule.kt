@@ -1,5 +1,6 @@
 package com.elta.android.data.di
 
+import android.bluetooth.le.ScanResult
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
 import com.elta.android.data.features.auth.model.SocialUserDto
@@ -80,7 +81,6 @@ import com.elta.android.domain.features.user.model.SocialNetwork
 import com.google.android.gms.fitness.data.Session
 import dagger.Binds
 import dagger.Module
-import no.nordicsemi.android.support.v18.scanner.ScanResult
 
 @Module
 @Suppress("UnnecessaryAbstractClass", "TooManyFunctions")

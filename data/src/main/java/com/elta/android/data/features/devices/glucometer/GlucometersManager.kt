@@ -1,5 +1,11 @@
 package com.elta.android.data.features.devices.glucometer
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotAvailableError
@@ -51,10 +57,6 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.rx2.asFlow
-import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
-import no.nordicsemi.android.support.v18.scanner.ScanFilter
-import no.nordicsemi.android.support.v18.scanner.ScanResult
-import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
 import java.nio.charset.Charset
@@ -63,6 +65,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 private const val MIN_BATTERY_LEVEL = 1
 private val UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
@@ -91,13 +94,13 @@ class GlucometersManager @Inject constructor(
     private val context: Context
 ) {
 
-    private val scanner = BluetoothLeScannerCompat.getScanner()
+    private val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
+    private val adapter: BluetoothAdapter = bluetoothManager.adapter
+    private val scanner: BluetoothLeScanner = adapter.bluetoothLeScanner
 
     private val settings = ScanSettings.Builder()
-        .setLegacy(false)
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .setReportDelay(0)
-        .setUseHardwareBatchingIfSupported(true)
         .build()
 
     private val filters = listOf<ScanFilter>(
@@ -121,7 +124,7 @@ class GlucometersManager @Inject constructor(
             .flatMap { it.observableState() }
             .flatMap {
                 val connectedDevices = glucometersCache.getAll(CommonConditions.All)
-                scanner.startScan(filters, settings)
+                scanner.startScan(filters, settings, context)
                     .map { filterConnectedDevices(connectedDevices, it) }
             }
 
@@ -267,7 +270,7 @@ class GlucometersManager @Inject constructor(
             if (client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED) {
                 Observable.error(BluetoothNotEnabledError)
             } else {
-                scanner.startScan(filters, settings)
+                scanner.startScan(filters, settings, context)
                     .filter { findGlucometers ->
                         findGlucometers.map { it.device.address }
                             .contains(address)
@@ -329,7 +332,7 @@ class GlucometersManager @Inject constructor(
     ): Observable<String> {
         return if (response.isOk()) {
             val dfuAddress = address.toDfuAddress()
-            scanner.startScan(dfuFilters, settings)
+            scanner.startScan(dfuFilters, settings, context)
                 .filter { results -> results.map { it.device.address }.contains(dfuAddress) }
                 .take(1)
                 .switchMap { startFirmwareUpdate(context, file.path, dfuAddress) }

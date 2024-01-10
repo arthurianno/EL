@@ -76,7 +76,6 @@ dependencies {
     implementation(Dependencies.Utils.jsr310)
 
     implementation(Dependencies.Nordic.dfu)
-    implementation(Dependencies.Nordic.scanner)
 
     implementation(Dependencies.Utils.essentials)
 
