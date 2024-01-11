@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.service.firmware
 
 import android.app.Activity
 import com.elta.android.data.BuildConfig

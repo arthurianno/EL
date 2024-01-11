@@ -24,8 +24,6 @@ interface DeviceDataSource {
 
     fun getLastGlucometerInfo(address: String): Single<GlucometerInfoDto>
 
-    fun getGlucometerEvents(address: String): Single<List<String>>
-
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable
 
     fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>>

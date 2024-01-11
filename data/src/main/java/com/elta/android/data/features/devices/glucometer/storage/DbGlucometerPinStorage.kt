@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.storage
 
 import com.elta.android.data.features.common.cache.BoxScope
 import com.elta.android.data.features.common.cache.BoxStoreFactory

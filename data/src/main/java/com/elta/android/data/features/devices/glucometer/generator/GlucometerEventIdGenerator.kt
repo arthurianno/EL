@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.generator
 
 interface GlucometerEventIdGenerator {
 

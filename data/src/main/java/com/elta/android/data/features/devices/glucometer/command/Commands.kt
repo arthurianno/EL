@@ -1,5 +1,6 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.command
 
+import com.elta.android.data.features.devices.glucometer.toGlucometerDateTime
 import com.elta.android.domain.features.diary.events.model.Event
 import org.threeten.bp.ZonedDateTime
 

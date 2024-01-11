@@ -1,14 +1,14 @@
 package com.elta.android.data.di
 
 import android.content.Context
-import com.elta.android.data.features.devices.glucometer.DbGlucometerPinStorage
-import com.elta.android.data.features.devices.glucometer.DefaultGlucometerEventBuilder
-import com.elta.android.data.features.devices.glucometer.DefaultGlucometerEventIdGenerator
-import com.elta.android.data.features.devices.glucometer.DefaultGlucometerInfoBuilder
-import com.elta.android.data.features.devices.glucometer.GlucometerEventBuilder
-import com.elta.android.data.features.devices.glucometer.GlucometerEventIdGenerator
-import com.elta.android.data.features.devices.glucometer.GlucometerInfoBuilder
-import com.elta.android.data.features.devices.glucometer.GlucometerPinStorage
+import com.elta.android.data.features.devices.glucometer.storage.DbGlucometerPinStorage
+import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerEventBuilder
+import com.elta.android.data.features.devices.glucometer.generator.DefaultGlucometerEventIdGenerator
+import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerInfoBuilder
+import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
+import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
+import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
+import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.polidea.rxandroidble2.LogConstants
 import com.polidea.rxandroidble2.LogOptions
 import com.polidea.rxandroidble2.RxBleClient

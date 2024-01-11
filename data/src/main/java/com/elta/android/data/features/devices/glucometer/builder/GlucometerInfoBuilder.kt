@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.builder
 
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import org.threeten.bp.ZonedDateTime

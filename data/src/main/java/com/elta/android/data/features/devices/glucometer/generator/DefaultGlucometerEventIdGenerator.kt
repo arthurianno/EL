@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer
+package com.elta.android.data.features.devices.glucometer.generator
 
 import java.util.UUID
 import javax.inject.Inject

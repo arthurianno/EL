@@ -1,6 +1,6 @@
 package com.elta.mobile.data
 
-import com.elta.android.data.features.devices.glucometer.DefaultGlucometerEventIdGenerator
+import com.elta.android.data.features.devices.glucometer.generator.DefaultGlucometerEventIdGenerator
 import org.junit.Test
 
 class IdTest {

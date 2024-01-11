@@ -60,7 +60,7 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name=".features.devices.glucometer.EltaDfuService"
+            android:name=".features.devices.glucometer.service.firmware.EltaDfuService"
             android:exported="false" />
     </application>
 </manifest>
