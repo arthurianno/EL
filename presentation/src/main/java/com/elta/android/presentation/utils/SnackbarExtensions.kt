@@ -14,7 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 
 fun Snackbar.applyTextAppearance(@StyleRes style: Int): Snackbar {
     with(view) {
-        val textView = findViewById<TextView>(R.id.snackbar_text)
+        val textView = findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
         textView?.let {
             TextViewCompat.setTextAppearance(it, style)
             it.maxLines = Int.MAX_VALUE
@@ -33,7 +33,7 @@ fun Snackbar.applySnackbarHeight(): Snackbar {
 fun Snackbar.applyTextDrawable(@DrawableRes drawable: Int?): Snackbar {
     drawable?.let { nonNullDrawable ->
         with(view) {
-            val textView = findViewById<TextView>(R.id.snackbar_text)
+            val textView = findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
             textView?.let {
                 it.compoundDrawablePadding = paddingLeft
                 it.setPadding(0, 0, 0, 0)

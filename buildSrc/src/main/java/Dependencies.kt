@@ -1,11 +1,11 @@
 object Dependencies {
-    const val gradleVersion = "7.4.2"
+    const val gradleVersion = "8.2.0"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"
 
     object Kotlin {
-        const val version = "1.7.20"
+        const val version = "1.9.20"
         private const val serializationVersion = "1.4.0"
         private const val coroutinesVersion = "1.6.4"
         private const val dateTimeVersion = "0.3.1"
@@ -61,7 +61,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val compilerVersion = "1.4.0-alpha01"
+            const val compilerVersion = "1.5.5"
 
             private const val bomVersion = "2023.01.00"
             private const val activityVersion = "1.6.1"
@@ -275,9 +275,12 @@ object Dependencies {
     object Nordic {
         private const val scanerVersion = "1.6.0"
         private const val dfuVersion = "2.3.0"
+        private const val bleVersion = "2.7.2"
 
         const val scanner = "no.nordicsemi.android.support.v18:scanner:$scanerVersion"
         const val dfu = "no.nordicsemi.android:dfu:$dfuVersion"
+        const val ble = "no.nordicsemi.android:ble:$bleVersion"
+        const val bleKtx = "no.nordicsemi.android:ble-ktx:$bleVersion"
     }
 
     object ObjectBox {
