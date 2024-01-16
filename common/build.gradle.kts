@@ -40,6 +40,7 @@ android {
             )
         }
     }
+    namespace = "com.elta.android.common"
 }
 
 dependencies {

@@ -98,7 +98,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
     }
 
     private fun initYandexMapKit() {
-        MapKitFactory.setApiKey(resources.getString(R.string.yandex_map_api_key))
+        MapKitFactory.setApiKey(resources.getString(com.elta.android.presentation.R.string.yandex_map_api_key))
     }
 
     private fun initSocialNetworks() {

@@ -26,6 +26,7 @@ android {
         create("releaseDev")
         create("releaseStage")
     }
+    namespace = "com.elta.android.domain"
 }
 
 dependencies {
