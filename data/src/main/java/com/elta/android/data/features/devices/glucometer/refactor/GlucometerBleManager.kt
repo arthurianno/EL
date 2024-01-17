@@ -94,10 +94,10 @@ class GlucometerBleManager @Inject constructor(
             byteCommand,
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         )
-            .split()
             .suspend()
             .value
             ?.toString(Charset.defaultCharset())
+            ?: throw Exception("Empty writeCharacteristic result")
 
         Timber.tag(TAG).d("sent $command with result: $request")
 
@@ -105,10 +105,11 @@ class GlucometerBleManager @Inject constructor(
             .suspend()
             .value
             ?.toString(Charset.defaultCharset())
+            ?: throw Exception("Empty waitForNotification result")
 
         Timber.tag(TAG).d("received notification for $command with result: $response")
 
-        return response ?: throw Exception("Empty response result")
+        return response
     }
 
 

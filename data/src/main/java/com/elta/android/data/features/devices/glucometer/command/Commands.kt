@@ -13,7 +13,7 @@ sealed class Commands(val command: String) {
 
     data object Reset : Commands(command = "reset") //TODO: delete?
 
-    data object ToDfuMode : Commands(command = "boom")
+    data object ToDfuMode : Commands(command = "boot")
 
     data object GetDate : Commands(command = "gettime")
 
