@@ -1,6 +1,7 @@
 package com.elta.android.data.features.devices.glucometer.refactor
 
 import android.bluetooth.BluetoothDevice
+import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
 import org.threeten.bp.ZonedDateTime
 
@@ -26,5 +27,7 @@ interface GlucometerCommand {
     suspend fun readEvent(index: Int): String
 
     suspend fun getSerialNumber(): String
+
+    suspend fun getGlucometerInfo(): GlucometerInfoDto
 
 }

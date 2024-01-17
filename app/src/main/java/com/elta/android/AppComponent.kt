@@ -6,6 +6,7 @@ import com.elta.android.data.di.ApiModule
 import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
+import com.elta.android.data.di.DeviceModule
 import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
@@ -49,6 +50,7 @@ import javax.inject.Singleton
         CacheModule::class,
         StorageModule::class,
         GlucometerModule::class,
+        DeviceModule::class,
         LocalSyncModule::class,
         FatSecretModule::class,
         WebimModule::class,

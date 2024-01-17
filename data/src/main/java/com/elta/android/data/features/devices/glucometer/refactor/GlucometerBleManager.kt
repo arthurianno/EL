@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
 import com.elta.android.data.features.devices.glucometer.service.isPinOk
@@ -28,9 +29,12 @@ class GlucometerBleManager @Inject constructor(
     private var glucometerCharacteristic: BluetoothGattCharacteristic? = null
     private var notificationCharacteristic: BluetoothGattCharacteristic? = null
 
+    private var device: BluetoothDevice? = null
+
 
     @SuppressLint("MissingPermission")
     override suspend fun connectToGlucometer(device: BluetoothDevice) {
+        this.device = device
         connect(device)
             .retry(3, 100)
             .useAutoConnect(false)
@@ -81,6 +85,26 @@ class GlucometerBleManager @Inject constructor(
         return serial.extractSerial()
     }
 
+    override suspend fun getGlucometerInfo(): GlucometerInfoDto {
+        val address = device?.address ?: throw Exception("Device address is null")
+
+        val date = getDate()
+        val (battery, temperature) = getBatteryAndTemperature()
+        val version = getVersion()
+        val serial = getSerialNumber()
+        return GlucometerInfoDto(
+            id = address,
+            deviceDate = date,
+            syncDate = null, //FIXME: почему-то в старом коде всегда null, кроме sync сценария
+            temperature = temperature,
+            batteryLevel = battery,
+            version = version,
+            glucometerSerialNumber = serial,
+            lastSyncedEvent = null //FIXME: почему-то в старом коде всегда null, кроме sync сценария
+        )
+
+    }
+
     override suspend fun readEvent(index: Int): String {
         return startCommand(Commands.ReadEvent(index)) //TODO: лучше какой-то объект сразу GLUCOMETER_EVENT_DTO
     }
@@ -119,7 +143,6 @@ class GlucometerBleManager @Inject constructor(
             notificationCharacteristic = getCharacteristic(NOTIFICATION_UUID)
             return glucometerCharacteristic != null && notificationCharacteristic != null
         }
-        Timber.tag(TAG).d("SERVICE: ${gatt.getService(SERVICE_UUID)}")
         return false
     }
 
@@ -131,6 +154,7 @@ class GlucometerBleManager @Inject constructor(
     override fun onServicesInvalidated() {
         glucometerCharacteristic = null
         notificationCharacteristic = null
+        device = null
     }
 }
 

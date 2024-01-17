@@ -12,6 +12,8 @@ import com.elta.android.data.features.devices.glucometer.builder.GlucometerEvent
 import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.refactor.GlucometerBleManager
+import com.elta.android.data.features.devices.glucometer.refactor.Manager
+import com.elta.android.data.features.devices.glucometer.refactor.ManagerImpl
 import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.polidea.rxandroidble2.LogConstants
 import com.polidea.rxandroidble2.LogOptions
