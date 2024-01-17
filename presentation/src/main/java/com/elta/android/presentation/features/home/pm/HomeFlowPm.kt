@@ -12,6 +12,8 @@ import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
+import com.elta.android.domain.features.devices.interactor.TestSecondUseCase
+import com.elta.android.domain.features.devices.interactor.TestUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
@@ -60,6 +62,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
@@ -68,6 +71,8 @@ private const val SNACK_BAR_DURATION = 60000
 private const val SYNC_TIMER_DELAY_MILLIS = 30000L
 
 class HomeFlowPm @Inject constructor(
+    private val testUseCase: TestUseCase,
+    private val testSecondUseCase: TestSecondUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getDevicesUseCase: GetGlucometersUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
@@ -593,9 +598,25 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun openConnectScreen() {
-        stopSyncTimer()
-        bus.event(Events.Sync.Glucometer.Error)
-        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+
+        //TODO: для теста
+//        testUseCase.execute()
+//            .subscribe()
+//            .untilDestroy()
+
+
+        testSecondUseCase.execute()
+            .subscribe()
+            .untilDestroy()
+        /*
+        *
+        * FIXME: вернуть код
+        *
+        * */
+
+//        stopSyncTimer()
+//        bus.event(Events.Sync.Glucometer.Error)
+//        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
     }
 
 }

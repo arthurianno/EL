@@ -1,60 +1,41 @@
 package com.elta.android.data.features.devices.glucometer.command
 
 import com.elta.android.data.features.devices.glucometer.toGlucometerDateTime
-import com.elta.android.domain.features.diary.events.model.Event
+import com.elta.android.domain.features.diary.events.model.EventV2
 import org.threeten.bp.ZonedDateTime
+import java.nio.charset.Charset
 
-object Commands {
-    object Reset : GlucometerCommand {
-        override fun toGlucometerString(): String = "reset"
+sealed class Commands(val command: String) {
+
+    fun getByteCommand(): ByteArray {
+        return command.toByteArray(Charset.defaultCharset())
     }
 
-    object ToDfuMode : GlucometerCommand {
-        override fun toGlucometerString(): String = "boot"
-    }
+    data object Reset : Commands(command = "reset") //TODO: delete?
 
-    object GetDate : GlucometerCommand {
-        override fun toGlucometerString(): String = "gettime"
-    }
+    data object ToDfuMode : Commands(command = "boom")
 
-    object GetVersion : GlucometerCommand {
-        override fun toGlucometerString(): String = "version"
-    }
+    data object GetDate : Commands(command = "gettime")
 
-    object GetBatteryAndTemperature : GlucometerCommand {
-        override fun toGlucometerString(): String = "battery"
-    }
+    data object GetVersion : Commands(command = "version")
 
-    object TurnOnAntiLossMode : GlucometerCommand {
-        override fun toGlucometerString(): String = "lon"
-    }
+    data object GetBatteryAndTemperature : Commands(command = "battery")
 
-    object TurnOffAntiLossMode : GlucometerCommand {
-        override fun toGlucometerString(): String = "loff"
-    }
+    data object TurnOnAntiLossMode : Commands(command = "lon") //TODO: delete?
 
-    object TurnOnFindMode : GlucometerCommand {
-        override fun toGlucometerString(): String = "find"
-    }
+    data object TurnOffAntiLossMode : Commands(command = "loff") //TODO: delete?
 
-    data class SetTime(val date: ZonedDateTime) : GlucometerCommand {
-        override fun toGlucometerString(): String = "settime.${date.toGlucometerDateTime()}"
-    }
+    data object TurnOnFindMode : Commands(command = "find")
 
-    data class AddEvent(val event: Event) : GlucometerCommand {
-        override fun toGlucometerString(): String = "blood.296044"
-    }
+    data class SetTime(val date: ZonedDateTime) :
+        Commands("settime.${date.toGlucometerDateTime()}")
 
-    data class ReadEvent(val cell: Int) : GlucometerCommand {
-        @Suppress("MagicNumber")
-        override fun toGlucometerString(): String = "rd.${cell.toString().padStart(3, '0')}"
-    }
+    data class AddEvent(val event: EventV2) : Commands(command = "blood.296044") //TODO: delete?
 
-    data class SetPin(val pin: String) : GlucometerCommand {
-        override fun toGlucometerString(): String = "pin.$pin"
-    }
+    data class ReadEvent(val cell: Int) :
+        Commands(command = "rd.${cell.toString().padStart(3, '0')}")
 
-    object Serial : GlucometerCommand {
-        override fun toGlucometerString(): String = "serial"
-    }
+    data class SetPin(val pin: String) : Commands(command = "pin.$pin")
+
+    data object Serial : Commands(command = "serial")
 }

@@ -7,7 +7,6 @@ import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
-import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
@@ -20,13 +19,12 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
-import com.elta.android.data.features.devices.glucometer.command.Commands
-import com.elta.android.data.features.devices.glucometer.command.GlucometerCommand
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
+import com.elta.android.data.features.devices.glucometer.command.Commands
 import com.elta.android.data.features.devices.glucometer.service.connect.ConnectService
-import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.elta.android.data.features.devices.glucometer.startScan
+import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.elta.android.data.features.diary.events.cache.EventsConditions
 import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -38,7 +36,6 @@ import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.exceptions.BleException
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -98,7 +95,7 @@ class GlucometersService @Inject constructor(
     fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
         connectService.findConnection(device.address)
             .switchMap { connection ->
-                connection.simpleRequest(device.address, Commands.SetPin(pinCode))
+                connection.simpleRequest(Commands.SetPin(pinCode))
             }
             .take(1)
             .switchMapCompletable { response ->
@@ -160,19 +157,14 @@ class GlucometersService @Inject constructor(
             ?: Observable.error(PrimaryGlucometerNotFoundError)
     }
 
-    private fun RxBleConnection.simpleRequest(
-        address: String,
-        cmd: GlucometerCommand
-    ): Observable<String> {
-        val input = cmd.toGlucometerString()
+    private fun RxBleConnection.simpleRequest(cmd: Commands): Observable<String> {
         val notification = setupNotification(UART_TX)
             .switchMap { it }
             .map { it.toString(Charset.defaultCharset()) }
-        val command = writeCharacteristic(UART_RX, input.toByteArray(Charset.defaultCharset()))
+        val command = writeCharacteristic(UART_RX, cmd.getByteCommand())
             .toObservable().map { it.toString(Charset.defaultCharset()) }
         return Observables.combineLatest(notification.take(1), command) { response, _ -> response }
     }
-
 
 
     @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -226,13 +218,12 @@ class GlucometersService @Inject constructor(
                 Timber.i("<<<<<<<Sync>>>>>>  Address: $address")
 
                 Observable.range(0, EVENTS_COUNT)
-                    .map<GlucometerCommand> { index -> Commands.ReadEvent(index) }
+                    .map<Commands> { index -> Commands.ReadEvent(index) }
                     .startWith(startCommands)
                     .concatMap { command ->
                         Observable.just(command).delay(COMMAND_DELAY, TimeUnit.MILLISECONDS)
                             .concatMapSingle {
-                                val input = command.toGlucometerString()
-                                    .toByteArray(Charset.defaultCharset())
+                                val input = command.getByteCommand()
                                 connection.writeCharacteristic(UART_RX, input)
                                     .map { responses }
                             }
@@ -253,7 +244,8 @@ class GlucometersService @Inject constructor(
                 }
             }
             .map { response ->
-                val info = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
+                val info =
+                    glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))
                 val lastEvent = info?.lastSyncedEvent
 
                 Timber.i("<<<<<<<Sync>>>>>>  Info from cache by address: $info")

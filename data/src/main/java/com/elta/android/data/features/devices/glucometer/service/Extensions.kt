@@ -4,7 +4,6 @@ import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
-import com.elta.android.data.features.devices.glucometer.command.GlucometerCommand
 import com.polidea.rxandroidble2.RxBleConnection
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
@@ -12,6 +11,7 @@ import java.nio.charset.Charset
 import java.util.UUID
 
 internal fun String.isPinError(): Boolean = this == "pin.error"
+internal fun String?.isPinOk(): Boolean = this == "pin.ok"
 internal fun String.isPinCommand(): Boolean = startsWith("pin")
 internal fun String.isEmptyEvent(): Boolean = contains("rd000000000000000000")
 internal fun String.isOk(): Boolean = endsWith("ok")
@@ -34,11 +34,12 @@ internal fun Observable<RxBleConnection>.checkPinAndSend(
     }
 
 internal fun RxBleConnection.request(
-    cmd: GlucometerCommand,
+    cmd: Commands,
     pin: String?,
     pinErrorCallback: () -> Unit,
 ): Observable<String> {
-    val input = cmd.toGlucometerString()
+
+    val input = cmd.command
     val notification = setupNotification(UART_TX)
         .switchMap { it }
         .map { it.toString(Charset.defaultCharset()) }

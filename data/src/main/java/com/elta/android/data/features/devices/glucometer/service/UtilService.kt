@@ -9,23 +9,19 @@ import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
-import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
-import com.elta.android.data.features.devices.glucometer.command.GlucometerCommand
+import com.elta.android.data.features.devices.glucometer.refactor.GlucometerCommand
 import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
-import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
-import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Observables
-import timber.log.Timber
 import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -55,7 +51,7 @@ class UtilService @Inject constructor(
         ScanFilter.Builder().setDeviceName("Dfu").build()
     )
 
-    val infoCommands: List<GlucometerCommand> = listOf(
+    val infoCommands: List<Commands> = listOf(
         Commands.GetDate,
         Commands.GetBatteryAndTemperature,
         Commands.GetVersion,
@@ -98,9 +94,9 @@ class UtilService @Inject constructor(
     internal fun request(
         connection: RxBleConnection,
         address: String,
-        cmd: GlucometerCommand
+        cmd: Commands
     ): Observable<String> {
-        val input = cmd.toGlucometerString()
+        val input = cmd.command
         val notification = connection.setupNotification(UART_TX)
             .switchMap { it }
             .map { it.toString(Charset.defaultCharset()) }

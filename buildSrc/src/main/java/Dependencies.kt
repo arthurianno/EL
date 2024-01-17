@@ -281,6 +281,7 @@ object Dependencies {
         const val dfu = "no.nordicsemi.android:dfu:$dfuVersion"
         const val ble = "no.nordicsemi.android:ble:$bleVersion"
         const val bleKtx = "no.nordicsemi.android:ble-ktx:$bleVersion"
+
     }
 
     object ObjectBox {

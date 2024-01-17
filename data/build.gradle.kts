@@ -77,6 +77,8 @@ dependencies {
     implementation(Dependencies.Utils.jsr310)
 
     implementation(Dependencies.Nordic.dfu)
+    implementation(Dependencies.Nordic.ble)
+    implementation(Dependencies.Nordic.bleKtx)
 
     implementation(Dependencies.Utils.essentials)
 
