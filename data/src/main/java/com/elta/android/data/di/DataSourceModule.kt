@@ -126,11 +126,6 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindMedicamentCacheDataSource(source: MedicamentCacheDataSource): MedicamentCacheSource
 
-
-    @Binds
-    @Singleton
-    abstract fun bindDeviceDataSource(source: DeviceRemoteDataSource): DeviceDataSource
-
     @Cache
     @Binds
     @Singleton
