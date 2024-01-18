@@ -40,6 +40,11 @@ class ManagerImpl @Inject constructor(
     // 1.1. пройден пин или нет
     // 2. если не привязано, то привязать, проверить пин
 
+    // TODO: Доступы к бд и иной логике в UseCase!
+
+    // TODO: для таймера timeout в UseCase
+
+
     private val settings: ScanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)

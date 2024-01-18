@@ -85,7 +85,7 @@ class GlucometerBleManager @Inject constructor(
         return serial.extractSerial()
     }
 
-    override suspend fun getGlucometerInfo(): GlucometerInfoDto {
+    override suspend fun getGlucometerInfo(): GlucometerInfoDto { //TODO: убрать DTO
         val address = device?.address ?: throw Exception("Device address is null")
 
         val date = getDate()
