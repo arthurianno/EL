@@ -13,6 +13,7 @@ import javax.inject.Singleton
 
 private const val DOT_SYMBOL = '.'
 private const val SPACE_SYMBOL = ' '
+private const val ZERO_CHAR = '0'
 private const val BATTERY_PREFIX = "b"
 private const val TEMPERATURE_PREFIX = "t"
 private const val SOFT_VERSION_PREFIX = "sw:"
@@ -85,7 +86,7 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         with(split(DOT_SYMBOL)) {
             Pair(
                 component1().removePrefix(BATTERY_PREFIX).toInt(),
-                component2().removePrefix(TEMPERATURE_PREFIX).toInt()
+                component2().removePrefix(TEMPERATURE_PREFIX).replace(SPACE_SYMBOL, ZERO_CHAR).toInt()
             )
         }
 
