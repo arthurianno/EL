@@ -44,4 +44,7 @@ interface Manager {
     suspend fun findGlucometer(address: String, pin: String)
 
 
+    suspend fun testAllCommand(address: String, pin: String)
+
+
 }

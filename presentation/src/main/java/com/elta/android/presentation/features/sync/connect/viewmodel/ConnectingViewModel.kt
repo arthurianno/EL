@@ -2,7 +2,7 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
 import com.elta.android.common.errors.BluetoothNotEnabledError
-import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
+import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
@@ -44,7 +44,7 @@ private const val CONNECT_DEVICE_TIMEOUT_SEC = 60L
 
 class ConnectingViewModel @Inject constructor(
     private val findGlucometers: FindGlucometersUseCase,
-    private val connectDevice: ConnectDeviceUseCase,
+    private val connectDevice: AddNewDeviceUseCase,
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val bus: RxBus,
@@ -188,7 +188,7 @@ class ConnectingViewModel @Inject constructor(
                 .map { it.first() }
                 .map {
                     reduceState { state.value.copy(connectDevice = it) }
-                    ConnectDeviceUseCase.Params(
+                    AddNewDeviceUseCase.Params(
                         device = it,
                         pinCode = state.value.pinCode
                     )

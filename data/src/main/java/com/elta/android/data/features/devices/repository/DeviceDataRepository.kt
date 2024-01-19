@@ -7,6 +7,7 @@ import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.manager.GlucometersInfoManager
+import com.elta.android.data.features.devices.glucometer.refactor.Manager
 import com.elta.android.data.features.devices.glucometer.service.GlucometersService
 import com.elta.android.data.features.devices.glucometer.service.firmware.FirmwareService
 import com.elta.android.data.features.devices.glucometer.service.info.InfoService
@@ -22,14 +23,17 @@ import io.reactivex.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
     private val glucometersInfoManager: GlucometersInfoManager,
+
     private val glucometersService: GlucometersService,
     private val firmwareService: FirmwareService,
     private val infoService: InfoService,
 
+    private val manager: Manager,
 
     private val eventsRepository: EventsRepository,
     private val eventsFromGlucometerMapper: Mapper<GlucometerEventDto, EventV2>,
@@ -40,10 +44,11 @@ class DeviceDataRepository @Inject constructor(
     override val dispatcher: CoroutineDispatcher
 ) : DeviceRepository, BaseRepository {
 
-    override fun findDevices(): Observable<List<Glucometer>> =
-        glucometersService.findDevices()
+    override fun findDevices(): Flow<List<Glucometer>> =
+        manager.findDevices()
             .map(scanToDtoMapper::mapFromObjects)
             .map(glucometerToDomainMapper::mapFromObjects)
+
 
     override fun getDevices(): Single<List<Pair<Glucometer, GlucometerInfo>>> =
         glucometersInfoManager.getDevices()
@@ -69,8 +74,8 @@ class DeviceDataRepository @Inject constructor(
         glucometersInfoManager.getLastGlucometerInfo(address)
             .map(glucometerInfoToDomainMapper::mapFromObject)
 
-    override fun connectDevice(device: Glucometer, pinCode: String): Completable =
-        glucometersService.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
+    override suspend fun connectDevice(address: String, pinCode: String) =
+        manager.connectDevice(address, pinCode)
 
     override fun syncWithDevice(device: Glucometer?): Observable<Int> =
         glucometersService.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) })
@@ -89,4 +94,8 @@ class DeviceDataRepository @Inject constructor(
     override fun findGlucometer(address: String): Flow<Unit> =
         glucometersService.findGlucometer(address)
             .flowOn(dispatcher)
+
+    override suspend fun testAllDevice(address: String, pinCode: String) {
+        manager.testAllCommand(address, pinCode)
+    }
 }

@@ -8,7 +8,8 @@ import com.elta.android.data.features.calculator.repository.CustomProductDataRep
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
-import com.elta.android.data.features.devices.repository.TestDeviceDataRepository
+import com.elta.android.data.features.devices.repository.GlucometerDataRepository
+import com.elta.android.data.features.devices.repository.PinDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
 import com.elta.android.data.features.diary.medicines.repository.InsulinMedicamentDataRepository
 import com.elta.android.data.features.diary.medicines.repository.MedicamentDataRepository
@@ -31,7 +32,8 @@ import com.elta.android.domain.features.calculator.repository.CalculatorReposito
 import com.elta.android.domain.features.calculator.repository.CustomProductRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
-import com.elta.android.domain.features.devices.repository.TestDeviceRepository
+import com.elta.android.domain.features.devices.repository.GlucometerRepository
+import com.elta.android.domain.features.devices.repository.PinRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
@@ -88,7 +90,11 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindTestDeviceRepository(repo: TestDeviceDataRepository): TestDeviceRepository
+    abstract fun bindPinRepository(repo: PinDataRepository): PinRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGlucometerRepository(repo: GlucometerDataRepository): GlucometerRepository
 
     @Binds
     @Singleton

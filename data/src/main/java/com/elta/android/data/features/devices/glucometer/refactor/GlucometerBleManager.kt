@@ -38,7 +38,7 @@ class GlucometerBleManager @Inject constructor(
         connect(device)
             .retry(3, 100)
             .useAutoConnect(false)
-            .usePreferredPhy(PhyRequest.PHY_LE_1M_MASK or PhyRequest.PHY_LE_2M_MASK or PhyRequest.PHY_LE_CODED_MASK)
+//            .usePreferredPhy(PhyRequest.PHY_LE_1M_MASK or PhyRequest.PHY_LE_2M_MASK or PhyRequest.PHY_LE_CODED_MASK)
             .timeout(30_000)
             .suspend()
     }
@@ -118,22 +118,18 @@ class GlucometerBleManager @Inject constructor(
             byteCommand,
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         )
+            .split()
             .suspend()
-            .value
-            ?.toString(Charset.defaultCharset())
-            ?: throw Exception("Empty writeCharacteristic result")
 
-        Timber.tag(TAG).d("sent $command with result: $request")
+        val requestResult = request.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty writeCharacteristic result")
+        Timber.tag(TAG).d("sent $command with result: $requestResult")
 
-        val response = waitForNotification(notificationCharacteristic)
-            .suspend()
-            .value
-            ?.toString(Charset.defaultCharset())
-            ?: throw Exception("Empty waitForNotification result")
+        val response = waitForNotification(notificationCharacteristic).suspend()
 
-        Timber.tag(TAG).d("received notification for $command with result: $response")
+        val resultResponse = response.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty waitForNotification result")
+        Timber.tag(TAG).d("received notification for $command with result: $resultResponse")
 
-        return response
+        return resultResponse
     }
 
 

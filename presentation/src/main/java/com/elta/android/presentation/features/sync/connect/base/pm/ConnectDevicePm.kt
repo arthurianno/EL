@@ -7,7 +7,7 @@ import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
-import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
+import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeoutException
 
 abstract class ConnectDevicePm constructor(
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
-    private val connectDevice: ConnectDeviceUseCase,
+    private val connectDevice: AddNewDeviceUseCase,
     private val findGlucometers: FindGlucometersUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     services: ServiceFacade
@@ -187,7 +187,7 @@ abstract class ConnectDevicePm constructor(
         internalConnectDeviceAction.observable
             .skipWhileInProgress()
             .filter { glucometer != null && pinState.hasValue() }
-            .map { ConnectDeviceUseCase.Params(checkNotNull(glucometer), pinState.value) }
+            .map { AddNewDeviceUseCase.Params(checkNotNull(glucometer), pinState.value) }
             .flatMapCompletable { params ->
                 connectDevice.execute(params)
                     .bindProgress()

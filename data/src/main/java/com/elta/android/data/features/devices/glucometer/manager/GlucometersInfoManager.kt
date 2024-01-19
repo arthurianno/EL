@@ -7,6 +7,7 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.glucometer.refactor.Manager
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject

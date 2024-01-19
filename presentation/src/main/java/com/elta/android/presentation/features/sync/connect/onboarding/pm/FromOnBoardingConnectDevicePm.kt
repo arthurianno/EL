@@ -1,6 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.onboarding.pm
 
-import com.elta.android.domain.features.devices.interactor.ConnectDeviceUseCase
+import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
@@ -13,13 +13,13 @@ import javax.inject.Inject
 
 class FromOnBoardingConnectDevicePm @Inject constructor(
     syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
-    connectDeviceUseCase: ConnectDeviceUseCase,
+    addNewDeviceUseCase: AddNewDeviceUseCase,
     findGlucometersUseCase: FindGlucometersUseCase,
     updateUserInfoUseCase: UpdateUserInfoUseCase,
     services: ServiceFacade
 ) : ConnectDevicePm(
     syncWithGlucometerUseCase,
-    connectDeviceUseCase,
+    addNewDeviceUseCase,
     findGlucometersUseCase,
     updateUserInfoUseCase,
     services

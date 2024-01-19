@@ -2,8 +2,6 @@ package com.elta.android.data.features.devices.glucometer.refactor
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -12,10 +10,9 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class ScannerService @Inject constructor(
@@ -32,25 +29,21 @@ class ScannerService @Inject constructor(
         stopScan()
 
         callback = object : ScanCallback() {
-            override fun onScanResult(callbackType: Int, result: ScanResult) {
-                resultCallback(listOf(result))
+
+            override fun onScanResult(callbackType: Int, result: ScanResult?) {
+                result?.let {
+                    if (result.isFiltered(filters)) {
+                        Timber.tag(TAG).d("onScanResult :: $result")
+                        resultCallback(listOf(result))
+                    }
+                }
             }
 
             override fun onBatchScanResults(results: MutableList<ScanResult>) {
-                val result = results.firstOrNull { it.isFiltered(filters) }
-                if (result != null) {
-                    val permission = ContextCompat.checkSelfPermission(
-                        context, Manifest.permission.BLUETOOTH
-                    ) == PackageManager.PERMISSION_GRANTED
-                    if (permission) {
-                        scanner.stopScan(callback)
-                    }
-                } else {
-                    //TIMER to STOP!
-                    //        .timeout(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, Schedulers.computation())
+                val list = results.filter { it.isFiltered(filters) }
+                if (list.isNotEmpty()) {
+                    resultCallback(list)
                 }
-
-                resultCallback(results)
             }
 
             override fun onScanFailed(errorCode: Int) {
@@ -103,5 +96,7 @@ class ScannerService @Inject constructor(
     data class ScanError(val code: Int) : RuntimeException()
 
 }
+
+private const val TAG = "ScannerService"
 
 private const val SCAN_TIMEOUT_SECOND = 60L

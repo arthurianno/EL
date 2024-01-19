@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.runningFold
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,15 +62,19 @@ class ManagerImpl @Inject constructor(
 
     override fun findDevices(): Flow<List<ScanResult>> {
         return callbackFlow {
-            //FIXME: есть задача, что НУЖНО выводить глюкометры, которые уже подсоеденены, а при попытке подключения выдавать ошибку, что уже привязан
-//            val connectedDevices = glucometersCache.getAll(CommonConditions.All)
             scannerService.startScan(filters, settings) {
+                Timber.tag(TAG).d("ScanResult :: $it")
                 trySend(it)
             }
             awaitClose {
                 scannerService.stopScan()
             }
         }
+            .runningFold(
+                emptyList(),
+                operation = { accumulator: List<ScanResult>, new: List<ScanResult> ->
+                    (accumulator + new).distinctBy { it.device.address }
+                })
     }
 
     override suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto {
@@ -92,21 +97,6 @@ class ManagerImpl @Inject constructor(
                 disconnectGlucometer()
                 throw GlucometerPinIncorrectOrNotFoundError
             }
-
-            //FIXME: по-хорошему вынести на другой уровень
-            //pinStorage.setPin(device.address, pinCode)
-            //val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
-            //val newDevice = glucometerToCacheMapper.mapFromObject(device)
-            //if (primaryDevice == null) {
-            //  glucometersCache.add(listOf(newDevice.apply { isPrimary = true }))
-            //}
-            //
-            //if (primaryDevice != null && !primaryDevice.address.equals(
-            //                                device.address,
-            //                                true)
-            //) {
-            //glucometersCache.add(listOf(newDevice))
-            //}
         }
     }
 
@@ -151,10 +141,11 @@ class ManagerImpl @Inject constructor(
         return suspendCoroutine { continuation ->
             scannerService.startScan(filters = filters, settings = settings) { scanResults ->
                 scanResults.firstOrNull { it.device.address == address }?.let { result ->
-                    try { //TODO: вызывается второй раз с исключением
-                        // TODO: нужен таймаут на сканирование
+                    try {
+                        Timber.tag(TAG).d("Device with address ${result.device.address} found")
                         continuation.resume(result)
                     } catch (ex: IllegalStateException) {
+                        Timber.tag(TAG).d("Error: Device with address ${result.device.address} not found")
                         scannerService.stopScan()
                     } finally {
                         scannerService.stopScan()
@@ -164,7 +155,7 @@ class ManagerImpl @Inject constructor(
         }
     }
 
-    suspend fun testAllCommand(address: String, pin: String) {
+    override suspend fun testAllCommand(address: String, pin: String) {
         val scanResult = scan(address)
         Timber.tag(TAG).d("ScanResult: $scanResult")
         glucometerBleManager.connectToGlucometer(scanResult.device)

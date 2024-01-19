@@ -11,8 +11,6 @@ import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.calculator.paging.ProductsPagingSource
-import com.elta.android.data.features.devices.datasource.DeviceDataSource
-import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource

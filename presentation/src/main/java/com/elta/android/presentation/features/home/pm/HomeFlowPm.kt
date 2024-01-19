@@ -12,7 +12,6 @@ import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
-import com.elta.android.domain.features.devices.interactor.TestSecondUseCase
 import com.elta.android.domain.features.devices.interactor.TestUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
@@ -20,7 +19,6 @@ import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companio
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
-import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
@@ -52,7 +50,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.rxkotlin.Singles
-import kotlinx.coroutines.flow.map
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
@@ -62,17 +59,17 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
 private const val SNACK_BAR_DURATION = 60000
-private const val SYNC_TIMER_DELAY_MILLIS = 30000L
+private const val SYNC_TIMER_DELAY_MILLIS = 30000L //TODO: общий таймер, надо убирать такое
 
 class HomeFlowPm @Inject constructor(
+
     private val testUseCase: TestUseCase,
-    private val testSecondUseCase: TestSecondUseCase,
+
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getDevicesUseCase: GetGlucometersUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
@@ -268,6 +265,7 @@ class HomeFlowPm @Inject constructor(
                             }
                         }
                     }
+
                     META_SYNC -> {
                         Completable.fromCallable {
                             if (isFirstSync.valueOrNull == true) {
@@ -277,6 +275,7 @@ class HomeFlowPm @Inject constructor(
                             }
                         }
                     }
+
                     else -> Completable.complete()
 
                 }
@@ -599,20 +598,10 @@ class HomeFlowPm @Inject constructor(
 
     private fun openConnectScreen() {
 
-        //TODO: для теста
-//        testUseCase.execute()
-//            .subscribe()
-//            .untilDestroy()
-
-
-        testSecondUseCase.execute()
+        testUseCase.execute()
             .subscribe()
             .untilDestroy()
-        /*
-        *
-        * FIXME: вернуть код
-        *
-        * */
+
 
 //        stopSyncTimer()
 //        bus.event(Events.Sync.Glucometer.Error)

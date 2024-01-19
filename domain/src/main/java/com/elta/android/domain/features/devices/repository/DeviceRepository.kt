@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Suppress("TooManyFunctions", "ComplexInterface")
 interface DeviceRepository {
 
-    fun findDevices(): Observable<List<Glucometer>>
+    fun findDevices(): Flow<List<Glucometer>>
 
     fun getDevices(): Single<List<Pair<Glucometer, GlucometerInfo>>>
 
@@ -23,7 +23,7 @@ interface DeviceRepository {
 
     fun getLastDeviceInfo(address: String): Single<GlucometerInfo>
 
-    fun connectDevice(device: Glucometer, pinCode: String): Completable
+    suspend fun connectDevice(address: String, pinCode: String)
 
     fun syncWithDevice(device: Glucometer?): Observable<Int>
 
@@ -32,4 +32,6 @@ interface DeviceRepository {
     fun setPrimaryDevice(address: String): Completable
 
     fun findGlucometer(address: String): Flow<Unit>
+
+    suspend fun testAllDevice(address: String, pinCode: String)
 }
