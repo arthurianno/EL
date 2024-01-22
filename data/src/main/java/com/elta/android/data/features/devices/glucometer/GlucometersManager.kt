@@ -25,7 +25,7 @@ import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.diary.events.cache.EventsConditions
-import com.elta.android.data.features.diary.events.cache.dto.v1.EventCachedDto
+import com.elta.android.data.features.diary.events.cache.dto.v2.EventV2CachedDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.FeatureToggles
@@ -81,7 +81,7 @@ class GlucometersManager @Inject constructor(
     private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
     private val userHolder: UserHolder,
     private val profileCache: Cache<ProfileCacheDto>,
-    private val eventsCache: Cache<EventCachedDto>,
+    private val eventsCache: Cache<EventV2CachedDto>,
     private val glucometersCache: Cache<GlucometerCachedDto>,
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
     private val eventBuilder: GlucometerEventBuilder,
@@ -675,7 +675,7 @@ class GlucometersManager @Inject constructor(
         Observable.just(client.state)
             .flatMap { it.observableState() }
 
-    private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventCachedDto> =
+    private fun getCachedEvents(fromGlucometer: List<GlucometerEventDto>): List<EventV2CachedDto> =
         eventsCache.getAll(
             EventsConditions.ByTypeAndIds(
                 EventTypeDto.GLUCOSE,
@@ -685,7 +685,7 @@ class GlucometersManager @Inject constructor(
 
     private fun filterExistingEvents(
         fromGlucometer: List<GlucometerEventDto>,
-        cached: List<EventCachedDto>
+        cached: List<EventV2CachedDto>
     ): List<GlucometerEventDto> =
         if (cached.isEmpty()) {
             fromGlucometer
