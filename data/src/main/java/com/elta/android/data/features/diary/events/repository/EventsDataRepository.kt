@@ -8,6 +8,7 @@ import com.elta.android.common.errors.NotFoundItemError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
+import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -18,6 +19,7 @@ import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
 import com.elta.android.data.features.diary.events.mapper.toDomain
 import com.elta.android.data.features.sync.manger.LocalSyncManager
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
@@ -38,7 +40,8 @@ class EventsDataRepository @Inject constructor(
     @Cache private val cacheSource: EventsCacheDataSource,
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
-    private val fileStorage: FileStorage
+    private val fileStorage: FileStorage,
+    private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>
 ) : EventsRepository {
 
     override fun getEvents(): Observable<List<EventV2>> =
@@ -109,6 +112,13 @@ class EventsDataRepository @Inject constructor(
                             }
                     )
             }
+
+    override fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
+        val events = glucometerEvents.map { event ->
+            eventsFromGlucometerMapper.mapFromObject(event)
+        }
+        addEvents(events)
+    }
 
     override fun updateEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }

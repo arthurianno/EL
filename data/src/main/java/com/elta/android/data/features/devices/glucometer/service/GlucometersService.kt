@@ -81,49 +81,6 @@ class GlucometersService @Inject constructor(
     private val context: Context
 ) {
 
-    fun findDevices(): Observable<List<ScanResult>> =
-        Observable.just(client.state)
-            .flatMap {
-                utilService.observableState(it)
-            }
-            .flatMap {
-                val connectedDevices = glucometersCache.getAll(CommonConditions.All)
-                utilService.scanner.startScan(utilService.filters, utilService.settings, context)
-                    .map { filterConnectedDevices(connectedDevices, it) }
-            }
-
-    fun connectDevice(device: GlucometerDto, pinCode: String): Completable =
-        connectService.findConnection(device.address)
-            .switchMap { connection ->
-                connection.simpleRequest(Commands.SetPin(pinCode))
-            }
-            .take(1)
-            .switchMapCompletable { response ->
-                when {
-                    response.isPinError() -> Completable.error(
-                        GlucometerPinIncorrectOrNotFoundError
-                    )
-
-                    else -> Completable.fromCallable {
-                        pinStorage.setPin(device.address, pinCode)
-                        val primaryDevice = glucometersCache.get(GlucometersConditions.Primary)
-                        val newDevice = glucometerToCacheMapper.mapFromObject(device)
-
-                        if (primaryDevice == null) {
-                            glucometersCache.add(listOf(newDevice.apply { isPrimary = true }))
-                        }
-
-                        if (primaryDevice != null && !primaryDevice.address.equals(
-                                device.address,
-                                true
-                            )
-                        ) {
-                            glucometersCache.add(listOf(newDevice))
-                        }
-                    }
-                }
-            }
-
     fun syncWithDevice(device: GlucometerDto?): Observable<List<GlucometerEventDto>> {
         val findDeviceAddress =
             device?.address ?: glucometersCache.get(GlucometersConditions.Primary)?.address
@@ -155,15 +112,6 @@ class GlucometersService @Inject constructor(
                 Observable.error(error)
             }
             ?: Observable.error(PrimaryGlucometerNotFoundError)
-    }
-
-    private fun RxBleConnection.simpleRequest(cmd: Commands): Observable<String> {
-        val notification = setupNotification(UART_TX)
-            .switchMap { it }
-            .map { it.toString(Charset.defaultCharset()) }
-        val command = writeCharacteristic(UART_RX, cmd.getByteCommand())
-            .toObservable().map { it.toString(Charset.defaultCharset()) }
-        return Observables.combineLatest(notification.take(1), command) { response, _ -> response }
     }
 
 

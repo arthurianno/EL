@@ -64,6 +64,28 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
         )
     }
 
+    override fun buildFrom(
+        id: String,
+        date: ZonedDateTime?,
+        temperature: Int?,
+        batteryLevel: Int?,
+        version: VersionDto?,
+        serial: String?,
+        syncDate: ZonedDateTime?,
+        lastSyncedEvent: String?
+    ): GlucometerInfoDto {
+        return GlucometerInfoDto(
+            id = id,
+            deviceDate = date,
+            syncDate = syncDate,
+            temperature = temperature,
+            batteryLevel = batteryLevel,
+            version = version,
+            glucometerSerialNumber = serial,
+            lastSyncedEvent = lastSyncedEvent
+        )
+    }
+
     private fun String.extractDate(): LocalDateTime {
         return try {
             "20${split(DOT_SYMBOL).component2()}".toLocalDateTime(DATE_TIME_PATTERN)

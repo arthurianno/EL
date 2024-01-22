@@ -8,6 +8,7 @@ import com.elta.android.data.features.calculator.repository.CustomProductDataRep
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
+import com.elta.android.data.features.devices.repository.DeviceInfoDataRepository
 import com.elta.android.data.features.devices.repository.GlucometerDataRepository
 import com.elta.android.data.features.devices.repository.PinDataRepository
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
@@ -31,6 +32,7 @@ import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
 import com.elta.android.domain.features.calculator.repository.CustomProductRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
+import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.GlucometerRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
@@ -87,6 +89,10 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindDeviceRepository(repo: DeviceDataRepository): DeviceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDeviceInfoRepository(repo: DeviceInfoDataRepository): DeviceInfoRepository
 
     @Binds
     @Singleton

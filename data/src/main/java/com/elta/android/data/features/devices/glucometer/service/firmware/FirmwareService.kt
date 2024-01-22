@@ -38,6 +38,8 @@ class FirmwareService @Inject constructor(
 ) {
 
     fun updateFirmware(address: String, file: FirmwareFile): Observable<String> =
+        //TODO: переписать на Nordic. Убрать RX по аналогии со всем остальным.
+        // Использовать ManagerImpl
         utilService.checkBluetoothClientState()
             .flatMap {
                 connectService.findConnection(address)

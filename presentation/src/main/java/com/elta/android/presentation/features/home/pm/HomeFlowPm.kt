@@ -439,7 +439,7 @@ class HomeFlowPm @Inject constructor(
         )
 
     private fun handleSyncCompleted(events: Int) {
-        if (events > 0) bus.event(Events.EventsChanged(true))
+        if (events > 0) bus.event(Events.EventsChanged(true)) //TODO: тут обязательно добавить снек, что новых событий не найдено. ПОТОМУ ЧТО ПО ТЗ ИМЕННО ТАК!
     }
 
     private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
@@ -598,14 +598,15 @@ class HomeFlowPm @Inject constructor(
 
     private fun openConnectScreen() {
 
-        testUseCase.execute()
-            .subscribe()
-            .untilDestroy()
+        //TODO: тест всех комманд глюкометра. Работает 100%.
+//        testUseCase.execute()
+//            .subscribe()
+//            .untilDestroy()
 
 
-//        stopSyncTimer()
-//        bus.event(Events.Sync.Glucometer.Error)
-//        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+        stopSyncTimer()
+        bus.event(Events.Sync.Glucometer.Error)
+        router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
     }
 
 }

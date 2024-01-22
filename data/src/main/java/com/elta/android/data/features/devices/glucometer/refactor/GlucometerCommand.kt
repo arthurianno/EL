@@ -28,6 +28,4 @@ interface GlucometerCommand {
 
     suspend fun getSerialNumber(): String
 
-    suspend fun getGlucometerInfo(): GlucometerInfoDto
-
 }

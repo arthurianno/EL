@@ -16,25 +16,26 @@ interface Manager {
 
     /**
      *
-     * Получение актуальной информации с глюкометра
-     *
-     * */
-    suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto
-
-
-    /**
-     *
      * Первое подключение к глюкометру
      *
      * */
     suspend fun connectDevice(address: String, pin: String)
 
+
+    /**
+     *
+     * Получение актуальной информации с глюкометра
+     *
+     * */
+    suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto
+
+    //TODO: надо оставить просто чтение событий
     /**
      *
      * Синхронизация с глюкометром
      *
      * */
-    suspend fun syncWithDevice(address: String, pin: String): List<GlucometerEventDto>
+    suspend fun syncWithDevice(address: String, pin: String, email: String): List<GlucometerEventDto>
 
     /**
      *
@@ -44,7 +45,7 @@ interface Manager {
     suspend fun findGlucometer(address: String, pin: String)
 
 
-    suspend fun testAllCommand(address: String, pin: String)
+    suspend fun testAllCommands(address: String, pin: String)
 
 
 }

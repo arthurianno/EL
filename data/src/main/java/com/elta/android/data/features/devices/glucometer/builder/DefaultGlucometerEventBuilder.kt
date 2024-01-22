@@ -39,7 +39,8 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
             date = extractDate(dateToken),
             temperature = extractTemperature(temperatureAndValueToken),
             value = extractValue(temperatureAndValueToken),
-            glucometerSerialNumber = glucometerSerialNumber
+            glucometerSerialNumber = glucometerSerialNumber,
+            originalResponse = response
         )
     }
 

@@ -7,7 +7,11 @@ import com.elta.android.domain.features.devices.repository.PinRepository
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
 
 class AddNewDeviceUseCase @Inject constructor(
@@ -18,21 +22,31 @@ class AddNewDeviceUseCase @Inject constructor(
 ) : CompletableUseCase<AddNewDeviceUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Completable {
-        return rxCompletable {
-            val p = checkNotNull(params)
-            val address = p.device.address
-            deviceRepository.connectDevice(address, p.pinCode)
-            pinRepository.savePin(address, p.pinCode)
 
-            val primaryDevice = glucometerRepository.getPrimaryDevice()
-            if (primaryDevice == null) {
-                glucometerRepository.putDevice(p.device, true)
-            }
+        return flow {
+            emit(test(params))
+        }.asObservable()
+            .ignoreElements()
 
-            if (primaryDevice != null && !primaryDevice.address.equals(address, true)) {
-                glucometerRepository.putDevice(p.device, false)
-            }
+//        return rxObservable {
+//            send(test(params))
+//        }
+//            .ignoreElements()
+    }
 
+    suspend fun test(params: Params?) {
+        val p = checkNotNull(params)
+        val address = p.device.address
+        deviceRepository.connectDevice(address, p.pinCode)
+        pinRepository.savePin(address, p.pinCode)
+
+        val primaryDevice = glucometerRepository.getPrimaryDevice()
+        if (primaryDevice == null) {
+            glucometerRepository.putDevice(p.device, true)
+        }
+
+        if (primaryDevice != null && !primaryDevice.address.equals(address, true)) {
+            glucometerRepository.putDevice(p.device, false)
         }
     }
 

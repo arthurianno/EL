@@ -69,6 +69,7 @@ import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
@@ -144,7 +145,7 @@ abstract class MappersModule {
     @Binds
     abstract fun bindEventV2FromGlucometerMapper(
         mapper: EventV2FromGlucometerMapper
-    ): Mapper<GlucometerEventDto, EventV2>
+    ): Mapper<GlucometerEvent, EventV2>
 
     @Binds
     abstract fun bindEventToSimpleMapper(

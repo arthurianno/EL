@@ -7,6 +7,8 @@ import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
+import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
+import com.elta.android.data.features.devices.glucometer.service.isEvent
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -61,10 +63,11 @@ class ManagerImpl @Inject constructor(
     )
 
     override fun findDevices(): Flow<List<ScanResult>> {
+        Timber.tag(TAG).d("Start find devices")
         return callbackFlow {
             scannerService.startScan(filters, settings) {
                 Timber.tag(TAG).d("ScanResult :: $it")
-                trySend(it)
+                trySend(it) //TODO: в сценарии первого подключения, когда пользователь выбирает из разных - необходимо остановить поиск после выбора.
             }
             awaitClose {
                 scannerService.stopScan()
@@ -78,17 +81,34 @@ class ManagerImpl @Inject constructor(
     }
 
     override suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto {
+        Timber.tag(TAG).d("Start get glucometer info")
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)
             checkPin(pin)
-            val info = getGlucometerInfo()
+            val date = getDate()
+            val (battery, temperature) = getBatteryAndTemperature()
+            val version = getVersion()
+            val serial = getSerialNumber()
+            val glucometerInfo = GlucometerInfoDto(
+                id = address,
+                deviceDate = date,
+                syncDate = ZonedDateTime.now(),
+                temperature = temperature,
+                batteryLevel = battery,
+                version = version,
+                glucometerSerialNumber = serial,
+                lastSyncedEvent = null //TODO: убрать бы отсюда это и поместить в use case, т.к. тут неи тнформции о последнем синке
+            )
+
             disconnectGlucometer()
-            return info
+
+            return glucometerInfo
         }
     }
 
     override suspend fun connectDevice(address: String, pin: String) {
+        Timber.tag(TAG).d("Start connect to glucometer")
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)
@@ -100,31 +120,43 @@ class ManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncWithDevice(address: String, pin: String): List<GlucometerEventDto> {
+    override suspend fun syncWithDevice(address: String, pin: String, email: String): List<GlucometerEventDto> {
+        Timber.tag(TAG).d("Start sync with glucometer")
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)
             checkPin(pin)
             //TODO: при синхронизации в старом коде идет и обновление данных,
             // и само вытягивание значений, надо это поделить
-            val glucometerInfo = getGlucometerInfo() //fixme: update and save
+            val serial = getSerialNumber()
             val events = mutableListOf<GlucometerEventDto>()
-            repeat(1000) { index -> //TODO: сюда прописать условия остановки
-                val event = readEvent(index)
-                val eventDto = eventBuilder.buildFrom(
-                    "test@mail.ru",
-                    address,
-                    event,
-                    glucometerInfo.glucometerSerialNumber
-                )
-                events.add(eventDto)
+
+            //TODO: рефактор
+            run repeatBlock@ {
+                repeat(1000) { index ->
+                    val event = readEvent(index)
+
+                    //TODO: сюда прописать условия остановки
+                    // Пустое событие isEmptyEvent ИЛИ last Event
+
+                    if (event.isEmptyEvent()) return@repeatBlock
+                    val eventDto = eventBuilder.buildFrom(
+                        email,
+                        address,
+                        event,
+                        serial
+                    )
+                    events.add(eventDto)
+                }
             }
+
             disconnectGlucometer()
             return events
         }
     }
 
     override suspend fun findGlucometer(address: String, pin: String) {
+        Timber.tag(TAG).d("Start find glucometer")
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)
@@ -155,7 +187,8 @@ class ManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun testAllCommand(address: String, pin: String) {
+    override suspend fun testAllCommands(address: String, pin: String) {
+        Timber.tag(TAG).d("Start all commands")
         val scanResult = scan(address)
         Timber.tag(TAG).d("ScanResult: $scanResult")
         glucometerBleManager.connectToGlucometer(scanResult.device)

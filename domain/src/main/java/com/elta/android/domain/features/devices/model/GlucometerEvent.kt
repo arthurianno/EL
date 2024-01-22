@@ -1,8 +1,8 @@
-package com.elta.android.data.features.devices.dto
+package com.elta.android.domain.features.devices.model
 
 import org.threeten.bp.ZonedDateTime
 
-data class GlucometerEventDto(
+data class GlucometerEvent(
     val id: String,
     val date: ZonedDateTime?,
     val temperature: Double?,
