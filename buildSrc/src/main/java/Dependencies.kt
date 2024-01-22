@@ -274,7 +274,7 @@ object Dependencies {
 
     object Nordic {
         private const val scanerVersion = "1.6.0"
-        private const val dfuVersion = "2.3.0"
+        private const val dfuVersion = "2.4.1"
 
         const val scanner = "no.nordicsemi.android.support.v18:scanner:$scanerVersion"
         const val dfu = "no.nordicsemi.android:dfu:$dfuVersion"
