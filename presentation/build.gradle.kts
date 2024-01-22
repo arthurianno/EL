@@ -8,6 +8,8 @@ plugins {
 android {
     compileSdk = AppConfig.completeSdk
 
+    val version = getTagInfo()
+
     defaultConfig {
         minSdk = AppConfig.minSdk
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -43,27 +45,13 @@ android {
     }
     buildTypes {
         release {
-            buildConfigField("String", "APP_VERSION", "\"${Version.versionName}\"")
+            buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
         }
         debug {
-            val debugVersionName = "\"${Version.versionName}${Version.prodNameSuffix}\""
+            val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
             buildConfigField("boolean", "DEBUG", "true")
 
-        }
-        create("releaseDev") {
-            buildConfigField(
-                "String",
-                "APP_VERSION",
-                "\"${Version.versionName}-${BackendVariant.dev.name}\""
-            )
-        }
-        create("releaseStage") {
-            buildConfigField(
-                "String",
-                "APP_VERSION",
-                "\"${Version.versionName}-${BackendVariant.stage.name}\""
-            )
         }
     }
 }

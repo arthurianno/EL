@@ -4,100 +4,118 @@ cache:
   key: ${CI_PROJECT_ID}
   paths:
   - .gradle/
- 
+
 before_script:
 - export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
 - chmod +x ./gradlew
 
 stages:
-- check
 - build
-- beta
-- uat
-- rc
 - test
+#- deploy
 
-
-complexCheck:
-  stage: check
-  script:
-  # - ./gradlew detektCheck ktlint testDebugUnitTest -x lint
-  - ./gradlew ktlintCheck testDebugUnitTest -x lint
-  only:
-  - merge_requests
-  - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
-  - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-build: # Собираем артефакт
+debug-build:
   stage: build
-  only:
-    - merge_requests  # Только при мердж реквесте
-  when: on_success
-  allow_failure: true
-  script:
-    - ./gradlew clean build -x lint  # Собираем проект
-    - echo JOB_ID="$CI_JOB_ID" >> build.env  # Создаём файл, в который помещаем номер сборки для последующей загрузки артефактов
-    - echo PLATFORM=Android >> build.env # Так же помещаем переменную с типом платформы
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-debug$/'
+  tags:
+    - android,docker
   artifacts:
+    when: on_success
+    expire_in: 1 week
     reports:
       dotenv: build.env
     paths:
-      - app/build/outputs/apk/debug/app-universal-debug.apk # Публикуем артефакты в Gitlab
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
+      - $CI_COMMIT_TAG.apk
+  script:
+    - ./gradlew assembleDebug
+    - echo JOB_ID="$CI_JOB_ID" >> build.env
+    - mv app/build/outputs/apk/debug/app-universal-debug.apk $CI_COMMIT_TAG.apk
 
-test:  # Делегируем артефакты в другой репозиторий для тестов
+debug-test:
   stage: test
-  when: on_success
-  variables: 
-    JOB_ID: $JOB_ID # Пробрасываем переменные в другой репозиторий
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-debug$/'
+  variables:
+    JOB_ID: $JOB_ID
     PLATFORM: $PLATFORM
-  needs:
-    - job: build
-  trigger: 
-    project: qa/ELTA-automation   # Репозиторий, в который мы делегируем джобу
-    branch: master     # Ветка из этого репозитория
-  only:
-    - merge_requests
+  needs: [debug-build]
+  trigger:
+    project: qa/ELTA-automation
+    branch: master
 
-# For tag v0.0.0-beta
-beta:
-  stage: beta
-  only:
-    - /^v(\d+)\.(\d+)\.(\d+)\-beta$/
-  when: on_success
-  script:
-    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
+#deploy-debug:
+#  image: node:latest
+#  stage: deploy
+#  rules:
+#    - if: '$CI_COMMIT_TAG  =~ /-debug$/'
+#  needs: [debug-build]
+#  script:
+#    - npm install -g firebase-tools
+#    - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+#    - firebase appdistribution:distribute $CI_COMMIT_TAG.apk --app $FIREBASE_APP_ID
+#      --release-notes "$TAG_MESSAGE"
+#      --groups "testGroup"
+#  after_script:
+#    - >
+#      if [ "$CI_JOB_STATUS" == "success" ]; then
+#        TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+#        curl -X POST -H 'Content-type: application/json' --data "{
+#                  \"text\": \"*Собран билд:* $CI_COMMIT_TAG\n*Инициатор сборки билда:* $GITLAB_USER_NAME\n*Release Notes:* $TAG_MESSAGE\n*Детали билда:* <$CI_JOB_URL|ссылка>\",
+#                  \"mrkdwn\": true
+#                }" $CHANNEL_WEB_HOOK;
+#      fi
 
-# For tag v0.0.0-uat
-uat:
-  stage: uat
-  only:
-    - /^v(\d+)\.(\d+)\.(\d+)\-uat$/
-  when: on_success
-  script:
-    - ./gradlew clean build crashlyticsUploadDistributionDebug -x lint
+release-build:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-release$/'
+  tags:
+    - android,docker
   artifacts:
-    paths:
-      - app/build/outputs/apk/debug/app-universal-debug.apk
-  variables:
-    COM_ELTA_ANDROID_CONFIG_FILE: "../configuration-build-stage.properties"
-
-# For tag v0.0.0-rc
-rc:
-  stage: rc
-  only:
-  - /^v(\d+)\.(\d+)\.(\d+)\-rc$/
-  when: on_success
-  script:
-  - ./gradlew clean build crashlyticsUploadDistributionRelease -x lint
-  artifacts:
+    when: on_success
     expire_in: 1 week
+    reports:
+      dotenv: build.env
     paths:
-    - app/build/outputs/
+      - $CI_COMMIT_TAG.apk
+  script:
+    - ./gradlew assembleRelease
+    - echo JOB_ID="$CI_JOB_ID" >> build.env
+    - mv app/build/outputs/apk/release/app-universal-release.apk $CI_COMMIT_TAG.apk
+
+release-test:
+  stage: test
+  rules:
+    - if: '$CI_COMMIT_TAG  =~ /-release$/'
+  variables:
+    JOB_ID: $JOB_ID
+    PLATFORM: $PLATFORM
+  needs: [release-build]
+  trigger:
+    project: qa/ELTA-automation
+    branch: master
+
+#deploy-release:
+#  image: node:latest
+#  stage: deploy
+#  rules:
+#    - if: '$CI_COMMIT_TAG  =~ /-release$/'
+#  needs: [release-build]
+#  script:
+#    - npm install -g firebase-tools
+#    - TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+#    - firebase appdistribution:distribute $CI_COMMIT_TAG.apk --app $FIREBASE_APP_ID
+#      --release-notes "$TAG_MESSAGE"
+#      --groups "testGroup"
+#  after_script:
+#    - >
+#        if [ "$CI_JOB_STATUS" == "success" ]; then
+#          TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
+#          curl -X POST -H 'Content-type: application/json' --data "{
+#                    \"text\": \"*Собран билд:* $CI_COMMIT_TAG\n*Инициатор сборки билда:* $GITLAB_USER_NAME\n*Release Notes:* $TAG_MESSAGE\n*Детали билда:* <$CI_JOB_URL|ссылка>\",
+#                    \"mrkdwn\": true
+#                  }" $CHANNEL_WEB_HOOK;
+#        fi
+
