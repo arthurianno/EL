@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "102343746205",
+    "firebase_url": "https://elta-31f0d-default-rtdb.firebaseio.com",
     "project_id": "elta-31f0d",
     "storage_bucket": "elta-31f0d.appspot.com"
   },
@@ -13,6 +14,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "102343746205-ljakdoil4dk9eeebqcn2hva42rufgavt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elta.android",
+            "certificate_hash": "9f8f0880f2d33a33c203fb78479ca3a748697d5d"
+          }
+        },
+        {
+          "client_id": "102343746205-njskfne141ovafgl7g915maa2shbff81.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elta.android",
+            "certificate_hash": "97bf791051e9423d16f5c48dc6c7b3d539b9762f"
+          }
+        },
         {
           "client_id": "102343746205-ngq58jmm8vjfunqtv9956ej081md0561.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +46,13 @@
             {
               "client_id": "102343746205-ngq58jmm8vjfunqtv9956ej081md0561.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "102343746205-g1e3s0c828v3ddig3eoaprha2fanl46j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "pro.siberian.elta"
+              }
             }
           ]
         }

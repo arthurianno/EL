@@ -142,6 +142,7 @@ dependencies {
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.FireBase.analyticsBom)
+    implementation(Dependencies.Google.FireBase.crashlyticsBom)
     implementation(Dependencies.Google.FireBase.appMessagingBom)
     implementation(Dependencies.Google.FireBase.dynamicLinksBom)
     implementation(Dependencies.Google.GoogleMap.location)
