@@ -125,7 +125,11 @@ class ManagerImpl @Inject constructor(
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)
-            checkPin(pin)
+            val pinIsValid = checkPin(pin)
+            if (!pinIsValid) {
+                disconnectGlucometer()
+                throw GlucometerPinIncorrectOrNotFoundError
+            }
             //TODO: при синхронизации в старом коде идет и обновление данных,
             // и само вытягивание значений, надо это поделить
             val serial = getSerialNumber()

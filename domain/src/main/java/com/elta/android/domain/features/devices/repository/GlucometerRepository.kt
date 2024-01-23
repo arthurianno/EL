@@ -9,3 +9,5 @@ interface GlucometerRepository {
     fun putDevice(glucometer: Glucometer, isPrimary: Boolean)
 
 }
+
+//FIXME GlucometerRepository and DeviceInfoRepisotory - объединить, потому что они оба ходят в БД за глюкометром.

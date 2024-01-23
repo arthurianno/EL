@@ -48,7 +48,6 @@ class SyncWithGlucometerUseCase @Inject constructor(
         //TODO: Перенес логику в Use Case. Но тут требуется рефакторинг.
 
         val pinCode = pinRepository.getPin(address) ?: throw GlucometerPinIncorrectOrNotFoundError
-        profileRepository.getProfile()
         val glucometerInfo = deviceRepository.getGlucometerInfo(address, pinCode)
         val events = deviceRepository.syncWithDevice(address, pinCode, email)
 
