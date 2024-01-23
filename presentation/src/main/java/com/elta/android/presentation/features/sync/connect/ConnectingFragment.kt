@@ -238,7 +238,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
-                    text = stringResource(id = R.string.sync_connection_connect_error_title),
+                    text = stringResource(id = R.string.sync_connection_sync_error_title),
                     style = types.h1
                 )
                 VSpacerSmall()
