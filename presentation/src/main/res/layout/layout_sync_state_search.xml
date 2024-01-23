@@ -51,7 +51,7 @@
         android:background="@color/shade_blue3"
         android:gravity="center"
         android:padding="5dp"
-        android:text="@string/connection_process_text"
+        android:text="@string/sync_device_finding_process_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
