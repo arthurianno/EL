@@ -131,7 +131,7 @@ object Dependencies {
             "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
 
         object Services {
-            const val servicesVersion = "4.3.14"
+            const val servicesVersion = "4.4.0"
             private const val fitnessVersion = "21.1.0"
             private const val authVersion = "20.2.0"
 
@@ -158,7 +158,7 @@ object Dependencies {
 
         object FireBase {
             const val pluginVersion = "2.0.0"
-            const val crashliticsGradleVersion = "2.9.0"
+            const val crashliticsGradleVersion = "2.9.9"
             private const val bomVersion = "31.4.0"
 
             const val bom = "com.google.firebase:firebase-bom:$bomVersion"
@@ -274,7 +274,7 @@ object Dependencies {
 
     object Nordic {
         private const val scanerVersion = "1.6.0"
-        private const val dfuVersion = "2.3.0"
+        private const val dfuVersion = "2.4.1"
 
         const val scanner = "no.nordicsemi.android.support.v18:scanner:$scanerVersion"
         const val dfu = "no.nordicsemi.android:dfu:$dfuVersion"

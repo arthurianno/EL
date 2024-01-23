@@ -27,13 +27,16 @@ fun getPropertiesFromFile(filename: String): Properties =
 android {
     compileSdk = AppConfig.completeSdk
 
+    val version = getTagInfo()
+    print(version.toString())
+
     defaultConfig {
         applicationId = AppConfig.applicationId
         minSdk = AppConfig.minSdk
         targetSdk = AppConfig.targetSdk
 
-        versionCode = Version.versionCode
-        versionName = Version.versionName
+        versionCode = version.buildNumber
+        versionName = version.versionName
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,16 +54,9 @@ android {
         }
 
         create("release") {
-            var credentialsRelease = Properties()
+            val credentialsRelease = Properties()
             val credentialsReleaseFile = file(CREDENTIALS_RELEASE)
-            if (credentialsReleaseFile.exists()) {
-                credentialsRelease.load(FileInputStream(credentialsReleaseFile))
-                println("credentials-release.properties is exist")
-            } else {
-                println("credentials-release.properties isn't exist - credentials-debug.properties will be used")
-                credentialsRelease = credentialsDebug
-            }
-
+            credentialsRelease.load(FileInputStream(credentialsReleaseFile))
             storeFile = file(credentialsRelease[STORE_FILE].toString())
             storePassword = credentialsRelease[STORE_PASSWORD].toString()
             keyAlias = credentialsRelease[KEY_ALIAS].toString()
@@ -79,7 +75,7 @@ android {
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
             buildConfigField("boolean", "DEBUG", "true")
 
-            versionNameSuffix = Version.prodNameSuffix
+            versionNameSuffix = "-debug(${version.buildNumber})"
             signingConfig = signingConfigs["debug"]
             isDebuggable = true
         }
@@ -87,26 +83,6 @@ android {
         release {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
-            signingConfig = signingConfigs["release"]
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            proguardFiles.addAll(fileTree("proguard"))
-        }
-
-        create("releaseDev") {
-            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
-            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
-            versionNameSuffix = "-${BackendVariant.dev.name}"
-            signingConfig = signingConfigs["release"]
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            proguardFiles.addAll(fileTree("proguard"))
-        }
-
-        create("releaseStage") {
-            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
-            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.stage.path}\"")
-            versionNameSuffix = "-${BackendVariant.stage.name}"
             signingConfig = signingConfigs["release"]
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")

@@ -9,7 +9,9 @@ import io.objectbox.annotation.Id
 data class LocalSyncCachedDto(
     @Id(assignable = true) var id: Long = 0,
     val secondaryId: String,
-    @Convert(converter = StateDtoConverter::class, dbType = String::class) val state: StateDto,
+    @Convert(converter = StateDtoConverter::class, dbType = String::class)
+    val state: StateDto,
     val className: String,
+    @Convert(converter = EventTypeConverter::class, dbType = String::class)
     var meta: String? = null
 )
