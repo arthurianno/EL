@@ -329,7 +329,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
             }
             VSpacerSmall()
-            BaseSnackBar(textId = R.string.connection_process_text)
+            BaseSnackBar(textId = R.string.sync_device_finding_process_text)
         }
     }
 

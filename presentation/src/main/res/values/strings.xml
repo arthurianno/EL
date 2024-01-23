@@ -381,7 +381,7 @@
     <string name="sync_connection_help_sheet_text">Если по каким-либо причинам Вам не удаётся подключиться с помощью считывания DMC-кода, то советуем воспользоваться подключением через ПИН-код.</string>
     <string name="sync_connection_exit_from_connecting_dialog_text">Вы уверены, что хотите прекратить подключение и выйти?</string>
     <string name="sync_connection_exit_from_sync_dialog_text">Вы уверены, что хотите прекратить синхронизацию и выйти?</string>
-    <string name="connection_process_text">Идёт процесс подключения к устройству...</string>
+    <string name="sync_device_finding_process_text">Идет процесс поиска устройства...</string>
     <string name="sync_process_text">Идёт процесс синхронизации с глюкометром...</string>
     <string name="sync_connection_screen_title">Подключаемся...</string>
     <string name="sync_connection_screen_text">Проверяем Bluetooth-соединение и устанавливаем связь с вашим устройством.</string>
