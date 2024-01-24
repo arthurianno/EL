@@ -9,6 +9,7 @@ interface Manager {
     /**
      *
      * Поиск глюклометров в окружении для добавления
+     * @return Flow которые порождает списки с результами сканирования окружения
      *
      * */
     fun findDevices(): Flow<List<ScanResult>>
@@ -17,7 +18,8 @@ interface Manager {
     /**
      *
      * Первое подключение к глюкометру
-     *
+     * @param address - мак-адрес устройства
+     * @param pin - пин-код для подключения к устройству
      * */
     suspend fun connectDevice(address: String, pin: String)
 

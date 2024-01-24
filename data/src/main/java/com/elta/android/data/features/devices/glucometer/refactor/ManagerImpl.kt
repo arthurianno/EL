@@ -67,11 +67,10 @@ class ManagerImpl @Inject constructor(
         return callbackFlow {
             scannerService.startScan(filters, settings) {
                 Timber.tag(TAG).d("ScanResult :: $it")
-                trySend(it) //TODO: в сценарии первого подключения, когда пользователь выбирает из разных - необходимо остановить поиск после выбора.
+                trySend(it) //TODO: в сценарии первого подключения, когда пользователь выбирает из разных
+            // - необходимо остановить поиск после выбора нужного пользователю устройства.
             }
-            awaitClose {
-                scannerService.stopScan()
-            }
+            awaitClose { scannerService.stopScan() }
         }
             .runningFold(
                 emptyList(),
@@ -109,6 +108,8 @@ class ManagerImpl @Inject constructor(
 
     override suspend fun connectDevice(address: String, pin: String) {
         Timber.tag(TAG).d("Start connect to glucometer")
+        //TODO: Перед коннектом к устройству нужно просканировать окружение на его наличие, подумать над
+        //какой-то более удобной реализацией.
         val scanResult = scan(address)
         with(glucometerBleManager) {
             connectToGlucometer(scanResult.device)

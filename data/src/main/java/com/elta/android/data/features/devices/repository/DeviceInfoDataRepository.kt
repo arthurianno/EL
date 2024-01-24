@@ -1,6 +1,5 @@
 package com.elta.android.data.features.devices.repository
 
-import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.data.features.devices.dto.GlucometerDto

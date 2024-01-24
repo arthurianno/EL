@@ -5,12 +5,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
-import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
 import com.elta.android.data.features.devices.glucometer.service.isPinOk
 import no.nordicsemi.android.ble.BleManager
-import no.nordicsemi.android.ble.PhyRequest
 import no.nordicsemi.android.ble.ktx.suspend
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -19,14 +17,17 @@ import java.nio.charset.Charset
 import java.util.UUID
 import javax.inject.Inject
 
-
-class GlucometerBleManager @Inject constructor(
-    context: Context,
-
-    ) : BleManager(context),
+class GlucometerBleManager @Inject constructor(context: Context) : BleManager(context),
     GlucometerCommand {
 
+    /**
+     * GATT характеристика для передачи комманд в глюкометр
+     */
     private var glucometerCharacteristic: BluetoothGattCharacteristic? = null
+
+    /**
+     * GATT характеристика для подписок, все результаты выполнения комманд получаем через нее
+     */
     private var notificationCharacteristic: BluetoothGattCharacteristic? = null
 
     @SuppressLint("MissingPermission")
@@ -87,21 +88,34 @@ class GlucometerBleManager @Inject constructor(
 
     private suspend fun startCommand(command: Commands): String {
 
+        //Получение байтового массива из комманды (строки)
         val byteCommand = command.getByteCommand()
 
+        //Запись характеристики методом BleManager. split() устанавливает Mtu(Maximum Transmission Unit)
+        //сплиттер и вызывает функцию расширение suspend() для преобразования асинхронного кода
+        //c помощью расширения suspend приостанавливается корутина до получения отклика на комманду
         val request = writeCharacteristic(
             glucometerCharacteristic,
             byteCommand,
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         )
+            //TODO: Проверить размер который был использован в старой реализации
             .split()
+            //Может выбрасывать исключения
             .suspend()
 
+        //Результат по сути является индикатором что
+        //операция завершена успешно, но сами данные получаем через notificationCharacteristic
         val requestResult = request.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty writeCharacteristic result")
         Timber.tag(TAG).d("sent $command with result: $requestResult")
 
+        //Тут подписываемся на уведомление из характеристики notificationCharacteristic,
+        //Метод waitForNotification вешает одноразовый коллбек который преобразуется
+        //c помощью расширения suspend приостанавливается корутина до получения уведомления
+        //suspend тут так же выбрасывает исключения
         val response = waitForNotification(notificationCharacteristic).suspend()
 
+        //Собственно тут получаем реальные замеры устройства в строковом представлении
         val resultResponse = response.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty waitForNotification result")
         Timber.tag(TAG).d("received notification for $command with result: $resultResponse")
 
@@ -109,6 +123,9 @@ class GlucometerBleManager @Inject constructor(
     }
 
 
+    /**
+     * Метод в котором происходит инициализации сервиса и характеристик
+     */
     override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
         gatt.getService(SERVICE_UUID)?.apply {
             glucometerCharacteristic = getCharacteristic(CHAR_UUID)

@@ -26,6 +26,8 @@ class ScannerService @Inject constructor(
         settings: ScanSettings,
         resultCallback: (List<ScanResult>) -> Unit
     ) {
+        //FIXME!! Это костыль Макса, т.к каждая комманда сейчас запускается со старта сканирования и подключения
+        //В дальнейшем сканирование и подключение должно быть единожды за сессию синхронизации
         stopScan()
 
         callback = object : ScanCallback() {

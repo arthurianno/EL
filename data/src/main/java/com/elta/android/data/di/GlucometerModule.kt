@@ -77,6 +77,7 @@ class GlucometerModule {
     }
 
     //TODO: обсудить 1 экземпляр или на каждое соединение - свое. Документация говорит, что на каждое - своё.
+    //Тут на каждое соединение с разными глюкометрами разный менеджер, подумать на чем-то типа мультитона
     @Provides
     @Singleton
     fun provideBleManager(context: Context): GlucometerBleManager = GlucometerBleManager(context)

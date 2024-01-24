@@ -38,13 +38,6 @@ class GlucometersInfoManager @Inject constructor(
             }
     }
 
-    fun getGlucometer(address: String): GlucometerDto? {
-        return glucometersCache.get(CommonConditions.ById(address.hashCode().toLong()))
-            ?.let { info ->
-                glucometerFromCacheMapper.mapFromObject(info)
-            }
-    }
-
     fun saveDevice(glucometerInfo: GlucometerInfoDto) {
         val info = glucometersInfoToCacheMapper.mapFromObject(glucometerInfo)
         glucometersInfoCache.add(listOf(info))
@@ -85,6 +78,13 @@ class GlucometersInfoManager @Inject constructor(
             secondaryId = address
         )
         return glucometersInfoFromCacheMapper.mapFromObject(info)
+    }
+
+    fun getGlucometer(address: String): GlucometerDto? {
+        return glucometersCache.get(CommonConditions.ById(address.hashCode().toLong()))
+            ?.let { info ->
+                glucometerFromCacheMapper.mapFromObject(info)
+            }
     }
 
     fun setPrimaryDevice(address: String) {
