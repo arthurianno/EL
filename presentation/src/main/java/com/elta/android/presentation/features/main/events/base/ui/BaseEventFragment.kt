@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -61,13 +60,12 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         val eventType = getEventType()
         initializer = eventType.makeFormInitializer()
         presentationModel.setEventType(eventType)
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         setWeightPicker()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        insetsListener = instance(binding.formSaveButtonView, binding.formContainerView) { offset ->
+        insetsListener = instance(binding.formContainerView) { offset ->
             if (!isTouchingScroll || !isTouchingAppBar) {
                 val isOffsetZero = offset == 0
                 binding.appBarLayoutView.setExpanded(isOffsetZero, true)
@@ -155,11 +153,6 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         addOnBackPressedCallback {
             view?.hideKeyboardFun()?.passTo(presentationModel.backHandleAction)
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     abstract fun getEventType(): EventType
