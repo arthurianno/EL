@@ -32,6 +32,8 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
 
     @SuppressLint("MissingPermission")
     override suspend fun connectToGlucometer(device: BluetoothDevice) {
+        // через bondState можем проверять связаны ли устройства или нет и таким образом отправлять команды далее
+      //  device.bondState
         connect(device)
             .retry(3, 100)
             .useAutoConnect(false)
