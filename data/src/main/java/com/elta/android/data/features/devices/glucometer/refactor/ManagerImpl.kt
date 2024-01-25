@@ -8,7 +8,6 @@ import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
-import com.elta.android.data.features.devices.glucometer.service.isEvent
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +60,27 @@ class ManagerImpl @Inject constructor(
             .setDeviceName("Satellite")
             .build()
     )
+
+        // todo example of dfu scanning
+    private val filterDfu: List<ScanFilter> = listOf<ScanFilter>(
+        ScanFilter.Builder()
+            .setDeviceName("Dfu")
+            .build()
+    )
+    // todo fix
+
+    suspend fun update(address: String, pin: String){
+        val scan = scan(address)
+        glucometerBleManager.connectToGlucometer(scan.device)
+        glucometerBleManager.checkPin(pin)
+        glucometerBleManager.toDfuMode()
+        glucometerBleManager.disconnectGlucometer()
+
+//        val scanDfu = scan(address, filterDfu)
+//        glucometerBleManager.connectToGlucometer(scanDfu.device)
+       // TODO() доделать glucometerBleManager.dfuUpdate()
+
+    }
 
     override fun findDevices(): Flow<List<ScanResult>> {
         Timber.tag(TAG).d("Start find devices")

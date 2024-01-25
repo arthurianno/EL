@@ -21,6 +21,7 @@ class ScannerService @Inject constructor(
 ) {
     private var callback: ScanCallback? = null
 
+    @SuppressLint("MissingPermission")
     fun startScan(
         filters: List<ScanFilter>,
         settings: ScanSettings,
@@ -53,13 +54,16 @@ class ScannerService @Inject constructor(
             }
         }
 
-        val permission = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.BLUETOOTH
-        ) == PackageManager.PERMISSION_GRANTED
-        if (permission) {
-            // pass empty list to organize own filter
+        // todo разобраться с пермишенами
+//        val permission = ContextCompat.checkSelfPermission(
+//            context, Manifest.permission.BLUETOOTH_SCAN
+//        ) == PackageManager.PERMISSION_GRANTED
+//        if (permission) {
+//            // pass empty list to organize own filter
+//            scanner.startScan(emptyList(), settings, callback)
+//        }
             scanner.startScan(emptyList(), settings, callback)
-        }
+
     }
 
     fun stopScan() {
