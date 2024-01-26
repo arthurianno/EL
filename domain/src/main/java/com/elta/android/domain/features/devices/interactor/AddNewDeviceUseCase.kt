@@ -1,52 +1,51 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
-import com.elta.android.domain.features.devices.repository.GlucometerRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import com.nullgr.core.interactor.CompletableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Completable
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxCompletable
-import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class AddNewDeviceUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val pinRepository: PinRepository,
-    private val glucometerRepository: GlucometerRepository,
+    private val deviceInfoRepository: DeviceInfoRepository,
     schedulers: SchedulersFacade
 ) : CompletableUseCase<AddNewDeviceUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Completable {
 
-        return flow {
-            emit(test(params))
-        }.asObservable()
-            .ignoreElements()
-
-//        return rxObservable {
-//            send(test(params))
-//        }
-//            .ignoreElements()
+        return rxCompletable(EmptyCoroutineContext + Dispatchers.Unconfined) {
+            addDevice(params)
+        }
     }
 
-    suspend fun test(params: Params?) {
-        val p = checkNotNull(params)
-        val address = p.device.address
-        deviceRepository.connectDevice(address, p.pinCode)
-        pinRepository.savePin(address, p.pinCode)
+    private suspend fun addDevice(params: Params?) {
+        try {
+            val (device, pincode) = requireNotNull(params) {
+                //TODO: лог, но пинкод не логгировать
+                "params for new device cannot be null"
+            }
+            val address = device.address
 
-        val primaryDevice = glucometerRepository.getPrimaryDevice()
-        if (primaryDevice == null) {
-            glucometerRepository.putDevice(p.device, true)
-        }
+            deviceRepository.connectDevice(address, pincode)
+            pinRepository.savePin(address, pincode)
 
-        if (primaryDevice != null && !primaryDevice.address.equals(address, true)) {
-            glucometerRepository.putDevice(p.device, false)
+            val primaryDevice = deviceInfoRepository.getPrimaryDeviceWithLastEvent()?.first
+
+            if (primaryDevice == null) {
+                deviceInfoRepository.putDevice(glucometer = device, isPrimary = true)
+            } else if (!primaryDevice.address.equals(address, true)) {
+                deviceInfoRepository.putDevice(device, isPrimary = false)
+            }
+        } finally {
+            deviceRepository.disconnect()
         }
     }
 

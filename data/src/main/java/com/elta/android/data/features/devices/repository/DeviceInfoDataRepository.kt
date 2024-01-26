@@ -6,7 +6,8 @@ import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
-import com.elta.android.data.features.devices.glucometer.manager.GlucometersInfoManager
+import com.elta.android.data.features.devices.glucometer.manager.GlucometerCacheManager
+import com.elta.android.data.features.devices.mapper.GlucometerToDtoMapper
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
@@ -16,7 +17,8 @@ import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class DeviceInfoDataRepository @Inject constructor(
-    private val glucometersInfoManager: GlucometersInfoManager,
+    private val glucometerCacheManager: GlucometerCacheManager,
+    private val glucometerToDtoMapper: GlucometerToDtoMapper,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
     private val infoBuilder: GlucometerInfoBuilder,
@@ -24,7 +26,7 @@ class DeviceInfoDataRepository @Inject constructor(
 ) : DeviceInfoRepository, BaseRepository {
 
     override fun getDevices(): List<Pair<Glucometer, GlucometerInfo>> {
-        return glucometersInfoManager.getDevices().map { (glucometer, info) ->
+        return glucometerCacheManager.getDevices().map { (glucometer, info) ->
             glucometerToDomainMapper.mapFromObject(glucometer) to
                     glucometerInfoToDomainMapper.mapFromObject(info)
         }
@@ -32,32 +34,37 @@ class DeviceInfoDataRepository @Inject constructor(
 
 
     override fun getDevice(address: String): Glucometer? {
-        return glucometersInfoManager.getGlucometer(address)?.let { glucometer ->
+        return glucometerCacheManager.getGlucometer(address)?.let { glucometer ->
             glucometerToDomainMapper.mapFromObject(glucometer)
         }
     }
 
     override fun deleteDevice(address: String) {
-        glucometersInfoManager.deleteDevice(address)
+        glucometerCacheManager.deleteDevice(address)
     }
 
     override fun getLastDeviceInfo(address: String): GlucometerInfo =
-        glucometersInfoManager.getLastGlucometerInfo(address).let { info ->
+        glucometerCacheManager.getLastGlucometerInfo(address).let { info ->
             glucometerInfoToDomainMapper.mapFromObject(info)
         }
 
-    override fun getPrimaryDevice(): Pair<Glucometer, GlucometerInfo>? {
+    override fun getPrimaryDeviceWithLastEvent(): Pair<Glucometer, GlucometerInfo>? {
         return getDevices()
-            .firstOrNull { (glucometer, info) ->
+            .firstOrNull { (glucometer, _) ->
                 glucometer.isPrimary
             }
     }
 
     override fun setPrimaryDevice(address: String) =
-        glucometersInfoManager.setPrimaryDevice(address)
+        glucometerCacheManager.setPrimaryDevice(address)
+
+    override fun putDevice(glucometer: Glucometer, isPrimary: Boolean) {
+        val glucometerDto = glucometerToDtoMapper.mapFromObject(glucometer)
+        glucometerCacheManager.addDevice(glucometerDto, isPrimary)
+    }
 
     override fun updateGlucometerInfo(glucometerInfo: GlucometerInfo, lastSyncedEvent: GlucometerEvent?) {
-        val cacheInfo = glucometersInfoManager.getGlucometerInfo(glucometerInfo.id)
+        val cacheInfo = glucometerCacheManager.getGlucometerInfo(glucometerInfo.id)
 
         val newInfo = infoBuilder.buildFrom( //TODO: можно сразу маппер
             id = glucometerInfo.id,
@@ -71,9 +78,9 @@ class DeviceInfoDataRepository @Inject constructor(
         )
 
         if (cacheInfo == null) {
-            glucometersInfoManager.saveDevice(newInfo)
+            glucometerCacheManager.saveDevice(newInfo)
         } else {
-            glucometersInfoManager.updateDevice(newInfo)
+            glucometerCacheManager.updateDevice(newInfo)
         }
     }
 }

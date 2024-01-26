@@ -3,7 +3,7 @@ package com.elta.android.presentation.features.sync.connect.base.pm
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
@@ -162,7 +162,7 @@ abstract class ConnectDevicePm constructor(
                 connectState.consumer.accept(syncState)
             }
 
-            is GlucometerPinIncorrectOrNotFoundError -> showRetryPinAction.consumer.accept(Unit)
+            is GlucometerPinIncorrect -> showRetryPinAction.consumer.accept(Unit)
             is GlucometerSyncError -> connectState.consumer.accept(ViewState.SYNC_ERROR)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)

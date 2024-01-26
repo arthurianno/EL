@@ -19,10 +19,9 @@ interface DeviceRepository {
     /**
      * Получение информации об устройстве.
      * @param address Адрес запрашиваемого устройства.
-     * @param pinCode Пин-код для подключения к устройству.
      * @return Возвращает информацию об устройстве: заряд батареи, версия прошивки и тд.
      */
-    suspend fun getGlucometerInfo(address: String, pinCode: String): GlucometerInfo
+    suspend fun getGlucometerInfo(address: String): GlucometerInfo
 
     /**
      * Подключение к устройству.
@@ -32,22 +31,20 @@ interface DeviceRepository {
     suspend fun connectDevice(address: String, pinCode: String)
 
     /**
+     * Отключение от текущего устройства
+     */
+    suspend fun disconnect()
+
+    /**
      * Синхронизация с устройством для получения всех сохраненных событий на устройстве.
      * @param address Адрес запрашиваемого устройства.
-     * @param pinCode Пин-код для подключения к устройству.
      * @param email Электронная почта пользователя, которая преоразуется в пользовательский идентификатор.
+     * @param serial Серийный номер устройства
+     * @param lastSyncEvent Последний считайнный замер с устройства в строковом представлении
      * Он необходим для сохранения в БД и отправления на сервер.
      * @return Список преоразованных событий с устройства.
      */
-    suspend fun syncWithDevice(address: String, pinCode: String, email: String): List<GlucometerEvent>
-
-    /**
-     * Обновление прошивки глюкометра на новую версию.
-     * @param address Адрес запрашиваемого устройства.
-     * @param firmwareFile Класс имеющий данные о версии новой прошивки и пути к ней в файловой системе.
-     * @return Возвращает строку-команду для обновления устройства.
-     */
-    fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String>
+    suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEvent>
 
     /**
      * Метод для обнаружение устройства. В случае обнаружения, отправляется команда к глюкометру.

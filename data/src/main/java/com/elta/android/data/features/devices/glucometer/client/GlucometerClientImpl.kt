@@ -1,9 +1,10 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerNotConnectedException
+import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
@@ -19,14 +20,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.jvm.Throws
 
 @Singleton
-class ManagerImpl @Inject constructor(
-    private val scannerService: ScannerService,
+class GlucometerClientImpl @Inject constructor(
+    private val environmentScanner: EnvironmentScanner,
     private val glucometerBleManager: GlucometerBleManager,
-
     private val eventBuilder: GlucometerEventBuilder //TODO: точно ли тут
-) : Manager {
+) : GlucometerClient {
 
     //TODO: для каждой команды надо сделать:
     // 1. проверку что уже не подсоеденено устройство
@@ -85,12 +86,12 @@ class ManagerImpl @Inject constructor(
     override fun findDevices(): Flow<List<ScanResult>> {
         Timber.tag(TAG).d("Start find devices")
         return callbackFlow {
-            scannerService.startScan(filters, settings) {
+            environmentScanner.startScan(filters, settings) {
                 Timber.tag(TAG).d("ScanResult :: $it")
                 trySend(it) //TODO: в сценарии первого подключения, когда пользователь выбирает из разных
             // - необходимо остановить поиск после выбора нужного пользователю устройства.
             }
-            awaitClose { scannerService.stopScan() }
+            awaitClose { environmentScanner.stopScan() }
         }
             .runningFold(
                 emptyList(),
@@ -99,17 +100,22 @@ class ManagerImpl @Inject constructor(
                 })
     }
 
-    override suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto {
+    @Throws(GlucometerNotConnectedException::class)
+    override suspend fun getGlucometerInfo(address: String): GlucometerInfoDto {
         Timber.tag(TAG).d("Start get glucometer info")
-        val scanResult = scan(address)
         with(glucometerBleManager) {
-            connectToGlucometer(scanResult.device)
-            checkPin(pin)
+            if (!glucometerBleManager.isConnected(address)) {
+                //TODO: в лог
+                throw GlucometerNotConnectedException(address)
+            }
+
+            updateTime(ZonedDateTime.now())
             val date = getDate()
             val (battery, temperature) = getBatteryAndTemperature()
             val version = getVersion()
             val serial = getSerialNumber()
-            val glucometerInfo = GlucometerInfoDto(
+
+            return GlucometerInfoDto(
                 id = address,
                 deviceDate = date,
                 syncDate = ZonedDateTime.now(),
@@ -119,10 +125,6 @@ class ManagerImpl @Inject constructor(
                 glucometerSerialNumber = serial,
                 lastSyncedEvent = null //TODO: убрать бы отсюда это и поместить в use case, т.к. тут неи тнформции о последнем синке
             )
-
-            disconnectGlucometer()
-
-            return glucometerInfo
         }
     }
 
@@ -130,52 +132,39 @@ class ManagerImpl @Inject constructor(
         Timber.tag(TAG).d("Start connect to glucometer")
         //TODO: Перед коннектом к устройству нужно просканировать окружение на его наличие, подумать над
         //какой-то более удобной реализацией.
+
         val scanResult = scan(address)
-        with(glucometerBleManager) {
-            connectToGlucometer(scanResult.device)
-            val pinIsValid = checkPin(pin)
-            if (!pinIsValid) {
-                disconnectGlucometer()
-                throw GlucometerPinIncorrectOrNotFoundError
-            }
+        glucometerBleManager.connectToGlucometer(scanResult.device)
+        val pinIsValid = glucometerBleManager.checkPin(pin)
+        if (!pinIsValid) {
+            glucometerBleManager.disconnectGlucometer()
+            throw GlucometerPinIncorrect
         }
     }
 
-    override suspend fun syncWithDevice(address: String, pin: String, email: String): List<GlucometerEventDto> {
+    override suspend fun disconnect() {
+        glucometerBleManager.disconnectGlucometer()
+    }
+
+    @Throws(GlucometerNotConnectedException::class)
+    override suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEventDto> {
         Timber.tag(TAG).d("Start sync with glucometer")
-        val scanResult = scan(address)
+
         with(glucometerBleManager) {
-            connectToGlucometer(scanResult.device)
-            val pinIsValid = checkPin(pin)
-            if (!pinIsValid) {
-                disconnectGlucometer()
-                throw GlucometerPinIncorrectOrNotFoundError
+            if (!isConnected(address)) {
+                throw GlucometerNotConnectedException(address)
             }
-            //TODO: при синхронизации в старом коде идет и обновление данных,
-            // и само вытягивание значений, надо это поделить
-            val serial = getSerialNumber()
+
             val events = mutableListOf<GlucometerEventDto>()
 
-            //TODO: рефактор
-            run repeatBlock@ {
-                repeat(1000) { index ->
-                    val event = readEvent(index)
-
-                    //TODO: сюда прописать условия остановки
-                    // Пустое событие isEmptyEvent ИЛИ last Event
-
-                    if (event.isEmptyEvent()) return@repeatBlock
-                    val eventDto = eventBuilder.buildFrom(
-                        email,
-                        address,
-                        event,
-                        serial
-                    )
-                    events.add(eventDto)
-                }
+            for (index in 0 until 1000) {
+                val event = readEvent(index)
+                if (event.isEmptyEvent() || event == lastSyncEvent) break
+                events.add(
+                    eventBuilder.buildFrom(email, address, event, serial)
+                )
             }
 
-            disconnectGlucometer()
             return events
         }
     }
@@ -196,16 +185,16 @@ class ManagerImpl @Inject constructor(
 
     private suspend fun scan(address: String): ScanResult {
         return suspendCoroutine { continuation ->
-            scannerService.startScan(filters = filters, settings = settings) { scanResults ->
+            environmentScanner.startScan(filters = filters, settings = settings) { scanResults ->
                 scanResults.firstOrNull { it.device.address == address }?.let { result ->
                     try {
                         Timber.tag(TAG).d("Device with address ${result.device.address} found")
                         continuation.resume(result)
                     } catch (ex: IllegalStateException) {
                         Timber.tag(TAG).d("Error: Device with address ${result.device.address} not found")
-                        scannerService.stopScan()
+                        environmentScanner.stopScan()
                     } finally {
-                        scannerService.stopScan()
+                        environmentScanner.stopScan()
                     }
                 }
             }

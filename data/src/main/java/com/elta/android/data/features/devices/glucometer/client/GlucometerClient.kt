@@ -1,11 +1,11 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import android.bluetooth.le.ScanResult
 import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import kotlinx.coroutines.flow.Flow
 
-interface Manager {
+interface GlucometerClient {
     /**
      *
      * Поиск глюклометров в окружении для добавления
@@ -17,11 +17,17 @@ interface Manager {
 
     /**
      *
-     * Первое подключение к глюкометру
+     * Подключение к глюкометру
      * @param address - мак-адрес устройства
      * @param pin - пин-код для подключения к устройству
      * */
     suspend fun connectDevice(address: String, pin: String)
+
+    /**
+     *
+     * Отключение от глюкометра
+     * */
+    suspend fun disconnect()
 
 
     /**
@@ -29,7 +35,7 @@ interface Manager {
      * Получение актуальной информации с глюкометра
      *
      * */
-    suspend fun getGlucometerInfo(address: String, pin: String): GlucometerInfoDto
+    suspend fun getGlucometerInfo(address: String): GlucometerInfoDto
 
     //TODO: надо оставить просто чтение событий
     /**
@@ -37,7 +43,7 @@ interface Manager {
      * Синхронизация с глюкометром
      *
      * */
-    suspend fun syncWithDevice(address: String, pin: String, email: String): List<GlucometerEventDto>
+    suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEventDto>
 
     /**
      *

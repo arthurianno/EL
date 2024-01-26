@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import com.elta.android.common.utils.toLocalDateTime
 import com.elta.android.data.features.devices.dto.VersionDto

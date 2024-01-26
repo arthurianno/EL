@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -15,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ScannerService @Inject constructor(
+class EnvironmentScanner @Inject constructor(
     private val scanner: BluetoothLeScanner,
     private val context: Context,
 ) {

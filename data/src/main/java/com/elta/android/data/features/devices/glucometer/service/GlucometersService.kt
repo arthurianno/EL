@@ -6,7 +6,8 @@ import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerOfflineError
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerPinIncorrect
+import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.mapper.Mapper
@@ -32,11 +33,8 @@ import com.elta.android.data.features.user.cache.dto.ProfileCacheDto
 import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.iiot.IiotSdkDeviceService
 import com.polidea.rxandroidble2.RxBleClient
-import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.exceptions.BleException
-import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -66,9 +64,7 @@ private const val SEND_FIND_COMMAND_DELAY_MILLIS = 8000L
 class GlucometersService @Inject constructor(
     private val utilService: UtilService, //FIXME: rename для статичных переменных
     private val connectService: ConnectService,
-
     private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
-    private val glucometerToCacheMapper: Mapper<GlucometerDto, GlucometerCachedDto>,
     private val userHolder: UserHolder,
     private val profileCache: Cache<ProfileCacheDto>,
     private val eventsCache: Cache<EventV2CachedDto>,
@@ -152,7 +148,7 @@ class GlucometersService @Inject constructor(
 
                 Timber.i("<<<<<<<Sync>>>>>>  Pin: $pin")
 
-                if (pin.isNullOrEmpty()) throw GlucometerPinIncorrectOrNotFoundError
+                if (pin.isNullOrEmpty()) throw GlucometerPinNotFoundInternaly
 
                 val startCommands = mutableListOf(
                     Commands.SetPin(pin),

@@ -7,15 +7,16 @@ import com.elta.android.data.features.devices.cache.dto.GlucometerCachedDto
 import com.elta.android.data.features.devices.cache.dto.GlucometerInfoCachedDto
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
-import io.reactivex.Single
+import com.elta.android.data.features.devices.mapper.GlucometerToCacheMapper
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GlucometersInfoManager @Inject constructor(
+class GlucometerCacheManager @Inject constructor(
     private val glucometersInfoFromCacheMapper: Mapper<GlucometerInfoCachedDto, GlucometerInfoDto>,
     private val glucometersInfoToCacheMapper: Mapper<GlucometerInfoDto, GlucometerInfoCachedDto>,
     private val glucometerFromCacheMapper: Mapper<GlucometerCachedDto, GlucometerDto>,
+    private val glucometerToCacheMapper: GlucometerToCacheMapper,
     private val glucometersCache: Cache<GlucometerCachedDto>,
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
 ) {
@@ -85,6 +86,11 @@ class GlucometersInfoManager @Inject constructor(
             ?.let { info ->
                 glucometerFromCacheMapper.mapFromObject(info)
             }
+    }
+
+    fun addDevice(glucometerDto: GlucometerDto, isPrimary: Boolean) {
+        val cache = glucometerToCacheMapper.mapFromObject(glucometerDto).apply { this.isPrimary = isPrimary }
+        glucometersCache.add(listOf(cache))
     }
 
     fun setPrimaryDevice(address: String) {

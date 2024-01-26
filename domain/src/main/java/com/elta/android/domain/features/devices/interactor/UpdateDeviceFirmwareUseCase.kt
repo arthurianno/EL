@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.devices.repository.UpdateRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -8,7 +9,7 @@ import io.reactivex.Observable
 import javax.inject.Inject
 
 class UpdateDeviceFirmwareUseCase @Inject constructor(
-    private val repo: DeviceRepository,
+    private val repo: UpdateRepository,
     schedulers: SchedulersFacade
 ) : ObservableUseCase<String, UpdateDeviceFirmwareUseCase.Params>(schedulers) {
 

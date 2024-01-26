@@ -41,11 +41,18 @@ interface DeviceInfoRepository {
     fun setPrimaryDevice(address: String)
 
     /**
+     * Помещает все данные об устройстве в БД.
+     * @param glucometer Устройство которое собираемся сохранить.
+     * @param isPrimary Является ли оно основным.
+     */
+    fun putDevice(glucometer: Glucometer, isPrimary: Boolean)
+
+    /**
      * Получение основных и дополнительных данных об устройстве пользователя из БД
      * @return данные в виде основной информации
      * по глюкометру и данных о нем полученных из последней синхронизации
      */
-    fun getPrimaryDevice(): Pair<Glucometer, GlucometerInfo>?
+    fun getPrimaryDeviceWithLastEvent(): Pair<Glucometer, GlucometerInfo>?
 
     /**
      * Обновление данных об устройстве пользователя

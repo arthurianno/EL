@@ -1,6 +1,6 @@
 package com.elta.android.data.features.devices.glucometer.service
 
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
@@ -26,7 +26,7 @@ internal fun Observable<RxBleConnection>.checkPinAndSend(
 ): Observable<RxBleConnection> =
     this.switchMap { connection ->
         if (pin.isNullOrEmpty()) {
-            Observable.error(GlucometerPinIncorrectOrNotFoundError)
+            Observable.error(GlucometerPinIncorrect)
         } else {
             request(connection, pin)
                 .switchMap { Observable.just(connection) }
@@ -52,7 +52,7 @@ internal fun RxBleConnection.request(
                 when {
                     input.isPinCommand() && response.isPinError() -> {
                         pinErrorCallback()
-                        Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        Observable.error(GlucometerPinIncorrect)
                     }
 
                     response.isPinError() -> Observable.error(GlucometerPinRequireError)
@@ -70,7 +70,7 @@ internal fun RxBleConnection.request(
                 }
                 .concatMap {
                     if (pin.isNullOrEmpty()) {
-                        Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                        Observable.error(GlucometerPinIncorrect)
                     } else {
                         request(Commands.SetPin(pin), pin, pinErrorCallback)
                     }

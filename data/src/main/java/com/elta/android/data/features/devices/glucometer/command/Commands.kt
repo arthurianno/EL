@@ -11,8 +11,6 @@ sealed class Commands(val command: String) {
         return command.toByteArray(Charset.defaultCharset())
     }
 
-    data object Reset : Commands(command = "reset") //TODO: delete?
-
     data object ToDfuMode : Commands(command = "boot")
 
     data object GetDate : Commands(command = "gettime")
@@ -21,16 +19,10 @@ sealed class Commands(val command: String) {
 
     data object GetBatteryAndTemperature : Commands(command = "battery")
 
-    data object TurnOnAntiLossMode : Commands(command = "lon") //TODO: delete?
-
-    data object TurnOffAntiLossMode : Commands(command = "loff") //TODO: delete?
-
     data object TurnOnFindMode : Commands(command = "find")
 
     data class SetTime(val date: ZonedDateTime) :
         Commands("settime.${date.toGlucometerDateTime()}")
-
-    data class AddEvent(val event: EventV2) : Commands(command = "blood.296044") //TODO: delete?
 
     data class ReadEvent(val cell: Int) :
         Commands(command = "rd.${cell.toString().padStart(3, '0')}")
@@ -38,4 +30,12 @@ sealed class Commands(val command: String) {
     data class SetPin(val pin: String) : Commands(command = "pin.$pin")
 
     data object Serial : Commands(command = "serial")
+
+    data object Reset : Commands(command = "reset") //TODO: delete?
+
+    data class AddEvent(val event: EventV2) : Commands(command = "blood.296044") //TODO: delete?
+
+    data object TurnOnAntiLossMode : Commands(command = "lon") //TODO: delete?
+
+    data object TurnOffAntiLossMode : Commands(command = "loff") //TODO: delete?
 }

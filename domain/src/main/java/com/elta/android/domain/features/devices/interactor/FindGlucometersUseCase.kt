@@ -5,11 +5,7 @@ import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.nullgr.core.interactor.ObservableListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.rx2.asObservable
-import timber.log.Timber
 import javax.inject.Inject
 
 class FindGlucometersUseCase @Inject constructor(

@@ -21,5 +21,6 @@ data class GlucometerInfo(
     val batteryLevel: Int? = null,
     val softwareVersion: String? = null,
     val hardwareVersion: String? = null,
-    val glucometerSerialNumber: String? = null
+    val glucometerSerialNumber: String? = null,
+    val lastSyncEvent: String? = null
 )

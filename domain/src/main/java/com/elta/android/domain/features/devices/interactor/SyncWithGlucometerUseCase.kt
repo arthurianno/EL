@@ -1,6 +1,8 @@
 package com.elta.android.domain.features.devices.interactor
 
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerConnectionException
+import com.elta.android.common.errors.GlucometerNotConnectedException
+import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -11,10 +13,10 @@ import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
-import io.reactivex.Single
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class SyncWithGlucometerUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
@@ -26,35 +28,83 @@ class SyncWithGlucometerUseCase @Inject constructor(
 ) : ObservableUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Int> {
-        val device = Single.fromCallable { deviceInfoRepository.getPrimaryDevice() ?: throw PrimaryGlucometerNotFoundError }
-        return Single.zip(
-            device,
-            profileRepository.getProfile()
-        ) { (glucometer, _), profile ->
-            val address = params?.device?.address ?: glucometer.address
-            val email = profile.email ?: throw Exception("Email is empty")
-            address to email
-        }
-            .flatMapObservable { (address, email) ->
-                flow {
-                    emit(launch(address, email))
-                }.asObservable()
+        return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
+            val deviceWithLastEvent = deviceInfoRepository.getPrimaryDeviceWithLastEvent()
+            if (deviceWithLastEvent == null) {
+                //TODO: в логи
+                throw PrimaryGlucometerNotFoundError
             }
+
+            val profile = try {
+                profileRepository.getProfile().blockingGet()
+            } catch (exception: Exception) {
+                //TODO: в логи
+                throw exception
+            }
+
+            val address = params?.device?.address ?: deviceWithLastEvent.first.address
+            val lastSyncEvent = deviceWithLastEvent.second.lastSyncEvent
+            val email = profile.email
+
+            if (email.isNullOrBlank()) {
+                throw Exception("Email is empty")
+            }
+
+            syncWithDevice(address, email, lastSyncEvent)
+        }
+    }
+
+    private suspend fun syncWithDevice(deviceAddress: String, userEmail: String, lastSyncEvent: String?): Int {
+        val pinCode = pinRepository.getPin(deviceAddress)
+        if (pinCode == null) {
+            //TODO: В логи
+            throw GlucometerPinNotFoundInternaly
+        }
+        deviceRepository.connectDevice(deviceAddress, pinCode)
+
+        try {
+
+            val glucometerInfo = runActionWithReconnection(deviceAddress = deviceAddress, pinCode = pinCode) {
+                deviceRepository.getGlucometerInfo(deviceAddress)
+            }
+
+            val events = runActionWithReconnection(deviceAddress = deviceAddress, pinCode = pinCode) {
+                deviceRepository.syncWithDevice(deviceAddress, userEmail, glucometerInfo.glucometerSerialNumber, lastSyncEvent)
+            }
+
+            deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
+            eventsRepository.addEventFromGlucometer(events)
+
+            return events.size
+        } finally {
+            deviceRepository.disconnect()
+        }
 
     }
 
-
-    suspend fun launch(address: String, email: String): Int {
-        //TODO: Перенес логику в Use Case. Но тут требуется рефакторинг.
-
-        val pinCode = pinRepository.getPin(address) ?: throw GlucometerPinIncorrectOrNotFoundError
-        val glucometerInfo = deviceRepository.getGlucometerInfo(address, pinCode)
-        val events = deviceRepository.syncWithDevice(address, pinCode, email)
-
-        deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
-        eventsRepository.addEventFromGlucometer(events)
-
-        return events.size
+    private suspend fun <T> runActionWithReconnection(
+        deviceAddress: String,
+        pinCode: String,
+        repeatTimes: Int = 0,
+        maxRepeatTimes: Int = 3, action: suspend () -> T
+    ): T {
+        return try {
+            action()
+        } catch (e: Exception) {
+            if (e is GlucometerNotConnectedException) {
+                if (repeatTimes >= maxRepeatTimes) throw GlucometerConnectionException(deviceAddress)
+                deviceRepository.connectDevice(deviceAddress, pinCode)
+                runActionWithReconnection(
+                    deviceAddress,
+                    pinCode,
+                    repeatTimes + 1,
+                    maxRepeatTimes,
+                    action
+                )
+            } else {
+                throw e
+            }
+        }
     }
 
 

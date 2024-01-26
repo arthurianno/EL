@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
@@ -42,9 +42,15 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
             .suspend()
     }
 
+    fun isConnected(deviceAddress: String): Boolean {
+        return bluetoothDevice?.address == deviceAddress && isConnected
+    }
+
     override suspend fun disconnectGlucometer() {
-        disconnect().suspend()
-        close()
+        if (isConnected){
+            disconnect().suspend()
+            close()
+        }
     }
 
     override suspend fun checkPin(pin: String): Boolean {
@@ -140,6 +146,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
     override fun initialize() {
         enableNotifications(notificationCharacteristic)
             .enqueue()
+        requestMtu(512).enqueue()
     }
 
     override fun onServicesInvalidated() {

@@ -9,8 +9,8 @@ import com.elta.android.data.features.consultant.repository.ConsultantDataReposi
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
 import com.elta.android.data.features.devices.repository.DeviceInfoDataRepository
-import com.elta.android.data.features.devices.repository.GlucometerDataRepository
 import com.elta.android.data.features.devices.repository.PinDataRepository
+import com.elta.android.data.features.devices.repository.UpdateRepositoryImpl
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
 import com.elta.android.data.features.diary.medicines.repository.InsulinMedicamentDataRepository
 import com.elta.android.data.features.diary.medicines.repository.MedicamentDataRepository
@@ -36,6 +36,7 @@ import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.GlucometerRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
+import com.elta.android.domain.features.devices.repository.UpdateRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
@@ -92,15 +93,15 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
+    abstract fun bindUpdateRepository(repo: UpdateRepositoryImpl): UpdateRepository
+
+    @Binds
+    @Singleton
     abstract fun bindDeviceInfoRepository(repo: DeviceInfoDataRepository): DeviceInfoRepository
 
     @Binds
     @Singleton
     abstract fun bindPinRepository(repo: PinDataRepository): PinRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindGlucometerRepository(repo: GlucometerDataRepository): GlucometerRepository
 
     @Binds
     @Singleton

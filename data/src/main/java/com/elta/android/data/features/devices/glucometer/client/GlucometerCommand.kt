@@ -1,4 +1,4 @@
-package com.elta.android.data.features.devices.glucometer.refactor
+package com.elta.android.data.features.devices.glucometer.client
 
 import android.bluetooth.BluetoothDevice
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto

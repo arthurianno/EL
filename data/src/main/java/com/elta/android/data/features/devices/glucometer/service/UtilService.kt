@@ -9,13 +9,13 @@ import android.content.Context
 import com.elta.android.common.errors.BluetoothNotAvailableError
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
-import com.elta.android.common.errors.GlucometerPinIncorrectOrNotFoundError
+import com.elta.android.common.errors.GlucometerPinIncorrect
+import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.GlucometerPinRequireError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
-import com.elta.android.data.features.devices.glucometer.refactor.GlucometerCommand
 import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -113,7 +113,7 @@ class UtilService @Inject constructor(
                     when {
                         input.isPinCommand() && response.isPinError() -> {
                             pinStorage.setPin(address, "")
-                            Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                            Observable.error(GlucometerPinIncorrect)
                         }
 
                         response.isPinError() -> Observable.error(GlucometerPinRequireError)
@@ -132,7 +132,7 @@ class UtilService @Inject constructor(
                     .concatMap {
                         val pin = pinStorage.getPin(address)
                         when (pin.isNullOrEmpty()) {
-                            true -> Observable.error(GlucometerPinIncorrectOrNotFoundError)
+                            true -> Observable.error(GlucometerPinNotFoundInternaly)
                             else -> request(connection, address, Commands.SetPin(pin))
                         }
                     }
