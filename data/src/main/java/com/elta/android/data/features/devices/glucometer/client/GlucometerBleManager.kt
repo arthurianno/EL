@@ -5,10 +5,12 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import com.elta.android.common.errors.CommandError
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
 import com.elta.android.data.features.devices.glucometer.service.isPinOk
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.PhyRequest
 import no.nordicsemi.android.ble.ktx.suspend
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -16,6 +18,7 @@ import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.jvm.Throws
 
 class GlucometerBleManager @Inject constructor(context: Context) : BleManager(context),
     GlucometerCommand {
@@ -37,7 +40,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         connect(device)
             .retry(3, 100)
             .useAutoConnect(false)
-//            .usePreferredPhy(PhyRequest.PHY_LE_1M_MASK or PhyRequest.PHY_LE_2M_MASK or PhyRequest.PHY_LE_CODED_MASK)
+            .usePreferredPhy(PhyRequest.PHY_LE_1M_MASK or PhyRequest.PHY_LE_2M_MASK)
             .timeout(30_000)
             .suspend()
     }
@@ -49,7 +52,6 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
     override suspend fun disconnectGlucometer() {
         if (isConnected){
             disconnect().suspend()
-            close()
         }
     }
 
@@ -58,41 +60,31 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         return result.isPinOk()
     }
 
-    override suspend fun toDfuMode(): String {
-        return startCommand(Commands.ToDfuMode)
-    }
+    override suspend fun toDfuMode(): String =
+        startCommand(Commands.ToDfuMode).checkCommandForError()
 
     override suspend fun getDate(): ZonedDateTime {
         val dateTime = startCommand(Commands.GetDate)
         return ZonedDateTime.of(dateTime.extractDate(), ZoneId.systemDefault())
     }
 
-    override suspend fun getVersion(): VersionDto {
-        val version = startCommand(Commands.GetVersion)
-        return version.extractVersion()
-    }
+    override suspend fun getVersion(): VersionDto =
+        startCommand(Commands.GetVersion).extractVersion()
 
-    override suspend fun getBatteryAndTemperature(): Pair<Int, Int> {
-        val batteryAndTemperature = startCommand(Commands.GetBatteryAndTemperature)
-        return batteryAndTemperature.extractBatteryAndTemperature()
-    }
+    override suspend fun getBatteryAndTemperature(): Pair<Int, Int> =
+        startCommand(Commands.GetBatteryAndTemperature).extractBatteryAndTemperature()
 
-    override suspend fun turnOnFindMode(): String {
-        return startCommand(Commands.TurnOnFindMode)
-    }
+    override suspend fun turnOnFindMode(): String =
+        startCommand(Commands.TurnOnFindMode).checkCommandForError()
 
-    override suspend fun updateTime(date: ZonedDateTime): String {
-        return startCommand(Commands.SetTime(date))
-    }
+    override suspend fun updateTime(date: ZonedDateTime): String =
+        startCommand(Commands.SetTime(date)).checkCommandForError()
 
-    override suspend fun getSerialNumber(): String {
-        val serial = startCommand(Commands.Serial)
-        return serial.extractSerial()
-    }
+    override suspend fun getSerialNumber(): String =
+        startCommand(Commands.Serial).extractSerial()
 
-    override suspend fun readEvent(index: Int): String {
-        return startCommand(Commands.ReadEvent(index))
-    }
+    override suspend fun readEvent(index: Int): String =
+        startCommand(Commands.ReadEvent(index))
 
     private suspend fun startCommand(command: Commands): String {
 
@@ -150,9 +142,17 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
     }
 
     override fun onServicesInvalidated() {
+        disableNotifications(notificationCharacteristic)
         glucometerCharacteristic = null
         notificationCharacteristic = null
     }
+
+    @Throws(CommandError::class)
+    private fun String.checkCommandForError(): String {
+       return if (isError()) throw CommandError(this) else this
+    }
+
+    private fun String.isError(): Boolean = contains("error")
 }
 
 private val SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")

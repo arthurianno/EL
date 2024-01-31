@@ -8,7 +8,6 @@ import com.elta.android.common.errors.NotFoundItemError
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto

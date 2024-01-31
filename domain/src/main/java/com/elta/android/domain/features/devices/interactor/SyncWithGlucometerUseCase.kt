@@ -50,6 +50,8 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw Exception("Email is empty")
             }
 
+            //TODO проверить на включенный блютуз и доступы к нему, выбрасывать необходимые исключения
+
             syncWithDevice(address, email, lastSyncEvent)
         }
     }
@@ -60,9 +62,9 @@ class SyncWithGlucometerUseCase @Inject constructor(
             //TODO: В логи
             throw GlucometerPinNotFoundInternaly
         }
-        deviceRepository.connectDevice(deviceAddress, pinCode)
 
         try {
+            deviceRepository.connectDevice(deviceAddress, pinCode)
 
             val glucometerInfo = runActionWithReconnection(deviceAddress = deviceAddress, pinCode = pinCode) {
                 deviceRepository.getGlucometerInfo(deviceAddress)
@@ -73,7 +75,9 @@ class SyncWithGlucometerUseCase @Inject constructor(
             }
 
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
-            eventsRepository.addEventFromGlucometer(events)
+
+            //TODO: Сейчас это callable который по сути нифига не делает, исправить
+            /*eventsRepository.addEventFromGlucometer(events)*/
 
             return events.size
         } finally {

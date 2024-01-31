@@ -1,7 +1,6 @@
 package com.elta.android.data.features.devices.glucometer.client
 
 import android.bluetooth.le.ScanResult
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import kotlinx.coroutines.flow.Flow
 
@@ -43,7 +42,7 @@ interface GlucometerClient {
      * Синхронизация с глюкометром
      *
      * */
-    suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEventDto>
+    suspend fun syncWithDevice(address: String, lastSyncEvent: String?): List<String>
 
     /**
      *

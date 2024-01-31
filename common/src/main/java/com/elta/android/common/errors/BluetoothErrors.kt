@@ -20,6 +20,6 @@ data class GlucometerLowBatteryLevelError(
 ) : RuntimeException("Battery level $current not enough to update firmware.")
 
 object PrimaryGlucometerNotFoundError : RuntimeException()
-object CommandError : RuntimeException()
+class CommandError(commandError: String) : RuntimeException("command error: $commandError")
 class GlucometerSyncError(exception: Throwable) : RuntimeException(exception)
 object GlucometerOfflineError : RuntimeException()

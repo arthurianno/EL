@@ -5,13 +5,14 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.client.GlucometerClient
 import com.elta.android.data.features.devices.glucometer.service.GlucometersService
-import com.elta.android.data.features.devices.mapper.toDomain
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.rostech.RosTechRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -24,6 +25,9 @@ class DeviceDataRepository @Inject constructor(
     private val scanToDtoMapper: Mapper<ScanResult, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
+    private val glucometerEventBuilder: GlucometerEventBuilder,
+    //TODO: не самое удобное место, но работу с SDK все равно нужно переделывать
+    private val rosTechRepository: RosTechRepository,
     override val dispatcher: CoroutineDispatcher
 ) : DeviceRepository, BaseRepository {
 
@@ -43,13 +47,10 @@ class DeviceDataRepository @Inject constructor(
         val info = glucometerClient.getGlucometerInfo(address)
         return glucometerInfoToDomainMapper.mapFromObject(info)
     }
-
-    //TODO: зачем тут Int, если надо GlucometerEventDto
     override suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEvent> =
-        glucometerClient.syncWithDevice(address, email, serial, lastSyncEvent)
-            .map { glucometerEventDto ->
-                glucometerEventDto.toDomain()
-            }
+        glucometerClient.syncWithDevice(address, lastSyncEvent)
+            .also { rosTechRepository.sendEvents(address, it) }
+            .map { event -> glucometerEventBuilder.buildFrom(email, address, event,serial) }
 
     override fun findGlucometer(address: String): Flow<Unit> =
         glucometersService.findGlucometer(address)

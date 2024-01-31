@@ -5,9 +5,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerPinIncorrect
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
-import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -25,8 +23,7 @@ import kotlin.jvm.Throws
 @Singleton
 class GlucometerClientImpl @Inject constructor(
     private val environmentScanner: EnvironmentScanner,
-    private val glucometerBleManager: GlucometerBleManager,
-    private val eventBuilder: GlucometerEventBuilder //TODO: точно ли тут
+    private val glucometerBleManager: GlucometerBleManager
 ) : GlucometerClient {
 
     //TODO: для каждой команды надо сделать:
@@ -122,8 +119,7 @@ class GlucometerClientImpl @Inject constructor(
                 temperature = temperature,
                 batteryLevel = battery,
                 version = version,
-                glucometerSerialNumber = serial,
-                lastSyncedEvent = null //TODO: убрать бы отсюда это и поместить в use case, т.к. тут неи тнформции о последнем синке
+                glucometerSerialNumber = serial
             )
         }
     }
@@ -147,23 +143,24 @@ class GlucometerClientImpl @Inject constructor(
     }
 
     @Throws(GlucometerNotConnectedException::class)
-    override suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEventDto> {
+    override suspend fun syncWithDevice(address: String, lastSyncEvent: String?): List<String> {
         Timber.tag(TAG).d("Start sync with glucometer")
 
         with(glucometerBleManager) {
             if (!isConnected(address)) {
+                Timber.tag(TAG).d("glucometer not connected")
                 throw GlucometerNotConnectedException(address)
             }
 
-            val events = mutableListOf<GlucometerEventDto>()
+            val events = mutableListOf<String>()
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
-                events.add(
-                    eventBuilder.buildFrom(email, address, event, serial)
-                )
+                events.add(event)
             }
+
+            Timber.tag(TAG).d("all values read successfully")
 
             return events
         }
@@ -187,24 +184,15 @@ class GlucometerClientImpl @Inject constructor(
         return suspendCoroutine { continuation ->
             environmentScanner.startScan(filters = filters, settings = settings) { scanResults ->
                 scanResults.firstOrNull { it.device.address == address }?.let { result ->
-                    try {
-                        Timber.tag(TAG).d("Device with address ${result.device.address} found")
-                        continuation.resume(result)
-                    } catch (ex: IllegalStateException) {
-                        Timber.tag(TAG).d("Error: Device with address ${result.device.address} not found")
-                        environmentScanner.stopScan()
-                    } finally {
-                        environmentScanner.stopScan()
-                    }
+                    continuation.resume(result)
+                    environmentScanner.stopScan()
                 }
             }
         }
     }
 
     override suspend fun testAllCommands(address: String, pin: String) {
-        Timber.tag(TAG).d("Start all commands")
         val scanResult = scan(address)
-        Timber.tag(TAG).d("ScanResult: $scanResult")
         glucometerBleManager.connectToGlucometer(scanResult.device)
         glucometerBleManager.checkPin(pin)
         glucometerBleManager.getDate()
@@ -213,13 +201,14 @@ class GlucometerClientImpl @Inject constructor(
         glucometerBleManager.turnOnFindMode()
         glucometerBleManager.updateTime(ZonedDateTime.now())
         glucometerBleManager.getSerialNumber()
-        repeat(1000) { index ->
+        repeat(1) { index ->
             glucometerBleManager.readEvent(index)
         }
-        glucometerBleManager.toDfuMode()
         glucometerBleManager.disconnectGlucometer()
     }
 
 }
 
-private const val TAG = "BLE_MANAGER"
+internal fun String.isError(): Boolean = contains("error")
+
+private const val TAG = "GLUCOMETER_CLIENT"

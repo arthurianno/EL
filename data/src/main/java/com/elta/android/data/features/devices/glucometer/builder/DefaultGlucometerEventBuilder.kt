@@ -1,8 +1,8 @@
 package com.elta.android.data.features.devices.glucometer.builder
 
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.fromGlucometerDateTime
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.user.interactor.round
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeParseException
@@ -23,7 +23,7 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         glucometerId: String,
         response: String,
         glucometerSerialNumber: String?
-    ): GlucometerEventDto {
+    ): GlucometerEvent {
         val tokens = getTokens(response)
         val dateToken = tokens.first
         val temperatureAndValueToken = tokens.second
@@ -34,7 +34,7 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         Timber.i("$LOG_STRING_SUFFIX Temperature : ${extractTemperature(temperatureAndValueToken)}")
         Timber.i("$LOG_STRING_SUFFIX Glucose Value : ${extractValue(temperatureAndValueToken)}")
 
-        return GlucometerEventDto(
+        return GlucometerEvent(
             id = generator.generate(userId, glucometerId, dateToken),
             date = extractDate(dateToken),
             temperature = extractTemperature(temperatureAndValueToken),

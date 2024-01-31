@@ -6,7 +6,6 @@ import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerOfflineError
-import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
@@ -181,7 +180,7 @@ class GlucometersService @Inject constructor(
                     Timber.i("<<<<<<<Sync>>>>>>  Response: $response")
 
                     if (response.isError()) {
-                        Observable.error(CommandError)
+                        Observable.error(CommandError(response))
                     } else {
                         Observable.just(response)
                     }
@@ -263,7 +262,17 @@ class GlucometersService @Inject constructor(
                     emptyList()
                 }
             }
-            .map { events ->
+            .map { glucometerEvents ->
+                val events = glucometerEvents.map {
+                    GlucometerEventDto(
+                        id = it.id,
+                        date = it.date,
+                        temperature = it.temperature,
+                        value = it.value,
+                        glucometerSerialNumber = it.glucometerSerialNumber,
+                        originalResponse = it.originalResponse
+                    )
+                }
                 Timber.i("<<<<<<<Sync>>>>>>  events: $events")
                 val filterExistingEvents = filterExistingEvents(events, getCachedEvents(events))
                 Timber.i("<<<<<<<Sync>>>>>>  filterExistingEvents: $events")
