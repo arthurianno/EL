@@ -1,11 +1,10 @@
 package com.elta.android.domain.features.devices.interactor
 
-import com.elta.android.common.errors.BluetoothNotAvailableError
-import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
+import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -37,16 +36,8 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw PrimaryGlucometerNotFoundError
             }
 
-            when {
-                !bluetoothStateRepository.isBluetoothEnable() -> {
-                    //TODO: в логи, в случае ошибки в исключения. Но и в кастомные логи тоже класть состояние
-                    throw BluetoothNotEnabledError
-                }
-                !bluetoothStateRepository.isPermissionGranted() -> {
-                    //TODO: в логи, в случае ошибки в исключения. Но и в кастомные логи тоже класть состояние
-                    throw BluetoothNotAvailableError
-                }
-            }
+            //TODO: Добавить логгер который будет логгировать ошибки внутри проверки
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
 
             val profile = try {
                 profileRepository.getProfile().blockingGet()
@@ -62,8 +53,6 @@ class SyncWithGlucometerUseCase @Inject constructor(
             if (email.isNullOrBlank()) {
                 throw Exception("Email is empty")
             }
-
-            //TODO проверить на включенный блютуз и доступы к нему, выбрасывать необходимые исключения
 
             syncWithDevice(address, email, lastSyncEvent)
         }

@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.devices.search.viewmodel
 
 import android.os.Bundle
-import com.elta.android.domain.features.devices.usecase.FindGlucometerUseCase
+import com.elta.android.domain.features.devices.interactor.FindGlucometerUseCase
 import com.elta.android.presentation.analytics.core.Analytics
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventType

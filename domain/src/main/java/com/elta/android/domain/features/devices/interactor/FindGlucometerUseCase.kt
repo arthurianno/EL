@@ -1,4 +1,4 @@
-package com.elta.android.domain.features.devices.usecase
+package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import kotlinx.coroutines.flow.Flow

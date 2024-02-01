@@ -1,13 +1,13 @@
 package com.elta.android.domain.features.devices.interactor
 
-import com.elta.android.common.errors.BluetoothNotEnabledError
-import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.nullgr.core.interactor.ObservableListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asObservable
 import javax.inject.Inject
 
@@ -22,20 +22,12 @@ class FindGlucometersUseCase @Inject constructor(
         // странно то, что он находит устрйоство без включенного блютуза
         // и без разрешения на устройства по близости
 
-
-        when {
-            !bluetoothStateRepository.isPermissionGranted() -> return Observable.error(
-                LocationPermissionNotGrantedError
-            )
-            !bluetoothStateRepository.isBluetoothEnable() -> return Observable.error(
-                BluetoothNotEnabledError
-            )
-        }
-
-        return repo.findDevices()
-
-//            .filter {  } //TODO: тут должна быть фильтрация уже подключенных, но по ТЗ ее не должно быть! Уточнить у Афонина Александра
+        return repo.findDevices().onStart {
+                //TODO: Добавить логгер который будет логгировать ошибки внутри проверки
+                bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
+            }
             .asObservable()
+        //TODO: тут должна быть фильтрация уже подключенных, но по ТЗ ее не должно быть! Уточнить у Афонина Александра
     }
 }
 //FIXME: СЕЙЧАС есть задача, что НУЖНО выводить глюкометры, которые уже подсоеденены, а при попытке подключения выдавать ошибку, что уже привязан

@@ -1,7 +1,6 @@
 package com.elta.android.domain.features.devices.interactor
 
-import com.elta.android.common.errors.BluetoothNotEnabledError
-import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -32,11 +31,8 @@ class AddNewDeviceUseCase @Inject constructor(
 
     private suspend fun addDevice(params: Params?) {
         try {
-
-            when {
-                !bluetoothStateRepository.isPermissionGranted() -> throw LocationPermissionNotGrantedError
-                !bluetoothStateRepository.isBluetoothEnable() -> throw BluetoothNotEnabledError
-            }
+            //TODO: Добавить логгер который будет логгировать ошибки внутри проверки
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
 
             val (device, pincode) = requireNotNull(params) {
                 //TODO: лог, но пинкод не логгировать
