@@ -18,6 +18,7 @@ import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
+import com.elta.android.presentation.features.sync.control.checkBluetooth
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.utils.makeSnackBarWithAction
@@ -91,7 +92,11 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
-
+        // TODO Диалог есть, но экран не реагирует на отказ от разрешения
+        pm.requestBluetoothPermissionCommand.bindTo {
+            // TODO может вообще отказаться от PermissionControl или переписать его под единый
+            checkBluetooth(requireActivity())
+        }
         pm.settingsDialog.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.settingsIsVisible.bindTo {
             if (it) {

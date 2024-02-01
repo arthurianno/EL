@@ -72,6 +72,8 @@ abstract class ConnectDevicePm constructor(
     val startSyncAction = action<Unit>()
     private val syncProgressState = state(false)
 
+    val requestBluetoothPermissionCommand = command<Unit>()
+
     val settingsDialog = dialogControl<DialogData, DialogResult>()
     private val settingsDialogData: DialogData by lazy { Dialogs.SettingsDialogData(resources) }
     val settingsIsVisible = state(false)
@@ -129,6 +131,7 @@ abstract class ConnectDevicePm constructor(
                             .map { it == DialogResult.POSITIVE }
                             .subscribe(settingsIsVisible.consumer)
                     }
+
                     !permission.granted -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
                 }
             }
@@ -141,17 +144,16 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError -> {
+            is BluetoothNotEnabledError ->
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
-            }
 
-            is LocationPermissionNotGrantedError -> btControl.requestLocationPermissionsCommand.consumer.accept(
-                Unit
-            )
+            is LocationPermissionNotGrantedError ->
+                // TODO необходимо дописать логику как с запросом блютуза. Менять флоу экрана
+                // а также необходимо делать повтор на поиск устройств если приняли разрешение
+                requestBluetoothPermissionCommand.consumer.accept(Unit)
 
-            is LocationNotEnabledError -> btControl.requestEnableLocationCommand.consumer.accept(
-                Unit
-            )
+            is LocationNotEnabledError ->
+                btControl.requestEnableLocationCommand.consumer.accept(Unit)
 
             is TimeoutException -> {
                 val syncState = if (items.valueOrNull.isNullOrEmpty()) {

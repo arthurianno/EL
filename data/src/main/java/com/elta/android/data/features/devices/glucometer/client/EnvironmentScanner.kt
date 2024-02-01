@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 import timber.log.Timber
 import javax.inject.Inject
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class EnvironmentScanner @Inject constructor(
     private val scanner: BluetoothLeScanner,
-    private val context: Context,
+    private val context: Context
 ) {
     private var callback: ScanCallback? = null
 
@@ -54,22 +55,20 @@ class EnvironmentScanner @Inject constructor(
             }
         }
 
-        // todo разобраться с пермишенами
-//        val permission = ContextCompat.checkSelfPermission(
-//            context, Manifest.permission.BLUETOOTH_SCAN
-//        ) == PackageManager.PERMISSION_GRANTED
-//        if (permission) {
-//            // pass empty list to organize own filter
-//            scanner.startScan(emptyList(), settings, callback)
-//        }
             scanner.startScan(emptyList(), settings, callback)
-
     }
 
     fun stopScan() {
-        val permission = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.BLUETOOTH
-        ) == PackageManager.PERMISSION_GRANTED
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED
+        }
+
+        Timber.tag(TAG).d("scanner permission state: $permission")
+
         if (permission) {
             callback?.let { scanner.stopScan(it) }
         }
