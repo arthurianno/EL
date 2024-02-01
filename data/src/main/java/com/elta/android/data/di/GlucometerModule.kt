@@ -48,6 +48,7 @@ class GlucometerModule {
         ): GlucometerEventIdGenerator
     }
 
+    // TODO :: удалить, так как будем избавляться от библиотеки
     @Provides
     @Singleton
     fun provideRxBleClient(context: Context): RxBleClient =
@@ -67,17 +68,22 @@ class GlucometerModule {
     //TODO: это не нужно будет, это временно для Android RX интеграции, чтобы завести проект
     @Provides
     @Singleton
-    fun provideScanner(context: Context): BluetoothLeScanner {
-        val bluetoothManager: BluetoothManager =
-            context.getSystemService(BluetoothManager::class.java)
-        val adapter: BluetoothAdapter = bluetoothManager.adapter
-        return adapter.bluetoothLeScanner
-    }
+    fun provideScanner(adapter: BluetoothAdapter): BluetoothLeScanner =
+        adapter.bluetoothLeScanner
+
+    @Provides
+    @Singleton
+    fun provideBluetoothAdapter(bluetoothManager: BluetoothManager): BluetoothAdapter =
+        bluetoothManager.adapter
+
+    @Provides
+    @Singleton
+    fun provideBluetoothManager(context: Context): BluetoothManager =
+        context.getSystemService(BluetoothManager::class.java)
 
     //TODO: обсудить 1 экземпляр или на каждое соединение - свое. Документация говорит, что на каждое - своё.
     //Тут на каждое соединение с разными глюкометрами разный менеджер, подумать на чем-то типа мультитона
     @Provides
     @Singleton
     fun provideBleManager(context: Context): GlucometerBleManager = GlucometerBleManager(context)
-
 }

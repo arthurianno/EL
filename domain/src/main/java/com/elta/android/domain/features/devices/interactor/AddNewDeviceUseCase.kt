@@ -1,6 +1,9 @@
 package com.elta.android.domain.features.devices.interactor
 
+import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
@@ -16,6 +19,7 @@ class AddNewDeviceUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val pinRepository: PinRepository,
     private val deviceInfoRepository: DeviceInfoRepository,
+    private val bluetoothStateRepository: BluetoothStateRepository,
     schedulers: SchedulersFacade
 ) : CompletableUseCase<AddNewDeviceUseCase.Params>(schedulers) {
 
@@ -28,6 +32,12 @@ class AddNewDeviceUseCase @Inject constructor(
 
     private suspend fun addDevice(params: Params?) {
         try {
+
+            when {
+                !bluetoothStateRepository.isPermissionGranted() -> throw LocationPermissionNotGrantedError
+                !bluetoothStateRepository.isBluetoothEnable() -> throw BluetoothNotEnabledError
+            }
+
             val (device, pincode) = requireNotNull(params) {
                 //TODO: лог, но пинкод не логгировать
                 "params for new device cannot be null"

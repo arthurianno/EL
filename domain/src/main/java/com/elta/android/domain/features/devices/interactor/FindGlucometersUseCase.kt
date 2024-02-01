@@ -1,6 +1,9 @@
 package com.elta.android.domain.features.devices.interactor
 
+import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.nullgr.core.interactor.ObservableListUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -10,13 +13,30 @@ import javax.inject.Inject
 
 class FindGlucometersUseCase @Inject constructor(
     private val repo: DeviceRepository,
+    private val bluetoothStateRepository: BluetoothStateRepository,
     schedulers: SchedulersFacade
 ) : ObservableListUseCase<Glucometer, Unit>(schedulers) {
 
-    override fun buildUseCaseObservable(params: Unit?): Observable<List<Glucometer>> =
-        repo.findDevices()
+    override fun buildUseCaseObservable(params: Unit?): Observable<List<Glucometer>> {
+        // FIXME написать по адекватному. При данной реализации появляются диалоги и запросы на включение блютуза
+        // странно то, что он находит устрйоство без включенного блютуза
+        // и без разрешения на устройства по близости
+
+
+        when {
+            !bluetoothStateRepository.isPermissionGranted() -> return Observable.error(
+                LocationPermissionNotGrantedError
+            )
+            !bluetoothStateRepository.isBluetoothEnable() -> return Observable.error(
+                BluetoothNotEnabledError
+            )
+        }
+
+        return repo.findDevices()
+
 //            .filter {  } //TODO: тут должна быть фильтрация уже подключенных, но по ТЗ ее не должно быть! Уточнить у Афонина Александра
             .asObservable()
+    }
 }
 //FIXME: СЕЙЧАС есть задача, что НУЖНО выводить глюкометры, которые уже подсоеденены, а при попытке подключения выдавать ошибку, что уже привязан
 // раньше это требование не соблюдалось. Сейчас лучше сразу сделать ПРАВИЛЬНО

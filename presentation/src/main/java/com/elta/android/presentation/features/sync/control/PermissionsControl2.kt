@@ -142,7 +142,7 @@ fun checkPermissions(activity: Activity) {
     }
 }
 
-private fun checkBluetooth(activity: Activity) {
+fun checkBluetooth(activity: Activity) {
     val bluetoothScanName = Manifest.permission.BLUETOOTH_SCAN
     val bluetoothConnectName = Manifest.permission.BLUETOOTH_CONNECT
 
