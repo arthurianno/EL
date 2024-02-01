@@ -13,6 +13,7 @@ interface EventsDataSource {
     fun getEvents(start: LocalDateTime, end: LocalDateTime): Observable<List<EventV2Dto>>
 
     fun addEvents(events: List<EventV2Dto>): Completable
+    suspend fun addEventsSuspend(events: List<EventV2Dto>)
 
     fun updateEvents(events: List<EventV2Dto>): Completable
 

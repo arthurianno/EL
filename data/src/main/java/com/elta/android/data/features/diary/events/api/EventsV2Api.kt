@@ -27,6 +27,12 @@ interface EventsV2Api {
         @Body events: List<EventV2Dto>
     ): Observable<List<EventV2Dto>>
 
+    @POST("api/diary/events/v2")
+    suspend fun addEventsSuspend(
+        @Query("sendToRostech") sendToRostech: Boolean,
+        @Body events: List<EventV2Dto>
+    ): List<EventV2Dto>
+
     @PUT("api/diary/events/v2")
     fun updateEvents(
         @Body events: List<EventV2Dto>

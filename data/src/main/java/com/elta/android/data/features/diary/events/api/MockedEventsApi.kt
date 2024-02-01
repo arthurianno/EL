@@ -72,6 +72,13 @@ class MockedEventsApi : EventsV2Api {
     ): Observable<List<EventV2Dto>> =
         Observable.just(events)
 
+    override suspend fun addEventsSuspend(
+        sendToRostech: Boolean,
+        events: List<EventV2Dto>
+    ): List<EventV2Dto> {
+        return events
+    }
+
     override fun updateEvents(events: List<EventV2Dto>): Observable<List<EventV2Dto>> {
         return Observable.just(events)
     }

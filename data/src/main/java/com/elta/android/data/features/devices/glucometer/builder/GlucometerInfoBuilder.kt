@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.glucometer.builder
 
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import org.threeten.bp.ZonedDateTime
 
 interface GlucometerInfoBuilder {
@@ -14,14 +15,5 @@ interface GlucometerInfoBuilder {
         lastSyncedEvent: String? = null
     ): GlucometerInfoDto
 
-    fun buildFrom(
-        id: String,
-        date: ZonedDateTime?,
-        temperature: Int?,
-        batteryLevel: Int?,
-        version: VersionDto?,
-        serial: String?,
-        syncDate: ZonedDateTime?,
-        lastSyncedEvent: String?
-    ): GlucometerInfoDto
+    fun buildFrom(glucometerInfo: GlucometerInfo, lastSyncedEvent: String?): GlucometerInfoDto
 }

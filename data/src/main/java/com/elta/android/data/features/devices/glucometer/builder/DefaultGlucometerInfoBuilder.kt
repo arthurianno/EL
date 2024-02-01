@@ -3,6 +3,7 @@ package com.elta.android.data.features.devices.glucometer.builder
 import com.elta.android.common.utils.toLocalDateTime
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.dto.VersionDto
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -65,23 +66,18 @@ open class DefaultGlucometerInfoBuilder @Inject constructor() : GlucometerInfoBu
     }
 
     override fun buildFrom(
-        id: String,
-        date: ZonedDateTime?,
-        temperature: Int?,
-        batteryLevel: Int?,
-        version: VersionDto?,
-        serial: String?,
-        syncDate: ZonedDateTime?,
+        glucometerInfo: GlucometerInfo,
         lastSyncedEvent: String?
     ): GlucometerInfoDto {
+
         return GlucometerInfoDto(
-            id = id,
-            deviceDate = date,
-            syncDate = syncDate,
-            temperature = temperature,
-            batteryLevel = batteryLevel,
-            version = version,
-            glucometerSerialNumber = serial,
+            id = glucometerInfo.id,
+            deviceDate = glucometerInfo.deviceDate,
+            temperature = glucometerInfo.temperature,
+            batteryLevel = glucometerInfo.batteryLevel,
+            version = VersionDto(software = glucometerInfo.softwareVersion, hardware = glucometerInfo.hardwareVersion),
+            glucometerSerialNumber = glucometerInfo.glucometerSerialNumber,
+            syncDate = ZonedDateTime.now(),
             lastSyncedEvent = lastSyncedEvent
         )
     }

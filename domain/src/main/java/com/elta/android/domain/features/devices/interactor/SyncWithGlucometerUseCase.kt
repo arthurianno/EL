@@ -10,6 +10,7 @@ import com.elta.android.domain.features.devices.repository.BluetoothStateReposit
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
+import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -25,6 +26,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val bluetoothStateRepository: BluetoothStateRepository,
     private val profileRepository: ProfileRepository,
     private val pinRepository: PinRepository,
+    private val eventsRepository: EventsRepository,
     schedulers: SchedulersFacade
 ) : ObservableUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers) {
 
@@ -78,8 +80,10 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
-            //TODO: Сейчас это callable который по сути нифига не делает, исправить
-            /*eventsRepository.addEventFromGlucometer(events)*/
+            if (events.isNotEmpty()) {
+                eventsRepository.addEventFromGlucometer(events)
+            }
+
 
             return events.size
         } finally {

@@ -28,7 +28,7 @@ interface EventsRepository {
 
     fun addEvents(events: List<EventV2>): Completable
 
-    fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>)
+    suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>)
 
     fun updateEvent(event: EventV2): Completable
 
@@ -39,4 +39,5 @@ interface EventsRepository {
     fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri>
 
     fun saveShareEventBitmap(sharingInfo: GlucoseSharingInfo, bitmap: Bitmap): Single<Uri>
+    suspend fun addEventsSuspend(events: List<EventV2>)
 }

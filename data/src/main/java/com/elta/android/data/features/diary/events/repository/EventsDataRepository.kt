@@ -112,11 +112,22 @@ class EventsDataRepository @Inject constructor(
                     )
             }
 
-    override fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
+    override suspend fun addEventsSuspend(events: List<EventV2>) {
+        val mappedEvents = toDtoMapper.mapFromObjects(events)
+        cacheSource.addEventsSuspend(mappedEvents)
+        try {
+            remoteSource.addEvents(mappedEvents)
+        } catch (e: Exception) {
+            //TODO: в логи или перебрасывать исключение выше и там обработать
+            syncManager.saveAsCreated(events)
+        }
+    }
+
+    override suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
         val events = glucometerEvents.map { event ->
             eventsFromGlucometerMapper.mapFromObject(event)
         }
-        addEvents(events)
+        addEventsSuspend(events)
     }
 
     override fun updateEvent(event: EventV2): Completable =

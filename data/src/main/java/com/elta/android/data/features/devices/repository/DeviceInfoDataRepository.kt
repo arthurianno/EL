@@ -66,14 +66,8 @@ class DeviceInfoDataRepository @Inject constructor(
     override fun updateGlucometerInfo(glucometerInfo: GlucometerInfo, lastSyncedEvent: GlucometerEvent?) {
         val cacheInfo = glucometerCacheManager.getGlucometerInfo(glucometerInfo.id)
 
-        val newInfo = infoBuilder.buildFrom( //TODO: можно сразу маппер
-            id = glucometerInfo.id,
-            date = glucometerInfo.deviceDate,
-            temperature = glucometerInfo.temperature,
-            batteryLevel = glucometerInfo.batteryLevel,
-            version = VersionDto(software = glucometerInfo.softwareVersion, hardware = glucometerInfo.hardwareVersion),
-            serial = glucometerInfo.glucometerSerialNumber,
-            syncDate = ZonedDateTime.now(),
+        val newInfo = infoBuilder.buildFrom(
+            glucometerInfo = glucometerInfo,
             lastSyncedEvent = lastSyncedEvent?.originalResponse ?: cacheInfo?.lastSyncedEvent
         )
 
