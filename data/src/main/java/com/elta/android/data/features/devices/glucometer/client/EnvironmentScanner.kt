@@ -2,7 +2,7 @@ package com.elta.android.data.features.devices.glucometer.client
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -11,13 +11,14 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
+import com.elta.android.common.errors.BluetoothScannerNotAvailable
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class EnvironmentScanner @Inject constructor(
-    private val scanner: BluetoothLeScanner,
+    private val adapter: BluetoothAdapter,
     private val context: Context
 ) {
     private var callback: ScanCallback? = null
@@ -54,8 +55,13 @@ class EnvironmentScanner @Inject constructor(
                 throw ScanError(errorCode)
             }
         }
+        val scanner = adapter.bluetoothLeScanner
+        if (scanner == null) {
+            //TODO: в логи, проверить состояние блютуз и разрешения
+            throw BluetoothScannerNotAvailable
+        }
 
-            scanner.startScan(emptyList(), settings, callback)
+        adapter.bluetoothLeScanner.startScan(emptyList(), settings, callback)
     }
 
     fun stopScan() {
@@ -70,7 +76,7 @@ class EnvironmentScanner @Inject constructor(
         Timber.tag(TAG).d("scanner permission state: $permission")
 
         if (permission) {
-            callback?.let { scanner.stopScan(it) }
+            callback?.let { adapter.bluetoothLeScanner?.stopScan(it) }
         }
     }
 

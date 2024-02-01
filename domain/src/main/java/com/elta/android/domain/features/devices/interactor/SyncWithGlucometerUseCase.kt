@@ -1,14 +1,16 @@
 package com.elta.android.domain.features.devices.interactor
 
+import com.elta.android.common.errors.BluetoothNotAvailableError
+import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
-import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
@@ -21,7 +23,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 class SyncWithGlucometerUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val deviceInfoRepository: DeviceInfoRepository,
-    private val eventsRepository: EventsRepository,
+    private val bluetoothStateRepository: BluetoothStateRepository,
     private val profileRepository: ProfileRepository,
     private val pinRepository: PinRepository,
     schedulers: SchedulersFacade
@@ -33,6 +35,17 @@ class SyncWithGlucometerUseCase @Inject constructor(
             if (deviceWithLastEvent == null) {
                 //TODO: в логи
                 throw PrimaryGlucometerNotFoundError
+            }
+
+            when {
+                !bluetoothStateRepository.isBluetoothEnable() -> {
+                    //TODO: в логи, в случае ошибки в исключения. Но и в кастомные логи тоже класть состояние
+                    throw BluetoothNotEnabledError
+                }
+                !bluetoothStateRepository.isPermissionGranted() -> {
+                    //TODO: в логи, в случае ошибки в исключения. Но и в кастомные логи тоже класть состояние
+                    throw BluetoothNotAvailableError
+                }
             }
 
             val profile = try {

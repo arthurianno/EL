@@ -2,6 +2,7 @@ package com.elta.android.common.errors
 
 object BluetoothNotAvailableError : RuntimeException()
 object BluetoothNotEnabledError : RuntimeException()
+object BluetoothScannerNotAvailable : RuntimeException()
 object LocationPermissionNotGrantedError : RuntimeException()
 object LocationNotEnabledError : RuntimeException()
 object GlucometerPinRequireError : RuntimeException()

@@ -83,7 +83,7 @@ class GlucometersService @Inject constructor(
             if (client.state == RxBleClient.State.BLUETOOTH_NOT_ENABLED) {
                 Observable.error(BluetoothNotEnabledError)
             } else {
-                utilService.scanner.startScan(utilService.filters, utilService.settings, context)
+                utilService.adapter.bluetoothLeScanner.startScan(utilService.filters, utilService.settings, context)
                     .filter { findGlucometers ->
                         findGlucometers.map { it.device.address }
                             .contains(address)

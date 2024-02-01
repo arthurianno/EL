@@ -2,7 +2,6 @@ package com.elta.android.data.features.devices.glucometer.service.connect
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
-import com.elta.android.data.features.devices.glucometer.service.UtilService
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection

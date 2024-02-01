@@ -28,15 +28,10 @@ import javax.inject.Singleton
 
 @Singleton
 class UtilService @Inject constructor(
-    context: Context,
     private val client: RxBleClient,
     private val pinStorage: GlucometerPinStorage,
+    val adapter: BluetoothAdapter
 ) {
-
-    private val bluetoothManager: BluetoothManager =
-        context.getSystemService(BluetoothManager::class.java)
-    private val adapter: BluetoothAdapter = bluetoothManager.adapter
-    val scanner: BluetoothLeScanner = adapter.bluetoothLeScanner
 
     val settings: ScanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -49,13 +44,6 @@ class UtilService @Inject constructor(
 
     val dfuFilters: List<ScanFilter> = listOf<ScanFilter>(
         ScanFilter.Builder().setDeviceName("Dfu").build()
-    )
-
-    val infoCommands: List<Commands> = listOf(
-        Commands.GetDate,
-        Commands.GetBatteryAndTemperature,
-        Commands.GetVersion,
-        Commands.Serial
     )
 
     fun checkBluetoothClientState(): Observable<RxBleClient.State> =

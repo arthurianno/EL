@@ -30,7 +30,6 @@ import javax.inject.Singleton
 class FirmwareService @Inject constructor(
     private val utilService: UtilService,
     private val connectService: ConnectService,
-
     private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
     private val pinStorage: GlucometerPinStorage,
     private val infoBuilder: GlucometerInfoBuilder,
@@ -77,7 +76,7 @@ class FirmwareService @Inject constructor(
     ): Observable<String> {
         return if (response.isOk()) {
             val dfuAddress = address.toDfuAddress()
-            utilService.scanner.startScan(utilService.dfuFilters, utilService.settings, context)
+            utilService.adapter.bluetoothLeScanner.startScan(utilService.dfuFilters, utilService.settings, context)
                 .filter { results -> results.map { it.device.address }.contains(dfuAddress) }
                 .take(1)
                 .switchMap { startFirmwareUpdate(context, file.path, dfuAddress) }
