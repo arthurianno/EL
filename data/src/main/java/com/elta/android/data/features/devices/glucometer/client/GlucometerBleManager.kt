@@ -97,7 +97,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         val request = writeCharacteristic(
             glucometerCharacteristic,
             byteCommand,
-            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
         )
             //TODO: Проверить размер который был использован в старой реализации
             .split()
