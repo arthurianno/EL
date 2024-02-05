@@ -70,13 +70,9 @@ class SyncWithGlucometerUseCase @Inject constructor(
         try {
             deviceRepository.connectDevice(deviceAddress, pinCode)
 
-            val glucometerInfo = runActionWithReconnection(deviceAddress = deviceAddress, pinCode = pinCode) {
-                deviceRepository.getGlucometerInfo(deviceAddress)
-            }
+            val glucometerInfo = deviceRepository.getGlucometerInfo(deviceAddress)
 
-            val events = runActionWithReconnection(deviceAddress = deviceAddress, pinCode = pinCode) {
-                deviceRepository.syncWithDevice(deviceAddress, userEmail, glucometerInfo.glucometerSerialNumber, lastSyncEvent)
-            }
+            val events = deviceRepository.syncWithDevice(deviceAddress, userEmail, glucometerInfo.glucometerSerialNumber, lastSyncEvent)
 
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 

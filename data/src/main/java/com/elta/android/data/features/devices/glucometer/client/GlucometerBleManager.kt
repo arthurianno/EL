@@ -94,15 +94,20 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         //Запись характеристики методом BleManager. split() устанавливает Mtu(Maximum Transmission Unit)
         //сплиттер и вызывает функцию расширение suspend() для преобразования асинхронного кода
         //c помощью расширения suspend приостанавливается корутина до получения отклика на комманду
-        val request = writeCharacteristic(
-            glucometerCharacteristic,
-            byteCommand,
-            BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-        )
-            //TODO: Проверить размер который был использован в старой реализации
-            .split()
-            //Может выбрасывать исключения
-            .suspend()
+        val request = try {
+            writeCharacteristic(
+                glucometerCharacteristic,
+                byteCommand,
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            )
+                //TODO: Проверить размер который был использован в старой реализации
+                .split()
+                //Может выбрасывать исключения
+                .suspend()
+        } catch (e: Exception) {
+            //TODO: в кастомный лог firebase,
+            throw e
+        }
 
         //Результат по сути является индикатором что
         //операция завершена успешно, но сами данные получаем через notificationCharacteristic

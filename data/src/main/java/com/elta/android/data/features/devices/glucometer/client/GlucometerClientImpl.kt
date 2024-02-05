@@ -100,6 +100,8 @@ class GlucometerClientImpl @Inject constructor(
     @Throws(GlucometerNotConnectedException::class)
     override suspend fun getGlucometerInfo(address: String): GlucometerInfoDto {
         Timber.tag(TAG).d("Start get glucometer info")
+        //в логи firebasse
+
         with(glucometerBleManager) {
             if (!glucometerBleManager.isConnected(address)) {
                 //TODO: в лог
@@ -111,6 +113,9 @@ class GlucometerClientImpl @Inject constructor(
             val (battery, temperature) = getBatteryAndTemperature()
             val version = getVersion()
             val serial = getSerialNumber()
+
+            Timber.tag(TAG).d("End get glucometer info")
+            //в логи firebasse
 
             return GlucometerInfoDto(
                 id = address,
@@ -130,7 +135,14 @@ class GlucometerClientImpl @Inject constructor(
         //какой-то более удобной реализацией.
 
         val scanResult = scan(address)
-        glucometerBleManager.connectToGlucometer(scanResult.device)
+        //TODO в логи результаты сканирования
+        try {
+            glucometerBleManager.connectToGlucometer(scanResult.device)
+        } catch (e: Exception){
+            //TODO: выбрасывать ошибку подключения
+            throw e
+        }
+
         val pinIsValid = glucometerBleManager.checkPin(pin)
         if (!pinIsValid) {
             glucometerBleManager.disconnectGlucometer()
@@ -153,6 +165,8 @@ class GlucometerClientImpl @Inject constructor(
             }
 
             val events = mutableListOf<String>()
+
+            Timber.tag(TAG).d("start read events from glucometer")
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
