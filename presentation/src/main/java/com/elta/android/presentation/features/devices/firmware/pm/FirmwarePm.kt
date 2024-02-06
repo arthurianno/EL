@@ -67,6 +67,8 @@ class FirmwarePm @Inject constructor(
             is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
+                // TODO не реализована ошибка. До этого состояние отлежиловало библиотека
+            // она сама прокидывала ошибку
             is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
             is NotFoundError -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
             is BluetoothNotEnabledError -> setState(UpdateState.FirmwareUpdateError(resources))
@@ -117,6 +119,7 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
     }
 
+    // TODO удалить и перенести логику проверки use case
     private fun checkBleBeforeUpdate(errorState: UpdateState, doOnSuccess: () -> Unit) {
         btControl.requestEnableBluetooth()
                 .doAfterSuccess {
@@ -283,6 +286,7 @@ class FirmwarePm @Inject constructor(
                                     setState(UpdateState.GlucometerOfflineError(resources))
                                 }
                             }
+                    // todo А нужно ли оно? Это ошибка для сдк <23, а у нас 24 минимальное.
                     is LocationNotEnabledError ->
                         btControl.requestEnableLocation()
                             .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
