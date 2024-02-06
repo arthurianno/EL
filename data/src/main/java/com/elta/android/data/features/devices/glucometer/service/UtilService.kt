@@ -26,6 +26,7 @@ import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// todo удалить после того как перепишем обновление прошивки
 @Singleton
 class UtilService @Inject constructor(
     private val client: RxBleClient,

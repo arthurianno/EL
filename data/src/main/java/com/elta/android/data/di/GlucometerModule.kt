@@ -4,14 +4,16 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
-import com.elta.android.data.features.devices.glucometer.storage.DbGlucometerPinStorage
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerEventBuilder
-import com.elta.android.data.features.devices.glucometer.generator.DefaultGlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
-import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.client.GlucometerBleManager
+import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
+import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManagerImpl
+import com.elta.android.data.features.devices.glucometer.generator.DefaultGlucometerEventIdGenerator
+import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
+import com.elta.android.data.features.devices.glucometer.storage.DbGlucometerPinStorage
 import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
 import com.polidea.rxandroidble2.LogConstants
 import com.polidea.rxandroidble2.LogOptions
@@ -86,4 +88,8 @@ class GlucometerModule {
     @Provides
     @Singleton
     fun provideBleManager(context: Context): GlucometerBleManager = GlucometerBleManager(context)
+
+    @Provides
+    @Singleton
+    fun provideFirmwareManger(context: Context): FirmwareManager = FirmwareManagerImpl(context)
 }
