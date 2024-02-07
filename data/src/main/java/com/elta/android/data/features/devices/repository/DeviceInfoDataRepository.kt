@@ -4,7 +4,6 @@ import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.repository.BaseRepository
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
-import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.manager.GlucometerCacheManager
 import com.elta.android.data.features.devices.mapper.GlucometerToDtoMapper
@@ -13,7 +12,6 @@ import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 class DeviceInfoDataRepository @Inject constructor(
@@ -31,7 +29,6 @@ class DeviceInfoDataRepository @Inject constructor(
                     glucometerInfoToDomainMapper.mapFromObject(info)
         }
     }
-
 
     override fun getDevice(address: String): Glucometer? {
         return glucometerCacheManager.getGlucometer(address)?.let { glucometer ->

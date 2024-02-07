@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.other.pm
 
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
+import com.elta.android.domain.features.devices.interactor.CheckConnectedDevicesUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
@@ -20,11 +21,13 @@ class FromOtherConnectDevicePm @Inject constructor(
     addNewDeviceUseCase: AddNewDeviceUseCase,
     findGlucometersUseCase: FindGlucometersUseCase,
     updateUserInfoUseCase: UpdateUserInfoUseCase,
+    checkConnectedDevicesUseCase: CheckConnectedDevicesUseCase,
     services: ServiceFacade
 ) : ConnectDevicePm(
     syncWithGlucometerUseCase,
     addNewDeviceUseCase,
     findGlucometersUseCase,
+    checkConnectedDevicesUseCase,
     updateUserInfoUseCase,
     services
 ) {

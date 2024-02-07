@@ -14,7 +14,6 @@ interface DeviceInfoRepository {
      */
     fun getDevices(): List<Pair<Glucometer, GlucometerInfo>>
 
-
     /**
      * Получение основных данных об устройстве из кеша по его мак адресу
      * @param address мак-адрес устройства

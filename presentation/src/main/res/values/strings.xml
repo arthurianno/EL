@@ -888,6 +888,9 @@
     <!-- Bluetooth Dialog -->
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
 
+    <!-- Device Dialog -->
+    <string name="device_connected_dialog_message">Данное устройство уже добавлено в список моих устройств. Выберите, пожалуйста, новый глюкометр</string>
+
     <string name="close">Закрыть</string>
 
     <string name="refresh_button">Обновить</string>

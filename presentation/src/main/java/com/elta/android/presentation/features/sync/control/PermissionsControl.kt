@@ -27,12 +27,14 @@ import timber.log.Timber
 class PermissionsControl(pm: PresentationModel) {
 
     val requestEnableBluetoothCommand = pm.command<Unit>(bufferSize = 1)
+    val requestBluetoothPermissionCommand = pm.command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = pm.command<Unit>(bufferSize = 1)
     val requestEnableLocationCommand = pm.command<Unit>(bufferSize = 1)
 
     val bluetoothEnabledAction = pm.action<Unit>()
     val bluetoothDeniedAction = pm.action<Unit>()
     val locationPermissionsGrantedAction = pm.action<Permission>()
+    val bluetoothPermissionsGrantedAction = pm.action<Permission>()
     val locationEnabledAction = pm.action<Unit>()
 
     companion object {
@@ -58,6 +60,15 @@ fun PermissionsControl.bindTo(
                 )
         }
         .addTo(compositeUnbind)
+
+    requestBluetoothPermissionCommand.observable
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.requestEach(android.Manifest.permission.BLUETOOTH_SCAN)
+        }
+        .subscribe(bluetoothPermissionsGrantedAction.consumer)
+        .addTo(compositeUnbind)
+
     requestLocationPermissionsCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {

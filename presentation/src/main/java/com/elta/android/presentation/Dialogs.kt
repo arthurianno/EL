@@ -118,12 +118,28 @@ sealed class Dialogs : DialogData {
         override val positive: String? = resourceProvider.getString(R.string.ok)
     ) : Dialogs()
 
-    data class SettingsDialogData(
+    data class SettingsLocationDialogData(
         val resourceProvider: ResourceProvider,
         override val title: String = resourceProvider.getString(R.string.settings_dialog_title),
         override val message: String = resourceProvider.getString(R.string.location_dialog_message),
         override val negative: String = resourceProvider.getString(R.string.settings_dialog_negative),
         override val positive: String = resourceProvider.getString(R.string.settings_dialog_positive),
+    ) : Dialogs()
+
+    data class SettingsBluetoothDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String = resourceProvider.getString(R.string.settings_dialog_title),
+        override val message: String = resourceProvider.getString(R.string.bluetooth_dialog_message),
+        override val negative: String = resourceProvider.getString(R.string.settings_dialog_negative),
+        override val positive: String = resourceProvider.getString(R.string.settings_dialog_positive),
+    ) : Dialogs()
+
+    data class DeviceAlreadyConnectedDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String? = null,
+        override val message: String = resourceProvider.getString(R.string.device_connected_dialog_message),
+        override val negative: String? = null,
+        override val positive: String = resourceProvider.getString(R.string.ok),
     ) : Dialogs()
 
     data class EditingXEIsNotAvailableData(
