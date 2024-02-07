@@ -41,10 +41,16 @@ class DeviceDataRepository @Inject constructor(
         val info = glucometerClient.getGlucometerInfo(address)
         return glucometerInfoToDomainMapper.mapFromObject(info)
     }
-    override suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEvent> =
-        glucometerClient.syncWithDevice(address, lastSyncEvent)
+    override suspend fun syncWithDevice(
+        address: String,
+        email: String,
+        serial: String?,
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
+    ): List<GlucometerEvent> =
+        glucometerClient.syncWithDevice(address, lastSyncEvent, onCommandSuccess)
             .also { rosTechRepository.sendEvents(address, it) }
-            .map { event -> glucometerEventBuilder.buildFrom(email, address, event,serial) }
+            .map { event -> glucometerEventBuilder.buildFrom(email, address, event, serial) }
 
     override suspend fun locateGlucometer() {
         glucometerClient.locateGlucometer()

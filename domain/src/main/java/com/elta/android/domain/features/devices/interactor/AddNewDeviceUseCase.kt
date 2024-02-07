@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
+import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -23,7 +24,6 @@ class AddNewDeviceUseCase @Inject constructor(
 ) : CompletableUseCase<AddNewDeviceUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Completable {
-
         return rxCompletable(EmptyCoroutineContext + Dispatchers.Unconfined) {
             addDevice(params)
         }
@@ -40,7 +40,7 @@ class AddNewDeviceUseCase @Inject constructor(
             }
             val address = device.address
 
-            deviceRepository.connectDevice(address, pincode)
+            deviceRepository.connectWithTimeout(address, pincode)
             pinRepository.savePin(address, pincode)
 
             val primaryDevice = deviceInfoRepository.getPrimaryDeviceWithLastEvent()?.first

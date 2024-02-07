@@ -41,10 +41,17 @@ interface DeviceRepository {
      * @param email Электронная почта пользователя, которая преоразуется в пользовательский идентификатор.
      * @param serial Серийный номер устройства
      * @param lastSyncEvent Последний считайнный замер с устройства в строковом представлении
+     * @param onCommandSuccess коллбек вызывающися после каждой успешной выполненной комманды глюкометра
      * Он необходим для сохранения в БД и отправления на сервер.
      * @return Список преоразованных событий с устройства.
      */
-    suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEvent>
+    suspend fun syncWithDevice(
+        address: String,
+        email: String,
+        serial: String?,
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
+    ): List<GlucometerEvent>
 
     /**
      * Метод для обнаружение устройства.

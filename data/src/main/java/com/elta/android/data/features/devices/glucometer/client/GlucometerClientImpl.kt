@@ -3,6 +3,7 @@ package com.elta.android.data.features.devices.glucometer.client
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerPinIncorrect
@@ -14,7 +15,6 @@ import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.runningFold
@@ -130,8 +130,7 @@ class GlucometerClientImpl @Inject constructor(
         try {
             glucometerBleManager.connectToGlucometer(scanResult.device)
         } catch (e: Exception){
-            //TODO: выбрасывать ошибку подключения
-            throw e
+            throw GlucometerConnectionException(address)
         }
 
         val pinIsValid = glucometerBleManager.checkPin(pin)
@@ -148,8 +147,8 @@ class GlucometerClientImpl @Inject constructor(
     @Throws(GlucometerNotConnectedException::class)
     override suspend fun syncWithDevice(
         address: String,
-
-        lastSyncEvent: String?
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
     ): List<String> {
         Timber.tag(TAG).d("Start sync with glucometer")
 
@@ -165,6 +164,7 @@ class GlucometerClientImpl @Inject constructor(
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
+                onCommandSuccess.invoke()
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
                 events.add(event)
             }

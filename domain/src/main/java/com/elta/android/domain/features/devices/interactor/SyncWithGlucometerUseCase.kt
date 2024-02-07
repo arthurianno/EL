@@ -3,6 +3,7 @@ package com.elta.android.domain.features.devices.interactor
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
+import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -10,10 +11,10 @@ import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
-import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
@@ -26,7 +27,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val eventsRepository: EventsRepository,
     schedulers: SchedulersFacade
-) : ObservableUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers) {
+) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Int> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
@@ -54,11 +55,16 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw Exception("Email is empty")
             }
 
-            syncWithDevice(address, email, lastSyncEvent)
+            syncWithDevice(this, address, email, lastSyncEvent)
         }
     }
 
-    private suspend fun syncWithDevice(deviceAddress: String, userEmail: String, lastSyncEvent: String?): Int {
+    private suspend fun syncWithDevice(
+        scope: ProducerScope<Int>,
+        deviceAddress: String,
+        userEmail: String,
+        lastSyncEvent: String?
+    ): Int {
         val pinCode = pinRepository.getPin(deviceAddress)
         if (pinCode == null) {
             //TODO: В логи
@@ -66,11 +72,21 @@ class SyncWithGlucometerUseCase @Inject constructor(
         }
 
         try {
-            deviceRepository.connectDevice(deviceAddress, pinCode)
+            deviceRepository.connectWithTimeout(deviceAddress, pinCode)
 
+            resetAndLaunchTimer(scope)
             val glucometerInfo = deviceRepository.getGlucometerInfo(deviceAddress)
 
-            val events = deviceRepository.syncWithDevice(deviceAddress, userEmail, glucometerInfo.glucometerSerialNumber, lastSyncEvent)
+
+            resetAndLaunchTimer(scope)
+            val events = deviceRepository.syncWithDevice(
+                address = deviceAddress,
+                email = userEmail,
+                serial = glucometerInfo.glucometerSerialNumber,
+                lastSyncEvent = lastSyncEvent
+            ) {
+                resetAndLaunchTimer(scope)
+            }
 
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
@@ -81,8 +97,10 @@ class SyncWithGlucometerUseCase @Inject constructor(
             return events.size
         } finally {
             deviceRepository.disconnect()
+            cancelTimer()
         }
 
     }
+
     data class Params(val device: Glucometer? = null)
 }

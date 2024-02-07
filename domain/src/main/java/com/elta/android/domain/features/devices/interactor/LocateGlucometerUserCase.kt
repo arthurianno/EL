@@ -1,13 +1,18 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
+import com.elta.android.domain.features.devices.COMMAND_TIMEOUT
+import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeout
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class LocateGlucometerUserCase @Inject constructor(
@@ -21,11 +26,20 @@ class LocateGlucometerUserCase @Inject constructor(
             throw GlucometerPinNotFoundInternaly
         }
 
-        deviceRepository.connectDevice(address, pin)
+        deviceRepository.connectWithTimeout(address, pin)
         try {
             while (currentCoroutineContext().isActive) {
                 emit(Unit)
-                deviceRepository.locateGlucometer()
+                try {
+                    withTimeout(COMMAND_TIMEOUT) {
+                        deviceRepository.locateGlucometer()
+                    }
+                } catch (e: TimeoutCancellationException) {
+                    //TODO в лог
+                    throw TimeoutException("cant locate glucometer with address $address")
+                }
+
+
                 delay(LOCATE_GLUCOMETER_DELAY)
             }
         } finally {

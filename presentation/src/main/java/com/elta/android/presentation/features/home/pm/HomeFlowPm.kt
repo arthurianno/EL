@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.home.pm
 
-import android.os.CountDownTimer
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerOfflineError
@@ -12,7 +11,6 @@ import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
-import com.elta.android.domain.features.devices.interactor.TestUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
@@ -63,13 +61,8 @@ import javax.inject.Inject
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
-private const val SNACK_BAR_DURATION = 60000
-private const val SYNC_TIMER_DELAY_MILLIS = 30000L //TODO: общий таймер, надо убирать такое
 
 class HomeFlowPm @Inject constructor(
-
-    private val testUseCase: TestUseCase,
-
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getDevicesUseCase: GetGlucometersUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
@@ -123,18 +116,6 @@ class HomeFlowPm @Inject constructor(
     private val googlePlayDialogAction = action<Unit>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
-
-    private val syncTimer =
-        object : CountDownTimer(SYNC_TIMER_DELAY_MILLIS, SYNC_TIMER_DELAY_MILLIS) {
-            override fun onTick(millisUntilFinished: Long) {}
-
-            override fun onFinish() {
-                syncTimerIsRun = false
-            }
-        }
-
-    @Volatile
-    private var syncTimerIsRun: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
@@ -319,7 +300,6 @@ class HomeFlowPm @Inject constructor(
         )
             .skipWhileInProgress(syncProgressState.observable)
             .flatMap {
-                startSyncTimer()
                 syncWithGlucometer(isAuto = false)
             }
             .retry()
@@ -449,7 +429,6 @@ class HomeFlowPm @Inject constructor(
         Singles.zip(getUserInfoUseCase.execute(), getDevicesUseCase.execute())
             .flatMapObservable { (info, devices) ->
                 if (devices.find { it.first.isPrimary } != null && info.isFirstHomeEntrance != true) {
-                    startSyncTimer()
                     syncWithGlucometer(isAuto = true)
                         .map { Unit }
                         .doOnError(::handleSyncAutoError)
@@ -466,7 +445,6 @@ class HomeFlowPm @Inject constructor(
             .bindProgress(syncProgressState.consumer)
             .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
             .doOnComplete {
-                stopSyncTimer()
                 bus.event(Events.Sync.Glucometer.Success)
             }
             .doOnError { error ->
@@ -495,9 +473,7 @@ class HomeFlowPm @Inject constructor(
 
                 is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
 
-                else -> if (syncTimerIsRun) {
-                    syncWithGlucometer(isAuto)
-                } else {
+                else -> {
                     Observable.error(error)
                 }
             }
@@ -518,20 +494,8 @@ class HomeFlowPm @Inject constructor(
         .filter { it }
         .flatMapObservable { syncWithGlucometer(isAuto) }
 
-    private fun startSyncTimer() {
-        syncTimer.cancel()
-        syncTimer.start()
-        syncTimerIsRun = true
-    }
-
-    private fun stopSyncTimer() {
-        syncTimer.cancel()
-        syncTimerIsRun = false
-    }
-
     private fun handleManualSyncError(error: Throwable) {
         bus.event(Events.Sync.Glucometer.Nothing)
-        stopSyncTimer()
 
         when (error) {
             is PrimaryGlucometerNotFoundError -> {
@@ -558,26 +522,22 @@ class HomeFlowPm @Inject constructor(
     }
 
     private fun handleAutoSyncError(error: Throwable) {
-        if (!syncTimerIsRun) {
-            when {
-                error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError || error.cause is LocationPermissionNotGrantedError ->
-                    bus.event(Events.Sync.Glucometer.Error)
+        when {
+            error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError || error.cause is LocationPermissionNotGrantedError ->
+                bus.event(Events.Sync.Glucometer.Error)
 
-                error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) ->
-                    bus.event(Events.Sync.Glucometer.ErrorWithMessage)
+            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) ->
+                bus.event(Events.Sync.Glucometer.ErrorWithMessage)
 
-                error is PrimaryGlucometerNotFoundError -> openConnectScreen()
+            error is PrimaryGlucometerNotFoundError -> openConnectScreen()
 
-                else -> handleError(error)
-            }
-
+            else -> handleError(error)
         }
     }
 
     private fun handleSyncAutoError(error: Throwable) {
         when (error) {
             is PrimaryGlucometerNotFoundError -> {
-                stopSyncTimer()
                 startSyncWithBackendAction.consumer.accept(Unit)
             }
 
@@ -603,8 +563,6 @@ class HomeFlowPm @Inject constructor(
 //            .subscribe()
 //            .untilDestroy()
 
-
-        stopSyncTimer()
         bus.event(Events.Sync.Glucometer.Error)
         router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
     }

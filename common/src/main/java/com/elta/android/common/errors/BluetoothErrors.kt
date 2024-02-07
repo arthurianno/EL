@@ -6,7 +6,6 @@ object BluetoothScannerNotAvailable : RuntimeException()
 object LocationPermissionNotGrantedError : RuntimeException()
 // TODO Возможно стоит удалить, так как оно используется для сдк <23, а у нас 24 минимальное
 object LocationNotEnabledError : RuntimeException()
-object GlucometerPinRequireError : RuntimeException()
 
 //TODO: проверить, разделиля ошибку некорректного пина и когда пина нет в базе
 object GlucometerPinIncorrect : RuntimeException()
