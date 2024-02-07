@@ -169,7 +169,6 @@ dependencies {
     implementation(Dependencies.Yandex.mapKit)
     implementation(Dependencies.RxJava2.rxJava)
     implementation(Dependencies.RxJava2.rxPm)
-    implementation(Dependencies.RxJava2.rxBluetooth)
     implementation(Dependencies.Cicerone.core)
 
     kapt(Dependencies.Dagger.daggerCompiler)

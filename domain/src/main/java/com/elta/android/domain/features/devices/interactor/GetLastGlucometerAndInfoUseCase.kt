@@ -6,10 +6,10 @@ import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.zip
-import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.rxObservable
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class GetLastGlucometerAndInfoUseCase @Inject constructor(
     private val repo: DeviceInfoRepository, schedulers: SchedulersFacade
@@ -18,14 +18,19 @@ class GetLastGlucometerAndInfoUseCase @Inject constructor(
 ) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Pair<Glucometer, GlucometerInfo>> {
-        //TODO: сделать через корутины или флоу. Сделал временное работоспособное решение.
         val p = checkNotNull(params)
 
-        return flow { emit(repo.getDevice(p.address)) }.zip(flow { emit(repo.getLastDeviceInfo(p.address)) }) { glucometer: Glucometer?, glucometerInfo: GlucometerInfo? ->
-            glucometer ?: throw Exception("Glucometer is Empty")
-            glucometerInfo ?: throw Exception("Glucometer Info is Empty")
+        return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined)  {
+            val glucometer = repo.getDevice(p.address)
+            if (glucometer == null) {
+                throw Exception("Glucometer is Empty")
+            }
+            val glucometerInfo = repo.getLastDeviceInfo(p.address)
+            if (glucometerInfo == null) {
+                throw Exception("Glucometer Info is Empty")
+            }
             glucometer to glucometerInfo
-        }.asObservable()
+        }
     }
 
     data class Params(val address: String)

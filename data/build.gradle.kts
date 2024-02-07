@@ -48,7 +48,6 @@ dependencies {
 
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.RxJava2.rxNetwork)
-    implementation(Dependencies.RxJava2.rxBluetooth)
     implementation(Dependencies.RxJava2.rxReplaying)
 
     implementation(Dependencies.Dagger.javaxAnnotation)

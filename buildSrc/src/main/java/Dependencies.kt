@@ -257,7 +257,6 @@ object Dependencies {
         private const val rxBindingVersion = "2.0.0"
         private const val rxNetworkVersion = "3.0.2"
         private const val rxReplayingVersion = "2.1.1"
-        private const val rxBluetoothVersion = "1.17.2"
 
         const val rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
         const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
@@ -269,7 +268,6 @@ object Dependencies {
         const val rxPermissions = "com.github.tbruyelle:rxpermissions:$rxPermissionsVersion"
         const val rxNetwork = "com.github.pwittchen:reactivenetwork-rx2:$rxNetworkVersion"
         const val rxReplaying = "com.jakewharton.rx2:replaying-share-kotlin:$rxReplayingVersion"
-        const val rxBluetooth = "com.polidea.rxandroidble2:rxandroidble:$rxBluetoothVersion"
     }
 
     object Nordic {

@@ -15,13 +15,9 @@ import com.elta.android.data.features.devices.glucometer.generator.DefaultGlucom
 import com.elta.android.data.features.devices.glucometer.generator.GlucometerEventIdGenerator
 import com.elta.android.data.features.devices.glucometer.storage.DbGlucometerPinStorage
 import com.elta.android.data.features.devices.glucometer.storage.GlucometerPinStorage
-import com.polidea.rxandroidble2.LogConstants
-import com.polidea.rxandroidble2.LogOptions
-import com.polidea.rxandroidble2.RxBleClient
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import timber.log.Timber
 import javax.inject.Singleton
 
 @Module(includes = [GlucometerModule.Declarations::class])
@@ -49,29 +45,6 @@ class GlucometerModule {
             generator: DefaultGlucometerEventIdGenerator
         ): GlucometerEventIdGenerator
     }
-
-    // TODO :: удалить, так как будем избавляться от библиотеки
-    @Provides
-    @Singleton
-    fun provideRxBleClient(context: Context): RxBleClient =
-        RxBleClient
-            .create(context)
-            .also {
-                RxBleClient.updateLogOptions(
-                    LogOptions.Builder()
-                        .setLogLevel(LogConstants.DEBUG)
-                        .setLogger { level, tag, msg ->
-                            Timber.tag(tag).log(level, msg)
-                        }
-                        .build()
-                )
-            }
-
-    //TODO: это не нужно будет, это временно для Android RX интеграции, чтобы завести проект
-    @Provides
-    @Singleton
-    fun provideScanner(adapter: BluetoothAdapter): BluetoothLeScanner =
-        adapter.bluetoothLeScanner
 
     @Provides
     @Singleton
