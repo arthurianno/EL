@@ -33,6 +33,9 @@ class PermissionsControl2 {
     internal val bluetoothRequestRelay = PublishRelay.create<Unit>()
     internal val bluetoothRequestResultRelay = PublishRelay.create<Boolean>()
 
+    internal val bluetoothPermissionsRequestRelay = PublishRelay.create<Unit>()
+    internal val bluetoothPermissionsRequestResultRelay = PublishRelay.create<Boolean>()
+
     internal val locationRequestRelay = PublishRelay.create<Unit>()
     internal val locationRequestResultRelay = PublishRelay.create<Boolean>()
 
@@ -53,9 +56,15 @@ class PermissionsControl2 {
             .firstElement()
 
     fun requestLocationPermissions(): Maybe<Boolean> =
-        locationPermissionsRequestResultRelay
-            .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
-            .firstElement()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            bluetoothPermissionsRequestResultRelay
+                .doOnSubscribe { bluetoothPermissionsRequestRelay.accept(Unit) }
+                .firstElement()
+        } else {
+            locationPermissionsRequestResultRelay
+                .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
+                .firstElement()
+        }
 
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 147
@@ -80,10 +89,19 @@ fun PermissionsControl2.bindTo(
                 )
         }
         .addTo(compositeUnbind)
+
+    bluetoothPermissionsRequestRelay
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.request(Manifest.permission.BLUETOOTH_SCAN)
+        }
+        .subscribe(bluetoothPermissionsRequestResultRelay)
+        .addTo(compositeUnbind)
+
     locationPermissionsRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.request(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            permissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
         }
         .subscribe(locationPermissionsRequestResultRelay)
         .addTo(compositeUnbind)

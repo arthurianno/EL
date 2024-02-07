@@ -67,8 +67,8 @@ class FirmwarePm @Inject constructor(
             is GlucometerLowBatteryLevelError -> setState(UpdateState.BatteryLowLevel(resources))
             is FirmwareDownloadingError -> setState(UpdateState.FirmwareDownloadingError(resources))
             is FirmwareUpdateError -> setState(UpdateState.FirmwareUpdateError(resources))
-                // TODO не реализована ошибка. До этого состояние отлежиловало библиотека
-            // она сама прокидывала ошибку
+            // TODO : не реализована ошибка. До этого состояние отлежиловало библиотека,
+            //       она сама прокидывала ошибку
             is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
             is NotFoundError -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
             is BluetoothNotEnabledError -> setState(UpdateState.FirmwareUpdateError(resources))
@@ -105,11 +105,21 @@ class FirmwarePm @Inject constructor(
             .subscribe {
                 when (updateState.value) {
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
-                    is UpdateState.Found -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
+                    is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
                     is UpdateState.BatteryLowLevel -> router.exit()
-                    is UpdateState.FirmwareDownloadingError -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
-                    is UpdateState.FirmwareUpdateError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
-                    is UpdateState.GlucometerOfflineError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
+                    is UpdateState.FirmwareDownloadingError ->
+                        downloadFirmwareAction.consumer.accept(Unit)
+
+                    is UpdateState.FirmwareUpdateError ->
+                        checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) {
+                            startUpdateAction.consumer.accept(Unit)
+                        }
+
+                    is UpdateState.GlucometerOfflineError ->
+                        checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) {
+                            startUpdateAction.consumer.accept(Unit)
+                        }
+
                     is UpdateState.Downloading -> {}
                     is UpdateState.Progress -> {}
                     is UpdateState.Updated -> {}
@@ -119,7 +129,6 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
     }
 
-    // TODO удалить и перенести логику проверки use case
     private fun checkBleBeforeUpdate(errorState: UpdateState, doOnSuccess: () -> Unit) {
         btControl.requestEnableBluetooth()
                 .doAfterSuccess {
