@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.devices.search.viewmodel
 
 import android.os.Bundle
-import com.elta.android.domain.features.devices.interactor.FindGlucometerUseCase
+import com.elta.android.domain.features.devices.interactor.LocateGlucometerUserCase
 import com.elta.android.presentation.analytics.core.Analytics
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventType
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class GlucometerSearchViewModel @Inject constructor(
-    private val findGlucometer: FindGlucometerUseCase,
+    private val findGlucometer: LocateGlucometerUserCase,
     private val analytics: Analytics
 ) : BaseViewModel<GlucometerSearchViewState>() {
     override fun createInitState(): GlucometerSearchViewState =

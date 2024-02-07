@@ -47,12 +47,10 @@ interface DeviceRepository {
     suspend fun syncWithDevice(address: String, email: String, serial: String?, lastSyncEvent: String?): List<GlucometerEvent>
 
     /**
-     * Метод для обнаружение устройства. В случае обнаружения, отправляется команда к глюкометру.
+     * Метод для обнаружение устройства.
      * Устройство будет издавать звук после команды.
-     * @param address Адрес запрашиваемого устройства.
-     * @return Возвращает пустой флоу.
      */
-    fun findGlucometer(address: String): Flow<Unit>
+    suspend fun locateGlucometer()
 
     /**
      * @suppress Метод для тестирования

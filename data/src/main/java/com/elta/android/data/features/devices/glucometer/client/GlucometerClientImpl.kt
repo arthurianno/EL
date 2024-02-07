@@ -32,25 +32,6 @@ class GlucometerClientImpl @Inject constructor(
     private val firmwareManager: FirmwareManager,
 ) : GlucometerClient {
 
-    //TODO: для каждой команды надо сделать:
-    // 1. проверку что уже не подсоеденено устройство
-    // 2. scan()
-    // 3. connect()
-    // 4. любые команды
-    // 5. disconnect()
-    // Чтобы минимизировать риск неправильной очередности команд или "забыл сканирование"
-
-    //TODO: стоит проверять на connect перед операцией и только тогда его производить.
-    // Проверять, не привязанно ли уже устройство,
-    // 1. если привязано, то выполнять команды
-    // 1.1. пройден пин или нет
-    // 2. если не привязано, то привязать, проверить пин
-
-    // TODO: Доступы к бд и иной логике в UseCase!
-
-    // TODO: для таймера timeout в UseCase
-
-
     private val settings: ScanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -194,18 +175,8 @@ class GlucometerClientImpl @Inject constructor(
         }
     }
 
-    override suspend fun findGlucometer(address: String, pin: String) {
-        Timber.tag(TAG).d("Start find glucometer")
-        val scanResult = scan(address, filters)
-        with(glucometerBleManager) {
-            connectToGlucometer(scanResult.device)
-            checkPin(pin)
-            repeat(10) { //TODO: сколько раз? Пока не пользователь не остановит?
-                turnOnFindMode()
-                delay(8000L)
-            }
-            disconnectGlucometer()
-        }
+    override suspend fun locateGlucometer() {
+        glucometerBleManager.turnOnFindMode()
     }
 
     private suspend fun scan(address: String, filters: List<ScanFilter>): ScanResult {
@@ -223,8 +194,8 @@ class GlucometerClientImpl @Inject constructor(
         val scan = scan(address, filters)
         glucometerBleManager.connectToGlucometer(scan.device)
         try {
-            val checkPinSuccess = glucometerBleManager.checkPin(pin)
-            if (!checkPinSuccess) {
+            val isPinValid = glucometerBleManager.checkPin(pin)
+            if (!isPinValid) {
                 //в логи
                 throw GlucometerPinIncorrect
             }
@@ -265,8 +236,6 @@ class GlucometerClientImpl @Inject constructor(
     }
 
 }
-
-internal fun String.isError(): Boolean = contains("error")
 
 private const val TAG = "GLUCOMETER_CLIENT"
 private const val MIN_BATTERY_LEVEL = 1

@@ -29,8 +29,6 @@ class EnvironmentScanner @Inject constructor(
         settings: ScanSettings,
         resultCallback: (List<ScanResult>) -> Unit
     ) {
-        //FIXME!! Это костыль Макса, т.к каждая комманда сейчас запускается со старта сканирования и подключения
-        //В дальнейшем сканирование и подключение должно быть единожды за сессию синхронизации
         stopScan()
 
         callback = object : ScanCallback() {
@@ -52,6 +50,7 @@ class EnvironmentScanner @Inject constructor(
             }
 
             override fun onScanFailed(errorCode: Int) {
+                //TODO: обязательно в логи, так как могут быть проблемы еще на этапе сканирования
                 throw ScanError(errorCode)
             }
         }

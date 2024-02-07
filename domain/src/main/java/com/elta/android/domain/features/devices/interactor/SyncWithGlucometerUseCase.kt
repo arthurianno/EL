@@ -1,7 +1,5 @@
 package com.elta.android.domain.features.devices.interactor
 
-import com.elta.android.common.errors.GlucometerConnectionException
-import com.elta.android.common.errors.GlucometerNotConnectedException
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
@@ -80,39 +78,11 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 eventsRepository.addEventFromGlucometer(events)
             }
 
-
             return events.size
         } finally {
             deviceRepository.disconnect()
         }
 
     }
-
-    private suspend fun <T> runActionWithReconnection(
-        deviceAddress: String,
-        pinCode: String,
-        repeatTimes: Int = 0,
-        maxRepeatTimes: Int = 3, action: suspend () -> T
-    ): T {
-        return try {
-            action()
-        } catch (e: Exception) {
-            if (e is GlucometerNotConnectedException) {
-                if (repeatTimes >= maxRepeatTimes) throw GlucometerConnectionException(deviceAddress)
-                deviceRepository.connectDevice(deviceAddress, pinCode)
-                runActionWithReconnection(
-                    deviceAddress,
-                    pinCode,
-                    repeatTimes + 1,
-                    maxRepeatTimes,
-                    action
-                )
-            } else {
-                throw e
-            }
-        }
-    }
-
-
     data class Params(val device: Glucometer? = null)
 }

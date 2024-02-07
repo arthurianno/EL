@@ -118,7 +118,12 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         //Метод waitForNotification вешает одноразовый коллбек который преобразуется
         //c помощью расширения suspend приостанавливается корутина до получения уведомления
         //suspend тут так же выбрасывает исключения
-        val response = waitForNotification(notificationCharacteristic).suspend()
+        val response = try {
+            waitForNotification(notificationCharacteristic).suspend()
+        } catch (e: Exception) {
+            //TODO: в кастомный лог firebase,
+            throw e
+        }
 
         //Собственно тут получаем реальные замеры устройства в строковом представлении
         val resultResponse = response.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty waitForNotification result")

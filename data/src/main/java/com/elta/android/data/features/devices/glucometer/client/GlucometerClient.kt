@@ -29,7 +29,6 @@ interface GlucometerClient {
      * */
     suspend fun getGlucometerInfo(address: String): GlucometerInfoDto
 
-    //TODO: надо оставить просто чтение событий
     /**
      * Синхронизация с глюкометром
      * */
@@ -38,7 +37,7 @@ interface GlucometerClient {
     /**
      * Запускает сценарий поиска глюкометра
      * */
-    suspend fun findGlucometer(address: String, pin: String)
+    suspend fun locateGlucometer()
 
     // TODO дописать документацию
     /**

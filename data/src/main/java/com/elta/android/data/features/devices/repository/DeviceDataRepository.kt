@@ -2,34 +2,28 @@ package com.elta.android.data.features.devices.repository
 
 import android.bluetooth.le.ScanResult
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.common.repository.BaseRepository
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.client.GlucometerClient
-import com.elta.android.data.features.devices.glucometer.service.GlucometersService
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.rostech.RosTechRepository
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
-    private val glucometersService: GlucometersService, //TODO: перевести на manager
     private val glucometerClient: GlucometerClient,
     private val scanToDtoMapper: Mapper<ScanResult, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
     private val glucometerEventBuilder: GlucometerEventBuilder,
     //TODO: не самое удобное место, но работу с SDK все равно нужно переделывать
-    private val rosTechRepository: RosTechRepository,
-    override val dispatcher: CoroutineDispatcher
-) : DeviceRepository, BaseRepository {
+    private val rosTechRepository: RosTechRepository
+) : DeviceRepository {
 
     override fun findDevices(): Flow<List<Glucometer>> =
         glucometerClient.findDevices()
@@ -52,9 +46,9 @@ class DeviceDataRepository @Inject constructor(
             .also { rosTechRepository.sendEvents(address, it) }
             .map { event -> glucometerEventBuilder.buildFrom(email, address, event,serial) }
 
-    override fun findGlucometer(address: String): Flow<Unit> =
-        glucometersService.findGlucometer(address)
-            .flowOn(dispatcher)
+    override suspend fun locateGlucometer() {
+        glucometerClient.locateGlucometer()
+    }
 
     override suspend fun testAllDevice(address: String, pinCode: String) {
         glucometerClient.testAllCommands(address, pinCode)
