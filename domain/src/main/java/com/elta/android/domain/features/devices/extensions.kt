@@ -23,11 +23,11 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions() {
         }
     }
 }
-@Throws(TimeoutCancellationException::class)
-suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String) {
+@Throws(GlucometerSyncError::class)
+suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String, isDfuMode: Boolean = false) {
     try {
         withTimeout(CONNECT_TIMEOUT) {
-            connectDevice(address, pinCode)
+            connectDevice(address, pinCode, isDfuMode)
         }
     } catch (e: TimeoutCancellationException) {
         //TODO: в логи

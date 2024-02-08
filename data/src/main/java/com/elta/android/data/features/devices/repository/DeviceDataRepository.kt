@@ -30,8 +30,8 @@ class DeviceDataRepository @Inject constructor(
             .map(scanToDtoMapper::mapFromObjects)
             .map(glucometerToDomainMapper::mapFromObjects)
 
-    override suspend fun connectDevice(address: String, pinCode: String) =
-        glucometerClient.connectDevice(address, pinCode)
+    override suspend fun connectDevice(address: String, pinCode: String, isDfuMode: Boolean) =
+        glucometerClient.connectDevice(address, pinCode, isDfuMode)
 
     override suspend fun disconnect() {
         glucometerClient.disconnect()
@@ -54,6 +54,10 @@ class DeviceDataRepository @Inject constructor(
 
     override suspend fun locateGlucometer() {
         glucometerClient.locateGlucometer()
+    }
+
+    override suspend fun turnOnDfuMode() {
+        glucometerClient.turnOnDfuMode()
     }
 
     override suspend fun testAllDevice(address: String, pinCode: String) {

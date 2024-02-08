@@ -16,8 +16,9 @@ interface GlucometerClient {
      * Подключение к глюкометру
      * @param address - мак-адрес устройства
      * @param pin - пин-код для подключения к устройству
+     * @param isDfuMode - поиск устройств в режиме DFU
      * */
-    suspend fun connectDevice(address: String, pin: String)
+    suspend fun connectDevice(address: String, pin: String, isDfuMode: Boolean)
 
     /**
      * Отключение от глюкометра
@@ -43,11 +44,12 @@ interface GlucometerClient {
     /**
      * Обновление прошивки глюкометра.
      * @param address Mac-адрес глюкометра.
-     * @param pin Пин-код к глюкометру.
-     * @param file Данные о файле с новой прошивкой (содержит путь до файла и версию).
+     * @param firmwareFile Данные о файле с новой прошивкой (содержит путь до файла и версию).
      * @return
     **/
-    suspend fun updateFirmware(address: String, pin: String, firmwareFile: FirmwareFile): String
+    suspend fun updateFirmware(address: String, firmwareFile: FirmwareFile): String
+
+    suspend fun turnOnDfuMode()
 
     suspend fun testAllCommands(address: String, pin: String)
 }

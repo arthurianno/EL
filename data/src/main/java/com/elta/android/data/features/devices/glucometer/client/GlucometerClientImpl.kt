@@ -10,7 +10,6 @@ import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
-import com.elta.android.data.features.devices.glucometer.firmware.utils.toDfuAddress
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
 import com.elta.android.domain.features.firmware.model.FirmwareFile
@@ -54,22 +53,15 @@ class GlucometerClientImpl @Inject constructor(
 
     override suspend fun updateFirmware(
         address: String,
-        pin: String,
         firmwareFile: FirmwareFile
     ): String {
-        setupDfuMode(address, pin)
-
-        val dfuAddress = address.toDfuAddress()
-        val scanDfu = scan(dfuAddress, dfuFilters)
-        glucometerBleManager.connectToGlucometer(scanDfu.device)
         val updateResult = try {
             firmwareManager.updateFirmware(address, firmwareFile.path)
         } catch (e: Exception) {
             //Todo: в логи
             throw e
-        } finally {
-            disconnect()
         }
+
         return updateResult
     }
 
@@ -122,10 +114,12 @@ class GlucometerClientImpl @Inject constructor(
         }
     }
 
-    override suspend fun connectDevice(address: String, pin: String) {
+    override suspend fun connectDevice(address: String, pin: String, isDfuMode: Boolean) {
         Timber.tag(TAG).d("Start connect to glucometer")
 
-        val scanResult = scan(address, filters)
+        val scanFilters = if (isDfuMode) dfuFilters else filters
+
+        val scanResult = scan(address, scanFilters)
         //TODO в логи результаты сканирования
         try {
             glucometerBleManager.connectToGlucometer(scanResult.device)
@@ -190,15 +184,8 @@ class GlucometerClientImpl @Inject constructor(
         }
     }
 
-    private suspend fun setupDfuMode(address: String, pin: String) {
-        val scan = scan(address, filters)
-        glucometerBleManager.connectToGlucometer(scan.device)
-        try {
-            val isPinValid = glucometerBleManager.checkPin(pin)
-            if (!isPinValid) {
-                //в логи
-                throw GlucometerPinIncorrect
-            }
+
+    override suspend fun turnOnDfuMode() {
             val batteryLevel = glucometerBleManager.getBatteryAndTemperature().first
 
             if (batteryLevel <= MIN_BATTERY_LEVEL) {
@@ -214,9 +201,6 @@ class GlucometerClientImpl @Inject constructor(
                 //в логи
                 throw GlucometerToDfuModeError
             }
-        } finally {
-            glucometerBleManager.disconnectGlucometer()
-        }
     }
 
     override suspend fun testAllCommands(address: String, pin: String) {

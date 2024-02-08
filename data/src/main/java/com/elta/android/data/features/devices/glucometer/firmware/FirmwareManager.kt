@@ -1,7 +1,5 @@
 package com.elta.android.data.features.devices.glucometer.firmware
 
-import com.elta.android.domain.features.firmware.model.FirmwareFile
-
 interface FirmwareManager {
 
     /**

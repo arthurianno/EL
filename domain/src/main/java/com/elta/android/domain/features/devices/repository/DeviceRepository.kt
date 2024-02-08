@@ -3,8 +3,6 @@ package com.elta.android.domain.features.devices.repository
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
-import com.elta.android.domain.features.firmware.model.FirmwareFile
-import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 @Suppress("TooManyFunctions", "ComplexInterface")
@@ -27,8 +25,9 @@ interface DeviceRepository {
      * Подключение к устройству.
      * @param address Адрес запрашиваемого устройства.
      * @param pinCode Пин-код для подключения к устройству.
+     * @param isDfuMode флаг, нужно ли переводить поиск в режим DFU
      */
-    suspend fun connectDevice(address: String, pinCode: String)
+    suspend fun connectDevice(address: String, pinCode: String, isDfuMode: Boolean)
 
     /**
      * Отключение от текущего устройства
@@ -58,6 +57,11 @@ interface DeviceRepository {
      * Устройство будет издавать звук после команды.
      */
     suspend fun locateGlucometer()
+
+    /**
+     * Перевод устройства в режим Dfu.
+     */
+    suspend fun turnOnDfuMode()
 
     /**
      * @suppress Метод для тестирования
