@@ -64,7 +64,10 @@ fun PermissionsControl.bindTo(
     requestBluetoothPermissionCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.requestEach(android.Manifest.permission.BLUETOOTH_SCAN)
+            permissions.requestEach(
+                android.Manifest.permission.BLUETOOTH_SCAN,
+                android.Manifest.permission.BLUETOOTH_CONNECT
+            )
         }
         .subscribe(bluetoothPermissionsGrantedAction.consumer)
         .addTo(compositeUnbind)
