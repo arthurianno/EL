@@ -55,4 +55,5 @@ dependencies {
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.storageBom)
     implementation(Dependencies.Jetpack.WorkManager.core)
+    implementation(Dependencies.Google.FireBase.crashlyticsBom)
 }
