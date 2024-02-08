@@ -127,6 +127,12 @@ class GlucometerClientImpl @Inject constructor(
             throw GlucometerConnectionException(address)
         }
 
+        if (!isDfuMode) {
+            checkPin(pin)
+        }
+    }
+
+    private suspend fun checkPin(pin: String) {
         val pinIsValid = glucometerBleManager.checkPin(pin)
         if (!pinIsValid) {
             glucometerBleManager.disconnectGlucometer()
