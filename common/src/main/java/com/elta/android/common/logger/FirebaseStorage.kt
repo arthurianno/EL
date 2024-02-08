@@ -3,7 +3,6 @@ package com.elta.android.common.logger
 import android.content.Context
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -33,7 +32,7 @@ class FirebaseStorage(private val context: Context) {
         File(context.getExternalFilesDir("logs"), "EltaApplicationLog_$date.txt").apply {
             if (!exists()) {
                 runCatching { createNewFile() }
-                    .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
+                    .onFailure { Timber.tag(DEFAULT_TAG).e(it) }
             }
         }
     }
