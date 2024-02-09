@@ -39,9 +39,9 @@ class RosTechDataRepository @Inject constructor(
 
     //TODO: Метод как временное решение, т.к вероятнее всего что SDK Росстеха будут ходить в глюкометр напрямую
     override suspend fun sendEvents(address: String, events: List<String>) {
-        crashlyticsReport.log("sending events to SDK, feature: ${FeatureToggles.isEnableIiotSdkFeature}")
+        crashlyticsReport.log("Started sending measurements to SDK, permission to work with SDK = ${FeatureToggles.isEnableIiotSdkFeature}")
         if (FeatureToggles.isEnableIiotSdkFeature) {
-            crashlyticsReport.log("start sending")
+            crashlyticsReport.log("Sending measurements to the SDK")
             events.forEach { event ->
                 delay(20)
                 IiotSdkDeviceService.sendEvent(
@@ -50,7 +50,7 @@ class RosTechDataRepository @Inject constructor(
                     model = GLUCOMETER_MODEL
                 )
             }
-            crashlyticsReport.log("events sent")
+            crashlyticsReport.log("All measurements were successfully sent to the SDK")
         }
     }
 }

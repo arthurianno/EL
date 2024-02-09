@@ -14,14 +14,14 @@ class CheckConnectedDevicesUseCase @Inject constructor(
 ) : ObservableUseCase<Boolean, CheckConnectedDevicesUseCase.Params>(schedulers) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Boolean> {
-        crashlyticsReport.log("start checking device in connected")
+        crashlyticsReport.log("Started checking the device for its presence in the list of connected devices")
         val address = checkNotNull(params).address
-        crashlyticsReport.log("getting devices")
+        crashlyticsReport.log("Getting a list of connected devices")
         val devices = deviceInfoRepository.getDevices()
 
-        crashlyticsReport.log("searching device in connected devices")
+        crashlyticsReport.log("Searching for a new device in the list of already connected ones")
         val containsSelected = devices.any { it.first.address == address }
-        crashlyticsReport.log("is device already connected: $containsSelected")
+        crashlyticsReport.log("New device status: already connected = $containsSelected")
         return Observable.just(containsSelected)
     }
 

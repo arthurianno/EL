@@ -16,9 +16,8 @@ interface GlucometerClient {
      * Подключение к глюкометру
      * @param address - мак-адрес устройства
      * @param pin - пин-код для подключения к устройству
-     * @param isDfuMode - поиск устройств в режиме DFU
      * */
-    suspend fun connectDevice(address: String, pin: String, isDfuMode: Boolean)
+    suspend fun connectDevice(address: String, pin: String)
 
     /**
      * Отключение от глюкометра

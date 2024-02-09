@@ -27,10 +27,10 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlytic
     }
 }
 @Throws(GlucometerSyncError::class)
-suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String, isDfuMode: Boolean = false, crashlyticsReport: CrashlyticsReport?) {
+suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String, crashlyticsReport: CrashlyticsReport?) {
     try {
         withTimeout(CONNECT_TIMEOUT) {
-            connectDevice(address, pinCode, isDfuMode)
+            connectDevice(address, pinCode)
         }
     } catch (e: TimeoutCancellationException) {
         val exception = GlucometerSyncError(TimeoutException("device $address connection timeout"))

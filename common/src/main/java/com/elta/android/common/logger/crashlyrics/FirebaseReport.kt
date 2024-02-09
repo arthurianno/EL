@@ -1,6 +1,7 @@
 package com.elta.android.common.logger.crashlyrics
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import timber.log.Timber
 
 class FirebaseReport : CrashlyticsReport {
 
@@ -9,6 +10,7 @@ class FirebaseReport : CrashlyticsReport {
 
     override fun log(message: String) {
         firebaseCrashlytics.log(message)
+        Timber.tag(TAG).i(message)
     }
 
     override fun setUserId(value: String) {
@@ -21,5 +23,8 @@ class FirebaseReport : CrashlyticsReport {
 
     override fun writeException(exception: Throwable) {
         firebaseCrashlytics.recordException(exception)
+        Timber.tag(TAG).e(exception)
     }
 }
+
+private const val TAG = "LocalReports"

@@ -37,9 +37,9 @@ class EnvironmentScanner @Inject constructor(
 
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
                 result?.let {
-                    crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
+                    //crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
                     if (result.isFiltered(filters)) {
-                        crashlyticsReport.log("onScanFilteredResult: ${result.device.address}")
+                        crashlyticsReport.log("Scan result filtered by 'Satellite' mask: ${result.device.address}")
                         resultCallback(listOf(result))
                     }
                 }
@@ -47,7 +47,7 @@ class EnvironmentScanner @Inject constructor(
 
             override fun onBatchScanResults(results: MutableList<ScanResult>) {
                 crashlyticsReport.log(
-                    "onScanNotFilteredResult: ${
+                    "Unfiltered scan results: ${
                         results.map {
                             it.device.address + ", "
                         }
@@ -58,7 +58,7 @@ class EnvironmentScanner @Inject constructor(
                 }
                 if (list.isNotEmpty()) {
                     crashlyticsReport.log(
-                        "onScanFilteredResult: ${
+                        "Scan results filtered by 'Satellite' mask:: ${
                             list.map {
                                 it.device.address + ", "
                             }
@@ -76,16 +76,16 @@ class EnvironmentScanner @Inject constructor(
         }
         val scanner = adapter.bluetoothLeScanner
         if (scanner == null) {
-            crashlyticsReport.log("bluetooth scanner not available during scan start")
+            crashlyticsReport.log("Bluetooth scanner is not available and is null")
             throw BluetoothScannerNotAvailable
         }
 
-        crashlyticsReport.log("start scanning")
+        crashlyticsReport.log("Start scanning the environment")
         adapter.bluetoothLeScanner.startScan(emptyList(), settings, callback)
     }
 
     fun stopScan() {
-        crashlyticsReport.log("stop scanning start")
+        crashlyticsReport.log("Undoing the environment scan")
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) ==
                     PackageManager.PERMISSION_GRANTED
@@ -94,12 +94,12 @@ class EnvironmentScanner @Inject constructor(
                     PackageManager.PERMISSION_GRANTED
         }
 
-        crashlyticsReport.log("scanner permission state: $permission")
+        crashlyticsReport.log("Scanner permission state: $permission")
 
         if (permission) {
             callback?.let {
                 adapter.bluetoothLeScanner?.stopScan(it)
-                crashlyticsReport.log("stop scanning success")
+                crashlyticsReport.log("The environment scan has been canceled")
             }
         }
     }
@@ -117,7 +117,3 @@ class EnvironmentScanner @Inject constructor(
     data class ScanError(val code: Int) : RuntimeException()
 
 }
-
-private const val TAG = "ScannerService"
-
-private const val SCAN_TIMEOUT_SECOND = 60L

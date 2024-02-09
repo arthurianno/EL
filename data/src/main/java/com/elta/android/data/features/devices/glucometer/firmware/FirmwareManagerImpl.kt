@@ -3,6 +3,7 @@ package com.elta.android.data.features.devices.glucometer.firmware
 import android.content.Context
 import android.os.Build
 import com.elta.android.common.errors.FirmwareUpdateError
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.glucometer.firmware.utils.DfuProgressLogger
 import com.elta.android.data.features.devices.glucometer.service.firmware.EltaDfuService
 import no.nordicsemi.android.dfu.DfuServiceInitiator
@@ -13,19 +14,23 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class FirmwareManagerImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val crashlyticsReport: CrashlyticsReport
 ): FirmwareManager {
     override suspend fun updateFirmware(address: String, filePath: String): String {
         return suspendCoroutine { continuation ->
             val listener = object : DfuProgressLogger() {
                 override fun onDfuCompleted(address: String) {
                     super.onDfuCompleted(address)
+                    crashlyticsReport.log("Firmware update completed")
                     continuation.resume("Dfu update completed")
                 }
 
                 override fun onError(address: String, error: Int, errorType: Int, message: String) {
                     super.onError(address, error, errorType, message)
-                    continuation.resumeWithException(FirmwareUpdateError(message))
+                    val error = FirmwareUpdateError(message)
+                    crashlyticsReport.writeException(error)
+                    continuation.resumeWithException(error)
                 }
             }
 
@@ -46,6 +51,7 @@ class FirmwareManagerImpl @Inject constructor(
                 setZip(filePath)
             }
 
+            crashlyticsReport.log("The device firmware update has started")
             starter.start(context, EltaDfuService::class.java)
         }
     }

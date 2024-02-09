@@ -20,21 +20,21 @@ class GetLastGlucometerAndInfoUseCase @Inject constructor(
 ) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Pair<Glucometer, GlucometerInfo>> {
-        val p = checkNotNull(params)
+        return Observable.fromCallable {
+            val p = checkNotNull(params)
 
-        return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined)  {
-            crashlyticsReport.log("start getting last glucometer and info")
+            crashlyticsReport.log("Started acquiring data about the latest device")
             val glucometer = repo.getDevice(p.address)
             if (glucometer == null) {
-                crashlyticsReport.log("last glucometer not found")
+                crashlyticsReport.log("Last device not found")
                 throw Exception("Glucometer is Empty")
             }
             val glucometerInfo = repo.getLastDeviceInfo(p.address)
             if (glucometerInfo == null) {
-                crashlyticsReport.log("last glucometer info not found")
+                crashlyticsReport.log("Last device information not found")
                 throw Exception("Glucometer Info is Empty")
             }
-            crashlyticsReport.log("last glucometer with info obtained successfully")
+            crashlyticsReport.log("The last device with information on it was successfully received")
             glucometer to glucometerInfo
         }
     }

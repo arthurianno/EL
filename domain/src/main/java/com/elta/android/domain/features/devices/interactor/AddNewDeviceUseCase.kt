@@ -32,35 +32,35 @@ class AddNewDeviceUseCase @Inject constructor(
     }
 
     private suspend fun addDevice(params: Params?) {
-        crashlyticsReport.log("adding device with address: ${params?.device?.address}")
+        crashlyticsReport.log("Started adding a new device with address: ${params?.device?.address}")
         try {
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 
             val (device, pincode) = requireNotNull(params) {
-                val errorString = "params for new device cannot be null"
+                val errorString = "Parameters for a new device cannot be null"
                 crashlyticsReport.writeException(RuntimeException(errorString))
                 errorString
             }
             val address = device.address
 
-            deviceRepository.connectWithTimeout(address, pincode, false, crashlyticsReport)
+            deviceRepository.connectWithTimeout(address, pincode, crashlyticsReport)
 
-            crashlyticsReport.log("saving pin")
+            crashlyticsReport.log("Saving pin")
             pinRepository.savePin(address, pincode)
 
-            crashlyticsReport.log("starting getting primary device")
+            crashlyticsReport.log("Started receiving data for the main device")
             val primaryDevice = deviceInfoRepository.getPrimaryDeviceWithLastEvent()?.first
-            crashlyticsReport.log("primary device obtained")
+            crashlyticsReport.log("Main device data received")
 
             if (primaryDevice == null) {
-                crashlyticsReport.log("obtained device is null")
+                crashlyticsReport.log("Main device data received is null")
                 deviceInfoRepository.putDevice(glucometer = device, isPrimary = true)
             } else if (!primaryDevice.address.equals(address, true)) {
-                crashlyticsReport.log("obtained device is device ${device.name}")
+                crashlyticsReport.log("Main device is ${device.name}")
                 deviceInfoRepository.putDevice(device, isPrimary = false)
             }
         } finally {
-            crashlyticsReport.log("disconnecting device")
+            crashlyticsReport.log("The procedure for disconnecting the connection with the device has begun")
             deviceRepository.disconnect()
         }
     }

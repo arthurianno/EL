@@ -116,9 +116,13 @@ class EventsDataRepository @Inject constructor(
 
     override suspend fun addEventsSuspend(events: List<EventV2>) {
         val mappedEvents = toDtoMapper.mapFromObjects(events)
+        crashlyticsReport.log("Started saving measurements to local storage")
         cacheSource.addEventsSuspend(mappedEvents)
+        crashlyticsReport.log("Saving measurements to local storage is completed")
         try {
+            crashlyticsReport.log("Started saving measurements to remote storage")
             remoteSource.addEvents(mappedEvents)
+            crashlyticsReport.log("Saving measurements to remote storage is completed")
         } catch (e: Exception) {
             crashlyticsReport.writeException(e)
             syncManager.saveAsCreated(events)

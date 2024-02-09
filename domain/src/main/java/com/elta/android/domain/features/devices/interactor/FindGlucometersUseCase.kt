@@ -23,13 +23,10 @@ class FindGlucometersUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Unit?): Observable<List<Glucometer>> {
         return repo.findDevices().onStart {
-            crashlyticsReport.log("start searching for glucometers")
+            crashlyticsReport.log("Started searching for devices in the environment")
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
         }
             .asObservable()
-            .timeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
-            .doOnError {
-                crashlyticsReport.writeException(it)
-            }
+            .takeUntil(Observable.timer(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS))
     }
 }

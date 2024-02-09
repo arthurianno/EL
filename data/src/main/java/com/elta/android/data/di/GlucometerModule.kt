@@ -2,8 +2,8 @@ package com.elta.android.data.di
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerInfoBuilder
 import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
@@ -60,9 +60,12 @@ class GlucometerModule {
     //Тут на каждое соединение с разными глюкометрами разный менеджер, подумать на чем-то типа мультитона
     @Provides
     @Singleton
-    fun provideBleManager(context: Context): GlucometerBleManager = GlucometerBleManager(context)
+    fun provideBleManager(
+        context: Context,
+        crashlyticsReport: CrashlyticsReport
+    ): GlucometerBleManager = GlucometerBleManager(crashlyticsReport, context)
 
     @Provides
     @Singleton
-    fun provideFirmwareManger(context: Context): FirmwareManager = FirmwareManagerImpl(context)
+    fun provideFirmwareManger(context: Context, crashlyticsReport: CrashlyticsReport): FirmwareManager = FirmwareManagerImpl(context, crashlyticsReport)
 }

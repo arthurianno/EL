@@ -116,7 +116,7 @@ class GlucometerBleManager @Inject constructor(
         val requestResult = request.value?.toString(Charset.defaultCharset())
             ?: throw Exception("Empty writeCharacteristic result")
 
-        val log = if (command is Commands.SetPin) "sent pin to device" else "sent $command with result: $requestResult"
+        val log = if (command is Commands.SetPin) "Sent pin to device" else "Sent $command with result: $requestResult"
         crashlyticsReport.log(log)
 
 
@@ -134,7 +134,7 @@ class GlucometerBleManager @Inject constructor(
         //Собственно тут получаем реальные замеры устройства в строковом представлении
         val resultResponse = response.value?.toString(Charset.defaultCharset())
             ?: throw Exception("Empty waitForNotification result")
-        crashlyticsReport.log("received notification for $command with result: $resultResponse")
+        crashlyticsReport.log("Received notification for ${command.javaClass.name} with result: $resultResponse")
 
         return resultResponse
     }

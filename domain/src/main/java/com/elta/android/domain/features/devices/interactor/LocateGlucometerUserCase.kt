@@ -29,17 +29,17 @@ class LocateGlucometerUserCase @Inject constructor(
             throw GlucometerPinNotFoundInternaly
         }
 
-        deviceRepository.connectWithTimeout(address, pin, false, crashlyticsReport)
+        deviceRepository.connectWithTimeout(address, pin, crashlyticsReport)
         try {
             while (currentCoroutineContext().isActive) {
                 emit(Unit)
                 try {
                     withTimeout(COMMAND_TIMEOUT) {
-                        crashlyticsReport.log("looking for a device")
+                        crashlyticsReport.log("Looking for a device (anti-loss)")
                         deviceRepository.locateGlucometer()
                     }
                 } catch (e: TimeoutCancellationException) {
-                    val error = TimeoutException("cant locate glucometer with address $address")
+                    val error = TimeoutException("Could not find device (anti-loss) $address")
                     crashlyticsReport.writeException(error)
                     throw error
                 }
@@ -48,7 +48,7 @@ class LocateGlucometerUserCase @Inject constructor(
                 delay(LOCATE_GLUCOMETER_DELAY)
             }
         } finally {
-            crashlyticsReport.log("disconnecting from device")
+            crashlyticsReport.log("The procedure for disconnecting the connection with the device has begun")
             deviceRepository.disconnect()
         }
     }

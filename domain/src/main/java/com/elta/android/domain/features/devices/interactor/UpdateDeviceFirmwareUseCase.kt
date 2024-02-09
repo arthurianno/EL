@@ -31,49 +31,42 @@ class UpdateDeviceFirmwareUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Observable<String> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
-            crashlyticsReport.log("starting firmware update for device: ${params?.address}")
-            crashlyticsReport.log("checking params")
+            crashlyticsReport.log("Firmware update started for device: ${params?.address}")
+            crashlyticsReport.log("Checking parameters for nullability")
             val p = checkNotNull(params)
 
             val address = p.address
 
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 
-            crashlyticsReport.log("checking pin")
+            crashlyticsReport.log("Checking pin")
             val pin = pinRepository.getPin(address)
             if (pin == null) {
                 crashlyticsReport.writeException(GlucometerPinNotFoundInternaly)
                 throw GlucometerPinNotFoundInternaly
             }
 
-            crashlyticsReport.log("start connection with device $address with timeout")
-            deviceRepository.connectWithTimeout(address, pin, false, crashlyticsReport)
+            deviceRepository.connectWithTimeout(address, pin, crashlyticsReport)
 
             try {
                 resetAndLaunchTimer(this)
                 deviceRepository.turnOnDfuMode()
             } finally {
-                crashlyticsReport.log("disconnect from device and cancelling timer")
+                crashlyticsReport.log("Disconnect from device and cancelling timer")
                 deviceRepository.disconnect()
                 cancelTimer()
             }
 
-            crashlyticsReport.log("creating dfu address")
+            crashlyticsReport.log("Creating dfu address")
             val dfuAddress = address.toDfuAddress()
 
-            crashlyticsReport.log("connecting to device in dfu mode $address with timeout")
-            deviceRepository.connectWithTimeout(dfuAddress, pin, true, crashlyticsReport)
-
-            crashlyticsReport.log("start updating device: $address firmware with file ${p.file.path}")
+            crashlyticsReport.log("Start updating device: $dfuAddress firmware with file ${p.file.path}")
             try {
                 updateRepository.updateFirmware(dfuAddress, p.file)
             } catch (e: Exception) {
                 crashlyticsReport.writeException(e)
                 throw e
-            } finally {
-                deviceRepository.disconnect()
             }
-
         }
     }
 

@@ -6,19 +6,26 @@ import android.bluetooth.le.ScanSettings
 import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerNotConnectedException
+import com.elta.android.common.errors.GlucometerNotFoundInDfuMode
 import com.elta.android.common.errors.GlucometerPinIncorrect
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
+import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.firmware.model.FirmwareFile
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
+import java.lang.IllegalStateException
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -56,6 +63,20 @@ class GlucometerClientImpl @Inject constructor(
         address: String,
         firmwareFile: FirmwareFile
     ): String {
+        val scanResult = try {
+            withTimeout(CONNECT_TIMEOUT) {
+                scan(address, dfuFilters)
+            }
+        } catch (e: TimeoutCancellationException) {
+            val exception = GlucometerSyncError(TimeoutException("Device search dfu $address timed out"))
+            crashlyticsReport.writeException(exception)
+            throw exception
+        }
+
+        if (scanResult.device.address != address) {
+            crashlyticsReport.writeException(GlucometerNotFoundInDfuMode)
+            throw GlucometerNotFoundInDfuMode
+        }
         return firmwareManager.updateFirmware(address, firmwareFile.path)
     }
 
@@ -77,7 +98,7 @@ class GlucometerClientImpl @Inject constructor(
 
     @Throws(GlucometerNotConnectedException::class)
     override suspend fun getGlucometerInfo(address: String): GlucometerInfoDto {
-        crashlyticsReport.log("start getting glucometer info with address $address")
+        crashlyticsReport.log("Started receiving information from the device with the address: $address")
         with(glucometerBleManager) {
             if (!glucometerBleManager.isConnected(address)) {
                 val error = GlucometerNotConnectedException(address)
@@ -86,22 +107,22 @@ class GlucometerClientImpl @Inject constructor(
             }
 
             val time = ZonedDateTime.now()
-            crashlyticsReport.log("updating time to time")
+            crashlyticsReport.log("Update device time to $time")
             updateTime(time)
             val date = getDate()
-            crashlyticsReport.log("obtained date $date")
+            crashlyticsReport.log("Received device date and time = $date")
             val (battery, temperature) = getBatteryAndTemperature()
             crashlyticsReport.log(
-                "obtained battery and temperature levels:\n battery: $battery, temperature: $temperature"
+                "Device temperature and battery levels obtained:\n battery: $battery, temperature: $temperature"
             )
             val version = getVersion()
             crashlyticsReport.log(
-                "obtained versions:\n hardware: ${version.hardware}, software: ${version.software}"
+                "Device versions received:\n hardware: ${version.hardware}, software: ${version.software}"
             )
             val serial = getSerialNumber()
-            crashlyticsReport.log("obtained serial")
+            crashlyticsReport.log("Serial number received")
 
-            crashlyticsReport.log("glucometer info received successfully")
+            crashlyticsReport.log("Device information was successfully read")
 
             return GlucometerInfoDto(
                 id = address,
@@ -115,41 +136,37 @@ class GlucometerClientImpl @Inject constructor(
         }
     }
 
-    override suspend fun connectDevice(address: String, pin: String, isDfuMode: Boolean) {
-        crashlyticsReport.log("start connection with device $address, isDfuMode: $isDfuMode")
-        val scanFilters = if (isDfuMode) dfuFilters else filters
-
-        crashlyticsReport.log("start scanning")
-        val scanResult = scan(address, scanFilters)
-        crashlyticsReport.log("scan finished with result")
+    override suspend fun connectDevice(address: String, pin: String) {
+        crashlyticsReport.log("Connection operations started with device $address")
+        crashlyticsReport.log("Environment scanning started")
+        val scanResult = scan(address, filters)
+        crashlyticsReport.log("Scanning the environment is completed with the result")
 
         try {
-            crashlyticsReport.log("establishing connection with glucometer")
+            crashlyticsReport.log("Establishing a connection with a device")
             glucometerBleManager.connectToGlucometer(scanResult.device)
         } catch (e: Exception){
-            val error = GlucometerConnectionException(address)
+            val error = GlucometerConnectionException(e.message.orEmpty())
             crashlyticsReport.writeException(error)
             throw error
         }
 
-        if (!isDfuMode) {
-            checkPin(pin)
-        }
+        checkPin(pin)
     }
 
     private suspend fun checkPin(pin: String) {
-        crashlyticsReport.log("checking pin")
+        crashlyticsReport.log("Checking pin")
         val pinIsValid = glucometerBleManager.checkPin(pin)
         if (!pinIsValid) {
             glucometerBleManager.disconnectGlucometer()
-            crashlyticsReport.log("pin invalid")
+            crashlyticsReport.log("Pin invalid")
             throw GlucometerPinIncorrect
         }
-        crashlyticsReport.log("pin valid")
+        crashlyticsReport.log("Pin valid")
     }
 
     override suspend fun disconnect() {
-        crashlyticsReport.log("start glucometer disconections")
+        crashlyticsReport.log("Started disconnecting the connection to the device")
         glucometerBleManager.disconnectGlucometer()
     }
 
@@ -159,7 +176,7 @@ class GlucometerClientImpl @Inject constructor(
         lastSyncEvent: String?,
         onCommandSuccess: () -> Unit
     ): List<String> {
-        crashlyticsReport.log("started receiving measurements from the device")
+        crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
             if (!isConnected(address)) {
                 val error = GlucometerNotConnectedException(address)
@@ -169,7 +186,7 @@ class GlucometerClientImpl @Inject constructor(
 
             val events = mutableListOf<String>()
 
-            crashlyticsReport.log("started reading measurements")
+            crashlyticsReport.log("Started reading measurements from the device")
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
@@ -178,7 +195,7 @@ class GlucometerClientImpl @Inject constructor(
                 events.add(event)
             }
 
-            crashlyticsReport.log("all measurements have been successfully read, events size: $events")
+            crashlyticsReport.log("All measurements were successfully read, events size: $events")
 
             return events
         }
@@ -192,8 +209,13 @@ class GlucometerClientImpl @Inject constructor(
         return suspendCoroutine { continuation ->
             environmentScanner.startScan(filters = filters, settings = settings) { scanResults ->
                 scanResults.firstOrNull { it.device.address == address }?.let { result ->
-                    continuation.resume(result)
-                    environmentScanner.stopScan()
+                    try {
+                        continuation.resume(result)
+                    } catch (e: IllegalStateException) {
+                        crashlyticsReport.log("Already resumed scan")
+                    } finally {
+                        environmentScanner.stopScan()
+                    }
                 }
             }
         }
@@ -201,7 +223,7 @@ class GlucometerClientImpl @Inject constructor(
 
 
     override suspend fun turnOnDfuMode() {
-        crashlyticsReport.log("start switching to dfu mode")
+        crashlyticsReport.log("Switching the device to dfu mode")
         val batteryLevel = glucometerBleManager.getBatteryAndTemperature().first
 
         if (batteryLevel <= MIN_BATTERY_LEVEL) {
@@ -218,7 +240,7 @@ class GlucometerClientImpl @Inject constructor(
             crashlyticsReport.writeException(GlucometerToDfuModeError)
             throw GlucometerToDfuModeError
         }
-        crashlyticsReport.log("successfully switched to dfu mode")
+        crashlyticsReport.log("The device has successfully switched to dfu mode")
     }
 
     override suspend fun testAllCommands(address: String, pin: String) {

@@ -25,9 +25,8 @@ interface DeviceRepository {
      * Подключение к устройству.
      * @param address Адрес запрашиваемого устройства.
      * @param pinCode Пин-код для подключения к устройству.
-     * @param isDfuMode флаг, нужно ли переводить поиск в режим DFU
      */
-    suspend fun connectDevice(address: String, pinCode: String, isDfuMode: Boolean)
+    suspend fun connectDevice(address: String, pinCode: String)
 
     /**
      * Отключение от текущего устройства

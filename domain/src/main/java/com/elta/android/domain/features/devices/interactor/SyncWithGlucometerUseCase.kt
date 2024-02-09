@@ -33,8 +33,8 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Observable<Int> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
-            crashlyticsReport.log("starting sync with glucometer ${params?.device?.address}")
-            crashlyticsReport.log("getting primary device")
+            crashlyticsReport.log("The synchronization procedure has begun with the device ${params?.device?.address}")
+            crashlyticsReport.log("Receiving data for the main device")
             val deviceWithLastEvent = deviceInfoRepository.getPrimaryDeviceWithLastEvent()
             if (deviceWithLastEvent == null) {
                 crashlyticsReport.writeException(PrimaryGlucometerNotFoundError)
@@ -43,7 +43,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 
-            crashlyticsReport.log("getting profile info")
+            crashlyticsReport.log("Getting a user profile")
             val profile = try {
                 profileRepository.getProfile().blockingGet()
             } catch (exception: Exception) {
@@ -51,7 +51,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw exception
             }
 
-            crashlyticsReport.log("preparing data for sync")
+            crashlyticsReport.log("Preparing data for synchronization")
             val address = params?.device?.address ?: deviceWithLastEvent.first.address
             val lastSyncEvent = deviceWithLastEvent.second.lastSyncEvent
             val email = profile.email
@@ -72,7 +72,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
         userEmail: String,
         lastSyncEvent: String?
     ): Int {
-        crashlyticsReport.log("getting pin")
+        crashlyticsReport.log("Getting pin")
         val pinCode = pinRepository.getPin(deviceAddress)
         if (pinCode == null) {
             crashlyticsReport.writeException(GlucometerPinNotFoundInternaly)
@@ -80,7 +80,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
         }
 
         try {
-            deviceRepository.connectWithTimeout(deviceAddress, pinCode, false, crashlyticsReport)
+            deviceRepository.connectWithTimeout(deviceAddress, pinCode, crashlyticsReport)
 
             resetAndLaunchTimer(scope)
             val glucometerInfo = deviceRepository.getGlucometerInfo(deviceAddress)
@@ -95,17 +95,17 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 resetAndLaunchTimer(scope)
             }
 
-            crashlyticsReport.log("start updating device info to storage")
+            crashlyticsReport.log("Started saving device data to local storage")
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
             if (events.isNotEmpty()) {
-                crashlyticsReport.log("start sending events to backend and db")
+                crashlyticsReport.log("Started sending measurements to the backend and saving to local storage")
                 eventsRepository.addEventFromGlucometer(events)
             }
 
             return events.size
         } finally {
-            crashlyticsReport.log("disconnection and timer cancelation")
+            crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
             deviceRepository.disconnect()
             cancelTimer()
         }
