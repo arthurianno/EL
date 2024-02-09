@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import com.elta.android.common.errors.CommandError
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
 import com.elta.android.data.features.devices.glucometer.service.isPinOk
@@ -20,7 +21,10 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.jvm.Throws
 
-class GlucometerBleManager @Inject constructor(context: Context) : BleManager(context),
+class GlucometerBleManager @Inject constructor(
+    private val crashlyticsReport: CrashlyticsReport,
+    context: Context
+) : BleManager(context),
     GlucometerCommand {
 
     /**
@@ -36,7 +40,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
     @SuppressLint("MissingPermission")
     override suspend fun connectToGlucometer(device: BluetoothDevice) {
         // через bondState можем проверять связаны ли устройства или нет и таким образом отправлять команды далее
-      //  device.bondState
+        //  device.bondState
         connect(device)
             .retry(3, 100)
             .useAutoConnect(false)
@@ -50,7 +54,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
     }
 
     override suspend fun disconnectGlucometer() {
-        if (isConnected){
+        if (isConnected) {
             disconnect().suspend()
         }
     }
@@ -100,19 +104,21 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
                 byteCommand,
                 BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
             )
-                //TODO: Проверить размер который был использован в старой реализации
                 .split()
-                //Может выбрасывать исключения
                 .suspend()
         } catch (e: Exception) {
-            //TODO: в кастомный лог firebase,
+            crashlyticsReport.writeException(e)
             throw e
         }
 
         //Результат по сути является индикатором что
         //операция завершена успешно, но сами данные получаем через notificationCharacteristic
-        val requestResult = request.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty writeCharacteristic result")
-        Timber.tag(TAG).d("sent $command with result: $requestResult")
+        val requestResult = request.value?.toString(Charset.defaultCharset())
+            ?: throw Exception("Empty writeCharacteristic result")
+
+        val log = if (command is Commands.SetPin) "sent pin to device" else "sent $command with result: $requestResult"
+        crashlyticsReport.log(log)
+
 
         //Тут подписываемся на уведомление из характеристики notificationCharacteristic,
         //Метод waitForNotification вешает одноразовый коллбек который преобразуется
@@ -121,13 +127,14 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
         val response = try {
             waitForNotification(notificationCharacteristic).suspend()
         } catch (e: Exception) {
-            //TODO: в кастомный лог firebase,
+            crashlyticsReport.writeException(e)
             throw e
         }
 
         //Собственно тут получаем реальные замеры устройства в строковом представлении
-        val resultResponse = response.value?.toString(Charset.defaultCharset()) ?: throw Exception("Empty waitForNotification result")
-        Timber.tag(TAG).d("received notification for $command with result: $resultResponse")
+        val resultResponse = response.value?.toString(Charset.defaultCharset())
+            ?: throw Exception("Empty waitForNotification result")
+        crashlyticsReport.log("received notification for $command with result: $resultResponse")
 
         return resultResponse
     }
@@ -159,7 +166,7 @@ class GlucometerBleManager @Inject constructor(context: Context) : BleManager(co
 
     @Throws(CommandError::class)
     private fun String.checkCommandForError(): String {
-       return if (isError()) throw CommandError(this) else this
+        return if (isError()) throw CommandError(this) else this
     }
 
     private fun String.isError(): Boolean = contains("error")

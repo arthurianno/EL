@@ -5,6 +5,7 @@ import android.net.Uri
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.errors.NotFoundItemError
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
@@ -40,7 +41,8 @@ class EventsDataRepository @Inject constructor(
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
     private val fileStorage: FileStorage,
-    private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>
+    private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>,
+    private val crashlyticsReport: CrashlyticsReport
 ) : EventsRepository {
 
     override fun getEvents(): Observable<List<EventV2>> =
@@ -118,7 +120,7 @@ class EventsDataRepository @Inject constructor(
         try {
             remoteSource.addEvents(mappedEvents)
         } catch (e: Exception) {
-            //TODO: в логи или перебрасывать исключение выше и там обработать
+            crashlyticsReport.writeException(e)
             syncManager.saveAsCreated(events)
         }
     }

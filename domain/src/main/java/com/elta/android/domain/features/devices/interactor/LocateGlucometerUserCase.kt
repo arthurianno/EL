@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.COMMAND_TIMEOUT
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.repository.DeviceRepository
@@ -18,31 +19,36 @@ import javax.inject.Inject
 class LocateGlucometerUserCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val pinRepository: PinRepository,
+    private val crashlyticsReport: CrashlyticsReport
 ) {
     operator fun invoke(address: String): Flow<Unit> = flow {
-
+        crashlyticsReport.log("start locating device with address $address")
         val pin = pinRepository.getPin(address)
         if (pin == null) {
+            crashlyticsReport.writeException(GlucometerPinNotFoundInternaly)
             throw GlucometerPinNotFoundInternaly
         }
 
-        deviceRepository.connectWithTimeout(address, pin)
+        deviceRepository.connectWithTimeout(address, pin, false, crashlyticsReport)
         try {
             while (currentCoroutineContext().isActive) {
                 emit(Unit)
                 try {
                     withTimeout(COMMAND_TIMEOUT) {
+                        crashlyticsReport.log("looking for a device")
                         deviceRepository.locateGlucometer()
                     }
                 } catch (e: TimeoutCancellationException) {
-                    //TODO в лог
-                    throw TimeoutException("cant locate glucometer with address $address")
+                    val error = TimeoutException("cant locate glucometer with address $address")
+                    crashlyticsReport.writeException(error)
+                    throw error
                 }
 
 
                 delay(LOCATE_GLUCOMETER_DELAY)
             }
         } finally {
+            crashlyticsReport.log("disconnecting from device")
             deviceRepository.disconnect()
         }
     }

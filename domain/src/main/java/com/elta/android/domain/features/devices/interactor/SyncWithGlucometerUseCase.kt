@@ -2,6 +2,7 @@ package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
@@ -26,33 +27,39 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val pinRepository: PinRepository,
     private val eventsRepository: EventsRepository,
+    private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
-) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers) {
+) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers, crashlyticsReport) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Int> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
+            crashlyticsReport.log("starting sync with glucometer ${params?.device?.address}")
+            crashlyticsReport.log("getting primary device")
             val deviceWithLastEvent = deviceInfoRepository.getPrimaryDeviceWithLastEvent()
             if (deviceWithLastEvent == null) {
-                //TODO: в логи
+                crashlyticsReport.writeException(PrimaryGlucometerNotFoundError)
                 throw PrimaryGlucometerNotFoundError
             }
 
-            //TODO: Добавить логгер который будет логгировать ошибки внутри проверки
-            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 
+            crashlyticsReport.log("getting profile info")
             val profile = try {
                 profileRepository.getProfile().blockingGet()
             } catch (exception: Exception) {
-                //TODO: в логи
+                crashlyticsReport.writeException(exception)
                 throw exception
             }
 
+            crashlyticsReport.log("preparing data for sync")
             val address = params?.device?.address ?: deviceWithLastEvent.first.address
             val lastSyncEvent = deviceWithLastEvent.second.lastSyncEvent
             val email = profile.email
 
             if (email.isNullOrBlank()) {
-                throw Exception("Email is empty")
+                val exception = Exception("Email is empty")
+                crashlyticsReport.writeException(exception)
+                throw exception
             }
 
             syncWithDevice(this, address, email, lastSyncEvent)
@@ -65,18 +72,18 @@ class SyncWithGlucometerUseCase @Inject constructor(
         userEmail: String,
         lastSyncEvent: String?
     ): Int {
+        crashlyticsReport.log("getting pin")
         val pinCode = pinRepository.getPin(deviceAddress)
         if (pinCode == null) {
-            //TODO: В логи
+            crashlyticsReport.writeException(GlucometerPinNotFoundInternaly)
             throw GlucometerPinNotFoundInternaly
         }
 
         try {
-            deviceRepository.connectWithTimeout(deviceAddress, pinCode)
+            deviceRepository.connectWithTimeout(deviceAddress, pinCode, false, crashlyticsReport)
 
             resetAndLaunchTimer(scope)
             val glucometerInfo = deviceRepository.getGlucometerInfo(deviceAddress)
-
 
             resetAndLaunchTimer(scope)
             val events = deviceRepository.syncWithDevice(
@@ -88,14 +95,17 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 resetAndLaunchTimer(scope)
             }
 
+            crashlyticsReport.log("start updating device info to storage")
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
             if (events.isNotEmpty()) {
+                crashlyticsReport.log("start sending events to backend and db")
                 eventsRepository.addEventFromGlucometer(events)
             }
 
             return events.size
         } finally {
+            crashlyticsReport.log("disconnection and timer cancelation")
             deviceRepository.disconnect()
             cancelTimer()
         }

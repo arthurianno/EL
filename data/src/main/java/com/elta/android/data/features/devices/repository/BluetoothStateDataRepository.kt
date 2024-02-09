@@ -5,13 +5,15 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 class BluetoothStateDataRepository @Inject constructor(
     private val context: Context,
-    private val adapter: BluetoothAdapter
+    private val adapter: BluetoothAdapter,
+    private val crashlyticsReport: CrashlyticsReport
 ) : BluetoothStateRepository {
 
     override fun isPermissionGranted(): Boolean {
@@ -22,7 +24,7 @@ class BluetoothStateDataRepository @Inject constructor(
             val bluetoothScanIsGranted =
                 context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
 
-            Timber.tag(TAG).d(
+            crashlyticsReport.log(
                 "Permission scan granted: $bluetoothScanIsGranted; " +
                         "connect granted: $bluetoothConnectIsGranted"
             )
@@ -32,7 +34,7 @@ class BluetoothStateDataRepository @Inject constructor(
             val accessFineLocationIsGranted =
                 context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-            Timber.tag(TAG).d(
+            crashlyticsReport.log(
                 "Permission fine location granted: $accessFineLocationIsGranted"
             )
 
@@ -43,7 +45,7 @@ class BluetoothStateDataRepository @Inject constructor(
     override fun isBluetoothEnable(): Boolean {
         val bluetoothIsEnable = adapter.isEnabled
 
-        Timber.tag(TAG).d("Bluetooth is enable: $bluetoothIsEnable")
+        crashlyticsReport.log("Bluetooth is enabled: $bluetoothIsEnable")
 
         return bluetoothIsEnable
     }

@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
@@ -21,39 +22,54 @@ class UpdateDeviceFirmwareUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val deviceRepository: DeviceRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
-) : ObservableWithTimerUseCase<String, UpdateDeviceFirmwareUseCase.Params>(schedulers) {
+) : ObservableWithTimerUseCase<String, UpdateDeviceFirmwareUseCase.Params>(
+    schedulers,
+    crashlyticsReport
+) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<String> {
-        bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
-
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
+            crashlyticsReport.log("starting firmware update for device: ${params?.address}")
+            crashlyticsReport.log("checking params")
             val p = checkNotNull(params)
 
             val address = p.address
 
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
+
+            crashlyticsReport.log("checking pin")
             val pin = pinRepository.getPin(address)
             if (pin == null) {
-                //В логи
+                crashlyticsReport.writeException(GlucometerPinNotFoundInternaly)
                 throw GlucometerPinNotFoundInternaly
             }
 
-            deviceRepository.connectWithTimeout(address, pin)
+            crashlyticsReport.log("start connection with device $address with timeout")
+            deviceRepository.connectWithTimeout(address, pin, false, crashlyticsReport)
 
             try {
                 resetAndLaunchTimer(this)
                 deviceRepository.turnOnDfuMode()
             } finally {
+                crashlyticsReport.log("disconnect from device and cancelling timer")
                 deviceRepository.disconnect()
                 cancelTimer()
             }
 
+            crashlyticsReport.log("creating dfu address")
             val dfuAddress = address.toDfuAddress()
 
-            deviceRepository.connectWithTimeout(dfuAddress, pin, true)
+            crashlyticsReport.log("connecting to device in dfu mode $address with timeout")
+            deviceRepository.connectWithTimeout(dfuAddress, pin, true, crashlyticsReport)
 
+            crashlyticsReport.log("start updating device: $address firmware with file ${p.file.path}")
             try {
                 updateRepository.updateFirmware(dfuAddress, p.file)
+            } catch (e: Exception) {
+                crashlyticsReport.writeException(e)
+                throw e
             } finally {
                 deviceRepository.disconnect()
             }

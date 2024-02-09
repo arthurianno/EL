@@ -2,6 +2,7 @@ package com.elta.android.data.features.rostech
 
 import android.app.Application
 import com.elta.android.common.constants.GLUCOMETER_MODEL
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.common.datasource.PersonalDataStorage
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
@@ -18,7 +19,8 @@ class RosTechDataRepository @Inject constructor(
     private val personalData: PersonalDataStorage,
     private val application: Application,
     private val glucometerEventBuilder: GlucometerEventBuilder,
-    private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>
+    private val glucometersInfoCache: Cache<GlucometerInfoCachedDto>,
+    private val crashlyticsReport: CrashlyticsReport
 ): RosTechRepository {
 
     override fun init(): Completable {
@@ -33,13 +35,13 @@ class RosTechDataRepository @Inject constructor(
                 }
                 .ignoreElement()
         } else Completable.error(RosTechDisableError)
-
-
     }
 
     //TODO: Метод как временное решение, т.к вероятнее всего что SDK Росстеха будут ходить в глюкометр напрямую
     override suspend fun sendEvents(address: String, events: List<String>) {
+        crashlyticsReport.log("sending events to SDK, feature: ${FeatureToggles.isEnableIiotSdkFeature}")
         if (FeatureToggles.isEnableIiotSdkFeature) {
+            crashlyticsReport.log("start sending")
             events.forEach { event ->
                 delay(20)
                 IiotSdkDeviceService.sendEvent(
@@ -48,6 +50,7 @@ class RosTechDataRepository @Inject constructor(
                     model = GLUCOMETER_MODEL
                 )
             }
+            crashlyticsReport.log("events sent")
         }
     }
 }

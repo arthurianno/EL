@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.elta.android.common.errors.BluetoothScannerNotAvailable
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +20,8 @@ import javax.inject.Singleton
 @Singleton
 class EnvironmentScanner @Inject constructor(
     private val adapter: BluetoothAdapter,
-    private val context: Context
+    private val context: Context,
+    private val crashlyticsReport: CrashlyticsReport
 ) {
     private var callback: ScanCallback? = null
 
@@ -35,35 +37,55 @@ class EnvironmentScanner @Inject constructor(
 
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
                 result?.let {
+                    crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
                     if (result.isFiltered(filters)) {
-                        Timber.tag(TAG).d("onScanResult :: $result")
+                        crashlyticsReport.log("onScanFilteredResult: ${result.device.address}")
                         resultCallback(listOf(result))
                     }
                 }
             }
 
             override fun onBatchScanResults(results: MutableList<ScanResult>) {
-                val list = results.filter { it.isFiltered(filters) }
+                crashlyticsReport.log(
+                    "onScanNotFilteredResult: ${
+                        results.map {
+                            it.device.address + ", "
+                        }
+                    }"
+                )
+                val list = results.filter {
+                    it.isFiltered(filters)
+                }
                 if (list.isNotEmpty()) {
+                    crashlyticsReport.log(
+                        "onScanFilteredResult: ${
+                            list.map {
+                                it.device.address + ", "
+                            }
+                        }"
+                    )
                     resultCallback(list)
                 }
             }
 
             override fun onScanFailed(errorCode: Int) {
-                //TODO: обязательно в логи, так как могут быть проблемы еще на этапе сканирования
-                throw ScanError(errorCode)
+                val error = ScanError(errorCode)
+                crashlyticsReport.writeException(error)
+                throw error
             }
         }
         val scanner = adapter.bluetoothLeScanner
         if (scanner == null) {
-            //TODO: в логи, проверить состояние блютуз и разрешения
+            crashlyticsReport.log("bluetooth scanner not available during scan start")
             throw BluetoothScannerNotAvailable
         }
 
+        crashlyticsReport.log("start scanning")
         adapter.bluetoothLeScanner.startScan(emptyList(), settings, callback)
     }
 
     fun stopScan() {
+        crashlyticsReport.log("stop scanning start")
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) ==
                     PackageManager.PERMISSION_GRANTED
@@ -72,25 +94,14 @@ class EnvironmentScanner @Inject constructor(
                     PackageManager.PERMISSION_GRANTED
         }
 
-        Timber.tag(TAG).d("scanner permission state: $permission")
+        crashlyticsReport.log("scanner permission state: $permission")
 
         if (permission) {
-            callback?.let { adapter.bluetoothLeScanner?.stopScan(it) }
+            callback?.let {
+                adapter.bluetoothLeScanner?.stopScan(it)
+                crashlyticsReport.log("stop scanning success")
+            }
         }
-    }
-
-
-    @Suppress("ReturnCount")
-    private fun List<ScanResult>.isResultChanged(other: List<ScanResult>): Boolean {
-        if (size != other.size) {
-            return true
-        }
-
-        forEachIndexed { index, item ->
-            return item.device != other[index].device
-        }
-
-        return false
     }
 
     @SuppressLint("MissingPermission")

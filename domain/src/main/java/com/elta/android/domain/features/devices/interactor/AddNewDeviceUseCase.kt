@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.devices.interactor
 
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
@@ -20,6 +21,7 @@ class AddNewDeviceUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val deviceInfoRepository: DeviceInfoRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
 ) : CompletableUseCase<AddNewDeviceUseCase.Params>(schedulers) {
 
@@ -30,27 +32,35 @@ class AddNewDeviceUseCase @Inject constructor(
     }
 
     private suspend fun addDevice(params: Params?) {
+        crashlyticsReport.log("adding device with address: ${params?.device?.address}")
         try {
-            //TODO: Добавить логгер который будет логгировать ошибки внутри проверки
-            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions()
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 
             val (device, pincode) = requireNotNull(params) {
-                //TODO: лог, но пинкод не логгировать
-                "params for new device cannot be null"
+                val errorString = "params for new device cannot be null"
+                crashlyticsReport.writeException(RuntimeException(errorString))
+                errorString
             }
             val address = device.address
 
-            deviceRepository.connectWithTimeout(address, pincode)
+            deviceRepository.connectWithTimeout(address, pincode, false, crashlyticsReport)
+
+            crashlyticsReport.log("saving pin")
             pinRepository.savePin(address, pincode)
 
+            crashlyticsReport.log("starting getting primary device")
             val primaryDevice = deviceInfoRepository.getPrimaryDeviceWithLastEvent()?.first
+            crashlyticsReport.log("primary device obtained")
 
             if (primaryDevice == null) {
+                crashlyticsReport.log("obtained device is null")
                 deviceInfoRepository.putDevice(glucometer = device, isPrimary = true)
             } else if (!primaryDevice.address.equals(address, true)) {
+                crashlyticsReport.log("obtained device is device ${device.name}")
                 deviceInfoRepository.putDevice(device, isPrimary = false)
             }
         } finally {
+            crashlyticsReport.log("disconnecting device")
             deviceRepository.disconnect()
         }
     }
