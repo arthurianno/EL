@@ -67,7 +67,6 @@ private fun WebimUser.toAuth(key: String): WebimUserAuthEntity =
         hash = this.toString().hmacSha1Signature(key)
     )
 
-
 private fun SendStatus.toDomain(): WebimMessageSendStatus =
     when (this) {
         SendStatus.SENDING -> WebimMessageSendStatus.Sending
