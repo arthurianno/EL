@@ -3,6 +3,7 @@ package com.elta.android.domain.features.devices.interactor
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideMac
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
@@ -33,7 +34,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
 
     override fun buildUseCaseObservable(params: Params?): Observable<Int> {
         return rxObservable(EmptyCoroutineContext + Dispatchers.Unconfined) {
-            crashlyticsReport.log("The synchronization procedure has begun with the device ${params?.device?.address}")
+            crashlyticsReport.log("The synchronization procedure has begun with the device ${params?.device?.address?.hideMac()}")
             crashlyticsReport.log("Receiving data for the main device")
             val deviceWithLastEvent = deviceInfoRepository.getPrimaryDeviceWithLastEvent()
             if (deviceWithLastEvent == null) {

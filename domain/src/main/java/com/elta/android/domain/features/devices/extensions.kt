@@ -4,6 +4,7 @@ import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideMac
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import kotlinx.coroutines.TimeoutCancellationException
@@ -33,7 +34,7 @@ suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String
             connectDevice(address, pinCode)
         }
     } catch (e: TimeoutCancellationException) {
-        val exception = GlucometerSyncError(TimeoutException("device $address connection timeout"))
+        val exception = GlucometerSyncError(TimeoutException("device ${address.hideMac()} connection timeout"))
         crashlyticsReport?.writeException(exception)
         throw exception
     }

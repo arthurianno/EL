@@ -11,6 +11,7 @@ import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideMac
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
 import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
@@ -68,7 +69,7 @@ class GlucometerClientImpl @Inject constructor(
                 scan(address, dfuFilters)
             }
         } catch (e: TimeoutCancellationException) {
-            val exception = GlucometerSyncError(TimeoutException("Device search dfu $address timed out"))
+            val exception = GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
             crashlyticsReport.writeException(exception)
             throw exception
         }
@@ -98,7 +99,7 @@ class GlucometerClientImpl @Inject constructor(
 
     @Throws(GlucometerNotConnectedException::class)
     override suspend fun getGlucometerInfo(address: String): GlucometerInfoDto {
-        crashlyticsReport.log("Started receiving information from the device with the address: $address")
+        crashlyticsReport.log("Started receiving information from the device with the address: ${address.hideMac()}")
         with(glucometerBleManager) {
             if (!glucometerBleManager.isConnected(address)) {
                 val error = GlucometerNotConnectedException(address)
@@ -137,7 +138,7 @@ class GlucometerClientImpl @Inject constructor(
     }
 
     override suspend fun connectDevice(address: String, pin: String) {
-        crashlyticsReport.log("Connection operations started with device $address")
+        crashlyticsReport.log("Connection operations started with device ${address.hideMac()}")
         crashlyticsReport.log("Environment scanning started")
         val scanResult = scan(address, filters)
         crashlyticsReport.log("Scanning the environment is completed with the result")

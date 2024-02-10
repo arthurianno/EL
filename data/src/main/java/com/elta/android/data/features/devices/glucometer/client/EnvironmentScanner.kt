@@ -13,6 +13,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.elta.android.common.errors.BluetoothScannerNotAvailable
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideMac
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +40,7 @@ class EnvironmentScanner @Inject constructor(
                 result?.let {
                     //crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
                     if (result.isFiltered(filters)) {
-                        crashlyticsReport.log("Scan result filtered by 'Satellite' mask: ${result.device.address}")
+                        crashlyticsReport.log("Scan result filtered by 'Satellite' mask: ${result.device.address.hideMac()}")
                         resultCallback(listOf(result))
                     }
                 }
@@ -49,7 +50,7 @@ class EnvironmentScanner @Inject constructor(
                 crashlyticsReport.log(
                     "Unfiltered scan results: ${
                         results.map {
-                            it.device.address + ", "
+                            it.device.address.hideMac() + ", "
                         }
                     }"
                 )
@@ -60,7 +61,7 @@ class EnvironmentScanner @Inject constructor(
                     crashlyticsReport.log(
                         "Scan results filtered by 'Satellite' mask:: ${
                             list.map {
-                                it.device.address + ", "
+                                it.device.address.hideMac() + ", "
                             }
                         }"
                     )
@@ -93,8 +94,6 @@ class EnvironmentScanner @Inject constructor(
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED
         }
-
-        crashlyticsReport.log("Scanner permission state: $permission")
 
         if (permission) {
             callback?.let {

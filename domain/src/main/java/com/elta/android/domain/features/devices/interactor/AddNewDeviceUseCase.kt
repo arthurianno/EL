@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideMac
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
@@ -32,7 +33,7 @@ class AddNewDeviceUseCase @Inject constructor(
     }
 
     private suspend fun addDevice(params: Params?) {
-        crashlyticsReport.log("Started adding a new device with address: ${params?.device?.address}")
+        crashlyticsReport.log("Started adding a new device with address: ${params?.device?.address?.hideMac()}")
         try {
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
 

@@ -134,7 +134,13 @@ class GlucometerBleManager @Inject constructor(
         //Собственно тут получаем реальные замеры устройства в строковом представлении
         val resultResponse = response.value?.toString(Charset.defaultCharset())
             ?: throw Exception("Empty waitForNotification result")
-        crashlyticsReport.log("Received notification for ${command.javaClass.name} with result: $resultResponse")
+
+        val logResponse = if (command is Commands.Serial) {
+            "Serial number received"
+        } else {
+            resultResponse
+        }
+        crashlyticsReport.log("Received notification for ${command.javaClass.name} with result: $logResponse")
 
         return resultResponse
     }
