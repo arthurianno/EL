@@ -9,6 +9,8 @@ before_script:
 - export CI=GitLab
 - export GRADLE_USER_HOME=$(pwd)/.gradle
 - chmod +x ./gradlew
+- apt-get update
+- apt-get install -y openjdk-17-jdk
 
 stages:
 - build
