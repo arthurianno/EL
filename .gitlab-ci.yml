@@ -85,6 +85,24 @@ release-build:
     - echo JOB_ID="$CI_JOB_ID" >> build.env
     - mv app/build/outputs/apk/release/app-universal-release.apk $CI_COMMIT_TAG.apk
 
+release-app-bundle-manual:
+  stage: build
+  when: manual
+  only:
+    - /-release$/
+  tags:
+    - android,docker
+  artifacts:
+    when: on_success
+    expire_in: 1 week
+    paths:
+      - $CI_COMMIT_TAG.aab
+  script:
+    - ./gradlew clean
+    - ./gradlew bundleRelease
+    - mv app/build/outputs/apk/release/app-universal-release.aab $CI_COMMIT_TAG.aab
+
+
 release-test:
   stage: test
   rules:
