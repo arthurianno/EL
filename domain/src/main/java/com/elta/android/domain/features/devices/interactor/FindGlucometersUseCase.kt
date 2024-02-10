@@ -12,6 +12,7 @@ import io.reactivex.Observable
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asObservable
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class FindGlucometersUseCase @Inject constructor(
@@ -21,12 +22,23 @@ class FindGlucometersUseCase @Inject constructor(
     schedulers: SchedulersFacade
 ) : ObservableListUseCase<Glucometer, Unit>(schedulers) {
 
+    private var anyDeviceFound: Boolean = false
+
     override fun buildUseCaseObservable(params: Unit?): Observable<List<Glucometer>> {
         return repo.findDevices().onStart {
             crashlyticsReport.log("Started searching for devices in the environment")
             bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
         }
             .asObservable()
-            .takeUntil(Observable.timer(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS))
+            .doOnNext {
+                anyDeviceFound = it.isNotEmpty() || anyDeviceFound
+            }
+            .takeUntil(Observable.timer(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).doOnNext {
+                if (!anyDeviceFound) {
+                    val exception = TimeoutException("The search for a device in the environment was stopped due to a timeout, no devices were found")
+                    crashlyticsReport.writeException(exception)
+                    throw exception
+                }
+            })
     }
 }
