@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.app.pm
 import android.net.Uri
 import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideEmail
 import com.elta.android.domain.features.rostech.RosTechUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
@@ -42,6 +44,7 @@ class AppPm @Inject constructor(
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val firebaseStorage: FirebaseStorage,
+    private val crashlyticsReport: CrashlyticsReport,
     private val rosTech: RosTechUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
@@ -69,7 +72,10 @@ class AppPm @Inject constructor(
                     }
                     .doOnSuccess { info ->
                         getUserId.execute()
-                            .doOnSuccess { firebaseStorage.userLogin = it }
+                            .doOnSuccess {
+                                firebaseStorage.userLogin = it
+                                crashlyticsReport.setUserId(it.hideEmail())
+                            }
                             .subscribe()
                         when {
                             info.first.isUserLoggedIn != true -> router.newRootFlow(Screens.GreetingFlow)

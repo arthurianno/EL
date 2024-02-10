@@ -14,3 +14,17 @@ fun String.hideMac(): String {
     }
     return string.toString()
 }
+
+fun String.hideEmail(): String {
+    val atIndex = indexOf('@')
+    if (atIndex == -1 || atIndex == 0 || atIndex == length - 1) {
+        return "Invalid email format"
+    }
+
+    val username = substring(0, atIndex)
+    val hiddenCharsCount = minOf(maxOf(username.length / 2, 1), 3)  // Максимум 3 скрытых символа
+    val hiddenChars = "*".repeat(hiddenCharsCount)
+    val visibleChars = username.substring(0, username.length - hiddenCharsCount)
+
+    return "$visibleChars$hiddenChars@${substring(atIndex + 1)}.${hashCode()}"
+}
