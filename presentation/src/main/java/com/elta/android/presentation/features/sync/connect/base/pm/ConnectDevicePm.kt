@@ -164,17 +164,21 @@ abstract class ConnectDevicePm constructor(
             is LocationNotEnabledError ->
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)
 
-            is TimeoutException -> {
-                val syncState = if (items.valueOrNull.isNullOrEmpty()) {
-                    ViewState.NOT_FOUND
+            is GlucometerSyncError -> {
+                if (error.cause is TimeoutException) {
+                    showRetryConnectAction.consumer.accept(Unit)
                 } else {
-                    ViewState.SYNC_ERROR
+                    val syncState = if (items.valueOrNull.isNullOrEmpty()) {
+                        ViewState.NOT_FOUND
+                    } else {
+                        ViewState.SYNC_ERROR
+                    }
+                    connectState.consumer.accept(syncState)
                 }
-                connectState.consumer.accept(syncState)
+
             }
 
             is GlucometerPinIncorrect -> showRetryPinAction.consumer.accept(Unit)
-            is GlucometerSyncError -> connectState.consumer.accept(ViewState.SYNC_ERROR)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
             else -> super.handleError(error)
         }
