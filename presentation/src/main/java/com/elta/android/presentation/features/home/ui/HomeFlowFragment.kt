@@ -175,8 +175,8 @@ class HomeFlowFragment :
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
         presentationModel.btControl.resolveResults(requestCode, resultCode)
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun initBottomSheetItemsView() {

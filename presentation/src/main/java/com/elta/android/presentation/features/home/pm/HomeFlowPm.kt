@@ -464,7 +464,7 @@ class HomeFlowPm @Inject constructor(
         isAuto: Boolean
     ): ObservableSource<out Int> = when (error) {
         is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
-
+        is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
         is GlucometerSyncError ->
             when (error.cause) {
                 is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
@@ -494,15 +494,20 @@ class HomeFlowPm @Inject constructor(
         .filter { it }
         .flatMapObservable { syncWithGlucometer(isAuto) }
 
+
     private fun handleManualSyncError(error: Throwable) {
         bus.event(Events.Sync.Glucometer.Nothing)
 
         when (error) {
+            is BluetoothNotEnabledError, LocationNotEnabledError -> {
+                manualSyncError.accept(ManualSyncError.ErrorSync)
+            }
+
             is PrimaryGlucometerNotFoundError -> {
                 openConnectScreen()
             }
 
-            is GlucometerOfflineError -> {
+            is GlucometerOfflineError,  -> {
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
@@ -523,7 +528,9 @@ class HomeFlowPm @Inject constructor(
 
     private fun handleAutoSyncError(error: Throwable) {
         when {
-            error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError || error.cause is LocationPermissionNotGrantedError ->
+            error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
+                    error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
+                    error.cause is LocationPermissionNotGrantedError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
             error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) ->

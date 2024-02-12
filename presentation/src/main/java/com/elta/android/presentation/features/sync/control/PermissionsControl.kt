@@ -5,12 +5,7 @@ package com.elta.android.presentation.features.sync.control
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.IntentSender
 import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
 import com.nullgr.core.intents.launchForResult
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -101,32 +96,6 @@ fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
             bluetoothEnabledAction.consumer.accept(Unit)
         } else {
             bluetoothDeniedAction.consumer.accept(Unit)
-        }
-    }
-}
-
-fun enableLocation(fragment: Fragment) {
-    val locationRequest = LocationRequest.create().apply {
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
-
-    val builder = LocationSettingsRequest.Builder()
-        .addLocationRequest(locationRequest)
-        .setAlwaysShow(true)
-
-    val client = LocationServices.getSettingsClient(fragment.requireContext())
-    val task = client.checkLocationSettings(builder.build())
-
-    task.addOnFailureListener { exception ->
-        if (exception is ResolvableApiException) {
-            try {
-                exception.startResolutionForResult(
-                    fragment.requireActivity(),
-                    PermissionsControl.REQUEST_CODE_ENABLE_LOCATION
-                )
-            } catch (sendEx: IntentSender.SendIntentException) {
-                // Обработка ошибки при отправке интента
-            }
         }
     }
 }

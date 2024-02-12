@@ -95,6 +95,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
             ) {
                 resetAndLaunchTimer(scope)
             }
+            cancelTimer()
 
             crashlyticsReport.log("Started saving device data to local storage")
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
