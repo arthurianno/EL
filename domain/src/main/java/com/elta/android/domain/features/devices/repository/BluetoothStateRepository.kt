@@ -4,5 +4,7 @@ interface BluetoothStateRepository {
 
     fun isPermissionGranted() : Boolean
 
-    fun isBluetoothEnable() : Boolean
+    fun isBluetoothEnabled() : Boolean
+
+    fun isLocationEnabledForPreTiramisu(): Boolean
 }

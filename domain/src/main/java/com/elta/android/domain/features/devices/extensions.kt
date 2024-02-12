@@ -2,6 +2,7 @@ package com.elta.android.domain.features.devices
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.GlucometerSyncError
+import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
@@ -14,16 +15,20 @@ import kotlin.jvm.Throws
 
 const val CONNECT_TIMEOUT: Long = 60_000
 const val COMMAND_TIMEOUT = 30_000L
-@Throws(LocationPermissionNotGrantedError::class, BluetoothNotEnabledError::class)
+@Throws(LocationPermissionNotGrantedError::class, BluetoothNotEnabledError::class, LocationNotEnabledError::class)
 fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport: CrashlyticsReport?) {
     when {
         !isPermissionGranted() -> {
             crashlyticsReport?.writeException(LocationPermissionNotGrantedError)
             throw LocationPermissionNotGrantedError
         }
-        !isBluetoothEnable() -> {
+        !isBluetoothEnabled() -> {
             crashlyticsReport?.writeException(BluetoothNotEnabledError)
             throw BluetoothNotEnabledError
+        }
+        !isLocationEnabledForPreTiramisu() -> {
+            crashlyticsReport?.writeException(LocationNotEnabledError)
+            throw  LocationNotEnabledError
         }
     }
 }

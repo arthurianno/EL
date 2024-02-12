@@ -125,7 +125,10 @@ abstract class ConnectDevicePm constructor(
         bindAnalytics()
         bindPermissionAction()
 
-        btControl.bluetoothDeniedAction.observable
+        Observable.merge(
+            btControl.bluetoothDeniedAction.observable,
+            btControl.locationDeniedAction.observable
+        )
             .subscribe { connectState.consumer.accept(ViewState.HOW_TO_CONNECT) }
             .untilDestroy()
 
