@@ -92,10 +92,9 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 email = userEmail,
                 serial = glucometerInfo.glucometerSerialNumber,
                 lastSyncEvent = lastSyncEvent
-            ) {
-                resetAndLaunchTimer(scope)
+            ) { isLast ->
+                if (isLast) cancelTimer() else resetAndLaunchTimer(scope)
             }
-            cancelTimer()
 
             crashlyticsReport.log("Started saving device data to local storage")
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())

@@ -176,7 +176,7 @@ class GlucometerClientImpl @Inject constructor(
     override suspend fun syncWithDevice(
         address: String,
         lastSyncEvent: String?,
-        onCommandSuccess: () -> Unit
+        onCommandSuccess: (Boolean) -> Unit
     ): List<String> {
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
@@ -192,7 +192,7 @@ class GlucometerClientImpl @Inject constructor(
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
-                onCommandSuccess.invoke()
+                onCommandSuccess.invoke(false)
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
                 events.add(event)
             }

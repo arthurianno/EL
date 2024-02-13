@@ -46,11 +46,25 @@ class DeviceDataRepository @Inject constructor(
         email: String,
         serial: String?,
         lastSyncEvent: String?,
-        onCommandSuccess: () -> Unit
-    ): List<GlucometerEvent> =
-        glucometerClient.syncWithDevice(address, lastSyncEvent, onCommandSuccess)
-            .also { rosTechRepository.sendEvents(address, it) }
-            .map { event -> glucometerEventBuilder.buildFrom(email, address, event, serial) }
+        onCommandSuccess: (isLast: Boolean) -> Unit
+    ): List<GlucometerEvent> {
+        val events = glucometerClient.syncWithDevice(address, lastSyncEvent, onCommandSuccess)
+        //FIXME!! это временное решение. Передача последнего события в параметрах лямбды нужна
+        //только для того, чтобы отменить таймер в коде выше, т.к синхронизация с Ростехом
+        //это часть метода syncWithDevice, чего быть не должно, но Ростеху нужны непреобразованные замеры,
+        //а дальше маппер. Либо мы вынесем это на этапе когда внедрим applyObservation. Либо когда
+        //внедрим прямой доступ SDK ростеха к глюкометру.
+        onCommandSuccess(true)
+        rosTechRepository.sendEvents(address, events)
+        return events.map { event ->
+            glucometerEventBuilder.buildFrom(
+                email,
+                address,
+                event,
+                serial
+            )
+        }
+    }
 
     override suspend fun locateGlucometer() {
         glucometerClient.locateGlucometer()

@@ -39,7 +39,8 @@ interface DeviceRepository {
      * @param email Электронная почта пользователя, которая преоразуется в пользовательский идентификатор.
      * @param serial Серийный номер устройства
      * @param lastSyncEvent Последний считайнный замер с устройства в строковом представлении
-     * @param onCommandSuccess коллбек вызывающися после каждой успешной выполненной комманды глюкометра
+     * @param onCommandSuccess коллбек вызывающися после каждой успешной выполненной комманды глюкометра,
+     * булевый параметр в лямбде указывает является ли замер последним
      * Он необходим для сохранения в БД и отправления на сервер.
      * @return Список преоразованных событий с устройства.
      */
@@ -48,7 +49,7 @@ interface DeviceRepository {
         email: String,
         serial: String?,
         lastSyncEvent: String?,
-        onCommandSuccess: () -> Unit
+        onCommandSuccess: (Boolean) -> Unit
     ): List<GlucometerEvent>
 
     /**
