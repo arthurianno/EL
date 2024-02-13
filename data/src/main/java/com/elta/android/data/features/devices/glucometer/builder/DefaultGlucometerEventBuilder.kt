@@ -10,8 +10,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val LOG_STRING_SUFFIX = "<<<<<<< DefaultGlucometerEventBuilder >>>>>>"
-
 @Suppress("MagicNumber")
 @Singleton
 open class DefaultGlucometerEventBuilder @Inject constructor(
@@ -27,12 +25,6 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         val tokens = getTokens(response)
         val dateToken = tokens.first
         val temperatureAndValueToken = tokens.second
-
-        Timber.i("$LOG_STRING_SUFFIX Response : $response")
-        Timber.i("$LOG_STRING_SUFFIX Tokens : $tokens")
-        Timber.i("$LOG_STRING_SUFFIX Date : ${extractDate(dateToken)}")
-        Timber.i("$LOG_STRING_SUFFIX Temperature : ${extractTemperature(temperatureAndValueToken)}")
-        Timber.i("$LOG_STRING_SUFFIX Glucose Value : ${extractValue(temperatureAndValueToken)}")
 
         return GlucometerEvent(
             id = generator.generate(userId, glucometerId, dateToken),
