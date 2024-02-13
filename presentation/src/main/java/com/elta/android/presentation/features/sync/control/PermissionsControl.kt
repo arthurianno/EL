@@ -21,6 +21,7 @@ class PermissionsControl(pm: PresentationModel) {
     val requestEnableBluetoothCommand = pm.command<Unit>(bufferSize = 1)
     val requestBluetoothPermissionCommand = pm.command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = pm.command<Unit>(bufferSize = 1)
+    val requestCombinedPermissionsCommand = pm.command<Unit>(bufferSize = 1)
     val requestEnableLocationCommand = pm.command<Unit>(bufferSize = 1)
 
     val bluetoothEnabledAction = pm.action<Unit>()
@@ -71,6 +72,26 @@ fun PermissionsControl.bindTo(
             permissions.requestEach(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
         .subscribe(locationPermissionsGrantedAction.consumer)
+        .addTo(compositeUnbind)
+
+    requestCombinedPermissionsCommand.observable
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.requestEach(
+                android.Manifest.permission.BLUETOOTH_SCAN,
+                android.Manifest.permission.BLUETOOTH_CONNECT,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        .filter { !it.granted }
+        .firstElement()
+        .subscribe {
+            if (it.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
+                locationPermissionsGrantedAction.consumer.accept(it)
+            } else {
+                bluetoothPermissionsGrantedAction.consumer.accept(it)
+            }
+        }
         .addTo(compositeUnbind)
 
     requestEnableLocationCommand.observable

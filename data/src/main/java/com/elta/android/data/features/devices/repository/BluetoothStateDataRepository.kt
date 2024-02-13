@@ -17,7 +17,19 @@ class BluetoothStateDataRepository @Inject constructor(
     private val crashlyticsReport: CrashlyticsReport
 ) : BluetoothStateRepository {
 
-    override fun isPermissionGranted(): Boolean {
+    private fun checkLocationPermissions(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
+        val accessFineLocationIsGranted =
+            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        crashlyticsReport.log(
+            "Permission fine location granted: $accessFineLocationIsGranted"
+        )
+
+        return accessFineLocationIsGranted
+    }
+
+    private fun checkBluetoothPermissions(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
             val bluetoothConnectIsGranted =
@@ -32,15 +44,12 @@ class BluetoothStateDataRepository @Inject constructor(
 
             bluetoothConnectIsGranted && bluetoothScanIsGranted
         } else {
-            val accessFineLocationIsGranted =
-                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-            crashlyticsReport.log(
-                "Permission fine location granted: $accessFineLocationIsGranted"
-            )
-
-            accessFineLocationIsGranted
+            true
         }
+    }
+
+    override fun isPermissionGranted(): Boolean {
+        return checkLocationPermissions() && checkBluetoothPermissions()
     }
 
     override fun isBluetoothEnabled(): Boolean {
@@ -51,8 +60,8 @@ class BluetoothStateDataRepository @Inject constructor(
         return bluetoothIsEnable
     }
 
-    override fun isLocationEnabledForPreTiramisu(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return true
+    override fun isLocationEnabledPre34Api(): Boolean {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) return true
         val locationIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
         crashlyticsReport.log("Location is enabled: $locationIsEnabled")

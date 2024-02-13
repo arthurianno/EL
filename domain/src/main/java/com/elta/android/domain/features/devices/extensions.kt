@@ -26,7 +26,7 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlytic
             crashlyticsReport?.writeException(BluetoothNotEnabledError)
             throw BluetoothNotEnabledError
         }
-        !isLocationEnabledForPreTiramisu() -> {
+        !isLocationEnabledPre34Api() -> {
             crashlyticsReport?.writeException(LocationNotEnabledError)
             throw  LocationNotEnabledError
         }

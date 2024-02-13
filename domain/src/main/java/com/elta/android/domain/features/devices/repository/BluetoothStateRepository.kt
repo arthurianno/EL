@@ -6,5 +6,5 @@ interface BluetoothStateRepository {
 
     fun isBluetoothEnabled() : Boolean
 
-    fun isLocationEnabledForPreTiramisu(): Boolean
+    fun isLocationEnabledPre34Api(): Boolean
 }

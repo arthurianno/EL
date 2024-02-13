@@ -151,8 +151,10 @@ abstract class ConnectDevicePm constructor(
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
 
             is LocationPermissionNotGrantedError -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
                 } else {
                     btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
                 }
@@ -328,6 +330,16 @@ abstract class ConnectDevicePm constructor(
                 handlePermissionResult(permission, settingsLocationDialogData)
             }
             .untilDestroy()
+
+    /*    btControl.combinedPermissionsGrantedAction.observable
+            .subscribe { permission ->
+                if (permission.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
+                    handlePermissionResult(permission, settingsLocationDialogData)
+                } else {
+                    handlePermissionResult(permission, settingsBluetoothDialogData)
+                }
+            }
+            .untilDestroy()*/
 
         btControl.bluetoothPermissionsGrantedAction.observable
             .subscribe { permission ->

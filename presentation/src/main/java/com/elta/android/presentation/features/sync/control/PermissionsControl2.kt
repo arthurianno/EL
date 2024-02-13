@@ -11,15 +11,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.android.gms.location.SettingsClient
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nullgr.core.intents.launchForResult
+import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,7 +25,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
-import timber.log.Timber
 
 class PermissionsControl2 {
 
@@ -36,6 +33,9 @@ class PermissionsControl2 {
 
     internal val bluetoothPermissionsRequestRelay = PublishRelay.create<Unit>()
     internal val bluetoothPermissionsRequestResultRelay = PublishRelay.create<Boolean>()
+
+    internal val combinedPermissionsRequestRelay = PublishRelay.create<Unit>()
+    internal val combinedPermissionsRequestResultRelay = PublishRelay.create<Permission>()
 
     internal val locationRequestRelay = PublishRelay.create<Unit>()
     internal val locationRequestResultRelay = PublishRelay.create<Boolean>()
@@ -57,10 +57,19 @@ class PermissionsControl2 {
             .firstElement()
 
     fun requestLocationPermissions(): Maybe<Boolean> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             bluetoothPermissionsRequestResultRelay
                 .doOnSubscribe { bluetoothPermissionsRequestRelay.accept(Unit) }
                 .firstElement()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            combinedPermissionsRequestResultRelay
+                .doOnSubscribe { combinedPermissionsRequestRelay.accept(Unit) }
+                .take(3)
+                .map { permission -> permission.granted }
+                .toList()
+                .map { !it.contains(false) }
+                .toMaybe()
+
         } else {
             locationPermissionsRequestResultRelay
                 .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
@@ -94,9 +103,21 @@ fun PermissionsControl2.bindTo(
     bluetoothPermissionsRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.request(Manifest.permission.BLUETOOTH_SCAN)
+            permissions.request(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
         }
         .subscribe(bluetoothPermissionsRequestResultRelay)
+        .addTo(compositeUnbind)
+
+    combinedPermissionsRequestRelay
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.requestEach(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        .subscribe(combinedPermissionsRequestResultRelay)
         .addTo(compositeUnbind)
 
     locationPermissionsRequestRelay
@@ -152,49 +173,35 @@ fun enableLocation(fragment: Fragment) {
 }
 
 fun checkPermissions(activity: Activity) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        checkNotificationAndBluetooth(activity)
+    fun check(permissions: List<String>) {
+        if (permissions.isEmpty()) return
+        permissions.map {
+            ActivityCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
+        }.firstOrNull { it }?.let {
+            requestPermissions(
+                activity,
+                permissions.toTypedArray(),
+                1
+            )
+        }
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        checkBluetooth(activity)
+
+    val androidVersion = Build.VERSION.SDK_INT
+
+    val permissionsList = mutableListOf<String>()
+
+    if (androidVersion >= Build.VERSION_CODES.TIRAMISU) {
+        permissionsList.add(Manifest.permission.POST_NOTIFICATIONS)
     }
-}
-
-fun checkBluetooth(activity: Activity) {
-    val bluetoothScanName = Manifest.permission.BLUETOOTH_SCAN
-    val bluetoothConnectName = Manifest.permission.BLUETOOTH_CONNECT
-
-    if (ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
-        PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
-        PackageManager.PERMISSION_GRANTED
-    ) {
-        requestPermissions(
-            activity,
-            arrayOf(bluetoothScanName, bluetoothConnectName),
-            1
-        )
+    if (androidVersion >= Build.VERSION_CODES.S) {
+        permissionsList.add(Manifest.permission.BLUETOOTH_SCAN)
+        permissionsList.add(Manifest.permission.BLUETOOTH_CONNECT)
     }
-}
-
-private fun checkNotificationAndBluetooth(activity: Activity) {
-    val bluetoothScanName = Manifest.permission.BLUETOOTH_SCAN
-    val bluetoothConnectName = Manifest.permission.BLUETOOTH_CONNECT
-    val notificationName = Manifest.permission.POST_NOTIFICATIONS
-
-    if (ActivityCompat.checkSelfPermission(activity, notificationName) !=
-        PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat.checkSelfPermission(activity, bluetoothScanName) !=
-        PackageManager.PERMISSION_GRANTED ||
-        ActivityCompat.checkSelfPermission(activity, bluetoothConnectName) !=
-        PackageManager.PERMISSION_GRANTED
-    ) {
-        requestPermissions(
-            activity,
-            arrayOf(notificationName, bluetoothScanName, bluetoothConnectName),
-            100
-        )
+    if (androidVersion < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION)
     }
+
+    check(permissionsList)
 }
 
 private fun requestPermissions(activity: Activity, permissions: Array<String>, requestCode: Int) {
