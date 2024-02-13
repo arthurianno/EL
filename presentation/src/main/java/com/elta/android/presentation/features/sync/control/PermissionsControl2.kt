@@ -146,7 +146,7 @@ fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
     }
 }
 
-fun enableLocation(fragment: Fragment) {
+fun enableLocation(fragment: Fragment, onEnabled: (() -> Unit)? = null) {
     val locationRequest = LocationRequest.create().apply {
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
@@ -170,6 +170,10 @@ fun enableLocation(fragment: Fragment) {
             }
         }
     }
+        .addOnSuccessListener {
+            onEnabled?.invoke()
+        }
+
 }
 
 fun checkPermissions(activity: Activity) {
