@@ -3,7 +3,9 @@ package com.elta.android.presentation.features.sync.connect.base.pm
 import android.os.Build
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerAlreadyConnectedError
+import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerSyncError
@@ -165,6 +167,10 @@ abstract class ConnectDevicePm constructor(
 
             is LocationNotEnabledError ->
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)
+
+            is CommandError, is GlucometerConnectionException -> {
+                showRetryConnectAction.consumer.accept(Unit)
+            }
 
             is GlucometerSyncError -> {
                 if (error.cause is TimeoutException) {
@@ -330,16 +336,6 @@ abstract class ConnectDevicePm constructor(
                 handlePermissionResult(permission, settingsLocationDialogData)
             }
             .untilDestroy()
-
-    /*    btControl.combinedPermissionsGrantedAction.observable
-            .subscribe { permission ->
-                if (permission.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
-                    handlePermissionResult(permission, settingsLocationDialogData)
-                } else {
-                    handlePermissionResult(permission, settingsBluetoothDialogData)
-                }
-            }
-            .untilDestroy()*/
 
         btControl.bluetoothPermissionsGrantedAction.observable
             .subscribe { permission ->

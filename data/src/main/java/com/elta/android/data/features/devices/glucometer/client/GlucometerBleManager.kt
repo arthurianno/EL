@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import com.elta.android.common.errors.CommandError
+import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
@@ -108,7 +109,7 @@ class GlucometerBleManager @Inject constructor(
                 .suspend()
         } catch (e: Exception) {
             crashlyticsReport.writeException(e)
-            throw e
+            throw CommandError(e.message.orEmpty())
         }
 
         //Результат по сути является индикатором что
@@ -128,7 +129,7 @@ class GlucometerBleManager @Inject constructor(
             waitForNotification(notificationCharacteristic).suspend()
         } catch (e: Exception) {
             crashlyticsReport.writeException(e)
-            throw e
+            throw CommandError(e.message.orEmpty())
         }
 
         //Собственно тут получаем реальные замеры устройства в строковом представлении

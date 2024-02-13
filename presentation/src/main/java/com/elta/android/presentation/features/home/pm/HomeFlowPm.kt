@@ -2,6 +2,8 @@ package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.CommandError
+import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerOfflineError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.InvalidRefreshTokenError
@@ -528,7 +530,7 @@ class HomeFlowPm @Inject constructor(
         when {
             error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
                     error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
-                    error is LocationPermissionNotGrantedError ->
+                    error is LocationPermissionNotGrantedError || error is CommandError || error is GlucometerConnectionException ->
                 bus.event(Events.Sync.Glucometer.Error)
 
             error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) ->
