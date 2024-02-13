@@ -197,7 +197,7 @@ class GlucometerClientImpl @Inject constructor(
                 events.add(event)
             }
 
-            crashlyticsReport.log("All measurements were successfully read, events size: $events")
+            crashlyticsReport.log("All measurements were successfully read, events size: ${events.size}")
 
             return events
         }

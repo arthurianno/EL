@@ -22,7 +22,12 @@ abstract class BaseTree(private val logsFile: File) : Timber.Tree() {
         val logRecord = LogRecord(timeFormat.format(Date()), priority, tag, message, error)
         Log.println(priority, tag, message)
         logs.add(logRecord)
-        saveLogInFile(logRecord)
+        try {
+            saveLogInFile(logRecord)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     private fun saveLogInFile(logRecord: LogRecord) {

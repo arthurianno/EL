@@ -23,7 +23,7 @@ abstract class ObservableWithTimerUseCase<T, in Params> protected constructor(
      * По истечении срока указанного в COMMAND_TIMEOUT отменяет скоуп, переданный в аргументах
      * @param scope скоуп корутин, отменяющийся по истечении таймера
      */
-    protected fun resetAndLaunchTimer(scope: ProducerScope<T>) {
+    protected fun resetAndLaunchTimer(scope: ProducerScope<T>, timeout: Long? = null) {
         cancelTimer()
 
         timer = Timer().apply {
@@ -33,7 +33,7 @@ abstract class ObservableWithTimerUseCase<T, in Params> protected constructor(
                     crashlyticsReport.writeException(error)
                     scope.cancel("timeout", error)
                 }
-            }, COMMAND_TIMEOUT)
+            }, timeout ?: COMMAND_TIMEOUT)
         }
     }
 
