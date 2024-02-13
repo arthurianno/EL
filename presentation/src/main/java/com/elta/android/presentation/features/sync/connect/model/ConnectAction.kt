@@ -17,9 +17,11 @@ sealed class ConnectAction : Action {
     object SkipNextStep : ConnectAction()
 
     @OptIn(ExperimentalPermissionsApi::class)
-    data class OpenConnectingScreen(
+    data class CheckPermissionsState(
         val permissionsStatus: List<PermissionState>
     ) : ConnectAction()
+
+    object OpenConnectingScreen: ConnectAction()
 
     object ScannerError : ConnectAction()
 }
