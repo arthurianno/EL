@@ -121,7 +121,7 @@ class EventsDataRepository @Inject constructor(
         crashlyticsReport.log("Saving measurements to local storage is completed")
         try {
             crashlyticsReport.log("Started saving measurements to remote storage")
-            remoteSource.addEvents(mappedEvents)
+            remoteSource.addEventsSuspend(mappedEvents)
             crashlyticsReport.log("Saving measurements to remote storage is completed")
         } catch (e: Exception) {
             crashlyticsReport.writeException(e)
