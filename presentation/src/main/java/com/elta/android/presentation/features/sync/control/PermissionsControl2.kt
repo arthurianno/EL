@@ -35,7 +35,7 @@ class PermissionsControl2 {
     internal val bluetoothPermissionsRequestResultRelay = PublishRelay.create<Boolean>()
 
     internal val combinedPermissionsRequestRelay = PublishRelay.create<Unit>()
-    internal val combinedPermissionsRequestResultRelay = PublishRelay.create<Permission>()
+    internal val combinedPermissionsRequestResultRelay = PublishRelay.create<Boolean>()
 
     internal val locationRequestRelay = PublishRelay.create<Unit>()
     internal val locationRequestResultRelay = PublishRelay.create<Boolean>()
@@ -64,11 +64,7 @@ class PermissionsControl2 {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             combinedPermissionsRequestResultRelay
                 .doOnSubscribe { combinedPermissionsRequestRelay.accept(Unit) }
-                .take(3)
-                .map { permission -> permission.granted }
-                .toList()
-                .map { !it.contains(false) }
-                .toMaybe()
+                .firstElement()
 
         } else {
             locationPermissionsRequestResultRelay
@@ -111,7 +107,7 @@ fun PermissionsControl2.bindTo(
     combinedPermissionsRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
-            permissions.requestEach(
+            permissions.request(
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.ACCESS_FINE_LOCATION
