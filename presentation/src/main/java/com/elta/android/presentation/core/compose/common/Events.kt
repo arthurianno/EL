@@ -10,9 +10,9 @@ sealed class PermissionEvent : Event {
 
     class Storage : PermissionEvent()
     class RecordAudio : PermissionEvent()
-    class Camera : PermissionEvent()
-    class FineLocation : PermissionEvent()
     object OpenSettings : PermissionEvent()
+    object RequestPermissions : PermissionEvent()
+    object RequestEnableLocation : PermissionEvent()
 
     sealed class Bluetooth : PermissionEvent() {
         object RequestEnable : Bluetooth()

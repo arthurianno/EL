@@ -11,13 +11,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.android.gms.location.SettingsClient
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nullgr.core.intents.launchForResult
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -27,7 +24,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
-import timber.log.Timber
 
 class PermissionsControl2 {
 
@@ -125,7 +121,7 @@ fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
     }
 }
 
-fun enableLocation(fragment: Fragment) {
+fun enableLocation(fragment: Fragment, onEnabled: (() -> Unit)? = null) {
     val locationRequest = LocationRequest.create().apply {
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
@@ -149,6 +145,10 @@ fun enableLocation(fragment: Fragment) {
             }
         }
     }
+        .addOnSuccessListener {
+            onEnabled?.invoke()
+        }
+
 }
 
 fun checkPermissions(activity: Activity) {
