@@ -40,7 +40,7 @@ class EnvironmentScanner @Inject constructor(
                 result?.let {
                     //crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
                     if (result.isFiltered(filters)) {
-                        crashlyticsReport.log("Scan result filtered by 'Satellite' mask: ${result.device.address.hideMac()}")
+                        crashlyticsReport.log("Scan result filtered by mask: ${result.device.address.hideMac()}")
                         resultCallback(listOf(result))
                     }
                 }
