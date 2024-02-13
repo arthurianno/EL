@@ -465,12 +465,10 @@ class HomeFlowPm @Inject constructor(
     ): ObservableSource<out Int> = when (error) {
         is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
         is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
+        is LocationPermissionNotGrantedError -> requestLocatePermissionAndRepeat(isAuto)
         is GlucometerSyncError ->
             when (error.cause) {
                 is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
-                is LocationPermissionNotGrantedError ->
-                    requestLocatePermissionAndRepeat(isAuto)
-
                 is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
 
                 else -> {
@@ -530,7 +528,7 @@ class HomeFlowPm @Inject constructor(
         when {
             error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
                     error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
-                    error.cause is LocationPermissionNotGrantedError ->
+                    error is LocationPermissionNotGrantedError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
             error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) ->
