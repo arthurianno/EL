@@ -7,6 +7,7 @@ import com.nullgr.core.interactor.ObservableUseCase
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ProducerScope
+import timber.log.Timber
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.TimeoutException

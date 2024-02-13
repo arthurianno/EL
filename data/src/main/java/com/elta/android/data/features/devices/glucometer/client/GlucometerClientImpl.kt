@@ -23,6 +23,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
 import java.lang.IllegalStateException
@@ -175,7 +176,7 @@ class GlucometerClientImpl @Inject constructor(
     override suspend fun syncWithDevice(
         address: String,
         lastSyncEvent: String?,
-        onCommandSuccess: () -> Unit
+        onCommandSuccess: (Boolean) -> Unit
     ): List<String> {
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
@@ -191,7 +192,7 @@ class GlucometerClientImpl @Inject constructor(
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
-                onCommandSuccess.invoke()
+                onCommandSuccess.invoke(false)
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
                 events.add(event)
             }
@@ -207,7 +208,8 @@ class GlucometerClientImpl @Inject constructor(
     }
 
     private suspend fun scan(address: String, filters: List<ScanFilter>): ScanResult {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCancellation { environmentScanner.stopScan() }
             environmentScanner.startScan(filters = filters, settings = settings) { scanResults ->
                 scanResults.firstOrNull { it.device.address == address }?.let { result ->
                     try {

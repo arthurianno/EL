@@ -3,6 +3,7 @@ package com.elta.android.data.di
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.location.LocationManager
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerEventBuilder
 import com.elta.android.data.features.devices.glucometer.builder.DefaultGlucometerInfoBuilder
@@ -64,6 +65,12 @@ class GlucometerModule {
         context: Context,
         crashlyticsReport: CrashlyticsReport
     ): GlucometerBleManager = GlucometerBleManager(crashlyticsReport, context)
+
+    @Provides
+    @Singleton
+    fun provideLocationManager(
+        context: Context
+    ): LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     @Provides
     @Singleton

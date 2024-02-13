@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.location.SettingsClient
@@ -109,13 +110,13 @@ fun PermissionsControl2.bindTo(
     locationDisposable = locationRequestRelay
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
-            enableLocation2(fragment)
+            enableLocation(fragment)
         }
         .addTo(compositeUnbind)
 }
 
 fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
-    if (requestCode == PermissionsControl2.REQUEST_CODE_ENABLE_LOCATION) {
+    if (requestCode in arrayOf(PermissionsControl2.REQUEST_CODE_ENABLE_LOCATION, PermissionsControl.REQUEST_CODE_ENABLE_LOCATION)) {
         locationRequestResultRelay.accept(resultCode == Activity.RESULT_OK)
     }
 
@@ -124,28 +125,27 @@ fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
     }
 }
 
-fun enableLocation2(fragment: Fragment) {
-    val result = SettingsClient(fragment.requireContext())
-        .checkLocationSettings(
-            LocationSettingsRequest.Builder()
-                .addLocationRequest(LocationRequest.create())
-                .setNeedBle(true)
-                .build()
-        )
-    result.addOnCompleteListener { task ->
-        try {
-            task.getResult(ApiException::class.java)
-        } catch (e: ApiException) {
-            when (e.statusCode) {
-                LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
-                    try {
-                        (e as? ResolvableApiException)?.startResolutionForResult(
-                            fragment.requireActivity(),
-                            PermissionsControl2.REQUEST_CODE_ENABLE_LOCATION
-                        )
-                    } catch (e1: IntentSender.SendIntentException) {
-                        Timber.e(e1)
-                    }
+fun enableLocation(fragment: Fragment) {
+    val locationRequest = LocationRequest.create().apply {
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
+
+    val builder = LocationSettingsRequest.Builder()
+        .addLocationRequest(locationRequest)
+        .setAlwaysShow(true)
+
+    val client = LocationServices.getSettingsClient(fragment.requireContext())
+    val task = client.checkLocationSettings(builder.build())
+
+    task.addOnFailureListener { exception ->
+        if (exception is ResolvableApiException) {
+            try {
+                exception.startResolutionForResult(
+                    fragment.requireActivity(),
+                    PermissionsControl.REQUEST_CODE_ENABLE_LOCATION
+                )
+            } catch (sendEx: IntentSender.SendIntentException) {
+                // Обработка ошибки при отправке интента
             }
         }
     }

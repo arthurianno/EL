@@ -4,15 +4,16 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
-import timber.log.Timber
 import javax.inject.Inject
 
 class BluetoothStateDataRepository @Inject constructor(
     private val context: Context,
     private val adapter: BluetoothAdapter,
+    private val locationManager: LocationManager,
     private val crashlyticsReport: CrashlyticsReport
 ) : BluetoothStateRepository {
 
@@ -42,12 +43,21 @@ class BluetoothStateDataRepository @Inject constructor(
         }
     }
 
-    override fun isBluetoothEnable(): Boolean {
+    override fun isBluetoothEnabled(): Boolean {
         val bluetoothIsEnable = adapter.isEnabled
 
         crashlyticsReport.log("Bluetooth is enabled: $bluetoothIsEnable")
 
         return bluetoothIsEnable
+    }
+
+    override fun isLocationEnabledForPreTiramisu(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return true
+        val locationIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+        crashlyticsReport.log("Location is enabled: $locationIsEnabled")
+
+        return locationIsEnabled
     }
 }
 
