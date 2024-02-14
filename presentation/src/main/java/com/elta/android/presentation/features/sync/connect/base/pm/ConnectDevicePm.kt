@@ -188,7 +188,10 @@ abstract class ConnectDevicePm constructor(
 
             is GlucometerPinIncorrect -> showRetryPinAction.consumer.accept(Unit)
             is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
-            else -> super.handleError(error)
+            else -> {
+                connectState.consumer.accept(ViewState.SYNC_ERROR)
+                super.handleError(error)
+            }
         }
     }
 
