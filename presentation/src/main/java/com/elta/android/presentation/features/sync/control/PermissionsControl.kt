@@ -84,7 +84,6 @@ fun PermissionsControl.bindTo(
             )
         }
         .filter { !it.granted }
-        .firstElement()
         .subscribe {
             if (it.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
                 locationPermissionsGrantedAction.consumer.accept(it)
