@@ -32,7 +32,7 @@ interface GlucometerClient {
     /**
      * Синхронизация с глюкометром
      * */
-    suspend fun syncWithDevice(address: String, lastSyncEvent: String?, onCommandSuccess: (Boolean) -> Unit): List<String>
+    suspend fun syncWithDevice(address: String, lastSyncEvent: String?, onCommandSuccess: () -> Unit): List<String>
 
     /**
      * Запускает сценарий поиска глюкометра

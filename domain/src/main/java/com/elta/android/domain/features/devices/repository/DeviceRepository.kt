@@ -36,21 +36,16 @@ interface DeviceRepository {
     /**
      * Синхронизация с устройством для получения всех сохраненных событий на устройстве.
      * @param address Адрес запрашиваемого устройства.
-     * @param email Электронная почта пользователя, которая преоразуется в пользовательский идентификатор.
-     * @param serial Серийный номер устройства
      * @param lastSyncEvent Последний считайнный замер с устройства в строковом представлении
      * @param onCommandSuccess коллбек вызывающися после каждой успешной выполненной комманды глюкометра,
-     * булевый параметр в лямбде указывает является ли замер последним
      * Он необходим для сохранения в БД и отправления на сервер.
-     * @return Список преоразованных событий с устройства.
+     * @return Список замеров с устройства.
      */
     suspend fun syncWithDevice(
         address: String,
-        email: String,
-        serial: String?,
         lastSyncEvent: String?,
-        onCommandSuccess: (Boolean) -> Unit
-    ): List<GlucometerEvent>
+        onCommandSuccess: () -> Unit
+    ): List<String>
 
     /**
      * Метод для обнаружение устройства.
@@ -69,4 +64,13 @@ interface DeviceRepository {
      * @param pinCode Пин-код для подключения к устройству.
      */
     suspend fun testAllDevice(address: String, pinCode: String)
+
+    /**
+     * @suppress Генерирует события из замеров
+     * @param address Адрес запрашиваемого устройства.
+     * @param email Email адрес пользователя.
+     * @param serial Серийный номер устройства.
+     * @param measurements список замеров которые превращаются в события.
+     */
+    suspend fun buildEvents(address: String, email: String, serial: String?, measurements: List<String>): List<GlucometerEvent>
 }

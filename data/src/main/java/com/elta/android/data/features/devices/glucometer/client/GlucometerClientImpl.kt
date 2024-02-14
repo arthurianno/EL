@@ -31,7 +31,6 @@ import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class GlucometerClientImpl @Inject constructor(
@@ -176,7 +175,7 @@ class GlucometerClientImpl @Inject constructor(
     override suspend fun syncWithDevice(
         address: String,
         lastSyncEvent: String?,
-        onCommandSuccess: (Boolean) -> Unit
+        onCommandSuccess: () -> Unit
     ): List<String> {
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
@@ -192,7 +191,7 @@ class GlucometerClientImpl @Inject constructor(
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
-                onCommandSuccess.invoke(false)
+                onCommandSuccess.invoke()
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
                 events.add(event)
             }

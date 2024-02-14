@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException
 import kotlin.jvm.Throws
 
 const val CONNECT_TIMEOUT: Long = 60_000
+const val SEND_DATA_TIMEOUT: Long = 120_000
 const val COMMAND_TIMEOUT = 30_000L
 @Throws(LocationPermissionNotGrantedError::class, BluetoothNotEnabledError::class, LocationNotEnabledError::class)
 fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport: CrashlyticsReport?) {

@@ -12,7 +12,7 @@ import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.iiot.IiotSdkDeviceService
 import io.reactivex.Completable
-import kotlinx.coroutines.delay
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class RosTechDataRepository @Inject constructor(
@@ -38,19 +38,27 @@ class RosTechDataRepository @Inject constructor(
     }
 
     //TODO: Метод как временное решение, т.к вероятнее всего что SDK Росстеха будут ходить в глюкометр напрямую
-    override suspend fun sendEvents(address: String, events: List<String>) {
-        crashlyticsReport.log("Started sending measurements to SDK, permission to work with SDK = ${FeatureToggles.isEnableIiotSdkFeature}")
-        if (FeatureToggles.isEnableIiotSdkFeature) {
-            crashlyticsReport.log("Sending measurements to the SDK")
-            events.forEach { event ->
-                delay(20)
-                IiotSdkDeviceService.sendEvent(
-                    event = glucometerEventBuilder.getTimeAndValue(event),
-                    serial = glucometersInfoCache.get(CommonConditions.ById(address.hashCode().toLong()))?.glucometerSerialNumber.orEmpty(),
-                    model = GLUCOMETER_MODEL
-                )
+    override fun sendMeasurments(address: String, events: List<String>) {
+            crashlyticsReport.log("Started sending measurements to SDK, permission to work with SDK = ${FeatureToggles.isEnableIiotSdkFeature}")
+            if (FeatureToggles.isEnableIiotSdkFeature) {
+                crashlyticsReport.log("Sending measurements to the SDK")
+
+                Executors.newSingleThreadExecutor().submit {
+                    events.forEach { event ->
+                        IiotSdkDeviceService.sendEvent(
+                            event = glucometerEventBuilder.getTimeAndValue(event),
+                            serial = glucometersInfoCache.get(
+                                CommonConditions.ById(
+                                    address.hashCode().toLong()
+                                )
+                            )?.glucometerSerialNumber.orEmpty(),
+                            model = GLUCOMETER_MODEL
+                        )
+                    }
+                }.get()
+
+                crashlyticsReport.log("All measurements were successfully sent to the SDK")
             }
-            crashlyticsReport.log("All measurements were successfully sent to the SDK")
-        }
+
     }
 }

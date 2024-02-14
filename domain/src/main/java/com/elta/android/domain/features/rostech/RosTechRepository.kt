@@ -6,5 +6,5 @@ interface RosTechRepository {
 
     fun init(): Completable
 
-    suspend fun sendEvents(address: String, events: List<String>)
+    fun sendMeasurments(address: String, events: List<String>)
 }
