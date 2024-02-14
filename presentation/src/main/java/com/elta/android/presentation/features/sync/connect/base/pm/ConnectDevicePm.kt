@@ -175,6 +175,7 @@ abstract class ConnectDevicePm constructor(
             is GlucometerSyncError -> {
                 if (error.cause is TimeoutException) {
                     showRetryConnectAction.consumer.accept(Unit)
+                    connectState.consumer.accept(ViewState.NOT_FOUND)
                 } else {
                     val syncState = if (items.valueOrNull.isNullOrEmpty()) {
                         ViewState.NOT_FOUND
