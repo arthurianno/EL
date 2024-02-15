@@ -5,6 +5,7 @@ import com.elta.android.common.utils.hideMac
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
@@ -50,7 +51,8 @@ class AddNewDeviceUseCase @Inject constructor(
             pinRepository.savePin(address, pincode)
 
             crashlyticsReport.log("Started receiving data for the main device")
-            val primaryDevice = deviceInfoRepository.getPrimaryDeviceWithLastEvent()?.first
+            val deviceData = deviceInfoRepository.getPrimaryDeviceWithLastEvent()
+            val primaryDevice = deviceData?.first
             crashlyticsReport.log("Main device data received")
 
             if (primaryDevice == null) {
@@ -60,6 +62,18 @@ class AddNewDeviceUseCase @Inject constructor(
                 crashlyticsReport.log("Main device is ${device.name}")
                 deviceInfoRepository.putDevice(device, isPrimary = false)
             }
+
+            crashlyticsReport.log("Start receiving device versions")
+            val (hardware, software) = deviceRepository.getVersions(address)
+
+            crashlyticsReport.log("Start saving device versions to storage")
+            val deviceInfo = deviceData?.second?.copy(
+                hardwareVersion = hardware,
+                softwareVersion = software
+            ) ?: GlucometerInfo(id = address, hardwareVersion = hardware, softwareVersion = software)
+
+            deviceInfoRepository.updateGlucometerInfo(deviceInfo, null)
+
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection with the device has begun")
             deviceRepository.disconnect()

@@ -2,6 +2,7 @@ package com.elta.android.data.features.devices.glucometer.client
 
 import android.bluetooth.le.ScanResult
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,11 @@ interface GlucometerClient {
      * Отключение от глюкометра
      * */
     suspend fun disconnect()
+
+    /**
+     * Получение версии софта и железа устройства
+     * */
+    suspend fun getVersions(address: String): VersionDto
 
     /**
      * Получение актуальной информации с глюкометра

@@ -15,6 +15,13 @@ interface DeviceRepository {
     fun findDevices(): Flow<List<Glucometer>>
 
     /**
+     * Получении версий железа и софта устройства.
+     * @param address Адрес запрашиваемого устройства.
+     * @return Возвращает информацию об устройстве: заряд батареи, версия прошивки и тд.
+     */
+    suspend fun getVersions(address: String): Pair<String?, String?>
+
+    /**
      * Получение информации об устройстве.
      * @param address Адрес запрашиваемого устройства.
      * @return Возвращает информацию об устройстве: заряд батареи, версия прошивки и тд.

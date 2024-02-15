@@ -13,6 +13,7 @@ import com.elta.android.common.errors.GlucometerToDfuModeError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManager
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
@@ -98,14 +99,17 @@ class GlucometerClientImpl @Inject constructor(
     }
 
     @Throws(GlucometerNotConnectedException::class)
+    override suspend fun getVersions(address: String): VersionDto {
+        checkIsConnected(address)
+
+        return glucometerBleManager.getVersion()
+    }
+
+    @Throws(GlucometerNotConnectedException::class)
     override suspend fun getGlucometerInfo(address: String): GlucometerInfoDto {
         crashlyticsReport.log("Started receiving information from the device with the address: ${address.hideMac()}")
         with(glucometerBleManager) {
-            if (!glucometerBleManager.isConnected(address)) {
-                val error = GlucometerNotConnectedException(address)
-                crashlyticsReport.writeException(error)
-                throw error
-            }
+            checkIsConnected(address)
 
             val time = ZonedDateTime.now()
             crashlyticsReport.log("Update device time to $time")
@@ -179,11 +183,7 @@ class GlucometerClientImpl @Inject constructor(
     ): List<String> {
         crashlyticsReport.log("The operation to obtain measurements from the device has begun")
         with(glucometerBleManager) {
-            if (!isConnected(address)) {
-                val error = GlucometerNotConnectedException(address)
-                crashlyticsReport.writeException(error)
-                throw error
-            }
+            checkIsConnected(address)
 
             val events = mutableListOf<String>()
 
@@ -259,6 +259,15 @@ class GlucometerClientImpl @Inject constructor(
             glucometerBleManager.readEvent(index)
         }
         glucometerBleManager.disconnectGlucometer()
+    }
+
+    @Throws(GlucometerNotConnectedException::class)
+    private fun checkIsConnected(address: String) {
+        if (!glucometerBleManager.isConnected(address)) {
+            val error = GlucometerNotConnectedException(address)
+            crashlyticsReport.writeException(error)
+            throw error
+        }
     }
 
 }

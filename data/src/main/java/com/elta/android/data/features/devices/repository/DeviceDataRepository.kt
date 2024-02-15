@@ -34,6 +34,11 @@ class DeviceDataRepository @Inject constructor(
         glucometerClient.disconnect()
     }
 
+    override suspend fun getVersions(address: String): Pair<String?, String?> {
+        val hardwareToSoftware = glucometerClient.getVersions(address)
+        return hardwareToSoftware.hardware to hardwareToSoftware.software
+    }
+
     override suspend fun getGlucometerInfo(address: String): GlucometerInfo {
         val info = glucometerClient.getGlucometerInfo(address)
         return glucometerInfoToDomainMapper.mapFromObject(info)
