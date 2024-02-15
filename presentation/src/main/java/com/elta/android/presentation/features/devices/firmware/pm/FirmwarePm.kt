@@ -16,17 +16,22 @@ import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseC
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.firmware.model.FirmwareInfo
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
+import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -56,6 +61,17 @@ class FirmwarePm @Inject constructor(
 
     private val delayedSetStateAction = action<UpdateState>()
 
+    val settingsDialog = dialogControl<DialogData, DialogResult>()
+    val settingsIsVisible = state(false)
+    val openSettingsCloseAction = action<Unit>()
+
+    private val settingsLocationDialogData: DialogData by lazy {
+        Dialogs.SettingsLocationDialogData(resources)
+    }
+    private val settingsBluetoothDialogData: DialogData by lazy {
+        Dialogs.SettingsBluetoothDialogData(resources)
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -65,6 +81,7 @@ class FirmwarePm @Inject constructor(
         bindDownloadFirmwareAction()
         bindStartUpdateAction()
         bindBluetoothAndLocationAction()
+        bindPermissionsAction()
     }
 
     override fun handleError(error: Throwable) {
@@ -143,6 +160,24 @@ class FirmwarePm @Inject constructor(
             .subscribe {
                 setState(UpdateState.GlucometerOfflineError(resources))
             }
+            .untilDestroy()
+    }
+
+    private fun bindPermissionsAction() {
+        btControl.locationPermissionsGrantedAction.observable
+            .subscribe { permission ->
+                handlePermissionResult(permission, settingsLocationDialogData)
+            }
+            .untilDestroy()
+
+        btControl.bluetoothPermissionsGrantedAction.observable
+            .subscribe { permission ->
+                handlePermissionResult(permission, settingsBluetoothDialogData)
+            }
+            .untilDestroy()
+
+        openSettingsCloseAction.observable
+            .subscribe { settingsIsVisible.accept(false) }
             .untilDestroy()
     }
 
@@ -293,6 +328,21 @@ class FirmwarePm @Inject constructor(
                     else -> handleError(error)
                 }
             }
+
+    private fun handlePermissionResult(permission: Permission, dialogData: DialogData) {
+        when {
+            permission.granted -> startUpdateAction.consumer.accept(Unit)
+            !permission.granted && !permission.shouldShowRequestPermissionRationale -> {
+                setState(UpdateState.NotFound(resources))
+                settingsDialog.showForResult(dialogData)
+                    .map { it == DialogResult.POSITIVE }
+                    .subscribe(settingsIsVisible.consumer)
+                    .untilDestroy()
+            }
+
+            !permission.granted -> setState(UpdateState.NotFound(resources))
+        }
+    }
 
     companion object {
         private const val ZERO_DELAY = 0L
