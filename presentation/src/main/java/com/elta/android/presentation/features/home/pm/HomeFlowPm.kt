@@ -507,6 +507,10 @@ class HomeFlowPm @Inject constructor(
                 openConnectScreen()
             }
 
+            is LocationPermissionNotGrantedError -> {
+                manualSyncError.accept(ManualSyncError.ErrorSync)
+            }
+
             is GlucometerOfflineError,  -> {
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)

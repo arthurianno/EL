@@ -35,9 +35,10 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.elta.android.presentation.features.sync.control.handlePermissionResult
+import com.elta.android.presentation.features.sync.control.isBluetoothName
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
-import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
@@ -335,32 +336,28 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindPermissionAction() {
-        btControl.locationPermissionsGrantedAction.observable
+        Observable.merge(
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.bluetoothPermissionsGrantedAction.observable
+        )
             .subscribe { permission ->
-                handlePermissionResult(permission, settingsLocationDialogData)
+                val dialogData =
+                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData
+                    else settingsLocationDialogData
+
+                permission.handlePermissionResult(
+                    onPermissionGranted = {
+                        startScanAction.consumer.accept(Unit)
+                    },
+                    shouldShowPermissionRationale = {
+                        showSettingDialog(dialogData)
+                    },
+                    onPermissionDenied = {
+                        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+                    }
+                )
             }
             .untilDestroy()
-
-        btControl.bluetoothPermissionsGrantedAction.observable
-            .subscribe { permission ->
-                handlePermissionResult(permission, settingsBluetoothDialogData)
-            }
-            .untilDestroy()
-    }
-
-    private fun handlePermissionResult(permission: Permission, dialogData: DialogData) {
-        when {
-            permission.granted -> startScanAction.consumer.accept(Unit)
-            !permission.granted && !permission.shouldShowRequestPermissionRationale -> {
-                connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
-                settingsDialog.showForResult(dialogData)
-                    .map { it == DialogResult.POSITIVE }
-                    .subscribe(settingsIsVisible.consumer)
-                    .untilDestroy()
-            }
-
-            !permission.granted -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
-        }
     }
 
     private fun showDeviceAlreadyConnectedDialog() {
@@ -427,6 +424,14 @@ abstract class ConnectDevicePm constructor(
     private fun handleHomeButton(state: ViewState) {
         if (state == ViewState.SYNC_COMPLETED) hideHomeButtonCommand.consumer.accept(Unit)
         else showHomeButtonCommand.consumer.accept(Unit)
+    }
+
+    private fun showSettingDialog(dialogData: DialogData) {
+        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+        settingsDialog.showForResult(dialogData)
+            .map { it == DialogResult.POSITIVE }
+            .subscribe(settingsIsVisible.consumer)
+            .untilDestroy()
     }
 
     enum class ViewState {

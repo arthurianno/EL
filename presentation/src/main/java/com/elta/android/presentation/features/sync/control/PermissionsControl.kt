@@ -84,7 +84,6 @@ fun PermissionsControl.bindTo(
             )
         }
         .filter { !it.granted }
-        .firstElement()
         .subscribe {
             if (it.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
                 locationPermissionsGrantedAction.consumer.accept(it)
@@ -120,3 +119,20 @@ fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
         }
     }
 }
+
+fun Permission.handlePermissionResult(
+    onPermissionGranted: () -> Unit,
+    shouldShowPermissionRationale: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    when {
+        granted -> onPermissionGranted()
+        !granted && !shouldShowRequestPermissionRationale ->
+            shouldShowPermissionRationale()
+
+        !granted -> onPermissionDenied()
+    }
+}
+
+fun String.isBluetoothName(): Boolean =
+    this == android.Manifest.permission.BLUETOOTH_SCAN || this == android.Manifest.permission.BLUETOOTH_CONNECT
