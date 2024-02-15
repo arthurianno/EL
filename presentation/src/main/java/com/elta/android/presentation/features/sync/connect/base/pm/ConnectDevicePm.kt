@@ -168,7 +168,11 @@ abstract class ConnectDevicePm constructor(
             is LocationNotEnabledError ->
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)
 
-            is CommandError, is GlucometerConnectionException -> {
+            is CommandError -> {
+                connectState.consumer.accept(ViewState.SYNC_ERROR)
+            }
+
+            is GlucometerConnectionException -> {
                 showRetryConnectAction.consumer.accept(Unit)
             }
 
