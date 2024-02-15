@@ -1,7 +1,6 @@
 package com.elta.android.iiot
 
 import android.app.Application
-import ru.SDK.PLATFORM.netmodel.Message
 import ru.SDK.Test.BluetoothStatusCode
 import ru.SDK.Test.DeviceCallBack
 import ru.SDK.Test.DeviceService
@@ -43,6 +42,7 @@ object IiotSdkDeviceService {
             val observation = ObservationTemplate.Glucometer(serial, model, date, value)
             Timber.tag(LOG_TAG).i("RosTech SDK has been successfully called: $observation")
             DeviceService.applyObservation(observation)
+            
         } catch (ex: Exception) {
             Timber.tag(LOG_TAG).e(ex)
         }
@@ -56,10 +56,6 @@ object IiotSdkDeviceService {
 
         override fun onSuccessMessage(p0: java.util.ArrayList<Observation>?) {
             Timber.tag(LOG_TAG).i("<Send Data> $p0")
-        }
-
-        override fun onSendData(p0: String?, p1: PlatformStatusCode?, p2: Message?) {
-            Timber.tag(LOG_TAG).i("<Send Data> $p0, status = ${p1?.name}, message = $p2")
         }
 
         override fun onErrorMessage(p0: ArrayList<ObservationError<Any, Any>>?) {
@@ -80,6 +76,10 @@ object IiotSdkDeviceService {
 
         override fun onException(p0: String?, exception: Exception?) {
             Timber.tag(LOG_TAG).e(exception, "<$LOG_TAG ERROR ($p0)> -> ${exception?.message}")
+        }
+
+        override fun onConnectToPlatform(p0: PlatformStatusCode?, p1: Int, p2: String?) {
+            Timber.tag(LOG_TAG).e("<$LOG_TAG CONNECT_TO_PLATFORM ($p0)> -> $p1 $p2")
         }
     }
 }
