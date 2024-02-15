@@ -24,7 +24,8 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.sync.control.bluetoothControl
-import com.tbruyelle.rxpermissions2.Permission
+import com.elta.android.presentation.features.sync.control.handlePermissionResult
+import com.elta.android.presentation.features.sync.control.isBluetoothName
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
@@ -164,15 +165,26 @@ class FirmwarePm @Inject constructor(
     }
 
     private fun bindPermissionsAction() {
-        btControl.locationPermissionsGrantedAction.observable
+        Observable.merge(
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.bluetoothPermissionsGrantedAction.observable
+        )
             .subscribe { permission ->
-                handlePermissionResult(permission, settingsLocationDialogData)
-            }
-            .untilDestroy()
+                val dialogData =
+                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData
+                    else settingsLocationDialogData
 
-        btControl.bluetoothPermissionsGrantedAction.observable
-            .subscribe { permission ->
-                handlePermissionResult(permission, settingsBluetoothDialogData)
+                permission.handlePermissionResult(
+                    onPermissionGranted = {
+                        startUpdateAction.consumer.accept(Unit)
+                    },
+                    shouldShowPermissionRationale = {
+                        showSettingDialog(dialogData)
+                    },
+                    onPermissionDenied = {
+                        setState(UpdateState.GlucometerOfflineError(resources))
+                    }
+                )
             }
             .untilDestroy()
 
@@ -243,6 +255,14 @@ class FirmwarePm @Inject constructor(
 
     private fun setState(state: UpdateState) {
         delayedSetStateAction.consumer.accept(state)
+    }
+
+    private fun showSettingDialog(dialogData: DialogData) {
+        setState(UpdateState.NotFound(resources))
+        settingsDialog.showForResult(dialogData)
+            .map { it == DialogResult.POSITIVE }
+            .subscribe(settingsIsVisible.consumer)
+            .untilDestroy()
     }
 
     private fun createGetDeviceInfoUseCaseParams(address: String): GetLastGlucometerInfoUseCase.Params =
@@ -328,21 +348,6 @@ class FirmwarePm @Inject constructor(
                     else -> handleError(error)
                 }
             }
-
-    private fun handlePermissionResult(permission: Permission, dialogData: DialogData) {
-        when {
-            permission.granted -> startUpdateAction.consumer.accept(Unit)
-            !permission.granted && !permission.shouldShowRequestPermissionRationale -> {
-                setState(UpdateState.NotFound(resources))
-                settingsDialog.showForResult(dialogData)
-                    .map { it == DialogResult.POSITIVE }
-                    .subscribe(settingsIsVisible.consumer)
-                    .untilDestroy()
-            }
-
-            !permission.granted -> setState(UpdateState.NotFound(resources))
-        }
-    }
 
     companion object {
         private const val ZERO_DELAY = 0L

@@ -119,3 +119,20 @@ fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
         }
     }
 }
+
+fun Permission.handlePermissionResult(
+    onPermissionGranted: () -> Unit,
+    shouldShowPermissionRationale: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    when {
+        granted -> onPermissionGranted()
+        !granted && !shouldShowRequestPermissionRationale ->
+            shouldShowPermissionRationale()
+
+        !granted -> onPermissionDenied()
+    }
+}
+
+fun String.isBluetoothName(): Boolean =
+    this == android.Manifest.permission.BLUETOOTH_SCAN || this == android.Manifest.permission.BLUETOOTH_CONNECT
