@@ -420,10 +420,6 @@ class HomeFlowPm @Inject constructor(
             meta = this
         )
 
-    private fun handleSyncCompleted(events: Int) {
-        if (events > 0) bus.event(Events.EventsChanged(true)) //TODO: тут обязательно добавить снек, что новых событий не найдено. ПОТОМУ ЧТО ПО ТЗ ИМЕННО ТАК!
-    }
-
     private fun createUserInfoParams(): UpdateUserInfoUseCase.Params =
         UpdateUserInfoUseCase.Params(UserInfo(isFeedbackSent = true))
 
@@ -448,6 +444,7 @@ class HomeFlowPm @Inject constructor(
             .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
             .doOnComplete {
                 bus.event(Events.Sync.Glucometer.Success)
+                bus.event(Events.EventsChanged(true))
             }
             .doOnError { error ->
                 if (isAuto) {
@@ -459,7 +456,6 @@ class HomeFlowPm @Inject constructor(
             .onErrorResumeNext { error: Throwable ->
                 observableSyncError(error, isAuto)
             }
-            .doOnNext(::handleSyncCompleted)
 
     private fun observableSyncError(
         error: Throwable,
@@ -525,8 +521,6 @@ class HomeFlowPm @Inject constructor(
                 this.manualSyncError.accept(manualSyncError)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
-
-            is BluetoothNotEnabledError -> bus.event(Events.Sync.Glucometer.ErrorWithMessage)
 
             else -> handleError(error)
         }
