@@ -371,8 +371,17 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun handleBack(i: Unit) {
-        if (connectState.valueOrNull == ViewState.SYNC_COMPLETED) toAppAction.consumer.accept(Unit)
-        else router.exit()
+        when (connectState.valueOrNull) {
+            ViewState.SYNC_COMPLETED,
+            ViewState.SYNC_ERROR -> toAppAction.consumer.accept(i)
+
+            ViewState.NOT_FOUND,
+            ViewState.FOUND,
+            ViewState.CONNECTED,
+            ViewState.SEARCH -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+
+            else -> router.exit()
+        }
     }
 
     private fun isValidDeviceChoice(

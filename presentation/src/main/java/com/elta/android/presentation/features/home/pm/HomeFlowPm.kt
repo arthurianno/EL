@@ -526,6 +526,8 @@ class HomeFlowPm @Inject constructor(
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
+            is BluetoothNotEnabledError -> bus.event(Events.Sync.Glucometer.ErrorWithMessage)
+
             else -> handleError(error)
         }
     }

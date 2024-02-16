@@ -19,7 +19,7 @@ sealed class UpdateState {
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
         },
-        override val hint: String? = null,
+        override val hint: String? = resources.getString(R.string.firmware_updates_hint),
         override val button: String? = null
     ) : UpdateState()
 
@@ -31,8 +31,8 @@ sealed class UpdateState {
         override val description: String? = currentVersion?.let {
             resources.getString(R.string.firmware_version_current, it)
         },
-        override val hint: String? = null,
-        override val button: String? = resources.getString(R.string.firmware_button_check_updates)
+        override val hint: String? = resources.getString(R.string.firmware_updates_hint),
+        override val button: String? = null
     ) : UpdateState()
 
     data class Found(

@@ -238,7 +238,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
-                    text = stringResource(id = R.string.sync_connection_connect_error_title),
+                    text = stringResource(id = R.string.sync_connection_sync_error_title),
                     style = types.h1
                 )
                 VSpacerSmall()
@@ -329,7 +329,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 )
             }
             VSpacerSmall()
-            BaseSnackBar(textId = R.string.connection_process_text)
+            BaseSnackBar(textId = R.string.sync_device_finding_process_text)
         }
     }
 
