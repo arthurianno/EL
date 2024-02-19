@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.devices.interactor
 
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
@@ -33,12 +34,14 @@ class FindGlucometersUseCase @Inject constructor(
             .doOnNext {
                 anyDeviceFound = it.isNotEmpty() || anyDeviceFound
             }
-            .takeUntil(Observable.timer(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).doOnNext {
-                if (!anyDeviceFound) {
-                    val exception = TimeoutException("The search for a device in the environment was stopped due to a timeout, no devices were found")
-                    crashlyticsReport.writeException(exception)
-                    throw exception
-                }
-            })
+            .takeUntil(Observable.timer(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .doOnNext {
+                    if (!anyDeviceFound) {
+                        val exception =
+                            GlucometerSyncError(TimeoutException("The search for a device in the environment was stopped due to a timeout, no devices were found"))
+                        crashlyticsReport.writeException(exception)
+                        throw exception
+                    }
+                })
     }
 }
