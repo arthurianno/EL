@@ -27,7 +27,7 @@ android {
 
 dependencies {
     implementation(Dependencies.Timber.core)
+    implementation(Dependencies.IIOT.JacsonDatabind)
 
-//    api(fileTree(baseDir = "libs"))
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+    implementation(files("libs/IIoT-SDK-0.2.0.aar"))
 }
