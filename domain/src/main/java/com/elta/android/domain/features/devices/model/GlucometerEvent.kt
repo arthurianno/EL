@@ -8,5 +8,5 @@ data class GlucometerEvent(
     val temperature: Double?,
     val value: Double?,
     val glucometerSerialNumber: String?,
-    val originalResponse: String?
+    val originalResponse: String
 )

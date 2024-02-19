@@ -28,6 +28,7 @@ android {
 dependencies {
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.IIOT.JacsonDatabind)
+    implementation(project(Module.common))
 
-    implementation(files("libs/IIoT-SDK-0.2.0.aar"))
+    implementation(files("libs/IoMT-SDK-0.2.2.aar"))
 }

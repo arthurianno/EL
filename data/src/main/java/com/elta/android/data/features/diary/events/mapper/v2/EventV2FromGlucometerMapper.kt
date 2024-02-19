@@ -1,7 +1,6 @@
 package com.elta.android.data.features.diary.events.mapper.v2
 
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.glucometer.toStorageDateTime
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType

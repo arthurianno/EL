@@ -4,7 +4,6 @@ import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
-import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.devices.SEND_DATA_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
@@ -109,7 +108,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 eventsRepository.addEventFromGlucometer(events)
 
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
-                rosTechRepository.sendMeasurments(deviceAddress, measurements)
+                rosTechRepository.sendMeasurements(deviceAddress, events)
             }
 
             return measurements.size
