@@ -49,4 +49,5 @@ object Module {
     const val data = ":data"
     const val common = ":common"
     const val iiot_sdk = ":iiot-sdk"
+    const val IoMT = ":IoMT"
 }
