@@ -26,7 +26,6 @@ fun Project.executeInShell(command: String): String? {
 
     exec {
         commandLine("bash", "-c", command)
-        commandLine
         standardOutput = stdout
     }
 
