@@ -179,7 +179,6 @@ abstract class ConnectDevicePm constructor(
 
             is GlucometerSyncError -> {
                 if (error.cause is TimeoutException) {
-                    showRetryConnectAction.consumer.accept(Unit)
                     connectState.consumer.accept(ViewState.NOT_FOUND)
                 } else {
                     val syncState = if (items.valueOrNull.isNullOrEmpty()) {
@@ -264,6 +263,7 @@ abstract class ConnectDevicePm constructor(
         startScanAction.observable
             .flatMap {
                 findGlucometers.execute()
+                    .takeUntil(backHandleAction.observable)
                     .doOnSubscribe {
                         connectState.consumer.accept(ViewState.SEARCH)
                     }
@@ -376,9 +376,13 @@ abstract class ConnectDevicePm constructor(
             ViewState.SYNC_ERROR -> toAppAction.consumer.accept(i)
 
             ViewState.NOT_FOUND,
-            ViewState.FOUND,
             ViewState.CONNECTED,
             ViewState.SEARCH -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+
+            ViewState.FOUND -> {
+                items.consumer.accept(emptyList())
+                connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+            }
 
             else -> router.exit()
         }

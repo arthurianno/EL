@@ -96,16 +96,16 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
         } ?: commonPermissions
 
         when {
-            permissions.all { it.status.isGranted } -> checkLocationAndBluetoothState()
-
-            cameraPermission.isSettingDialogNeed() ->
+            cameraPermission.status.shouldShowRationale ->
                 cameraPermissionDialog.dialogOpen()
 
-            locationPermission?.isSettingDialogNeed() ?: false ->
+            locationPermission?.status?.shouldShowRationale ?: false ->
                 locationPermissionDialog.dialogOpen()
 
-            bluetoothPermission?.any { it.isSettingDialogNeed() } ?: false ->
+            bluetoothPermission?.any { it.status.shouldShowRationale } ?: false ->
                 bluetoothPermissionDialog.dialogOpen()
+
+            permissions.all { it.status.isGranted } -> checkLocationAndBluetoothState()
 
             else -> sendEvent(PermissionEvent.RequestPermissions)
         }
@@ -123,7 +123,4 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
 
     private fun isBlePermissionsNeeded(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
-    @OptIn(ExperimentalPermissionsApi::class)
-    private fun PermissionState.isSettingDialogNeed(): Boolean =
-        !status.isGranted && !status.shouldShowRationale
 }
