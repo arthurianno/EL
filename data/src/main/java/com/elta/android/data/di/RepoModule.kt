@@ -26,6 +26,7 @@ import com.elta.android.data.features.rostech.RosTechDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
+import com.elta.android.data.features.version.repository.VersionDataRepository
 import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
@@ -52,6 +53,7 @@ import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
+import com.elta.android.domain.features.version.repository.VersionRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -162,5 +164,9 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindAppSettingsDataRepository(source: AppSettingsDataRepository): AppSettingsRepository
+    abstract fun bindAppSettingsRepository(source: AppSettingsDataRepository): AppSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVersionRepository(source: VersionDataRepository): VersionRepository
 }

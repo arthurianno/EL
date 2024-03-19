@@ -43,7 +43,7 @@ class GlucometerBleManager @Inject constructor(
         // через bondState можем проверять связаны ли устройства или нет и таким образом отправлять команды далее
         //  device.bondState
         connect(device)
-            .retry(3, 100)
+            .retry(10, 600)
             .useAutoConnect(false)
             .usePreferredPhy(PhyRequest.PHY_LE_1M_MASK or PhyRequest.PHY_LE_2M_MASK)
             .timeout(30_000)

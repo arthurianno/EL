@@ -97,8 +97,10 @@ data class EltaDimens(
     val glucoseRangeCardPadding: PaddingValues,
     // Event
     val recentlySelection: PaddingValues,
-    val selectionValue: PaddingValues
-
+    val selectionValue: PaddingValues,
+    // Forced Update
+    val imageForcedUpdatePadding: PaddingValues,
+    val titleForcedUpdatePadding: PaddingValues
     )
 
 internal val eltaDimens = EltaDimens(
@@ -209,5 +211,7 @@ internal val eltaDimens = EltaDimens(
     glucoseRangeTextPadding = 20.dp,
     glucoseRangeCardPadding = PaddingValues(top = 8.dp, start = 16.dp, bottom = 12.dp, end = 16.dp),
     recentlySelection = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
-    selectionValue = PaddingValues(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 12.dp)
+    selectionValue = PaddingValues(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 12.dp),
+    imageForcedUpdatePadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
+    titleForcedUpdatePadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 8.dp)
 )
