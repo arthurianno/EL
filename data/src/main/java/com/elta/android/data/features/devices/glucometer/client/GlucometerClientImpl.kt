@@ -32,6 +32,7 @@ import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @Singleton
 class GlucometerClientImpl @Inject constructor(
@@ -84,9 +85,15 @@ class GlucometerClientImpl @Inject constructor(
 
     override fun findDevices(): Flow<List<ScanResult>> {
         return callbackFlow {
-            environmentScanner.startScan(filters, settings) {
-                trySend(it)
-            }
+            environmentScanner.startScan(
+                filters = filters,
+                settings = settings,
+                resultCallback = {
+                    trySend(it)
+                },
+                errorCallback = {
+
+                })
             awaitClose {
                 environmentScanner.stopScan()
             }
@@ -209,17 +216,30 @@ class GlucometerClientImpl @Inject constructor(
     private suspend fun scan(address: String, filters: List<ScanFilter>): ScanResult {
         return suspendCancellableCoroutine { continuation ->
             continuation.invokeOnCancellation { environmentScanner.stopScan() }
-            environmentScanner.startScan(filters = filters, settings = settings) { scanResults ->
-                scanResults.firstOrNull { it.device.address == address }?.let { result ->
+
+            environmentScanner.startScan(
+                filters = filters,
+                settings = settings,
+                resultCallback = { scanResults ->
+                    scanResults.firstOrNull { it.device.address == address }?.let { result ->
+                        try {
+                            continuation.resume(result)
+                        } catch (e: IllegalStateException) {
+                            crashlyticsReport.log("Already resumed scan")
+                        } finally {
+                            environmentScanner.stopScan()
+                        }
+                    }
+                }, errorCallback = {
                     try {
-                        continuation.resume(result)
-                    } catch (e: IllegalStateException) {
-                        crashlyticsReport.log("Already resumed scan")
+                        continuation.resumeWithException(it)
                     } finally {
                         environmentScanner.stopScan()
                     }
+
                 }
-            }
+            )
+
         }
     }
 

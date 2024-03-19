@@ -71,6 +71,8 @@ import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFl
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
 import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
+import com.elta.android.presentation.features.version.mandatory.ui.MandatoryUpdateFragment
+import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -355,4 +357,13 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRemindersFragment(): RemindersFragment
+
+    // UPDATE APP FLOW
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindMandatoryUpdateFragment(): MandatoryUpdateFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindOptionalUpdateDialogFragment(): OptionalUpdateDialogFragment
 }

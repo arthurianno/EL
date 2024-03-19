@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect.base.pm
 import android.os.Build
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerAlreadyConnectedError
 import com.elta.android.common.errors.GlucometerConnectionException
@@ -169,7 +170,7 @@ abstract class ConnectDevicePm constructor(
             is LocationNotEnabledError ->
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)
 
-            is CommandError -> {
+            is CommandError, is BluetoothScannerError -> {
                 connectState.consumer.accept(ViewState.SYNC_ERROR)
             }
 

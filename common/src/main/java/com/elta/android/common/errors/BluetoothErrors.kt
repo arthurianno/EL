@@ -2,7 +2,7 @@ package com.elta.android.common.errors
 
 import com.elta.android.common.utils.hideMac
 
-object BluetoothNotAvailableError : RuntimeException()
+class BluetoothScannerError(val code: Int) : RuntimeException("bluetooth scanner return error: $code")
 object BluetoothNotEnabledError : RuntimeException()
 object BluetoothScannerNotAvailable : RuntimeException()
 object LocationPermissionNotGrantedError : RuntimeException()

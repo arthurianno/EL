@@ -50,6 +50,8 @@ import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoCachedDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.version.datasource.VersionDataSource
+import com.elta.android.data.features.version.datasource.VersionSource
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -177,4 +179,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindMedicineRemoteDataSource(source: InsulinMedicamentRemoteDataSource): InsulinMedicamentRemoteSource
+
+    @Binds
+    @Singleton
+    abstract fun bindVersionDataSource(source: VersionDataSource): VersionSource
 }

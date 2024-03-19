@@ -13,10 +13,12 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkPermissions
+import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
 import com.elta.android.presentation.widgets.TwoStateStatusView
 import com.elta.android.presentation.widgets.status.StatusView
+import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
@@ -68,6 +70,9 @@ class AppActivity : BaseActivity<AppPm>() {
         pm.networkStateCommand.bindTo(connectionStatusView.changeState())
         pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
         pm.syncStatusState.bindTo(statusView.statusChanges())
+        pm.showOptionalUpdateDialogCommand.bindTo{
+            supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

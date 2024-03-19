@@ -29,12 +29,11 @@ class LocalTokenStorage(
     @SuppressLint("CheckResult")
     override fun refresh() {
         if (accessToken != null && refreshToken != null) {
-            api.refresh(RefreshNetworkRequest(accessToken, refreshToken))
-                .doOnSuccess { tokens ->
-                    accessToken = tokens.accessToken
-                    refreshToken = tokens.refreshToken
-                }
-                .blockingGet()
+            val tokens = api.refresh(RefreshNetworkRequest(accessToken, refreshToken)).execute().body()
+            tokens?.let {
+                accessToken = tokens.accessToken
+                refreshToken = tokens.refreshToken
+            }
         } else {
             throw InvalidRefreshTokenError("Tokens can`t be null")
         }

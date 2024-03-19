@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import com.elta.android.common.errors.BluetoothScannerNotAvailable
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +29,8 @@ class EnvironmentScanner @Inject constructor(
     fun startScan(
         filters: List<ScanFilter>,
         settings: ScanSettings,
-        resultCallback: (List<ScanResult>) -> Unit
+        resultCallback: (List<ScanResult>) -> Unit,
+        errorCallback: (e: Exception) -> Unit
     ) {
         stopScan()
 
@@ -38,7 +38,6 @@ class EnvironmentScanner @Inject constructor(
 
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
                 result?.let {
-                    //crashlyticsReport.log("onScanNotFilteredResult: ${result.device.address}")
                     if (result.isFiltered(filters)) {
                         crashlyticsReport.log("Scan result filtered by mask: ${result.device.address.hideMac()}")
                         resultCallback(listOf(result))
@@ -72,7 +71,7 @@ class EnvironmentScanner @Inject constructor(
             override fun onScanFailed(errorCode: Int) {
                 val error = ScanError(errorCode)
                 crashlyticsReport.writeException(error)
-                throw error
+                errorCallback(error)
             }
         }
         val scanner = adapter.bluetoothLeScanner

@@ -5,6 +5,8 @@ plugins {
     id("io.objectbox")
 }
 
+val version = getTagInfo()
+
 android {
 
     compileSdk = AppConfig.completeSdk
@@ -20,8 +22,12 @@ android {
         targetCompatibility = AppConfig.javaVersion
     }
     buildTypes {
+        // todo: а нужно ли это? Вроде только две сборки осталось
         create("releaseDev")
         create("releaseStage")
+        all {
+            buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
+        }
     }
     namespace = "com.elta.android.data"
 }

@@ -31,6 +31,8 @@ import com.elta.android.data.features.sale_points.api.MockedSalePointsApi
 import com.elta.android.data.features.sale_points.api.SalePointsApi
 import com.elta.android.data.features.user.api.MockedProfileApi
 import com.elta.android.data.features.user.api.ProfileApi
+import com.elta.android.data.features.version.api.MockedVersionApi
+import com.elta.android.data.features.version.api.VersionApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -47,6 +49,7 @@ private const val USE_MOCKED_REPORTS_API = false
 private const val USE_MOCKED_MEDICINES_API = false
 private const val USE_MOCKED_PRODUCT_API = false
 private const val USE_MOCKED_PERSONAL_DATA_API = true
+private const val USE_MOCKED_VERSION_API = false
 
 @Module
 @Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
@@ -205,5 +208,16 @@ class ApiModule {
             MockMedicinesApi()
         } else {
             retrofit.create(MedicinesApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideVersionApi(
+        retrofit: Retrofit
+    ): VersionApi =
+        if (USE_MOCKED_VERSION_API) {
+            MockedVersionApi()
+        } else {
+            retrofit.create(VersionApi::class.java)
         }
 }

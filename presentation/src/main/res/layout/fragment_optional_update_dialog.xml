@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_top_round_rect"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/skipTextView"
+        style="@style/New.Button3.ShadeBlack0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        android:text="@string/update_recommended_skip_button" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/updateImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_connect_finish" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/updateAvailableTitleView"
+        style="@style/New.Headline3.BlackBlue"
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/update_recommended_is_available_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/descriptionTextView"
+        style="@style/New.Caption1.ShadeBlack2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="24dp"
+        android:text="@string/update_recommended_description" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/updateActionButtonView"
+        style="@style/Button.Large"
+        android:text="@string/update_app_button" />
+
+</LinearLayout>

@@ -136,6 +136,10 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="New.Button3.ShadeBlack0">
+        <item name="android:textColor">@color/shade_black0</item>
+    </style>
+
     <!-- OVERLINE -->
 
     <!-- BODY -->

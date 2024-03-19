@@ -55,6 +55,7 @@ import com.elta.android.presentation.features.sync.flow.other.pm.FromOtherSyncFl
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
 import com.elta.android.presentation.features.sync.start.onboarding.pm.FromOnBoardingSyncStartPm
 import com.elta.android.presentation.features.sync.start.other.pm.FromOtherSyncStartPm
+import com.elta.android.presentation.features.version.optional.pm.OptionalUpdatePm
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -334,4 +335,10 @@ abstract class PmModule {
     @IntoMap
     @PmKey(FeedbackPm::class)
     abstract fun bindFeedbackPm(pm: FeedbackPm): PresentationModel
+
+    // UPDATE APP
+    @Binds
+    @IntoMap
+    @PmKey(OptionalUpdatePm::class)
+    abstract fun bindOptionalUpdateDialogPm(pm: OptionalUpdatePm): PresentationModel
 }

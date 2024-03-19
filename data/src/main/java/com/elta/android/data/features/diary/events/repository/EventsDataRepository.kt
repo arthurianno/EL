@@ -126,6 +126,7 @@ class EventsDataRepository @Inject constructor(
         } catch (e: Exception) {
             crashlyticsReport.writeException(e)
             syncManager.saveAsCreated(events)
+            throw e
         }
     }
 
