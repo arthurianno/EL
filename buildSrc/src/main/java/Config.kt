@@ -6,7 +6,7 @@ object AppConfig {
     const val completeSdk = 34
     const val targetSdk = 34
     const val jvmTarget = "11"
-    val javaVersion = JavaVersion.VERSION_11
+    val javaVersion = JavaVersion.VERSION_17
 
     object DeepLink {
         const val host = "stage2.vdiabete.com"
@@ -49,4 +49,5 @@ object Module {
     const val data = ":data"
     const val common = ":common"
     const val iiot_sdk = ":iiot-sdk"
+    const val IoMT = ":IoMT"
 }

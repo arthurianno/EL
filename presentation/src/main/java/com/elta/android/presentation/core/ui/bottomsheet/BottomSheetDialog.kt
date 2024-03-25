@@ -272,7 +272,7 @@ class BottomSheetDialog(context: Context, @StyleRes theme: Int = 0) : AppCompatD
                 // If the provided theme is 0, then retrieve the dialogTheme from our theme
                 val outValue = TypedValue()
                 mThemeId = if (context.theme.resolveAttribute(
-                        R.attr.bottomSheetDialogTheme,
+                        com.google.android.material.R.attr.bottomSheetDialogTheme,
                         outValue,
                         true
                     )
@@ -280,7 +280,7 @@ class BottomSheetDialog(context: Context, @StyleRes theme: Int = 0) : AppCompatD
                     outValue.resourceId
                 } else {
                     // bottomSheetDialogTheme is not provided; we default to our light theme
-                    R.style.Theme_Design_Light_BottomSheetDialog
+                    com.google.android.material.R.style.Theme_Design_Light_BottomSheetDialog
                 }
             }
             return mThemeId

@@ -3,10 +3,8 @@ package com.elta.android.common.logger
 import android.content.Context
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -33,7 +31,7 @@ class FirebaseStorage(private val context: Context) {
         File(context.getExternalFilesDir("logs"), "EltaApplicationLog_$date.txt").apply {
             if (!exists()) {
                 runCatching { createNewFile() }
-                    .onFailure { Log.e(DEFAULT_TAG, it.message, it) }
+                    .onFailure { Timber.tag(DEFAULT_TAG).e(it) }
             }
         }
     }
@@ -51,14 +49,6 @@ class FirebaseStorage(private val context: Context) {
     fun uploadLogFile() {
         WorkManager.getInstance(context).enqueue(
             OneTimeWorkRequestBuilder<UploadWorker>()
-                .setInputData(getUploadWorkerData())
-                .build()
-        )
-    }
-
-    fun createPeriodicUploadLogFile(repeatDuration: Duration) {
-        WorkManager.getInstance(context).enqueue(
-            PeriodicWorkRequestBuilder<UploadWorker>(repeatDuration)
                 .setInputData(getUploadWorkerData())
                 .build()
         )

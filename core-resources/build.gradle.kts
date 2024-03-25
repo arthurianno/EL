@@ -21,6 +21,7 @@ android {
         create("releaseDev")
         create("releaseStage")
     }
+    namespace = "com.nullgr.core.resources"
 }
 
 dependencies {

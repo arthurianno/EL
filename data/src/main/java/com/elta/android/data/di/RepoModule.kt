@@ -7,7 +7,11 @@ import com.elta.android.data.features.calculator.repository.CalculatorDataReposi
 import com.elta.android.data.features.calculator.repository.CustomProductDataRepository
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
+import com.elta.android.data.features.devices.repository.BluetoothStateDataRepository
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
+import com.elta.android.data.features.devices.repository.DeviceInfoDataRepository
+import com.elta.android.data.features.devices.repository.PinDataRepository
+import com.elta.android.data.features.devices.repository.UpdateRepositoryImpl
 import com.elta.android.data.features.diary.events.repository.EventsDataRepository
 import com.elta.android.data.features.diary.medicines.repository.InsulinMedicamentDataRepository
 import com.elta.android.data.features.diary.medicines.repository.MedicamentDataRepository
@@ -22,6 +26,7 @@ import com.elta.android.data.features.rostech.RosTechDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
+import com.elta.android.data.features.version.repository.VersionDataRepository
 import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
@@ -29,7 +34,11 @@ import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
 import com.elta.android.domain.features.calculator.repository.CustomProductRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
+import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
+import com.elta.android.domain.features.devices.repository.PinRepository
+import com.elta.android.domain.features.devices.repository.UpdateRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
@@ -44,6 +53,7 @@ import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.elta.android.domain.features.userinfo.repository.UserInfoRepository
+import com.elta.android.domain.features.version.repository.VersionRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -83,6 +93,22 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindDeviceRepository(repo: DeviceDataRepository): DeviceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateRepository(repo: UpdateRepositoryImpl): UpdateRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDeviceInfoRepository(repo: DeviceInfoDataRepository): DeviceInfoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPinRepository(repo: PinDataRepository): PinRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBluetoothStateRepository(repo: BluetoothStateDataRepository): BluetoothStateRepository
 
     @Binds
     @Singleton
@@ -138,5 +164,9 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindAppSettingsDataRepository(source: AppSettingsDataRepository): AppSettingsRepository
+    abstract fun bindAppSettingsRepository(source: AppSettingsDataRepository): AppSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVersionRepository(source: VersionDataRepository): VersionRepository
 }

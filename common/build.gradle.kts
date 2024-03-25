@@ -28,6 +28,7 @@ android {
             buildConfigField("String", "APP_VERSION", debugVersionName)
         }
     }
+    namespace = "com.elta.android.common"
 }
 
 dependencies {
@@ -42,4 +43,5 @@ dependencies {
     implementation(platform(Dependencies.Google.FireBase.bom))
     implementation(Dependencies.Google.FireBase.storageBom)
     implementation(Dependencies.Jetpack.WorkManager.core)
+    implementation(Dependencies.Google.FireBase.crashlyticsBom)
 }

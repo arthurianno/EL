@@ -381,7 +381,7 @@
     <string name="sync_connection_help_sheet_text">Если по каким-либо причинам Вам не удаётся подключиться с помощью считывания DMC-кода, то советуем воспользоваться подключением через ПИН-код.</string>
     <string name="sync_connection_exit_from_connecting_dialog_text">Вы уверены, что хотите прекратить подключение и выйти?</string>
     <string name="sync_connection_exit_from_sync_dialog_text">Вы уверены, что хотите прекратить синхронизацию и выйти?</string>
-    <string name="connection_process_text">Идёт процесс подключения к устройству...</string>
+    <string name="sync_device_finding_process_text">Идет процесс поиска устройства...</string>
     <string name="sync_process_text">Идёт процесс синхронизации с глюкометром...</string>
     <string name="sync_connection_screen_title">Подключаемся...</string>
     <string name="sync_connection_screen_text">Проверяем Bluetooth-соединение и устанавливаем связь с вашим устройством.</string>
@@ -867,6 +867,14 @@
     <string name="content_description_question_button">кнопка Вопрос</string>
     <string name="content_description_back_button">кнопка Назад</string>
 
+    <!-- Update App -->
+    <string name="update_app_button">Обновить приложение</string>
+    <string name="update_forced_app_is_old_title">Ваше приложение устарело</string>
+    <string name="update_forced_app_is_not_supported_description">Эта версия приложения больше не поддерживается. Чтобы продолжить, пожалуйста, обновите приложение.</string>
+    <string name="update_recommended_is_available_title">Доступно обновление</string>
+    <string name="update_recommended_skip_button">Пропустить</string>
+    <string name="update_recommended_description">Мы добавили полезные функции и улучшили\nстабильность работы. Обновите приложение,\nчтобы перейти на новую версию.</string>
+
     <!-- Settings Dialog -->
     <string name="settings_dialog_title">Внимание</string>
     <string name="settings_dialog_negative">Отменить</string>
@@ -887,6 +895,9 @@
 
     <!-- Bluetooth Dialog -->
     <string name="bluetooth_dialog_message">Для подключения к глюкометру приложению необходим доступ к устройствам поблизости</string>
+
+    <!-- Device Dialog -->
+    <string name="device_connected_dialog_message">Данное устройство уже добавлено в список моих устройств. Выберите, пожалуйста, новый глюкометр</string>
 
     <string name="close">Закрыть</string>
 

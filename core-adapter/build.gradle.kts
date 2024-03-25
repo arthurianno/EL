@@ -22,6 +22,7 @@ android {
         create("releaseDev")
         create("releaseStage")
     }
+    namespace = "com.nullgr.core.adapter"
 }
 
 dependencies {

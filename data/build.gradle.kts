@@ -5,6 +5,8 @@ plugins {
     id("io.objectbox")
 }
 
+val version = getTagInfo()
+
 android {
 
     compileSdk = AppConfig.completeSdk
@@ -20,9 +22,14 @@ android {
         targetCompatibility = AppConfig.javaVersion
     }
     buildTypes {
+        // todo: а нужно ли это? Вроде только две сборки осталось
         create("releaseDev")
         create("releaseStage")
+        all {
+            buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
+        }
     }
+    namespace = "com.elta.android.data"
 }
 
 dependencies {
@@ -47,7 +54,6 @@ dependencies {
 
     implementation(Dependencies.RxJava2.rxKotlin)
     implementation(Dependencies.RxJava2.rxNetwork)
-    implementation(Dependencies.RxJava2.rxBluetooth)
     implementation(Dependencies.RxJava2.rxReplaying)
 
     implementation(Dependencies.Dagger.javaxAnnotation)
@@ -76,7 +82,8 @@ dependencies {
     implementation(Dependencies.Utils.jsr310)
 
     implementation(Dependencies.Nordic.dfu)
-    implementation(Dependencies.Nordic.scanner)
+    implementation(Dependencies.Nordic.ble)
+    implementation(Dependencies.Nordic.bleKtx)
 
     implementation(Dependencies.Utils.essentials)
 

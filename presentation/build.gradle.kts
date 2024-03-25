@@ -54,6 +54,7 @@ android {
 
         }
     }
+    namespace = "com.elta.android.presentation"
 }
 
 kapt {

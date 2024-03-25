@@ -1,80 +1,81 @@
 package com.elta.android.data.features.devices.repository
 
+import android.bluetooth.le.ScanResult
 import com.elta.android.common.mapper.Mapper
-import com.elta.android.common.repository.BaseRepository
-import com.elta.android.data.features.devices.datasource.DeviceDataSource
 import com.elta.android.data.features.devices.dto.GlucometerDto
-import com.elta.android.data.features.devices.dto.GlucometerEventDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
+import com.elta.android.data.features.devices.glucometer.builder.GlucometerEventBuilder
+import com.elta.android.data.features.devices.glucometer.client.GlucometerClient
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.devices.repository.DeviceRepository
-import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.firmware.model.FirmwareFile
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
-    private val eventsRepository: EventsRepository,
-    private val eventsFromGlucometerMapper: Mapper<GlucometerEventDto, EventV2>,
-    private val glucometerToDtoMapper: Mapper<Glucometer, GlucometerDto>,
+    private val glucometerClient: GlucometerClient,
+    private val scanToDtoMapper: Mapper<ScanResult, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
-    private val source: DeviceDataSource,
-    override val dispatcher: CoroutineDispatcher
-) : DeviceRepository, BaseRepository {
+    private val glucometerEventBuilder: GlucometerEventBuilder
+) : DeviceRepository {
 
-    override fun findDevices(): Observable<List<Glucometer>> =
-        source.findDevices().map(glucometerToDomainMapper::mapFromObjects)
+    override fun findDevices(): Flow<List<Glucometer>> =
+        glucometerClient.findDevices()
+            .map(scanToDtoMapper::mapFromObjects)
+            .map(glucometerToDomainMapper::mapFromObjects)
 
-    override fun getDevices(): Single<List<Pair<Glucometer, GlucometerInfo>>> =
-        source.getDevices()
-            .map {
-                it.map { glucometerWithInfo ->
-                    glucometerToDomainMapper.mapFromObject(glucometerWithInfo.first) to
-                        glucometerInfoToDomainMapper.mapFromObject(glucometerWithInfo.second)
-                }
-            }
+    override suspend fun connectDevice(address: String, pinCode: String) =
+        glucometerClient.connectDevice(address, pinCode)
 
-    override fun getDevice(address: String): Single<Glucometer> =
-        source.getDevice(address).map(glucometerToDomainMapper::mapFromObject)
+    override suspend fun disconnect() {
+        glucometerClient.disconnect()
+    }
 
-    override fun deleteDevice(address: String): Completable =
-        source.deleteDevice(address)
+    override suspend fun getVersions(address: String): Pair<String?, String?> {
+        val hardwareToSoftware = glucometerClient.getVersions(address)
+        return hardwareToSoftware.hardware to hardwareToSoftware.software
+    }
 
-    override fun getDeviceInfo(address: String): Single<GlucometerInfo> =
-        source.getGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
+    override suspend fun getGlucometerInfo(address: String): GlucometerInfo {
+        val info = glucometerClient.getGlucometerInfo(address)
+        return glucometerInfoToDomainMapper.mapFromObject(info)
+    }
+    override suspend fun syncWithDevice(
+        address: String,
+        lastSyncEvent: String?,
+        onCommandSuccess: () -> Unit
+    ): List<String> {
+        return glucometerClient.syncWithDevice(address, lastSyncEvent, onCommandSuccess)
+    }
 
-    override fun getLastDeviceInfo(address: String): Single<GlucometerInfo> =
-        source.getLastGlucometerInfo(address).map(glucometerInfoToDomainMapper::mapFromObject)
+    override suspend fun locateGlucometer() {
+        glucometerClient.locateGlucometer()
+    }
 
-    override fun getDeviceEvents(address: String): Single<List<String>> =
-        source.getGlucometerEvents(address)
+    override suspend fun turnOnDfuMode() {
+        glucometerClient.turnOnDfuMode()
+    }
 
-    override fun connectDevice(device: Glucometer, pinCode: String): Completable =
-        source.connectDevice(glucometerToDtoMapper.mapFromObject(device), pinCode)
+    override suspend fun testAllDevice(address: String, pinCode: String) {
+        glucometerClient.testAllCommands(address, pinCode)
+    }
 
-    override fun syncWithDevice(device: Glucometer?): Observable<Int> =
-        source.syncWithDevice(device?.let { glucometerToDtoMapper.mapFromObject(it) })
-            .map(eventsFromGlucometerMapper::mapFromObjects)
-            .flatMap { events ->
-                eventsRepository.addEvents(events)
-                    .andThen(Observable.just(events.size))
-            }
-
-    override fun updateFirmware(address: String, firmwareFile: FirmwareFile): Observable<String> =
-        source.updateFirmware(address, firmwareFile)
-
-    override fun setPrimaryDevice(address: String): Completable =
-        source.setPrimaryDevice(address)
-
-    override fun findGlucometer(address: String): Flow<Unit> =
-        source.findGlucometer(address)
-            .flowOn(dispatcher)
+    override suspend fun buildEvents(
+        address: String,
+        email: String,
+        serial: String?,
+        measurements: List<String>
+    ): List<GlucometerEvent> {
+        return measurements.map { event ->
+            glucometerEventBuilder.buildFrom(
+                email,
+                address,
+                event,
+                serial
+            )
+        }
+    }
 }

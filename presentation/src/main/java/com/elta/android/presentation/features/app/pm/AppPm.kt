@@ -3,15 +3,18 @@ package com.elta.android.presentation.features.app.pm
 import android.net.Uri
 import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.common.utils.hideEmail
 import com.elta.android.domain.features.rostech.RosTechUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.domain.features.version.interactor.CheckAppVersionUseCase
+import com.elta.android.domain.features.version.model.VersionStatus
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytics.model.AnalyticsEvent
 import com.elta.android.presentation.analytics.model.AnalyticsEventParam
@@ -21,14 +24,15 @@ import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
+import com.elta.android.presentation.features.app.model.SyncStatus
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamiclinks.NotificationNavigationMapper
 import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
-import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Observable
 import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -41,7 +45,9 @@ class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
+    private val checkAppVersion: CheckAppVersionUseCase,
     private val firebaseStorage: FirebaseStorage,
+    private val crashlyticsReport: CrashlyticsReport,
     private val rosTech: RosTechUseCase,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
@@ -51,9 +57,12 @@ class AppPm @Inject constructor(
     val deepLinkAction = action<Uri>()
     val coldStartDeepLinkAction = action<Uri>()
     val onStopAction = action<String>()
+    private val checkAppVersionAction = action<Unit>()
 
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
+
+    val showOptionalUpdateDialogCommand = command<Unit>()
 
     @Suppress("LongMethod")
     override fun onCreate() {
@@ -67,23 +76,60 @@ class AppPm @Inject constructor(
                         getProfileSettings.execute()
                             .map { userInfo to it.isOnboarded }
                     }
-                    .doOnSuccess { info ->
+                    .doOnSuccess {
                         getUserId.execute()
-                            .doOnSuccess { firebaseStorage.userLogin = it }
+                            .doOnSuccess {
+                                firebaseStorage.userLogin = it
+                                crashlyticsReport.setUserId(it.hideEmail())
+                            }
                             .subscribe()
+                            .untilDestroy()
+                    }
+                    .doOnSuccess { info ->
                         when {
-                            info.first.isUserLoggedIn != true -> router.newRootFlow(Screens.GreetingFlow)
-                            info.first.isEmailConfirmed != true -> router.newRootChain(
-                                Screens.GreetingFlow,
-                                Screens.ActivateProfile
-                            )
+
+                            info.first.isUserLoggedIn != true ->
+                                router.newRootFlow(Screens.GreetingFlow)
+
+                            info.first.isEmailConfirmed != true ->
+                                router.newRootChain(
+                                    Screens.GreetingFlow,
+                                    Screens.ActivateProfile
+                                )
 
                             !info.second -> router.newRootFlow(Screens.OnBoardingFlow)
                             else -> router.newRootFlow(Screens.HomeFlow)
                         }
                     }
                     .doOnError(::handleError)
-                    .bindProgress()
+            }
+            .subscribe()
+            .untilDestroy()
+
+        networkStateCommand.observable
+            .filter { it }
+            .map { }
+            .doOnNext(checkAppVersionAction.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        checkAppVersionAction.observable
+            .flatMapSingle {
+                checkAppVersion.execute()
+                    .doOnSuccess { versionStatus ->
+                        when (versionStatus) {
+                            VersionStatus.OPTIONAL -> {
+                                showOptionalUpdateDialogCommand.consumer.accept(Unit)
+                            }
+
+                            VersionStatus.MANDATORY -> {
+                                setStatusVisibility(Visibility.Hide)
+                                router.newRootFlow(Screens.ForcedUpdateScreen)
+                            }
+                            else -> {}
+                        }
+                    }
+                    .doOnError(::handleError)
             }
             .retry()
             .subscribe()
@@ -122,7 +168,8 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit }
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map { }
             .take(1)
             .flatMapCompletable {
                 rosTech.execute()
@@ -131,8 +178,15 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        lifecycleObservable.filter { it == Lifecycle.CREATED }.map { Unit }
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map { }
             .trackEvent(AnalyticsEventType.APP_LAUNCH)
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .map { }
+            .doOnNext(checkAppVersionAction.consumer)
             .subscribe()
             .untilDestroy()
 
@@ -141,9 +195,10 @@ class AppPm @Inject constructor(
                 val delay = when {
                     !syncStatusState.hasValue() -> EMPTY_STATUS_DELAY_MILLIS // first start add delay to make smoooth
                     event is Events.Sync.Glucometer.Error ||
-                    event is Events.Sync.Server.ErrorWithMessage ||
-                    event is Events.Sync.Glucometer.Started ||
-                    event is Events.Sync.Glucometer.Nothing -> 0L
+                            event is Events.Sync.Server.ErrorWithMessage ||
+                            event is Events.Sync.Glucometer.Started ||
+                            event is Events.Sync.Glucometer.Nothing -> 0L
+
                     else -> STATUS_DELAY_MILLIS
                 }
                 Observable.just(event).delay(delay, TimeUnit.MILLISECONDS)
@@ -154,6 +209,7 @@ class AppPm @Inject constructor(
                     is Events.Sync.Glucometer.ErrorWithMessage -> {
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
+                        setStatusVisibility(Visibility.HideWithDelay)
                     }
 
                     is Events.Sync.Glucometer.Started -> {
@@ -234,7 +290,7 @@ class AppPm @Inject constructor(
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
         if (pair.second.isUserLoggedIn == true) {
-            NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let { it ->
+            NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let {
                 router.newRootScreen(it)
             }
         } else {
@@ -248,65 +304,5 @@ class AppPm @Inject constructor(
 
     private fun setStatusVisibility(visibility: Visibility) {
         syncStatusVisibility.consumer.accept(visibility)
-    }
-
-    private sealed class SyncStatus : Status {
-        sealed class Glucometer : SyncStatus() {
-            data class Started(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_glucometer_in_progress),
-                override val color: Int = resources.getColor(R.color.color_background_sync_started)
-            ) : SyncStatus()
-
-            data class Success(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_glucometer_completed),
-                override val color: Int = resources.getColor(R.color.color_background_sync_finished)
-            ) : SyncStatus()
-
-            data class Error(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_glucometer_error),
-                override val color: Int = resources.getColor(R.color.color_background_sync_error)
-            ) : SyncStatus()
-        }
-
-        sealed class Server : SyncStatus() {
-            data class Started(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_backend_in_progress),
-                override val color: Int = resources.getColor(R.color.color_background_backend_sync_started)
-            ) : SyncStatus()
-
-            data class Success(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_backend_complete),
-                override val color: Int = resources.getColor(R.color.color_background_backend_sync_finished)
-            ) : SyncStatus()
-
-            data class Error(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_backend_error),
-                override val color: Int = resources.getColor(R.color.color_background_sync_error)
-            ) : SyncStatus()
-
-            data class ErrorWithMessage(
-                val resources: ResourceProvider,
-                override val text: String = resources.getString(R.string.sync_with_backend_error_try_later),
-                override val color: Int = resources.getColor(R.color.black)
-            ) : SyncStatus()
-        }
-
-        data class Email(
-            val resources: ResourceProvider,
-            override val text: String = resources.getString(R.string.error_verify_your_email),
-            override val color: Int = resources.getColor(R.color.black)
-        ) : SyncStatus()
-
-        data class SomethingWentWrong(
-            val resources: ResourceProvider,
-            override val text: String = resources.getString(R.string.error_something_went_wrong),
-            override val color: Int = resources.getColor(R.color.black)
-        ) : SyncStatus()
     }
 }

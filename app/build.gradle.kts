@@ -115,6 +115,7 @@ android {
         include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         isUniversalApk = true
     }
+    namespace = "com.elta.android"
 }
 
 kapt {
@@ -137,14 +138,12 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.presentation))
     api(project(Module.data))
-    implementation(fileTree(baseDir = "libs"))
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
     implementation(Dependencies.Yandex.mapKit)
     implementation(Dependencies.RxJava2.rxJava)
     implementation(Dependencies.RxJava2.rxPm)
-    implementation(Dependencies.RxJava2.rxBluetooth)
     implementation(Dependencies.Cicerone.core)
 
     kapt(Dependencies.Dagger.daggerCompiler)

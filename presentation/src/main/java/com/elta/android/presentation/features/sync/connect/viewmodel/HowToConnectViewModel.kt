@@ -25,8 +25,7 @@ import javax.inject.Inject
 class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectViewState>() {
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
-            isOnBoarding = false,
-            isBluetoothEnabled = false
+            isOnBoarding = false
         )
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -62,7 +61,9 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
-            is ConnectAction.OpenConnectingScreen -> checkPermissions(action.permissionsStatus)
+            is ConnectAction.CheckPermissionsState -> checkPermissions(action.permissionsStatus)
+            is ConnectAction.OpenConnectingScreen ->
+                router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
         }
     }
 
@@ -73,11 +74,9 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
         when (action) {
             is ConnectAction.Complete -> {
                 sendEvent(PermissionEvent.Bluetooth.OnAllow)
-                state.value.copy(isBluetoothEnabled = true)
+                currentState
             }
-            is ConnectAction.RepeatConnect -> {
-                state.value.copy(isBluetoothEnabled = false)
-            }
+
             else -> currentState
         }
     }
@@ -85,33 +84,43 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     private fun checkPermissions(permissionStates: List<PermissionState>) {
         val cameraPermission = permissionStates.component1()
         val locationPermission = permissionStates.component2()
-        val bluetoothPermission = buildBluetoothPermission(permissionStates)
-        val permissions = listOf(cameraPermission, locationPermission, bluetoothPermission)
+            .takeIf { isLocationPermissionNeeded() }
 
-        if (permissions.all { it.status.isGranted } && state.value.isBluetoothEnabled) {
-            router.navigateTo(Screens.ScannerDmcScreen(state.value.isOnBoarding))
-            reduceState { state.value.copy(isBluetoothEnabled = false) }
-        } else {
-            if (bluetoothPermission.status.isGranted) {
-                sendEvent(PermissionEvent.Bluetooth.RequestEnable)
-            }
-            when {
-                !cameraPermission.status.isGranted && cameraPermission.status.shouldShowRationale -> cameraPermissionDialog.dialogOpen()
-                !locationPermission.status.isGranted && locationPermission.status.shouldShowRationale -> locationPermissionDialog.dialogOpen()
-                !bluetoothPermission.status.isGranted -> bluetoothPermissionDialog.dialogOpen()
+        val bluetoothPermission =
+            listOf(permissionStates.component3(), permissionStates.component4())
+                .takeIf { isBlePermissionsNeeded() }
 
-                !cameraPermission.status.isGranted -> sendEvent(PermissionEvent.Camera())
-                !locationPermission.status.isGranted -> sendEvent(PermissionEvent.FineLocation())
-            }
+        val commonPermissions = listOf(cameraPermission)
+        val permissions = bluetoothPermission?.let {
+            it.toMutableList() + commonPermissions
+        } ?: commonPermissions
+
+        when {
+            cameraPermission.status.shouldShowRationale ->
+                cameraPermissionDialog.dialogOpen()
+
+            locationPermission?.status?.shouldShowRationale ?: false ->
+                locationPermissionDialog.dialogOpen()
+
+            bluetoothPermission?.any { it.status.shouldShowRationale } ?: false ->
+                bluetoothPermissionDialog.dialogOpen()
+
+            permissions.all { it.status.isGranted } -> checkLocationAndBluetoothState()
+
+            else -> sendEvent(PermissionEvent.RequestPermissions)
         }
     }
 
-    private fun buildBluetoothPermission(permissionStates: List<PermissionState>) =
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-            val bluetoothScanPermission = permissionStates.component4()
-            bluetoothScanPermission
-        } else {
-            val bluetoothPermissionForLowerVersion = permissionStates.component3()
-            bluetoothPermissionForLowerVersion
-        }
+    private fun checkLocationAndBluetoothState() {
+        val event =
+            if (isLocationPermissionNeeded()) PermissionEvent.RequestEnableLocation
+            else PermissionEvent.Bluetooth.RequestEnable
+
+        sendEvent(event)
+    }
+
+    private fun isLocationPermissionNeeded(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+
+    private fun isBlePermissionsNeeded(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
 }

@@ -17,7 +17,8 @@ class GlucometerInfoToDomainMapper @Inject constructor() : Mapper<GlucometerInfo
                 batteryLevel = batteryLevel,
                 softwareVersion = version?.software,
                 hardwareVersion = version?.hardware,
-                glucometerSerialNumber = glucometerSerialNumber
+                glucometerSerialNumber = glucometerSerialNumber,
+                lastSyncEvent = lastSyncedEvent
             )
         }
 }

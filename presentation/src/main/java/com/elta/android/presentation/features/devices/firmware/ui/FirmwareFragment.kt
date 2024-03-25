@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
@@ -12,10 +13,12 @@ import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.toggleView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 
 class FirmwareFragment :
     BaseFragment<FirmwarePm, FragmentUpdateFirmwareBinding>(FragmentUpdateFirmwareBinding::inflate) {
@@ -51,6 +54,13 @@ class FirmwareFragment :
             }
         }
         pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
+        pm.settingsDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.settingsIsVisible.bindTo {
+            if (it) {
+                openSettingsIntent(requireContext())
+                pm.openSettingsCloseAction.consumer.accept(Unit)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

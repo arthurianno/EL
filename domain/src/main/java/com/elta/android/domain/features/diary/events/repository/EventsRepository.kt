@@ -2,6 +2,7 @@ package com.elta.android.domain.features.diary.events.repository
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
@@ -27,6 +28,8 @@ interface EventsRepository {
 
     fun addEvents(events: List<EventV2>): Completable
 
+    suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>)
+
     fun updateEvent(event: EventV2): Completable
 
     fun deleteEvent(event: EventV2): Completable
@@ -36,4 +39,5 @@ interface EventsRepository {
     fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri>
 
     fun saveShareEventBitmap(sharingInfo: GlucoseSharingInfo, bitmap: Bitmap): Single<Uri>
+    suspend fun addEventsSuspend(events: List<EventV2>)
 }

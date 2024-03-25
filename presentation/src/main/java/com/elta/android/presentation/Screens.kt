@@ -74,6 +74,7 @@ import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoar
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
 import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
+import com.elta.android.presentation.features.version.mandatory.ui.MandatoryUpdateFragment
 import com.elta.android.presentation.utils.pdfActionIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
@@ -407,5 +408,10 @@ object Screens {
 
     data class AddDishScreen(val dish: DishUiEntity, val calculatorFlow: CalculatorFlow) : SupportAppScreen() {
         override fun getFragment() = DishDetailFragment.newInstance(dish, calculatorFlow)
+    }
+
+    // UPDATE APP FLOW
+    object ForcedUpdateScreen : SupportAppScreen() {
+        override fun getFragment() = MandatoryUpdateFragment.newInstance()
     }
 }

@@ -1,3 +1,5 @@
 package com.elta.android.common.errors
 
-class UnauthorizedError : RuntimeException()
+import java.io.IOException
+
+class UnauthorizedError : IOException()

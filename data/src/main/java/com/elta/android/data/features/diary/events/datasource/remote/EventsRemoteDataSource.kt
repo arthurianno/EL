@@ -38,6 +38,11 @@ class EventsRemoteDataSource @Inject constructor(
         api.addEvents(!FeatureToggles.isEnableIiotSdkFeature, events)
             .flatMapCompletable { Completable.complete() }
 
+    override suspend fun addEventsSuspend(events: List<EventV2Dto>) {
+        api.addEventsSuspend(!FeatureToggles.isEnableIiotSdkFeature, events)
+    }
+
+
     override fun updateEvents(events: List<EventV2Dto>): Completable =
         api.updateEvents(events)
             .flatMapCompletable { Completable.complete() }

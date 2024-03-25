@@ -3,6 +3,8 @@ package com.elta.android.common.utils
 import org.threeten.bp.ZonedDateTime
 
 const val MILLIS_IN_SECOND = 1000L
+const val SECOND_IN_DAY = 24 * 60 * 60
+
 val MONTH_NAMES = arrayOf(
     "Январь",
     "Февраль",

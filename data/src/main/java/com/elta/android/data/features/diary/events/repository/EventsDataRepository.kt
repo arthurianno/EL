@@ -5,6 +5,7 @@ import android.net.Uri
 import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.errors.NotFoundItemError
+import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.common.storage.FileStorage
@@ -18,6 +19,7 @@ import com.elta.android.data.features.diary.events.extensions.EVENTS_DIR_NAME
 import com.elta.android.data.features.diary.events.extensions.buildFileName
 import com.elta.android.data.features.diary.events.mapper.toDomain
 import com.elta.android.data.features.sync.manger.LocalSyncManager
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
@@ -38,7 +40,9 @@ class EventsDataRepository @Inject constructor(
     @Cache private val cacheSource: EventsCacheDataSource,
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
-    private val fileStorage: FileStorage
+    private val fileStorage: FileStorage,
+    private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>,
+    private val crashlyticsReport: CrashlyticsReport
 ) : EventsRepository {
 
     override fun getEvents(): Observable<List<EventV2>> =
@@ -109,6 +113,29 @@ class EventsDataRepository @Inject constructor(
                             }
                     )
             }
+
+    override suspend fun addEventsSuspend(events: List<EventV2>) {
+        val mappedEvents = toDtoMapper.mapFromObjects(events)
+        crashlyticsReport.log("Started saving measurements to local storage")
+        cacheSource.addEventsSuspend(mappedEvents)
+        crashlyticsReport.log("Saving measurements to local storage is completed")
+        try {
+            crashlyticsReport.log("Started saving measurements to remote storage")
+            remoteSource.addEventsSuspend(mappedEvents)
+            crashlyticsReport.log("Saving measurements to remote storage is completed")
+        } catch (e: Exception) {
+            crashlyticsReport.writeException(e)
+            syncManager.saveAsCreated(events)
+            throw e
+        }
+    }
+
+    override suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
+        val events = glucometerEvents.map { event ->
+            eventsFromGlucometerMapper.mapFromObject(event)
+        }
+        addEventsSuspend(events)
+    }
 
     override fun updateEvent(event: EventV2): Completable =
         Single.fromCallable { listOf(toDtoMapper.mapFromObject(event)) }

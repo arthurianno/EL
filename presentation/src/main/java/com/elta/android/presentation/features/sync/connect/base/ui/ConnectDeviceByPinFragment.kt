@@ -63,6 +63,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         binding.layoutSyncStateSyncError.actionButtonView.clicks().bindTo(pm.startSyncAction)
         binding.layoutSyncStateSyncCompleted.toAppButtonView.clicks().bindTo(pm.toAppAction)
         binding.layoutSyncStateHowToConnect.manualStartButtonView.clicks().bindTo(pm.startScanAction)
+        binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)
         pm.connectDeviceEnabledState.bindTo(binding.layoutSyncStateDeviceFound.actionButtonView::setEnabled)
         pm.hideHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.hide() }
         pm.showHomeButtonCommand.bindTo { binding.toolbar.homeButtonView.show() }
@@ -91,7 +92,6 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
         }
-
         pm.settingsDialog.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.settingsIsVisible.bindTo {
             if (it) {
@@ -99,6 +99,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
                 pm.openSettingsCloseAction.consumer.accept(Unit)
             }
         }
+        pm.deviceAlreadyConnectedDialog.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     override fun onAttach(context: Context) {

@@ -5,14 +5,7 @@ package com.elta.android.presentation.features.sync.control
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.IntentSender
 import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.android.gms.location.SettingsClient
 import com.nullgr.core.intents.launchForResult
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -22,18 +15,21 @@ import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
-import timber.log.Timber
 
 class PermissionsControl(pm: PresentationModel) {
 
     val requestEnableBluetoothCommand = pm.command<Unit>(bufferSize = 1)
+    val requestBluetoothPermissionCommand = pm.command<Unit>(bufferSize = 1)
     val requestLocationPermissionsCommand = pm.command<Unit>(bufferSize = 1)
+    val requestCombinedPermissionsCommand = pm.command<Unit>(bufferSize = 1)
     val requestEnableLocationCommand = pm.command<Unit>(bufferSize = 1)
 
     val bluetoothEnabledAction = pm.action<Unit>()
     val bluetoothDeniedAction = pm.action<Unit>()
     val locationPermissionsGrantedAction = pm.action<Permission>()
+    val bluetoothPermissionsGrantedAction = pm.action<Permission>()
     val locationEnabledAction = pm.action<Unit>()
+    val locationDeniedAction = pm.action<Unit>()
 
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 145
@@ -58,12 +54,43 @@ fun PermissionsControl.bindTo(
                 )
         }
         .addTo(compositeUnbind)
+
+    requestBluetoothPermissionCommand.observable
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.requestEach(
+                android.Manifest.permission.BLUETOOTH_SCAN,
+                android.Manifest.permission.BLUETOOTH_CONNECT
+            )
+        }
+        .subscribe(bluetoothPermissionsGrantedAction.consumer)
+        .addTo(compositeUnbind)
+
     requestLocationPermissionsCommand.observable
         .observeOn(AndroidSchedulers.mainThread())
         .switchMap {
             permissions.requestEach(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
         .subscribe(locationPermissionsGrantedAction.consumer)
+        .addTo(compositeUnbind)
+
+    requestCombinedPermissionsCommand.observable
+        .observeOn(AndroidSchedulers.mainThread())
+        .switchMap {
+            permissions.requestEach(
+                android.Manifest.permission.BLUETOOTH_SCAN,
+                android.Manifest.permission.BLUETOOTH_CONNECT,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        .filter { !it.granted }
+        .subscribe {
+            if (it.name == android.Manifest.permission.ACCESS_FINE_LOCATION) {
+                locationPermissionsGrantedAction.consumer.accept(it)
+            } else {
+                bluetoothPermissionsGrantedAction.consumer.accept(it)
+            }
+        }
         .addTo(compositeUnbind)
 
     requestEnableLocationCommand.observable
@@ -75,8 +102,13 @@ fun PermissionsControl.bindTo(
 }
 
 fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
-    if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_LOCATION && resultCode == Activity.RESULT_OK) {
-        locationEnabledAction.consumer.accept(Unit)
+    if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_LOCATION) {
+        if (resultCode == Activity.RESULT_OK) {
+            locationEnabledAction.consumer.accept(Unit)
+        } else {
+            locationDeniedAction.consumer.accept(Unit)
+        }
+
     }
 
     if (requestCode == PermissionsControl.REQUEST_CODE_ENABLE_BLUETOOTH) {
@@ -88,29 +120,19 @@ fun PermissionsControl.resolveResults(requestCode: Int, resultCode: Int) {
     }
 }
 
-fun enableLocation(fragment: Fragment) {
-    val result = SettingsClient(fragment.requireContext())
-        .checkLocationSettings(
-            LocationSettingsRequest.Builder()
-                .addLocationRequest(LocationRequest.create())
-                .setNeedBle(true)
-                .build()
-        )
-    result.addOnCompleteListener { task ->
-        try {
-            task.getResult(ApiException::class.java)
-        } catch (e: ApiException) {
-            when (e.statusCode) {
-                LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
-                    try {
-                        (e as? ResolvableApiException)?.startResolutionForResult(
-                            fragment.requireActivity(),
-                            PermissionsControl.REQUEST_CODE_ENABLE_LOCATION
-                        )
-                    } catch (e1: IntentSender.SendIntentException) {
-                        Timber.e(e1)
-                    }
-            }
-        }
+fun Permission.handlePermissionResult(
+    onPermissionGranted: () -> Unit,
+    shouldShowPermissionRationale: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    when {
+        granted -> onPermissionGranted()
+        !granted && !shouldShowRequestPermissionRationale ->
+            shouldShowPermissionRationale()
+
+        !granted -> onPermissionDenied()
     }
 }
+
+fun String.isBluetoothName(): Boolean =
+    this == android.Manifest.permission.BLUETOOTH_SCAN || this == android.Manifest.permission.BLUETOOTH_CONNECT

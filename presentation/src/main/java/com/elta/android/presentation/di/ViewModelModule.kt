@@ -21,6 +21,7 @@ import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectType
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModel
+import com.elta.android.presentation.features.version.mandatory.viewmodel.MandatoryUpdateViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -114,4 +115,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(EventSelectorViewModel::class)
     abstract fun bindEventSelectorViewModel(viewModel: EventSelectorViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MandatoryUpdateViewModel::class)
+    abstract fun bindMandatoryUpdateViewModel(viewModel: MandatoryUpdateViewModel): ViewModel
 }

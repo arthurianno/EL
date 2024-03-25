@@ -27,7 +27,7 @@ android {
 
 dependencies {
     implementation(Dependencies.Timber.core)
-
-//    api(fileTree(baseDir = "libs"))
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+    implementation(Dependencies.IIOT.JacsonDatabind)
+    implementation(project(Module.common))
+    implementation(project(Module.IoMT))
 }

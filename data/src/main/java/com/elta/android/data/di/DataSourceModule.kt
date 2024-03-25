@@ -11,8 +11,6 @@ import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.calculator.paging.ProductsPagingSource
-import com.elta.android.data.features.devices.datasource.DeviceDataSource
-import com.elta.android.data.features.devices.datasource.DeviceRemoteDataSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
@@ -52,6 +50,8 @@ import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.datasource.ProfileRemoteDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoCachedDataSource
 import com.elta.android.data.features.userinfo.datasource.UserInfoDataSource
+import com.elta.android.data.features.version.datasource.VersionDataSource
+import com.elta.android.data.features.version.datasource.VersionSource
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -126,11 +126,6 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindMedicamentCacheDataSource(source: MedicamentCacheDataSource): MedicamentCacheSource
 
-
-    @Binds
-    @Singleton
-    abstract fun bindDeviceDataSource(source: DeviceRemoteDataSource): DeviceDataSource
-
     @Cache
     @Binds
     @Singleton
@@ -184,4 +179,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindMedicineRemoteDataSource(source: InsulinMedicamentRemoteDataSource): InsulinMedicamentRemoteSource
+
+    @Binds
+    @Singleton
+    abstract fun bindVersionDataSource(source: VersionDataSource): VersionSource
 }

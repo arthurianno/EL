@@ -1,5 +1,6 @@
 package com.elta.android.data.di
 
+import android.bluetooth.le.ScanResult
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.auth.mapper.SocialUserDtoMapper
 import com.elta.android.data.features.auth.model.SocialUserDto
@@ -68,6 +69,7 @@ import com.elta.android.data.features.user.mapper.ProfileFromCacheMapper
 import com.elta.android.data.features.user.mapper.ProfileToCacheMapper
 import com.elta.android.domain.features.auth.model.SocialUser
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.Event
@@ -80,7 +82,6 @@ import com.elta.android.domain.features.user.model.SocialNetwork
 import com.google.android.gms.fitness.data.Session
 import dagger.Binds
 import dagger.Module
-import no.nordicsemi.android.support.v18.scanner.ScanResult
 
 @Module
 @Suppress("UnnecessaryAbstractClass", "TooManyFunctions")
@@ -144,7 +145,7 @@ abstract class MappersModule {
     @Binds
     abstract fun bindEventV2FromGlucometerMapper(
         mapper: EventV2FromGlucometerMapper
-    ): Mapper<GlucometerEventDto, EventV2>
+    ): Mapper<GlucometerEvent, EventV2>
 
     @Binds
     abstract fun bindEventToSimpleMapper(

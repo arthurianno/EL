@@ -1,5 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.elta.android.data">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Request legacy Bluetooth permissions on older devices. -->
     <uses-permission
@@ -8,7 +8,9 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
@@ -61,7 +63,7 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name=".features.devices.glucometer.EltaDfuService"
+            android:name=".features.devices.glucometer.service.firmware.EltaDfuService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
     </application>

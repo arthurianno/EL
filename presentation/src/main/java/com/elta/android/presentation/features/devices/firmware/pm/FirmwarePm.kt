@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.devices.firmware.pm
 
+import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.FirmwareUpdateError
@@ -15,17 +16,23 @@ import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseC
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.firmware.model.FirmwareInfo
+import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
-import com.elta.android.presentation.features.sync.control.bluetoothControl2
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.elta.android.presentation.features.sync.control.handlePermissionResult
+import com.elta.android.presentation.features.sync.control.isBluetoothName
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
+import me.dmdev.rxpm.widget.dialogControl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -41,7 +48,7 @@ class FirmwarePm @Inject constructor(
     val buttonAction = action<Unit>()
     val updateState = state<UpdateState>(UpdateState.Progress(resources))
 
-    val btControl = bluetoothControl2()
+    val btControl = bluetoothControl()
 
     private val getDeviceInfoAction = action<String>()
     private val checkUpdatesAction = action<Unit>()
@@ -55,11 +62,27 @@ class FirmwarePm @Inject constructor(
 
     private val delayedSetStateAction = action<UpdateState>()
 
+    val settingsDialog = dialogControl<DialogData, DialogResult>()
+    val settingsIsVisible = state(false)
+    val openSettingsCloseAction = action<Unit>()
+
+    private val settingsLocationDialogData: DialogData by lazy {
+        Dialogs.SettingsLocationDialogData(resources)
+    }
+    private val settingsBluetoothDialogData: DialogData by lazy {
+        Dialogs.SettingsBluetoothDialogData(resources)
+    }
+
     override fun onCreate() {
         super.onCreate()
 
         bindStateBehavior()
-        bindActions()
+        bindCheckUpdateAction()
+        bindDeviceInfoAction()
+        bindDownloadFirmwareAction()
+        bindStartUpdateAction()
+        bindBluetoothAndLocationAction()
+        bindPermissionsAction()
     }
 
     override fun handleError(error: Throwable) {
@@ -103,11 +126,17 @@ class FirmwarePm @Inject constructor(
             .subscribe {
                 when (updateState.value) {
                     is UpdateState.NotFound -> checkUpdatesAction.consumer.accept(Unit)
-                    is UpdateState.Found -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
+                    is UpdateState.Found -> downloadFirmwareAction.consumer.accept(Unit)
                     is UpdateState.BatteryLowLevel -> router.exit()
-                    is UpdateState.FirmwareDownloadingError -> checkBleBeforeUpdate(UpdateState.FirmwareDownloadingError(resources)) { downloadFirmwareAction.consumer.accept(Unit) }
-                    is UpdateState.FirmwareUpdateError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
-                    is UpdateState.GlucometerOfflineError -> checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
+                    is UpdateState.FirmwareDownloadingError ->
+                        downloadFirmwareAction.consumer.accept(Unit)
+
+                    is UpdateState.FirmwareUpdateError ->
+                        startUpdateAction.consumer.accept(Unit)
+
+                    is UpdateState.GlucometerOfflineError ->
+                        startUpdateAction.consumer.accept(Unit)
+
                     is UpdateState.Downloading -> {}
                     is UpdateState.Progress -> {}
                     is UpdateState.Updated -> {}
@@ -117,23 +146,51 @@ class FirmwarePm @Inject constructor(
             .untilDestroy()
     }
 
-    private fun checkBleBeforeUpdate(errorState: UpdateState, doOnSuccess: () -> Unit) {
-        btControl.requestEnableBluetooth()
-                .doAfterSuccess {
-                    if (it) {
-                        doOnSuccess.invoke()
-                    } else {
-                        setState(errorState)
-                    }
-                }
-                .subscribe()
+    private fun bindBluetoothAndLocationAction() {
+        Observable.merge(
+            btControl.bluetoothEnabledAction.observable,
+            btControl.locationEnabledAction.observable
+        )
+            .subscribe(startUpdateAction.consumer)
+            .untilDestroy()
+
+        Observable.merge(
+            btControl.bluetoothDeniedAction.observable,
+            btControl.locationDeniedAction.observable
+        )
+            .subscribe {
+                setState(UpdateState.GlucometerOfflineError(resources))
+            }
+            .untilDestroy()
     }
 
-    private fun bindActions() {
-        bindCheckUpdateAction()
-        bindDeviceInfoAction()
-        bindDownloadFirmwareAction()
-        bindStartUpdateAction()
+    private fun bindPermissionsAction() {
+        Observable.merge(
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.bluetoothPermissionsGrantedAction.observable
+        )
+            .subscribe { permission ->
+                val dialogData =
+                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData
+                    else settingsLocationDialogData
+
+                permission.handlePermissionResult(
+                    onPermissionGranted = {
+                        startUpdateAction.consumer.accept(Unit)
+                    },
+                    shouldShowPermissionRationale = {
+                        showSettingDialog(dialogData)
+                    },
+                    onPermissionDenied = {
+                        setState(UpdateState.GlucometerOfflineError(resources))
+                    }
+                )
+            }
+            .untilDestroy()
+
+        openSettingsCloseAction.observable
+            .subscribe { settingsIsVisible.accept(false) }
+            .untilDestroy()
     }
 
     private fun bindStartUpdateAction() =
@@ -200,6 +257,14 @@ class FirmwarePm @Inject constructor(
         delayedSetStateAction.consumer.accept(state)
     }
 
+    private fun showSettingDialog(dialogData: DialogData) {
+        setState(UpdateState.NotFound(resources))
+        settingsDialog.showForResult(dialogData)
+            .map { it == DialogResult.POSITIVE }
+            .subscribe(settingsIsVisible.consumer)
+            .untilDestroy()
+    }
+
     private fun createGetDeviceInfoUseCaseParams(address: String): GetLastGlucometerInfoUseCase.Params =
         GetLastGlucometerInfoUseCase.Params(address)
 
@@ -221,7 +286,7 @@ class FirmwarePm @Inject constructor(
 
     private fun handleFirmwareDownloaded(file: FirmwareFile) {
         firmwareFileState.consumer.accept(file)
-        checkBleBeforeUpdate(UpdateState.FirmwareUpdateError(resources)) { startUpdateAction.consumer.accept(Unit) }
+        startUpdateAction.consumer.accept(Unit)
     }
 
     private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
@@ -266,41 +331,26 @@ class FirmwarePm @Inject constructor(
             .doOnError { error ->
                 when (error) {
                     is BluetoothNotEnabledError ->
-                        btControl.requestEnableBluetooth()
-                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
-                            .flatMapObservable {
-                                if (it) updateFirmware(params)
-                                else Observable.fromCallable {
-                                    setState(UpdateState.GlucometerOfflineError(resources))
-                                }
-                            }
+                        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+
                     is LocationPermissionNotGrantedError ->
-                        btControl.requestLocationPermissions()
-                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
-                            .flatMapObservable {
-                                if (it) updateFirmware(params)
-                                else Observable.fromCallable {
-                                    setState(UpdateState.GlucometerOfflineError(resources))
-                                }
-                            }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
+                        } else {
+                            btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+                        }
+
                     is LocationNotEnabledError ->
-                        btControl.requestEnableLocation()
-                            .delay(DELAY_MILLISECONDS, TimeUnit.MILLISECONDS)
-                            .flatMapObservable {
-                                if (it) updateFirmware(params)
-                                else Observable.fromCallable {
-                                    setState(UpdateState.GlucometerOfflineError(resources))
-                                }
-                            }
-                    else -> Observable.error(error)
+                        btControl.requestEnableLocationCommand.consumer.accept(Unit)
+
+                    else -> handleError(error)
                 }
             }
-            .doOnError(::handleError)
 
     companion object {
         private const val ZERO_DELAY = 0L
         private const val NEXT_STATE_DELAY = 1500L
     }
 }
-
-const val DELAY_MILLISECONDS = 1000L

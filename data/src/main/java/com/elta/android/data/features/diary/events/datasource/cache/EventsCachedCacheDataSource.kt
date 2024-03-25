@@ -59,6 +59,10 @@ class EventsCachedCacheDataSource @Inject constructor(
             cache.add(toCacheMapper.mapFromObjects(events))
         }
 
+    override suspend fun addEventsSuspend(events: List<EventV2Dto>) {
+        cache.add(toCacheMapper.mapFromObjects(events))
+    }
+
     override fun updateEvents(events: List<EventV2Dto>): Completable =
         Completable.fromCallable {
             cache.update(toCacheMapper.mapFromObjects(events))
