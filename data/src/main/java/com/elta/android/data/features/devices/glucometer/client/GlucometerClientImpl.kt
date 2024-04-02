@@ -3,6 +3,7 @@ package com.elta.android.data.features.devices.glucometer.client
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.os.Build
 import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerNotConnectedException
@@ -21,6 +22,7 @@ import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.runningFold
@@ -155,6 +157,10 @@ class GlucometerClientImpl @Inject constructor(
         crashlyticsReport.log("Scanning the environment is completed with the result")
 
         try {
+            // Решение для huawei/honor на Android 10. Эти устройства не успевают освободить ресурс и
+            // синхронизация не проходит. Поэтому нужна исскустенная задержка между scan и connect
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) delay(1_000)
+
             crashlyticsReport.log("Establishing a connection with a device")
             glucometerBleManager.connectToGlucometer(scanResult.device)
         } catch (e: Exception){
