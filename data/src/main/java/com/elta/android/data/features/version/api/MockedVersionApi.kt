@@ -6,7 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 class MockedVersionApi : VersionApi {
-    override fun checkAppVersion(appId: String, appVersion: String): Single<VersionResponse> {
+    override fun checkAppVersion(appId: String, appVersion: String, appStore: String): Single<VersionResponse> {
         return Single.just(
             VersionResponse(
 //                "NEEDLESS"

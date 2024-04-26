@@ -88,6 +88,15 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             proguardFiles.addAll(fileTree("proguard"))
         }
+
+        create("huawei") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+        }
     }
 
     compileOptions {

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/typesView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/on_boarding_emias_text" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/notificationAlertForMoscow"
+            style="@style/Typography.Title3.GreenBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_notification_emais"
+            android:drawableLeft="@drawable/ic_kremlin"
+            android:drawablePadding="12dp"
+            android:padding="16dp"
+            android:text="@string/emias_notification_for_moscow" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/omsInputView"
+            style="@style/InputStyle.Number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:hint="@string/on_boarding_emias_hint"
+            app:met_helperText="@string/on_boarding_emias_helper" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/dateBirthInputView"
+            style="@style/InputStyle.Number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/on_boarding_emias_date_birth_hint" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/notificationAccountConnected"
+            style="@style/Typography.Title3.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_notification_emais_connected"
+            android:drawableLeft="@drawable/ic_complete"
+            android:drawablePadding="12dp"
+            android:padding="16dp"
+            android:text="@string/emias_notification_account_connected"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

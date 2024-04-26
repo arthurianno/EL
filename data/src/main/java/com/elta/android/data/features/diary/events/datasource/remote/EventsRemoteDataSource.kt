@@ -26,7 +26,7 @@ class EventsRemoteDataSource @Inject constructor(
 ) : EventsDataSource {
 
     override fun getEvents(): Observable<List<EventV2Dto>> =
-        getDataByPage(PAGE, PAGE_SIZE)
+        getDataByPage()
             .doOnNext { syncStorage.lastEventsSync = timestamp() }
             .map(EventsV2Dto::events)
             .doOnNext { events -> updateCache(events, eventsCache, toCacheMapper) }
@@ -51,15 +51,19 @@ class EventsRemoteDataSource @Inject constructor(
         api.deleteEvents(events)
             .flatMapCompletable { Completable.complete() }
 
-    private fun getDataByPage(page: Int, size: Int): Observable<EventsV2Dto> =
-        api.getEvents(syncStorage.lastEventsSync, true, page, size)
-            .concatMap { data ->
-                val meta = data.meta
-                val nextPage = meta.currentPage + 1
-                when (meta.isTheLastPage()) {
-                    true -> Observable.just(data)
-                    else -> Observable.just(data).concatWith(getDataByPage(nextPage, meta.pageSize))
-                }
+    private fun getDataByPage(): Observable<EventsV2Dto> =
+        Observable
+            .range(PAGE, PAGE_SIZE)
+            .concatMap { page ->
+                api.getEvents(
+                    touchedAfter = syncStorage.lastEventsSync,
+                    ignoreDeleted = true,
+                    page = page,
+                    pageSize = PAGE_SIZE
+                )
+            }
+            .takeUntil{ data ->
+                data.meta.isTheLastPage()
             }
             .collectInto(mutableListOf<EventsV2Dto>()) { list, data -> list.add(data) }
             .map { list ->

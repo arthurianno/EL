@@ -30,12 +30,16 @@ class ProfileSettingsFragment :
     BaseRecyclerViewFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
         FragmentProfileSettingsBinding::inflate
     ) {
+    companion object {
+        fun newInstance() = ProfileSettingsFragment()
+    }
+
     @Inject
     lateinit var profileSettingsAdapter: ProfileSettingsAdapter
-
     override val screenLayout: Int = R.layout.fragment_profile_settings
     override val classToken: Class<ProfileSettingsPm> = ProfileSettingsPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+
     override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { profileSettingsAdapter }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,17 +65,15 @@ class ProfileSettingsFragment :
             )
         }
         pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
-        pm.copyTokenCommand.bindTo{ copyToClipboard(it) }
+        pm.copyTokenCommand.bindTo { copyToClipboard(it) }
         pm.downloadGoogleFitCommand.bindTo { requireContext().openGoogleFitInStoreIntent() }
         pm.openGoogleFitCommand.bindTo { requireContext().openGoogleFitIntent() }
-    }
-
-    companion object {
-        fun newInstance() = ProfileSettingsFragment()
+        pm.emiasErrorDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     private fun copyToClipboard(message: String) {
-        val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboardManager =
+            requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("TOKEN", message)
         clipboardManager.setPrimaryClip(clip)
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()

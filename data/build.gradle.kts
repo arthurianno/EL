@@ -22,9 +22,15 @@ android {
         targetCompatibility = AppConfig.javaVersion
     }
     buildTypes {
-        // todo: а нужно ли это? Вроде только две сборки осталось
-        create("releaseDev")
-        create("releaseStage")
+        create("huawei") {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.HuaweiAppGallery.storeName}\"")
+        }
+        release {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
+        }
+        debug {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
+        }
         all {
             buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
         }

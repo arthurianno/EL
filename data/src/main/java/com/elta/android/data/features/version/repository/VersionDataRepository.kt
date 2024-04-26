@@ -33,13 +33,13 @@ class VersionDataRepository @Inject constructor(
     override fun checkAppVersion(): Single<VersionStatus> {
         return source.checkVersion(
             appId = APP_ID,
-            appVersion = BuildConfig.VERSION_NAME
+            appVersion = BuildConfig.VERSION_NAME,
+            appStore = BuildConfig.APP_STORE
         )
             .map { VersionStatus.valueOf(it) }
             .map { versionStatus ->
                 checkOptionalUpdate(versionStatus)
             }
-
     }
 
     private fun checkOptionalUpdate(versionStatus: VersionStatus) =

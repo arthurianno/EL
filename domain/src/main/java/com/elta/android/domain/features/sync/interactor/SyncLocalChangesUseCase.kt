@@ -5,6 +5,7 @@ import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
+import com.elta.android.domain.features.glucometers.repository.GlucometersRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
@@ -23,6 +24,7 @@ class SyncLocalChangesUseCase @Inject constructor(
     private val migration: EventsMigration,
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val medicamentRepository: MedicamentRepository,
+    private val glucometersRepository: GlucometersRepository,
     private val schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
 
@@ -31,6 +33,8 @@ class SyncLocalChangesUseCase @Inject constructor(
             listOf(
                 migration.migrationEventsToEventsV2(),
                 profileRepo.sync(),
+                glucometersRepository.sync()
+                    .onErrorComplete(),
                 eventsRepo.sync(),
                 tagsRepository.sync(),
                 salePointsRepository.sync(),

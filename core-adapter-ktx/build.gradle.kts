@@ -21,10 +21,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
     buildTypes {
-        create("releaseDev")
-        create("releaseStage")
+        create("huawei")
     }
+
     namespace = "com.nullgr.core.adapter.ktx"
 }
 

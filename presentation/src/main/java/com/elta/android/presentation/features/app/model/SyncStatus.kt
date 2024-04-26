@@ -57,6 +57,12 @@ sealed class SyncStatus : Status {
         override val color: Int = resources.getColor(R.color.black)
     ) : SyncStatus()
 
+    data class NetworkProblemTryLater(
+        val resources: ResourceProvider,
+        override val text: String = resources.getString(R.string.error_network_try_later),
+        override val color: Int = resources.getColor(R.color.black)
+    ) : SyncStatus()
+
     data class SomethingWentWrong(
         val resources: ResourceProvider,
         override val text: String = resources.getString(R.string.error_something_went_wrong),

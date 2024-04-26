@@ -16,8 +16,10 @@ import com.elta.android.data.features.diary.events.repository.EventsDataReposito
 import com.elta.android.data.features.diary.medicines.repository.InsulinMedicamentDataRepository
 import com.elta.android.data.features.diary.medicines.repository.MedicamentDataRepository
 import com.elta.android.data.features.diary.tags.repository.TagsDataRepository
+import com.elta.android.data.features.emias.repository.EmiasDataRepository
 import com.elta.android.data.features.feedback.repository.FeedbackDataRepository
 import com.elta.android.data.features.firmware.repository.FirmwareDataRepository
+import com.elta.android.data.features.glucometers.repository.GlucometersDataRepository
 import com.elta.android.data.features.googlefit.repository.GoogleFitDataRepository
 import com.elta.android.data.features.observers.repository.ObserverDataRepository
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
@@ -43,8 +45,10 @@ import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import com.elta.android.domain.features.diary.medicines.repository.MedicamentRepository
 import com.elta.android.domain.features.diary.tags.repository.TagsRepository
+import com.elta.android.domain.features.emias.repository.EmiasRepository
 import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
+import com.elta.android.domain.features.glucometers.repository.GlucometersRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
@@ -164,7 +168,15 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindAppSettingsRepository(source: AppSettingsDataRepository): AppSettingsRepository
+    abstract fun bindAppSettingsDataRepository(source: AppSettingsDataRepository): AppSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGlucometersRepository(repo: GlucometersDataRepository): GlucometersRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEmiasRepository(repo: EmiasDataRepository): EmiasRepository
 
     @Binds
     @Singleton

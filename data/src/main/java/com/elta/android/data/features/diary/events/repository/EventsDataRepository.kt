@@ -22,13 +22,14 @@ import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.rx2.await
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import javax.inject.Inject
@@ -124,9 +125,9 @@ class EventsDataRepository @Inject constructor(
             remoteSource.addEventsSuspend(mappedEvents)
             crashlyticsReport.log("Saving measurements to remote storage is completed")
         } catch (e: Exception) {
+            crashlyticsReport.log("Saving measurements to remote storage is failed")
             crashlyticsReport.writeException(e)
-            syncManager.saveAsCreated(events)
-            throw e
+            syncManager.saveAsCreated(events).await()
         }
     }
 

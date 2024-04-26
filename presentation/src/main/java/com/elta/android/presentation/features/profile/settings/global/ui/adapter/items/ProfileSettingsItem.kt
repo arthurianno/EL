@@ -32,6 +32,7 @@ data class ProfileSettingsItem(
         NOTIFICATION,
         GLUCOSE_FORMAT,
         LEGAL_INFO,
+        EMIAS_ACCOUNT,
         DELETE_PROFILE,
         APP_VERSION
     }

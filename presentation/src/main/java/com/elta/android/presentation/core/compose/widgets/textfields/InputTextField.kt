@@ -34,6 +34,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -48,9 +49,11 @@ import com.elta.android.presentation.theme.GetLocalProperties
 @Immutable
 data class InputTextFieldWidgetState(
     val hint: String,
+    val hintInFocus: String?,
     val header: String,
     val description: String,
     val isError: Boolean,
+    val errorTextId: Int?,
     val textField: TextFieldValue,
     val maxLength: Int,
     val enabled: Boolean,
@@ -61,11 +64,13 @@ data class InputTextFieldWidgetState(
 class InputTextFieldWidgetModel : BaseWidgetModel<InputTextFieldWidgetState>() {
     override fun createInitState(): InputTextFieldWidgetState = InputTextFieldWidgetState(
         hint = "",
+        hintInFocus = null,
         header = "",
         description = "",
         textField = TextFieldValue(""),
         enabled = true,
         isError = false,
+        errorTextId = null,
         isFocused = false,
         maxLength = 100,
         showDescription = true
@@ -73,8 +78,13 @@ class InputTextFieldWidgetModel : BaseWidgetModel<InputTextFieldWidgetState>() {
 
     var textFilter: (TextFieldValue) -> TextFieldValue? = { it }
 
-    fun setHint(hint: String?) {
-        setState { state.value.copy(hint = hint.orEmpty()) }
+    fun setHint(hint: String?, hintInFocus: String? = null) {
+        setState {
+            state.value.copy(
+                hint = hint.orEmpty(),
+                hintInFocus = hintInFocus
+            )
+        }
     }
 
     fun setHeader(header: String?) {
@@ -102,6 +112,15 @@ class InputTextFieldWidgetModel : BaseWidgetModel<InputTextFieldWidgetState>() {
         setState {
             state.value.copy(
                 isError = errorState
+            )
+        }
+    }
+
+    fun setError(errorTextId: Int?){
+        setState {
+            state.value.copy(
+                isError = errorTextId != null,
+                errorTextId = errorTextId
             )
         }
     }
@@ -138,7 +157,9 @@ fun InputText(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     focusRequester: FocusRequester = FocusRequester(),
     focusManager: FocusManager = LocalFocusManager.current,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     isFocusRequested: Boolean = false,
+    singleLine: Boolean = false,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
     val state = widgetModel.state.collectAsState()
@@ -162,6 +183,8 @@ fun InputText(
 
             var borderWidth by remember { mutableStateOf(dimens.borderWidth) }
             var borderColor by remember { mutableStateOf(colors.shadeBlack3) }
+            var description by remember { mutableStateOf("") }
+            var hint by remember { mutableStateOf("") }
 
             borderWidth = if (state.value.isError || state.value.isFocused)
                 dimens.borderWidthMedium
@@ -172,6 +195,13 @@ fun InputText(
                 state.value.isFocused -> colors.shadeBlack0
                 else -> colors.shadeBlack3
             }
+
+            hint =
+                if (state.value.isFocused) state.value.hintInFocus.orEmpty()
+                else state.value.hint
+
+            description =
+                state.value.errorTextId?.let { stringResource(id = it) } ?: state.value.description
 
             Column(modifier = Modifier.background(color = colors.white)) {
                 if (state.value.header.isNotEmpty()) {
@@ -195,6 +225,7 @@ fun InputText(
                                 keyboardController?.hide()
                                 focusManager.clearFocus()
                             }),
+                            visualTransformation = visualTransformation,
                             enabled = state.value.enabled,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -205,9 +236,9 @@ fun InputText(
                                 .bottomBorder(borderWidth, borderColor),
                         ) { innerTextField ->
                             TextFieldDefaults.OutlinedTextFieldDecorationBox(value = state.value.textField.text,
-                                visualTransformation = VisualTransformation.None,
+                                visualTransformation = visualTransformation,
                                 innerTextField = innerTextField,
-                                singleLine = false,
+                                singleLine = singleLine,
                                 enabled = true,
                                 interactionSource = interactionSource,
                                 contentPadding = PaddingValues(
@@ -225,7 +256,7 @@ fun InputText(
                                 ),
                                 placeholder = {
                                     Text(
-                                        text = state.value.hint,
+                                        text = hint,
                                         style = types.subtitle1,
                                         color = colors.shadeBlack2
                                     )
@@ -233,9 +264,9 @@ fun InputText(
                                 border = { }
                             )
                         }
-                        VerticallyAnimation(state.value.description.isNotEmpty() && state.value.showDescription) {
+                        VerticallyAnimation(description.isNotEmpty() && state.value.showDescription) {
                             Text(
-                                text = state.value.description,
+                                text = description,
                                 style = if (state.value.isError) types.descriptionError else types.description,
                                 modifier = Modifier
                                     .padding(top = dimens.smallDim)

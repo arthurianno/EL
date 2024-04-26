@@ -3,6 +3,8 @@ package com.elta.android.presentation
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.nullgr.core.resources.ResourceProvider
 
+private const val EMPTY_STRING = ""
+
 sealed class Dialogs : DialogData {
 
     data class ExitAndLoseData(
@@ -149,6 +151,72 @@ sealed class Dialogs : DialogData {
         override val negative: String? = null,
         override val positive: String? = resourceProvider.getString(R.string.ok),
     ) : Dialogs()
+
+    sealed class Emias : Dialogs() {
+        data class UserConnected(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_user_connected_title),
+            override val message: String = resourceProvider.getString(R.string.emias_user_connected_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class UserNotFound(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_user_not_found_title),
+            override val message: String = resourceProvider.getString(R.string.emias_user_not_found_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class BadInternetConnection(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_network_connection_error_title),
+            override val message: String = resourceProvider.getString(R.string.emias_network_connection_error_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class AgreementNotFound(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_agreement_not_found_title),
+            override val message: String = resourceProvider.getString(R.string.emias_agreement_not_found_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class InternalError(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_internal_error_title),
+            override val message: String = EMPTY_STRING,
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class UserAlreadyLinked(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_oms_already_linked_title),
+            override val message: String = resourceProvider.getString(R.string.emias_oms_already_linked_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class ReceivingDataError(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_receiving_data_error_title),
+            override val message: String = resourceProvider.getString(R.string.emias_try_later_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+
+        data class NoInternetConnection(
+            val resourceProvider: ResourceProvider,
+            override val title: String = resourceProvider.getString(R.string.emias_no_internet_connection_error_title),
+            override val message: String = resourceProvider.getString(R.string.emias_try_later_message),
+            override val negative: String? = null,
+            override val positive: String = resourceProvider.getString(R.string.emias_dialog_confirm)
+        ) : Emias()
+    }
 
     data class ReminderWrongTime(
         val resourceProvider: ResourceProvider,

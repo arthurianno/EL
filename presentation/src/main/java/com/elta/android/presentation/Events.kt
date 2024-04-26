@@ -35,6 +35,7 @@ sealed class Events : Event {
     data class ReminderSpent(val reminder: Reminder) : Events()
     data class ReportLoadedEvent(val uri: Uri) : Events()
     object EmailNotConfirmed : Events()
+    object NetworkProblemTryLater : Events()
 
     sealed class Sync : Events() {
         sealed class Glucometer : Sync() {

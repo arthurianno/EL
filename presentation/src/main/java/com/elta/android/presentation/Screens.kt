@@ -7,6 +7,8 @@ import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.emias.model.Emias
+import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
@@ -43,6 +45,7 @@ import com.elta.android.presentation.features.onboaring.ui.OnBoardingFragment
 import com.elta.android.presentation.features.profile.flow.ui.ProfileFlowFragment
 import com.elta.android.presentation.features.profile.main.ui.MainProfileFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseSettingFragment
+import com.elta.android.presentation.features.profile.settings.emias.ui.EmiasProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
@@ -330,6 +333,10 @@ object Screens {
 
     object SetGender : SupportAppScreen() {
         override fun getFragment() = ProfileSetGenderFragment.newInstance()
+    }
+
+    data class EmiasProfile(val linkedStatus: EmiasStatus, val emias: Emias?) : SupportAppScreen() {
+        override fun getFragment() = EmiasProfileFragment.newInstance(linkedStatus, emias)
     }
 
     object Support : SupportAppScreen() {
