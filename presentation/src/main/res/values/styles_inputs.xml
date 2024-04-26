@@ -28,6 +28,10 @@
         <item name="android:inputType">textCapSentences</item>
     </style>
 
+    <style name="InputStyle.Number" parent="InputStyle">
+        <item name="android:inputType">phone</item>
+    </style>
+
     <style name="InputStyle.Digits" parent="InputStyle">
         <item name="android:inputType">numberDecimal</item>
     </style>
@@ -38,6 +42,9 @@
 
     <style name="InputStyle.Email" parent="InputStyle">
         <item name="android:inputType">textEmailAddress</item>
+    </style>
+    <style name="InputStyle.Date" parent="InputStyle">
+        <item name="android:inputType">date</item>
     </style>
 
     <style name="Search" parent="Widget.AppCompat.EditText">

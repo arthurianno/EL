@@ -27,6 +27,9 @@ android {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
         }
+        create("huawei") {
+            buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
+        }
     }
     namespace = "com.elta.android.common"
 }

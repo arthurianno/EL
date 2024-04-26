@@ -17,6 +17,7 @@ import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUse
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
+import com.elta.android.domain.features.emias.interactor.SyncGlucometersUseCase
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
@@ -75,6 +76,7 @@ class HomeFlowPm @Inject constructor(
     private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
     private val syncWithBackendUseCase: SyncLocalChangesUseCase,
+    private val syncGlucometers: SyncGlucometersUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val getGlucoseFormat: GetGlucoseFormatUseCase,
     private val getUpdatedProfileUseCase: GetUpdatedProfileUseCase,
@@ -326,7 +328,7 @@ class HomeFlowPm @Inject constructor(
             .flatMapCompletable {
                 sendAppVersion.execute()
                     .bindProgress(syncProgressState.consumer)
-                    .doOnError{ Timber.e(it) }
+                    .doOnError { Timber.e(it) }
             }
             .retry()
             .subscribe()
@@ -460,6 +462,9 @@ class HomeFlowPm @Inject constructor(
 
     private fun syncWithGlucometer(isAuto: Boolean): Observable<Int> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCase.Params())
+            .concatWith(
+                if (!isAuto) syncGlucometers.execute() else Completable.complete()
+            )
             .bindProgress(syncProgressState.consumer)
             .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
             .doOnComplete {
@@ -527,7 +532,7 @@ class HomeFlowPm @Inject constructor(
                 manualSyncError.accept(ManualSyncError.ErrorSync)
             }
 
-            is GlucometerOfflineError,  -> {
+            is GlucometerOfflineError -> {
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
@@ -568,7 +573,10 @@ class HomeFlowPm @Inject constructor(
                 startSyncWithBackendAction.consumer.accept(Unit)
             }
 
-            is GlucometerSyncError, is GlucometerConnectionException -> startSyncWithBackendAction.consumer.accept(Unit)
+            is GlucometerSyncError, is GlucometerConnectionException -> startSyncWithBackendAction.consumer.accept(
+                Unit
+            )
+
             else -> handleError(error)
         }
     }

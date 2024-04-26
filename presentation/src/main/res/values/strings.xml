@@ -97,6 +97,7 @@
     <!-- ON BOARDING FLOW -->
     <string name="on_boarding_toolbar_menu_button">Пропустить этот шаг</string>
     <string name="on_boarding_subtitle">Давайте знакомиться</string>
+    <string name="on_boarding_header_emias_account">Привяжите аккаунт ЕМИАС</string>
     <string name="on_boarding_header_user_sex">Укажите ваш пол</string>
     <string name="on_boarding_header_user_weight">Какой у вас вес?</string>
     <string name="on_boarding_header_user_diabetes_type">Какой у вас тип диабета?</string>
@@ -110,6 +111,15 @@
     <string name="diabetes_type_second_short">2 тип (Инсулин)</string>
     <string name="diabetes_type_second_tablets_short">2 тип (Таблетки)</string>
     <string name="coma">,</string>
+    <string name="emias_notification_for_moscow">Доступно только для жителей Москвы</string>
+    <string name="emias_notification_account_connected">Аккаунт ЕМИАС привязан к вашему профилю Сателлит Online</string>
+    <string name="emias_profile_unlink">Отвязать аккаунт</string>
+    <string name="emias_save_button">Сохранить</string>
+    <string name="on_boarding_emias_text">При включенной привязке данные измерений с глюкометра автоматически передаются вашему лечащему врачу через систему ЕМИАС.\n\nЕсли вы наблюдаетесь у врача и подписывали соглашение о передаче данных по замерам, заполните поля ниже.</string>
+    <string name="on_boarding_emias_helper">Значение должно быть между 9 и 16 знаками</string>
+    <string name="on_boarding_emias_hint">Номер полиса ОМС</string>
+    <string name="on_boarding_emias_date_birth_hint">Дата рождения</string>
+    <string name="on_boarding_emias_date_birth_mask_hint">ДД-ММ-ГГГГ</string>
     <string name="on_boarding_glucose_format_help_header">Обратите внимание!</string>
     <string name="on_boarding_glucose_format_help_text1">Значения уровня глюкозы на экране глюкометра указаны в цельной капиллярной крови, что соответствует формату «В цельной капиллярной крови».</string>
     <string name="on_boarding_glucose_format_help_text2">Если вы привыкли ориентироваться на замеры глюкозы в плазме, то выберите этот вариант.</string>
@@ -458,6 +468,8 @@
     <string name="profile_notification">Напоминания</string>
     <string name="profile_glucose_format">Формат отображения глюкозы</string>
     <string name="profile_legal_information">Юридическая информация</string>
+    <string name="profile_emias_account">ЕМИАС</string>
+    <string name="profile_emais_title">Привязка аккаунта ЕМИАС</string>
     <string name="facebook">Facebook</string>
     <string name="vkontakte">VK</string>
     <string name="odnoklasniki">OK</string>
@@ -467,7 +479,7 @@
     <string name="profile_delete_title">Удалить профиль?</string>
     <string name="profile_delete_button_confirm">Да</string>
     <string name="profile_delete_button_dissmit">Нет</string>
-    <string name="profile_delete_text">После удаления профиля все ранее внесенные данные будут так же удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
+    <string name="profile_delete_text">После удаления профиля все ранее внесенные данные, в том числе привязка к системе ЕМИАС, будут удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
     <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
     <string name="profile_is_deleted_body">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
@@ -880,7 +892,6 @@
     <string name="settings_dialog_negative">Отменить</string>
     <string name="settings_dialog_positive">Настройки</string>
 
-
     <!-- Notifications Dialog -->
     <string name="settings_dialog_settings_reminder">Включить напоминания?</string>
     <string name="notification_dialog_message">Для отправки напоминаний необходимо включить уведомления</string>
@@ -903,5 +914,32 @@
 
     <string name="refresh_button">Обновить</string>
     <string name="repeat_button">Повторить</string>
+
+    <!-- Emias Dialog -->
+    <string name="emias_user_connected_title">Аккаунт ЕМИАС успешно привязан к вашему профилю Сателлит Online</string>
+    <string name="emias_user_connected_message">Статус привязки можно найти\nв Настройках профиля</string>
+    <string name="emias_network_connection_error_title">Не удалось сохранить введенные данные, так как отсутствует Интернет</string>
+    <string name="emias_network_connection_error_message">Попробуйте еще раз позже или пропустите этот шаг. Привязать аккаунт ЕМИАС можно в Настройках профиля.</string>
+    <string name="emias_user_not_found_title">Пользователь с введенными данными не найден в ЕМИАС</string>
+    <string name="emias_user_not_found_message">Проверьте корректность заполненных данных</string>
+    <string name="emias_agreement_not_found_title">Отсутствует согласие на передачу данных в ЕМИАС</string>
+    <string name="emias_agreement_not_found_message">Для подписания согласия обратитесь к лечащему врачу, выдавшему рецепт на глюкометр</string>
+    <string name="emias_internal_error_title">Ошибка связи с сервером, попробуйте позже</string>
+    <string name="emias_oms_already_linked_title">Этот аккаунт ЕМИАС уже привязан к другому профилю Сателлит Online</string>
+    <string name="emias_oms_already_linked_message">Проверьте корректность данных</string>
+    <string name="emias_receiving_data_error_title">Ошибка загрузки данных ЕМИАС</string>
+    <string name="emias_try_later_message">Попробуйте еще раз позже</string>
+    <string name="emias_no_internet_connection_error_title">Отсутствует интернет-соединение</string>
+    <string name="emias_exit_title">Вы уверены, что хотите выйти?</string>
+    <string name="emias_exit_message">Введенные данные не сохранятся</string>
+    <string name="emias_unbind_title">Вы уверены, что хотите отвязать аккаунт от системы ЕМИАС?</string>
+    <string name="emias_unbind_message">Ваши данные по замерам глюкозы больше не будут отправляться в ЕМИАС</string>
+    <string name="emias_profile_unbinded_title">Аккаунт ЕМИАС успешно отвязан</string>
+    <string name="emias_dialog_confirm">Ок</string>
+
+    <string name="incorrect_length_error">Поле должно быть заполнено полностью</string>
+    <string name="required_field_error">Обязательно поле</string>
+    <string name="incorrect_age_error">Некорректный возраст</string>
+    <string name="incorrect_date_error">Некорректная дата</string>
 
 </resources>

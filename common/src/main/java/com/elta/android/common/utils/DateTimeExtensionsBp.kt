@@ -113,6 +113,11 @@ object CommonFormats {
     const val FORMAT_SIMPLE_DATE = "dd.MM.yyyy"
 
     /**
+     * Date/time format: ddMMyyyy
+     */
+    const val FORMAT_ONLY_DIGITS = "ddMMyyyy"
+
+    /**
      * Date/time format: dd LLL yyyy
      */
     const val FORMAT_DATE_WITH_MONTH_NAME = "dd LLL yyyy"

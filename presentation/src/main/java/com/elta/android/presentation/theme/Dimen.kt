@@ -119,7 +119,7 @@ internal val eltaDimens = EltaDimens(
     textFieldPopupOffset = DpOffset(16.dp, 0.dp),
     borderWidth = 1.dp,
     borderWidthMedium = 2.dp,
-    dialogPaddings = PaddingValues(top = 24.dp, start = 24.dp, end = 8.dp, bottom = 8.dp),
+    dialogPaddings = PaddingValues(top = 24.dp, start = 24.dp, end = 24.dp),
     zero = 0.dp,
     progressSmallWidth = 1.dp,
     progressRegularWidth = 2.dp,

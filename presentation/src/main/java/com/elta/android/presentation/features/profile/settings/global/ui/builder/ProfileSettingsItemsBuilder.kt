@@ -90,6 +90,13 @@ class ProfileSettingsItemsBuilder @Inject constructor(
                     type = ProfileSettingsItem.Type.LEGAL_INFO
                 )
             )
+            add(
+                ProfileSettingsItem(
+                    icon = R.drawable.ic_emias,
+                    title = resources.getString(R.string.profile_emias_account),
+                    type = ProfileSettingsItem.Type.EMIAS_ACCOUNT
+                )
+            )
             createHealthAppItem(profile)?.let { add(it) }
             add(
                 ProfileSettingsItem(

@@ -19,10 +19,11 @@ android {
         sourceCompatibility = AppConfig.javaVersion
         targetCompatibility = AppConfig.javaVersion
     }
+
     buildTypes {
-        create("releaseDev")
-        create("releaseStage")
+        create("huawei")
     }
+
 }
 
 dependencies {
@@ -30,4 +31,7 @@ dependencies {
     implementation(Dependencies.IIOT.JacsonDatabind)
     implementation(project(Module.common))
     implementation(project(Module.IoMT))
+
+//    api(fileTree(baseDir = "libs"))
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 }

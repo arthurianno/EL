@@ -46,12 +46,17 @@ android {
     buildTypes {
         release {
             buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
         }
         debug {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
             buildConfigField("boolean", "DEBUG", "true")
-
+        }
+        create("huawei") {
+            buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
+            buildConfigField("String", "APP_STORE", "\"${AppStore.HuaweiAppGallery.storeName}\"")
         }
     }
     namespace = "com.elta.android.presentation"

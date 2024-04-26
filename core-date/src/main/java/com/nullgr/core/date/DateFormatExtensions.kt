@@ -42,6 +42,7 @@ internal object SimpleDateFormatterCache {
  * Simple class which contains number of common and wide useful date formats.
  * @author Grishko Nikita
  */
+// TODO: Есть точно такой же объект в DateTimeExtensionsBp
 object CommonFormats {
     /**
      * Date/time format: dd.MM.yyyy HH:mm:ss
@@ -57,6 +58,11 @@ object CommonFormats {
      * Date/time format: dd.MM.yyyy
      */
     const val FORMAT_SIMPLE_DATE = "dd.MM.yyyy"
+
+    /**
+     * Date/time format: ddMMyyyy
+     */
+    const val FORMAT_ONLY_DIGITS = "ddMMyyyy"
 
     /**
      * Date/time format: dd LLL yyyy

@@ -9,8 +9,8 @@ import javax.inject.Inject
 class VersionDataSource @Inject constructor(
     private val api: VersionApi
 ) : VersionSource {
-    override fun checkVersion(appId: String, appVersion: String): Single<String> =
-        api.checkAppVersion(appId, appVersion)
+    override fun checkVersion(appId: String, appVersion: String, appStore: String): Single<String> =
+        api.checkAppVersion(appId, appVersion, appStore)
             .map { it.update }
 
     override fun sendAppVersion(appVersion: AppVersionNetworkRequest): Completable =

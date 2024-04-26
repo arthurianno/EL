@@ -13,6 +13,7 @@ import com.elta.android.presentation.features.consultant.viewmodel.ConsultantVie
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.main.events.selector.viewmodel.EventSelectorViewModel
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
+import com.elta.android.presentation.features.profile.settings.emias.viewmodel.EmiasProfileViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
@@ -120,4 +121,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MandatoryUpdateViewModel::class)
     abstract fun bindMandatoryUpdateViewModel(viewModel: MandatoryUpdateViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(EmiasProfileViewModel::class)
+    abstract fun bindEmiasProfileViewModel(viewModel: EmiasProfileViewModel): ViewModel
 }

@@ -1,5 +1,6 @@
 package com.elta.android.presentation.di
 
+import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
@@ -37,6 +38,7 @@ import com.elta.android.presentation.features.profile.main.ui.MainProfileFragmen
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseSettingFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
+import com.elta.android.presentation.features.profile.settings.emias.ui.EmiasProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
@@ -76,6 +78,7 @@ import com.elta.android.presentation.features.version.optional.ui.OptionalUpdate
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
+@ExperimentalCameraProviderConfiguration
 @Module
 @Suppress("UnnecessaryAbstractClass", "TooManyFunctions")
 abstract class FragmentBuilder {
@@ -283,6 +286,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindProfileSetGenderFragment(): ProfileSetGenderFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEmiasProfileFragment(): EmiasProfileFragment
 
     @FragmentScope
     @ContributesAndroidInjector

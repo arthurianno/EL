@@ -260,6 +260,15 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        bus.events<Events.NetworkProblemTryLater>()
+            .doOnNext {
+                setStatus(SyncStatus.NetworkProblemTryLater(resources))
+                setStatusVisibility(Visibility.Show)
+                setStatusVisibility(Visibility.HideWithDelay)
+            }
+            .subscribe()
+            .untilDestroy()
+
         bus.clicks<Clicks.ProfileAdditionalClicked>()
             .map { it.item.type }
             .filter { it is ExitFromApp }
