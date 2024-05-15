@@ -59,6 +59,7 @@ import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import timber.log.Timber
+import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
@@ -466,10 +467,14 @@ class HomeFlowPm @Inject constructor(
                 if (!isAuto) syncGlucometers.execute() else Completable.complete()
             )
             .bindProgress(syncProgressState.consumer)
-            .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
-            .doOnComplete {
-                bus.event(Events.Sync.Glucometer.Success)
-                bus.event(Events.EventsChanged(true))
+            .doOnSubscribe {
+                bus.event(Events.Sync.Glucometer.Started)
+            }
+            .doOnNext { events ->
+                if (events > 0) {
+                    bus.event(Events.EventsChanged(true))
+                    bus.event(Events.Sync.Glucometer.Success)
+                } else bus.event(Events.Sync.Glucometer.NoNewEvents)
             }
             .doOnError { error ->
                 if (isAuto) {
@@ -558,7 +563,8 @@ class HomeFlowPm @Inject constructor(
                     error is LocationPermissionNotGrantedError || error is CommandError || error is BluetoothScannerError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
-            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) || error is GlucometerConnectionException ->
+            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException)
+                    || error is CancellationException ->
                 bus.event(Events.Sync.Glucometer.ErrorWithMessage)
 
             error is PrimaryGlucometerNotFoundError -> openConnectScreen()

@@ -1,9 +1,10 @@
-package com.elta.android.data.features.observers.datasource
+package com.elta.android.data.features.observers.datasource.cache
 
 import com.elta.android.data.features.common.cache.Cache
 import com.elta.android.data.features.common.cache.CommonConditions
 import com.elta.android.data.features.observers.model.ObserverDbEntity
 import com.elta.android.data.features.observers.model.ObserverNetworkResponse
+import com.elta.android.data.features.observers.toDb
 import com.elta.android.data.features.observers.toNetwork
 import com.elta.android.data.features.user.dto.SimpleObserverNetworkEntity
 import io.reactivex.Completable
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 class ObserverCachedDataSource @Inject constructor(
     private val cache: Cache<ObserverDbEntity>
-) : ObserverDataSource {
+) : ObserverCachedSource {
 
     override fun getObserverInvites(): Observable<List<ObserverNetworkResponse>> =
         Observable.fromCallable {
@@ -33,11 +34,22 @@ class ObserverCachedDataSource @Inject constructor(
             }
         }
 
-    override fun sendObserverInvite(email: String): Completable =
-        Completable.error(Throwable("Unsupported cache method"))
-
     override fun deleteObserverInvite(observables: List<SimpleObserverNetworkEntity>): Completable =
         Completable.fromCallable {
             cache.delete(CommonConditions.ByIds(observables.map { it.id.hashCode().toLong() }))
         }
+
+    override fun updateObservers(items: List<ObserverNetworkResponse>): Completable =
+        Completable.fromCallable {
+            cache.delete(CommonConditions.All)
+            cache.add(
+                items.map(ObserverNetworkResponse::toDb)
+            )
+        }
+
+    override fun addObserver(item: ObserverNetworkResponse): Completable {
+        return Completable.fromCallable {
+            cache.add(listOf(item.toDb()))
+        }
+    }
 }

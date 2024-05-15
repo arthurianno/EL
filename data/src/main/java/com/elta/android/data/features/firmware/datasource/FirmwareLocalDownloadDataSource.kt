@@ -16,7 +16,7 @@ class FirmwareLocalDownloadDataSource @Inject constructor(
         firmwareInfo: FirmwareInfo
     ): Single<FirmwareFileStorageEntity> =
         Single.fromCallable {
-            firmwaresManager.getFile(firmwareInfo.version)?.let { file ->
+            firmwaresManager.getFile(firmwareInfo.version, true)?.let { file ->
                 firmwareInfo.toFirmwareFileStorage(file)
             } ?: throw NoSuchFirmware
         }.validateFileHash(firmwareInfo, NoSuchFirmware)

@@ -1,15 +1,11 @@
-package com.elta.android.data.features.observers.datasource
+package com.elta.android.data.features.observers.datasource.remote
 
-import com.elta.android.data.features.common.cache.Cache
-import com.elta.android.data.features.common.cache.updateCache
 import com.elta.android.data.features.common.isTheLastPage
 import com.elta.android.data.features.observers.api.ObserverApi
-import com.elta.android.data.features.observers.model.ObserverDbEntity
 import com.elta.android.data.features.observers.model.ObserverInviteEmailNetworkRequest
 import com.elta.android.data.features.observers.model.ObserverNetworkResponse
 import com.elta.android.data.features.observers.model.ObserverUpdateNameNetworkRequest
 import com.elta.android.data.features.observers.model.ObserversNetworkResponse
-import com.elta.android.data.features.observers.toDb
 import com.elta.android.data.features.user.dto.SimpleObserverNetworkEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -18,29 +14,20 @@ import javax.inject.Inject
 
 private const val PAGE = 1
 private const val PAGE_SIZE = 100
-private const val GET_SINGLE_OBSERVER_ERROR_MESSAGE =
-    "getObserver method dose not support by remote data source"
 
 class ObserverRemoteDataSource @Inject constructor(
-    private val cache: Cache<ObserverDbEntity>,
     private val api: ObserverApi
-) : ObserverDataSource {
+) : ObserverRemoteSource {
 
     override fun getObserverInvites(): Observable<List<ObserverNetworkResponse>> =
         getObserverInvitesByPage(PAGE, PAGE_SIZE)
             .map(ObserversNetworkResponse::items)
-            .doOnNext { events -> updateCache(events, cache, ObserverNetworkResponse::toDb) }
-
-    override fun getObserver(id: String): Single<ObserverNetworkResponse> =
-        Single.error(IllegalStateException(GET_SINGLE_OBSERVER_ERROR_MESSAGE))
 
     override fun updateObserverName(id: String, name: String) =
         api.updateObserverName(id, ObserverUpdateNameNetworkRequest(name))
 
-    override fun sendObserverInvite(email: String): Completable =
+    override fun sendObserverInvite(email: String): Single<ObserverNetworkResponse> =
         api.sendObserverInvite(ObserverInviteEmailNetworkRequest(email))
-            .doOnSuccess { cache.add(listOf(it.toDb())) }
-            .ignoreElement()
 
     override fun deleteObserverInvite(observables: List<SimpleObserverNetworkEntity>): Completable =
         api.deleteObserverInvite(observables.first().id)

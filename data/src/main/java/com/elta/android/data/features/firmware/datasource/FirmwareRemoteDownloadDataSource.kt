@@ -21,4 +21,5 @@ class FirmwareRemoteDownloadDataSource @Inject constructor(
                     firmwareInfo.toFirmwareFileStorage(file)
                 } ?: throw FirmwareDownloadingError
             }.validateFileHash(firmwareInfo, FirmwareDownloadingError)
+            .onErrorResumeNext { Single.error(FirmwareDownloadingError) }
 }

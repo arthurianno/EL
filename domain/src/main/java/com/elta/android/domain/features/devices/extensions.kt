@@ -11,7 +11,6 @@ import com.elta.android.domain.features.devices.repository.DeviceRepository
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import java.util.concurrent.TimeoutException
-import kotlin.jvm.Throws
 
 const val CONNECT_TIMEOUT: Long = 60_000
 const val SEND_DATA_TIMEOUT: Long = 120_000

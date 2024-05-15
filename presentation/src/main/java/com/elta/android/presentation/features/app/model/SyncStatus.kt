@@ -23,6 +23,12 @@ sealed class SyncStatus : Status {
             override val text: String = resources.getString(R.string.sync_with_glucometer_error),
             override val color: Int = resources.getColor(R.color.color_background_sync_error)
         ) : SyncStatus()
+
+        data class NoNewEvents(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.sync_with_glucometer_no_new_events),
+            override val color: Int = resources.getColor(R.color.black)
+        ) : SyncStatus()
     }
 
     sealed class Server : SyncStatus() {

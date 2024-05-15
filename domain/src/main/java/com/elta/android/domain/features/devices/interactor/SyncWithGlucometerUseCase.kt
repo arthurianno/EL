@@ -75,7 +75,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
         deviceAddress: String,
         userEmail: String,
         lastSyncEvent: String?
-    ): Int {
+    ) {
         crashlyticsReport.log("Getting pin")
         val pinCode = pinRepository.getPin(deviceAddress)
         if (pinCode == null) {
@@ -111,7 +111,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 rosTechRepository.sendMeasurements(deviceAddress, events)
             }
 
-            return measurements.size
+            scope.channel.send(measurements.size)
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
             deviceRepository.disconnect()

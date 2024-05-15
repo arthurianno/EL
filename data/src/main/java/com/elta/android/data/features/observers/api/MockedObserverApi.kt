@@ -1,7 +1,6 @@
 package com.elta.android.data.features.observers.api
 
 import com.elta.android.data.features.common.dto.MetaDto
-import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.observers.model.ObserverInviteEmailNetworkRequest
 import com.elta.android.data.features.observers.model.ObserverNetworkResponse
 import com.elta.android.data.features.observers.model.ObserverStatusNetworkEntity
@@ -10,7 +9,6 @@ import com.elta.android.data.features.observers.model.ObserversNetworkResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.Date
 
 @Suppress("MagicNumber")
 class MockedObserverApi : ObserverApi {
@@ -24,27 +22,21 @@ class MockedObserverApi : ObserverApi {
             email = "maksim@gmail.com",
             name = "Maksim Drum",
             customName = "Some Name",
-            status = ObserverStatusNetworkEntity.PENDING,
-            modificationTime = Date().time,
-            state = StateDto.CREATED
+            status = ObserverStatusNetworkEntity.PENDING
         )
         val vet = ObserverNetworkResponse(
             id = "fdas-gfsd-trwe-gfsd",
             email = "vitaliy@gmail.com",
             name = "Vitaliy Vocal",
             customName = "Some Name",
-            status = ObserverStatusNetworkEntity.CONFIRMED,
-            modificationTime = Date().time,
-            state = StateDto.CREATED
+            status = ObserverStatusNetworkEntity.CONFIRMED
         )
         val dim = ObserverNetworkResponse(
             id = "trwe-hgfd-jhgf-nbvc",
             email = "dmitriy@gmail.com",
             name = "Dmitriy Bass",
             customName = "Some Name",
-            status = ObserverStatusNetworkEntity.EXPIRED,
-            modificationTime = Date().time,
-            state = StateDto.CREATED
+            status = ObserverStatusNetworkEntity.EXPIRED
         )
         ObserversNetworkResponse(
             items = listOf(max, vet, dim),
@@ -59,9 +51,7 @@ class MockedObserverApi : ObserverApi {
                 email = "maksim@gmail.com",
                 name = "Maksim Drum",
                 customName = "Some Name",
-                status = ObserverStatusNetworkEntity.PENDING,
-                modificationTime = Date().time,
-                state = StateDto.CREATED
+                status = ObserverStatusNetworkEntity.PENDING
             )
         )
 

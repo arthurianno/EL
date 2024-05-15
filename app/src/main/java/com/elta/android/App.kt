@@ -2,6 +2,7 @@ package com.elta.android
 
 import android.app.Activity
 import android.app.Application
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import androidx.multidex.MultiDex
@@ -18,18 +19,22 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasBroadcastReceiverInjector
+import dagger.android.HasServiceInjector
 import io.reactivex.plugins.RxJavaPlugins
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import javax.inject.Inject
 
-class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
+class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, HasServiceInjector {
 
     @Inject
     lateinit var dispatchingActivityInjector: DispatchingAndroidInjector<Activity>
 
     @Inject
     lateinit var dispatchingReceiverInjector: DispatchingAndroidInjector<BroadcastReceiver>
+
+    @Inject
+    lateinit var dispatchingServiceInjector: DispatchingAndroidInjector<Service>
 
     @Inject
     lateinit var logTree: Timber.Tree
@@ -65,6 +70,9 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector {
 
     override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> =
         dispatchingReceiverInjector
+
+    override fun serviceInjector(): AndroidInjector<Service> =
+        dispatchingServiceInjector
 
     private fun initInjector() {
         DaggerAppComponent
