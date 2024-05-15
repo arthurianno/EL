@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import com.elta.android.common.errors.CommandError
-import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
+import com.elta.android.common.errors.CommandStillWritingError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.data.features.devices.dto.VersionDto
 import com.elta.android.data.features.devices.glucometer.command.Commands
@@ -16,17 +16,41 @@ import no.nordicsemi.android.ble.PhyRequest
 import no.nordicsemi.android.ble.ktx.suspend
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
-import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.jvm.Throws
+import javax.inject.Singleton
 
+@Singleton
 class GlucometerBleManager @Inject constructor(
     private val crashlyticsReport: CrashlyticsReport,
     context: Context
 ) : BleManager(context),
     GlucometerCommand {
+    class Builder {
+        private var mtu: Int = DEFAULT_MTU_VALUE
+        private var connectionPriority: Int? = null
+        private var crashlyticsReport: CrashlyticsReport? = null
+        private var context: Context? = null
+
+        fun setMtu(value: Int) = apply { mtu = value }
+        fun setConnectionPriority(value: Int?) = apply { connectionPriority = value }
+        fun setCrashlyticsReport(report: CrashlyticsReport) = apply { crashlyticsReport = report }
+        fun setContext(context: Context) = apply { this.context = context }
+        fun build(): GlucometerBleManager {
+            if (context == null || crashlyticsReport == null)
+                throw Exception("Not implemented context or crashlytics")
+
+            return GlucometerBleManager(crashlyticsReport!!, context!!)
+                .apply {
+                    this.mtuValue = mtu
+                    this.connectionPriorityValue = connectionPriority
+                }
+        }
+    }
+
+    private var mtuValue: Int = DEFAULT_MTU_VALUE
+    private var connectionPriorityValue: Int? = null
 
     /**
      * GATT характеристика для передачи комманд в глюкометр
@@ -40,8 +64,6 @@ class GlucometerBleManager @Inject constructor(
 
     @SuppressLint("MissingPermission")
     override suspend fun connectToGlucometer(device: BluetoothDevice) {
-        // через bondState можем проверять связаны ли устройства или нет и таким образом отправлять команды далее
-        //  device.bondState
         connect(device)
             .retry(10, 600)
             .useAutoConnect(false)
@@ -65,8 +87,8 @@ class GlucometerBleManager @Inject constructor(
         return result.isPinOk()
     }
 
-    override suspend fun toDfuMode(): String =
-        startCommand(Commands.ToDfuMode).checkCommandForError()
+    override suspend fun toBootMode(): String =
+        startCommand(Commands.ToBootMode).checkCommandForError()
 
     override suspend fun getDate(): ZonedDateTime {
         val dateTime = startCommand(Commands.GetDate)
@@ -91,10 +113,14 @@ class GlucometerBleManager @Inject constructor(
     override suspend fun readEvent(index: Int): String =
         startCommand(Commands.ReadEvent(index))
 
-    private suspend fun startCommand(command: Commands): String {
+    override suspend fun sendFirmwareChunk(chunk: FirmwareChunk): String =
+        startCommand(Commands.SendFirmwareChunk(chunk)).checkChunkWritingResult()
 
-        //Получение байтового массива из комманды (строки)
-        val byteCommand = command.getByteCommand()
+    private suspend fun startCommand(command: Commands): String {
+        //Получение байтового массива из команды (строки)
+        val byteCommand =
+            if (command is Commands.SendFirmwareChunk) command.chunk.toByteArray()
+            else command.getByteCommand()
 
         //Запись характеристики методом BleManager. split() устанавливает Mtu(Maximum Transmission Unit)
         //сплиттер и вызывает функцию расширение suspend() для преобразования асинхронного кода
@@ -117,7 +143,12 @@ class GlucometerBleManager @Inject constructor(
         val requestResult = request.value?.toString(Charset.defaultCharset())
             ?: throw Exception("Empty writeCharacteristic result")
 
-        val log = if (command is Commands.SetPin) "Sent pin to device" else "Sent $command with result: $requestResult"
+        val log =
+            when (command) {
+                is Commands.SetPin -> "Sent pin to device"
+                is Commands.SendFirmwareChunk -> "Sent a chunk of bytes"
+                else -> "Sent $command with result: $requestResult"
+            }
         crashlyticsReport.log(log)
 
 
@@ -132,8 +163,8 @@ class GlucometerBleManager @Inject constructor(
             throw CommandError(e.message.orEmpty())
         }
 
-        //Собственно тут получаем реальные замеры устройства в строковом представлении
-        val resultResponse = response.value?.toString(Charset.defaultCharset())
+        // Получаем ответ устройства в строковом представлении
+        val resultResponse = response.value?.parseToString(command is Commands.SendFirmwareChunk)
             ?: throw Exception("Empty waitForNotification result")
 
         val logResponse = if (command is Commands.Serial) {
@@ -145,7 +176,6 @@ class GlucometerBleManager @Inject constructor(
 
         return resultResponse
     }
-
 
     /**
      * Метод в котором происходит инициализации сервиса и характеристик
@@ -162,7 +192,8 @@ class GlucometerBleManager @Inject constructor(
     override fun initialize() {
         enableNotifications(notificationCharacteristic)
             .enqueue()
-        requestMtu(512).enqueue()
+        connectionPriorityValue?.let { requestConnectionPriority(it) }
+        requestMtu(mtuValue).enqueue()
     }
 
     override fun onServicesInvalidated() {
@@ -171,17 +202,32 @@ class GlucometerBleManager @Inject constructor(
         notificationCharacteristic = null
     }
 
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private fun ByteArray?.parseToString(isFirmwareUpdate: Boolean): String? =
+        if (isFirmwareUpdate) this?.toUByteArray()?.map { it.toString() }?.first()
+        else this?.toString(Charset.defaultCharset())
+
     @Throws(CommandError::class)
     private fun String.checkCommandForError(): String {
         return if (isError()) throw CommandError(this) else this
     }
 
     private fun String.isError(): Boolean = contains("error")
+
+    @Throws(CommandError::class)
+    private fun String.checkChunkWritingResult(): String {
+        val resultCode = this.toInt()
+        return when (resultCode) {
+            0x00 -> this
+            0x01 -> throw CommandStillWritingError
+            0x02 -> throw CommandError("Command ended with error")
+            else -> throw CommandError("Command not accepted. Format or syntax error")
+        }
+    }
 }
 
 private val SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
 private val CHAR_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
 private val NOTIFICATION_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
 
-private const val TAG = "GLUCOMETER_BLE_MANAGER"
-
+private const val DEFAULT_MTU_VALUE = 512

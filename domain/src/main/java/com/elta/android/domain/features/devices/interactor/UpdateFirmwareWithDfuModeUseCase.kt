@@ -17,14 +17,14 @@ import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.coroutines.EmptyCoroutineContext
 
-class UpdateDeviceFirmwareUseCase @Inject constructor(
+class UpdateFirmwareWithDfuModeUseCase @Inject constructor(
     private val updateRepository: UpdateRepository,
     private val pinRepository: PinRepository,
     private val deviceRepository: DeviceRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
     private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
-) : ObservableWithTimerUseCase<String, UpdateDeviceFirmwareUseCase.Params>(
+) : ObservableWithTimerUseCase<String, UpdateFirmwareWithDfuModeUseCase.Params>(
     schedulers,
     crashlyticsReport
 ) {
@@ -62,7 +62,7 @@ class UpdateDeviceFirmwareUseCase @Inject constructor(
 
             crashlyticsReport.log("Start updating device: $dfuAddress firmware with file ${p.file.path}")
             try {
-                updateRepository.updateFirmware(dfuAddress, p.file)
+                updateRepository.updateFirmwareWithDfuMode(dfuAddress, p.file)
             } catch (e: Exception) {
                 crashlyticsReport.writeException(e)
                 throw e
@@ -70,12 +70,10 @@ class UpdateDeviceFirmwareUseCase @Inject constructor(
         }
     }
 
-    data class Params(
-        val address: String,
-        val file: FirmwareFile
-    )
-
-    @Suppress("MagicNumber")
+    /**
+     * Функция перевода mac-адреса глюкометра в адрес для BootMode. Берётся последний октет и повышается на 1.
+     * Пример: адрес 00:11:22:33:FF:00 станет 00:11:22:33:FF:01.
+     */
     private fun String.toDfuAddress(): String {
         val tokens = this.split(":")
         val token = tokens.last()
@@ -89,4 +87,9 @@ class UpdateDeviceFirmwareUseCase @Inject constructor(
             truncated = ""
         ).uppercase()
     }
+
+    data class Params(
+        val address: String,
+        val file: FirmwareFile
+    )
 }

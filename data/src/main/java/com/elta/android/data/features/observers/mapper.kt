@@ -1,12 +1,10 @@
 package com.elta.android.data.features.observers // ktlint-disable filename
 
-import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.observers.model.ObserverDbEntity
 import com.elta.android.data.features.observers.model.ObserverNetworkResponse
 import com.elta.android.data.features.observers.model.ObserverStatusNetworkEntity
 import com.elta.android.domain.features.observers.model.Observer
 import com.elta.android.domain.features.observers.model.ObserverStatus
-import com.elta.android.domain.features.user.model.State
 
 fun ObserverNetworkResponse.toDomain(): Observer =
     Observer(
@@ -15,9 +13,7 @@ fun ObserverNetworkResponse.toDomain(): Observer =
         // for some reason server returns empty name instead of null, so we make null explicitly
         name = name?.takeIf { it.isNotBlank() },
         customName = customName,
-        status = ObserverStatus.valueOf(status.name),
-        modificationTime = modificationTime,
-        state = State.valueOf(state.name)
+        status = ObserverStatus.valueOf(status.name)
     )
 
 fun ObserverNetworkResponse.toDb(): ObserverDbEntity =
@@ -28,8 +24,9 @@ fun ObserverNetworkResponse.toDb(): ObserverDbEntity =
         name = name,
         customName = customName,
         status = status.name,
-        modificationTime = modificationTime,
-        state = state.name
+        // useless fields. Now we have other structure
+        modificationTime = null,
+        state = ""
     )
 
 fun ObserverDbEntity.toNetwork(): ObserverNetworkResponse =
@@ -38,9 +35,7 @@ fun ObserverDbEntity.toNetwork(): ObserverNetworkResponse =
         email = email,
         name = name,
         customName = customName,
-        status = ObserverStatusNetworkEntity.valueOf(status),
-        modificationTime = modificationTime,
-        state = StateDto.valueOf(state)
+        status = ObserverStatusNetworkEntity.valueOf(status)
     )
 
 internal fun List<ObserverNetworkResponse>.toDomain(): List<Observer> =

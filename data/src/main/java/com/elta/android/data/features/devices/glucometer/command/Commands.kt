@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.glucometer.command
 
+import com.elta.android.data.features.devices.glucometer.client.FirmwareChunk
 import com.elta.android.data.features.devices.glucometer.toGlucometerDateTime
 import com.elta.android.domain.features.diary.events.model.EventV2
 import org.threeten.bp.ZonedDateTime
@@ -11,7 +12,7 @@ sealed class Commands(val command: String) {
         return command.toByteArray(Charset.defaultCharset())
     }
 
-    data object ToDfuMode : Commands(command = "boot")
+    data object ToBootMode : Commands(command = "boot")
 
     data object GetDate : Commands(command = "gettime")
 
@@ -30,6 +31,8 @@ sealed class Commands(val command: String) {
     data class SetPin(val pin: String) : Commands(command = "pin.$pin")
 
     data object Serial : Commands(command = "serial")
+
+    data class SendFirmwareChunk(val chunk: FirmwareChunk) : Commands(command = "")
 
     data object Reset : Commands(command = "reset") //TODO: delete?
 

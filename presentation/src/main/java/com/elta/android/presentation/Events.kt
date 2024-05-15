@@ -44,6 +44,7 @@ sealed class Events : Event {
             object Error : Glucometer()
             object Success : Glucometer()
             object Nothing : Glucometer()
+            object NoNewEvents : Glucometer()
         }
 
         sealed class Server : Sync() {

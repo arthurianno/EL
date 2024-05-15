@@ -222,6 +222,11 @@ class AppPm @Inject constructor(
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
 
+                    is Events.Sync.Glucometer.NoNewEvents -> {
+                        setStatus(SyncStatus.Glucometer.NoNewEvents(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
+                    }
+
                     is Events.Sync.Server.Error -> {
                         setStatus(SyncStatus.Server.Error(resources))
                         setStatusVisibility(Visibility.HideWithDelay)

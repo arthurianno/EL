@@ -31,7 +31,8 @@ class MockedFirmwareApi(
                 id = "047303d8-6a31-42c9-bd41-fa8ec58d75a5",
                 version = "4.0.3",
                 size = 43499,
-                hash = "873B2329ACD1BD802086D7FCEC8EB668"
+                hash = "873B2329ACD1BD802086D7FCEC8EB668",
+                dfuMode = "nordic-dfu"
             )
         )
     }

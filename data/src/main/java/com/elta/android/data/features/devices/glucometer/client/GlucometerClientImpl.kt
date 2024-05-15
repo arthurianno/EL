@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,9 +37,9 @@ import kotlin.coroutines.resumeWithException
 
 @Singleton
 class GlucometerClientImpl @Inject constructor(
-    private val environmentScanner: EnvironmentScanner,
     private val glucometerBleManager: GlucometerBleManager,
     private val firmwareManager: FirmwareManager,
+    private val environmentScanner: EnvironmentScanner,
     private val crashlyticsReport: CrashlyticsReport
 ) : GlucometerClient {
 
@@ -64,7 +63,7 @@ class GlucometerClientImpl @Inject constructor(
             .build()
     )
 
-    override suspend fun updateFirmware(
+    override suspend fun updateFirmwareWithNordicDfu(
         address: String,
         firmwareFile: FirmwareFile
     ): String {
@@ -73,7 +72,8 @@ class GlucometerClientImpl @Inject constructor(
                 scan(address, dfuFilters)
             }
         } catch (e: TimeoutCancellationException) {
-            val exception = GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
+            val exception =
+                GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
             crashlyticsReport.writeException(exception)
             throw exception
         }
@@ -82,7 +82,7 @@ class GlucometerClientImpl @Inject constructor(
             crashlyticsReport.writeException(GlucometerNotFoundInDfuMode)
             throw GlucometerNotFoundInDfuMode
         }
-        return firmwareManager.updateFirmware(address, firmwareFile.path)
+        return firmwareManager.updateFirmwareWithNordicDfu(address, firmwareFile.path)
     }
 
     override fun findDevices(): Flow<List<ScanResult>> {
@@ -163,7 +163,7 @@ class GlucometerClientImpl @Inject constructor(
 
             crashlyticsReport.log("Establishing a connection with a device")
             glucometerBleManager.connectToGlucometer(scanResult.device)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             val error = GlucometerConnectionException(e.message.orEmpty())
             crashlyticsReport.writeException(error)
             throw error
@@ -263,12 +263,16 @@ class GlucometerClientImpl @Inject constructor(
             throw error
         }
 
-        val toDfuModeResult = glucometerBleManager.toDfuMode()
-        if (!toDfuModeResult.isOk()) {
+        val toBootModeResult = glucometerBleManager.toBootMode()
+        if (!toBootModeResult.isOk()) {
             crashlyticsReport.writeException(GlucometerToDfuModeError)
             throw GlucometerToDfuModeError
         }
         crashlyticsReport.log("The device has successfully switched to dfu mode")
+    }
+
+    override suspend fun sendFirmwareChunk(chuck: FirmwareChunk): String {
+        return glucometerBleManager.sendFirmwareChunk(chuck)
     }
 
     override suspend fun testAllCommands(address: String, pin: String) {

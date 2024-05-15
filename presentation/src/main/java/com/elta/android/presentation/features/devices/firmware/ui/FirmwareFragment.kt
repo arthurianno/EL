@@ -1,11 +1,18 @@
 package com.elta.android.presentation.features.devices.firmware.ui
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.elta.android.domain.features.devices.model.BootModeStatus
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentUpdateFirmwareBinding
@@ -13,6 +20,7 @@ import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.makeSnackBarWithAction
 import com.elta.android.presentation.utils.openSettingsIntent
 import com.jakewharton.rxbinding2.view.clicks
 import com.nullgr.core.ui.extensions.toggleView
@@ -29,8 +37,25 @@ class FirmwareFragment :
 
     private val rxPermissions by lazy { RxPermissions(this) }
 
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val message = intent.getStringExtra(BootModeStatus.STATUS_NAME_KEY).orEmpty()
+            val status = try {
+                BootModeStatus.valueOf(message)
+            } catch (_: Exception) {
+                BootModeStatus.UpdateFailed
+            }
+
+            presentationModel.bootModeStatusAction.consumer.accept(status)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val intentFilter = IntentFilter(BootModeStatus.ACTION_STATUS_NAME)
+        context?.let {
+            LocalBroadcastManager.getInstance(it).registerReceiver(receiver, intentFilter)
+        }
         val address = arguments?.getString(EXTRA_ADDRESS)
         address?.let { presentationModel.setDeviceAddress(address) }
     }
@@ -60,6 +85,10 @@ class FirmwareFragment :
                 openSettingsIntent(requireContext())
                 pm.openSettingsCloseAction.consumer.accept(Unit)
             }
+        }
+
+        pm.retryUpdateControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
+            makeSnackBarWithAction(binding.root, data, sc)
         }
     }
 

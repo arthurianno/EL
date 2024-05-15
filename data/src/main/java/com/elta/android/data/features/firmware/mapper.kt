@@ -4,6 +4,7 @@ import com.elta.android.data.features.firmware.model.FirmwareFileStorageEntity
 import com.elta.android.data.features.firmware.model.NewVersionFirmwareInfoResponse
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.firmware.model.FirmwareInfo
+import com.elta.android.domain.features.firmware.model.FirmwareMode
 import org.greenrobot.essentials.io.IoUtils
 import java.io.File
 import java.io.FileInputStream
@@ -28,5 +29,6 @@ internal fun NewVersionFirmwareInfoResponse.toDomain(): FirmwareInfo =
         id = id,
         version = version,
         size = size,
-        hash = hash
+        hash = hash,
+        firmwareMode = FirmwareMode.toFirmwareMode(dfuMode)
     )

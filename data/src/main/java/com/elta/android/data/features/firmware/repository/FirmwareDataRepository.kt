@@ -16,7 +16,7 @@ import javax.inject.Inject
 class FirmwareDataRepository @Inject constructor(
     @Remote private val remoteSource: FirmwareDownloadDataSource,
     @Cache private val localSource: FirmwareDownloadDataSource,
-    @Remote private val remoteInfoSource: FirmwareInfoDataSource
+    @Remote private val remoteInfoSource: FirmwareInfoDataSource,
 ) : FirmwareRepository {
 
     override fun getFirmwareInfo(

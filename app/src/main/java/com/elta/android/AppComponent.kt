@@ -6,15 +6,17 @@ import com.elta.android.data.di.ApiModule
 import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
-import com.elta.android.data.di.DeviceModule
-import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerModule
+import com.elta.android.data.di.FatSecretModule
+import com.elta.android.data.di.GlucometerImplModule
+import com.elta.android.data.di.BleToolsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
 import com.elta.android.data.di.MappersModule
 import com.elta.android.data.di.MigrationModule
 import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.RepoModule
+import com.elta.android.data.di.ServiceModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
 import com.elta.android.data.di.WebimModule
@@ -49,11 +51,13 @@ import javax.inject.Singleton
         MigrationModule::class,
         CacheModule::class,
         StorageModule::class,
+        BleToolsModule::class,
         GlucometerModule::class,
-        DeviceModule::class,
+        GlucometerImplModule::class,
         LocalSyncModule::class,
         FatSecretModule::class,
         WebimModule::class,
+        ServiceModule::class,
         // domain
         RepoModule::class,
         // presentation
