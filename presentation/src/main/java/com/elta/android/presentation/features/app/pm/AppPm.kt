@@ -5,7 +5,7 @@ import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideEmail
-import com.elta.android.domain.features.rostech.RosTechUseCase
+import com.elta.android.domain.features.rostech.interactor.RosTechUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase

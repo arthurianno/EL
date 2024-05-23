@@ -25,8 +25,7 @@ interface FormValidator {
     ): Boolean
 }
 
-internal fun String?.noteIsValid(): Boolean =
-    (this.orEmpty().length <= NOTE_MAX_LENGTH) && this.symbolsIsValid()
+internal fun String?.noteIsValid(): Boolean = this.orEmpty().length <= NOTE_MAX_LENGTH
 
 internal fun String?.symbolsIsValid(): Boolean =
     this.orEmpty().isEmpty() || this.orEmpty().any { it.isLetterOrDigit() }

@@ -1,6 +1,7 @@
 package com.elta.android.iiot
 
 import android.app.Application
+import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import ru.SDK.Test.BluetoothStatusCode
 import ru.SDK.Test.DeviceCallBack
@@ -9,18 +10,18 @@ import ru.SDK.Test.ELTAConnect
 import ru.SDK.Test.PlatformStatusCode
 import ru.SDK.Test.model.Observation
 import ru.SDK.Test.model.ObservationError
-import ru.SDK.Test.model.ObservationTemplate
 import timber.log.Timber
 import java.lang.ref.WeakReference
-import java.util.Date
 import java.util.UUID
-
-private const val LOG_TAG = "SDK_DeviceService_ELTA"
 
 object IoMTDeviceService {
 
     private var _crashlyticsReport: WeakReference<CrashlyticsReport>? = null
-    private val  crashlyticsReport: CrashlyticsReport? get() = _crashlyticsReport?.get()
+    private val crashlyticsReport: CrashlyticsReport?
+        get() = _crashlyticsReport?.get()
+
+    private var onExceptionCallback: ((Exception) -> Unit)? = null
+    private var onDisconnectCallback: (() -> Unit)? = null
 
     fun init(
         application: Application,
@@ -46,18 +47,21 @@ object IoMTDeviceService {
 
     }
 
-    fun connect(pin: String, address: String) {
-        DeviceService.connect(ELTAConnect::class.java, address, pin)
+    fun connect(pin: String, address: String, email: String) {
+        DeviceService.connect(ELTAConnect::class.java, address, pin, email)
     }
 
-    fun sendEvents(events: List<IoMTEvent>) {
-        crashlyticsReport?.log("IoMT SDK starts sending measurements, events size: ${events.size}")
-        val observations = events.map {
-            ObservationTemplate.Glucometer(UUID.fromString(it.id), it.serial, it.model, it.date, it.value)
-        }
+    fun setListeners(onDisconnect: (() -> Unit)?, onException: ((Exception) -> Unit)?) {
+        onExceptionCallback = onException
+        onDisconnectCallback = onDisconnect
+    }
 
-        DeviceService.applyObservation(observations)
-        crashlyticsReport?.log("IoMT SDK finished sending measurements")
+    fun sendLogs() {
+        DeviceService.sendLogs()
+    }
+
+    fun clearLogs() {
+        DeviceService.clearLogs()
     }
 
     private val deviceCallBack = object : DeviceCallBack {
@@ -76,38 +80,50 @@ object IoMTDeviceService {
             crashlyticsReport?.writeException(IoMTException(messagesErrors))
         }
 
-        override fun onExploreDevice(name: String?, value: String?, p2: Any?) {
-            crashlyticsReport?.log("IoMT SDK: device explored $name")
+        override fun onExploreDevice(name: String?, attribute: String?, value: Any?) {
+            crashlyticsReport?.log("IoMT SDK: device explored $name  attribute: $attribute, value: $value")
         }
 
-        override fun onSendFetalOnPlatform(p0: PlatformStatusCode?, p1: String?) {
-            crashlyticsReport?.log("IoMT SDK: fetal send on platform $p0, $p1")
+        override fun onSendFetalOnPlatform(status: PlatformStatusCode?, value: String?) {
+            crashlyticsReport?.log("IoMT SDK: fetal send on platform $status, $value")
         }
 
-        override fun onStatusDevice(p0: String?, statusCode: BluetoothStatusCode?) {
-            crashlyticsReport?.log("IoMT SDK: on device status $p0, code: $statusCode")
+        override fun onStatusDevice(mac: String?, statusCode: BluetoothStatusCode?) {
+            crashlyticsReport?.log("IoMT SDK: on device status $mac, code: $statusCode")
+            when (statusCode) {
+                BluetoothStatusCode.ConnectDisconnect -> onDisconnectCallback?.invoke()
+                BluetoothStatusCode.ConnectFail ->
+                    onExceptionCallback?.invoke(GlucometerConnectionException(mac.orEmpty()))
+
+                else -> {}
+            }
         }
 
-        override fun onDisconnect(p0: String?, events: HashMap<String, Any>?) {
-            crashlyticsReport?.log("IoMT SDK: on disconnect: $p0, eventsSize: ${events?.size}")
+        @Deprecated("Нерабочий метод")
+        override fun onDisconnect(mac: String?, events: HashMap<String, Any>?) {
+            crashlyticsReport?.log("IoMT SDK: on disconnect: $mac, eventsSize: ${events?.size}")
         }
 
-        override fun onException(p0: String?, exception: Exception?) {
-            crashlyticsReport?.writeException(IoMTException(p0))
+        override fun onException(mac: String?, exception: Exception?) {
+            crashlyticsReport?.writeException(IoMTException(mac))
+            exception?.let { onExceptionCallback?.invoke(it) }
+            setListeners(null, null)
         }
 
-        override fun onConnectToPlatform(p0: PlatformStatusCode?, p1: Int, p2: String?) {
-            crashlyticsReport?.log("IoMT SDK: on connect to platform ($p0)> -> $p1 $p2")
+        override fun onConnectToPlatform(status: PlatformStatusCode?, message: String?) {
+            crashlyticsReport?.log("IoMT SDK: on connect to platform ($status)> -> $message")
+            setListeners(null, null)
+        }
+
+        override fun onConnectToPlatform(
+            status: PlatformStatusCode?,
+            httpCode: Int,
+            message: String?
+        ) {
+            crashlyticsReport?.log("IoMT SDK: on connect to platform ($status)> -> $httpCode $message")
+            setListeners(null, null)
         }
     }
-
-    data class IoMTEvent(
-        val id: String,
-        val serial: String,
-        val model: String,
-        val date: Date,
-        val value: Double
-    )
 
     class IoMTException(message: String?) : Exception(message)
 }

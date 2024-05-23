@@ -19,6 +19,7 @@ import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUs
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
 import com.elta.android.domain.features.emias.interactor.SyncGlucometersUseCase
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
+import com.elta.android.domain.features.rostech.interactor.ConnectIomtUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
@@ -81,6 +82,7 @@ class HomeFlowPm @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     private val getGlucoseFormat: GetGlucoseFormatUseCase,
     private val getUpdatedProfileUseCase: GetUpdatedProfileUseCase,
+    private val connectIomt: ConnectIomtUseCase,
     private val sendAppVersion: SendAppVersionUseCase,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
@@ -118,6 +120,7 @@ class HomeFlowPm @Inject constructor(
 
     private val syncWithBackendProgressState = state(false)
     private val startSyncWithBackendAction = action<Unit>()
+    private val startSyncWithIomtAction = action<Unit>()
     private val sendAppVersionAction = action<Unit>()
 
     private val feedbackAction = action<Unit>()
@@ -190,6 +193,7 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnError { Log.d("error", "bus.events<Events.EventsChanged> error") }
             .subscribe(glucoseFormat.consumer)
+            .untilDestroy()
 
         bus.events<Events.DeviceChanged>()
             .flatMapSingle {
@@ -198,6 +202,7 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnError { Log.d("error", "bus.events<Events.DeviceChanged> error") }
             .subscribe(isFirstSync.consumer)
+            .untilDestroy()
 
         observeClicks()
     }
@@ -347,6 +352,7 @@ class HomeFlowPm @Inject constructor(
             .skipWhileInProgress(syncWithBackendProgressState.observable)
             .flatMapCompletable {
                 syncWithBackendUseCase.execute()
+                    .mergeWith(connectIomt.execute())
                     .bindProgress(syncWithBackendProgressState.consumer)
                     .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
                     .doOnComplete { bus.event(Events.Sync.Server.Success) }
@@ -357,6 +363,18 @@ class HomeFlowPm @Inject constructor(
                     .doOnError(::handleError)
             }
             .retry(3)
+            .subscribe()
+            .untilDestroy()
+
+        startSyncWithIomtAction.observable
+            .skipWhileInProgress(syncWithBackendProgressState.observable)
+            .flatMapCompletable {
+                connectIomt.execute()
+                    .bindProgress(syncWithBackendProgressState.consumer)
+                    .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
+                    .doOnComplete { bus.event(Events.Sync.Server.Success) }
+                    .doOnError(::handleError)
+            }
             .subscribe()
             .untilDestroy()
 
@@ -476,6 +494,7 @@ class HomeFlowPm @Inject constructor(
                     bus.event(Events.Sync.Glucometer.Success)
                 } else bus.event(Events.Sync.Glucometer.NoNewEvents)
             }
+            .doOnComplete { if (!isAuto) startSyncWithIomtAction.consumer.accept(Unit) }
             .doOnError { error ->
                 if (isAuto) {
                     handleAutoSyncError(error)
