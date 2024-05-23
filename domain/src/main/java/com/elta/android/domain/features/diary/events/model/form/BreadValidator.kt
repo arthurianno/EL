@@ -27,14 +27,13 @@ class BreadValidator(private val calculatorFlow: CalculatorFlow?) : FormValidato
         flowIsEdit: Boolean?,
         date: ZonedDateTime?,
         note: String?
-    ): Boolean =
-        if (calculatorFlow == CalculatorFlow.BREAD_UNITS)
-            validateValue(value)
-        else
-            validateDishes(dishes)
-            && validateKind(kind)
-            && date != null
-            && note.noteIsValid()
+    ): Boolean {
+        val areFlowFieldsValid =
+            if (calculatorFlow == CalculatorFlow.BREAD_UNITS) validateValue(value)
+            else validateDishes(dishes) && validateKind(kind)
+
+        return areFlowFieldsValid && date != null && note.noteIsValid()
+    }
 
     private fun validateValue(value: Double?): Boolean =
         value != null && value in VALUE_DIAPASON

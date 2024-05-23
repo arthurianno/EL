@@ -130,7 +130,7 @@ class EditEventPm @Inject constructor(
             .untilDestroy()
 
         eventIdState.observable
-            .map { Unit }
+            .map { }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
     }
@@ -175,7 +175,7 @@ class EditEventPm @Inject constructor(
                 insulinMedicament = form.insulinMedicament,
                 medicament = form.medicament,
                 tabletsNumber = form.tabletsNumber,
-                note = form.note,
+                note = form.note?.trim(),
                 type = checkNotNull(form.eventType),
                 dishes = dishes.value
             )

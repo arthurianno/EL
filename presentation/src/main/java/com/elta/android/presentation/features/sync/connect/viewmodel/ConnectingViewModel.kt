@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -110,18 +111,20 @@ class ConnectingViewModel @Inject constructor(
     }
 
     private fun completeConnect() {
-        updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
-            .subscribe(
-                {
-                    bus.event(Events.DeviceChanged)
-                    if (state.value.isOnBoarding) {
-                        router.newRootScreen(Screens.HomeFlow)
-                    } else {
-                        router.backTo(Screens.Devices)
-                    }
-                },
-                { handleError(it) }
-            )
+        launch {
+            try {
+                updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
+                    .await()
+
+                bus.event(Events.DeviceChanged)
+                bus.event(Events.EventsChanged(true))
+                if (state.value.isOnBoarding) router.newRootScreen(Screens.HomeFlow)
+                else router.backTo(Screens.Devices)
+
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
     }
 
     private fun repeatSyncDevice(currentState: ConnectingViewState) = run {

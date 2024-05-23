@@ -13,7 +13,6 @@ import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
@@ -31,7 +30,6 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val eventsRepository: EventsRepository,
     private val crashlyticsReport: CrashlyticsReport,
-    private val rosTechRepository: RosTechRepository,
     schedulers: SchedulersFacade
 ) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers, crashlyticsReport) {
 
@@ -108,7 +106,6 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 eventsRepository.addEventFromGlucometer(events)
 
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
-                rosTechRepository.sendMeasurements(deviceAddress, events)
             }
 
             scope.channel.send(measurements.size)
