@@ -5,8 +5,6 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
-import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
-import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toDoubleFormat
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toStringFormat
 import org.threeten.bp.ZonedDateTime
 
@@ -47,7 +45,7 @@ data class EventFormModel(
         }
 
     val note: String?
-        get() = if (noteValue.isNullOrEmpty()) null else noteValue
+        get() = if (noteValue.isNullOrBlank()) null else noteValue?.trim()
 
     val activityType: ActivityType?
         get() = meta as? ActivityType
