@@ -1,4 +1,4 @@
-image: circleci/android:api-30
+image: mirror.gcr.io/library/jangrewe/gitlab-ci-android
 
 cache:
   key: ${CI_PROJECT_ID}
