@@ -1,4 +1,4 @@
-image: dockerhub.timeweb.cloud/jangrewe/gitlab-ci-android
+image: mirror.gcr.io/jangrewe/gitlab-ci-android
 
 cache:
   key: ${CI_PROJECT_ID}
@@ -48,7 +48,7 @@ debug-test:
     branch: master
 
 deploy-debug:
-  image: dockerhub.timeweb.cloud/node:latest
+  image: mirror.gcr.io/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-debug$/'
@@ -135,7 +135,7 @@ release-test:
     branch: master
 
 deploy-release:
-  image: dockerhub.timeweb.cloud/node:latest/node:latest
+  image: mirror.gcr.io/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-release$/'
