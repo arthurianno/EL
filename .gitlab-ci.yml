@@ -1,4 +1,4 @@
-image: jangrewe/gitlab-ci-android:latest
+image: dockerhub.timeweb.cloud/jangrewe/gitlab-ci-android
 
 cache:
   key: ${CI_PROJECT_ID}
