@@ -22,7 +22,7 @@ debug-build:
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-debug$/'
   tags:
-    - android,docker,testsiberian
+    - android,docker
   artifacts:
     when: on_success
     expire_in: 1 week
