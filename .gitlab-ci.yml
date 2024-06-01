@@ -48,7 +48,7 @@ debug-test:
     branch: master
 
 deploy-debug:
-  image: mirror.gcr.io/node:latest
+  image: mirror.gcr.io/library/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-debug$/'
@@ -135,7 +135,7 @@ release-test:
     branch: master
 
 deploy-release:
-  image: mirror.gcr.io/node:latest
+  image: mirror.gcr.io/library/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-release$/'
