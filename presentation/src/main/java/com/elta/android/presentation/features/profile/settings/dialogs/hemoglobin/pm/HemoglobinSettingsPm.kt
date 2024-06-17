@@ -13,7 +13,7 @@ import com.elta.android.domain.features.user.interactor.increment
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade

@@ -16,8 +16,8 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
-import com.elta.android.presentation.analytics.trackEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.trackEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -34,7 +34,6 @@ import io.reactivex.Single
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min

@@ -132,6 +132,7 @@ dependencies {
     implementation(Dependencies.CustomView.materialEditText)
     implementation(Dependencies.Yandex.mapKit)
     implementation(Dependencies.Yandex.mapKitClustering)
+    implementation(Dependencies.Yandex.appMetrica)
     implementation(Dependencies.CustomView.pulseView)
     implementation(Dependencies.CustomView.datePicker)
     implementation(Dependencies.CustomView.lottie)

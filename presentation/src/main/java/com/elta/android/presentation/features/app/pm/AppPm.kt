@@ -16,9 +16,12 @@ import com.elta.android.domain.features.version.model.VersionStatus
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
@@ -49,6 +52,7 @@ class AppPm @Inject constructor(
     private val firebaseStorage: FirebaseStorage,
     private val crashlyticsReport: CrashlyticsReport,
     private val rosTech: RosTechUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -126,6 +130,7 @@ class AppPm @Inject constructor(
                                 setStatusVisibility(Visibility.Hide)
                                 router.newRootFlow(Screens.ForcedUpdateScreen)
                             }
+
                             else -> {}
                         }
                     }
@@ -179,7 +184,7 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
-            .map { }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.AppStart) }
             .trackEvent(AnalyticsEventType.APP_LAUNCH)
             .subscribe()
             .untilDestroy()
@@ -207,6 +212,9 @@ class AppPm @Inject constructor(
                 when (it) {
                     is Events.Sync.Glucometer.Error -> setStatusVisibility(Visibility.Hide)
                     is Events.Sync.Glucometer.ErrorWithMessage -> {
+                        appMetric.trackEvent(
+                            AppMetricEvent.SnackSynchronization(SnackStatusParam.SYNCHRONIZATION_ERROR)
+                        )
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
                         setStatusVisibility(Visibility.HideWithDelay)
@@ -218,6 +226,7 @@ class AppPm @Inject constructor(
                     }
 
                     is Events.Sync.Glucometer.Success -> {
+                        appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.SUCCESS))
                         setStatus(SyncStatus.Glucometer.Success(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
@@ -257,6 +266,7 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.EmailNotConfirmed>()
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.ProfileVerificationError) }
             .doOnNext {
                 setStatus(SyncStatus.Email(resources))
                 setStatusVisibility(Visibility.Show)

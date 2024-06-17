@@ -2,12 +2,15 @@ package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.domain.features.auth.interactor.RegisterUseCase
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.pm.ServiceFacade
 import io.reactivex.rxkotlin.Observables
 import javax.inject.Inject
 
 class RegistrationMainPm @Inject constructor(
     private val registerUseCase: RegisterUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseRegistrationPm(services) {
 
@@ -47,6 +50,7 @@ class RegistrationMainPm @Inject constructor(
         RegisterUseCase.Params(emailInput.text.value, passwordInput.text.value)
 
     private fun handleSuccess() {
+        appMetric.trackEvent(AppMetricEvent.RegistrationContinueClick)
         router.navigateTo(Screens.ActivateProfile)
     }
 }

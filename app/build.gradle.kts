@@ -151,6 +151,7 @@ dependencies {
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
     implementation(Dependencies.Yandex.mapKit)
+    implementation(Dependencies.Yandex.appMetrica)
     implementation(Dependencies.RxJava2.rxJava)
     implementation(Dependencies.RxJava2.rxPm)
     implementation(Dependencies.Cicerone.core)

@@ -7,9 +7,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.core.Analytics
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.analytics.Analytics
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
@@ -28,7 +30,8 @@ private const val SCANNER_ERROR_SHOWING_DELAY_MILLIS = 1000L
 private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 
 class ScannerDmcViewModel @Inject constructor(
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val appMetric: AppMetricTracker
 ) : BaseViewModel<ScannerDmcViewState>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewState =
         ScannerDmcViewState(
@@ -48,6 +51,10 @@ class ScannerDmcViewModel @Inject constructor(
         connectByPinButton,
         appTopBar
     ).actionObserve()
+
+    init {
+        appMetric.trackEvent(AppMetricEvent.CameraScanningScreen)
+    }
 
     override fun handleFragmentArguments(arguments: Bundle) {
         reduceState {

@@ -24,7 +24,13 @@ import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.models.AlertType
+import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -54,6 +60,7 @@ abstract class ConnectDevicePm constructor(
     private val findGlucometers: FindGlucometersUseCase,
     private val checkConnectedDevices: CheckConnectedDevicesUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -151,16 +158,25 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError ->
+            is BluetoothNotEnabledError -> {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            }
 
             is LocationPermissionNotGrantedError -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
+                    appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
+                    listOf(
+                        AppMetricEvent.Permission.Alert.Location,
+                        AppMetricEvent.Permission.Alert.Bluetooth
+                    )
+                        .forEach { appMetric.trackEvent(it) }
                 } else {
                     btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+                    appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
                 }
             }
 
@@ -317,13 +333,16 @@ abstract class ConnectDevicePm constructor(
         bus.events<Events.PinCodeEntered>()
             .map(Events.PinCodeEntered::pin)
             .doOnNext(pinState.consumer)
-            .map { Unit }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.DeviceConnectClick) }
+            .map { }
             .subscribe(internalConnectDeviceAction.consumer)
             .untilDestroy()
 
         bus.clicks<Clicks.DeviceClicked>()
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.SelectedDeviceConnectClick) }
             .doOnNext { click ->
-                glucometer = scanResults.firstOrNull { it.address == click.item.address && !click.item.isSelected }
+                glucometer =
+                    scanResults.firstOrNull { it.address == click.item.address && !click.item.isSelected }
                 val prevItems = (items.value as List<*>).map { it as DeviceItem }
                 val newItems = prevItems.mapIndexed { index, item ->
                     item.copy(
@@ -346,10 +365,11 @@ abstract class ConnectDevicePm constructor(
             btControl.bluetoothPermissionsGrantedAction.observable
         )
             .subscribe { permission ->
-                val dialogData =
-                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData
-                    else settingsLocationDialogData
+                val (dialogData, alertType) =
+                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData to AlertType.Bluetooth
+                    else settingsLocationDialogData to AlertType.Location
 
+                appMetric.trackEvent(permission.getMetricName(alertType))
                 permission.handlePermissionResult(
                     onPermissionGranted = {
                         startScanAction.consumer.accept(Unit)
@@ -436,6 +456,48 @@ abstract class ConnectDevicePm constructor(
             .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
             .doOnNext(::handleHomeButton)
             .subscribe()
+            .untilDestroy()
+
+        connectState.observable
+            .filter {
+                it == ViewState.FOUND ||
+                        it == ViewState.CONNECTED ||
+                        it == ViewState.SYNC_COMPLETED ||
+                        it == ViewState.SYNC_ERROR
+            }
+            .subscribe { state ->
+                val eventName = when (state) {
+                    ViewState.FOUND -> AppMetricEvent.DevicesFoundScreen
+                    ViewState.CONNECTED -> AppMetricEvent.DeviceConnectedScreen
+                    ViewState.SYNC_COMPLETED ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.SUCCESS)
+
+                    ViewState.SYNC_ERROR ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.ERROR)
+
+                    else -> null
+                }
+                eventName?.let { appMetric.trackEvent(it) }
+            }
+
+        btControl.bluetoothDeniedAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.REJECT
+                    )
+                )
+            }
+            .untilDestroy()
+
+        btControl.bluetoothEnabledAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.ALLOW
+                    )
+                )
+            }
             .untilDestroy()
     }
 

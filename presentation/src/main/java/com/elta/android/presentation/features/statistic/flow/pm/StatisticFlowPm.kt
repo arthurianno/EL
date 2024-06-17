@@ -4,10 +4,10 @@ import android.net.Uri
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.getPeriodParam
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.getPeriodParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseFlowPm
 import com.elta.android.presentation.core.pm.ServiceFacade

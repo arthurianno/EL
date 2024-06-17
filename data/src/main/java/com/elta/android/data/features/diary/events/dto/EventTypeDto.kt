@@ -2,7 +2,6 @@ package com.elta.android.data.features.diary.events.dto
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
-import timber.log.Timber
 
 enum class EventTypeDto {
     GLYCATEDHEMOGLOBIN,

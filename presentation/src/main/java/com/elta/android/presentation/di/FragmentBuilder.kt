@@ -1,14 +1,13 @@
 package com.elta.android.presentation.di
 
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
-import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
 import com.elta.android.presentation.features.consultant.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
@@ -78,7 +77,6 @@ import com.elta.android.presentation.features.version.optional.ui.OptionalUpdate
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-@ExperimentalCameraProviderConfiguration
 @Module
 @Suppress("UnnecessaryAbstractClass", "TooManyFunctions")
 abstract class FragmentBuilder {

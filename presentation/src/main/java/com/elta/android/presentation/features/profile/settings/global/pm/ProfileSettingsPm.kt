@@ -21,6 +21,8 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -57,6 +59,7 @@ class ProfileSettingsPm @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     private val itemsBuilder: ProfileSettingsItemsBuilder,
     private val getEmiasStatus: GetEmiasStatusUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -96,6 +99,7 @@ class ProfileSettingsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        appMetric.trackEvent(AppMetricEvent.SettingsScreen)
         observeClicks()
         observeNetworksActions()
 
@@ -209,6 +213,7 @@ class ProfileSettingsPm @Inject constructor(
             }
             .doOnError { Timber.e(it) }
             .doOnSuccess {
+                appMetric.trackEvent(AppMetricEvent.EmiasClick)
                 router.navigateTo(Screens.EmiasProfile(linkedStatus = it.first, emias = it.second))
             }
             .subscribe()
@@ -227,6 +232,7 @@ class ProfileSettingsPm @Inject constructor(
     private fun deleteProfile() {
         profileDeleteDialogControl.showForResult(profileDeleteDialogData)
             .filter { it == DialogResult.POSITIVE }
+            .doOnSubscribe { appMetric.trackEvent(AppMetricEvent.SettingDeleteProfileClick) }
             .flatMapCompletable {
                 deleteProfileUseCase.execute()
                     .bindProgress()
@@ -236,6 +242,9 @@ class ProfileSettingsPm @Inject constructor(
                             is NetworkConnectionError, is TimeoutException -> bus.event(Events.NetworkProblemTryLater)
                             else -> handleError(it)
                         }
+                    }
+                    .doOnComplete {
+                        appMetric.trackEvent(AppMetricEvent.DeleteProfileAlertClick)
                     }
                     .doOnComplete {
                         router.newRootFlow(Screens.AuthFlow)

@@ -33,8 +33,14 @@ import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.AlertResultParam
+import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -60,7 +66,6 @@ import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import timber.log.Timber
-import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
@@ -68,7 +73,6 @@ import javax.inject.Inject
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
-private const val SYNC_TIMER_DELAY_MILLIS = 30000L
 
 class HomeFlowPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -84,6 +88,7 @@ class HomeFlowPm @Inject constructor(
     private val getUpdatedProfileUseCase: GetUpdatedProfileUseCase,
     private val connectIomt: ConnectIomtUseCase,
     private val sendAppVersion: SendAppVersionUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
@@ -139,6 +144,7 @@ class HomeFlowPm @Inject constructor(
         bindGooglePlayRateDialog()
         bindFeedbackDialog()
         bindFeedbackAction()
+        bindAppMetricEvents()
         initGlucoseFormat()
 
         loadEvents.observable
@@ -172,6 +178,18 @@ class HomeFlowPm @Inject constructor(
             .doOnNext(startAutoSyncAction.consumer)
             .doOnNext(sendAppVersionAction.consumer)
             .doOnNext(loadEvents.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .flatMapSingle {
+                getUpdatedProfileUseCase.execute()
+                    .doOnSuccess { profile ->
+                        appMetric.setProfileAttributes(profile.getMetricAttributes())
+                    }
+                    .doOnError(::handleError)
+            }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.MainScreen) }
             .subscribe()
             .untilDestroy()
 
@@ -268,6 +286,7 @@ class HomeFlowPm @Inject constructor(
                             if (isFirstSync.valueOrNull == true) {
                                 showHelpBottomSheetCommand.consumer.accept(Unit)
                             } else {
+                                appMetric.trackEvent(AppMetricEvent.SynchronizationDeviceClick)
                                 startSyncAction.consumer.accept(Unit)
                             }
                         }
@@ -489,7 +508,9 @@ class HomeFlowPm @Inject constructor(
                 bus.event(Events.Sync.Glucometer.Started)
             }
             .doOnNext { events ->
+                appMetric.trackEvent(AppMetricEvent.SnackProcessing)
                 if (events > 0) {
+                    appMetric.trackEvent(AppMetricEvent.ReceivedMeasurementsSugar)
                     bus.event(Events.EventsChanged(true))
                     bus.event(Events.Sync.Glucometer.Success)
                 } else bus.event(Events.Sync.Glucometer.NoNewEvents)
@@ -510,12 +531,26 @@ class HomeFlowPm @Inject constructor(
         error: Throwable,
         isAuto: Boolean
     ): ObservableSource<out Int> = when (error) {
-        is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
+        is BluetoothNotEnabledError -> {
+            appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+            bluetoothEnableAndRepeat(isAuto)
+        }
         is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
-        is LocationPermissionNotGrantedError -> requestLocatePermissionAndRepeat(isAuto)
+        is LocationPermissionNotGrantedError -> {
+            listOf(
+                AppMetricEvent.Permission.Alert.Bluetooth,
+                AppMetricEvent.Permission.Alert.Location
+            ).forEach { event ->
+                appMetric.trackEvent(event)
+            }
+            requestLocatePermissionAndRepeat(isAuto)
+        }
         is GlucometerSyncError ->
             when (error.cause) {
-                is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
+                is BluetoothNotEnabledError -> {
+                    appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+                    bluetoothEnableAndRepeat(isAuto)
+                }
                 is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
 
                 else -> {
@@ -557,12 +592,14 @@ class HomeFlowPm @Inject constructor(
             }
 
             is GlucometerOfflineError -> {
+                appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
             is GlucometerSyncError -> {
                 val manualSyncError = if (error.cause is TimeoutException) {
+                    appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                     ManualSyncError.NotFound
                 } else {
                     ManualSyncError.ErrorSync
@@ -582,8 +619,7 @@ class HomeFlowPm @Inject constructor(
                     error is LocationPermissionNotGrantedError || error is CommandError || error is BluetoothScannerError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
-            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException)
-                    || error is CancellationException ->
+            error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) || error is GlucometerConnectionException ->
                 bus.event(Events.Sync.Glucometer.ErrorWithMessage)
 
             error is PrimaryGlucometerNotFoundError -> openConnectScreen()
@@ -625,6 +661,38 @@ class HomeFlowPm @Inject constructor(
 
         bus.event(Events.Sync.Glucometer.Error)
         router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+    }
+
+    private fun bindAppMetricEvents() {
+        btControl.bluetoothPermissionsRequestResultRelay
+            .subscribe{
+                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam))
+            }
+            .untilDestroy()
+        btControl.combinedPermissionsRequestResultRelay
+            .subscribe{ result ->
+                val eventParam = if (result) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                listOf(
+                    AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam),
+                    AppMetricEvent.Permission.AlertClick.Location(eventParam)
+                ).forEach { event ->
+                    appMetric.trackEvent(event)
+                }
+            }
+            .untilDestroy()
+        btControl.locationPermissionsRequestResultRelay
+            .subscribe{
+                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Location(eventParam))
+            }
+            .untilDestroy()
+        btControl.bluetoothRequestResultRelay
+            .subscribe{
+                val eventParam = if (it) TurningResultParam.ALLOW else TurningResultParam.REJECT
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlertClick(eventParam))
+            }
+            .untilDestroy()
     }
 
 }

@@ -4,6 +4,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.models.AlertType
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.PermissionEvent
@@ -22,7 +27,9 @@ import javax.inject.Inject
 
 @ExperimentalCameraProviderConfiguration
 @OptIn(ExperimentalPermissionsApi::class)
-class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectViewState>() {
+class HowToConnectViewModel @Inject constructor(
+    private val appMetric: AppMetricTracker
+) : BaseViewModel<HowToConnectViewState>() {
     override fun createInitState(): HowToConnectViewState =
         HowToConnectViewState(
             isOnBoarding = false
@@ -73,7 +80,13 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     ): HowToConnectViewState = run {
         when (action) {
             is ConnectAction.Complete -> {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlertClick(TurningResultParam.ALLOW))
                 sendEvent(PermissionEvent.Bluetooth.OnAllow)
+                currentState
+            }
+
+            is ConnectAction.RepeatConnect -> {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlertClick(TurningResultParam.REJECT))
                 currentState
             }
 
@@ -95,6 +108,12 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
             it.toMutableList() + commonPermissions
         } ?: commonPermissions
 
+        appMetric.trackEvent(cameraPermission.getMetricName(AlertType.Camera))
+        bluetoothPermission?.first()?.getMetricName(AlertType.Camera)
+            ?.let { appMetric.trackEvent(it) }
+        locationPermission?.getMetricName(AlertType.Camera)
+            ?.let { appMetric.trackEvent(it) }
+
         when {
             cameraPermission.status.shouldShowRationale ->
                 cameraPermissionDialog.dialogOpen()
@@ -114,12 +133,16 @@ class HowToConnectViewModel @Inject constructor() : BaseViewModel<HowToConnectVi
     private fun checkLocationAndBluetoothState() {
         val event =
             if (isLocationPermissionNeeded()) PermissionEvent.RequestEnableLocation
-            else PermissionEvent.Bluetooth.RequestEnable
+            else {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+                PermissionEvent.Bluetooth.RequestEnable
+            }
 
         sendEvent(event)
     }
 
-    private fun isLocationPermissionNeeded(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+    private fun isLocationPermissionNeeded(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 
     private fun isBlePermissionsNeeded(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 

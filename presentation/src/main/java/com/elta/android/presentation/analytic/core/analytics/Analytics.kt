@@ -1,7 +1,7 @@
-package com.elta.android.presentation.analytics.core
+package com.elta.android.presentation.analytic.core.analytics
 
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.di.AnalyticModule
 import javax.inject.Inject
 
 class Analytics @Inject constructor(
@@ -42,5 +42,5 @@ class Analytics @Inject constructor(
         config.usedTrackers.forEach { name -> trackers[name]?.track(event) }
     }
 
-    data class Config(val usedTrackers: List<String> = listOf(AnalyticsModule.FIREBASE))
+    data class Config(val usedTrackers: List<String> = listOf(AnalyticModule.FIREBASE))
 }

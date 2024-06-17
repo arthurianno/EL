@@ -1,11 +1,11 @@
 @file:Suppress("SpreadOperator")
 
-package com.elta.android.presentation.analytics
+package com.elta.android.presentation.analytic
 
 import com.elta.android.domain.features.user.model.Profile
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.pm.BasePm
 import java.math.BigInteger
 import java.security.MessageDigest

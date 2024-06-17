@@ -1,7 +1,7 @@
 package com.elta.android.presentation.features.registration.main.pm
 
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command

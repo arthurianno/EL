@@ -5,6 +5,8 @@ import com.elta.android.domain.features.auth.interactor.SendConfirmationLinkUseC
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -13,9 +15,10 @@ import me.dmdev.rxpm.action
 import javax.inject.Inject
 
 class ActivationPm @Inject constructor(
-    services: ServiceFacade,
     private val sendConfirmationLinkUseCase: SendConfirmationLinkUseCase,
-    private val checkEmailUseCase: CheckEmailUseCase
+    private val checkEmailUseCase: CheckEmailUseCase,
+    private val appMetric: AppMetricTracker,
+    services: ServiceFacade
 ) : BasePm(services) {
 
     val sendAgainAction = action<Unit>()
@@ -24,8 +27,12 @@ class ActivationPm @Inject constructor(
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
+        appMetric.trackEvent(AppMetricEvent.ProfileActivationScreen)
         sendAgainAction.observable
             .skipWhileInProgress()
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.SendLetter)
+            }
             .flatMapCompletable {
                 sendConfirmationLinkUseCase.execute()
                     .bindProgress()
@@ -38,6 +45,9 @@ class ActivationPm @Inject constructor(
 
         continueAction.observable
             .skipWhileInProgress()
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.ActivationContinue)
+            }
             .flatMapSingle {
                 checkEmailUseCase.execute()
                     .bindProgress()
