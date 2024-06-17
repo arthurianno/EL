@@ -14,7 +14,6 @@ import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.date.DateChangedEvent
-import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ExpandableListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.stateControl
@@ -26,7 +25,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(

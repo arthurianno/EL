@@ -9,7 +9,7 @@ import androidx.multidex.MultiDex
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
-import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -20,6 +20,8 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasBroadcastReceiverInjector
 import dagger.android.HasServiceInjector
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 import io.reactivex.plugins.RxJavaPlugins
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
@@ -51,6 +53,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
         initSocialNetworks()
         initYandexMapKit()
         initRxJava()
+        initAppMetric()
     }
 
     private fun initRxJava() {
@@ -92,7 +95,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
                 )
             )
-            .analyticsModule(AnalyticsModule(this))
+            .analyticsModule(AnalyticModule(this))
             .build()
             .inject(this)
     }
@@ -111,5 +114,16 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
 
     private fun initSocialNetworks() {
         SocialNetworks.initialize(this)
+    }
+
+    private fun initAppMetric() {
+        val key =
+            if (BuildConfig.DEBUG) com.elta.android.presentation.R.string.app_metric_debug_api_key
+            else com.elta.android.presentation.R.string.app_metric_prod_api_key
+
+        val config = AppMetricaConfig
+            .newConfigBuilder(resources.getString(key))
+            .build()
+        AppMetrica.activate(this, config)
     }
 }

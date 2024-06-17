@@ -16,10 +16,14 @@ import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
-import com.elta.android.presentation.analytics.updateStableParam
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.updateStableParam
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -48,6 +52,7 @@ class OnBoardingPm @Inject constructor(
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val updateEmiasUseCase: UpdateEmiasUseCase,
     private val getEmiasStatus: GetEmiasStatusUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade,
 ) : BaseListPm(services) {
 
@@ -102,8 +107,8 @@ class OnBoardingPm @Inject constructor(
             .untilDestroy()
         linkedStatusState.observable
             .subscribe { linkedStatus ->
-                val page = if (linkedStatus == EmiasStatus.LINKED) GENDER_PAGE
-                else EMIAS_PAGE
+                appMetric.trackEvent(linkedStatus.getMetricName())
+                val page = if (linkedStatus == EmiasStatus.LINKED) GENDER_PAGE else EMIAS_PAGE
                 currentPageState.consumer.accept(page)
             }
             .untilDestroy()
@@ -180,6 +185,11 @@ class OnBoardingPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete { updateStableParam(profile = params.profile) }
+                    .doOnComplete {
+                        appMetric.setProfileAttributes(params.profile.getMetricAttributes())
+                        appMetric.trackEvent(params.profile.glucoseFormat.getMetricName())
+                        params.profile.diabetes?.getMetricName()?.let { appMetric.trackEvent(it) }
+                    }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -196,6 +206,7 @@ class OnBoardingPm @Inject constructor(
 
     private fun observeLifecycle() {
         lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.OnboardingScreen) }
             .map { }
             .subscribe(updateUserInfoAction.consumer)
             .untilDestroy()
@@ -328,9 +339,11 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun showErrorDialog(error: Throwable) {
+        if (error is EmiasError) appMetric.trackEvent(error.getMetricName())
         val errorDialog = when (error) {
             is EmiasError.EmiasInternalError,
             is ServiceUnavailableError -> emiasDialogs.internalErrorDialogData
+
             is EmiasError.OmsAlreadyLinked -> emiasDialogs.userAlreadyLinkedDialogData
             is EmiasError.UserInEmiasNotFound -> emiasDialogs.userNotFoundDialogData
             is EmiasError.AgreementForEmiasUsageNotFound -> emiasDialogs.agreementNotFoundDialogData
@@ -340,6 +353,7 @@ class OnBoardingPm @Inject constructor(
     }
 
     private fun showCompleteDialog() {
+        appMetric.trackEvent(AppMetricEvent.EmiasBinded)
         showDialog
             .showForResult(emiasDialogs.userConnectedDialogData)
             .filter { it == DialogResult.POSITIVE }

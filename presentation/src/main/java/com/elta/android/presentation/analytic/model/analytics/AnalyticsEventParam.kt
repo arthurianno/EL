@@ -1,6 +1,6 @@
 @file:Suppress("UtilityClassWithPublicConstructor")
 
-package com.elta.android.presentation.analytics.model
+package com.elta.android.presentation.analytic.model.analytics
 
 import androidx.annotation.StringDef
 
@@ -14,7 +14,7 @@ import androidx.annotation.StringDef
     AnalyticsEventParam.ACCOUNT,
     AnalyticsEventParam.DIABETES
 )
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class AnalyticsEventParam {
     companion object {
         const val LOG_TYPE = "log_type"

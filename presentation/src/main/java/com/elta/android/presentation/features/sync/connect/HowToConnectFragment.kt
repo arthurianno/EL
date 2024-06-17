@@ -5,6 +5,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ private val requiredPermissions = listOf(
     Manifest.permission.BLUETOOTH_CONNECT
 )
 
+@ExperimentalCameraProviderConfiguration
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = HowToConnectFragment().apply {

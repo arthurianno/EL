@@ -9,7 +9,6 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
@@ -84,7 +83,6 @@ private enum class CropCornerType(val degrees: Float, val align: Alignment) {
     BottomLeft(degrees = 270f, align = Alignment.BottomStart),
 }
 
-@ExperimentalCameraProviderConfiguration
 @ExperimentalGetImage
 class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     companion object {

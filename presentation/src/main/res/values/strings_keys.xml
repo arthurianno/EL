@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="yandex_map_api_key">822a5bc1-5bc9-45bb-8f40-72ad75dc31b5</string>
+    <string name="yandex_map_api_key" translatable="false">822a5bc1-5bc9-45bb-8f40-72ad75dc31b5</string>
+    <string name="app_metric_debug_api_key" translatable="false">26efef61-e305-414b-a05a-b4eee6c3ffbf</string>
+    <string name="app_metric_prod_api_key" translatable="false">8da64f26-dbc8-4379-a364-28e445f529f0</string>
 </resources>

@@ -3,9 +3,9 @@
 package com.elta.android.presentation.core.pm
 
 import androidx.annotation.StringRes
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
-import com.elta.android.presentation.analytics.trackEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.trackEvent
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.date.DateChangedEvent
 import com.elta.android.presentation.core.navigation.FlowRouter

@@ -12,6 +12,10 @@ import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.EmiasErrorParam
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
@@ -49,6 +53,7 @@ import javax.inject.Inject
 class EmiasProfileViewModel @Inject constructor(
     private val unbindEmiasProfile: UnbindEmiasUseCase,
     private val updateEmias: UpdateEmiasUseCase,
+    private val appMetric: AppMetricTracker,
 ) : BaseViewModel<EmiasProfileViewState>() {
     override fun createInitState(): EmiasProfileViewState =
         EmiasProfileViewState(
@@ -154,6 +159,8 @@ class EmiasProfileViewModel @Inject constructor(
         val oms = arguments.getString(EmiasProfileFragment.OMS_KEY_EXTRA, "")
         val date = arguments.getString(EmiasProfileFragment.BIRTH_DATE_KEY_EXTRA, "")
 
+        appMetric.trackEvent(status.getMetricName())
+
         startOms = oms
         startDateBirth = date
 
@@ -193,6 +200,7 @@ class EmiasProfileViewModel @Inject constructor(
     }
 
     private fun updateEmias() {
+        appMetric.trackEvent(AppMetricEvent.EmiasSaveClick)
         launch {
             val emias = Emias(
                 oms = state.value.oms,
@@ -212,6 +220,7 @@ class EmiasProfileViewModel @Inject constructor(
                             reduceState { state.value.copy(isLoading = true) }
                         }
                         .onCompletion { throwable ->
+                            appMetric.trackEvent(AppMetricEvent.EmiasBinded)
                             reduceState {
                                 state.value.copy(
                                     isLoading = false,
@@ -222,9 +231,17 @@ class EmiasProfileViewModel @Inject constructor(
                             startOms = omsInput.state.value.textField.text
                             startDateBirth = dateInput.state.value.textField.text
                         }
-                        .catch {
+                        .catch { error ->
                             reduceState { state.value.copy(isLoading = false) }
-                            handleEmiasError(it)
+                            handleEmiasError(error)
+                            val eventName = when (error){
+                                is EmiasError -> error.getMetricName()
+                                is ServiceUnavailableError ->
+                                    AppMetricEvent.EmiasNotBinded(EmiasErrorParam.INTERNAL_ERROR)
+
+                                else -> null
+                            }
+                            eventName?.let { appMetric.trackEvent(it) }
                         }
                         .collect()
                 }

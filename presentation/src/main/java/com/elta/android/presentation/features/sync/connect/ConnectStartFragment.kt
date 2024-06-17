@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -107,13 +108,11 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
             )
         }
     }
-}
 
-@Preview
-@Composable
-private fun PreviewContent() {
-    val viewModel = ConnectStartViewModel().apply {
-        downButton.setText(stringResource(id = R.string.sync_connect_start_title))
+    // fixme: сломана
+    @Preview
+    @Composable
+    private fun PreviewContent() {
+        Content(viewModel = viewModel())
     }
-    ConnectStartFragment().Content(viewModel = viewModel)
 }

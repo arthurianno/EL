@@ -12,9 +12,9 @@ import com.elta.android.domain.features.diary.events.model.form.ActivityValidato
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.presentation.R
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer

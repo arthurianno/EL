@@ -1,6 +1,6 @@
 package com.elta.android.presentation
 
-import com.elta.android.presentation.analytics.encodeUserId
+import com.elta.android.presentation.analytic.encodeUserId
 import org.junit.Test
 
 class EncodeIdTest {

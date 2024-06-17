@@ -21,7 +21,7 @@ import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
 import com.elta.android.data.di.WebimModule
 import com.elta.android.presentation.di.ActivityBuilder
-import com.elta.android.presentation.di.AnalyticsModule
+import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.di.FragmentBuilder
 import com.elta.android.presentation.di.MediaModule
 import com.elta.android.presentation.di.NavigationModule
@@ -71,7 +71,7 @@ import javax.inject.Singleton
         // navigation
         NavigationModule::class,
         // analytics
-        AnalyticsModule::class,
+        AnalyticModule::class,
         // Coroutines
         CoroutineModule::class
     ]
@@ -89,7 +89,7 @@ interface AppComponent {
 
         fun interceptorModule(module: InterceptorModule): Builder
 
-        fun analyticsModule(analyticsModule: AnalyticsModule): Builder
+        fun analyticsModule(analyticsModule: AnalyticModule): Builder
 
         fun build(): AppComponent
     }

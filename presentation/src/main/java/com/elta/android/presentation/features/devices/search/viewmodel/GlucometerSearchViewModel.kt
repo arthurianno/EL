@@ -2,9 +2,9 @@ package com.elta.android.presentation.features.devices.search.viewmodel
 
 import android.os.Bundle
 import com.elta.android.domain.features.devices.interactor.LocateGlucometerUserCase
-import com.elta.android.presentation.analytics.core.Analytics
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.analytics.Analytics
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel

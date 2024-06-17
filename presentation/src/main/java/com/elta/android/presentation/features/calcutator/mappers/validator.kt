@@ -1,11 +1,8 @@
 package com.elta.android.presentation.features.calcutator.mappers
 
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
-import com.elta.android.presentation.features.calcutator.custom.model.CreateCustomProductFlow
 import com.elta.android.presentation.features.calcutator.custom.model.ProductUiEntity
-import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.products.model.ServingUiEntity
-import timber.log.Timber
 
 internal fun ProductUiEntity.isValid(calculatorFlow: CalculatorFlow): Boolean {
     return name?.isNotBlank() == true &&

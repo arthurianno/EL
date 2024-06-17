@@ -9,9 +9,12 @@ import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCas
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.core.Analytics
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.analytics.Analytics
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -49,7 +52,8 @@ class ConnectingViewModel @Inject constructor(
     private val syncWithGlucometer: SyncWithGlucometerUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val bus: RxBus,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val appMetric: AppMetricTracker
 ) : BaseViewModel<ConnectingViewState>() {
     override fun createInitState(): ConnectingViewState =
         ConnectingViewState(
@@ -86,6 +90,34 @@ class ConnectingViewModel @Inject constructor(
         searchRepeatButton,
         completeButton
     ).actionObserve()
+
+    init {
+        launch {
+            state
+                .map { it.stageType }
+                .filter {
+                    it == ConnectingStageType.Connecting ||
+                            it == ConnectingStageType.Sync ||
+                            it == ConnectingStageType.Complete ||
+                            it == ConnectingStageType.ErrorSync
+                }
+                .collect { stageType ->
+                    val eventName = when (stageType) {
+                        ConnectingStageType.Connecting -> AppMetricEvent.ConnectionToDeviceScreen
+                        ConnectingStageType.Sync -> AppMetricEvent.DeviceConnectedScreen
+                        ConnectingStageType.Complete ->
+                            AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.SUCCESS)
+
+                        ConnectingStageType.ErrorSync ->
+                            AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.ERROR)
+
+                        else -> null
+                    }
+
+                    eventName?.let { appMetric.trackEvent(it) }
+                }
+        }
+    }
 
     override fun handleUserAction(action: Action) {
         when (action) {

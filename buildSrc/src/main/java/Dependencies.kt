@@ -113,7 +113,9 @@ object Dependencies {
         private const val fullVersion = "4.0.0-full"
         private const val mapKitVersion = "3.5.0"
         private const val mapKitClusteringVersion = "0.2"
+        private const val appMetricaVersion = "6.5.0"
 
+        const val appMetrica = "io.appmetrica.analytics:analytics:$appMetricaVersion"
         const val lite = "com.yandex.android:maps.mobile:$liteVersion"
         const val full = "com.yandex.android:maps.mobile:$fullVersion"
         const val mapKit = "com.yandex.android:mapkit:$mapKitVersion"

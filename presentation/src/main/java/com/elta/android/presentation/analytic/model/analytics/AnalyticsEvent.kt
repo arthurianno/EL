@@ -1,4 +1,4 @@
-package com.elta.android.presentation.analytics.model
+package com.elta.android.presentation.analytic.model.analytics
 
 data class AnalyticsEvent(
     @AnalyticsEventType val name: String,
