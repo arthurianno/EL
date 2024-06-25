@@ -18,19 +18,29 @@ class ProfileSettingsViewHolder(
             settingsIconView.setImageResource(item.icon)
             settingsTitleView.text = item.title
             when (item.type) {
+                ProfileSettingsItem.Type.BIRTH_DATE -> {
+                    toggleFocus(true)
+                }
+
+                ProfileSettingsItem.Type.BIRTH_DATE_PLACEHOLDER -> {
+                    toggleFocus(false)
+                }
+
                 ProfileSettingsItem.Type.EMAIL -> {
                     toggleFocus(false)
-                    dividerView.isInvisible = true
                 }
+
                 ProfileSettingsItem.Type.TOKEN -> {
                     toggleFocus(false)
                     dividerView.isInvisible = true
                 }
+
                 ProfileSettingsItem.Type.DELETE_PROFILE -> nextIconView.isInvisible = true
                 ProfileSettingsItem.Type.APP_VERSION -> {
                     toggleFocus(false)
                     dividerView.isInvisible = true
                 }
+
                 else -> toggleFocus(true)
             }
 

@@ -13,6 +13,7 @@ data class ProfileCacheDto(
     val gender: String?,
     val email: String?,
     val timeStamp: Long,
+    val birthDate: String?,
 
     // represents PersonDto
     val firstName: String?,

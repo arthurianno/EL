@@ -41,6 +41,7 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
+import org.threeten.bp.LocalDate
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -67,6 +68,7 @@ class ProfileSettingsPm @Inject constructor(
     val googleFitActivatedDialogControl = dialogControl<DialogData, DialogResult>()
     val profileDeleteDialogControl = dialogControl<DialogData, DialogResult>()
     val emiasErrorDialogControl = dialogControl<DialogData, DialogResult>()
+    val datePickerExitDialogControl = dialogControl<DialogData, DialogResult>()
     val openPrivacyPolicyCommand = command<Unit>(bufferSize = 1)
     val copyTokenCommand = command<String>()
     val downloadGoogleFitCommand = command<Unit>()
@@ -78,10 +80,20 @@ class ProfileSettingsPm @Inject constructor(
     private val unlinkSocialUserAction = action<Unit>()
     private val profileState = state<Profile>()
     private val logoutAction = action<Unit>()
+    val datePickerCloseAction = action<LocalDate>()
 
     private val unlinkNetworkDialogData: DialogData by lazy { Dialogs.EventUnlinkNetwork(resources) }
+
+    val showDatePickerDialog = command<LocalDate>(bufferSize = 1)
+    val dateTimeSelectedAction = action<LocalDate>()
+
     private val googleFitActivatedDialogData: DialogData by lazy {
         Dialogs.GoogleFitActivated(
+            resources
+        )
+    }
+    private val datePickerExitDialogData: DialogData by lazy {
+        Dialogs.DataPickerExit(
             resources
         )
     }
@@ -96,6 +108,7 @@ class ProfileSettingsPm @Inject constructor(
             resources
         )
     }
+    private val previousDay = LocalDate.now().minusDays(1)
 
     override fun onCreate() {
         super.onCreate()
@@ -129,6 +142,30 @@ class ProfileSettingsPm @Inject constructor(
         )
             .subscribe(getProfileSettingsAction.consumer)
             .untilDestroy()
+        dateTimeSelectedAction.observable
+            .map { UpdateProfileUseCase.Params(profileState.value.copy(birthDate = it)) }
+            .flatMapCompletable { params ->
+                updateProfileUseCase.execute(params)
+                    .doOnComplete { bus.event(Events.ProfileDataChanged) }
+                    .doOnError(::handleError)
+            }
+            .subscribe()
+            .untilDestroy()
+        datePickerCloseAction.observable
+            .doOnNext(::handleClosePicker)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleClosePicker(selectedDate: LocalDate) {
+        if (selectedDate != previousDay ||
+            (profileState.value.birthDate != null && selectedDate != profileState.value.birthDate)
+        ) {
+            datePickerExitDialogControl.showForResult(datePickerExitDialogData)
+                .filter { it == DialogResult.POSITIVE }
+                .subscribe { dateTimeSelectedAction.consumer.accept(selectedDate) }
+                .untilDestroy()
+        }
     }
 
     private fun observeClicks() {
@@ -145,9 +182,9 @@ class ProfileSettingsPm @Inject constructor(
                     Type.GLUCOSE_FORMAT -> router.navigateTo(Screens.GlucoseFormat)
                     Type.DELETE_PROFILE -> deleteProfile()
                     Type.TOKEN -> copyToken()
+                    Type.BIRTH_DATE, Type.BIRTH_DATE_PLACEHOLDER -> showDataPicker()
+
                     Type.APP_VERSION, Type.EMAIL -> {}
-                    else -> Timber.tag(javaClass.simpleName)
-                        .e("This type:$type haven`t implemented yet...")
                 }
             }
             .doOnError(::handleError)
@@ -214,7 +251,11 @@ class ProfileSettingsPm @Inject constructor(
             .doOnError { Timber.e(it) }
             .doOnSuccess {
                 appMetric.trackEvent(AppMetricEvent.EmiasClick)
-                router.navigateTo(Screens.EmiasProfile(linkedStatus = it.first, emias = it.second))
+                router.navigateTo(Screens.EmiasProfile(
+                    linkedStatus = it.first,
+                    emias = it.second,
+                    birthDateFromProfile = profileState.value.birthDate
+                ))
             }
             .subscribe()
             .untilDestroy()
@@ -227,6 +268,11 @@ class ProfileSettingsPm @Inject constructor(
         tokenUseCase()
             .subscribe(copyTokenCommand.consumer)
             .untilDestroy()
+    }
+
+    private fun showDataPicker() {
+        val date = profileState.value.birthDate ?: previousDay
+        showDatePickerDialog.consumer.accept(date)
     }
 
     private fun deleteProfile() {

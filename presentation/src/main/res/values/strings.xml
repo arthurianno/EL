@@ -463,6 +463,7 @@
     <string name="profile_linked_social_networks">Привязанные соцсети</string>
     <string name="profile_additional_settings">Дополнительно</string>
     <string name="profile_full_name_placeholder">Имя и фамилия</string>
+    <string name="profile_birth_date_placeholder">Дата рождения</string>
     <string name="profile_my_devices">Мои устройства</string>
     <string name="profile_manage_glucometer">Управление глюкометром</string>
     <string name="profile_change_password">Изменить пароль</string>
@@ -942,5 +943,9 @@
     <string name="required_field_error">Обязательно поле</string>
     <string name="incorrect_age_error">Некорректный возраст</string>
     <string name="incorrect_date_error">Некорректная дата</string>
+
+    <!--  Picker Dialog  -->
+    <string name="date_picker_exit_title">Выйти?</string>
+    <string name="date_picker_exit_message">Изменения не будут сохранены</string>
 
 </resources>

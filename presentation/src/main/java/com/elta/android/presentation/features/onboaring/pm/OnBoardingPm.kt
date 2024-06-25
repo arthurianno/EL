@@ -1,8 +1,8 @@
 package com.elta.android.presentation.features.onboaring.pm
 
 import com.elta.android.common.errors.EmiasError
-import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
 import com.elta.android.common.errors.ServiceUnavailableError
+import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
 import com.elta.android.domain.features.emias.interactor.UpdateEmiasUseCase
 import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
@@ -24,6 +24,7 @@ import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventPara
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.analytic.updateStableParam
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -42,6 +43,8 @@ import com.nullgr.core.date.toTimestamp
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -70,6 +73,7 @@ class OnBoardingPm @Inject constructor(
 
     private val params = hashMapOf<Class<out OnBoardingItem>, Any?>()
     private val updateProfileSettingsAction = action<Unit>()
+    private val saveDateBirthDateAction = action<LocalDate>()
     private val updateUserInfoAction = action<Unit>()
     private val linkedStatusState = state(EmiasStatus.UNLINKED)
     private val emiasDialogs = EmiasDialogs(resources)
@@ -196,6 +200,15 @@ class OnBoardingPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+        saveDateBirthDateAction.observable
+            .map(::createUpdateProfileUseCaseParamsForBirthDate)
+            .flatMapCompletable { params ->
+                updateProfileUseCase.execute(params)
+                    .hideErrorContainer()
+                    .bindProgress()
+                    .doOnComplete { bus.event(Events.ProfileDataChanged) }
+                    .doOnError(::handleError)
+            }
     }
 
     private fun observeBusEvents() {
@@ -313,15 +326,25 @@ class OnBoardingPm @Inject constructor(
         val weight = params[OnBoardingWeightItem::class.java] as? Double
         val diabetes = params[OnBoardingDiabetesItem::class.java] as? Diabetes
         val glucoseFormat = params[OnBoardingGlucoseFormatItem::class.java] as? GlucoseFormat
+        val emiasUi = params[OnBoardingEmiasProfileItem::class.java] as? EmiasUi
         val profile = Profile(
             gender = gender ?: Gender.NOT_SPECIFIED,
             weight = weight,
             diabetes = diabetes,
+            birthDate = emiasUi?.let { parseDate(it.birthday) },
             timeStamp = Date().toTimestamp(),
             glucoseFormat = glucoseFormat ?: GlucoseFormat.CAPILLARY
         )
         return UpdateProfileUseCase.Params(profile = profile, isOnboarding = true)
     }
+
+    private fun createUpdateProfileUseCaseParamsForBirthDate(it: LocalDate) =
+        UpdateProfileUseCase.Params(
+            Profile(
+                birthDate = it,
+                glucoseFormat = GlucoseFormat.CAPILLARY
+            )
+        )
 
     private fun createEmailUserInfoParams(i: Unit): UpdateUserInfoUseCase.Params =
         UpdateUserInfoUseCase.Params(UserInfo(isEmailConfirmed = true))
@@ -337,6 +360,11 @@ class OnBoardingPm @Inject constructor(
             )
         )
     }
+
+    private fun parseDate(birthDate: String?): LocalDate? =
+        birthDate?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern(CommonFormats.FORMAT_SIMPLE_DATE))
+        }
 
     private fun showErrorDialog(error: Throwable) {
         if (error is EmiasError) appMetric.trackEvent(error.getMetricName())

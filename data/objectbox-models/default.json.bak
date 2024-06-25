@@ -234,7 +234,7 @@
     },
     {
       "id": "5:7778186585007624272",
-      "lastPropertyId": "18:746197622564177940",
+      "lastPropertyId": "19:6325529466568630367",
       "name": "ProfileCacheDto",
       "properties": [
         {
@@ -307,6 +307,11 @@
           "id": "17:5757595762673508479",
           "name": "maxAverageValue",
           "type": 8
+        },
+        {
+          "id": "19:6325529466568630367",
+          "name": "birthDate",
+          "type": 9
         }
       ],
       "relations": []

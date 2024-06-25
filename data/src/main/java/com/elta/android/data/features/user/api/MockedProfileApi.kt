@@ -47,6 +47,7 @@ class MockedProfileApi : ProfileApi {
                     5.7
                 ),
                 email = "test@gmail.com",
+                birthDate = null,
                 socialNetworks = listOf(
                     SocialNetworkDto(type = SocialNetworkTypeNetworkEntity.FB, isLinked = true),
                     SocialNetworkDto(type = SocialNetworkTypeNetworkEntity.VK, isLinked = false),
