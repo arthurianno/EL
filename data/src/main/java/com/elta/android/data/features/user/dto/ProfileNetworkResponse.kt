@@ -7,6 +7,7 @@ data class ProfileNetworkResponse(
     @SerializedName("weight") val weight: Double?,
     @SerializedName("gender") val gender: GenderTypeNetworkEntity?,
     @SerializedName("person") val person: PersonNetworkEntity?,
+    @SerializedName("birthDate") val birthDate: String?,
     @SerializedName("glucoseLevelsBeforeEating") val glucoseLevelsBeforeEating: GlucoseLevelNetworkEntity?,
     @SerializedName("glucoseLevelsAfterEating") val glucoseLevelsAfterEating: GlucoseLevelNetworkEntity?,
     @SerializedName("glucoseLevelsAverage") val glucoseLevelsAverage: GlucoseLevelNetworkEntity?,

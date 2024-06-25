@@ -26,6 +26,8 @@ data class ProfileSettingsItem(
     enum class Type {
         NAME,
         GENDER,
+        BIRTH_DATE,
+        BIRTH_DATE_PLACEHOLDER,
         PASSWORD,
         EMAIL,
         TOKEN,

@@ -37,6 +37,7 @@ class ProfileCachedDataSource @Inject constructor(
                         weight = profile.weight ?: cachedProfile.weight,
                         gender = profile.gender?.name ?: cachedProfile.gender,
                         email = profile.email ?: cachedProfile.email,
+                        birthDate = profile.birthDate,
                         timeStamp = profile.timeStamp,
                         firstName = profile.person?.firstName ?: cachedProfile.firstName,
                         lastName = profile.person?.lastName ?: cachedProfile.lastName,

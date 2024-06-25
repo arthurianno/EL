@@ -86,6 +86,7 @@ import com.nullgr.core.intents.telegramIntent
 import com.nullgr.core.intents.viberIntent
 import com.nullgr.core.intents.webIntent
 import com.nullgr.core.intents.whatsAppIntent
+import org.threeten.bp.LocalDate
 
 object Screens {
 
@@ -271,7 +272,7 @@ object Screens {
         override fun getFragment() = MainProfileFragment.newInstance()
     }
 
-    object GlucoseSettingScreen: SupportAppScreen() {
+    object GlucoseSettingScreen : SupportAppScreen() {
         override fun getFragment(): Fragment = GlucoseSettingFragment.newInstance()
     }
 
@@ -335,8 +336,16 @@ object Screens {
         override fun getFragment() = ProfileSetGenderFragment.newInstance()
     }
 
-    data class EmiasProfile(val linkedStatus: EmiasStatus, val emias: Emias?) : SupportAppScreen() {
-        override fun getFragment() = EmiasProfileFragment.newInstance(linkedStatus, emias)
+    data class EmiasProfile(
+        val linkedStatus: EmiasStatus,
+        val emias: Emias?,
+        val birthDateFromProfile: LocalDate?
+    ) : SupportAppScreen() {
+        override fun getFragment() = EmiasProfileFragment.newInstance(
+            linkedStatus = linkedStatus,
+            emias = emias,
+            birthDateFromProfile = birthDateFromProfile
+        )
     }
 
     object Support : SupportAppScreen() {
@@ -410,10 +419,12 @@ object Screens {
         val productName: String? = null,
         val calculatorFlow: CalculatorFlow,
     ) : SupportAppScreen() {
-        override fun getFragment() = CreateCustomProductFragment.newInstance(dish, productName, calculatorFlow)
+        override fun getFragment() =
+            CreateCustomProductFragment.newInstance(dish, productName, calculatorFlow)
     }
 
-    data class AddDishScreen(val dish: DishUiEntity, val calculatorFlow: CalculatorFlow) : SupportAppScreen() {
+    data class AddDishScreen(val dish: DishUiEntity, val calculatorFlow: CalculatorFlow) :
+        SupportAppScreen() {
         override fun getFragment() = DishDetailFragment.newInstance(dish, calculatorFlow)
     }
 

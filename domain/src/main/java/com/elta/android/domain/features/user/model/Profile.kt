@@ -1,12 +1,14 @@
 package com.elta.android.domain.features.user.model
 
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
+import org.threeten.bp.LocalDate
 
 data class Profile(
     val firstName: String? = null,
     val secondName: String? = null,
     val gender: Gender = Gender.NOT_SPECIFIED,
     val email: String? = null,
+    val birthDate: LocalDate? = null,
     val glucoseLevelSettings: GlucoseLevelSettings = GlucoseLevelSettings.fromNormalValues(
         GlucoseLevelSettings.NORMAL_START,
         GlucoseLevelSettings.NORMAL_END

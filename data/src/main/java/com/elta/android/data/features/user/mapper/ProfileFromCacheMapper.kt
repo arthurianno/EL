@@ -27,6 +27,7 @@ class ProfileFromCacheMapper @Inject constructor(
                     firstName = firstName,
                     lastName = lastName
                 ),
+                birthDate = birthDate,
                 glucoseLevelsBeforeEating = GlucoseLevelNetworkEntity(
                     minBeforeEatingValue,
                     maxBeforeEatingValue

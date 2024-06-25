@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elta.android.common.utils.CommonFormats.FORMAT_ONLY_DIGITS
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.presentation.R
@@ -41,6 +42,7 @@ import com.elta.android.presentation.features.profile.settings.emias.model.Emias
 import com.elta.android.presentation.features.profile.settings.emias.viewmodel.EmiasProfileViewModel
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.nullgr.core.date.toStringWithFormat
+import org.threeten.bp.LocalDate
 
 class EmiasProfileFragment : BaseComposeFragment<EmiasProfileViewModel>() {
     companion object {
@@ -48,19 +50,25 @@ class EmiasProfileFragment : BaseComposeFragment<EmiasProfileViewModel>() {
         const val BIRTH_DATE_KEY_EXTRA = "date_birth"
         const val LINK_STATUS_KEY_EXTRA = "link_status"
 
-        fun newInstance(linkedStatus: EmiasStatus, emias: Emias?) =
-            EmiasProfileFragment().apply {
-                arguments = Bundle().apply {
-                    emias?.let {
-                        putString(OMS_KEY_EXTRA, emias.oms)
-                        putString(
-                            BIRTH_DATE_KEY_EXTRA,
-                            emias.birthdayDate.toStringWithFormat(FORMAT_ONLY_DIGITS)
-                        )
-                    }
-                    putString(LINK_STATUS_KEY_EXTRA, linkedStatus.name)
-                }
+        fun newInstance(
+            linkedStatus: EmiasStatus,
+            emias: Emias?,
+            birthDateFromProfile: LocalDate?
+        ) = EmiasProfileFragment().apply {
+            arguments = Bundle().apply {
+                emias?.let {
+                    putString(OMS_KEY_EXTRA, emias.oms)
+                    putString(
+                        BIRTH_DATE_KEY_EXTRA,
+                        emias.birthdayDate.toStringWithFormat(FORMAT_ONLY_DIGITS)
+                    )
+                } ?: putString(
+                    BIRTH_DATE_KEY_EXTRA,
+                    birthDateFromProfile?.toStringWithFormat(FORMAT_ONLY_DIGITS)
+                )
+                putString(LINK_STATUS_KEY_EXTRA, linkedStatus.name)
             }
+        }
     }
 
     override val viewModel: EmiasProfileViewModel by viewModels { viewModelFactory }
@@ -170,7 +178,7 @@ class EmiasProfileFragment : BaseComposeFragment<EmiasProfileViewModel>() {
                         state = state
                     )
                 }
-                AnimatedVisibility (
+                AnimatedVisibility(
                     state.isLoading,
                     enter = fadeIn(),
                     exit = fadeOut()

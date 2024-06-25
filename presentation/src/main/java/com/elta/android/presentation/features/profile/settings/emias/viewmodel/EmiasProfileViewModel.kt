@@ -5,17 +5,22 @@ import androidx.core.text.isDigitsOnly
 import com.elta.android.common.errors.EmiasError
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.ServiceUnavailableError
+import com.elta.android.common.utils.CommonFormats.FORMAT_ONLY_DIGITS
 import com.elta.android.domain.common.mapDistinct
 import com.elta.android.domain.features.emias.interactor.UnbindEmiasUseCase
 import com.elta.android.domain.features.emias.interactor.UpdateEmiasUseCase
 import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
+import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
+import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.getMetricName
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.analytic.model.appmetric.params.EmiasErrorParam
+import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
@@ -33,6 +38,7 @@ import com.elta.android.presentation.features.profile.settings.emias.model.valid
 import com.elta.android.presentation.features.profile.settings.emias.model.validateOms
 import com.elta.android.presentation.features.profile.settings.emias.ui.EmiasProfileFragment
 import com.nullgr.core.date.CommonFormats
+import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -44,7 +50,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withTimeout
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,7 +62,10 @@ import javax.inject.Inject
 class EmiasProfileViewModel @Inject constructor(
     private val unbindEmiasProfile: UnbindEmiasUseCase,
     private val updateEmias: UpdateEmiasUseCase,
+    private val updateProfile: UpdateProfileUseCase,
+    private val getProfile: GetProfileUseCase,
     private val appMetric: AppMetricTracker,
+    private val bus: RxBus
 ) : BaseViewModel<EmiasProfileViewState>() {
     override fun createInitState(): EmiasProfileViewState =
         EmiasProfileViewState(
@@ -202,52 +214,74 @@ class EmiasProfileViewModel @Inject constructor(
     private fun updateEmias() {
         appMetric.trackEvent(AppMetricEvent.EmiasSaveClick)
         launch {
-            val emias = Emias(
-                oms = state.value.oms,
-                birthdayDate = SimpleDateFormat(
-                    CommonFormats.FORMAT_ONLY_DIGITS,
-                    Locale.getDefault()
-                ).parse(state.value.dateBirth) ?: Date()
+            updateBirthDate(
+                LocalDate.parse(
+                    state.value.dateBirth,
+                    DateTimeFormatter.ofPattern(FORMAT_ONLY_DIGITS)
+                )
             )
-            val params = UpdateEmiasUseCase.Params(emias)
+            bindEmiasProfile()
+        }
+    }
 
-            try {
-                withTimeout(EMIAS_TIMEOUT) {
-                    updateEmias.execute(params)
-                        .toObservable<Unit>()
-                        .asFlow()
-                        .onStart {
-                            reduceState { state.value.copy(isLoading = true) }
-                        }
-                        .onCompletion { throwable ->
-                            appMetric.trackEvent(AppMetricEvent.EmiasBinded)
-                            reduceState {
-                                state.value.copy(
-                                    isLoading = false,
-                                    isLinked = throwable == null
-                                )
-                            }
-
-                            startOms = omsInput.state.value.textField.text
-                            startDateBirth = dateInput.state.value.textField.text
-                        }
-                        .catch { error ->
-                            reduceState { state.value.copy(isLoading = false) }
-                            handleEmiasError(error)
-                            val eventName = when (error){
-                                is EmiasError -> error.getMetricName()
-                                is ServiceUnavailableError ->
-                                    AppMetricEvent.EmiasNotBinded(EmiasErrorParam.INTERNAL_ERROR)
-
-                                else -> null
-                            }
-                            eventName?.let { appMetric.trackEvent(it) }
-                        }
-                        .collect()
-                }
-            } catch (ex: Exception) {
-                handleEmiasError(ex)
+    private suspend fun updateBirthDate(value: LocalDate) {
+        getProfile()
+            .map { profile -> profile.copy(birthDate = value) }
+            .collect {
+                updateProfile
+                    .execute(UpdateProfileUseCase.Params(profile = it))
+                    .doOnComplete { bus.event(Events.ProfileDataChanged) }
+                    .doOnError(::handleError)
+                    .await()
             }
+    }
+
+    private suspend fun bindEmiasProfile() {
+        val emias = Emias(
+            oms = state.value.oms,
+            birthdayDate = SimpleDateFormat(
+                CommonFormats.FORMAT_ONLY_DIGITS,
+                Locale.getDefault()
+            ).parse(state.value.dateBirth) ?: Date()
+        )
+        val params = UpdateEmiasUseCase.Params(emias)
+
+        try {
+            withTimeout(EMIAS_TIMEOUT) {
+                updateEmias.execute(params)
+                    .toObservable<Unit>()
+                    .asFlow()
+                    .onStart {
+                        reduceState { state.value.copy(isLoading = true) }
+                    }
+                    .onCompletion { throwable ->
+                        appMetric.trackEvent(AppMetricEvent.EmiasBinded)
+                        reduceState {
+                            state.value.copy(
+                                isLoading = false,
+                                isLinked = throwable == null
+                            )
+                        }
+
+                        startOms = omsInput.state.value.textField.text
+                        startDateBirth = dateInput.state.value.textField.text
+                    }
+                    .catch { error ->
+                        reduceState { state.value.copy(isLoading = false) }
+                        handleEmiasError(error)
+                        val eventName = when (error) {
+                            is EmiasError -> error.getMetricName()
+                            is ServiceUnavailableError ->
+                                AppMetricEvent.EmiasNotBinded(EmiasErrorParam.INTERNAL_ERROR)
+
+                            else -> null
+                        }
+                        eventName?.let { appMetric.trackEvent(it) }
+                    }
+                    .collect()
+            }
+        } catch (ex: Exception) {
+            handleEmiasError(ex)
         }
     }
 

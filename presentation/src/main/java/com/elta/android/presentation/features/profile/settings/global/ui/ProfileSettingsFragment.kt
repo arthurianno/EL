@@ -19,11 +19,13 @@ import com.elta.android.presentation.features.googlefit.openGoogleFitIntent
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.ProfileSettingsAdapter
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
+import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
+import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 class ProfileSettingsFragment :
@@ -69,6 +71,21 @@ class ProfileSettingsFragment :
         pm.downloadGoogleFitCommand.bindTo { requireContext().openGoogleFitInStoreIntent() }
         pm.openGoogleFitCommand.bindTo { requireContext().openGoogleFitIntent() }
         pm.emiasErrorDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.datePickerExitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+
+        pm.showDatePickerDialog.bindTo { originalDate ->
+            activity.showDatePickerDialog(
+                date = originalDate,
+                minDate = LocalDate.parse(MIN_DATE_OF_BIRTH_DATE),
+                maxDate = LocalDate.now(),
+                onDateSelectedFunction = {
+                    pm.dateTimeSelectedAction.consumer.accept(it)
+                },
+                onCancelPickerFunction = { selectedDate ->
+                    pm.datePickerCloseAction.consumer.accept(selectedDate)
+                }
+            )
+        }
     }
 
     private fun copyToClipboard(message: String) {
@@ -79,3 +96,5 @@ class ProfileSettingsFragment :
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }
+
+private const val MIN_DATE_OF_BIRTH_DATE = "1900-01-01"

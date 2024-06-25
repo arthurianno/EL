@@ -55,9 +55,13 @@ class MainDiaryFragment @Inject constructor() :
         binding.selectDateButtonView.clicks().bindTo(pm.selectDateInDialogAction)
         pm.monthTitleState.bindTo(binding.selectedMonthTitleView.text())
         pm.showDatePickerDialogCommand.bindTo { originalDate ->
-            activity.showDatePickerDialog(originalDate, maxDate = LocalDate.now()) {
-                pm.dateInDialogSelectedAction.consumer.accept(it)
-            }
+            activity.showDatePickerDialog(
+                date = originalDate,
+                maxDate = LocalDate.now(),
+                onDateSelectedFunction = {
+                    pm.dateInDialogSelectedAction.consumer.accept(it)
+                }
+            )
         }
         pm.todayButtonVisibilityState.bindTo(binding.todayButtonView.visibility())
         binding.todayButtonView.clicks().bindTo(pm.todayClickedAction)
