@@ -228,7 +228,7 @@ sealed class Dialogs : DialogData {
 
     data class DataPickerExit(
         val resourceProvider: ResourceProvider,
-        override val title: String? = resourceProvider.getString(R.string.date_picker_exit_title),
+        override val title: String? = null,
         override val message: String = resourceProvider.getString(R.string.date_picker_exit_message),
         override val negative: String? = resourceProvider.getString(R.string.no_text),
         override val positive: String? = resourceProvider.getString(R.string.yes_text),

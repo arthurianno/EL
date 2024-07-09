@@ -22,7 +22,11 @@ abstract class SyncStartFragment<T : SyncStartPm> :
         super.onViewCreated(view, savedInstanceState)
         with(binding.toolbar) {
             homeButtonView.hide()
-            menuButtonView.text = getString(R.string.sync_start_menu_button_text)
+            // todo: SalepointHide
+            // скрываем точки продаж пока пока не примем решение что с ними делать
+//            menuButtonView.text = getString(R.string.sync_start_menu_button_text)
+                // Когда вернём карты, то убрать эту заглушку
+            menuButtonView.hide()
         }
     }
 

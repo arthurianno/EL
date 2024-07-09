@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.sync.start.base.pm
 
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import me.dmdev.rxpm.action
@@ -29,6 +28,8 @@ abstract class SyncStartPm constructor(
     }
 
     private fun navigateToShopsFlow(i: Unit) {
-        router.newRootFlow(Screens.ShopsFlow)
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        router.newRootFlow(Screens.ShopsFlow)
     }
 }

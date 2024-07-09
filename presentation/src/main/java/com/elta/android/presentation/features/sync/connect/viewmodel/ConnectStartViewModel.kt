@@ -46,7 +46,10 @@ class ConnectStartViewModel @Inject constructor(
     override fun handleUserAction(action: Action) {
         when (action) {
             is DownButtonClick -> router.navigateTo(Screens.ConnectTypeScreen(state.value.isOnBoarding))
-            is ConnectAction.SkipNextStep -> router.navigateTo(Screens.ShopsStart)
+            // todo: SalepointHide
+            // скрываем точки продаж. было:
+            // router.navigateTo(Screens.ShopsStart)
+            is ConnectAction.SkipNextStep -> router.newRootScreen(Screens.HomeFlow)
         }
         super.handleUserAction(action)
     }

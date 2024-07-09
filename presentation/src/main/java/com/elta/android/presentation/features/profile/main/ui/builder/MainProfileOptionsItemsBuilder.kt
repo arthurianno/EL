@@ -6,7 +6,6 @@ import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.Support
-import com.elta.android.domain.features.user.model.WhereBuy
 import com.elta.android.presentation.R
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileAdditionalItem
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileHeaderItem
@@ -62,14 +61,16 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
                 MyDevices
             )
         )
-        add(
-            MainProfileAdditionalItem(
-                R.string.profile_where_purchase_products,
-                R.string.profile_map_of_stores,
-                R.drawable.ic_map_pin_bg,
-                WhereBuy
-            )
-        )
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        add(
+//            MainProfileAdditionalItem(
+//                R.string.profile_where_purchase_products,
+//                R.string.profile_map_of_stores,
+//                R.drawable.ic_map_pin_bg,
+//                WhereBuy
+//            )
+//        )
         add(
             MainProfileAdditionalItem(
                 R.string.profile_support_title,

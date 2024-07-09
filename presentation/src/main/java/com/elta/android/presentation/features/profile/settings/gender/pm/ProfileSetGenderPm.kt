@@ -6,6 +6,8 @@ import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.updateStableParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
@@ -25,6 +27,7 @@ import javax.inject.Inject
 class ProfileSetGenderPm @Inject constructor(
     private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
+    private val appMetric: AppMetricTracker,
     serviceFacade: ServiceFacade
 ) : BasePm(serviceFacade) {
 
@@ -72,6 +75,7 @@ class ProfileSetGenderPm @Inject constructor(
                     .hideErrorContainer()
                     .bindProgress()
                     .doOnComplete { updateStableParam(profile = it.profile) }
+                    .doOnComplete { appMetric.setProfileAttributes(it.profile.getMetricAttributes()) }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }

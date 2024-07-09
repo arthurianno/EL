@@ -115,7 +115,7 @@
     <string name="emias_notification_account_connected">Аккаунт ЕМИАС привязан к вашему профилю Сателлит Online</string>
     <string name="emias_profile_unlink">Отвязать аккаунт</string>
     <string name="emias_save_button">Сохранить</string>
-    <string name="on_boarding_emias_text">При включенной привязке данные измерений с глюкометра автоматически передаются вашему лечащему врачу через систему ЕМИАС.\n\nЕсли вы наблюдаетесь у врача и подписывали соглашение о передаче данных по замерам, заполните поля ниже.</string>
+    <string name="on_boarding_emias_text">При включенной привязке данные измерений с глюкометра автоматически передаются вашему лечащему врачу через систему ЕМИАС.</string>
     <string name="on_boarding_emias_helper">Значение должно быть между 9 и 16 знаками</string>
     <string name="on_boarding_emias_hint">Номер полиса ОМС</string>
     <string name="on_boarding_emias_date_birth_hint">Дата рождения</string>
@@ -945,7 +945,6 @@
     <string name="incorrect_date_error">Некорректная дата</string>
 
     <!--  Picker Dialog  -->
-    <string name="date_picker_exit_title">Выйти?</string>
-    <string name="date_picker_exit_message">Изменения не будут сохранены</string>
+    <string name="date_picker_exit_message">Несохраненные данные будут потеряны. Сохранить?</string>
 
 </resources>

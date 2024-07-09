@@ -46,12 +46,14 @@ class SupportItemsBuilder @Inject constructor(
             subTitle = resourceProvider.getString(R.string.profile_support_email_description),
             action = SupportAction.ViberAction
         ),
-        SupportActionItem(
-            icon = R.drawable.ic_support_center,
-            title = resourceProvider.getString(R.string.profile_support_service_centers),
-            subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),
-            action = SupportAction.ServiceCentersAction
-        ),
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        SupportActionItem(
+//            icon = R.drawable.ic_support_center,
+//            title = resourceProvider.getString(R.string.profile_support_service_centers),
+//            subTitle = resourceProvider.getString(R.string.profile_support_service_centers_description),
+//            action = SupportAction.ServiceCentersAction
+//        ),
         SupportHeaderItem(
             text = resourceProvider.getString(R.string.profile_support_versions_header)
         ),
