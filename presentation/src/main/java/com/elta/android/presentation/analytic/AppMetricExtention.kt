@@ -3,6 +3,7 @@ package com.elta.android.presentation.analytic
 import com.elta.android.common.errors.EmiasError
 import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.domain.features.user.model.Diabetes
+import com.elta.android.domain.features.user.model.Gender
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricAttribute
@@ -18,11 +19,16 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 import com.tbruyelle.rxpermissions2.Permission
+import io.appmetrica.analytics.profile.GenderAttribute
+import org.threeten.bp.LocalDate
+import org.threeten.bp.Period
 
 fun Profile.getMetricAttributes(): List<AppMetricAttribute> {
     val attributes = mutableListOf<AppMetricAttribute>()
     email?.let { attributes.add(AppMetricAttribute.Email(it)) }
     diabetes?.getMetricAttribute()?.let { diabetesType -> attributes.add(diabetesType) }
+    gender.getMetricAttribute().let { metricGender -> attributes.add(metricGender) }
+    birthDate?.getMetricAttribute()?.let { age -> attributes.add(age) }
     return attributes
 }
 
@@ -101,6 +107,21 @@ private fun Diabetes.getMetricAttribute(): AppMetricAttribute.DiabetesType {
         Diabetes.SECOND_TABLETS -> DiabetesTypeParam.DIABETES_SECOND_PILLS
     }
     return AppMetricAttribute.DiabetesType(params)
+}
+
+private fun Gender.getMetricAttribute(): AppMetricAttribute.Gender {
+    val params = when (this) {
+        Gender.MALE -> GenderAttribute.Gender.MALE
+        Gender.FEMALE -> GenderAttribute.Gender.FEMALE
+        Gender.NOT_SPECIFIED -> GenderAttribute.Gender.OTHER
+    }
+    return AppMetricAttribute.Gender(params)
+}
+
+private fun LocalDate.getMetricAttribute(): AppMetricAttribute.Age {
+    val today = LocalDate.now()
+    val age = Period.between(this, today)
+    return AppMetricAttribute.Age(age.years)
 }
 
 private fun getAlertMetric(alertType: AlertType): AppMetricEvent {

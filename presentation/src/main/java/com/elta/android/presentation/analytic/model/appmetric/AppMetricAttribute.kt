@@ -1,14 +1,12 @@
 package com.elta.android.presentation.analytic.model.appmetric
 
 import com.elta.android.presentation.analytic.model.appmetric.params.DiabetesTypeParam
+import io.appmetrica.analytics.profile.GenderAttribute
 
-sealed class AppMetricAttribute(
-    val key: String,
-    val value: String
-) {
-    data class Email(val emailAddress: String) :
-        AppMetricAttribute(key = "e-mail", value = emailAddress)
+sealed class AppMetricAttribute {
 
-    data class DiabetesType(@DiabetesTypeParam val type: String) :
-        AppMetricAttribute(key = "type_diabetes", value = type)
+    data class Email(val emailAddress: String) : AppMetricAttribute()
+    data class DiabetesType(@DiabetesTypeParam val type: String) : AppMetricAttribute()
+    data class Gender(val gender: GenderAttribute.Gender) : AppMetricAttribute()
+    data class Age(val years: Int) : AppMetricAttribute()
 }

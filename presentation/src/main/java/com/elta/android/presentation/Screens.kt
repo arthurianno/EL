@@ -133,14 +133,20 @@ object Screens {
     }
 
     // SHOPS FLOW
+    // todo: SalepointHide
+    @Deprecated("Скрываем функциал карт до лучших времён")
     object ShopsFlow : SupportAppScreen() {
         override fun getFragment() = ShopsFlowFragment.newInstance()
     }
 
+    // todo: SalepointHide
+    @Deprecated("Скрываем функциал карт до лучших времён")
     object ShopsStart : SupportAppScreen() {
         override fun getFragment() = ShopsStartFragment.newInstance()
     }
 
+    // todo: SalepointHide
+    @Deprecated("Скрываем функциал карт до лучших времён")
     data class ShopsMap(val isOnBoarding: Boolean = false) : SupportAppScreen() {
         override fun getFragment() = ShopsMapFragment.newInstance(
             Type.SALE,
@@ -148,6 +154,8 @@ object Screens {
         )
     }
 
+    // todo: SalepointHide
+    @Deprecated("Скрываем функциал карт до лучших времён")
     object ServiceCentersMap : SupportAppScreen() {
         override fun getFragment() = ShopsMapFragment.newInstance(Type.SERVICE)
     }

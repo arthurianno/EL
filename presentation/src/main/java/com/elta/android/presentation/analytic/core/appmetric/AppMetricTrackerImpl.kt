@@ -26,10 +26,16 @@ class AppMetricTrackerImpl @Inject constructor() : AppMetricTracker {
                     attributes.forEach {
                         when (it) {
                             is AppMetricAttribute.Email ->
-                                apply(Attribute.customString(it.key).withValue(it.emailAddress))
+                                apply(Attribute.customString("e-mail").withValue(it.emailAddress))
 
                             is AppMetricAttribute.DiabetesType ->
-                                apply(Attribute.customString(it.key).withValue(it.type))
+                                apply(Attribute.customString("type_diabetes").withValue(it.type))
+
+                            is AppMetricAttribute.Age ->
+                                apply(Attribute.birthDate().withAge(it.years))
+
+                            is AppMetricAttribute.Gender ->
+                                apply(Attribute.gender().withValue(it.gender))
                         }
                     }
                 }

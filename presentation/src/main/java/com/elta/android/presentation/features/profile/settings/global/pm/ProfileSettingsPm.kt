@@ -22,6 +22,7 @@ import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
@@ -147,6 +148,7 @@ class ProfileSettingsPm @Inject constructor(
             .flatMapCompletable { params ->
                 updateProfileUseCase.execute(params)
                     .doOnComplete { bus.event(Events.ProfileDataChanged) }
+                    .doOnComplete { appMetric.setProfileAttributes(params.profile.getMetricAttributes()) }
                     .doOnError(::handleError)
             }
             .subscribe()
@@ -251,11 +253,13 @@ class ProfileSettingsPm @Inject constructor(
             .doOnError { Timber.e(it) }
             .doOnSuccess {
                 appMetric.trackEvent(AppMetricEvent.EmiasClick)
-                router.navigateTo(Screens.EmiasProfile(
-                    linkedStatus = it.first,
-                    emias = it.second,
-                    birthDateFromProfile = profileState.value.birthDate
-                ))
+                router.navigateTo(
+                    Screens.EmiasProfile(
+                        linkedStatus = it.first,
+                        emias = it.second,
+                        birthDateFromProfile = profileState.value.birthDate
+                    )
+                )
             }
             .subscribe()
             .untilDestroy()

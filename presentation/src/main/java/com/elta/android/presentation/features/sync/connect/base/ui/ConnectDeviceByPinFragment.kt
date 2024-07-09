@@ -50,7 +50,11 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.toolbar) {
-            menuButtonView.text = getString(R.string.sync_connect_menu_button_text)
+            // todo: SalepointHide
+            // скрываем точки продаж пока пока не примем решение что с ними делать
+//            menuButtonView.text = getString(R.string.sync_connect_menu_button_text)
+            // если возвращаем карты, то убираем эту заглушку
+            menuButtonView.hide()
         }
     }
 

@@ -23,7 +23,6 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.getMetricName
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
@@ -425,7 +424,9 @@ abstract class ConnectDevicePm constructor(
             newItems.map { it.address to it.isSelected }
 
     private fun navigateToShopsFlow(i: Unit) {
-        router.newRootFlow(Screens.ShopsFlow)
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        router.newRootFlow(Screens.ShopsFlow)
     }
 
     private fun handleSearchResults(results: List<Glucometer>) {

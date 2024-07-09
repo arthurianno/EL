@@ -159,8 +159,10 @@ class MainProfilePm @Inject constructor(
     private fun navigateAdditionalSettingsScreen(type: AdditionalFunction) =
         when (type) {
             WhereBuy -> {
-                trackEvent(AnalyticsEventType.MAP_OPEN)
-                router.startFlow(Screens.ShopsMap())
+                // todo: SalepointHide
+                // скрываем точки продаж пока пока не примем решение что с ними делать
+//                trackEvent(AnalyticsEventType.MAP_OPEN)
+//                router.startFlow(Screens.ShopsMap())
             }
 
             MyObservers -> router.startFlow(Screens.Observers)
