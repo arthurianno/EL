@@ -16,4 +16,11 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">test.ppma.ru</domain>
     </domain-config>
+
+    <domain-config>
+        <domain includeSubdomains="true">vdiabete.com</domain>
+        <trust-anchors>
+            <certificates src="@raw/vdiabete_prod" />
+        </trust-anchors>
+    </domain-config>
 </network-security-config>
