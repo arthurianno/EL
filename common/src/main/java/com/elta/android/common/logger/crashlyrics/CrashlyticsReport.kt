@@ -9,4 +9,6 @@ interface CrashlyticsReport {
     fun setCustomKey(key: String, value: String)
 
     fun writeException(exception: Throwable)
+
+    fun enableCrashlytics()
 }

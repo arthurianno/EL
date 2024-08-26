@@ -9,6 +9,7 @@ sealed class PermissionEvent : Event {
     override fun hashCode() = System.identityHashCode(this)
 
     class Storage : PermissionEvent()
+    object Camera : PermissionEvent()
     class RecordAudio : PermissionEvent()
     object OpenSettings : PermissionEvent()
     object RequestPermissions : PermissionEvent()

@@ -4,7 +4,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
 class FirebaseReport : CrashlyticsReport {
-
     private val firebaseCrashlytics: FirebaseCrashlytics
         get() = FirebaseCrashlytics.getInstance()
 
@@ -25,6 +24,12 @@ class FirebaseReport : CrashlyticsReport {
         firebaseCrashlytics.recordException(exception)
         Timber.tag(TAG).e(exception)
     }
+
+    override fun enableCrashlytics() {
+        firebaseCrashlytics.setCrashlyticsCollectionEnabled(true)
+    }
+
+
 }
 
 private const val TAG = "LocalReports"

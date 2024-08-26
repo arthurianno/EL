@@ -9,7 +9,7 @@ import com.elta.android.presentation.features.calcutator.custom.CreateCustomProd
 import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
 import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
-import com.elta.android.presentation.features.consultant.ConsultantFragment
+import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment

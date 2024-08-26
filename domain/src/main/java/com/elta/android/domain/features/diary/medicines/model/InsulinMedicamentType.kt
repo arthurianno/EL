@@ -23,3 +23,6 @@ data class MedicamentInsulinType(
 
 const val ALL = "ALL"
 const val ALL_NAME = "Все"
+const val SHORT = "SHORT"
+const val PROLONGED = "PROLONGED"
+const val MIXED = "MIXED"

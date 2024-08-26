@@ -3,6 +3,8 @@ package com.elta.android.presentation.features.profile.settings.reminders.all.vi
 import com.elta.android.domain.features.reminder.interactor.GetRemindersUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -23,8 +25,13 @@ import javax.inject.Inject
 class RemindersViewModel @Inject constructor(
     private val getRemindersUseCase: GetRemindersUseCase,
     private val mapper: ReminderMapper,
+    private val appMetricTracker: AppMetricTracker,
     bus: RxBus
 ) : BaseViewModel<RemindersViewState>() {
+
+    init {
+        appMetricTracker.trackEvent(AppMetricEvent.TapButtonReminders)
+    }
 
     override fun createInitState(): RemindersViewState {
         return RemindersViewState(
@@ -49,7 +56,10 @@ class RemindersViewModel @Inject constructor(
     override fun handleUserAction(action: Action) {
         when (action) {
             is AppAction.BackPressure -> backClick()
-            is RemindersAction.CreateReminder -> sendEvent(RemindersEvent.CheckNotificationPermission)
+            is RemindersAction.CreateReminder -> {
+                appMetricTracker.trackEvent(AppMetricEvent.TapButtonRemindersNew)
+                sendEvent(RemindersEvent.CheckNotificationPermission)
+            }
             is RemindersAction.OpenCreateReminder -> router.navigateTo(Screens.CreateRemind)
             is RemindersAction.OpenReminder -> router.navigateTo(Screens.EditRemind(action.id))
             is RemindersAction.NotificationPermissionResult -> notificationPermissionResult(action.isGranted)

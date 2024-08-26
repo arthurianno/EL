@@ -4,6 +4,10 @@ import com.elta.android.common.di.qualifires.Cache
 import com.elta.android.common.di.qualifires.Paging
 import com.elta.android.common.di.qualifires.PagingType
 import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.data.common.datasource.download.DownloadDataSource
+import com.elta.android.data.common.datasource.download.DownloadSource
+import com.elta.android.data.features.files.source.FileInfoDataSource
+import com.elta.android.data.features.files.source.FileInfoSource
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
@@ -184,4 +188,13 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindVersionDataSource(source: VersionDataSource): VersionSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDownloadSource(source: DownloadDataSource): DownloadSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFileInfoSource(source: FileInfoDataSource): FileInfoSource
+
 }

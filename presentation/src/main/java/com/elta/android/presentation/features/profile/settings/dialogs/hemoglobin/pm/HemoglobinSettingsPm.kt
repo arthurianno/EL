@@ -13,7 +13,9 @@ import com.elta.android.domain.features.user.interactor.increment
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -34,6 +36,7 @@ class HemoglobinSettingsPm @Inject constructor(
     private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val getHemoglobinEventsUseCase: GetGlycatedHemoglobinEventsUseCase,
     private val hemoglobinItemsBuilder: HemoglobinItemsBuilder,
+    private val appMetricTracker: AppMetricTracker,
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
@@ -54,6 +57,7 @@ class HemoglobinSettingsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+        appMetricTracker.trackEvent(AppMetricEvent.ViewScreenHbA1c)
         // always enabled for hemoglobin
         actionButtonEnabledCommand.consumer.accept(true)
 
@@ -103,6 +107,9 @@ class HemoglobinSettingsPm @Inject constructor(
         mainAction.observable
             .debounceAction()
             .skipWhileInProgress()
+            .doOnNext {
+                appMetricTracker.trackEvent(AppMetricEvent.TapButtonHbA1cSave)
+            }
             .map(::createNewEventParams)
             .flatMapCompletable { params ->
                 addNewEventUseCase.execute(params)

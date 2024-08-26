@@ -24,6 +24,10 @@ import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
 
 class AppActivity : BaseActivity<AppPm>() {
+    companion object {
+        const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
+    }
+
     override val screenLayout: Int = R.layout.activity_app
     override val classToken: Class<AppPm> = AppPm::class.java
 
@@ -48,6 +52,7 @@ class AppActivity : BaseActivity<AppPm>() {
             .withSavedState(savedInstanceState)
             .coldStartPassTo(presentationModel.coldStartAction)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
+            .consultantDeeplink(presentationModel.consultantDeepLinkAction)
             .coldStartByDeepLinkPassTo(presentationModel.coldStartDeepLinkAction)
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
@@ -70,7 +75,7 @@ class AppActivity : BaseActivity<AppPm>() {
         pm.networkStateCommand.bindTo(connectionStatusView.changeState())
         pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
         pm.syncStatusState.bindTo(statusView.statusChanges())
-        pm.showOptionalUpdateDialogCommand.bindTo{
+        pm.showOptionalUpdateDialogCommand.bindTo {
             supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
         }
     }

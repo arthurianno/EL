@@ -9,6 +9,7 @@ import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.ReleaseTree
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.logger.crashlyrics.FirebaseReport
+import com.elta.android.common.utils.EltaMessageClient
 import com.elta.android.presentation.core.geo.RxLocationManagerFixed
 import com.elta.android.presentation.core.pm.ExceptionParser
 import com.elta.android.presentation.core.pm.SimpleExceptionParser
@@ -103,4 +104,9 @@ class AppModule(
     @Singleton
     fun provideRxLocationManager(context: Context): RxLocationManagerFixed =
         RxLocationManagerFixed(context, updatesInterval = 1100, updateCount = 1)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseMessageClient(): EltaMessageClient =
+        EltaMessageClient(isConsultantScreenActive = false)
 }

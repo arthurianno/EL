@@ -372,7 +372,7 @@ object Dependencies {
     }
 
     object Webim {
-        private const val version = "3.+"
+        private const val version = "3.42.1"
 
         const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
     }

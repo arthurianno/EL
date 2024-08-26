@@ -5,7 +5,9 @@ import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideEmail
+import com.elta.android.domain.common.usecase.CleanupCachedFilesUseCase
 import com.elta.android.domain.features.rostech.interactor.RosTechUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
@@ -34,6 +36,8 @@ import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
 import io.reactivex.Observable
+import io.reactivex.Single
+import kotlinx.coroutines.rx2.asObservable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -46,9 +50,11 @@ private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
+    private val getProfile: GetProfileUseCase,
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val checkAppVersion: CheckAppVersionUseCase,
+    private val cleanupFiles: CleanupCachedFilesUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val crashlyticsReport: CrashlyticsReport,
     private val rosTech: RosTechUseCase,
@@ -56,12 +62,19 @@ class AppPm @Inject constructor(
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
+    /**
+     * Так как диплинки выключены, то используем свой механизм диплинков
+     * с помощью интента и навигации
+     */
+    val consultantDeepLinkAction = action<Unit>()
+
     val coldStartAction = action<Unit>()
     val notificationStartAction = action<Uri>()
     val deepLinkAction = action<Uri>()
     val coldStartDeepLinkAction = action<Uri>()
     val onStopAction = action<String>()
     private val checkAppVersionAction = action<Unit>()
+    private val cleanupFilesAction = action<Unit>()
 
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
@@ -140,6 +153,10 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        cleanupFilesAction.observable
+            .flatMapSingle { Single.fromCallable { cleanupFiles() } }
+            .subscribe()
+            .untilDestroy()
         deepLinkAction.observable
             .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
             .doOnNext { router.navigateTo(it as Screen) }
@@ -149,6 +166,26 @@ class AppPm @Inject constructor(
         coldStartDeepLinkAction.observable
             .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
             .doOnNext { router.newRootChain(Screens.GreetingFlow, it as Screen) }
+            .subscribe()
+            .untilDestroy()
+
+        consultantDeepLinkAction.observable
+            .concatMapSingle {
+                Single.zip(
+                    getUserId.execute(),
+                    getProfile().asObservable().firstOrError()
+                ) { id, profile ->
+                    id to "${profile.firstName} ${profile.secondName}"
+                }
+            }
+            .doOnNext { (id, userName) ->
+                router.newRootChain(
+                    Screens.HomeFlow,
+                    Screens.Support,
+                    Screens.ConsultantScreen(id, userName)
+                )
+            }
+            .doOnError(::handleError)
             .subscribe()
             .untilDestroy()
 
@@ -191,6 +228,7 @@ class AppPm @Inject constructor(
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { }
+            .doOnNext(cleanupFilesAction.consumer)
             .doOnNext(checkAppVersionAction.consumer)
             .subscribe()
             .untilDestroy()

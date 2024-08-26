@@ -3,27 +3,30 @@ package com.elta.android
 import android.content.Context
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.ApiModule
+import com.elta.android.data.di.BleToolsModule
 import com.elta.android.data.di.CacheModule
+import com.elta.android.data.di.ClipboardModule
 import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
-import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerImplModule
-import com.elta.android.data.di.BleToolsModule
+import com.elta.android.data.di.GlucometerModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.di.LocalSyncModule
 import com.elta.android.data.di.MappersModule
+import com.elta.android.data.di.MediaModule
 import com.elta.android.data.di.MigrationModule
 import com.elta.android.data.di.NetworkModule
+import com.elta.android.data.di.NetworkRequesterModule
 import com.elta.android.data.di.RepoModule
 import com.elta.android.data.di.ServiceModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
 import com.elta.android.data.di.WebimModule
+import com.elta.android.injector.MessagingServiceBuilder
 import com.elta.android.presentation.di.ActivityBuilder
 import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.di.FragmentBuilder
-import com.elta.android.presentation.di.MediaModule
 import com.elta.android.presentation.di.NavigationModule
 import com.elta.android.presentation.di.NotificationModule
 import com.elta.android.presentation.di.PmModule
@@ -41,6 +44,7 @@ import javax.inject.Singleton
         // common
         AndroidSupportInjectionModule::class,
         AppModule::class,
+        MessagingServiceBuilder::class,
         // data
         ApiModule::class,
         ApiConstantsModule::class,
@@ -58,6 +62,8 @@ import javax.inject.Singleton
         FatSecretModule::class,
         WebimModule::class,
         ServiceModule::class,
+        ClipboardModule::class,
+        NetworkRequesterModule::class,
         // domain
         RepoModule::class,
         // presentation
