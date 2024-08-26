@@ -32,6 +32,14 @@ fun Profile.getMetricAttributes(): List<AppMetricAttribute> {
     return attributes
 }
 
+fun EmiasStatus.getMetricAttributes(): List<AppMetricAttribute> {
+    val attribute = when (this) {
+        EmiasStatus.LINKED -> AppMetricAttribute.Emias(EmiasStatusParam.REGISTERED)
+        EmiasStatus.UNLINKED -> AppMetricAttribute.Emias(EmiasStatusParam.NOT_REGISTERED)
+    }
+    return listOf(attribute)
+}
+
 fun EmiasStatus.getMetricName(): AppMetricEvent.EmiasScreen {
     val eventParam = when (this) {
         EmiasStatus.LINKED -> EmiasStatusParam.REGISTERED

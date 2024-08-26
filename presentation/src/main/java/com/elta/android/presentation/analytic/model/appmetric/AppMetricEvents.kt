@@ -10,6 +10,7 @@ import com.elta.android.presentation.analytic.model.appmetric.params.GlucoseForm
 import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
 import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
 import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TypeOfInsulinParam
 
 sealed class AppMetricEvent(
     val eventName: String,
@@ -136,4 +137,33 @@ sealed class AppMetricEvent(
             eventName = "tap_button_save_glucose_level_format",
             eventParams = "format" to format
         )
+
+    data object TapUploadingAReport : AppMetricEvent("tap_uploading_a_report")
+    data object TapSupport : AppMetricEvent("tap_support")
+    data object ViewScreenFood : AppMetricEvent("view_screen_food")
+    data object TapButtonFoodSave : AppMetricEvent("tap_button_food_save")
+    data object ViewScreenFoodNew : AppMetricEvent("view_screen_food_new")
+    data object TapButtonFoodNewSave : AppMetricEvent("tap_button_food_new_save")
+    data object ViewScreenActivity : AppMetricEvent("view_screen_activity")
+    data object ViewScreenActivityType : AppMetricEvent("view_screen_activity_type")
+    data object TapButtonActivityType : AppMetricEvent("tap_button_activity_type")
+    data object TapButtonActivitySave : AppMetricEvent("tap_button_activity_save")
+    data object ViewScreenInsulin : AppMetricEvent("view_screen_insulin")
+    data class ViewScreenInsulinType(@TypeOfInsulinParam val param: String) : AppMetricEvent(
+        eventName = "view_screen_insulin_type",
+        eventParams = "type_of_insulin" to param
+    )
+    data object TapButtonInsulinSave : AppMetricEvent("tap_button_insulin_save")
+    data object ViewScreenMedicines : AppMetricEvent("view_screen_medicines")
+    data object ViewScreenMedicinesName : AppMetricEvent("view_screen_medicines_name")
+    data object TapButtonMedicinesType : AppMetricEvent("tap_button_medicines_type")
+    data object TapButtonMedicinesSave : AppMetricEvent("tap_button_medicines_save")
+    data object ViewScreenWeight : AppMetricEvent("view_screen_weight")
+    data object TapButtonWeightSave : AppMetricEvent("tap_button_weight_save")
+    data object ViewScreenHbA1c : AppMetricEvent("view_screen_HbA1c")
+    data object TapButtonHbA1cSave : AppMetricEvent("tap_button_HbA1c_save")
+    data object TapButtonReminders : AppMetricEvent("tap_button_reminders")
+    data object TapButtonRemindersNew : AppMetricEvent("tap_button_reminders_new")
+    data object TapButtonRemindersSave : AppMetricEvent("tap_button_reminders_save")
+    data object TapOnlineConsultant : AppMetricEvent("tap_online_consultant")
 }

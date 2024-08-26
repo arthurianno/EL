@@ -6,6 +6,8 @@ import com.elta.android.domain.features.diary.medicines.interactor.GetRecentlySe
 import com.elta.android.domain.features.diary.medicines.interactor.GetRecentlyUsedMedicamentsUseCase
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -40,6 +42,7 @@ class EventSelectorViewModel @Inject constructor(
     private val getRecentlySearchesMedicamentsUseCase: GetRecentlySearchesMedicamentsUseCase,
     private val addRecentlySearchesMedicamentsUseCase: AddRecentlySearchesMedicamentsUseCase,
     private val bus: RxBus,
+    private val appMetricTracker: AppMetricTracker
 ) : BaseViewModel<EventSelectorViewState>() {
 
     val appTopBar = BaseAppTopBarWidgetModel()
@@ -65,6 +68,8 @@ class EventSelectorViewModel @Inject constructor(
     }
 
     init {
+
+        appMetricTracker.trackEvent(AppMetricEvent.ViewScreenMedicinesName)
 
         launch {
             getRecentlyUsedMedicamentsUseCase()
@@ -207,6 +212,7 @@ class EventSelectorViewModel @Inject constructor(
     }
 
     private fun confirm(selectedId: Long? = null) {
+        appMetricTracker.trackEvent(AppMetricEvent.TapButtonMedicinesType)
         launch {
             val findItem = if (selectedId != null) {
                 state.value.selection.find { it.id == selectedId }

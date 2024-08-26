@@ -17,6 +17,7 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
 import com.elta.android.presentation.analytic.getMetricName
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.analytic.model.appmetric.params.EmiasErrorParam
@@ -172,6 +173,7 @@ class EmiasProfileViewModel @Inject constructor(
         val date = arguments.getString(EmiasProfileFragment.BIRTH_DATE_KEY_EXTRA, "")
 
         appMetric.trackEvent(status.getMetricName())
+        appMetric.setProfileAttributes(status.getMetricAttributes())
 
         startOms = oms
         startDateBirth = date

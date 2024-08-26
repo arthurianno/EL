@@ -12,9 +12,11 @@ import com.elta.android.domain.features.diary.events.model.form.ActivityValidato
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.presentation.R
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.initializer.WeightFormInitializer
@@ -40,6 +42,7 @@ class EventCreationPm @Inject constructor(
     private val getProfileUseCase: GetUpdatedProfileUseCase,
     private val clearCachedDishes: ClearCachedDishesUseCase,
     private val getLastInsulinEventUseCase: GetLastInsulinEventUseCase,
+    private val appMetricTracker: AppMetricTracker,
     cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
@@ -88,6 +91,19 @@ class EventCreationPm @Inject constructor(
     }
 
     override fun observeEventChanges() {
+        eventTypeState.observable.doOnEach {
+            when(it.value) {
+                is EventType.Bread -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenFood)
+                is EventType.Activity -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenActivity)
+                is EventType.Insulin -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenInsulin)
+                is EventType.Medicaments -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenMedicines)
+                is EventType.Weight -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenWeight)
+                else -> Unit
+            }
+        }
+            .subscribe()
+            .untilDestroy()
+
         Observables.combineLatest(
             eventTypeState.observable,
             formPickerValue.observable,
@@ -156,6 +172,16 @@ class EventCreationPm @Inject constructor(
         mainAction.observable
             .skipWhileInProgress()
             .map(::createAddEventParams)
+            .doOnEach {
+                when(it.value?.eventType) {
+                    is EventType.Bread -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonFoodSave)
+                    is EventType.Activity -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonActivitySave)
+                    is EventType.Insulin -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonInsulinSave)
+                    is EventType.Medicaments -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonMedicinesSave)
+                    is EventType.Weight -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonWeightSave)
+                    else -> Unit
+                }
+            }
             .filter { isValidDuration(it.duration) || it.duration == null }
             .flatMapSingle { params ->
                 addNewEventUseCase.execute(params)

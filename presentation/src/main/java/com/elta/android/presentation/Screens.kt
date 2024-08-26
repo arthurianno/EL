@@ -20,7 +20,7 @@ import com.elta.android.presentation.features.calcutator.products.CalculatorFrag
 import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
 import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
-import com.elta.android.presentation.features.consultant.ConsultantFragment
+import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
@@ -78,6 +78,7 @@ import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFl
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
 import com.elta.android.presentation.features.sync.start.other.ui.FromOtherSyncStartFragment
 import com.elta.android.presentation.features.version.mandatory.ui.MandatoryUpdateFragment
+import com.elta.android.presentation.utils.mp4ActionIntent
 import com.elta.android.presentation.utils.pdfActionIntent
 import com.elta.android.presentation.utils.shareIntent
 import com.nullgr.core.intents.callIntent
@@ -363,6 +364,11 @@ object Screens {
     data class ConsultantScreen(val userId: String, val userName: String) : SupportAppScreen() {
         override fun getFragment(): Fragment =
             ConsultantFragment.newInstance(userId = userId, userName = userName)
+    }
+
+    data class ViewVideoScreen(val uri: Uri) : SupportAppScreen() {
+        override fun getActivityIntent(context: Context): Intent =
+            mp4ActionIntent(uri, context)
     }
 
     data class EmailScreen(

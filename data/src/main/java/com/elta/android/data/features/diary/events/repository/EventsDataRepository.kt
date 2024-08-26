@@ -8,7 +8,7 @@ import com.elta.android.common.errors.NotFoundItemError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
-import com.elta.android.data.features.common.storage.FileStorage
+import com.elta.android.data.features.files.storage.FileStorageImpl
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -41,7 +41,7 @@ class EventsDataRepository @Inject constructor(
     @Cache private val cacheSource: EventsCacheDataSource,
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
-    private val fileStorage: FileStorage,
+    private val fileStorage: FileStorageImpl,
     private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>,
     private val crashlyticsReport: CrashlyticsReport
 ) : EventsRepository {
@@ -225,7 +225,7 @@ class EventsDataRepository @Inject constructor(
 
     override fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri> =
         Single.fromCallable {
-            fileStorage.getFile(
+            fileStorage.getImageFile(
                 fileName = buildFileName(sharingInfo),
                 directoryName = EVENTS_DIR_NAME
             )

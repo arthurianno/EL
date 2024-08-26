@@ -1131,9 +1131,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "32:839403557684771368",
+      "lastPropertyId": "4:7894306685939447027",
+      "name": "FileInfoDbEntity",
+      "properties": [
+        {
+          "id": "1:5297881585074224191",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5559116919616891115",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:8067969252555206548",
+          "name": "timestamp",
+          "type": 6
+        },
+        {
+          "id": "4:7894306685939447027",
+          "name": "type",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "31:3282265351876994341",
+  "lastEntityId": "32:839403557684771368",
   "lastIndexId": "6:8670197050320643670",
   "lastRelationId": "4:5291358786591636907",
   "lastSequenceId": "0:0",

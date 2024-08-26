@@ -1,49 +1,127 @@
 package com.elta.android.presentation.features.consultant.model // ktlint-disable filename
 
-import com.elta.android.domain.features.consultant.model.WebimChatState
-import com.elta.android.domain.features.consultant.model.WebimMessage
-import com.elta.android.domain.features.consultant.model.WebimStatus
+import android.net.Uri
+import com.elta.android.common.utils.MILLIS_IN_SECOND
+import com.elta.android.domain.features.consultant.model.ChatState
+import com.elta.android.domain.features.consultant.model.ConnectionStatus
+import com.elta.android.domain.features.consultant.model.ConsultantMessage
+import com.elta.android.domain.features.consultant.model.ContentType
+import com.elta.android.domain.features.consultant.model.ContentType.Companion.toContentType
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.user.interactor.round
 import com.elta.android.domain.features.user.model.Profile
 import com.nullgr.core.date.CommonFormats
-import com.nullgr.core.date.toStringWithFormat
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import org.threeten.bp.temporal.ChronoField
-import java.sql.Time
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private const val MB_SIZE = 1048576
-private const val KB_SIZE = 1024
-internal fun WebimStatus.toUi(): ConnectState =
+
+fun ConnectionStatus.toUi(): ConnectState =
     when (this) {
-        WebimStatus.Online -> ConnectState.Connect
-        WebimStatus.Offline -> ConnectState.Offline
-        WebimStatus.Connecting -> ConnectState.Connecting
+        ConnectionStatus.Online -> ConnectState.Connect
+        ConnectionStatus.Offline -> ConnectState.Offline
+        ConnectionStatus.Connecting -> ConnectState.Connecting
     }
 
-internal fun WebimChatState.toUi(): ConnectState =
+fun ChatState.toUi(): ConnectState =
     when (this) {
-        WebimChatState.Open -> ConnectState.Connect
-        WebimChatState.Close -> ConnectState.Offline
-        WebimChatState.Chatting -> ConnectState.Connecting
+        ChatState.Open -> ConnectState.Connect
+        ChatState.Close -> ConnectState.Offline
+        ChatState.Chatting -> ConnectState.Connecting
     }
 
-internal fun WebimMessage.toUi(): ChatUiEntity =
-    ChatUiEntity(
+internal fun List<ConsultantMessage>.toUi(): List<MessageUiEntity> =
+    this.map {
+            it.toUi()
+        }
+
+private fun ConsultantMessage.toUi(): MessageUiEntity {
+    return MessageUiEntity(
+        id = id,
         owner = owner,
-        type = attachment?.contentType,
         text = text,
-        fileSize = attachment?.size?.toSizeString(),
-        date = Time(time).toStringWithFormat(CommonFormats.FORMAT_TIME),
-        sendStatus = sendStatus,
+        document = attachment?.let {
+            DocumentUiEntity(
+                fileName = it.name.orEmpty(),
+                fileType = it.fileType?.toContentType().toUi(),
+                url = it.url,
+                size = it.size.toSizeString(),
+                isPortrait = it.imageSize?.let { size -> size.height > size.width },
+                cachingState = if (it.uri == null) CachingState.NotCached else CachingState.Cached,
+                uri = it.uri
+            )
+        },
+        timeSending = SimpleDateFormat(CommonFormats.FORMAT_TIME).format(Date(time)),
+        dateSending = time.formatDate(),
+        sendingStatus = sendStatus,
+        type = attachment?.fileType?.toContentType().toUi(),
         isRead = isRead,
-        thumbnail = attachment?.thumbnail,
-        attachmentUrl = attachment?.url
+        isEdited = isEdited,
+        canBeEdit = canBeEdited,
+        cornerSequence = null,
+        isDayChanged = false,
+        audioState = null
+    )
+}
+
+fun ContentType?.toUi(): MessageType {
+    return when (this) {
+        ContentType.Text -> MessageType.Text
+        ContentType.Image -> MessageType.Image
+        ContentType.Voice -> MessageType.Voice
+        ContentType.DocumentPdf -> MessageType.Document
+        ContentType.Video -> MessageType.Video
+        else -> MessageType.Text
+    }
+}
+
+fun ChatUiEntity.reduceChatState(
+    messageId: String,
+    cachingState: CachingState,
+    uri: Uri? = null
+): ChatUiEntity =
+    this.copy(
+        messages = messages.map { message ->
+            message.takeIf { it.id == messageId }
+                ?.copy(
+                    document = message.document?.copy(
+                        cachingState = cachingState,
+                        uri = uri
+                    )
+                )
+                ?: message
+        }
     )
 
-internal fun List<WebimMessage>.toUi(): List<ChatUiEntity> =
-    map { it.toUi() }
+fun ChatUiEntity.reduceAudioState(
+    messageId: String,
+    isPlaying: Boolean? = null,
+    trackPosition: Int? = null,
+    duration: Int? = null
+): ChatUiEntity {
+    val messages = this.messages.map { message ->
+        if (message.id == messageId) {
+            message.copy(
+                audioState = message.audioState?.let { audioState ->
+                    audioState.copy(
+                        isPlaying = isPlaying ?: audioState.isPlaying,
+                        trackPosition = trackPosition ?: audioState.trackPosition,
+                        duration = duration ?: audioState.duration
+                    )
+                }
+            )
+        } else message
+    }
+    return this.copy(messages = messages)
+}
 
 internal fun Profile.toWebimUser(): WebimUser =
     WebimUser(
@@ -60,9 +138,35 @@ internal fun LocalTime.toUi(): String =
             .toFormatter()
     )
 
-private fun Long.toSizeString(): String =
-    when {
-        this / MB_SIZE > 1 -> "${(this.toDouble() / MB_SIZE).round(2)} MB"
-        this / KB_SIZE > 1 -> "${(this.toDouble() / KB_SIZE).round(2)} KB"
-        else -> "${toString()} B"
+internal fun Int?.toDuration(): String {
+    val seconds = this?.div(MILLIS_IN_SECOND.toInt())
+    val minutes = seconds?.div(60) ?: 0
+    val remainsSeconds = seconds?.rem(60) ?: 0
+    return String.format("%d:%02d", minutes, remainsSeconds)
+}
+
+private fun Long.toSizeString(): Double? =
+    this.takeIf { it != 0L }?.toDouble()?.div(MB_SIZE)?.round(2)
+
+
+fun Long.formatDate(): DateUiEntity {
+    val messageDate = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+    val today = LocalDate.now()
+    val yesterday = today.minusDays(1)
+    val dateFormatterThisYear = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
+    val dateFormatterOtherYears = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
+
+    return when {
+        messageDate.isEqual(today) -> DateUiEntity.Today(this)
+        messageDate.isEqual(yesterday) -> DateUiEntity.Yesterday(this)
+        messageDate.year == today.year -> DateUiEntity.ThisYear(
+            timestampOfDate = this,
+            date = messageDate.format(dateFormatterThisYear)
+        )
+
+        else -> DateUiEntity.Other(
+            timestampOfDate = this,
+            date = messageDate.format(dateFormatterOtherYears)
+        )
     }
+}

@@ -16,7 +16,9 @@ import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.analytic.trackEvent
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
@@ -45,6 +47,7 @@ class MainProfilePm @Inject constructor(
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val itemsBuilder: MainProfileOptionsItemsBuilder,
     private val resourceProvider: ResourceProvider,
+    private val appMetricTracker: AppMetricTracker,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -171,7 +174,10 @@ class MainProfilePm @Inject constructor(
                 router.startFlow(Screens.Devices)
             }
 
-            Support -> router.startFlow(Screens.Support)
+            Support -> {
+                appMetricTracker.trackEvent(AppMetricEvent.TapSupport)
+                router.startFlow(Screens.Support)
+            }
             else -> throw IllegalArgumentException("$type  type doesn't support.")
         }
 

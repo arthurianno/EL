@@ -1,7 +1,7 @@
 package com.elta.android.data.common.datasource
 
 import com.elta.android.data.common.api.PersonalDataApi
-import com.elta.android.domain.features.consultant.model.WebimAccount
+import com.elta.android.data.features.consultant.model.WebimAccount
 import com.nullgr.core.security.prefs.CryptoPreferences
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow

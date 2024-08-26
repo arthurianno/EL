@@ -36,6 +36,9 @@ class AppMetricTrackerImpl @Inject constructor() : AppMetricTracker {
 
                             is AppMetricAttribute.Gender ->
                                 apply(Attribute.gender().withValue(it.gender))
+
+                            is AppMetricAttribute.Emias ->
+                                apply(Attribute.customString("emias").withValue(it.registered))
                         }
                     }
                 }

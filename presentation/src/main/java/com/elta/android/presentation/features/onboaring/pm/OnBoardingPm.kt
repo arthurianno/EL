@@ -112,6 +112,7 @@ class OnBoardingPm @Inject constructor(
         linkedStatusState.observable
             .subscribe { linkedStatus ->
                 appMetric.trackEvent(linkedStatus.getMetricName())
+                appMetric.setProfileAttributes(linkedStatus.getMetricAttributes())
                 val page = if (linkedStatus == EmiasStatus.LINKED) GENDER_PAGE else EMIAS_PAGE
                 currentPageState.consumer.accept(page)
             }

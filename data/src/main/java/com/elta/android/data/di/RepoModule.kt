@@ -1,10 +1,15 @@
 package com.elta.android.data.di
 
+import com.elta.android.data.common.repository.ClipboardDataRepository
+import com.elta.android.data.common.repository.DownloadDataRepository
+import com.elta.android.data.features.files.repository.FileInfoDataRepository
 import com.elta.android.data.features.appsettings.AppSettingsDataRepository
 import com.elta.android.data.features.auth.repository.AuthDataRepository
 import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.calculator.repository.CalculatorDataRepository
 import com.elta.android.data.features.calculator.repository.CustomProductDataRepository
+import com.elta.android.data.features.consultant.repository.AudioPlayerDataRepository
+import com.elta.android.data.features.consultant.repository.AudioRecorderDataRepository
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.BluetoothStateDataRepository
@@ -29,12 +34,17 @@ import com.elta.android.data.features.sale_points.repository.SalePointsDataRepos
 import com.elta.android.data.features.user.repository.ProfileDataRepository
 import com.elta.android.data.features.userinfo.repository.UserInfoDataRepository
 import com.elta.android.data.features.version.repository.VersionDataRepository
+import com.elta.android.domain.common.repository.ClipboardRepository
+import com.elta.android.domain.common.repository.DownloadRepository
+import com.elta.android.domain.common.repository.FileInfoRepository
 import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
 import com.elta.android.domain.features.calculator.repository.CustomProductRepository
+import com.elta.android.domain.features.consultant.repository.AudioPlayerRepository
+import com.elta.android.domain.features.consultant.repository.AudioRecorderRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -181,4 +191,25 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindVersionRepository(source: VersionDataRepository): VersionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAudioRecorderRepository(source: AudioRecorderDataRepository): AudioRecorderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAudioPlayerRepository(source: AudioPlayerDataRepository): AudioPlayerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindClipboardRepository(source: ClipboardDataRepository): ClipboardRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDownloadRepository(source: DownloadDataRepository): DownloadRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFileInfoRepository(source: FileInfoDataRepository): FileInfoRepository
+
 }

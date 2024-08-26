@@ -2,17 +2,22 @@ package com.elta.android.data.di
 
 import com.elta.android.common.di.qualifires.WebimAnnotation
 import com.elta.android.common.di.qualifires.WebimAnnotationType
+import com.elta.android.data.features.consultant.cache.ConsultantMessageCache
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
-private const val ACCOUNT_NAME = "eltaltdru"
+/*
+* Чтобы создать тестовый аккаунт, заходим на сайт Webim, переходим в регистрацию, заполняяем данные любыми данными и
+* пишем любой придуманный сайт. Например site123.ru. Создав аккаунт меняем здесь ACCOUNT_NAME на сайт с доменом без точки.
+* Пример: site123ru
+* Также надо будет закоментить строчку в WebimClient webimUser.toJsonObject(privateKey), так как она работает только с продовым сервером
+ */
+private const val ACCOUNT_NAME = "eltaltdru" // fixme раскоментить
 
-//private const val ACCOUNT_NAME = "wwwmarslabru"
 private const val LOCATION_NAME = "mobile"
 
 private const val PRIVATE_KEY = "7d112ff804823419b208678bd779f81f"
-//private const val PRIVATE_KEY = "8599c5abfcd7342b5feac6599279ca06"
-
 
 @Module
 class WebimModule {
@@ -28,4 +33,9 @@ class WebimModule {
     @Provides
     @WebimAnnotation(WebimAnnotationType.PrivateKey)
     fun provideWebimPrivateKey(): String = PRIVATE_KEY
+
+    @Provides
+    @Singleton
+    fun provideConsultantMessageCache(): ConsultantMessageCache =
+        ConsultantMessageCache()
 }

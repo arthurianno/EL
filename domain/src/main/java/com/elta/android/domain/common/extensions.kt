@@ -23,6 +23,7 @@ fun Uri.fileType(): FileType? =
         FileType.Pdf.extension -> FileType.Pdf
         FileType.Png.extension -> FileType.Png
         FileType.Voice.extension -> FileType.Voice
+        FileType.Mp4.extension -> FileType.Mp4
         else -> null
     }
 
