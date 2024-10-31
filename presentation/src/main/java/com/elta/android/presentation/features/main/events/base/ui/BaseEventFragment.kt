@@ -7,6 +7,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.MealTag
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.dialog.createDialog
@@ -16,6 +18,7 @@ import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.TransparentLightStatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentEventFormBinding
 import com.elta.android.presentation.features.main.events.base.initializer.FormInitializer
+import com.elta.android.presentation.features.main.events.base.initializer.ManualGlucoseFormInitializer
 import com.elta.android.presentation.features.main.events.base.initializer.makeFormInitializer
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.utils.OnApplyBottomWindowInsetsListener
@@ -63,6 +66,7 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         presentationModel.setEventType(eventType)
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         setWeightPicker()
+        setGlucosePickerInfo()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -93,9 +97,13 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             binding.progressView.toggleVisibilityState(it, defaultFalseState = View.INVISIBLE)
             binding.scrollableView.toggleVisibilityState(!it, defaultFalseState = View.INVISIBLE)
         }
+        binding.mealTagButtons.beforeEatingAttribute.clicks().bindTo(pm.beforeMealAction)
+        binding.mealTagButtons.afterEatingAttribute.clicks().bindTo(pm.afterMealAction)
+        pm.mealSelector.bindTo(::toggleMealTagButtons)
         observeAppBarChanges(pm)
         observeFoodChanges(pm)
         observeMedicamentChanges(pm)
+        observeGlucoseChanges(pm)
         observeFormKeyEvent(pm)
 
         binding.formPickerView.valueChanges().bindTo(pm.formPickerValueChangedAction)
@@ -170,6 +178,26 @@ abstract class BaseEventFragment<T : BaseEventPm> :
         }
     }
 
+    private fun setGlucosePickerInfo() {
+        if (presentationModel.eventTypeState.valueOrNull is EventType.Glucose) {
+            presentationModel.profileState.bindTo {
+                val (textId, pickerConfig) = when (it.glucoseFormat) {
+                    GlucoseFormat.CAPILLARY -> {
+                        R.string.events_helper_text_glucose_capillary to
+                                ManualGlucoseFormInitializer.pickerConfiguration
+                    }
+
+                    GlucoseFormat.PLASMA -> {
+                        R.string.events_helper_text_glucose_plasma to
+                                ManualGlucoseFormInitializer.pickerPlasmaConfiguration
+                    }
+                }
+                binding.eventInfoTextView.setText(textId)
+                initializer.setPickerConfiguration(pickerConfig)
+            }
+        }
+    }
+
     private fun T.bindDateSelection() {
         showDatePickerDialog.bindTo { originalDate ->
             activity.showDatePickerDialog(originalDate, maxDate = ZonedDateTime.now()) {
@@ -180,6 +208,20 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             activity.showTimePickerDialog(originalDate) {
                 dateTimeSelectedAction.consumer.accept(it)
             }
+        }
+    }
+
+    private fun observeGlucoseChanges(pm: T) {
+        if (pm.eventTypeState.valueOrNull is EventType.Glucose) {
+            pm.appBarColorState.bindTo { drawableRes ->
+                binding.appBarLayoutView.setBackgroundResource(drawableRes)
+            }
+            pm.eventTypeState.observable
+                .subscribe {
+                    binding.mealTagButtons.root.visibility = View.VISIBLE
+                }
+
+            binding.formPickerView.valueChanges().bindTo(pm.changeAppBarColorAction)
         }
     }
 
@@ -294,6 +336,25 @@ abstract class BaseEventFragment<T : BaseEventPm> :
             pm.hideKeyboardAction.consumer.accept(Unit)
         }
         return false
+    }
+
+    private fun toggleMealTagButtons(it: MealTag?) {
+        when (it) {
+            MealTag.BEFOREMEAL -> {
+                binding.mealTagButtons.afterEatingAttribute.isSelected = false
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = true
+            }
+
+            MealTag.AFTERMEAL -> {
+                binding.mealTagButtons.afterEatingAttribute.isSelected = true
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = false
+            }
+
+            else -> {
+                binding.mealTagButtons.afterEatingAttribute.isSelected = false
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = false
+            }
+        }
     }
 
     private data class ViewsState(

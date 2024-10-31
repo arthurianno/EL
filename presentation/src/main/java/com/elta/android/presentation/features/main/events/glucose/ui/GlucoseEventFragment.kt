@@ -130,8 +130,8 @@ class GlucoseEventFragment :
         pm.hideKeyBoardCommand.bindTo { view?.hideKeyboardFun() }
         with(binding) {
             formNoteView.textChanges().subscribe { binding.scrollableView.scrollToBottom() }
-            beforeEatingAttribute.clicks().bindTo(pm.beforeMealAction)
-            afterEatingAttribute.clicks().bindTo(pm.afterMealAction)
+            mealTagButtons.beforeEatingAttribute.clicks().bindTo(pm.beforeMealAction)
+            mealTagButtons.afterEatingAttribute.clicks().bindTo(pm.afterMealAction)
             pm.mealSelector.bindTo(::toggleMealTagButtons)
         }
     }
@@ -139,18 +139,18 @@ class GlucoseEventFragment :
     private fun toggleMealTagButtons(it: MealTag?) {
         when (it) {
             MealTag.BEFOREMEAL -> {
-                binding.afterEatingAttribute.isSelected = false
-                binding.beforeEatingAttribute.isSelected = true
+                binding.mealTagButtons.afterEatingAttribute.isSelected = false
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = true
             }
 
             MealTag.AFTERMEAL -> {
-                binding.afterEatingAttribute.isSelected = true
-                binding.beforeEatingAttribute.isSelected = false
+                binding.mealTagButtons.afterEatingAttribute.isSelected = true
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = false
             }
 
             else -> {
-                binding.afterEatingAttribute.isSelected = false
-                binding.beforeEatingAttribute.isSelected = false
+                binding.mealTagButtons.afterEatingAttribute.isSelected = false
+                binding.mealTagButtons.beforeEatingAttribute.isSelected = false
             }
         }
     }

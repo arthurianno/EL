@@ -1,7 +1,9 @@
 package com.elta.android.data.features.diary.events.cache.dto.v2
 
+import com.elta.android.data.features.diary.events.cache.converter.GlucoseInputTypeDtoConverter
 import com.elta.android.data.features.diary.events.cache.converter.InsulinMedicamentDtoConverter
 import com.elta.android.data.features.diary.events.cache.converter.MedicamentDtoConverter
+import com.elta.android.data.features.diary.events.dto.GlucoseInputTypeDto
 import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import io.objectbox.annotation.Convert
@@ -26,6 +28,8 @@ data class EventV2CachedDto(
     val duration: Long?,
     val activityType: String?,
     val mealTag: String?,
+    @Convert(converter = GlucoseInputTypeDtoConverter::class, dbType = String::class)
+    val glucoseInputType: GlucoseInputTypeDto?,
 
     @Convert(converter = InsulinMedicamentDtoConverter::class, dbType = String::class)
     val medicament: InsulinMedicamentDto?,

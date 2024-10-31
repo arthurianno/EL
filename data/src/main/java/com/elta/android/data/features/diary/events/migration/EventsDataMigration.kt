@@ -57,7 +57,8 @@ private fun EventCachedDto.toV2(): EventV2CachedDto {
         glucometerSerialNumber = glucometerSerialNumber,
         medicament = toInsulinMedicament(medicament, insulinType),
         medicamentDto = null,
-        tabletsNumber = null
+        tabletsNumber = null,
+        glucoseInputType = null
     )
 }
 

@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.events.base.initializer
 import android.text.InputFilter
 import android.view.View
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.presentation.databinding.FragmentEventFormBinding
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
@@ -41,6 +42,10 @@ abstract class FormInitializer {
         binding.formPickerView.setValue(pickerValue ?: DEFAULT_PICKER_VALUE)
     }
 
+    open fun setPickerConfiguration(pickerConfig: FormMeasurementConfig) {
+        binding.formPickerView.config = pickerConfig
+    }
+
     open fun View.initNoteView() {
         binding.formNoteView.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_NOTE_LENGTH))
     }
@@ -59,5 +64,8 @@ fun EventType.makeFormInitializer() =
         EventType.Medicaments -> MedicamentsFormInitializer
         EventType.Activity -> ActivityFormInitializer
         EventType.Weight -> WeightFormInitializer
-        EventType.Glucose, EventType.Glycatedhemoglobin -> throw IllegalArgumentException("No form initializer for $this type")
+        is EventType.Glucose -> if (inputType == GlucoseInputType.MANUAL){
+            ManualGlucoseFormInitializer
+        } else throw IllegalArgumentException("No form initializer for $this type")
+        EventType.Glycatedhemoglobin -> throw IllegalArgumentException("No form initializer for $this type")
     }

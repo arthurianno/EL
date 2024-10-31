@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.main.events.base.model
 
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
@@ -17,7 +18,8 @@ data class EventFormModel(
     var isDateChanged: Boolean = false,
     var date: ZonedDateTime? = null,
     var noteValue: String? = null,
-    var meta: Any? = null
+    var meta: Any? = null,
+    var mealTag: MealTag? = null
 ) {
 
     val kind: String?

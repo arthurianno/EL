@@ -28,7 +28,9 @@ class ShareImageBuilder @Inject constructor(val context: Context) {
             root.background = glucoseLevel.toBackground()
             valueView.text = NumberFormatter.format(sharingInfo.event.glucoseValue(sharingInfo.glucoseFormat))
             emojiView.setImageResource(glucoseLevel.toEmoji())
-            dateView.text = sharingInfo.event.additionTime.toStringWithFormat(GLUCOSE_SHARE_EVENT_DATE_FORMAT)
+            dateView.text = sharingInfo.event.additionTime.toStringWithFormat(
+                GLUCOSE_SHARE_EVENT_DATE_FORMAT
+            )
         }
         return binding.root.getBitmapFromView(GLUCOSE_SHARE_EVENT_PICTURE_SIZE)
     }

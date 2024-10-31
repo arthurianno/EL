@@ -160,6 +160,8 @@ sealed class AppMetricEvent(
     data object TapButtonMedicinesSave : AppMetricEvent("tap_button_medicines_save")
     data object ViewScreenWeight : AppMetricEvent("view_screen_weight")
     data object TapButtonWeightSave : AppMetricEvent("tap_button_weight_save")
+    data object ViewScreenManualGlucose : AppMetricEvent("tap_button_glucose_measurements")
+    data object TapButtonManualGlucoseSave : AppMetricEvent("tap_button_glucose_measurements_save")
     data object ViewScreenHbA1c : AppMetricEvent("view_screen_HbA1c")
     data object TapButtonHbA1cSave : AppMetricEvent("tap_button_HbA1c_save")
     data object TapButtonReminders : AppMetricEvent("tap_button_reminders")

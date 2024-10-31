@@ -904,7 +904,7 @@
     },
     {
       "id": "27:3900211914005807584",
-      "lastPropertyId": "21:5540657784539879993",
+      "lastPropertyId": "22:185164373796252422",
       "name": "EventV2CachedDto",
       "properties": [
         {
@@ -1012,6 +1012,11 @@
           "id": "21:5540657784539879993",
           "name": "tabletsNumber",
           "type": 8
+        },
+        {
+          "id": "22:185164373796252422",
+          "name": "glucoseInputType",
+          "type": 9
         }
       ],
       "relations": []

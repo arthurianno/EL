@@ -23,4 +23,10 @@ class AppSettingsDataRepository @Inject constructor(
         }
 
     override fun deleteDbFiles(): Completable = syncStorage.deleteDbFiles()
+
+    override var shouldManualGlucoseDialogShow: Boolean
+        get() = preferencesHolder.manualGlucoseRemind
+        set(value) {
+            preferencesHolder.manualGlucoseRemind = value
+        }
 }

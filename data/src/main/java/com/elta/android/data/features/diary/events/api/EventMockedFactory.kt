@@ -5,13 +5,13 @@ import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
+import com.elta.android.data.features.diary.events.dto.GlucoseInputTypeDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.v2.EventDataV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import com.elta.android.data.features.diary.events.extensions.countOrZero
-import com.elta.android.domain.features.diary.medicines.model.Medicament
 import org.threeten.bp.ZonedDateTime
 import java.util.Date
 
@@ -62,7 +62,8 @@ object EventMockedFactory {
                 type = type,
                 glucometerSerialNumber = null,
                 products = products,
-                productsCount = products.countOrZero()
+                productsCount = products.countOrZero(),
+                inputType = GlucoseInputTypeDto.AUTO
             )
         )
 }

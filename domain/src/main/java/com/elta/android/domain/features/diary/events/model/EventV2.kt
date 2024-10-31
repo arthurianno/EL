@@ -20,6 +20,7 @@ data class EventV2(
     val duration: Long?,
     val activityType: ActivityType?,
     val mealTag: MealTag?,
+    val glucoseInputType: GlucoseInputType?,
     val insulinMedicament: InsulinMedicament?,
     val medicament: Medicament?,
     val tabletsNumber: Double?,
