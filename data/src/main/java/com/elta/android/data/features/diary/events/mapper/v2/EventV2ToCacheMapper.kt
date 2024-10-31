@@ -32,7 +32,8 @@ class EventV2ToCacheMapper @Inject constructor() : Mapper<EventV2Dto, EventV2Cac
                 temperature = data.temperature,
                 state = state.name,
                 glucometerSerialNumber = data.glucometerSerialNumber,
-                products = data.products.toCache()
+                products = data.products.toCache(),
+                glucoseInputType = data.inputType
             )
         }
 }

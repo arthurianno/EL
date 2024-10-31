@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.fragment.app.Fragment
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
@@ -16,8 +17,8 @@ import com.elta.android.presentation.features.auth.login.ui.LoginFragment
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
-import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
@@ -198,8 +199,11 @@ object Screens {
     }
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
-        override fun getFragment() = when (eventType) {
-            EventType.Glucose -> GlucoseEventFragment.newInstance(eventId)
+        override fun getFragment() = when {
+            eventType is EventType.Glucose && eventType.inputType == GlucoseInputType.AUTO -> {
+                GlucoseEventFragment.newInstance(eventId)
+            }
+
             else -> EditEventFragment.newInstance(eventId, eventType)
         }
     }

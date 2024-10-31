@@ -110,6 +110,7 @@ class HomeFlowFragment :
         pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.glucoseDataReminderDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         bindHelpBottomSheet(pm)
     }
 

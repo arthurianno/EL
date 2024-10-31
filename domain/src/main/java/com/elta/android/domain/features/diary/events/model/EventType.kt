@@ -9,15 +9,15 @@ sealed interface EventType : Parcelable {
     @Parcelize
     data class Bread(val calculatorFlow: CalculatorFlow) : EventType
     @Parcelize
-    object Insulin : EventType
+    data object Insulin : EventType
     @Parcelize
-    object Medicaments : EventType
+    data object Medicaments : EventType
     @Parcelize
-    object Activity : EventType
+    data object Activity : EventType
     @Parcelize
-    object Weight : EventType
+    data object Weight : EventType
     @Parcelize
-    object Glucose : EventType
+    data class Glucose(val inputType : GlucoseInputType) : EventType
     @Parcelize
-    object Glycatedhemoglobin: EventType
+    data object Glycatedhemoglobin: EventType
 }

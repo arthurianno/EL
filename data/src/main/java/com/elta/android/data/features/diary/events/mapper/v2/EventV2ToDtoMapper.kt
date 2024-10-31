@@ -7,12 +7,14 @@ import com.elta.android.data.features.common.dto.StateDto
 import com.elta.android.data.features.diary.events.dto.ActivityTypeDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
 import com.elta.android.data.features.diary.events.dto.EventTypeDto.Companion.toEventTypeDto
+import com.elta.android.data.features.diary.events.dto.GlucoseInputTypeDto.Companion.toDto
 import com.elta.android.data.features.diary.events.dto.MealTagDto
 import com.elta.android.data.features.diary.events.dto.v2.EventDataV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.extensions.countOrZero
 import com.elta.android.data.features.diary.events.mapper.toDto
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MealTag
 import javax.inject.Inject
 
 class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
@@ -41,7 +43,8 @@ class EventV2ToDtoMapper @Inject constructor() : Mapper<EventV2, EventV2Dto> {
                     tabletsNumber = tabletsNumber,
                     glucometerSerialNumber = glucometerSerialNumber,
                     products = dishes.toNetwork(eventType),
-                    productsCount = if (eventType == EventTypeDto.BREAD) dishes.countOrZero() else null
+                    productsCount = if (eventType == EventTypeDto.BREAD) dishes.countOrZero() else null,
+                    inputType = glucoseInputType?.toDto()
                 )
             )
         }

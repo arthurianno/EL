@@ -1,8 +1,9 @@
 package com.elta.android.presentation.features.main.events.edit.pm.mapper
 
 import com.elta.android.domain.features.diary.events.model.ActivityType
-import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.presentation.features.main.events.mapper.toPickerValues
@@ -64,6 +65,12 @@ fun EventV2.getSelectorOption(res: ResourceProvider): SelectorOption? =
 fun EventV2.getMedicament(): Medicament? =
     when(type) {
         EventType.Medicaments -> medicament
+        else -> null
+    }
+
+fun EventV2.getMealTag(): MealTag? =
+    when(type) {
+        is EventType.Glucose -> mealTag
         else -> null
     }
 

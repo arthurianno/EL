@@ -20,6 +20,8 @@ data class GlucoseLevelSettings(
         const val LOW_END = NORMAL_START - STEP
         const val LOW_START = 0.0
 
+        val defaultRange = DoubleRange(NORMAL_START, NORMAL_END)
+
         fun fromNormalValues(normalStart: Double, normalEnd: Double): GlucoseLevelSettings =
             GlucoseLevelSettings(
                 high = DoubleRange(normalEnd + STEP, HIGH_END),

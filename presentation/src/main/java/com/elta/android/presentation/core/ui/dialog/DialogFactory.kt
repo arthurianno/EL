@@ -33,6 +33,12 @@ fun MaterialDialog.Builder.buttons(
     data: DialogData
 ): MaterialDialog.Builder =
     this.also { builder ->
+        data.neural?.let { text ->
+            builder
+                .neutralText(text)
+                .onNeutral { _, _ -> dc.sendResult(DialogResult.NEURAL) }
+                .neutralColorRes(R.color.color_dialog_button)
+        }
         data.negative?.let { text ->
             builder
                 .negativeText(text)

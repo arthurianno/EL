@@ -4,6 +4,8 @@ import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.events.model.State
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
@@ -42,10 +44,11 @@ class AddNewEventUseCase @Inject constructor(
                 medicament = p.medicament,
                 tabletsNumber = p.tabletsNumber,
                 type = p.eventType,
-                mealTag = null,
+                mealTag = p.mealTag,
                 state = State.CREATED,
                 glucometerSerialNumber = p.glucometerSerialNumber,
-                dishes = p.dishes
+                dishes = p.dishes,
+                glucoseInputType = p.glucoseInputType
             )
         )
     }
@@ -64,6 +67,8 @@ class AddNewEventUseCase @Inject constructor(
         val note: String? = null,
         val glucometerSerialNumber: String?,
         val eventType: EventType,
-        val dishes: List<Dish> = emptyList()
+        val dishes: List<Dish> = emptyList(),
+        val glucoseInputType: GlucoseInputType? = null,
+        val mealTag: MealTag? = null
     )
 }

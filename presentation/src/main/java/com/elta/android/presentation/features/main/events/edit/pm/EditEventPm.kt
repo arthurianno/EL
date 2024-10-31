@@ -8,9 +8,14 @@ import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseC
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
 import com.elta.android.domain.features.diary.events.model.isChanged
+import com.elta.android.domain.features.diary.events.model.toCapillaryGlucoseFormat
+import com.elta.android.domain.features.diary.events.model.toGlucoseFormat
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -22,6 +27,7 @@ import com.elta.android.presentation.features.main.events.base.model.MedicamentM
 import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormAdditionalText
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormInputText
+import com.elta.android.presentation.features.main.events.edit.pm.mapper.getMealTag
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getMedicament
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getPickerValues
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
@@ -29,6 +35,7 @@ import com.elta.android.presentation.features.main.events.edit.pm.mapper.getTag
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toDoubleFormat
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.rx2.asObservable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import javax.inject.Inject
@@ -39,6 +46,7 @@ class EditEventPm @Inject constructor(
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
     private val cachedDishes: CachedDishesUseCase,
     calculatorFragmentResult: CalculatorFragmentResultHandler,
     services: ServiceFacade
@@ -58,6 +66,7 @@ class EditEventPm @Inject constructor(
         mainActionTitleState.consumer.accept(resources.getString(R.string.event_form_save_updated_entry_title))
         observeSaveEventAction()
         observeDeleteEventAction()
+        observeGetProfile()
         loadEvent()
     }
 
@@ -79,23 +88,28 @@ class EditEventPm @Inject constructor(
             tagSelector.option.observable,
             selectedDateState.observable,
             noteInput.text.observable,
-            dishes.observable
-        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, dishes ->
+            mealSelector.observable
+        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, mealTag ->
             eventFormHolderState.value.apply {
                 this.eventType = eventType
                 this.pickerValue = pickerValue
-                this.inputValue = inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                this.inputValue =
+                    inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
                 this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
                 this.noteValue = note
                 this.meta = variant.meta
+                this.mealTag = mealTag.takeIf { eventTypeState.value is EventType.Glucose }
             }
         }
             .skip(DEFAULT_SCREEN)
             .doOnNext(::checkIsChanged)
-            .map { isFormValid(it) && isFormChangedState.value }
+            .map {
+                isFormValid(it, profileState.valueOrNull?.glucoseFormat )
+                        && isFormChangedState.value
+            }
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
     }
@@ -111,6 +125,7 @@ class EditEventPm @Inject constructor(
                 getEventByIdUseCase.execute(it)
                     .hideErrorContainer()
                     .bindProgress()
+                    .map(::handleValueWithGlucoseFormat)
                     .doOnSuccess { event ->
                         launch {
                             cachedDishes(event.dishes)
@@ -131,6 +146,26 @@ class EditEventPm @Inject constructor(
 
         eventIdState.observable
             .map { }
+            .subscribe(getProfileAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun observeGetProfile() {
+        getProfileAction.observable
+            .flatMapSingle {
+                getProfileUseCase().asObservable()
+                    .firstOrError()
+                    .bindProgress()
+                    .hideErrorContainer()
+                    .doOnSuccess(profileState.consumer)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        profileState.observable
+            .map {  }
             .subscribe(loadScreenAction.consumer)
             .untilDestroy()
     }
@@ -149,6 +184,9 @@ class EditEventPm @Inject constructor(
                 )
             )
         }
+        event.getMealTag()?.let {
+            mealSelector.consumer.accept(it)
+        }
         dateTimeSelectedAction.consumer.accept(event.additionTime)
         event.note?.let { noteInput.text.consumer.accept(it) }
         dishes.consumer.accept(event.dishes)
@@ -159,9 +197,13 @@ class EditEventPm @Inject constructor(
 
     private fun createEditEventParams(i: Unit): UpdateEventUseCase.Params {
         val form = eventFormHolderState.value
+        val pickerValue =
+            if (eventTypeState.valueOrNull is EventType.Glucose)
+                form.value?.toCapillaryGlucoseFormat(profileState.valueOrNull?.glucoseFormat)
+            else form.value
         return UpdateEventUseCase.Params(
             eventState.value.copy(
-                value = form.value,
+                value = pickerValue,
                 kind = form.kind,
                 name = if (form.medicament == null
                     || form.medicament?.isOther == true
@@ -177,7 +219,9 @@ class EditEventPm @Inject constructor(
                 tabletsNumber = form.tabletsNumber,
                 note = form.note?.trim(),
                 type = checkNotNull(form.eventType),
-                dishes = dishes.value
+                dishes = dishes.value,
+                glucoseInputType = GlucoseInputType.MANUAL.takeIf { eventTypeState.value is EventType.Glucose },
+                mealTag = form.mealTag.takeIf { eventTypeState.value is EventType.Glucose && it != MealTag.NOT_SELECTED }
             )
         )
     }
@@ -195,7 +239,8 @@ class EditEventPm @Inject constructor(
             medicament = eventFormModel.medicament,
             tabletsNumber = eventFormModel.tabletsNumber,
             activity = eventFormModel.activityType,
-            note = eventFormModel.note
+            note = eventFormModel.note,
+            mealTag = eventFormModel.mealTag.takeIf { eventTypeState.value is EventType.Glucose }
         ) ?: false
         isFormChangedState.consumer.accept(isChanged)
     }
@@ -238,6 +283,14 @@ class EditEventPm @Inject constructor(
             .subscribe()
             .untilDestroy()
     }
+
+    private fun handleValueWithGlucoseFormat(event: EventV2): EventV2 =
+        if (event.type is EventType.Glucose) {
+            event.copy(
+                value = event.value?.toGlucoseFormat(profileState.valueOrNull?.glucoseFormat),
+                mealTag = event.mealTag.takeIf { it != null } ?: MealTag.NOT_SELECTED
+            )
+        } else event
 
     private fun createDeleteEventUseCaseParams(event: EventV2) =
         DeleteEventUseCase.Params(event)

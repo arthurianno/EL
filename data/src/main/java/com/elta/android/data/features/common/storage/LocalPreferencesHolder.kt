@@ -13,4 +13,17 @@ class LocalPreferencesHolder @Inject constructor(
         set(value) {
             preferences[BackendVariant.NAME_BACKEND_VARIANT] = value
         }
+
+
+    override var manualGlucoseRemind: Boolean
+        // Если нет значения, то возвращаем true, чтобы отобразить диалог при создании события Ручной замер глюкозы
+        get() = preferences.getBoolean(MANUAL_GLUCOSE_REMIND, true)
+        set(value) {
+            preferences[MANUAL_GLUCOSE_REMIND] = value
+        }
+
+    companion object {
+        const val MANUAL_GLUCOSE_REMIND = "manual_glucose_remind"
+
+    }
 }

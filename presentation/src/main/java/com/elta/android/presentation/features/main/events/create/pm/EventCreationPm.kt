@@ -8,7 +8,10 @@ import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
 import com.elta.android.domain.features.diary.events.interactor.GetLastInsulinEventUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.form.ActivityValidator.isValidDuration
+import com.elta.android.domain.features.diary.events.model.toCapillaryGlucoseFormat
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.presentation.R
@@ -56,7 +59,6 @@ class EventCreationPm @Inject constructor(
         super.onCreate()
 
         getProfileAction.observable
-            .skipWhileInProgress()
             .flatMapSingle {
                 getProfileUseCase.execute()
                     .bindProgress()
@@ -70,7 +72,7 @@ class EventCreationPm @Inject constructor(
 
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+            .map { }
             .subscribe(getProfileAction.consumer)
             .untilDestroy()
 
@@ -92,12 +94,13 @@ class EventCreationPm @Inject constructor(
 
     override fun observeEventChanges() {
         eventTypeState.observable.doOnEach {
-            when(it.value) {
+            when (it.value) {
                 is EventType.Bread -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenFood)
                 is EventType.Activity -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenActivity)
                 is EventType.Insulin -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenInsulin)
                 is EventType.Medicaments -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenMedicines)
                 is EventType.Weight -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenWeight)
+                is EventType.Glucose -> appMetricTracker.trackEvent(AppMetricEvent.ViewScreenManualGlucose)
                 else -> Unit
             }
         }
@@ -113,27 +116,33 @@ class EventCreationPm @Inject constructor(
             tagSelector.option.observable,
             selectedDateState.observable,
             noteInput.text.observable,
-            dishes.observable
-        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, dishes ->
+            mealSelector.observable
+        ) { eventType, pickerValue, inputValue, additionalValue, variant, tag, date, note, mealTag ->
             eventFormHolderState.value.apply {
                 this.eventType = eventType
                 this.pickerValue = pickerValue
-                this.inputValue = inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
+                this.inputValue =
+                    inputValue.removeSuffix(MEDICAMENT_MEASURE_SUFFIX).toDoubleFormat()
                 this.additionalValue = additionalValue
                 this.tag = tag.meta as? Tag
                 this.isDateChanged = this.date.isDateChanged(date)
                 this.date = date
                 this.noteValue = note
                 this.meta = variant.meta
+                this.mealTag = mealTag.takeIf { eventTypeState.value is EventType.Glucose && it != MealTag.NOT_SELECTED }
             }
         }
             .debounce(MAIN_ACTON_BUTTON_DEBOUNCE, TimeUnit.MILLISECONDS)
             .doOnNext { checkIsEmpty(it, dishes.valueOrNull) }
-            .map(::isFormValid)
+            .map { isFormValid(it, profileState.valueOrNull?.glucoseFormat) }
             .subscribe(mainActionVisibilityState.consumer)
             .untilDestroy()
     }
 
+    /**
+     * Проверка отсуствия значения. Если значение пустое или равняется стандартному значению, то
+     * значение будет true
+     */
     private fun checkIsEmpty(eventFormModel: EventFormModel, dishes: List<Dish>?) {
         val isSpecialChanged = when (eventTypeState.valueOrNull) {
             EventType.Weight -> {
@@ -155,6 +164,12 @@ class EventCreationPm @Inject constructor(
                         eventFormModel.inputValue != null
             }
 
+            is EventType.Glucose -> {
+                eventFormModel.mealTag != MealTag.NOT_SELECTED ||
+                        eventFormModel.mealTag != null
+                        eventFormModel.pickerValue != ZERO_PICKER_VALUE
+            }
+
             else -> {
                 eventFormModel.pickerValue != ZERO_PICKER_VALUE ||
                         eventFormModel.meta != null || !dishes.isNullOrEmpty() ||
@@ -164,7 +179,6 @@ class EventCreationPm @Inject constructor(
         val isCommonChanged = eventFormModel.tag != null ||
                 !eventFormModel.note.isNullOrEmpty() ||
                 eventFormModel.isDateChanged
-
         isFormNotEmptyState.consumer.accept(isSpecialChanged || isCommonChanged)
     }
 
@@ -173,12 +187,13 @@ class EventCreationPm @Inject constructor(
             .skipWhileInProgress()
             .map(::createAddEventParams)
             .doOnEach {
-                when(it.value?.eventType) {
+                when (it.value?.eventType) {
                     is EventType.Bread -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonFoodSave)
                     is EventType.Activity -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonActivitySave)
                     is EventType.Insulin -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonInsulinSave)
                     is EventType.Medicaments -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonMedicinesSave)
                     is EventType.Weight -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonWeightSave)
+                    is EventType.Glucose -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonManualGlucoseSave)
                     else -> Unit
                 }
             }
@@ -243,8 +258,12 @@ class EventCreationPm @Inject constructor(
 
     private fun createAddEventParams(i: Unit): AddNewEventUseCase.Params {
         val form = eventFormHolderState.value
+        val pickerValue =
+            if (eventTypeState.valueOrNull is EventType.Glucose)
+                form.value?.toCapillaryGlucoseFormat(profileState.value.glucoseFormat)
+            else form.value
         return AddNewEventUseCase.Params(
-            value = form.value,
+            value = pickerValue,
             kind = form.kind,
             name = form.name,
             duration = form.duration,
@@ -257,7 +276,9 @@ class EventCreationPm @Inject constructor(
             note = form.note,
             eventType = checkNotNull(form.eventType),
             glucometerSerialNumber = null,
-            dishes = dishes.value
+            dishes = dishes.value,
+            glucoseInputType = GlucoseInputType.MANUAL.takeIf { eventTypeState.value is EventType.Glucose },
+            mealTag = form.mealTag.takeIf { eventTypeState.value is EventType.Glucose }
         )
     }
 
@@ -284,6 +305,6 @@ class EventCreationPm @Inject constructor(
     }
 
     companion object {
-        private const val ZERO_PICKER_VALUE = 0.0
+        internal const val ZERO_PICKER_VALUE = 0.0
     }
 }

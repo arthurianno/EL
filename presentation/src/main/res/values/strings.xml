@@ -162,6 +162,7 @@
     <string name="event_type_weight">Вес</string>
     <string name="event_type_activity">Активность</string>
     <string name="event_type_glucose">Запись с глюкометра</string>
+    <string name="event_type_manual_glucose">Ручной ввод</string>
     <string name="event_type_hba1c">HbA1c</string>
     <string name="event_type_sync">Синхронизация с устройством</string>
 
@@ -287,23 +288,28 @@
     <string name="events_helper_text_bread">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_insulin">Доступный целевой диапазон ввода: от 0,1 до 99,9</string>
     <string name="events_helper_text_weight">Укажите ваш текущий вес</string>
+    <string name="events_helper_text_glucose_capillary">Доступный диапазон ввода: от 1,4 до 28,0\nУровень глюкозы в цельной капиллярной крови</string>
+    <string name="events_helper_text_glucose_plasma">Доступный диапазон ввода: от 1,6 до 31,4\nУровень глюкозы в плазме крови</string>
     <string name="events_helper_text_activity">Введите общую продолжительность активности</string>
 
     <string name="events_form_screen_title_bread">Еда</string>
     <string name="events_form_screen_title_insulin">Инсулин</string>
     <string name="events_form_screen_title_weight">Вес</string>
+    <string name="events_form_screen_title_glucose_manual">Глюкоза (ручной ввод)</string>
     <string name="events_form_screen_title_activity">Активность</string>
     <string name="events_form_screen_title_medicaments">Медикаменты</string>
 
     <string name="event_form_measure_unit_bread">ХЕ</string>
     <string name="event_form_measure_unit_insulin">Ед.</string>
     <string name="event_form_measure_unit_weight">кг</string>
+    <string name="event_form_measure_unit_glucose">ммоль/л</string>
     <string name="event_form_measure_unit_hours">ч</string>
     <string name="event_form_measure_unit_minutes">мин</string>
 
     <string name="event_form_bread_format_mask">%d,%d XE</string>
     <string name="event_form_insulin_format_mask">%d,%d Ед.</string>
     <string name="event_form_weight_format_mask">%d,%d кг</string>
+    <string name="event_form_glucose_format_mask">%d,%d ммоль/л</string>
     <string name="event_form_activity_format_mask">%d ч %d мин</string>
 
     <string name="event_time_in_mask">%s в %s</string>
@@ -962,6 +968,8 @@
     <string name="emias_unbind_message">Ваши данные по замерам глюкозы больше не будут отправляться в ЕМИАС</string>
     <string name="emias_profile_unbinded_title">Аккаунт ЕМИАС успешно отвязан</string>
     <string name="emias_dialog_confirm">Ок</string>
+    <string name="emias_dialog_manual_glucose_not_send">Данные об уровне глюкозы, добавленные вручную, не передаются в ЕМИАС</string>
+    <string name="emias_dialog_manual_glucose_not_send_not_remind_button">Не напоминать</string>
 
     <string name="incorrect_length_error">Поле должно быть заполнено полностью</string>
     <string name="required_field_error">Обязательно поле</string>
