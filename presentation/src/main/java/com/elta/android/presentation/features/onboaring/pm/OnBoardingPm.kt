@@ -2,6 +2,8 @@ package com.elta.android.presentation.features.onboaring.pm
 
 import com.elta.android.common.errors.EmiasError
 import com.elta.android.common.errors.ServiceUnavailableError
+import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
 import com.elta.android.domain.features.emias.interactor.UpdateEmiasUseCase
 import com.elta.android.domain.features.emias.model.Emias
@@ -44,6 +46,7 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -55,6 +58,7 @@ class OnBoardingPm @Inject constructor(
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val updateEmiasUseCase: UpdateEmiasUseCase,
     private val getEmiasStatus: GetEmiasStatusUseCase,
+    private val addNewEvent: AddNewEventUseCase,
     private val appMetric: AppMetricTracker,
     services: ServiceFacade,
 ) : BaseListPm(services) {
@@ -195,6 +199,9 @@ class OnBoardingPm @Inject constructor(
                         appMetric.trackEvent(params.profile.glucoseFormat.getMetricName())
                         params.profile.diabetes?.getMetricName()?.let { appMetric.trackEvent(it) }
                     }
+                    .doOnComplete {
+                        params.profile.weight?.let { addWeightEvent(it) }
+                    }
                     .doOnComplete(::handleSuccess)
                     .doOnError(::handleError)
             }
@@ -320,6 +327,20 @@ class OnBoardingPm @Inject constructor(
                 else -> false
             }
         )
+    }
+
+    private fun addWeightEvent(weight: Double) {
+        addNewEvent.execute(
+            AddNewEventUseCase.Params(
+                value = weight,
+                date = ZonedDateTime.now(),
+                eventType = EventType.Weight,
+                glucometerSerialNumber = null
+            )
+        )
+            .doOnError(::handleError)
+            .subscribe()
+            .untilDestroy()
     }
 
     private fun createUseCaseParams(i: Unit): UpdateProfileUseCase.Params {
