@@ -91,7 +91,7 @@ object Dependencies {
     object Utils {
         private const val jodaTimeVersion = "2.9.9.2" // 2.12.0
         private const val essentialsVersion = "3.1.0"
-        private const val android310Version = "1.2.0"
+        private const val android310Version = "1.4.7"
 
         const val jodaTime = "net.danlew:android.joda:$jodaTimeVersion"
         const val essentials = "org.greenrobot:essentials:$essentialsVersion"
