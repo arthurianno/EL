@@ -4,6 +4,7 @@ import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.NotFoundError
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -23,12 +24,16 @@ class ConnectIomtUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val crashlyticsReport: CrashlyticsReport,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     schedulers: SchedulersFacade
 ) : CompletableUseCase<Unit>(schedulers) {
     override fun buildUseCaseObservable(params: Unit?): Completable {
         return Completable.create { emitter ->
             try {
-                bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
+                bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+                    crashlyticsReport = crashlyticsReport,
+                    isLocationNeeded = appSettingsRepository.isLocationNeeded
+                )
 
                 rosTech.setListeners(
                     onDisconnect = { emitter.onComplete() },

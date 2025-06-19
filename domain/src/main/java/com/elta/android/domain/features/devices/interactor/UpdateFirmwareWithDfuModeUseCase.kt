@@ -2,6 +2,7 @@ package com.elta.android.domain.features.devices.interactor
 
 import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
+import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
@@ -22,6 +23,7 @@ class UpdateFirmwareWithDfuModeUseCase @Inject constructor(
     private val pinRepository: PinRepository,
     private val deviceRepository: DeviceRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val crashlyticsReport: CrashlyticsReport,
     schedulers: SchedulersFacade
 ) : ObservableWithTimerUseCase<String, UpdateFirmwareWithDfuModeUseCase.Params>(
@@ -37,7 +39,10 @@ class UpdateFirmwareWithDfuModeUseCase @Inject constructor(
 
             val address = p.address
 
-            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+                crashlyticsReport = crashlyticsReport,
+                isLocationNeeded = appSettingsRepository.isLocationNeeded
+            )
 
             crashlyticsReport.log("Checking pin")
             val pin = pinRepository.getPin(address)

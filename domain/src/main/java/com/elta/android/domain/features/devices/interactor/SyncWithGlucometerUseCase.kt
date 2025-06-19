@@ -4,6 +4,7 @@ import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
+import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.SEND_DATA_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
@@ -26,6 +27,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val deviceInfoRepository: DeviceInfoRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val profileRepository: ProfileRepository,
     private val pinRepository: PinRepository,
     private val eventsRepository: EventsRepository,
@@ -43,7 +45,10 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw PrimaryGlucometerNotFoundError
             }
 
-            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+                crashlyticsReport = crashlyticsReport,
+                isLocationNeeded = appSettingsRepository.isLocationNeeded
+            )
 
             crashlyticsReport.log("Getting a user profile")
             val profile = try {

@@ -1,13 +1,13 @@
 package com.elta.android.data.features.auth.repository
 
 import com.elta.android.common.di.qualifires.Cache
-import com.elta.android.data.features.appsettings.AppSettingsDataRepository
 import com.elta.android.data.features.auth.datasource.AuthDataSource
 import com.elta.android.data.features.auth.model.EmailStatusNetworkResponse
 import com.elta.android.data.features.auth.model.LoginNetworkResponse
 import com.elta.android.data.features.auth.model.TokenOwnerNetworkResponse
 import com.elta.android.data.features.auth.model.TokensNetworkResponse
 import com.elta.android.data.features.auth.storage.TokenStorage
+import com.elta.android.data.features.common.storage.PreferencesHolder
 import com.elta.android.data.features.common.storage.UserHolder
 import com.elta.android.data.features.user.datasource.ProfileDataSource
 import com.elta.android.data.features.user.mapper.toNetwork
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class AuthDataRepository @Inject constructor(
     private val userHolder: UserHolder,
     private val tokenStorage: TokenStorage,
-    private val localSettingsDataRepository: AppSettingsDataRepository,
+    private val preferencesHolder: PreferencesHolder,
     private val source: AuthDataSource,
     private val userInfoRepository: UserInfoRepository,
     private val profileRepository: ProfileRepository,
@@ -42,8 +42,8 @@ class AuthDataRepository @Inject constructor(
             }
             .andThen(userInfoRepository.updateUserInfo(createNewUserInfo()))
 
-    override fun login(email: String, password: String): Single<Boolean> =
-        source.login(email, password)
+    override fun login(email: String, password: String, activateAccount: Boolean): Single<Boolean> =
+        source.login(email, password, activateAccount)
             .doOnSuccess { response ->
                 saveUserCredentials(response.tokens, email)
             }
@@ -113,7 +113,7 @@ class AuthDataRepository @Inject constructor(
             tokenStorage.accessToken = null
             tokenStorage.refreshToken = null
             userHolder.currentUser = null
-            localSettingsDataRepository.shouldManualGlucoseDialogShow = true
+            preferencesHolder.manualGlucoseRemind = true
         }
 
     override fun deleteAccount(): Completable =

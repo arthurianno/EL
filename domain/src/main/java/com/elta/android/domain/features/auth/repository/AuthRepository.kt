@@ -8,7 +8,13 @@ interface AuthRepository {
 
     fun register(email: String, password: String): Completable
 
-    fun login(email: String, password: String): Single<Boolean>
+    /**
+     * Авторизация аккаунта и восстановление.
+     * @param email Электронная почта.
+     * @param password Пароль от аккаунта.
+     * @param activateAccount Указывает на необходимость восстановления аккаунта. По умолчанию false.
+     */
+    fun login(email: String, password: String, activateAccount: Boolean = false): Single<Boolean>
 
     fun isEmailConfirmed(): Single<Boolean>
 

@@ -14,6 +14,7 @@ import com.elta.android.domain.features.sale_points.model.Type
 import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
+import com.elta.android.presentation.features.auth.login.ui.LoginFragmentVariantA
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
@@ -24,6 +25,7 @@ import com.elta.android.presentation.features.calcutator.products.model.DishUiEn
 import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragmentVariantA
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
@@ -31,6 +33,7 @@ import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
+import com.elta.android.presentation.features.home.ui.HomeFlowFragmentVariantA
 import com.elta.android.presentation.features.main.events.chooser.models.ChooserConfiguration
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
@@ -60,6 +63,7 @@ import com.elta.android.presentation.features.registration.activation.ui.Activat
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
+import com.elta.android.presentation.features.registration.main.variantA.ui.RegistrationMainFragmentVariantA
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
 import com.elta.android.presentation.features.shops.start.ui.ShopsStartFragment
@@ -70,10 +74,15 @@ import com.elta.android.presentation.features.sync.connect.ConnectHelpFragment
 import com.elta.android.presentation.features.sync.connect.ConnectStartFragment
 import com.elta.android.presentation.features.sync.connect.ConnectTypeFragment
 import com.elta.android.presentation.features.sync.connect.ConnectingFragment
+import com.elta.android.presentation.features.sync.connect.ConnectingFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.HowToConnectFragment
+import com.elta.android.presentation.features.sync.connect.HowToConnectFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.ScannerDmcFragment
+import com.elta.android.presentation.features.sync.connect.ScannerDmcFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragmentVariantA
 import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.start.onboarding.ui.FromOnBoardingSyncStartFragment
@@ -109,6 +118,10 @@ object Screens {
         override fun getFragment(): Fragment = RegistrationMainFragment.newInstance()
     }
 
+    object RegistrationMainVariantA : SupportAppScreen() {
+        override fun getFragment(): Fragment = RegistrationMainFragmentVariantA.newInstance()
+    }
+
     object ActivateProfile : SupportAppScreen() {
         override fun getFragment(): Fragment = ActivationFragment.newInstance()
     }
@@ -124,6 +137,11 @@ object Screens {
 
     object Login : SupportAppScreen() {
         override fun getFragment(): Fragment = LoginFragment.newInstance()
+    }
+
+    // fixme Variant A : recovery_account
+    object LoginVariantA : SupportAppScreen() {
+        override fun getFragment(): Fragment = LoginFragmentVariantA.newInstance()
     }
 
     object PasswordRecovery : SupportAppScreen() {
@@ -170,6 +188,11 @@ object Screens {
     // HOME FLOW
     object HomeFlow : SupportAppScreen() {
         override fun getFragment() = HomeFlowFragment.newInstance()
+    }
+
+    // fixme Variant A : improved_enabling_location
+    object HomeFlowVariantA : SupportAppScreen() {
+        override fun getFragment() = HomeFlowFragmentVariantA.newInstance()
     }
 
     // TABS
@@ -242,8 +265,17 @@ object Screens {
             FromOnBoardingConnectDeviceByPinFragment.newInstance()
     }
 
+    object FromOnBoardingConnectDeviceByPinVariantA : SupportAppScreen() {
+        override fun getFragment(): Fragment =
+            FromOnBoardingConnectDeviceByPinFragmentVariantA.newInstance()
+    }
+
     object FromOtherConnectDeviceByPin : SupportAppScreen() {
         override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragment.newInstance()
+    }
+
+    object FromOtherConnectDeviceByPinVariantA : SupportAppScreen() {
+        override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragmentVariantA.newInstance()
     }
 
     data class ConnectStartScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
@@ -262,9 +294,18 @@ object Screens {
         override fun getFragment() = HowToConnectFragment.newInstance(isOnBoarding)
     }
 
+    data class HowToConnectScreenVariantA(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = HowToConnectFragmentVariantA.newInstance(isOnBoarding)
+    }
+
     @ExperimentalCameraProviderConfiguration
     data class ScannerDmcScreen(val isOnBoarding: Boolean) : SupportAppScreen() {
         override fun getFragment() = ScannerDmcFragment.newInstance(isOnBoarding)
+    }
+
+    @ExperimentalCameraProviderConfiguration
+    data class ScannerDmcScreenVariantA(val isOnBoarding: Boolean) : SupportAppScreen() {
+        override fun getFragment() = ScannerDmcFragmentVariantA.newInstance(isOnBoarding)
     }
 
     data class ConnectingScreen(
@@ -273,6 +314,14 @@ object Screens {
         val name: String
     ) : SupportAppScreen() {
         override fun getFragment() = ConnectingFragment.newInstance(isOnBoarding, pin, name)
+    }
+
+    data class ConnectingScreenVariantA(
+        val isOnBoarding: Boolean,
+        val pin: String,
+        val name: String
+    ) : SupportAppScreen() {
+        override fun getFragment() = ConnectingFragmentVariantA.newInstance(isOnBoarding, pin, name)
     }
 
     // DIARY FLOW
@@ -327,6 +376,12 @@ object Screens {
 
     data class UpdateFirmware(val address: String) : SupportAppScreen() {
         override fun getFragment() = FirmwareFragment.newInstance(address)
+    }
+
+    // fixme Variant A : improved_enabling_location
+
+    data class UpdateFirmwareVariantA(val address: String) : SupportAppScreen() {
+        override fun getFragment() = FirmwareFragmentVariantA.newInstance(address)
     }
 
     object CreateRemind : SupportAppScreen() {

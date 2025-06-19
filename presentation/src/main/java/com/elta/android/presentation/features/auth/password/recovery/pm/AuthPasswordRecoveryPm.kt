@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.auth.password.recovery.pm
 
 import com.elta.android.common.errors.NotFoundError
 import com.elta.android.domain.features.auth.interactor.SendPasswordResetLinkUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -11,6 +12,7 @@ import javax.inject.Inject
 
 class AuthPasswordRecoveryPm @Inject constructor(
     private val sendPasswordResetLinkUseCase: SendPasswordResetLinkUseCase,
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     services: ServiceFacade
 ) : BaseAuthPm(services) {
 
@@ -45,7 +47,11 @@ class AuthPasswordRecoveryPm @Inject constructor(
             )
         )
 
-        router.navigateTo(Screens.Login)
+        // fixme Variant A : recovery_account
+        val isNewRecovery = getFeatureConfigUseCase.invoke().recoveryAccount
+        val screen = if (isNewRecovery) Screens.Login
+        else Screens.LoginVariantA
+        router.navigateTo(screen)
     }
 
     override fun handleError(error: Throwable) {

@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
@@ -18,6 +19,7 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectTypeView
 import javax.inject.Inject
 
 class ConnectTypeViewModel @Inject constructor(
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     private val analytics: Analytics,
     private val appMetric: AppMetricTracker
 ) : BaseViewModel<ConnectTypeViewState>() {
@@ -55,17 +57,26 @@ class ConnectTypeViewModel @Inject constructor(
     private fun connectByDmc() {
         appMetric.trackEvent(AppMetricEvent.ConnectingOptionClick(ConnectingTypeParam.DMC_SCAN))
         analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.SCAN_DMC))
-        router.navigateTo(Screens.HowToConnectScreen(state.value.isOnBoarding))
+        // fixme Variant A : improved_enabling_location
+        val screen = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) Screens.HowToConnectScreen(state.value.isOnBoarding)
+        else Screens.HowToConnectScreenVariantA(state.value.isOnBoarding)
+        router.navigateTo(screen)
     }
 
     private fun connectByPin() {
         appMetric.trackEvent(AppMetricEvent.ConnectingOptionClick(ConnectingTypeParam.PIN_ENTER))
         analytics.trackEvent(AnalyticsEvent(AnalyticsEventType.PIN_CONNECTION))
+            // fixme variant a improved_enabling_location
+        val (fromOnboardingScreen, fromOtherConnectScreen) = if (getFeatureConfigUseCase.invoke().improvedEnablingLocation) {
+            Screens.FromOnBoardingConnectDeviceByPin to Screens.FromOtherConnectDeviceByPin
+        } else {
+            Screens.FromOnBoardingConnectDeviceByPinVariantA to Screens.FromOtherConnectDeviceByPinVariantA
+        }
         router.navigateTo(
             if (state.value.isOnBoarding) {
-                Screens.FromOnBoardingConnectDeviceByPin
+                fromOnboardingScreen
             } else {
-                Screens.FromOtherConnectDeviceByPin
+                fromOtherConnectScreen
             }
         )
     }

@@ -4,6 +4,7 @@ import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.CheckConnectedDevicesUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
+import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
@@ -15,7 +16,8 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
 import javax.inject.Inject
 
-private const val SOURCE_PROFILE = "profile"
+// fixme Variant A : improved_enabling_location
+const val SOURCE_PROFILE = "profile"
 
 class FromOtherConnectDevicePm @Inject constructor(
     syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
@@ -23,6 +25,7 @@ class FromOtherConnectDevicePm @Inject constructor(
     findGlucometersUseCase: FindGlucometersUseCase,
     updateUserInfoUseCase: UpdateUserInfoUseCase,
     checkConnectedDevicesUseCase: CheckConnectedDevicesUseCase,
+    getLocationNeededUseCase: GetLocationNeededUseCase,
     appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : ConnectDevicePm(
@@ -30,6 +33,7 @@ class FromOtherConnectDevicePm @Inject constructor(
     addNewDeviceUseCase,
     findGlucometersUseCase,
     checkConnectedDevicesUseCase,
+    getLocationNeededUseCase,
     updateUserInfoUseCase,
     appMetric,
     services

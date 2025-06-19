@@ -11,7 +11,13 @@ interface AuthDataSource {
 
     fun register(email: String, password: String): Single<TokensNetworkResponse>
 
-    fun login(email: String, password: String): Single<LoginNetworkResponse>
+    /**
+    * Авторизация аккаунта и восстановление.
+     * @param email Электронная почта.
+     * @param password Пароль от аккаунта.
+     * @param activateAccount Указывает на необходимость восстановления аккаунта.
+     */
+    fun login(email: String, password: String, activateAccount: Boolean): Single<LoginNetworkResponse>
 
     fun sendConfirmationLink(): Completable
 

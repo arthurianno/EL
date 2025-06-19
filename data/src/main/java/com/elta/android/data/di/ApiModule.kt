@@ -7,6 +7,7 @@ import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.common.api.PersonalDataApi
 import com.elta.android.data.common.api.PersonalDataMockedApi
 import com.elta.android.data.features.auth.api.AuthApi
+import com.elta.android.data.features.auth.api.AuthApiVariantA
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
 import com.elta.android.data.features.calculator.api.FatSecretApi
@@ -64,6 +65,13 @@ class ApiModule {
     fun provideAuthApi(
         retrofit: Retrofit
     ): AuthApi = retrofit.create(AuthApi::class.java)
+
+    // fixme Variant A : recovery_account
+    @Provides
+    @Singleton
+    fun provideAuthApiVariantA(
+        retrofit: Retrofit
+    ): AuthApiVariantA = retrofit.create(AuthApiVariantA::class.java)
 
     @Provides
     @Singleton

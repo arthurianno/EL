@@ -5,19 +5,25 @@ package com.elta.android.presentation.features.sync.control
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.tasks.Task
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nullgr.core.intents.launchForResult
-import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,6 +31,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import me.dmdev.rxpm.PresentationModel
+import timber.log.Timber
 
 class PermissionsControl2 {
 
@@ -56,21 +63,22 @@ class PermissionsControl2 {
             .doOnSubscribe { locationRequestRelay.accept(Unit) }
             .firstElement()
 
-    fun requestLocationPermissions(): Maybe<Boolean> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    @Deprecated("Метод некорретно обрабатывает результаты разрешения Устройств поблизости из-за логики библиотеки. Используейте нативные контракты")
+    fun requestBluetoothPermission(): Maybe<Boolean> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             bluetoothPermissionsRequestResultRelay
                 .doOnSubscribe { bluetoothPermissionsRequestRelay.accept(Unit) }
                 .firstElement()
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            combinedPermissionsRequestResultRelay
-                .doOnSubscribe { combinedPermissionsRequestRelay.accept(Unit) }
-                .firstElement()
-
         } else {
             locationPermissionsRequestResultRelay
                 .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
                 .firstElement()
         }
+
+    fun requestLocationPermission(): Maybe<Boolean> =
+        locationPermissionsRequestResultRelay
+                .doOnSubscribe { locationPermissionsRequestRelay.accept(Unit) }
+                .firstElement()
 
     companion object {
         const val REQUEST_CODE_ENABLE_LOCATION = 147
@@ -142,7 +150,7 @@ fun PermissionsControl2.resolveResults(requestCode: Int, resultCode: Int) {
     }
 }
 
-fun enableLocation(fragment: Fragment, onEnabled: (() -> Unit)? = null) {
+fun enableLocation(fragment: Fragment) {
     val locationRequest = LocationRequest.create().apply {
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
@@ -166,10 +174,88 @@ fun enableLocation(fragment: Fragment, onEnabled: (() -> Unit)? = null) {
             }
         }
     }
-        .addOnSuccessListener {
-            onEnabled?.invoke()
-        }
+}
 
+fun ActivityResultLauncher<IntentSenderRequest>.requestEnableLocation(
+    context: Context,
+    locationAlreadyEnable: (() -> Unit)? = null
+) {
+    val locationRequest = LocationRequest.create().apply {
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
+
+    val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+    val client = LocationServices.getSettingsClient(context)
+    val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+    task.addOnFailureListener { exception ->
+        if (exception is ResolvableApiException) {
+            try {
+                this.launch(IntentSenderRequest.Builder(exception.resolution).build())
+            } catch (sendEx: IntentSender.SendIntentException) {
+                Timber.e(exception, "Error requesting location enabling")
+            }
+        }
+    }
+        .addOnSuccessListener {
+            locationAlreadyEnable?.invoke()
+        }
+}
+
+fun ActivityResultLauncher<Intent>.requestEnableBluetooth() {
+    val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+    this.launch(intent)
+}
+
+fun Context.checkSelfPermissionByName(
+    permissionName: String,
+    onRequestPermission: (permissionName : String) -> Unit = {},
+    showPermissionRationale: () -> Unit = {},
+    onGranted: () -> Unit = {}
+) {
+    if (ContextCompat.checkSelfPermission(
+            this,
+            permissionName
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this as ComponentActivity,
+                permissionName
+            )
+        ) {
+            showPermissionRationale()
+        } else {
+            onRequestPermission(permissionName)
+        }
+    } else {
+        onGranted()
+    }
+}
+
+fun Context.checkBluetoothSelfPermission(
+    onRequestPermission: () -> Unit = {},
+    showPermissionRationale: () -> Unit = {},
+    onGranted: () -> Unit = {}
+) {
+    if (
+        ContextCompat.checkSelfPermission(
+            this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        && ContextCompat.checkSelfPermission(
+            this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+    ) {
+        if (
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this as ComponentActivity, Manifest.permission.BLUETOOTH_SCAN)
+            && ActivityCompat.shouldShowRequestPermissionRationale(
+                this as ComponentActivity, Manifest.permission.BLUETOOTH_CONNECT)
+        ) {
+            showPermissionRationale()
+        } else {
+            onRequestPermission()
+        }
+    } else {
+        onGranted()
+    }
 }
 
 fun checkPermissions(activity: Activity) {
@@ -186,19 +272,10 @@ fun checkPermissions(activity: Activity) {
         }
     }
 
-    val androidVersion = Build.VERSION.SDK_INT
-
     val permissionsList = mutableListOf<String>()
 
-    if (androidVersion >= Build.VERSION_CODES.TIRAMISU) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         permissionsList.add(Manifest.permission.POST_NOTIFICATIONS)
-    }
-    if (androidVersion >= Build.VERSION_CODES.S) {
-        permissionsList.add(Manifest.permission.BLUETOOTH_SCAN)
-        permissionsList.add(Manifest.permission.BLUETOOTH_CONNECT)
-    }
-    if (androidVersion < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     check(permissionsList)

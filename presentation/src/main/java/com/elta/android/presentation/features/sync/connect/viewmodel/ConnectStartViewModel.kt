@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
@@ -16,7 +17,8 @@ import com.elta.android.presentation.features.sync.connect.model.ConnectStartVie
 import javax.inject.Inject
 
 class ConnectStartViewModel @Inject constructor(
-    private val appMetric: AppMetricTracker
+    private val appMetric: AppMetricTracker,
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
 ) : BaseViewModel<ConnectStartViewState>() {
     override fun createInitState() = ConnectStartViewState(
         isOnBoarding = true
@@ -49,7 +51,13 @@ class ConnectStartViewModel @Inject constructor(
             // todo: SalepointHide
             // скрываем точки продаж. было:
             // router.navigateTo(Screens.ShopsStart)
-            is ConnectAction.SkipNextStep -> router.newRootScreen(Screens.HomeFlow)
+            is ConnectAction.SkipNextStep -> {
+                // fixme Variant A : improved_enabling_location
+                val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                val screen = if (improvedEnablingLocation) Screens.HomeFlow
+                else Screens.HomeFlowVariantA
+                router.newRootScreen(screen)
+            }
         }
         super.handleUserAction(action)
     }

@@ -6,9 +6,10 @@ import com.elta.android.presentation.core.navigation.support.SupportAppScreen
 
 object NotificationNavigationMapper {
 
-    fun notificationDataToScreen(uri: Uri): SupportAppScreen? {
+    fun notificationDataToScreen(uri: Uri, improvedEnablingLocation: Boolean): SupportAppScreen? {
         return when {
-            uri.lastPathSegment.equals(HOME_SCREEN, true) -> Screens.HomeFlow
+            // fixme Variant A : improved_enabling_location
+            uri.lastPathSegment.equals(HOME_SCREEN, true) -> if (improvedEnablingLocation) Screens.HomeFlow else Screens.HomeFlowVariantA
             else -> null
         }
     }

@@ -5,7 +5,13 @@ import com.elta.android.common.utils.hideMac
 class BluetoothScannerError(val code: Int) : RuntimeException("bluetooth scanner return error: $code")
 object BluetoothNotEnabledError : RuntimeException()
 object BluetoothScannerNotAvailable : RuntimeException()
+// fixme Variant A : improved_enabling_location
+object LocationPermissionNotGrantedErrorVariantA : RuntimeException()
+object BluetoothNotEnabledErrorVariantA : RuntimeException()
+object LocationNotEnabledErrorVariantA : RuntimeException()
+
 object LocationPermissionNotGrantedError : RuntimeException()
+object BluetoothPermissionNotGrantedError : RuntimeException()
 object LocationNotEnabledError : RuntimeException()
 
 object GlucometerPinIncorrect : RuntimeException()

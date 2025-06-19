@@ -28,6 +28,7 @@ import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.elta.android.presentation.widgets.BottomNavigationView
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
@@ -111,6 +112,7 @@ class HomeFlowFragment :
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.glucoseDataReminderDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.openSettingsCommand.bindTo { openSettingsIntent(requireContext()) }
         bindHelpBottomSheet(pm)
     }
 
@@ -144,13 +146,35 @@ class HomeFlowFragment :
                 val title = when (error) {
                     ManualSyncError.ErrorSync -> R.string.sync_connection_sync_error_title
                     ManualSyncError.NotFound -> R.string.sync_connect_device_not_found
+                    ManualSyncError.PermissionNotGranted -> R.string.sync_connect_device_check_permission
                 }
-                val errorIsNotFound = error is ManualSyncError.NotFound
+                val errorTextView = findViewById<TextView>(R.id.error_sync_text)
+                val confirmButton = findViewById<AppCompatTextView>(R.id.confirmButtonView)
+
+                val (errorMessageId, buttonMessageId, action) =
+                    if (error is ManualSyncError.PermissionNotGranted)
+                        Triple(
+                            R.string.sync_connection_permission_not_granted_description,
+                            R.string.sync_connection_permission_not_granted_button,
+                            pm.permissionSyncErrorAction
+                        )
+                    else
+                        Triple(
+                            R.string.sync_connection_error_text,
+                            R.string.repeat_sync_button_text,
+                            pm.manualSyncErrorAction
+                        )
+
+                errorTextView.isVisible = error is ManualSyncError.ErrorSync || error is ManualSyncError.PermissionNotGranted
+                errorTextView.text = resources.getString(errorMessageId)
+
                 findViewById<TextView>(R.id.title).setText(title)
-                findViewById<TextView>(R.id.error_sync_text).isVisible = !errorIsNotFound
-                findViewById<TextView>(R.id.not_found_text).isVisible = errorIsNotFound
-                findViewById<AppCompatTextView>(R.id.confirmButtonView).clicks().bindTo(pm.manualSyncErrorAction)
-                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks().bindTo(pm.closeBottomSheetErrorAction)
+                findViewById<TextView>(R.id.not_found_text).isVisible = error is ManualSyncError.NotFound
+
+                confirmButton.text = resources.getString(buttonMessageId)
+                confirmButton.clicks().bindTo(action)
+                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks()
+                    .bindTo(pm.closeBottomSheetErrorAction)
             }
         }
 
