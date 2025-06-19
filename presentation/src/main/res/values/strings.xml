@@ -56,6 +56,7 @@
     <string name="registration_activate_description">Пройдите по ссылке, чтобы подтвердить\nрегистрацию вашего аккаунта. Если вы\nне получили данное письмо, проверьте\nпапки «Спам»</string>
     <string name="registration_send_again">Отправить письмо повторно</string>
     <string name="registration_error_input_email">Введите, пожалуйста, корректный email</string>
+    <string name="registration_error_email_already_registered">Внимание! Указанный email уже существует.</string>
     <string name="registration_error_same_email">Данный пользователь уже является вашим наблюдателем</string>
     <string name="registration_error_same_email_awaiting">Данному пользователю уже отправлено приглашение</string>
     <string name="registration_error_current_user_email">Невозможно отправить на свой email</string>
@@ -389,6 +390,7 @@
     <string name="sync_connect_start_title">Хотите подключить глюкометр?</string>
     <string name="sync_connect_start_text">Вы можете подключить глюкометр сейчас или пропустить этот шаг и сделать это позже в своём профиле</string>
 
+    <string name="sync_connect_device_check_permission">Проверьте разрешение</string>
     <string name="sync_connect_device_not_found">Устройство не найдено</string>
     <string name="sync_connect_incorrect_pin_code">Вы ввели неверный ПИН-код</string>
     <string name="sync_connect_connect_error">Ошибка подключения устройства</string>
@@ -404,10 +406,16 @@
     <string name="sync_connection_screen_text">Проверяем Bluetooth-соединение и устанавливаем связь с вашим устройством.</string>
     <string name="sync_connection_connect_error_title">Ошибка подключения</string>
     <string name="sync_connection_sync_error_title">Ошибка синхронизации</string>
+    <string name="sync_connection_permission_not_granted_description">Для поиска устройства и успешной синхронизации приложению необходимы определенные разрешения (Bluetooth, поиск устройств поблизости, определение местоположения). Пожалуйста, перейдите в настройки и предоставьте доступ</string>
+    <string name="sync_connection_permission_not_granted_button">Перейти в настройки</string>
     <string name="sync_connection_error_text">Проверьте, что глюкометр готов/доступен для подключения. Если подключиться так и не удается, повторите попытку позднее.</string>
     <string name="sync_connection_scanner_sheet_info_text">Расположите DMC-код внутри выделенной области сверху</string>
     <string name="sync_connection_scanner_sheet_error_title">Ошибка чтения</string>
     <string name="sync_connection_scanner_sheet_error_text">Наведите камеру на DMC-код ещё раз</string>
+    <string name="sync_connection_scanner_sheet_already_connected_title">Этот глюкометр уже подключен</string>
+    <string name="sync_connection_scanner_sheet_already_connected_text">Повторное подключение не требуется, попробуйте отсканировать другое устройство.</string>
+    <string name="sync_connection_scanner_sheet_device_already_connected_title">Этот глюкометр уже подключен</string>
+    <string name="sync_connection_scanner_sheet_device_already_connected_text">Повторное подключение не требуется, попробуйте отсканировать другое устройство.</string>
     <string name="sync_connected_text">Поздравляем! Глюкометр %s успешно подключен. Вы можете перейти к работе с приложением после завершения синхронизации.</string>
     <string name="sync_connect_by_pin_boton_text">Подключить через ПИН-код</string>
     <string name="repeat_search_button_text">Повторить поиск</string>
@@ -489,8 +497,14 @@
     <string name="profile_delete_button_dissmit">Нет</string>
     <string name="profile_delete_text">После удаления профиля все ранее внесенные данные, в том числе привязка к системе ЕМИАС, будут удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
-    <string name="profile_is_deleted_title">Пользователь удалил профиль</string>
-    <string name="profile_is_deleted_body">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
+    <string name="profile_is_deleted_title">Аккаунт удален</string>
+    <string name="profile_is_deleted_body">Хотите восстановить аккаунт?</string>
+    <string name="profile_is_deleted_restored_body">Ваш аккаунт успешно восстановлен</string>
+    <string name="profile_is_deleted_restore_button">Восстановить</string>
+
+<!--  Variant A recovery_account -->
+    <string name="profile_is_deleted_title_variant_a">Пользователь удалил профиль</string>
+    <string name="profile_is_deleted_body_variant_a">Для восстановления учетной записи обратитесь на service@eltaltd.ru в течение 30 дней после удаления профиля. В обращении укажите email, указанный при регистрации.</string>
 
     <string name="profile_settings_dialog_diabetes_title">Диабет</string>
     <string name="profile_settings_dialog_diabetes_subtitle">Изменение типа</string>
@@ -665,7 +679,10 @@
     <string name="profile_support_phone_number">8 800 250 17 50</string>
     <string name="profile_support_phone_number_description">Позвонить</string>
     <string name="profile_support_email">service@eltaltd.ru</string>
+
+<!--    VariantA recovery_account-->
     <string name="profile_restore_email_body">Прошу восстановить мой профиль</string>
+
     <string name="profile_support_email_description">Написать</string>
     <string name="profile_support_service_centers">Куда обратиться</string>
     <string name="profile_support_service_centers_description">Карта сервисных центров</string>
@@ -941,6 +958,9 @@
 
     <!-- Device Dialog -->
     <string name="device_connected_dialog_message">Данное устройство уже добавлено в список моих устройств. Выберите, пожалуйста, новый глюкометр</string>
+    <string name="device_need_location_dialog_message">Некоторые устройства не могут определить глюкометр без данных о местоположении устройства. Разрешите доступ к геолокации</string>
+    <string name="device_need_location_dialog_positive_button">Разрешить</string>
+    <string name="device_need_location_dialog_negative_button">Отклонить</string>
 
     <string name="close">Закрыть</string>
 

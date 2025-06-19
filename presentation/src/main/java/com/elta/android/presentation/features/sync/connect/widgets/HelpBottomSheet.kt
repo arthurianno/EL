@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.buttons.ButtonCircle
@@ -19,6 +20,7 @@ import com.elta.android.presentation.theme.GetLocalProperties
 @Composable
 internal fun HelpBottomSheet(
     downButtonModel: DownButtonWidgetModel,
+    connectAction: Action = ConnectAction.ConnectByPin,
     closeOnClick: () -> Unit
 ) {
     GetLocalProperties { dimens, _, colors, _, types ->
@@ -47,7 +49,7 @@ internal fun HelpBottomSheet(
         VSpacer(height = dimens.bigDim)
         DownButton(
             widgetModel = downButtonModel,
-            onClickAction = ConnectAction.ConnectByPin
+            onClickAction = connectAction
         )
     }
 }

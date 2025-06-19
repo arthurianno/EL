@@ -22,8 +22,15 @@ class LocalPreferencesHolder @Inject constructor(
             preferences[MANUAL_GLUCOSE_REMIND] = value
         }
 
+    override var isLocationNeeded: Boolean
+        get() = preferences.getBoolean(IS_LOCATION_NEEDED, false)
+        set(value) {
+            preferences[IS_LOCATION_NEEDED] = value
+        }
+
     companion object {
         const val MANUAL_GLUCOSE_REMIND = "manual_glucose_remind"
+        const val IS_LOCATION_NEEDED = "is_location_needed"
 
     }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>improved_enabling_location</key>
+    <value>true</value>
+  </entry>
+  <entry>
+    <key>recovery_account</key>
+    <value>true</value>
+  </entry>
+</defaults>

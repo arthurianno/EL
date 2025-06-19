@@ -4,12 +4,9 @@ import com.elta.android.common.errors.EmailAlreadyRegisteredError
 import com.elta.android.common.errors.IncorrectLoginOrPasswordError
 import com.elta.android.common.errors.NetworkConnectionError
 import com.elta.android.common.errors.NotFoundError
-import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.domain.features.auth.interactor.isEmailValid
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
-import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -33,7 +30,6 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
     val menuAction = action<Unit>()
 
     val profileIsDeletedDialogControl = dialogControl<DialogData, DialogResult>()
-    private val profileIsDeletedDialogData: DialogData by lazy { Dialogs.ProfileIsDeleted(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -53,7 +49,6 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is ProfileIsDeletedError -> profileIsDeleted()
             is NotFoundError -> {
                 setErrorStateData(
                     States.SimpleError(
@@ -79,19 +74,6 @@ abstract class BaseAuthPm(services: ServiceFacade) : BasePm(services) {
             }
             else -> super.handleError(error)
         }
-    }
-
-    private fun profileIsDeleted() {
-        profileIsDeletedDialogControl.showForResult(profileIsDeletedDialogData)
-            .filter { it == DialogResult.NEGATIVE }
-            .subscribe {
-                router.navigateTo(
-                    Screens.EmailScreen(
-                        email = resources.getString(R.string.profile_support_email),
-                        body = resources.getString(R.string.profile_restore_email_body)
-                    )
-                )
-            }
     }
 
     private fun validateEmail(email: String): Boolean =

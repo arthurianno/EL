@@ -1,11 +1,11 @@
 object Dependencies {
-    const val gradleVersion = "8.2.0"
+    const val gradleVersion = "8.7.0"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"
 
     object Kotlin {
-        const val version = "1.9.20"
+        const val version = "1.9.21"
         private const val serializationVersion = "1.4.0"
         private const val coroutinesVersion = "1.6.4"
         private const val dateTimeVersion = "0.3.1"
@@ -61,7 +61,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val compilerVersion = "1.5.5"
+            const val compilerVersion = "1.5.6"
 
             private const val bomVersion = "2023.01.00"
             private const val activityVersion = "1.6.1"
@@ -169,6 +169,7 @@ object Dependencies {
             const val firestoreBom = "com.google.firebase:firebase-firestore-ktx"
             const val databaseBom = "com.google.firebase:firebase-database-ktx"
             const val analyticsBom = "com.google.firebase:firebase-analytics-ktx"
+            const val configBom = "com.google.firebase:firebase-config-ktx"
             const val crashlyticsBom = "com.google.firebase:firebase-crashlytics-ktx"
             const val appMessagingBom = "com.google.firebase:firebase-inappmessaging-display"
             const val dynamicLinksBom = "com.google.firebase:firebase-dynamic-links"

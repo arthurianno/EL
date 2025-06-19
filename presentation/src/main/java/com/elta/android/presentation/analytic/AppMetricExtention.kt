@@ -91,6 +91,16 @@ fun Permission.getMetricName(alertType: AlertType): AppMetricEvent {
     }
 }
 
+fun Boolean.getBluetoothPermissionGrantedMetricName(): AppMetricEvent {
+    return if (this) AppMetricEvent.Permission.AlertClick.Bluetooth(AlertResultParam.ALLOW)
+    else AppMetricEvent.Permission.AlertClick.Bluetooth(AlertResultParam.PROHIBIT)
+}
+
+fun Boolean.getLocationPermissionGrantedMetricName(): AppMetricEvent {
+    return if (this) AppMetricEvent.Permission.AlertClick.Location(AlertResultParam.ALLOW)
+    else AppMetricEvent.Permission.AlertClick.Location(AlertResultParam.PROHIBIT)
+}
+
 fun Diabetes.getMetricName(): AppMetricEvent.DiabetesTypeSave {
     val params = when (this) {
         Diabetes.FIRST -> DiabetesTypeParam.DIABETES_FIRST
@@ -132,7 +142,7 @@ private fun LocalDate.getMetricAttribute(): AppMetricAttribute.Age {
     return AppMetricAttribute.Age(age.years)
 }
 
-private fun getAlertMetric(alertType: AlertType): AppMetricEvent {
+fun getAlertMetric(alertType: AlertType): AppMetricEvent {
     return when (alertType) {
         AlertType.Camera -> AppMetricEvent.Permission.Alert.Camera
         AlertType.Location -> AppMetricEvent.Permission.Alert.Location
@@ -140,7 +150,7 @@ private fun getAlertMetric(alertType: AlertType): AppMetricEvent {
     }
 }
 
-private fun getAlertClickMetric(
+fun getAlertClickMetric(
     alertType: AlertType,
     @AlertResultParam param: String
 ): AppMetricEvent {

@@ -17,39 +17,29 @@ class BluetoothStateDataRepository @Inject constructor(
     private val crashlyticsReport: CrashlyticsReport
 ) : BluetoothStateRepository {
 
-    private fun checkLocationPermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
-        val accessFineLocationIsGranted =
-            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-        crashlyticsReport.log(
-            "Permission fine location granted: $accessFineLocationIsGranted"
-        )
-
-        return accessFineLocationIsGranted
-    }
-
-    private fun checkBluetoothPermissions(): Boolean {
+    override fun isBluetoothPermissionGranted(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-
-            val bluetoothConnectIsGranted =
-                context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-            val bluetoothScanIsGranted =
-                context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+            val bluetoothConnectIsGranted = checkPermission(Manifest.permission.BLUETOOTH_CONNECT)
+            val bluetoothScanIsGranted = checkPermission(Manifest.permission.BLUETOOTH_SCAN)
 
             crashlyticsReport.log(
-                "Permission scan granted: $bluetoothScanIsGranted; " +
-                        "connect granted: $bluetoothConnectIsGranted"
+                "Permission scan granted: $bluetoothScanIsGranted; connect granted: $bluetoothConnectIsGranted"
             )
 
             bluetoothConnectIsGranted && bluetoothScanIsGranted
         } else {
-            true
+            val accessFineLocationIsGranted = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            crashlyticsReport.log("Permission fine location granted: $accessFineLocationIsGranted")
+            accessFineLocationIsGranted
         }
     }
 
-    override fun isPermissionGranted(): Boolean {
-        return checkLocationPermissions() && checkBluetoothPermissions()
+    override fun isLocationPermissionGranted(): Boolean {
+        val accessFineLocationIsGranted = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        crashlyticsReport.log("Permission fine location granted: $accessFineLocationIsGranted")
+
+        return accessFineLocationIsGranted
     }
 
     override fun isBluetoothEnabled(): Boolean {
@@ -60,14 +50,14 @@ class BluetoothStateDataRepository @Inject constructor(
         return bluetoothIsEnable
     }
 
-    override fun isLocationEnabledPre34Api(): Boolean {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) return true
+    override fun isLocationEnabled(): Boolean {
         val locationIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
         crashlyticsReport.log("Location is enabled: $locationIsEnabled")
 
         return locationIsEnabled
     }
-}
 
-private const val TAG = "BluetoothState"
+    private fun checkPermission(permissionName: String): Boolean =
+        context.checkSelfPermission(permissionName) == PackageManager.PERMISSION_GRANTED
+}

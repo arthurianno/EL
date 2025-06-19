@@ -10,7 +10,9 @@ import com.elta.android.data.features.files.source.FileInfoDataSource
 import com.elta.android.data.features.files.source.FileInfoSource
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.auth.datasource.AuthDataSource
+import com.elta.android.data.features.auth.datasource.AuthDataSourceVariantA
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
+import com.elta.android.data.features.auth.datasource.AuthRemoteDataSourceVariantA
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
@@ -68,6 +70,11 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindAuthDataSource(source: AuthRemoteDataSource): AuthDataSource
+
+    // fixme Variant A : recovery_account
+    @Binds
+    @Singleton
+    abstract fun bindAuthDataSourceVariantA(source: AuthRemoteDataSourceVariantA): AuthDataSourceVariantA
 
     @Binds
     @Singleton

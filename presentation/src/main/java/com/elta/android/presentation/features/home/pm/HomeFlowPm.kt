@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerConnectionException
@@ -115,6 +116,7 @@ class HomeFlowPm @Inject constructor(
     val manualSyncError = state<ManualSyncError>()
     val manualSyncErrorBottomSheetCommand = command<Unit>()
     val manualSyncErrorAction = action<Unit>()
+    val permissionSyncErrorAction = action<Unit>()
     val closeBottomSheetErrorAction = action<Unit>()
     val closeManualSyncErrorBottomSheetCommand = command<Unit>()
 
@@ -136,6 +138,8 @@ class HomeFlowPm @Inject constructor(
     private val startSyncWithBackendAction = action<Unit>()
     private val startSyncWithIomtAction = action<Unit>()
     private val sendAppVersionAction = action<Unit>()
+
+    val openSettingsCommand = command<Unit>()
 
     private val feedbackAction = action<Unit>()
     private val likeAppDialogAction = action<Int>()
@@ -340,12 +344,20 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        manualSyncErrorAction.observable
+        Observable.merge(
+            manualSyncErrorAction.observable,
+            permissionSyncErrorAction.observable
+        )
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
             .untilDestroy()
 
         closeBottomSheetErrorAction.observable
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
+            .untilDestroy()
+
+        permissionSyncErrorAction.observable
+            .doOnNext(openSettingsCommand.consumer)
+            .subscribe()
             .untilDestroy()
 
         Observable.merge(
@@ -606,13 +618,13 @@ class HomeFlowPm @Inject constructor(
 
         is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
         is LocationPermissionNotGrantedError -> {
-            listOf(
-                AppMetricEvent.Permission.Alert.Bluetooth,
-                AppMetricEvent.Permission.Alert.Location
-            ).forEach { event ->
-                appMetric.trackEvent(event)
-            }
-            requestLocatePermissionAndRepeat(isAuto)
+            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
+            requestLocationPermissionAndRepeat(isAuto)
+        }
+
+        is BluetoothPermissionNotGrantedError -> {
+            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
+            requestBluetoothPermissionAndRepeat(isAuto)
         }
 
         is GlucometerSyncError ->
@@ -632,14 +644,19 @@ class HomeFlowPm @Inject constructor(
         else -> Observable.error(error)
     }
 
+    private fun requestLocationPermissionAndRepeat(isAuto: Boolean) =
+        btControl.requestLocationPermission()
+            .filter { it }
+            .flatMapObservable { syncWithGlucometer(isAuto) }
+
+    private fun requestBluetoothPermissionAndRepeat(isAuto: Boolean) =
+        btControl.requestBluetoothPermission()
+            .filter { it }
+            .flatMapObservable { syncWithGlucometer(isAuto) }
+
     private fun locationEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableLocation()
         .filter { it }
         .flatMapObservable { syncWithGlucometer(isAuto) }
-
-    private fun requestLocatePermissionAndRepeat(isAuto: Boolean) =
-        btControl.requestLocationPermissions()
-            .filter { it }
-            .flatMapObservable { syncWithGlucometer(isAuto) }
 
     private fun bluetoothEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableBluetooth()
         .filter { it }
@@ -658,8 +675,9 @@ class HomeFlowPm @Inject constructor(
                 openConnectScreen()
             }
 
-            is LocationPermissionNotGrantedError -> {
-                manualSyncError.accept(ManualSyncError.ErrorSync)
+            is LocationPermissionNotGrantedError, is BluetoothPermissionNotGrantedError -> {
+                manualSyncError.accept(ManualSyncError.PermissionNotGranted)
+                manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
             is GlucometerOfflineError -> {
@@ -668,7 +686,7 @@ class HomeFlowPm @Inject constructor(
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
-            is GlucometerSyncError -> {
+            is GlucometerSyncError, is CommandError, is GlucometerConnectionException -> {
                 val manualSyncError = if (error.cause is TimeoutException) {
                     appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                     ManualSyncError.NotFound
@@ -687,7 +705,8 @@ class HomeFlowPm @Inject constructor(
         when {
             error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
                     error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
-                    error is LocationPermissionNotGrantedError || error is CommandError || error is BluetoothScannerError ->
+                    error is LocationPermissionNotGrantedError || error is BluetoothPermissionNotGrantedError ||
+                    error is CommandError || error is BluetoothScannerError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
             error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) || error is GlucometerConnectionException ->

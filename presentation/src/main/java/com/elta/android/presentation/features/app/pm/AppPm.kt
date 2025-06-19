@@ -6,6 +6,8 @@ import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideEmail
 import com.elta.android.domain.common.usecase.CleanupCachedFilesUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.FetchRemoteConfigUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.domain.features.rostech.interactor.RosTechUseCase
 import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
@@ -57,6 +59,8 @@ class AppPm @Inject constructor(
     private val cleanupFiles: CleanupCachedFilesUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val crashlyticsReport: CrashlyticsReport,
+    private val fetchRemoteConfigUseCase: FetchRemoteConfigUseCase,
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     private val rosTech: RosTechUseCase,
     private val appMetric: AppMetricTracker,
     services: ServiceFacade
@@ -75,6 +79,7 @@ class AppPm @Inject constructor(
     val onStopAction = action<String>()
     private val checkAppVersionAction = action<Unit>()
     private val cleanupFilesAction = action<Unit>()
+    private val fetchRemoteConfigAction = action<Unit>()
 
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
@@ -104,7 +109,6 @@ class AppPm @Inject constructor(
                     }
                     .doOnSuccess { info ->
                         when {
-
                             info.first.isUserLoggedIn != true ->
                                 router.newRootFlow(Screens.GreetingFlow)
 
@@ -115,7 +119,14 @@ class AppPm @Inject constructor(
                                 )
 
                             !info.second -> router.newRootFlow(Screens.OnBoardingFlow)
-                            else -> router.newRootFlow(Screens.HomeFlow)
+                            else -> {
+                                // fixme Variant A : improved_enabling_location
+
+                                val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                                val screen = if (improvedEnablingLocation) Screens.HomeFlow
+                                else Screens.HomeFlowVariantA
+                                router.newRootFlow(screen)
+                            }
                         }
                     }
                     .doOnError(::handleError)
@@ -157,14 +168,25 @@ class AppPm @Inject constructor(
             .flatMapSingle { Single.fromCallable { cleanupFiles() } }
             .subscribe()
             .untilDestroy()
+        fetchRemoteConfigAction.observable
+            .flatMapCompletable {
+                fetchRemoteConfigUseCase.execute()
+            }
+            .subscribe()
+            .untilDestroy()
         deepLinkAction.observable
-            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
+            // fixme Variant A : improved_enabling_location
+            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it,getFeatureConfigUseCase.invoke().improvedEnablingLocation) }
             .doOnNext { router.navigateTo(it as Screen) }
             .subscribe()
             .untilDestroy()
 
         coldStartDeepLinkAction.observable
-            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
+            .map { DynamicLinkNavigationMapper.deepLinkToScreen(
+                it,
+                // fixme Variant A : improved_enabling_location
+                getFeatureConfigUseCase.invoke().improvedEnablingLocation
+            ) }
             .doOnNext { router.newRootChain(Screens.GreetingFlow, it as Screen) }
             .subscribe()
             .untilDestroy()
@@ -179,8 +201,11 @@ class AppPm @Inject constructor(
                 }
             }
             .doOnNext { (id, userName) ->
+                val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                val homeScreen = if (improvedEnablingLocation) Screens.HomeFlow
+                else Screens.HomeFlowVariantA
                 router.newRootChain(
-                    Screens.HomeFlow,
+                    homeScreen,
                     Screens.Support,
                     Screens.ConsultantScreen(id, userName)
                 )
@@ -229,6 +254,7 @@ class AppPm @Inject constructor(
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { }
             .doOnNext(cleanupFilesAction.consumer)
+            .doOnNext(fetchRemoteConfigAction.consumer)
             .doOnNext(checkAppVersionAction.consumer)
             .subscribe()
             .untilDestroy()
@@ -352,7 +378,7 @@ class AppPm @Inject constructor(
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
         if (pair.second.isUserLoggedIn == true) {
-            NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let {
+            NotificationNavigationMapper.notificationDataToScreen(pair.first, getFeatureConfigUseCase.invoke().improvedEnablingLocation)?.let {
                 router.newRootScreen(it)
             }
         } else {

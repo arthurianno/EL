@@ -119,7 +119,16 @@ sealed class Dialogs : DialogData {
         val resources: ResourceProvider,
         override val title: String = resources.getString(R.string.profile_is_deleted_title),
         override val message: String = resources.getString(R.string.profile_is_deleted_body),
-        override val negative: String? = resources.getString(R.string.profile_support_email_description),
+        override val negative: String? = resources.getString(R.string.cancel_text),
+        override val positive: String? = resources.getString(R.string.profile_is_deleted_restore_button),
+        override val neural: String? = null
+    ) : Dialogs()
+
+    data class ProfileRestored(
+        val resources: ResourceProvider,
+        override val title: String? = null,
+        override val message: String = resources.getString(R.string.profile_is_deleted_restored_body),
+        override val negative: String? = null,
         override val positive: String? = resources.getString(R.string.ok),
         override val neural: String? = null
     ) : Dialogs()
@@ -157,6 +166,15 @@ sealed class Dialogs : DialogData {
         override val message: String = resourceProvider.getString(R.string.device_connected_dialog_message),
         override val negative: String? = null,
         override val positive: String = resourceProvider.getString(R.string.ok),
+        override val neural: String? = null
+    ) : Dialogs()
+
+    data class DeviceNeedLocationDialogData(
+        val resourceProvider: ResourceProvider,
+        override val title: String? = null,
+        override val message: String = resourceProvider.getString(R.string.device_need_location_dialog_message),
+        override val negative: String? = resourceProvider.getString(R.string.device_need_location_dialog_negative_button),
+        override val positive: String = resourceProvider.getString(R.string.device_need_location_dialog_positive_button),
         override val neural: String? = null
     ) : Dialogs()
 

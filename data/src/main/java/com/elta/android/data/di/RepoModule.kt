@@ -5,6 +5,7 @@ import com.elta.android.data.common.repository.DownloadDataRepository
 import com.elta.android.data.features.files.repository.FileInfoDataRepository
 import com.elta.android.data.features.appsettings.AppSettingsDataRepository
 import com.elta.android.data.features.auth.repository.AuthDataRepository
+import com.elta.android.data.features.auth.repository.AuthDataRepositoryVariantA
 import com.elta.android.data.features.auth.repository.SocialDataRepository
 import com.elta.android.data.features.calculator.repository.CalculatorDataRepository
 import com.elta.android.data.features.calculator.repository.CustomProductDataRepository
@@ -13,6 +14,7 @@ import com.elta.android.data.features.consultant.repository.AudioRecorderDataRep
 import com.elta.android.data.features.consultant.repository.ConsultantDataRepository
 import com.elta.android.data.features.consultant.repository.MediaDataRepository
 import com.elta.android.data.features.devices.repository.BluetoothStateDataRepository
+import com.elta.android.data.features.devices.repository.BluetoothStateDataRepositoryVariantA
 import com.elta.android.data.features.devices.repository.DeviceDataRepository
 import com.elta.android.data.features.devices.repository.DeviceInfoDataRepository
 import com.elta.android.data.features.devices.repository.PinDataRepository
@@ -28,6 +30,7 @@ import com.elta.android.data.features.glucometers.repository.GlucometersDataRepo
 import com.elta.android.data.features.googlefit.repository.GoogleFitDataRepository
 import com.elta.android.data.features.observers.repository.ObserverDataRepository
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
+import com.elta.android.data.features.remoteconfig.repository.RemoteConfigDataRepository
 import com.elta.android.data.features.reports.repository.ReportsDataRepository
 import com.elta.android.data.features.rostech.IomtDataRepository
 import com.elta.android.data.features.sale_points.repository.SalePointsDataRepository
@@ -40,6 +43,7 @@ import com.elta.android.domain.common.repository.FileInfoRepository
 import com.elta.android.domain.common.repository.MediaRepository
 import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.auth.repository.AuthRepository
+import com.elta.android.domain.features.auth.repository.AuthRepositoryVariantA
 import com.elta.android.domain.features.auth.repository.SocialRepository
 import com.elta.android.domain.features.calculator.repository.CalculatorRepository
 import com.elta.android.domain.features.calculator.repository.CustomProductRepository
@@ -47,6 +51,7 @@ import com.elta.android.domain.features.consultant.repository.AudioPlayerReposit
 import com.elta.android.domain.features.consultant.repository.AudioRecorderRepository
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepositoryVariantA
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
@@ -62,6 +67,7 @@ import com.elta.android.domain.features.glucometers.repository.GlucometersReposi
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
+import com.elta.android.domain.features.remoteconfig.repository.RemoteConfigRepository
 import com.elta.android.domain.features.reports.repository.ReportsRepository
 import com.elta.android.domain.features.rostech.repository.IomtRepository
 import com.elta.android.domain.features.sale_points.repository.SalePointsRepository
@@ -79,6 +85,11 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(repo: AuthDataRepository): AuthRepository
+
+    // fixme Variant A : recovery_account
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepositoryVariantA(repo: AuthDataRepositoryVariantA): AuthRepositoryVariantA
 
     @Binds
     @Singleton
@@ -123,6 +134,11 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindBluetoothStateRepository(repo: BluetoothStateDataRepository): BluetoothStateRepository
+
+    // fixme Variant A : improved_enabling_location
+    @Binds
+    @Singleton
+    abstract fun bindBluetoothStateRepositoryVariantA(repo: BluetoothStateDataRepositoryVariantA): BluetoothStateRepositoryVariantA
 
     @Binds
     @Singleton
@@ -211,5 +227,9 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindFileInfoRepository(source: FileInfoDataRepository): FileInfoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoteConfigRepository(source: RemoteConfigDataRepository): RemoteConfigRepository
 
 }

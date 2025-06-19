@@ -20,10 +20,10 @@ class AuthRemoteDataSource @Inject constructor(
 ) : AuthDataSource {
 
     override fun register(email: String, password: String): Single<TokensNetworkResponse> =
-        api.register(AuthNetworkRequest(email, password))
+        api.register(AuthNetworkRequest(email, password, activateAccount = false))
 
-    override fun login(email: String, password: String): Single<LoginNetworkResponse> =
-        api.login(AuthNetworkRequest(email, password))
+    override fun login(email: String, password: String, activateAccount: Boolean): Single<LoginNetworkResponse> =
+        api.login(AuthNetworkRequest(email, password, activateAccount))
 
     override fun isEmailConfirmed(): Single<EmailStatusNetworkResponse> =
         api.isEmailConfirmed()

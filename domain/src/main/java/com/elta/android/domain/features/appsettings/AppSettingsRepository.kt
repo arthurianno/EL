@@ -9,4 +9,5 @@ interface AppSettingsRepository {
     fun changeBackendVariant(server: BackendVariant): Completable
     fun deleteDbFiles(): Completable
     var shouldManualGlucoseDialogShow: Boolean
+    var isLocationNeeded: Boolean
 }

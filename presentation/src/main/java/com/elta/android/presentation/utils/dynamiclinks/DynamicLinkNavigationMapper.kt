@@ -13,7 +13,7 @@ object DynamicLinkNavigationMapper {
     private const val QUERY_SCREEN = "screen"
     private const val SETTINGS_SCREEN = "settings"
 
-    fun deepLinkToScreen(uri: Uri): SupportAppScreen? {
+    fun deepLinkToScreen(uri: Uri, improvedEnablingLocation: Boolean): SupportAppScreen? {
         val token = uri.getQueryParameter(QUERY_TOKEN)
         val screen = uri.getQueryParameter(QUERY_SCREEN)
         return when {
@@ -25,7 +25,8 @@ object DynamicLinkNavigationMapper {
             screen != null && uri.lastPathSegment.equals(IN_APP_MESSAGE_PATH, true) ->
                 when (screen) {
                     SETTINGS_SCREEN -> Screens.ProfileSettings
-                    else -> Screens.HomeFlow
+                    // fixme Variant A : improved_enabling_location
+                    else -> if (improvedEnablingLocation) Screens.HomeFlow else Screens.HomeFlowVariantA
                 }
             else -> null
         }

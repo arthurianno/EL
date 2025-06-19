@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.devices.firmware.pm
 
 import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.FirmwareUpdateError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
@@ -435,14 +436,17 @@ class FirmwarePm @Inject constructor(
             is BluetoothNotEnabledError ->
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
 
-            is LocationPermissionNotGrantedError ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            is LocationPermissionNotGrantedError -> {
+                btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            }
+
+            is BluetoothPermissionNotGrantedError -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
                 } else {
                     btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
                 }
+            }
 
             is LocationNotEnabledError ->
                 btControl.requestEnableLocationCommand.consumer.accept(Unit)

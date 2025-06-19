@@ -54,6 +54,7 @@ dependencies {
     implementation(Dependencies.Google.Services.auth)
 
     implementation(Dependencies.Google.FireBase.messagingBom)
+    implementation(Dependencies.Google.FireBase.configBom)
 
     implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.Kotlin.coroutinesRx2)
