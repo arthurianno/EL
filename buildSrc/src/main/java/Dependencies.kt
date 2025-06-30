@@ -255,7 +255,7 @@ object Dependencies {
         private const val rxAndroidVersion = "2.1.0"
         private const val rxRelayVersion = "2.1.0"
         private const val rxLocationVersion = "2.1@aar"
-        private const val rxPermissionsVersion = "0.10.2"
+        private const val rxPermissionsVersion = "0.10.0"
         private const val rxPmVersion = "2.1.2"
         private const val rxBindingVersion = "2.0.0"
         private const val rxNetworkVersion = "3.0.2"
