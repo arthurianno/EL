@@ -35,7 +35,7 @@ class FirmwareFragmentVariantA :
     override val classToken: Class<FirmwarePmVariantA> = FirmwarePmVariantA::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    private val rxPermissions by lazy { RxPermissions(this) }
+    private val rxPermissions by lazy { RxPermissions(requireActivity()) }
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {

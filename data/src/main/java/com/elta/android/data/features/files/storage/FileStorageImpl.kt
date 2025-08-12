@@ -90,7 +90,7 @@ class FileStorageImpl @Inject constructor(val context: Context): FileStorage {
             val originalSize = inputStream.available()
 
             if (originalSize > maxSize) {
-               val compressedImage = compressImageFile(fileName, sourceUri)
+                val compressedImage = compressImageFile(fileName, sourceUri)
                 getFileUri(compressedImage)
             } else {
                 val outputFile = File(context.getExternalFilesDir(null), fileName)
@@ -175,6 +175,12 @@ class FileStorageImpl @Inject constructor(val context: Context): FileStorage {
 
     override fun getDirectory(dir: FileDirectory) =
         context.filesDir.absolutePath + File.separator + dir.path
+
+
+    override fun createCacheFile(fileName: String): File {
+        val cacheDir = context.cacheDir
+        return File(cacheDir, fileName)
+    }
 
     override fun getFileType(uri: Uri): String? = context.contentResolver.getType(uri)
 

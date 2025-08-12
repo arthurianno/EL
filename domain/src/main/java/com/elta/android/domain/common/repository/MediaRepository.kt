@@ -18,5 +18,9 @@ interface MediaRepository {
     fun getFileFromDirectory(directory: FileDirectory, fileName: String): File?
     fun getCachedFile(fileName: String): File?
     fun getFileType(uri: Uri): FileType?
+    fun getFileSize(uri: Uri): Long?
     fun getDuration(fileName: String): Int
+    suspend fun saveImageToCache(data: ByteArray, fileName: String): Uri?
+    suspend fun getBitmapFromUri(uri: Uri?): Bitmap?
+
 }

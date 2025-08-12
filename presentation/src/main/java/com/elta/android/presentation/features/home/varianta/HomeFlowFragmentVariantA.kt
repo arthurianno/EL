@@ -59,8 +59,7 @@ class HomeFlowFragmentVariantA :
     @Inject
     lateinit var bus: RxBus
 
-    private val rxPermissions by lazy { RxPermissions(this) }
-
+    private val rxPermissions by lazy { RxPermissions(requireActivity()) }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)

@@ -67,6 +67,7 @@ annotation class AnalyticsEventType {
         const val PERIOD_TAB = "period_tab"
         const val APP_EXIT = "app_exit"
         const val GLUCOMETERS_OPEN = "glucometers_open"
+        const val NEWS_OPEN = "news_open"
         const val TURN_ON_SEARCH = "turn_on_search"
         const val FIND_GLUCOMETER = "find_glucometer"
         const val SCAN_DMC = "scan_dmc"

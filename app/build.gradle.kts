@@ -27,8 +27,10 @@ fun getPropertiesFromFile(filename: String): Properties =
 android {
     compileSdk = AppConfig.completeSdk
 
-    val version = getTagInfo()
-    print(version.toString())
+    val version = getTagInfo().also {
+        println(">>> Current Git tag: ${it}")
+        println(">>> Version code: ${it.buildNumber}")
+    }
 
     defaultConfig {
         applicationId = AppConfig.applicationId

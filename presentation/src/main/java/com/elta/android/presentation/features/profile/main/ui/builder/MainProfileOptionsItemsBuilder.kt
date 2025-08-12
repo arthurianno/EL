@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.user.model.MyDevices
 import com.elta.android.domain.features.user.model.MyObservers
+import com.elta.android.domain.features.user.model.News
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.Support
 import com.elta.android.presentation.R
@@ -59,6 +60,15 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
                 R.string.profile_manage_glucometer,
                 R.drawable.ic_devices,
                 MyDevices
+            )
+        )
+
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_my_news,
+                R.string.profile_manage_news,
+                R.drawable.ic_observers_bg,
+                News
             )
         )
         // todo: SalepointHide

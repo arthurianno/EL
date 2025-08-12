@@ -8,4 +8,5 @@ sealed class SupportAction {
     object WhatsAppAction : SupportAction()
     object ViberAction : SupportAction()
     object ServiceCentersAction : SupportAction()
+    object AppVersionAction : SupportAction()
 }

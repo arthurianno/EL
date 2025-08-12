@@ -16,13 +16,7 @@ fun <T> Observable<List<T>>.onConnectionErrorReturnsEmpty(): Observable<List<T>>
         }
     }
 
-fun <T> Single<List<T>>.onConnectionErrorReturnsEmpty(): Single<List<T>> =
-    this.onErrorReturn {
-        when (it.canIgnoreError()) {
-            true -> emptyList()
-            else -> throw it
-        }
-    }
+
 
 fun <T> Observable<T>.onConnectionErrorResumeEmpty(): Observable<T> =
     this.onErrorResumeNext { error: Throwable ->

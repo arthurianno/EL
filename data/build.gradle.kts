@@ -32,7 +32,7 @@ android {
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
         }
         all {
-            buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
+            buildConfigField("String", "VERSION_NAME", "\"${version}\"")
         }
     }
     namespace = "com.elta.android.data"

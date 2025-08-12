@@ -25,4 +25,6 @@ interface FileStorage {
     fun cacheFileInDirectory(filePath: String, sourceUri: Uri): Uri
     fun getDirectory(dir: FileDirectory): String
     fun getFileType(uri: Uri): String?
+    fun createCacheFile(fileName: String): File
+
 }

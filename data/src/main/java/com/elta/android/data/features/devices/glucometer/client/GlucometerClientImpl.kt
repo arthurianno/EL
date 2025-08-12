@@ -1,5 +1,6 @@
 package com.elta.android.data.features.devices.glucometer.client
 
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -19,6 +20,7 @@ import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManage
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
 import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
@@ -40,7 +42,9 @@ class GlucometerClientImpl @Inject constructor(
     private val glucometerBleManager: GlucometerBleManager,
     private val firmwareManager: FirmwareManager,
     private val environmentScanner: EnvironmentScanner,
-    private val crashlyticsReport: CrashlyticsReport
+    private val crashlyticsReport: CrashlyticsReport,
+    private val bluetoothAdapter: BluetoothAdapter,
+    private val bluetoothStateRep: BluetoothStateRepository
 ) : GlucometerClient {
 
     private val settings: ScanSettings = ScanSettings.Builder()
@@ -171,6 +175,24 @@ class GlucometerClientImpl @Inject constructor(
 
         checkPin(pin)
     }
+
+    override suspend fun connectDeviceDirectly(address: String, pin: String) {
+        crashlyticsReport.log("Connection operations started with device ${address.hideMac()}")
+        try {
+            crashlyticsReport.log("Establishing a connection with a device")
+            val device = bluetoothAdapter.getRemoteDevice(address) ?: throw Exception("Device not found")
+            crashlyticsReport.log("Device found")
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) delay(1_000)
+            glucometerBleManager.connectToGlucometer(device)
+
+        } catch (e: Exception) {
+            val error = GlucometerConnectionException(e.message.orEmpty())
+            crashlyticsReport.writeException(error)
+            throw error
+        }
+        checkPin(pin)
+    }
+
 
     private suspend fun checkPin(pin: String) {
         crashlyticsReport.log("Checking pin")

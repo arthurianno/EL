@@ -28,6 +28,7 @@ import com.elta.android.data.features.feedback.repository.FeedbackDataRepository
 import com.elta.android.data.features.firmware.repository.FirmwareDataRepository
 import com.elta.android.data.features.glucometers.repository.GlucometersDataRepository
 import com.elta.android.data.features.googlefit.repository.GoogleFitDataRepository
+import com.elta.android.data.features.newsChannel.repository.NewsDataRepository
 import com.elta.android.data.features.observers.repository.ObserverDataRepository
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
 import com.elta.android.data.features.remoteconfig.repository.RemoteConfigDataRepository
@@ -65,6 +66,7 @@ import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
 import com.elta.android.domain.features.glucometers.repository.GlucometersRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
+import com.elta.android.domain.features.newsChannel.repository.NewsRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
 import com.elta.android.domain.features.remoteconfig.repository.RemoteConfigRepository
@@ -90,6 +92,10 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepositoryVariantA(repo: AuthDataRepositoryVariantA): AuthRepositoryVariantA
+
+    @Binds
+    @Singleton
+    abstract fun bindNewsRepository(repo: NewsDataRepository): NewsRepository
 
     @Binds
     @Singleton

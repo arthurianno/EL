@@ -18,6 +18,7 @@ import com.elta.android.data.di.MediaModule
 import com.elta.android.data.di.MigrationModule
 import com.elta.android.data.di.NetworkModule
 import com.elta.android.data.di.NetworkRequesterModule
+import com.elta.android.data.di.NewsModule
 import com.elta.android.data.di.RemoteModule
 import com.elta.android.data.di.RepoModule
 import com.elta.android.data.di.ServiceModule
@@ -70,6 +71,7 @@ import javax.inject.Singleton
         RepoModule::class,
         // presentation
         PmModule::class,
+        NewsModule::class,
         ViewModelModule::class,
         ActivityBuilder::class,
         FragmentBuilder::class,

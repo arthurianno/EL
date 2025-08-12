@@ -27,6 +27,7 @@ import com.elta.android.data.features.feedback.api.MockedFeedbackApi
 import com.elta.android.data.features.firmware.api.FirmwareApi
 import com.elta.android.data.features.firmware.api.MockedFirmwareApi
 import com.elta.android.data.features.glucometers.api.GlucometersApi
+import com.elta.android.data.features.newsChannel.datasource.NewsApi
 import com.elta.android.data.features.observers.api.MockedObserverApi
 import com.elta.android.data.features.observers.api.ObserverApi
 import com.elta.android.data.features.reports.api.MockedReportsApi
@@ -72,6 +73,12 @@ class ApiModule {
     fun provideAuthApiVariantA(
         retrofit: Retrofit
     ): AuthApiVariantA = retrofit.create(AuthApiVariantA::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNewsApi(
+        retrofit: Retrofit
+    ): NewsApi = retrofit.create(NewsApi::class.java)
 
     @Provides
     @Singleton

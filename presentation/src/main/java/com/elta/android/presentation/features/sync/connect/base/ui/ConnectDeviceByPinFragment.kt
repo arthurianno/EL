@@ -49,8 +49,7 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    private val rxPermissions by lazy { RxPermissions(this) }
-
+    private val rxPermissions by lazy { RxPermissions(requireActivity()) }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.toolbar) {

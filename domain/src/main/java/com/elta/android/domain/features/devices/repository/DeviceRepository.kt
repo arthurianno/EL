@@ -35,6 +35,8 @@ interface DeviceRepository {
      */
     suspend fun connectDevice(address: String, pinCode: String)
 
+    suspend fun connectDeviceDirectly(address: String, pinCode: String)
+
     /**
      * Отключение от текущего устройства
      */

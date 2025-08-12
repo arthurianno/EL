@@ -45,8 +45,7 @@ import me.dmdev.rxpm.widget.bindTo
 
 private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
 
-class HomeFlowFragment :
-    BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(FragmentHomeFlowBinding::inflate) {
+class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(FragmentHomeFlowBinding::inflate) {
     companion object {
         fun newInstance() = HomeFlowFragment()
     }
@@ -60,20 +59,19 @@ class HomeFlowFragment :
     @Inject
     lateinit var bus: RxBus
 
-    private val rxPermissions by lazy { RxPermissions(this) }
+    private lateinit var rxPermissions: RxPermissions
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Откладываем инициализацию RxPermissions
+        view.post {
+            if (isAdded && !requireActivity().supportFragmentManager.isStateSaved) {
+                rxPermissions = RxPermissions(requireActivity())
+            }
+        }
         savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        view?.findViewById<BottomNavigationView>(R.id.homeBottomNavigationView)?.selectedId?.let {
-            outState.putInt(KEY_SELECTED_MENU_ID, it)
-        }
     }
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
@@ -106,8 +104,16 @@ class HomeFlowFragment :
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         binding.homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
-        pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
-
+        // Проверяем, инициализирован ли rxPermissions перед использованием
+        if (::rxPermissions.isInitialized) {
+            pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
+        } else {
+            view?.post {
+                if (::rxPermissions.isInitialized) {
+                    pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
+                }
+            }
+        }
         pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
@@ -142,7 +148,6 @@ class HomeFlowFragment :
 
         pm.manualSyncError.bindTo { error ->
             with(binding.syncErrorBottomSheetView) {
-
                 val title = when (error) {
                     ManualSyncError.ErrorSync -> R.string.sync_connection_sync_error_title
                     ManualSyncError.NotFound -> R.string.sync_connect_device_not_found
@@ -189,7 +194,6 @@ class HomeFlowFragment :
             binding.syncErrorBottomSheetView.hide()
             binding.homeActionView.isVisible = true
         }
-
     }
 
     override fun onAttach(context: Context) {

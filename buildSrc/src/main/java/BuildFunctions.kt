@@ -3,9 +3,18 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
 fun Project.getTagInfo(): GitTag {
-        val tag = executeInShell("echo \$CI_COMMIT_TAG").takeIf { !it.isNullOrBlank() } ?: GitTag.DEFAULT
-        return GitTag.fromString(tag)
+    // Пытаемся получить текущий Git-тег
+    val gitTag = executeInShell("git describe --tags --exact-match 2>/dev/null")?.trim()
+
+    return if (!gitTag.isNullOrBlank()) {
+        println("Using Git tag: $gitTag")
+        GitTag.fromString(gitTag)
+    } else {
+        // Fallback: используем хардкод или дефолтное значение
+        println("No Git tag found, using default version")
+        GitTag.fromString("v1.0.0.376-release") // Явно указываем последний тег
     }
+}
 
 fun Project.getPropertyFromAnywhere(propertyName: String, defaultValue: String): String {
     return when {

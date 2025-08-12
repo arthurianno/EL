@@ -58,3 +58,18 @@ suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String
         throw exception
     }
 }
+
+@Throws(GlucometerSyncError::class)
+suspend fun DeviceRepository.connectWithTimeoutDirectly(address: String, pinCode: String, crashlyticsReport: CrashlyticsReport?) {
+    try {
+        withTimeout(CONNECT_TIMEOUT) {
+            connectDeviceDirectly(address, pinCode)
+        }
+    } catch (e: TimeoutCancellationException) {
+        val exception = GlucometerSyncError(TimeoutException("device ${address.hideMac()} connection timeout"))
+        crashlyticsReport?.writeException(exception)
+        throw exception
+    }
+}
+
+

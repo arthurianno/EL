@@ -108,5 +108,5 @@ class AppModule(
     @Provides
     @Singleton
     fun provideFirebaseMessageClient(): EltaMessageClient =
-        EltaMessageClient(isConsultantScreenActive = false)
+        EltaMessageClient(isConsultantScreenActive = false,isNewsScreenActive = false)
 }

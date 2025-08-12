@@ -15,6 +15,7 @@ import com.elta.android.domain.features.user.model.WhereBuy
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.domain.features.user.model.News
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
@@ -166,6 +167,11 @@ class MainProfilePm @Inject constructor(
                 // скрываем точки продаж пока пока не примем решение что с ними делать
 //                trackEvent(AnalyticsEventType.MAP_OPEN)
 //                router.startFlow(Screens.ShopsMap())
+            }
+
+            News -> {
+                trackEvent(AnalyticsEventType.NEWS_OPEN)
+                router.startFlow(Screens.NewsScreen)
             }
 
             MyObservers -> router.startFlow(Screens.Observers)

@@ -12,6 +12,7 @@ import com.elta.android.presentation.features.calcutator.products.viewmodel.Dish
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.main.events.selector.viewmodel.EventSelectorViewModel
+import com.elta.android.presentation.features.newsChannel.viewModel.NewsViewModel
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
 import com.elta.android.presentation.features.profile.settings.emias.viewmodel.EmiasProfileViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
@@ -58,6 +59,12 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(DishDetailViewModel::class)
     abstract fun bindDishDetailViewModel(viewModel: DishDetailViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NewsViewModel::class)
+    abstract fun bindNewsViewModel(viewModel: NewsViewModel): ViewModel
+
 
     @Binds
     @IntoMap

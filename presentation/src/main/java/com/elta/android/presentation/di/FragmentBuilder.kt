@@ -31,6 +31,7 @@ import com.elta.android.presentation.features.main.events.selector.ui.EventSelec
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.newsChannel.FragmentNewsChannel
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
@@ -111,6 +112,11 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRegistrationMainFragmentVariantA(): RegistrationMainFragmentVariantA
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindNewsFragment(): FragmentNewsChannel
+
 
     @FragmentScope
     @ContributesAndroidInjector

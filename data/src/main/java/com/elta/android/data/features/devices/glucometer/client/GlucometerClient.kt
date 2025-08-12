@@ -21,6 +21,13 @@ interface GlucometerClient {
     suspend fun connectDevice(address: String, pin: String)
 
     /**
+     * Подключение к глюкометру уже известному
+     * @param address - мак-адрес устройства
+     * @param pin - пин-код для подключения к устройству
+     * */
+    suspend fun connectDeviceDirectly(address: String, pin: String)
+
+    /**
      * Отключение от глюкометра
      * */
     suspend fun disconnect()

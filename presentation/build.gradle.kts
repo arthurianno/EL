@@ -1,8 +1,9 @@
 plugins {
     id("com.android.library")
-    kotlin("android")
-    kotlin("kapt")
+    id("kotlin-android") // Замените kotlin("android") на id("kotlin-android") для консистентности
+    id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" // Добавьте эту строку
 }
 
 android {
@@ -47,16 +48,28 @@ android {
         release {
             buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
+            buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
+            buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
         }
         debug {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
+            buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
+            buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
+            buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
         }
         create("huawei") {
             buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.HuaweiAppGallery.storeName}\"")
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
+            buildConfigField("String", "BUILD_TYPE", "\"${version.buildType}\"")
+            buildConfigField("String", "HOTFIX_VERSION", "\"${version.hotfixVersion}\"")
         }
     }
     namespace = "com.elta.android.presentation"
@@ -64,10 +77,6 @@ android {
 
 kapt {
     correctErrorTypes = true
-    javacOptions {
-        option("-source", "8")
-        option("-target", "8")
-    }
 }
 
 configurations.all {

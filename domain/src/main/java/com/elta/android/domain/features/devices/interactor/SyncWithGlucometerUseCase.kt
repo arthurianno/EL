@@ -8,6 +8,7 @@ import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.SEND_DATA_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
+import com.elta.android.domain.features.devices.connectWithTimeoutDirectly
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
@@ -87,7 +88,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
         }
 
         try {
-            deviceRepository.connectWithTimeout(deviceAddress, pinCode, crashlyticsReport)
+            deviceRepository.connectWithTimeoutDirectly(deviceAddress, pinCode, crashlyticsReport)
 
             resetAndLaunchTimer(scope)
             val glucometerInfo = deviceRepository.getGlucometerInfo(deviceAddress)

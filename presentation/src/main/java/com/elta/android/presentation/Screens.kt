@@ -42,6 +42,7 @@ import com.elta.android.presentation.features.main.events.glucose.ui.GlucoseEven
 import com.elta.android.presentation.features.main.events.selector.ui.EventSelectorFragment
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.newsChannel.FragmentNewsChannel
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
@@ -274,7 +275,12 @@ object Screens {
         override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragment.newInstance()
     }
 
-    object FromOtherConnectDeviceByPinVariantA : SupportAppScreen() {
+    object NewsScreen : SupportAppScreen() {
+        override fun getFragment() = FragmentNewsChannel.newInstance()
+    }
+
+
+        object FromOtherConnectDeviceByPinVariantA : SupportAppScreen() {
         override fun getFragment(): Fragment = FromOtherConnectDeviceByPinFragmentVariantA.newInstance()
     }
 
