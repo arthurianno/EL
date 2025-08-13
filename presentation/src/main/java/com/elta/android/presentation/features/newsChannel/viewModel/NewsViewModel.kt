@@ -501,7 +501,7 @@ class NewsViewModel @Inject constructor(
                     return@launch
                 }
 
-                Log.d("NewsViewModel", "Authority being used: ${context.packageName}.fileprovider") // Или то, что вы используете
+                Log.d("NewsViewModel", "Authorit being used: ${context.packageName}.fileprovider") // Или то, что вы используете
                 Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}, length: ${file.length()}")
                 // Получаем Uri через FileProvider
                 val shareUri = FileProvider.getUriForFile(
