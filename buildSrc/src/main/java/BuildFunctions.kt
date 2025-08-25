@@ -25,18 +25,21 @@ fun Project.getPropertyFromAnywhere(propertyName: String, defaultValue: String):
 }
 
 fun Project.executeInShell(command: String): String? {
-
     if (System.getProperty("os.name").lowercase().contains("windows")) {
-        print("Doesn't work in Windows")
+        println("Doesn't work in Windows")
         return null
     }
 
     val stdout = ByteArrayOutputStream()
-
-    exec {
-        commandLine("bash", "-c", command)
-        standardOutput = stdout
+    try {
+        exec {
+            commandLine("bash", "-c", command)
+            standardOutput = stdout
+            isIgnoreExitValue = true // Игнорируем ненулевой код выхода
+        }
+        return stdout.toString(StandardCharsets.UTF_8.name()).trim().takeIf { it.isNotBlank() }
+    } catch (e: Exception) {
+        println("Error executing command: $command, error: ${e.message}")
+        return null
     }
-
-    return stdout.toString(StandardCharsets.UTF_8.name()).trim()
 }
