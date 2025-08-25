@@ -68,7 +68,7 @@ fun NewsChatContent(
     connectState: ConnectState,
     contentMenuEntity: ContextMenuUiEntityNews,
     isLoadingNextMessagesPage: Boolean,
-    isSwipeRefreshing: Boolean, // Новый параметр
+    isSwipeRefreshing: Boolean,
     hasNewMessages: Boolean,
     listState: LazyListState,
     onMessageClick: (MessageUiEntity) -> Unit = {},
@@ -129,6 +129,7 @@ fun NewsChatContent(
                     )
                 }
             }
+            // Изолируем AnimatedVisibility для минимизации recomposition
             AnimatedVisibility(
                 visible = isLoadingNextMessagesPage && chat.messages.isNotEmpty(),
                 enter = fadeIn(animationSpec = tween(200)),
@@ -148,7 +149,7 @@ fun NewsChatContent(
                 )
             }
             PullRefreshIndicator(
-                refreshing = isSwipeRefreshing, // Используем isSwipeRefreshing
+                refreshing = isSwipeRefreshing,
                 state = pullRefreshState,
                 modifier = Modifier
                     .align(Alignment.TopCenter)

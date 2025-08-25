@@ -65,6 +65,10 @@ dependencies {
 
     implementation(Dependencies.Dagger.javaxAnnotation)
     implementation(Dependencies.Dagger.javaxInject)
+    implementation("androidx.room:room-common:2.7.2")
+    implementation("androidx.room:room-runtime:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+    implementation(Dependencies.Kotlin.metadataJvm)
 
     kapt(Dependencies.Dagger.daggerCompiler)
     kapt(Dependencies.Dagger.daggerAndroidProcessor)

@@ -28,7 +28,7 @@ android {
     compileSdk = AppConfig.completeSdk
 
     val version = getTagInfo().also {
-        println(">>> Current Git tag: ${it}")
+        println(">>> Current Git tag: $it")
         println(">>> Version code: ${it.buildNumber}")
     }
 
@@ -132,8 +132,8 @@ android {
 kapt {
     correctErrorTypes = true
     javacOptions {
-        option("-source", "8")
-        option("-target", "8")
+        option("-source", "11")
+        option("-target", "11")
     }
 }
 
@@ -149,6 +149,8 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.presentation))
     api(project(Module.data))
+
+
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
@@ -176,6 +178,9 @@ dependencies {
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)
     implementation(Dependencies.Webim.core)
+
+    implementation("androidx.room:room-common:2.7.2")
+    implementation("androidx.room:room-runtime:2.7.2")
 
     testBaseDependencies()
 }

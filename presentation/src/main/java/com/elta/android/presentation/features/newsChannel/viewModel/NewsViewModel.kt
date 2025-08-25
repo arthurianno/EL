@@ -89,6 +89,7 @@ class NewsViewModel @Inject constructor(
         const val PREFS_NAME = "NewsViewModelPrefs"
         const val KEY_SWIPE_COUNT = "swipeRefreshCount"
         const val KEY_LAST_SWIPE_TIME = "lastSwipeRefreshTime"
+        const val MIN_NEWS_THRESHOLD = 3 // Минимальное количество новостей для автоматической дозагрузки
     }
 
     override fun createInitState(): NewsViewState =
@@ -221,11 +222,15 @@ class NewsViewModel @Inject constructor(
     }
 
     private fun loadNewsPage(cursor: Long? = null) {
-        if (isLoadingNextPage) return
+        if (isLoadingNextPage) {
+            Log.d("NewsViewModel", "Loading next page skipped, already in progress")
+            return
+        }
         isLoadingNextPage = true
 
         launch {
             try {
+                Log.d("NewsViewModel", "Loading news page with cursor=$cursor, limit=$LIMIT")
                 reduceState {
                     state.value.copy(
                         isLoadingNextMessagesPage = true,
@@ -237,35 +242,39 @@ class NewsViewModel @Inject constructor(
 
                 val allMessagesUi = mutableListOf<MessageUiEntity>()
                 if (!networkStatus.isInternetConnectionEnabled()) {
+                    Log.d("NewsViewModel", "No internet connection, returning empty list")
                     reduceState { state.value.copy(connectState = ConnectState.Offline) }
-                    // При отсутствии сети возвращаем пустой список
                     allMessagesUi.clear()
                 } else {
                     reduceState { state.value.copy(connectState = ConnectState.Connect) }
-                    val response =
-                        loadNewsMessages(cursor = cursor, limit = LIMIT, direction = "DESC")
-                    // При swipeRefresh очищаем список, если cursor == null
-                    if (cursor == null && isSwipeRefreshing) {
-                        reduceState { state.value.copy(chat = ChatUiEntity(messages = emptyList())) }
-                    }
+                    val response = loadNewsMessages(cursor = cursor, limit = LIMIT, direction = "DESC")
+                    Log.d("NewsViewModel", "Response: news=${response.news.size}, hasNextPage=${response.hasNextPage}, endCursor=${response.endCursor}")
                     if (response.news.isNotEmpty()) {
-                        allMessagesUi.addAll(response.news.toUi().filter { newMessage ->
+                        val newMessages = response.news.toUi().filter { newMessage ->
                             !state.value.chat.messages.any { it.id == newMessage.id }
-                        })
+                        }
+                        allMessagesUi.addAll(newMessages)
                         hasMoreMessages = response.hasNextPage
                         currentCursor = response.endCursor
+                        Log.d("NewsViewModel", "New messages added: ${newMessages.size}, hasMoreMessages=$hasMoreMessages, currentCursor=$currentCursor")
                     } else {
                         hasMoreMessages = false
+                        Log.d("NewsViewModel", "No new messages, setting hasMoreMessages=false")
                     }
                 }
 
+                // Обновляем состояние только если есть новые сообщения
                 if (allMessagesUi.isNotEmpty()) {
                     Log.d(
                         "NewsViewModel",
                         "Updating chat with titles: ${allMessagesUi.map { it.title }}"
                     )
                     updateChatState(allMessagesUi)
+                } else {
+                    Log.d("NewsViewModel", "No new messages, skipping chat state update")
                 }
+
+                // Обновляем флаги состояния в любом случае
                 reduceState {
                     state.value.copy(
                         isLoadingNextMessagesPage = false,
@@ -274,6 +283,12 @@ class NewsViewModel @Inject constructor(
                 }
                 isLoadingNextPage = false
                 isSwipeRefreshing = false
+
+                // Автоматическая дозагрузка, если новостей меньше порога и есть еще страницы
+                if (allMessagesUi.size < MIN_NEWS_THRESHOLD && hasMoreMessages) {
+                    Log.d("NewsViewModel", "Автоматическая дозагрузка: новостей меньше $MIN_NEWS_THRESHOLD, загружаем следующую страницу")
+                    handleUserAction(NewsAction.LoadNextPage)
+                }
             } catch (e: Exception) {
                 Log.e("NewsViewModel", "Error loading news: ${e.message}", e)
                 handleError(e)
@@ -386,6 +401,7 @@ class NewsViewModel @Inject constructor(
                     delay(600)
                 }
                 currentCursor = null
+                Log.d("NewsViewModel", "Swipe refresh triggered, resetting cursor")
                 loadNewsPage()
             }
 
@@ -396,6 +412,8 @@ class NewsViewModel @Inject constructor(
                 if (hasMoreMessages && !isLoadingNextPage) {
                     Log.d("NewsViewModel", "Loading next page with cursor=$currentCursor")
                     loadNewsPage(cursor = currentCursor)
+                } else {
+                    Log.d("NewsViewModel", "No more messages to load or loading in progress")
                 }
             }
         }
@@ -501,12 +519,12 @@ class NewsViewModel @Inject constructor(
                     return@launch
                 }
 
-                Log.d("NewsViewModel", "Authorit being used: ${context.packageName}.fileprovider") // Или то, что вы используете
+                Log.d("NewsViewModel", "Authorit being used: ${context.packageName}.fileprovider")
                 Log.d("NewsViewModel", "File path: ${file.absolutePath}, exists: ${file.exists()}, length: ${file.length()}")
                 // Получаем Uri через FileProvider
                 val shareUri = FileProvider.getUriForFile(
                     context,
-                    "com.elta.android.fileprovider", // Исправьте на это
+                    "com.elta.android.fileprovider",
                     file
                 )
 
@@ -632,26 +650,24 @@ class NewsViewModel @Inject constructor(
 
     private fun updateChatState(messagesUi: List<MessageUiEntity>) {
         val updatedMessages = messagesUi.map { it.copy(isNewMessage = true) }
-        val messagesWithCorner = NewsChatAnalyzer.defineMessagesInSequence(updatedMessages)
-        val messagesWithDate = NewsChatAnalyzer.defineChangingDateMessages(messagesWithCorner)
 
-        val currentMessages = if (isSwipeRefreshing) {
-            emptyList() // Очищаем текущие сообщения при swipeRefresh
-        } else {
-            state.value.chat.messages
-        }
-        val allMessages = (currentMessages + messagesWithDate)
-            .distinctBy { it.id } // Убедимся, что нет дубликатов по ID
-            .sortedByDescending { it.dateSending.timestamp }
+        // Сначала объединяем все сообщения (старые + новые)
+        val currentMessages = state.value.chat.messages
+        val allMessagesTemp = (currentMessages + updatedMessages)
+            .distinctBy { it.id }  // Убираем дубликаты
+            .sortedByDescending { it.dateSending.timestamp }  // Сортируем по дате (descending)
+
+        // Теперь применяем analyzer ко ВСЕМУ списку
+        val messagesWithCorner = NewsChatAnalyzer.defineMessagesInSequence(allMessagesTemp)
+        val messagesWithDate = NewsChatAnalyzer.defineChangingDateMessages(messagesWithCorner)
 
         reduceState {
             state.value.copy(
-                chat = ChatUiEntity(messages = allMessages),
-                hasNewMessages = messagesWithDate.isNotEmpty(),
+                chat = ChatUiEntity(messages = messagesWithDate),
+                hasNewMessages = updatedMessages.isNotEmpty(),
                 isLoadingNextMessagesPage = false
             )
         }
-
     }
 
     private suspend fun startDownloadFile(message: MessageUiEntity) {

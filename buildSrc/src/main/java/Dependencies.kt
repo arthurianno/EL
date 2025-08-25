@@ -9,6 +9,7 @@ object Dependencies {
         private const val serializationVersion = "1.4.0"
         private const val coroutinesVersion = "1.6.4"
         private const val dateTimeVersion = "0.3.1"
+            private const val metadataVersion = "0.9.0"
 
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         const val coroutinesCore =
@@ -19,6 +20,7 @@ object Dependencies {
         const val serializationJson =
             "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
         const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion"
+            const val metadataJvm = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:$metadataVersion"
     }
 
     object Jetpack {

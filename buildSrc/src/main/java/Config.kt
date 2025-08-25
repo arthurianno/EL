@@ -6,7 +6,7 @@ object AppConfig {
     const val completeSdk = 34
     const val targetSdk = 34
     const val jvmTarget = "11"
-    val javaVersion = JavaVersion.VERSION_17
+    val javaVersion = JavaVersion.VERSION_11
 
     object DeepLink {
         const val host = "stage2.vdiabete.com"

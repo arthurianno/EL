@@ -176,10 +176,9 @@ private fun ModifiedCard(
         )
 
         val density = LocalDensity.current
-        val maxWidthPx = with(density) { 250.dp.toPx() } // Максимальная ширина карточки
+        val maxWidthPx = with(density) { 250.dp.toPx() }
         val context = LocalContext.current
 
-        // Вычисляем размеры изображения
         val computedSize = remember(message.image?.width, message.image?.height) {
             message.image?.let { imageDoc ->
                 if (imageDoc.width != null && imageDoc.height != null && imageDoc.width > 0) {
@@ -188,7 +187,7 @@ private fun ModifiedCard(
                     val heightDp = with(density) { (maxWidthPx * aspectRatio).toDp() }
                     Pair(widthDp, heightDp)
                 } else {
-                    Pair(250.dp, 150.dp) // Дефолтные размеры
+                    Pair(250.dp, 150.dp)
                 }
             } ?: Pair(250.dp, 150.dp)
         }
@@ -198,23 +197,24 @@ private fun ModifiedCard(
                 .fillMaxWidth()
         ) {
             message.image?.let { imageDoc ->
-                // Определяем данные для загрузки изображения
-                val imageData = when {
-                    imageDoc.base64Data != null -> {
-                        try {
-                            Base64.decode(imageDoc.base64Data)
-                        } catch (e: Exception) {
-                            Log.e("ImageDebug", "Failed to decode Base64: ${e.message}")
-                            null
+                // Запоминаем декодированные данные на основе base64Data или url
+                val imageData = remember(imageDoc.base64Data, imageDoc.url) {
+                    when {
+                        imageDoc.base64Data != null -> {
+                            try {
+                                Base64.decode(imageDoc.base64Data)
+                            } catch (e: Exception) {
+                                Log.e("ImageDebug", "Failed to decode Base64: ${e.message}")
+                                null
+                            }
                         }
+                        imageDoc.url != null -> imageDoc.url
+                        else -> null
                     }
-                    imageDoc.url != null -> imageDoc.url
-                    else -> null
                 }
 
-                Log.d("ImageDebug", "Loading image data: $imageData, Width: ${imageDoc.width}, Height: ${imageDoc.height}")
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
+                val imageRequest = remember(imageData, imageDoc.url, imageDoc.base64Data) {
+                    ImageRequest.Builder(context)
                         .data(imageData)
                         .crossfade(true)
                         .allowHardware(true)
@@ -229,8 +229,13 @@ private fun ModifiedCard(
                                 Log.e("ImageDebug", "Failed to load image: ${imageDoc.url ?: "Base64"}, Error: ${throwable.throwable.message}", throwable.throwable)
                             }
                         )
-                        .build(),
-                    contentScale = ContentScale.Fit, // Изменено на Fit для сохранения пропорций
+                        .build()
+                }
+
+                Log.d("ImageDebug", "Loading image data: $imageData, Width: ${imageDoc.width}, Height: ${imageDoc.height}")
+                AsyncImage(
+                    model = imageRequest,
+                    contentScale = ContentScale.Fit,
                     contentDescription = null,
                     placeholder = ColorPainter(colors.shadeBlack3),
                     error = ColorPainter(colors.shadeBlack3),

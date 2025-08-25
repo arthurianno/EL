@@ -39,7 +39,7 @@ class NewsDataSource @Inject constructor(
 
 private fun NewsListResponseDto.toDomain(): NewsListResponse {
     return NewsListResponse(
-        news = content?.map { it.toDomain() } ?: emptyList(),
+        news = content?.filter { it.state.equals("ACTIVE", ignoreCase = true) }?.map { it.toDomain() } ?: emptyList(),
         hasNextPage = hasNextPage,
         endCursor = endCursor
     )
