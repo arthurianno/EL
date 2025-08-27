@@ -9,10 +9,12 @@ import androidx.multidex.MultiDex
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
+import com.elta.android.domain.features.multiLang.usecases.FetchScreenConfigsUseCase
 import com.elta.android.presentation.di.AnalyticModule
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nullgr.core.hardware.NetworkChecker
 import com.nullgr.core.preferences.defaultPrefs
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
@@ -23,6 +25,9 @@ import dagger.android.HasServiceInjector
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,6 +49,11 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
     @Inject
     lateinit var remindersManager: RemindersManager
 
+    @Inject lateinit var fetchScreenConfigsUseCase: FetchScreenConfigsUseCase// Добавляем UseCase
+
+
+    @Inject lateinit var networkChecker: NetworkChecker
+
     override fun onCreate() {
         super.onCreate()
         initFirebase()
@@ -54,6 +64,25 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
         initYandexMapKit()
         initRxJava()
         initAppMetric()
+        initScreenConfigs()
+    }
+
+
+    private fun initScreenConfigs() {
+        // Запускаем в фоне через корутины
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                if (networkChecker.isInternetConnectionEnabled()) {
+                    val slugs = listOf("connect_start") // Slug для экрана
+                    val langs = listOf("ru", "kk") // Запрашиваем русский и казахский
+                    fetchScreenConfigsUseCase(slugs, langs)
+                } else {
+                    Timber.d("No network, using cached screen configs")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to fetch screen configs")
+            }
+        }
     }
 
     private fun initRxJava() {

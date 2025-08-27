@@ -21,6 +21,7 @@ import com.elta.android.data.di.NetworkRequesterModule
 import com.elta.android.data.di.NewsModule
 import com.elta.android.data.di.RemoteModule
 import com.elta.android.data.di.RepoModule
+import com.elta.android.data.di.RoomModule
 import com.elta.android.data.di.ServiceModule
 import com.elta.android.data.di.StorageModule
 import com.elta.android.data.di.TokenModule
@@ -69,6 +70,7 @@ import javax.inject.Singleton
         NetworkRequesterModule::class,
         // domain
         RepoModule::class,
+        RoomModule::class,
         // presentation
         PmModule::class,
         NewsModule::class,
