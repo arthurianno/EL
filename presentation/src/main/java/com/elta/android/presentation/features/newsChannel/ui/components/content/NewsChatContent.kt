@@ -93,6 +93,15 @@ fun NewsChatContent(
                 .pullRefresh(pullRefreshState)
         ) {
             when {
+                // Проверка на отсутствие интернета
+                connectState == ConnectState.Offline -> {
+                    Text(
+                        text = stringResource(id = R.string.news_chat_noConnect_text),
+                        color = colors.shadeBlack2,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
                 isLoadingNextMessagesPage && chat.messages.isEmpty() -> {
                     Text(
                         text = stringResource(id = R.string.news_chat_loading_text),
@@ -121,9 +130,9 @@ fun NewsChatContent(
                         onMessageClick = onMessageClick,
                         onDocumentIconClick = onDocumentIconClick,
                         onLongMessageClick = onLongMessageClick,
+                        onCopyClick = onCopyClick,
                         onDownIconClick = onDownIconClick,
                         onDismissClick = onDismissClick,
-                        onCopyClick = onCopyClick,
                         onScrollToTop = onScrollToTop,
                         onLoadNextPage = onLoadNextPage
                     )

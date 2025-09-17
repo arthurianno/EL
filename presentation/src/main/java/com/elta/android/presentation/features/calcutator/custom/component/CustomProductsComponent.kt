@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -137,81 +138,78 @@ private fun Content(
 
         val loadState = customProducts.loadState
 
-        if (loadState.refresh !is LoadState.Error) {
-            Header(
-                searchFieldWidgetModel = viewModel.searchField,
-                searchInFocus = searchInFocus
-            ) {
-                viewModel.sendAction(CustomProductAction.CreateProduct)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)
+        ) {
+            // Header как item в списке
+            item {
+                Header(
+                    searchFieldWidgetModel = viewModel.searchField,
+                    searchInFocus = searchInFocus
+                ) {
+                    viewModel.sendAction(CustomProductAction.CreateProduct)
+                }
+                VSpacerMedium()
             }
 
-            VSpacerMedium()
-        }
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                loadState.refresh is LoadState.Loading -> LoadingScreen(color = colors.shadeBlack1)
-
-                loadState.refresh is LoadState.Error -> {
-                    viewModel.sendAction(CustomProductAction.ErrorResult)
-                    val textId = if (networkAvailable) {
-                        R.string.custom_product_list_server_error
-                    } else {
-                        R.string.custom_product_list_offline_error
-                    }
+            // Контент в зависимости от состояния
+            if (loadState.refresh is LoadState.Loading) {
+                item {
+                    LoadingScreen(color = colors.shadeBlack1)
+                }
+            } else if (loadState.refresh is LoadState.Error) {
+                viewModel.sendAction(CustomProductAction.ErrorResult)
+                val textId = if (networkAvailable) {
+                    R.string.custom_product_list_server_error
+                } else {
+                    R.string.custom_product_list_offline_error
+                }
+                item {
                     ErrorScreen(titleTextId = textId) {
                         customProducts.retry()
                     }
                 }
-
-                loadState.refresh is LoadState.NotLoading && customProducts.itemCount == 0 -> {
-                    val notResultTextId = if (searchText.isBlank()) {
-                        R.string.custom_product_list_is_empty
-                    } else {
-                        R.string.calculator_search_no_result
+            } else if (loadState.refresh is LoadState.NotLoading && customProducts.itemCount == 0) {
+                val notResultTextId = if (searchText.isBlank()) {
+                    R.string.custom_product_list_is_empty
+                } else {
+                    R.string.calculator_search_no_result
+                }
+                item {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        NotResult(notResultTextId)
                     }
-                    NotResult(notResultTextId)
+                }
+            } else {
+                items(customProducts.itemCount) { index ->
+                    DishesItem(
+                        dish = customProducts[index],
+                        trailingIcon = TrailingIcon.CustomDish,
+                        calculatorFlow = calculatorFlow,
+                        isSelectedDish = false,
+                        dishesClick = { dishClicked ->
+                            viewModel.sendAction(CustomProductAction.ProductClicked(dishClicked))
+                        },
+                        deleteClick = { deletedDish ->
+                            viewModel.sendAction(CustomProductAction.DeleteProductClicked(deletedDish))
+                        }
+                    )
                 }
 
-                else -> {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(dimens.dishCardVerticalSpace)) {
-
-                        items(customProducts.itemCount) { index ->
-                            DishesItem(
-                                dish = customProducts[index],
-                                trailingIcon = TrailingIcon.CustomDish,
-                                calculatorFlow = calculatorFlow,
-                                isSelectedDish = false,
-                                dishesClick = { dishClicked ->
-                                    viewModel sendAction CustomProductAction.ProductClicked(
-                                        dishClicked
-                                    )
-                                },
-                                deleteClick = { deletedDish ->
-                                    viewModel sendAction CustomProductAction.DeleteProductClicked(
-                                        deletedDish
-                                    )
-                                }
-                            )
+                if (loadState.append is LoadState.Loading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = dimens.contentPadding)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        ) {
+                            LoadingScreen(color = colors.shadeBlack1)
                         }
-
-                        if (loadState.append is LoadState.Loading) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = dimens.contentPadding)
-                                        .wrapContentWidth(Alignment.CenterHorizontally)
-                                ) {
-                                    LoadingScreen(color = colors.shadeBlack1)
-                                }
-                            }
-                        }
-
                     }
                 }
             }
-            VSpacerMedium()
         }
     }
 }

@@ -247,11 +247,15 @@
     <string name="main_records_new_day_subtitle">Сегодня новый день! Не забудьте\nсинхронизироваться с глюкометром\nи внести первую запись в свой дневник</string>
 
     <string name="main_records_header_title_bread">Хлебных ед</string>
+    <string name="main_records_header_title_gmi">Индикатор управления глюкозой (GMI)</string>
+    <string name="main_records_header_title_target">Время в целевом\nдиапазоне</string>
+    <string name="main_records_header_title_avergluc">Средений уровень\nглюкозы</string>
     <string name="main_records_header_title_glucose">Уровень глюкозы</string>
     <string name="main_records_header_title_insulin">Инсулина</string>
 
     <string name="main_records_mask_value">%s ед</string>
     <string name="main_records_mask_value_he">%s ХЕ</string>
+    <string name="main_records_mask_value_proc">%</string>
     <string name="main_records_empty_value">—</string>
     <string name="main_records_daily_glucose_title">Мои показатели сегодня</string>
     <string name="main_records_daily_glucose_subtitle">Последний в %s</string>
@@ -768,8 +772,9 @@
 
     <!-- NEWS -->
     <string name="news_topbar_title">Новости</string>
-    <string name="news_chat_empty_text">Привет уважаемый юзер, пока новостей нет</string>
-    <string name="news_chat_loading_text">ГРУЗИМ НОВОСТИ :)</string>
+    <string name="news_chat_empty_text">Привет, уважаемый пользователь, пока новостей нет</string>
+    <string name="news_chat_loading_text">Загрузка новостей!</string>
+    <string name="news_chat_noConnect_text">Загрузка новостей не возможна\nпроверьте подключение</string>
 
     <!-- FIRMWARE -->
     <string name="firmware_title_updates_not_found">Обновления не найдены</string>

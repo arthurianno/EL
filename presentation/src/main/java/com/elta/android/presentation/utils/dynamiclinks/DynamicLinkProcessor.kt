@@ -16,40 +16,48 @@ class DynamicLinkProcessor private constructor(
     private val notificationStartAction: Action<Uri>?,
     private val deepLinkOpenAction: Action<Uri>?,
     private val consultantDeepLinkOpenAction: Action<Unit>?,
+    private val newsDeepLinkOpenAction: Action<Unit>?,
     private val coldStartByDeepLinkAction: Action<Uri>?
 ) {
 
     @Suppress("LongMethod")
     fun process() {
         if (initialIntent != null) {
-            if (initialIntent.getBooleanExtra(AppActivity.OPEN_CONSULTANT_CHAT, false)) {
-                consultantDeepLinkOpenAction?.consumer?.accept(Unit)
-            } else {
-                FirebaseDynamicLinks.getInstance().getDynamicLink(initialIntent)
-                    .addOnSuccessListener { pendingDynamicLinkData ->
-                        with(pendingDynamicLinkData?.link) {
-                            if (this != null) {
-                                if (!ignoreColdStart && savedState == null) {
-                                    coldStartByDeepLinkAction?.consumer?.accept(this)
+            val launchUrl = initialIntent.getStringExtra("launch_url")
+            when (launchUrl) {
+                "myapp://news" -> {
+                    newsDeepLinkOpenAction?.consumer?.accept(Unit)
+                }
+                "myapp://consultant" -> {
+                    consultantDeepLinkOpenAction?.consumer?.accept(Unit)
+                }
+                else -> {
+                    FirebaseDynamicLinks.getInstance().getDynamicLink(initialIntent)
+                        .addOnSuccessListener { pendingDynamicLinkData ->
+                            with(pendingDynamicLinkData?.link) {
+                                if (this != null) {
+                                    if (!ignoreColdStart && savedState == null) {
+                                        coldStartByDeepLinkAction?.consumer?.accept(this)
+                                    } else {
+                                        deepLinkOpenAction?.consumer?.accept(this)
+                                    }
                                 } else {
-                                    deepLinkOpenAction?.consumer?.accept(this)
-                                }
-                            } else {
-                                if (initialIntent.data.isNotificationUriValid()) {
-                                    notificationStartAction?.consumer?.accept(initialIntent.data)
-                                } else {
-                                    processColdStartIfNeed()
+                                    if (initialIntent.data.isNotificationUriValid()) {
+                                        notificationStartAction?.consumer?.accept(initialIntent.data)
+                                    } else {
+                                        processColdStartIfNeed()
+                                    }
                                 }
                             }
                         }
-                    }
-                    .addOnFailureListener {
-                        Timber.e(it, "DynamicLink process error ")
-                        processColdStartIfNeed()
-                    }
-                    .addOnCanceledListener {
-                        processColdStartIfNeed()
-                    }
+                        .addOnFailureListener {
+                            Timber.e(it, "DynamicLink process error ")
+                            processColdStartIfNeed()
+                        }
+                        .addOnCanceledListener {
+                            processColdStartIfNeed()
+                        }
+                }
             }
         } else {
             processColdStartIfNeed()
@@ -73,6 +81,7 @@ class DynamicLinkProcessor private constructor(
         private var notificationStartAction: Action<Uri>? = null
         private var deepLinkOpenAction: Action<Uri>? = null
         private var consultantDeepLinkOpenAction: Action<Unit>? = null
+        private var newsDeepLinkOpenAction: Action<Unit>? = null
         private var coldStartByDeepLinkAction: Action<Uri>? = null
 
         fun ignoreColdStart(ignore: Boolean): Builder {
@@ -104,6 +113,10 @@ class DynamicLinkProcessor private constructor(
             this.consultantDeepLinkOpenAction = action
             return this
         }
+        fun newsDeeplink(action: Action<Unit>): Builder {
+            this.newsDeepLinkOpenAction = action
+            return this
+        }
 
         fun coldStartByDeepLinkPassTo(action: Action<Uri>): Builder {
             this.coldStartByDeepLinkAction = action
@@ -120,6 +133,7 @@ class DynamicLinkProcessor private constructor(
                 deepLinkOpenAction = deepLinkOpenAction,
                 consultantDeepLinkOpenAction = consultantDeepLinkOpenAction,
                 coldStartByDeepLinkAction = coldStartByDeepLinkAction,
+                newsDeepLinkOpenAction = newsDeepLinkOpenAction
             )
     }
 }

@@ -169,10 +169,10 @@ class MainProfilePm @Inject constructor(
 //                router.startFlow(Screens.ShopsMap())
             }
 
-//            News -> {
-//                trackEvent(AnalyticsEventType.NEWS_OPEN)
-//                router.startFlow(Screens.NewsScreen)
-//            }
+            News -> {
+                trackEvent(AnalyticsEventType.NEWS_OPEN)
+                router.startFlow(Screens.NewsScreen)
+            }
 
             MyObservers -> router.startFlow(Screens.Observers)
             MyDevices -> {

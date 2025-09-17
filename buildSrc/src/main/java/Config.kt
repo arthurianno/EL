@@ -3,10 +3,9 @@ import org.gradle.api.JavaVersion
 object AppConfig {
     const val applicationId = "com.elta.android"
     const val minSdk = 24
-    const val completeSdk = 34
-    const val targetSdk = 34
-    const val jvmTarget = "11"
-    val javaVersion = JavaVersion.VERSION_11
+    const val completeSdk = 35
+    const val targetSdk = 35
+    val javaVersion = JavaVersion.VERSION_1_8
 
     object DeepLink {
         const val host = "stage2.vdiabete.com"

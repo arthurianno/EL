@@ -10,6 +10,7 @@ plugins {
     id("io.objectbox")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.huawei.agconnect")
 }
 
 val CREDENTIALS_DEBUG = "../keystore/credentials-debug.properties"
@@ -45,7 +46,6 @@ android {
     }
 
     signingConfigs {
-
         val credentialsDebug = getPropertiesFromFile(CREDENTIALS_DEBUG)
 
         getByName("debug") {
@@ -67,7 +67,6 @@ android {
     }
 
     buildTypes {
-
         all {
             resValue("string", "app_deep_link_host", AppConfig.DeepLink.host)
             resValue("string", "app_deep_link_schema", AppConfig.DeepLink.schema)
@@ -132,8 +131,8 @@ android {
 kapt {
     correctErrorTypes = true
     javacOptions {
-        option("-source", "11")
-        option("-target", "11")
+        option("-source", "1.8")
+        option("-target", "1.8")
     }
 }
 
@@ -149,8 +148,6 @@ dependencies {
     implementation(project(Module.common))
     api(project(Module.presentation))
     api(project(Module.data))
-
-
 
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
@@ -178,6 +175,8 @@ dependencies {
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)
     implementation(Dependencies.Webim.core)
+    implementation(Dependencies.OneSignal.core) // OneSignal уже есть
+    implementation ("com.huawei.hms:push:6.3.0.304") // Новая строка
 
     implementation("androidx.room:room-common:2.7.2")
     implementation("androidx.room:room-runtime:2.7.2")

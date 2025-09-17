@@ -56,6 +56,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import java.io.File
 import java.io.FileOutputStream
 import androidx.core.content.FileProvider
+import com.elta.android.presentation.R
 import com.elta.android.presentation.features.newsChannel.model.PreviewStateNews
 import com.nullgr.core.hardware.NetworkChecker
 
@@ -186,6 +187,7 @@ class NewsViewModel @Inject constructor(
                     if (state.value.connectState == ConnectState.Offline) {
                         reduceState { state.value.copy(connectState = ConnectState.Connect) }
                         Log.d("NewsViewModel", "Сеть восстановлена, пытаемся загрузить новости")
+                        loadNewsPage()
                     }
                 }
             }
@@ -250,9 +252,7 @@ class NewsViewModel @Inject constructor(
                     val response = loadNewsMessages(cursor = cursor, limit = LIMIT, direction = "DESC")
                     Log.d("NewsViewModel", "Response: news=${response.news.size}, hasNextPage=${response.hasNextPage}, endCursor=${response.endCursor}")
                     if (response.news.isNotEmpty()) {
-                        val newMessages = response.news.toUi().filter { newMessage ->
-                            !state.value.chat.messages.any { it.id == newMessage.id }
-                        }
+                        val newMessages = response.news.toUi()  // Без .filter { !state.value.chat.messages.any { it.id == newMessage.id } }
                         allMessagesUi.addAll(newMessages)
                         hasMoreMessages = response.hasNextPage
                         currentCursor = response.endCursor
@@ -361,6 +361,18 @@ class NewsViewModel @Inject constructor(
             }
 
             is NewsAction.OnSwipeRefresh -> {
+                if (!networkStatus.isInternetConnectionEnabled()) {
+                    viewModelScope.launch {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.news_chat_noConnect_text),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                    return
+                }
                 val currentTime = System.currentTimeMillis()
                 val cooldownMillis = SWIPE_REFRESH_COOLDOWN_MINUTES * 60 * 1000
 
@@ -402,6 +414,7 @@ class NewsViewModel @Inject constructor(
                 }
                 currentCursor = null
                 Log.d("NewsViewModel", "Swipe refresh triggered, resetting cursor")
+                reduceState { state.value.copy(chat = state.value.chat.copy(messages = emptyList())) }  // Очистка списка для полного рефреша
                 loadNewsPage()
             }
 
@@ -579,14 +592,14 @@ class NewsViewModel @Inject constructor(
                     contentValues.clear()
                     contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
                     resolver.update(uri, contentValues, null, null)
-                    Log.d("NewsViewModel", "File saved to MediaStore: $uri")
+
                     uri
                 } ?: run {
-                    Log.e("NewsViewModel", "Failed to create new URI in MediaStore")
+
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NewsViewModel", "Error saving to MediaStore: ${e.message}", e)
+
                 null
             }
         }
@@ -651,13 +664,19 @@ class NewsViewModel @Inject constructor(
     private fun updateChatState(messagesUi: List<MessageUiEntity>) {
         val updatedMessages = messagesUi.map { it.copy(isNewMessage = true) }
 
-        // Сначала объединяем все сообщения (старые + новые)
-        val currentMessages = state.value.chat.messages
-        val allMessagesTemp = (currentMessages + updatedMessages)
-            .distinctBy { it.id }  // Убираем дубликаты
-            .sortedByDescending { it.dateSending.timestamp }  // Сортируем по дате (descending)
+        val currentMessages = state.value.chat.messages.toMutableList()
+        for (newMessage in updatedMessages) {
+            val index = currentMessages.indexOfFirst { it.id == newMessage.id }
+            if (index != -1) {
+                currentMessages[index] = newMessage  // Обновляем существующую
+            } else {
+                currentMessages.add(newMessage)  // Добавляем новую
+            }
+        }
 
-        // Теперь применяем analyzer ко ВСЕМУ списку
+        // Сортировка теперь по orderNumber (см. проблему 2 ниже)
+        val allMessagesTemp = currentMessages.sortedByDescending { it.orderNumber ?: it.dateSending.timestamp }  // Fallback на timestamp, если orderNumber null
+
         val messagesWithCorner = NewsChatAnalyzer.defineMessagesInSequence(allMessagesTemp)
         val messagesWithDate = NewsChatAnalyzer.defineChangingDateMessages(messagesWithCorner)
 
@@ -672,28 +691,39 @@ class NewsViewModel @Inject constructor(
 
     private suspend fun startDownloadFile(message: MessageUiEntity) {
         val document = message.document ?: message.image ?: return
+        var fileName = document.fileName
         val url = document.url.orEmpty()
 
+        // Проверка корректности URL
         if (url.isBlank() || (!url.startsWith("http://") && !url.startsWith("https://"))) {
-            Log.e("NewsViewModel", "Некорректный URL: $url")
             reduceState {
                 state.value.copy(
                     chat = state.value.chat.reduceChatState(
                         messageId = message.id.toString(),
                         cachingState = CachingState.NotCached,
+                        uri = null,
                         size = document.size
                     )
                 )
             }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Ошибка: некорректный URL файла", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
+        // Fix для PDF: добавляем расширение .pdf, если это документ и нет расширения
+        if (document.fileType == MessageType.Document && !fileName.endsWith(".pdf", ignoreCase = true)) {
+            fileName = "$fileName.pdf"
+        }
+
+        // Устанавливаем состояние загрузки
         reduceState {
-            Log.d("NewsViewModel", "Установка состояния Downloading для сообщения ${message.id}")
             state.value.copy(
                 chat = state.value.chat.reduceChatState(
                     messageId = message.id.toString(),
                     cachingState = CachingState.Downloading,
+                    uri = null,
                     size = document.size
                 )
             )
@@ -702,14 +732,34 @@ class NewsViewModel @Inject constructor(
         try {
             val downloadedFileUri = downloadFile(
                 url = url,
-                fileName = document.fileName
-            )
-            val fileSize = mediaRepository.getFileSize(downloadedFileUri) ?: document.size
-            Log.d(
-                "NewsViewModel",
-                "Файл загружен: url=$url, fileName=${document.fileName}, downloadedFileUri=$downloadedFileUri, size=$fileSize"
+                fileName = fileName // Используем имя с .pdf
             )
 
+            // Проверяем, что Uri не null
+            if (downloadedFileUri == null) {
+                reduceState {
+                    state.value.copy(
+                        chat = state.value.chat.reduceChatState(
+                            messageId = message.id.toString(),
+                            cachingState = CachingState.NotCached,
+                            uri = null,
+                            size = document.size
+                        )
+                    )
+                }
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Ошибка: не удалось загрузить файл", Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+
+            // Проверяем существование файла
+            val file = File(context.getExternalFilesDir(null), fileName)
+
+            // Получаем размер файла
+            val fileSize = mediaRepository.getFileSize(downloadedFileUri) ?: document.size
+
+            // Обновляем состояние чата
             val updatedChat = state.value.chat.reduceChatState(
                 messageId = message.id.toString(),
                 cachingState = CachingState.Cached,
@@ -718,13 +768,10 @@ class NewsViewModel @Inject constructor(
             )
 
             reduceState {
-                Log.d(
-                    "NewsViewModel",
-                    "Обновление состояния чата: messageId=${message.id}, cachingState=Cached"
-                )
                 state.value.copy(chat = updatedChat)
             }
 
+            // Навигация в зависимости от типа файла
             val screen = if (document.fileType == MessageType.Document) {
                 Screens.ViewPdfScreen(downloadedFileUri)
             } else {
@@ -732,14 +779,18 @@ class NewsViewModel @Inject constructor(
             }
             router.navigateTo(screen)
         } catch (e: Exception) {
-            Log.e("NewsViewModel", "Не удалось скачать файл: ${e.message}")
+            if (e is IllegalArgumentException && e.message?.contains("Couldn't find meta-data for provider") == true) { }
             val errorChat = state.value.chat.reduceChatState(
                 messageId = message.id.toString(),
                 cachingState = CachingState.NotCached,
+                uri = null,
                 size = document.size
             )
             reduceState {
                 state.value.copy(chat = errorChat)
+            }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Ошибка загрузки PDF: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

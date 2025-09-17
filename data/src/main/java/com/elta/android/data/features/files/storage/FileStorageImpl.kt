@@ -39,7 +39,7 @@ class FileStorageImpl @Inject constructor(val context: Context): FileStorage {
     }
 
     override fun getFileUri(file: File): Uri =
-        FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
     override fun createCachedPhoto(
         fileName: String,

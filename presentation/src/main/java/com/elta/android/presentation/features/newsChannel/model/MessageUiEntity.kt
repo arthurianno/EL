@@ -18,5 +18,6 @@ data class MessageUiEntity(
     val dateSending: DateUiEntity,
     val isDayChanged: Boolean = false,
     val cornerSequence: CornerUiEntity? = null,
-    val isNewMessage: Boolean = false
+    val isNewMessage: Boolean = false,
+    val orderNumber: Long? = null
 )

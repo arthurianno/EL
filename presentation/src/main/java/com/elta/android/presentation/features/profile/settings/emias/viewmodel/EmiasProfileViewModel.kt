@@ -184,7 +184,15 @@ class EmiasProfileViewModel @Inject constructor(
 
         omsInput.setText(oms)
         dateInput.setText(date)
+
+        // Явная валидация после установки текста (используем функции из модели)
+        val omsErrorId = oms.validateOms()  // Возвращает Int? (ID ошибки) или null
+        omsInput.setError(omsErrorId)
+
+        val dateErrorId = date.validateDate()  // Аналогично
+        dateInput.setError(dateErrorId)
     }
+
 
     override fun handleUserAction(action: Action) {
         when (action) {

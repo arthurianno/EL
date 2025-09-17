@@ -93,7 +93,8 @@ private fun News.toUi(): MessageUiEntity {
             .format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())),
         dateSending = createdDateTime.formatDate(),
         isDayChanged = false,
-        cornerSequence = null
+        cornerSequence = null,
+        orderNumber = orderNumber
     )
 }
 

@@ -45,46 +45,46 @@ class EltaMessageService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        // Обрабатываем только Webim-уведомления
         val webimPush = Webim.parseFcmPushNotification(message.data.toString())
         val isWebimPush = webimPush != null && webimPush.event == OPERATOR_EVENT_NAME
 
-        val (title, body) = if (isWebimPush) {
-            val body = getWebimMessageType(webimPush?.type)
-            val title = resources.getString(com.elta.android.presentation.R.string.app_name)
-            title to body
-        } else message.notification?.title to message.notification?.body
+        if (!isWebimPush) {
+            // Пропускаем не-Webim-уведомления, их обрабатывает OneSignal
+            return
+        }
 
-        val icon = if (isWebimPush) com.elta.android.presentation.R.drawable.ic_app_logo
-        else com.elta.android.presentation.R.drawable.ic_notification_reminder
+        // Логика для Webim-уведомлений
+        val title = resources.getString(com.elta.android.presentation.R.string.app_name)
+        val body = getWebimMessageType(webimPush?.type)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setContentTitle(title)
             setContentText(body)
-            setSmallIcon(icon)
+            setSmallIcon(com.elta.android.presentation.R.drawable.ic_app_logo)
             setStyle(
                 NotificationCompat.BigTextStyle()
                     .setBigContentTitle(title)
                     .bigText(body)
             )
-            if (isWebimPush) {
-                val consultantIntent =
-                    Intent(this@EltaMessageService, AppActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        putExtra(AppActivity.OPEN_CONSULTANT_CHAT, true)
-                    }
+            val consultantIntent =
+                Intent(this@EltaMessageService, AppActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                   // putExtra(AppActivity.OPEN_CONSULTANT_CHAT, true)
+                }
 
-                val pendingIntent = PendingIntent.getActivity(
-                    applicationContext,
-                    NOTIFICATION_ID,
-                    consultantIntent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-                setContentIntent(pendingIntent)
-            }
+            val pendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                NOTIFICATION_ID,
+                consultantIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            setContentIntent(pendingIntent)
             setAutoCancel(true)
             priority = NotificationCompat.PRIORITY_HIGH
         }.build()
-        if (isWebimPush && messageClient.isConsultantScreenActive) {
+
+        if (messageClient.isConsultantScreenActive) {
             notificationManager.cancel(NOTIFICATION_ID)
         } else {
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -92,21 +92,16 @@ class EltaMessageService : FirebaseMessagingService() {
     }
 
     private fun getWebimMessageType(type: WebimPushNotification.NotificationType?): String? {
-        val webimType = when (type) {
+        return when (type) {
             WebimPushNotification.NotificationType.OPERATOR_ACCEPTED ->
                 resources.getString(com.elta.android.presentation.R.string.consultant_push_operator_joined)
-
             WebimPushNotification.NotificationType.OPERATOR_FILE ->
                 resources.getString(com.elta.android.presentation.R.string.consultant_push_file_message)
-
             WebimPushNotification.NotificationType.OPERATOR_MESSAGE ->
                 resources.getString(com.elta.android.presentation.R.string.consultant_push_text_message)
-
             WebimPushNotification.NotificationType.RATE_OPERATOR ->
                 resources.getString(com.elta.android.presentation.R.string.consultant_rate_operator)
-
             else -> null
         }
-        return webimType
     }
 }

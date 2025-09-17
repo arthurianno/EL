@@ -74,7 +74,7 @@ fun EventBlock(
 @Composable
 private fun LazyItemScope.RecentQueriesRow(items: EventSelectorViewState, onRecentQueryClick:  (Pair<Long, String>) -> Unit) {
     GetLocalProperties { dimens, _, _, _, _ ->
-        Column(modifier = Modifier.animateItemPlacement()) {
+        Column(modifier = Modifier.animateItem()) {
             Subtitle(
                 text = stringResource(id = R.string.event_selector_recent_search_subtitle),
                 paddingValues = PaddingValues(top = dimens.smallDim, bottom = dimens.verySmallDim)
@@ -131,7 +131,7 @@ private fun LazyItemScope.SelectionValue(item: EventSelectorUi, onSelectionClick
                     .fillMaxWidth()
                     .clickable { onSelectionClick(item.id) }
                     .padding(dimens.selectionValue)
-                    .animateItemPlacement(),
+                    .animateItem(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

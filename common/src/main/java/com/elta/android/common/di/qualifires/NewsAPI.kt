@@ -5,7 +5,7 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class NewsApi(val value: NewsApiAnnotationType)
+annotation class NewsApiAnnotation(val value: NewsApiAnnotationType)
 
 enum class NewsApiAnnotationType {
     BaseUrl,

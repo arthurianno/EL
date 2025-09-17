@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 class AppActivity : BaseActivity<AppPm>() {
     companion object {
-        const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
+       // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
     }
 
     @Inject
@@ -62,6 +62,7 @@ class AppActivity : BaseActivity<AppPm>() {
             .coldStartPassTo(presentationModel.coldStartAction)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
             .consultantDeeplink(presentationModel.consultantDeepLinkAction)
+            .newsDeeplink(presentationModel.newsDeepLinkAction)
             .coldStartByDeepLinkPassTo(presentationModel.coldStartDeepLinkAction)
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
@@ -89,7 +90,7 @@ class AppActivity : BaseActivity<AppPm>() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)

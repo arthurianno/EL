@@ -49,14 +49,16 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    private val rxPermissions by lazy { RxPermissions(requireActivity()) }
+    private lateinit var rxPermissions: RxPermissions
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        rxPermissions = RxPermissions(requireActivity())
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.toolbar) {
-            // todo: SalepointHide
-            // скрываем точки продаж пока пока не примем решение что с ними делать
-//            menuButtonView.text = getString(R.string.sync_connect_menu_button_text)
-            // если возвращаем карты, то убираем эту заглушку
             menuButtonView.hide()
         }
     }
@@ -81,20 +83,18 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
         }
 
         pm.retryPinControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
+            makeSnackBarWithAction(binding.root, data, sc)
         }
         pm.retryConnectControl.bindTo { data: SnackBarData, sc: SnackBarControl<SnackBarData> ->
-            makeSnackBarWithAction(
-                binding.root,
-                data,
-                sc
-            )
+            makeSnackBarWithAction(binding.root, data, sc)
         }
-        pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
+
+        // Откладываем выполнение bindTo для rxPermissions
+        view?.post {
+            if (isAdded) { // Проверяем, что фрагмент всё ещё прикреплён
+                pm.btControl.bindTo(compositeUnbind, rxPermissions, this@ConnectDeviceByPinFragment)
+            }
+        }
 
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))

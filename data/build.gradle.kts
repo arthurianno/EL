@@ -36,6 +36,9 @@ android {
         }
     }
     namespace = "com.elta.android.data"
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 dependencies {

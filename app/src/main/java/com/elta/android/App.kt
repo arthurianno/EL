@@ -5,17 +5,24 @@ import android.app.Application
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import androidx.multidex.MultiDex
 import com.elta.android.data.di.ApiConstantsModule
 import com.elta.android.data.di.InterceptorModule
 import com.elta.android.data.features.auth.datasource.social.SocialNetworks
 import com.elta.android.domain.features.multiLang.usecases.FetchScreenConfigsUseCase
 import com.elta.android.presentation.di.AnalyticModule
+import com.elta.android.presentation.features.app.ui.AppActivity
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
 import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nullgr.core.hardware.NetworkChecker
 import com.nullgr.core.preferences.defaultPrefs
+import com.onesignal.OneSignal
+import com.onesignal.notifications.INotificationClickEvent
+import com.onesignal.notifications.INotificationClickListener
+import com.onesignal.notifications.INotificationLifecycleListener
+import com.onesignal.notifications.INotificationWillDisplayEvent
 import com.yandex.mapkit.MapKitFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -49,7 +56,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
     @Inject
     lateinit var remindersManager: RemindersManager
 
-    @Inject lateinit var fetchScreenConfigsUseCase: FetchScreenConfigsUseCase// Добавляем UseCase
+    @Inject lateinit var fetchScreenConfigsUseCase: FetchScreenConfigsUseCase
 
 
     @Inject lateinit var networkChecker: NetworkChecker
@@ -64,7 +71,12 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
         initYandexMapKit()
         initRxJava()
         initAppMetric()
-        initScreenConfigs()
+        //initScreenConfigs()
+        //initOneSignal()
+    }
+
+    private fun initOneSignal() {
+        OneSignalInitializer.initialize(this)
     }
 
 

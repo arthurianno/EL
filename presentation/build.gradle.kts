@@ -3,7 +3,7 @@ plugins {
     id("kotlin-android") // Замените kotlin("android") на id("kotlin-android") для консистентности
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" // Добавьте эту строку
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.0" // Добавьте эту строку
 }
 
 android {
@@ -39,10 +39,6 @@ android {
     buildFeatures {
         viewBinding = true
         compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = Dependencies.Jetpack.Compose.compilerVersion
     }
     buildTypes {
         release {
@@ -145,6 +141,7 @@ dependencies {
     implementation(Dependencies.CustomView.pulseView)
     implementation(Dependencies.CustomView.datePicker)
     implementation(Dependencies.CustomView.lottie)
+    debugImplementation("androidx.compose.ui:ui-tooling:1.9.0")
 
     kapt(Dependencies.Dagger.daggerCompiler)
     kapt(Dependencies.Dagger.daggerAndroidProcessor)

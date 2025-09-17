@@ -75,8 +75,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     private fun Body(screenConfig: ScreenConfig?) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             Text(
-                text = screenConfig?.description?.getTranslation("kk", defaultLang = "ru")
-                    ?: stringResource(id = R.string.sync_connect_start_text),
+                text = stringResource(id = R.string.sync_connect_start_text),
                 color = colors.shadeBlack0,
                 modifier = Modifier.padding(horizontal = dimens.contentPadding)
             )
@@ -87,8 +86,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     private fun Title(screenConfig: ScreenConfig?) {
         GetLocalProperties { dimens, _, _, _, types ->
             Text(
-                text = screenConfig?.description?.getTranslation("kk", defaultLang = "ru")
-                    ?: stringResource(id = R.string.sync_connect_start_title),
+                text = stringResource(id = R.string.sync_connect_start_title),
                 style = types.h1,
                 modifier = Modifier.padding(horizontal = dimens.contentPadding)
             )

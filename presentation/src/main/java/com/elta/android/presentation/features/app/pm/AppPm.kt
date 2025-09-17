@@ -71,6 +71,7 @@ class AppPm @Inject constructor(
      * с помощью интента и навигации
      */
     val consultantDeepLinkAction = action<Unit>()
+    val newsDeepLinkAction = action<Unit>()
 
     val coldStartAction = action<Unit>()
     val notificationStartAction = action<Uri>()
@@ -209,6 +210,28 @@ class AppPm @Inject constructor(
                     Screens.Support,
                     Screens.ConsultantScreen(id, userName)
                 )
+            }
+            .doOnError(::handleError)
+            .subscribe()
+            .untilDestroy()
+
+        newsDeepLinkAction.observable
+            .flatMapSingle {
+                getUserInfo.execute()
+                    .map { userInfo -> userInfo.isUserLoggedIn }
+            }
+            .doOnNext { isLoggedIn ->
+                if (isLoggedIn == true) {
+                    val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                    val homeScreen = if (improvedEnablingLocation) Screens.HomeFlow
+                    else Screens.HomeFlowVariantA
+                    router.newRootChain(
+                        homeScreen,
+                        Screens.NewsScreen
+                    )
+                } else {
+                    router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+                }
             }
             .doOnError(::handleError)
             .subscribe()

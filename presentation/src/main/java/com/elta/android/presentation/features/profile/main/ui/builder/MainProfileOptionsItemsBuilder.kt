@@ -63,14 +63,14 @@ class MainProfileOptionsItemsBuilder @Inject constructor(
             )
         )
 
-//        add(
-//            MainProfileAdditionalItem(
-//                R.string.profile_my_news,
-//                R.string.profile_manage_news,
-//                R.drawable.ic_observers_bg,
-//                News
-//            )
-//        )
+        add(
+            MainProfileAdditionalItem(
+                R.string.profile_my_news,
+                R.string.profile_manage_news,
+                R.drawable.ic_observers_bg,
+                News
+            )
+        )
         // todo: SalepointHide
         // скрываем точки продаж пока пока не примем решение что с ними делать
 //        add(

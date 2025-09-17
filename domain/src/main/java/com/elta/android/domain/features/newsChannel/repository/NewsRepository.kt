@@ -9,8 +9,5 @@ import java.util.UUID
 interface NewsRepository : BaseRepository {
     suspend fun getNewsList(cursor: Long?, limit: Int?, direction: String?): NewsListResponse
     suspend fun getNewsById(id: UUID): News
-    suspend fun getCachedNews(): List<News>
-    suspend fun saveNewsToCache(news: List<News>)
-    suspend fun clearCache()
     val newsList: Flow<NewsListResponse>
 }

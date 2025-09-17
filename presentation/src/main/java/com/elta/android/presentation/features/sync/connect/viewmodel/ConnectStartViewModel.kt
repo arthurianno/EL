@@ -62,7 +62,7 @@ class ConnectStartViewModel @Inject constructor(
                     state.value.copy(screenConfig = config)
                 }
                 // Устанавливаем текст кнопки из конфигурации
-                val buttonText = config?.description?.getTranslation("kk", defaultLang = "ru")
+                val buttonText = config?.description?.getTranslation("ru", defaultLang = "ru")
                 Timber.d("Button text from config: $buttonText") // Логируем для отладки
                 downButton.setText(buttonText ?: context.getString(R.string.sync_state_pin_dialog_button))
             } catch (e: Exception) {
