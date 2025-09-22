@@ -5,10 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -64,6 +69,7 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Откладываем инициализацию RxPermissions
+        setupBottomNavigationInsets()
         view.post {
             if (isAdded && !requireActivity().supportFragmentManager.isStateSaved) {
                 rxPermissions = RxPermissions(requireActivity())
@@ -214,6 +220,39 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             adapter = this@HomeFlowFragment.adapter
         }
     }
+
+    private fun setupBottomNavigationInsets() {
+        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
+        syncStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
+        connectionStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+    }
+
+
+
+
 
     private fun DialogControl<DialogData, DialogResult>.bindLikeAppDialog() =
         bindTo { data, dc ->

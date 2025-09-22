@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object AppConfig {
     const val applicationId = "com.elta.android"
-    const val minSdk = 24
+    const val minSdk = 27
     const val completeSdk = 35
     const val targetSdk = 35
     val javaVersion = JavaVersion.VERSION_1_8

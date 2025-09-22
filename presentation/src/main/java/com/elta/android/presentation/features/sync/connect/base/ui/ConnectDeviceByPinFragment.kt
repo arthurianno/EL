@@ -53,11 +53,11 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rxPermissions = RxPermissions(requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        rxPermissions = RxPermissions(requireActivity())
         with(binding.toolbar) {
             menuButtonView.hide()
         }
@@ -89,12 +89,8 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
             makeSnackBarWithAction(binding.root, data, sc)
         }
 
-        // Откладываем выполнение bindTo для rxPermissions
-        view?.post {
-            if (isAdded) { // Проверяем, что фрагмент всё ещё прикреплён
-                pm.btControl.bindTo(compositeUnbind, rxPermissions, this@ConnectDeviceByPinFragment)
-            }
-        }
+        // Теперь можем безопасно использовать rxPermissions без отложенного вызова
+        pm.btControl.bindTo(compositeUnbind, rxPermissions, this@ConnectDeviceByPinFragment)
 
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))
