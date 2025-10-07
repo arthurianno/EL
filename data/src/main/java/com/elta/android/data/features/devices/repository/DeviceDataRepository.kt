@@ -32,8 +32,7 @@ class DeviceDataRepository @Inject constructor(
     override suspend fun connectDevice(address: String, pinCode: String) =
         glucometerClient.connectDevice(address, pinCode)
 
-    override suspend fun connectDeviceDirectly(address: String, pinCode: String) =
-        glucometerClient.connectDeviceDirectly(address, pinCode)
+
 
     override suspend fun disconnect() {
         glucometerClient.disconnect()

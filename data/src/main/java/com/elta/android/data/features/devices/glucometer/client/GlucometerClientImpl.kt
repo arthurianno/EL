@@ -176,23 +176,6 @@ class GlucometerClientImpl @Inject constructor(
         checkPin(pin)
     }
 
-    override suspend fun connectDeviceDirectly(address: String, pin: String) {
-        crashlyticsReport.log("Connection operations started with device ${address.hideMac()}")
-        try {
-            crashlyticsReport.log("Establishing a connection with a device")
-            val device = bluetoothAdapter.getRemoteDevice(address) ?: throw Exception("Device not found")
-            crashlyticsReport.log("Device found")
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) delay(1_000)
-            glucometerBleManager.connectToGlucometer(device)
-
-        } catch (e: Exception) {
-            val error = GlucometerConnectionException(e.message.orEmpty())
-            crashlyticsReport.writeException(error)
-            throw error
-        }
-        checkPin(pin)
-    }
-
 
     private suspend fun checkPin(pin: String) {
         crashlyticsReport.log("Checking pin")
