@@ -72,7 +72,7 @@ class App : Application(), HasActivityInjector, HasBroadcastReceiverInjector, Ha
         initRxJava()
         initAppMetric()
         //initScreenConfigs()
-        //initOneSignal()
+        initOneSignal()
     }
 
     private fun initOneSignal() {

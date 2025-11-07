@@ -1,12 +1,17 @@
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.elta.android.BuildConfig
 import com.elta.android.presentation.features.app.ui.AppActivity
 import com.onesignal.OneSignal
 import com.onesignal.notifications.INotificationClickEvent
 import com.onesignal.notifications.INotificationClickListener
 import com.onesignal.notifications.INotificationLifecycleListener
 import com.onesignal.notifications.INotificationWillDisplayEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber  // Если используете Timber
 
@@ -17,6 +22,13 @@ object OneSignalInitializer {
     fun initialize(context: Context) {
         // Инициализация OneSignal в версии 5.x
         OneSignal.initWithContext(context, ONESIGNAL_APP_ID)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val accepted = OneSignal.Notifications.requestPermission(true)
+           Log.e("OneSignal", "Permission accepted: $accepted")
+        }
+
+        OneSignal.User.addTag("environment", BuildConfig.ENVIRONMENT_TAG)
 
         // Обработчик для показа уведомлений в foreground (без изменений)
         OneSignal.Notifications.addForegroundLifecycleListener(object : INotificationLifecycleListener {

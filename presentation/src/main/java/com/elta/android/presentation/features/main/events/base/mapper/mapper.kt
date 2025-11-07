@@ -4,10 +4,12 @@ import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.presentation.features.main.events.chooser.models.InsulinMedicamentChooser
 import com.elta.android.presentation.features.main.events.chooser.models.MedicamentChooser
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
+import com.nullgr.core.resources.ResourceProvider
 
 
-internal fun SelectorOption?.toChooserInsulin(): InsulinMedicamentChooser? {
+internal fun SelectorOption?.toChooserInsulin(resources: ResourceProvider): InsulinMedicamentChooser? {
     return if (!this?.meta.toString().contains(NULL)
     ) {
         val insulinMedicament = this?.meta as InsulinMedicament
@@ -15,7 +17,7 @@ internal fun SelectorOption?.toChooserInsulin(): InsulinMedicamentChooser? {
             medicamentId = insulinMedicament.id,
             medicamentName = insulinMedicament.name,
             insulinCode = insulinMedicament.insulinType.code,
-            insulinName = insulinMedicament.insulinType.name,
+            insulinName = insulinMedicament.insulinType.getLocalizedName(resources),
             insulinId = insulinMedicament.insulinType.id,
         )
     } else null

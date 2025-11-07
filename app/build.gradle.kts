@@ -75,6 +75,7 @@ android {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"dev\"")
 
             versionNameSuffix = "-debug(${version.buildNumber})"
             signingConfig = signingConfigs["debug"]
@@ -88,6 +89,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             proguardFiles.addAll(fileTree("proguard"))
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"prod\"")
         }
 
         create("huawei") {
@@ -97,6 +99,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             proguardFiles.addAll(fileTree("proguard"))
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"prod\"")
         }
     }
 

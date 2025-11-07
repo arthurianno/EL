@@ -27,6 +27,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Insulin
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -299,7 +300,7 @@ class EventsOptionsChooserPm @Inject constructor(
         else
             InsulinMedicamentChooser(
                 insulinCode = insulinType.code,
-                insulinName = insulinType.name,
+                insulinName = insulinType.getLocalizedName(resources),
                 insulinId = insulinType.id
             )
 

@@ -6,6 +6,7 @@ import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
 import com.elta.android.domain.features.diary.medicines.model.Medicament
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import com.elta.android.presentation.features.main.events.mapper.toPickerValues
 import com.elta.android.presentation.utils.NumberFormatter
 import com.elta.android.presentation.utils.toIcon
@@ -57,7 +58,7 @@ fun EventV2.getTag(res: ResourceProvider): SelectorOption? {
 fun EventV2.getSelectorOption(res: ResourceProvider): SelectorOption? =
     when (type) {
         EventType.Activity -> activityType.toSelectorOption(res)
-        EventType.Insulin -> insulinMedicament?.toSelectorOption()
+        EventType.Insulin -> insulinMedicament?.toSelectorOption(res)
         EventType.Medicaments -> medicament?.toSelectorOption()
         else -> null
     }
@@ -83,9 +84,9 @@ private fun ActivityType?.toSelectorOption(res: ResourceProvider): SelectorOptio
     )
 }
 
-private fun InsulinMedicament.toSelectorOption(): SelectorOption =
+private fun InsulinMedicament.toSelectorOption(res: ResourceProvider): SelectorOption =
     SelectorOption(
-        text = "${insulinType.name}($name)",
+        text = "${insulinType.getLocalizedName(res)}($name)",
         meta = this
     )
 

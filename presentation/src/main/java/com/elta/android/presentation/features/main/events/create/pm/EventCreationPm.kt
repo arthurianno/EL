@@ -29,6 +29,7 @@ import com.elta.android.presentation.features.main.events.base.pm.BaseEventPm
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getFormAdditionalText
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getMedicament
 import com.elta.android.presentation.features.main.events.edit.pm.mapper.getSelectorOption
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.model.toDoubleFormat
 import com.elta.android.presentation.widgets.selector.model.SelectorOption
 import io.reactivex.Single
@@ -295,7 +296,7 @@ class EventCreationPm @Inject constructor(
 
             EventType.Insulin -> {
                 data[AnalyticsEventParam.TYPE] =
-                    checkNotNull(params.insulinMedicament).insulinType.name
+                    checkNotNull(params.insulinMedicament).insulinType.getLocalizedName(resources)
                 AnalyticsEventType.EVENT_INSULIN_ADD
             }
 

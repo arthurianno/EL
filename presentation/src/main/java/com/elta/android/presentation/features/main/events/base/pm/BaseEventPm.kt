@@ -321,7 +321,7 @@ abstract class BaseEventPm(
                 chooserType = ChooserType.VARIANTS_WITH_SUBTYPE,
                 eventType = eventTypeState.value,
                 id = generateChooserId(),
-                insulinMedicament = formSelector.option.valueOrNull.toChooserInsulin()
+                insulinMedicament = formSelector.option.valueOrNull.toChooserInsulin(resources)
             )
 
             is EventType.Bread -> ChooserConfiguration(

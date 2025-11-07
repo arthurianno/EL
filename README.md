@@ -29,20 +29,20 @@ Detekt
 Before making pull request check code calling _./gradlew detektCheck_ in Terminal.
 Report will be printed to Terminal. HTML version of report you can find at _..detekt-report_
 
-Versions
---------
-1. Bump version:
-     - _./gradlew bumpPatch_ if build contains bug fixes or improvements of existing functional
-     - _./gradlew bumpMinor_ if build contains some new features
-     - _./gradlew bumpMajor_ if build contains changes that not compatible with previous versions
-     - _./gradlew bumpLocalBuildNumber_ if build contains fixes for open release
-     - _./gradlew bumpBuildNumber_ 
-2. Push branch to remote
-3. Open _Terminal_ and execute commands:
-    - _./gradlew clean_
-    - _./gradlew build_
-    - _./gradlew zipArtifacts_
-4. Open _../artifacts_ and send archive with highest version for test
+Versions & Releases
+-------------------
+**📖 Полная инструкция:** см. [VERSIONING.md](./VERSIONING.md)
+
+**Быстрый процесс релиза:**
+1. Отредактируйте `version.properties` (увеличьте `build` на 1)
+2. Закоммитьте: `git commit -am "Bump version" && git push`
+3. Создайте тег: `git tag -a v2.10.3.393-release -m "Release 393" && git push origin v2.10.3.393-release`
+4. Соберите APK: `./gradlew assembleRelease` (для Google Play) или `./gradlew assembleHuawei` (для Huawei)
+
+**Формат тега:** `v{major}.{minor}.{patch}.{build}-{type}` где type = `release`, `debug`, или `huawei`
+
+**Система версионирования:**
+- Git теги (приоритет) → version.properties (fallback) → hardcoded версия
 
 For easier work
 ===============

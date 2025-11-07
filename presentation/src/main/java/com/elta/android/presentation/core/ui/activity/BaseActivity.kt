@@ -1,5 +1,6 @@
 package com.elta.android.presentation.core.ui.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -15,6 +16,7 @@ import com.elta.android.presentation.core.pm.widgets.bind
 import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.stateview.StateView
+import com.elta.android.presentation.utils.LocaleHelper
 import com.elta.android.presentation.utils.makeSnackBar
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
@@ -62,6 +64,10 @@ abstract class BaseActivity<T : BasePm> :
     private var progressView: View? = null
     private var homeButtonView: View? = null
     protected val compositeUnbind = CompositeDisposable()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)

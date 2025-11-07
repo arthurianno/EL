@@ -232,7 +232,7 @@ fun buildInsulinStatisticModelByPeriod(
 }
 
 private fun List<MedicamentInsulinType>.convertToStatistic() =
-    map { insulinType -> insulinType.name.lowercase() }
+    map { insulinType -> insulinType.code.lowercase() }
 
 //private fun getInsulinTypeForStatistic(lambda: (EventV2) -> List<MedicamentInsulinType>?) =
 //    this?.mapNotNull { event -> lambda.invoke(event)?.map { type -> type.name.lowercase() } }

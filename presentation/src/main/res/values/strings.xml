@@ -1017,5 +1017,11 @@
 
     <!--  Picker Dialog  -->
     <string name="date_picker_exit_message">Несохраненные данные будут потеряны. Сохранить?</string>
+    <string name="insulin_type_short_ultrashort">короткого действия</string>
+    <string name="insulin_type_prolong">Длинного-действия</string>
+    <string name="insulin_type_mixed">Смешанный</string>
+    <string name="language_selection_dialog_title">Выбор языка</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_english">Английский</string>
 
 </resources>

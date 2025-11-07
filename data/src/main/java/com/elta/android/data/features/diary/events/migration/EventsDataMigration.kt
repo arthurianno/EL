@@ -120,6 +120,6 @@ private enum class InsulinType {
     MIXED
 }
 
-private const val SHORT_ULTRASHORT = "Короткий"
-private const val PROLONG = "Продленный"
-private const val MIXED = "Смешанный"
+private const val SHORT_ULTRASHORT = "Short-acting"
+private const val PROLONG = "Long-acting"
+private const val MIXED = "Mixed"
