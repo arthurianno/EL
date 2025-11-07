@@ -1023,5 +1023,20 @@
     <string name="language_selection_dialog_title">Выбор языка</string>
     <string name="language_russian">Русский</string>
     <string name="language_english">Английский</string>
+    <string name="statistic_general_index_description_by_hour_bread">По результатам записей вы потребляете %s за день.</string>
+    <string name="statistic_general_index_description_by_period_hour_bread">По результатам записей вы потребляете в среднем %s в день.</string>
+    <string name="statistic_general_index_description_by_hour_insulin">Количество общего инсулина %s: %s</string>
+    <string name="statistic_general_index_description_by_period_hour_insulin">Количество общего инсулина</string>
+    <string name="statistic_general_index_description_by_hour_bolus_insulin">%ед: %ед</string>
+    <string name="statistic_general_index_description_by_period_hour_bolus_insulin">Среднечасовое количество болюсного инсулина %s: %s</string>
+    <string name="statistic_general_index_description_by_hour_basal_insulin">Количество базального инсулина %s в этот час: %s</string>
+    <string name="statistic_general_index_description_by_period_hour_basal_insulin">%ед</string>
+    <string name="statistic_general_index_description_by_hour_activity">Количество тренировок в этот час: %1$s. Средняя продолжительность тренировки: %2$s</string>
+    <string name="statistic_glucose_index_hour_unit">per hour</string>
+    <string name="statistic_error_date">Невозможно выгрузить статистику без Интернет-соединения</string>
+    <string name="statistic_period_one_day">1 day</string>
+    <string name="general_date_range_title">Выберите период</string>
+    <string name="general_date_range_description">Выберите начало и конец периода</string>
+    <string name="general_date_range_action_button">Подтвердить</string>
 
 </resources>

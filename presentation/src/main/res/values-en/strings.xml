@@ -612,14 +612,14 @@
     <string name="profile_support_hotfix_version">Hotfix Version</string>
     <string name="profile_support_api_version">API Version</string>
     <string name="statistic_title">Statistics</string>
-    <string name="statistic_period_one_day">1 день</string>
+    <string name="statistic_period_one_day">1 day</string>
     <string name="statistic_period_seven_days">7 Days</string>
     <string name="statistic_period_fourteen_days">14 days</string>
     <string name="statistic_period_thirty_days">30 days</string>
     <string name="statistic_period_ninety_days">90 days</string>
-    <string name="general_date_range_title">Выберите период</string>
-    <string name="general_date_range_description">Выберите начало и конец периода</string>
-    <string name="general_date_range_action_button">Подтвердить</string>
+    <string name="general_date_range_title">Select period</string>
+    <string name="general_date_range_description">" Select the start and end of the period"</string>
+    <string name="general_date_range_action_button">Confirm</string>
     <string name="statistic_glucose_index_description_average">Average Glucose Level</string>
     <string name="statistic_glucose_index_description_total">Number of Measurements</string>
     <string name="statistic_glucose_index_description_high">Measurements Above Target Range</string>
@@ -639,19 +639,17 @@
     <string name="statistic_general_index_description_by_period_bolus_insulin">Average daily bolus insulin amount %s: %s</string>
     <string name="statistic_general_index_description_by_day_basal_insulin">Basal insulin amount on this day:\\n%s\\n%s</string>
     <string name="statistic_general_index_description_by_period_basal_insulin">Average daily basal insulin amount %s: %s</string>
-    <string name="statistic_general_index_description_by_hour_bread">По результатам записей вы потребляете %s за день.</string>
-    <string name="statistic_general_index_description_by_period_hour_bread">По результатам записей вы потребляете в среднем %s в день.</string>
-    <string name="statistic_general_index_description_by_hour_insulin">Количество общего инсулина\n%s: %s</string>
-    <string name="statistic_general_index_description_by_period_hour_insulin">Среднечасовое количество общего инсулина\n%s: %s</string>
-    <string name="statistic_general_index_description_by_hour_bolus_insulin">Количество болюсного инсулина\n%s\nв этот час: %s</string>
-    <string name="statistic_general_index_description_by_period_hour_bolus_insulin">Среднечасовое количество болюсного инсулина %s: %s</string>
-    <string name="statistic_general_index_description_by_hour_basal_insulin">Количество базального инсулина\n%s\nв этот час: %s</string>
-    <string name="statistic_general_index_description_by_period_hour_basal_insulin">Среднечасовое количество базального\nинсулина %s: %s</string>
+    <string name="statistic_general_index_description_by_hour_bread">Based on your records, you consume %s per day.</string>
+    <string name="statistic_general_index_description_by_period_hour_bread">Based on your records, you consume an average of %s per day.</string>
+    <string name="statistic_general_index_description_by_period_hour_insulin">Total insulin amount</string>
+    <string name="statistic_general_index_description_by_hour_bolus_insulin">%s: %s</string>
+    <string name="statistic_general_index_description_by_period_hour_bolus_insulin">Average hourly bolus insulin %s: %s</string>
+    <string name="statistic_general_index_description_by_hour_basal_insulin">Basal insulin amount</string>
+    <string name="statistic_general_index_description_by_period_hour_basal_insulin">%s</string>
     <string name="statistic_general_index_description_value_by_period_insulin">%s units</string>
     <string name="statistic_general_index_description_by_day_activity">Number of workouts on this day: %1$s.\\nAverage workout duration: %2$s</string>
-    <string name="statistic_general_index_description_by_hour_activity">Количество тренировок в этот час: %1$s.\nСредняя продолжительность тренировки: %2$s</string>
-    <string name="statistic_general_index_description_by_period_activity">Number of workouts during the period: %1$s.\\nAverage workout duration: %2$s</string>
-    <string name="statistic_glucose_index_average_unit">mmol/L</string>
+    <string name="statistic_general_index_description_by_period_activity">Number of workouts this hour: %1$s.</string>
+    <string name="statistic_glucose_index_average_unit">Average workout duration: %2$s</string>
     <string name="statistic_glucose_index_total_unit">for the period</string>
     <string name="statistic_glucose_index_day_unit">for the day</string>
     <string name="statistic_glucose_index_hour_unit">за час</string>
@@ -903,5 +901,7 @@
     <string name="error_general_title">Error</string>
     <string name="error_general_button">Retry</string>
     <string name="error_file_not_saved">An error occurred while saving the file</string>
+    <string name="statistic_general_index_description_by_hour_insulin">Total insulin amount %s: %s</string>
+    <string name="statistic_general_index_description_by_hour_activity">" Number of workouts this hour: %1$s. Average workout duration: %2$s"</string>
 
 </resources>
