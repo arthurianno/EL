@@ -6,12 +6,14 @@ import com.elta.android.domain.features.devices.interactor.GetLastGlucometerAndI
 import com.elta.android.domain.features.devices.interactor.SetPrimaryGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.devices.model.GlucometerInfo
+import com.elta.android.domain.features.remoteconfig.interactor.FetchRemoteConfigUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -31,6 +33,7 @@ class DeviceInfoPm @Inject constructor(
     private val getLastGlucometerAndInfoUseCase: GetLastGlucometerAndInfoUseCase,
     private val deleteGlucometerUseCase: DeleteGlucometerUseCase,
     private val setPrimaryGlucometerUseCase: SetPrimaryGlucometerUseCase,
+    private val getConfigUseCase: GetFeatureConfigUseCase,
     private val itemsBuilder: DeviceInfoItemsBuilder,
     services: ServiceFacade
 ) : BaseListPm(services) {
@@ -58,7 +61,15 @@ class DeviceInfoPm @Inject constructor(
 
         checkUpdateAction.observable
             .skipWhileInProgress()
-            .subscribe { router.navigateTo(Screens.UpdateFirmware(addressState.value)) }
+            .subscribe {
+                // fixme Variant A : improved_enabling_location
+
+                val improvedEnablingLocation = getConfigUseCase.invoke().improvedEnablingLocation
+                val screen =
+                    if (improvedEnablingLocation) Screens.UpdateFirmware(addressState.value)
+                    else Screens.UpdateFirmwareVariantA(addressState.value)
+                router.navigateTo(screen)
+            }
             .untilDestroy()
 
         observeEvents()

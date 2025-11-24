@@ -2,15 +2,12 @@ package com.elta.android.presentation.features.main.events.base.initializer
 
 import android.content.res.Resources
 import android.view.View
-import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
 import com.elta.android.presentation.widgets.picker.FormPicker
 import com.elta.android.presentation.widgets.picker.model.FormMeasurementConfig
-import com.nullgr.core.ui.extensions.applyLengthFilter
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
-import timber.log.Timber
 
 private const val INPUT_LENGTH = 40
 

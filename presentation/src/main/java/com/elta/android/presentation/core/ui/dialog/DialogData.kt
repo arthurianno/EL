@@ -5,4 +5,5 @@ interface DialogData {
     val message: String
     val negative: String?
     val positive: String?
+    val neural: String?
 }

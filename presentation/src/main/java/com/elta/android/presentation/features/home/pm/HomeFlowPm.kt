@@ -2,6 +2,7 @@ package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerConnectionException
@@ -15,9 +16,16 @@ import com.elta.android.domain.features.auth.interactor.LogOutUseCase
 import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.interactor.GetAddableEventsUseCase
+import com.elta.android.domain.features.diary.home.interactor.SetManualGlucoseRemindUseCase
+import com.elta.android.domain.features.diary.home.interactor.ShouldManualGlucoseRemindShowUseCase
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow.Companion.toCalculatorFlow
+import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
+import com.elta.android.domain.features.emias.interactor.SyncGlucometersUseCase
+import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.domain.features.feedback.interactor.ShouldSendFeedbackUseCase
+import com.elta.android.domain.features.rostech.interactor.ConnectIomtUseCase
 import com.elta.android.domain.features.sync.interactor.SyncLocalChangesUseCase
 import com.elta.android.domain.features.user.interactor.GetGlucoseFormatUseCase
 import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
@@ -31,8 +39,14 @@ import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.AlertResultParam
+import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -65,7 +79,6 @@ import javax.inject.Inject
 private const val OPEN_EVENT_SCREEN_DELAY_MILLIS = 400L
 private const val META_SYNC = "meta_sync"
 private const val SYNC_AFTER_CONNECTION_RESTORED_DELAY_MILLIS = 2800L
-private const val SYNC_TIMER_DELAY_MILLIS = 30000L
 
 class HomeFlowPm @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
@@ -75,10 +88,16 @@ class HomeFlowPm @Inject constructor(
     private val syncWithGlucometerUseCase: SyncWithGlucometerUseCase,
     private val getAddableEventsUseCase: GetAddableEventsUseCase,
     private val syncWithBackendUseCase: SyncLocalChangesUseCase,
+    private val syncGlucometers: SyncGlucometersUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val getGlucoseFormat: GetGlucoseFormatUseCase,
     private val getUpdatedProfileUseCase: GetUpdatedProfileUseCase,
+    private val connectIomt: ConnectIomtUseCase,
     private val sendAppVersion: SendAppVersionUseCase,
+    private val getEmiasStatus: GetEmiasStatusUseCase,
+    private val shouldShowGlucoseDialog: ShouldManualGlucoseRemindShowUseCase,
+    private val setManualGlucoseRemind: SetManualGlucoseRemindUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
@@ -97,6 +116,7 @@ class HomeFlowPm @Inject constructor(
     val manualSyncError = state<ManualSyncError>()
     val manualSyncErrorBottomSheetCommand = command<Unit>()
     val manualSyncErrorAction = action<Unit>()
+    val permissionSyncErrorAction = action<Unit>()
     val closeBottomSheetErrorAction = action<Unit>()
     val closeManualSyncErrorBottomSheetCommand = command<Unit>()
 
@@ -105,6 +125,7 @@ class HomeFlowPm @Inject constructor(
     val googlePlayDialogControl = dialogControl<DialogData, DialogResult>()
     val feedbackDialogControl = dialogControl<DialogData, DialogResult>()
     val likeAppDialogControl = dialogControl<DialogData, DialogResult>()
+    val glucoseDataReminderDialogControl = dialogControl<DialogData, DialogResult>()
 
     val firstSyncAction = action<Unit>()
     private val isFirstSync = state<Boolean>()
@@ -115,14 +136,21 @@ class HomeFlowPm @Inject constructor(
 
     private val syncWithBackendProgressState = state(false)
     private val startSyncWithBackendAction = action<Unit>()
+    private val startSyncWithIomtAction = action<Unit>()
     private val sendAppVersionAction = action<Unit>()
+
+    val openSettingsCommand = command<Unit>()
 
     private val feedbackAction = action<Unit>()
     private val likeAppDialogAction = action<Int>()
     private val feedbackDialogAction = action<Unit>()
     private val googlePlayDialogAction = action<Unit>()
+    private val glucoseDataReminderDialogAction = action<Unit>()
+    private val checkEmiasStatusAction = action<Unit>()
+    private val getManualGlucoseRemindAction = action<Unit>()
     private val feedbackDialogData by lazy { Dialogs.FeedbackData(resources) }
     private val googlePlayDialogData by lazy { Dialogs.GooglePlayRateData(resources) }
+    private val glucoseDataReminderDialogData by lazy { Dialogs.ManualGlucoseDataReminder(resources) }
 
     override fun onCreate() {
         super.onCreate()
@@ -133,6 +161,8 @@ class HomeFlowPm @Inject constructor(
         bindGooglePlayRateDialog()
         bindFeedbackDialog()
         bindFeedbackAction()
+        bindGlucoseDialog()
+        bindAppMetricEvents()
         initGlucoseFormat()
 
         loadEvents.observable
@@ -169,6 +199,18 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .flatMapSingle {
+                getUpdatedProfileUseCase.execute()
+                    .doOnSuccess { profile ->
+                        appMetric.setProfileAttributes(profile.getMetricAttributes())
+                    }
+                    .doOnError(::handleError)
+            }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.MainScreen) }
+            .subscribe()
+            .untilDestroy()
+
         bus.events<Events.HomeModelChanged>()
             .map { it.model.isFirstEntrance || !it.model.hasEvents }
             .subscribe(pulseCommand.consumer)
@@ -187,6 +229,7 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnError { Log.d("error", "bus.events<Events.EventsChanged> error") }
             .subscribe(glucoseFormat.consumer)
+            .untilDestroy()
 
         bus.events<Events.DeviceChanged>()
             .flatMapSingle {
@@ -195,6 +238,7 @@ class HomeFlowPm @Inject constructor(
             }
             .doOnError { Log.d("error", "bus.events<Events.DeviceChanged> error") }
             .subscribe(isFirstSync.consumer)
+            .untilDestroy()
 
         observeClicks()
     }
@@ -239,34 +283,40 @@ class HomeFlowPm @Inject constructor(
             .delay(OPEN_EVENT_SCREEN_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .flatMapCompletable { meta ->
                 when (meta) {
-                    is EventType -> {
-                        if (meta is EventType.Bread) {
-                            getUpdatedProfileUseCase.execute()
-                                .map { events -> events.diabetes.toCalculatorFlow() }
-                                .map { EventType.Bread(it) }
-                                .doOnSuccess {
-                                    router.startFlow(Screens.EventsCreationScreen(it))
-                                }
-                                .ignoreElement()
-                        } else {
-                            Completable.fromCallable {
-                                router.startFlow(Screens.EventsCreationScreen(meta))
+                    is EventType.Bread -> {
+                        getUpdatedProfileUseCase.execute()
+                            .map { events -> events.diabetes.toCalculatorFlow() }
+                            .map { EventType.Bread(it) }
+                            .doOnSuccess {
+                                router.startFlow(Screens.EventsCreationScreen(it))
                             }
-                        }
+                            .ignoreElement()
                     }
+
+                    is EventType.Glucose -> Completable.fromCallable {
+                        getManualGlucoseRemindAction.consumer.accept(Unit)
+                    }
+
+                    is EventType.Weight,
+                    is EventType.Insulin,
+                    is EventType.Medicaments,
+                    is EventType.Activity ->
+                        Completable.fromCallable {
+                            router.startFlow(Screens.EventsCreationScreen(meta as EventType))
+                        }
 
                     META_SYNC -> {
                         Completable.fromCallable {
                             if (isFirstSync.valueOrNull == true) {
                                 showHelpBottomSheetCommand.consumer.accept(Unit)
                             } else {
+                                appMetric.trackEvent(AppMetricEvent.SynchronizationDeviceClick)
                                 startSyncAction.consumer.accept(Unit)
                             }
                         }
                     }
 
                     else -> Completable.complete()
-
                 }
 
             }
@@ -294,12 +344,20 @@ class HomeFlowPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
-        manualSyncErrorAction.observable
+        Observable.merge(
+            manualSyncErrorAction.observable,
+            permissionSyncErrorAction.observable
+        )
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
             .untilDestroy()
 
         closeBottomSheetErrorAction.observable
             .subscribe(closeManualSyncErrorBottomSheetCommand.consumer)
+            .untilDestroy()
+
+        permissionSyncErrorAction.observable
+            .doOnNext(openSettingsCommand.consumer)
+            .subscribe()
             .untilDestroy()
 
         Observable.merge(
@@ -326,9 +384,58 @@ class HomeFlowPm @Inject constructor(
             .flatMapCompletable {
                 sendAppVersion.execute()
                     .bindProgress(syncProgressState.consumer)
-                    .doOnError{ Timber.e(it) }
+                    .doOnError { Timber.e(it) }
             }
             .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindGlucoseDialog() {
+        getManualGlucoseRemindAction.observable
+            .flatMapSingle {
+                shouldShowGlucoseDialog.execute()
+                    .doOnSuccess {
+                        if (it) checkEmiasStatusAction.consumer.accept(Unit)
+                        else navigateToCreationManualGlucoseScreen()
+                    }
+            }
+            .subscribe()
+            .untilDestroy()
+        checkEmiasStatusAction.observable
+            .flatMapSingle {
+                getEmiasStatus.execute()
+                    .onErrorReturn { EmiasStatus.UNLINKED to null }
+                    .doOnSuccess {
+                        when (it.first) {
+                            EmiasStatus.LINKED -> glucoseDataReminderDialogAction.consumer.accept(
+                                Unit
+                            )
+
+                            EmiasStatus.UNLINKED -> navigateToCreationManualGlucoseScreen()
+                        }
+                    }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        glucoseDataReminderDialogAction.observable
+            .switchMapMaybe {
+                glucoseDataReminderDialogControl.showForResult(
+                    glucoseDataReminderDialogData
+                )
+            }
+            .flatMapCompletable { dialogResult ->
+                when (dialogResult) {
+                    DialogResult.POSITIVE -> Completable.fromCallable {
+                        navigateToCreationManualGlucoseScreen()
+                    }
+
+                    DialogResult.NEGATIVE -> Completable.complete()
+                    DialogResult.NEURAL -> setManualGlucoseRemind.execute(false)
+                        .doOnComplete { navigateToCreationManualGlucoseScreen() }
+                }
+            }
             .subscribe()
             .untilDestroy()
     }
@@ -344,6 +451,7 @@ class HomeFlowPm @Inject constructor(
             .skipWhileInProgress(syncWithBackendProgressState.observable)
             .flatMapCompletable {
                 syncWithBackendUseCase.execute()
+                    .mergeWith(connectIomt.execute())
                     .bindProgress(syncWithBackendProgressState.consumer)
                     .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
                     .doOnComplete { bus.event(Events.Sync.Server.Success) }
@@ -354,6 +462,18 @@ class HomeFlowPm @Inject constructor(
                     .doOnError(::handleError)
             }
             .retry(3)
+            .subscribe()
+            .untilDestroy()
+
+        startSyncWithIomtAction.observable
+            .skipWhileInProgress(syncWithBackendProgressState.observable)
+            .flatMapCompletable {
+                connectIomt.execute()
+                    .bindProgress(syncWithBackendProgressState.consumer)
+                    .doOnSubscribe { bus.event(Events.Sync.Server.Started) }
+                    .doOnComplete { bus.event(Events.Sync.Server.Success) }
+                    .doOnError(::handleError)
+            }
             .subscribe()
             .untilDestroy()
 
@@ -460,12 +580,22 @@ class HomeFlowPm @Inject constructor(
 
     private fun syncWithGlucometer(isAuto: Boolean): Observable<Int> =
         syncWithGlucometerUseCase.execute(SyncWithGlucometerUseCase.Params())
+            .concatWith(
+                if (!isAuto) syncGlucometers.execute() else Completable.complete()
+            )
             .bindProgress(syncProgressState.consumer)
-            .doOnSubscribe { bus.event(Events.Sync.Glucometer.Started) }
-            .doOnComplete {
-                bus.event(Events.Sync.Glucometer.Success)
-                bus.event(Events.EventsChanged(true))
+            .doOnSubscribe {
+                bus.event(Events.Sync.Glucometer.Started)
             }
+            .doOnNext { events ->
+                appMetric.trackEvent(AppMetricEvent.SnackProcessing)
+                if (events > 0) {
+                    appMetric.trackEvent(AppMetricEvent.ReceivedMeasurementsSugar)
+                    bus.event(Events.EventsChanged(true))
+                    bus.event(Events.Sync.Glucometer.Success)
+                } else bus.event(Events.Sync.Glucometer.NoNewEvents)
+            }
+            .doOnComplete { if (!isAuto) startSyncWithIomtAction.consumer.accept(Unit) }
             .doOnError { error ->
                 if (isAuto) {
                     handleAutoSyncError(error)
@@ -481,12 +611,29 @@ class HomeFlowPm @Inject constructor(
         error: Throwable,
         isAuto: Boolean
     ): ObservableSource<out Int> = when (error) {
-        is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
+        is BluetoothNotEnabledError -> {
+            appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+            bluetoothEnableAndRepeat(isAuto)
+        }
+
         is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
-        is LocationPermissionNotGrantedError -> requestLocatePermissionAndRepeat(isAuto)
+        is LocationPermissionNotGrantedError -> {
+            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
+            requestLocationPermissionAndRepeat(isAuto)
+        }
+
+        is BluetoothPermissionNotGrantedError -> {
+            appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
+            requestBluetoothPermissionAndRepeat(isAuto)
+        }
+
         is GlucometerSyncError ->
             when (error.cause) {
-                is BluetoothNotEnabledError -> bluetoothEnableAndRepeat(isAuto)
+                is BluetoothNotEnabledError -> {
+                    appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+                    bluetoothEnableAndRepeat(isAuto)
+                }
+
                 is LocationNotEnabledError -> locationEnableAndRepeat(isAuto)
 
                 else -> {
@@ -497,14 +644,19 @@ class HomeFlowPm @Inject constructor(
         else -> Observable.error(error)
     }
 
+    private fun requestLocationPermissionAndRepeat(isAuto: Boolean) =
+        btControl.requestLocationPermission()
+            .filter { it }
+            .flatMapObservable { syncWithGlucometer(isAuto) }
+
+    private fun requestBluetoothPermissionAndRepeat(isAuto: Boolean) =
+        btControl.requestBluetoothPermission()
+            .filter { it }
+            .flatMapObservable { syncWithGlucometer(isAuto) }
+
     private fun locationEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableLocation()
         .filter { it }
         .flatMapObservable { syncWithGlucometer(isAuto) }
-
-    private fun requestLocatePermissionAndRepeat(isAuto: Boolean) =
-        btControl.requestLocationPermissions()
-            .filter { it }
-            .flatMapObservable { syncWithGlucometer(isAuto) }
 
     private fun bluetoothEnableAndRepeat(isAuto: Boolean) = btControl.requestEnableBluetooth()
         .filter { it }
@@ -523,17 +675,20 @@ class HomeFlowPm @Inject constructor(
                 openConnectScreen()
             }
 
-            is LocationPermissionNotGrantedError -> {
-                manualSyncError.accept(ManualSyncError.ErrorSync)
+            is LocationPermissionNotGrantedError, is BluetoothPermissionNotGrantedError -> {
+                manualSyncError.accept(ManualSyncError.PermissionNotGranted)
+                manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
-            is GlucometerOfflineError,  -> {
+            is GlucometerOfflineError -> {
+                appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                 manualSyncError.accept(ManualSyncError.NotFound)
                 manualSyncErrorBottomSheetCommand.accept(Unit)
             }
 
-            is GlucometerSyncError -> {
+            is GlucometerSyncError, is CommandError, is GlucometerConnectionException -> {
                 val manualSyncError = if (error.cause is TimeoutException) {
+                    appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.DEVICE_NOT_FOUND))
                     ManualSyncError.NotFound
                 } else {
                     ManualSyncError.ErrorSync
@@ -550,7 +705,8 @@ class HomeFlowPm @Inject constructor(
         when {
             error is BluetoothNotEnabledError || error is LocationNotEnabledError ||
                     error.cause is BluetoothNotEnabledError || error.cause is LocationNotEnabledError ||
-                    error is LocationPermissionNotGrantedError || error is CommandError || error is BluetoothScannerError ->
+                    error is LocationPermissionNotGrantedError || error is BluetoothPermissionNotGrantedError ||
+                    error is CommandError || error is BluetoothScannerError ->
                 bus.event(Events.Sync.Glucometer.Error)
 
             error is GlucometerSyncError && (error.cause is GlucometerOfflineError || error.cause is TimeoutException) || error is GlucometerConnectionException ->
@@ -568,7 +724,10 @@ class HomeFlowPm @Inject constructor(
                 startSyncWithBackendAction.consumer.accept(Unit)
             }
 
-            is GlucometerSyncError, is GlucometerConnectionException -> startSyncWithBackendAction.consumer.accept(Unit)
+            is GlucometerSyncError, is GlucometerConnectionException -> startSyncWithBackendAction.consumer.accept(
+                Unit
+            )
+
             else -> handleError(error)
         }
     }
@@ -583,6 +742,10 @@ class HomeFlowPm @Inject constructor(
         super.handleError(error)
     }
 
+    private fun navigateToCreationManualGlucoseScreen() {
+        router.startFlow(Screens.EventsCreationScreen(EventType.Glucose(GlucoseInputType.MANUAL)))
+    }
+
     private fun openConnectScreen() {
 
         //TODO: тест всех комманд глюкометра. Работает 100%.
@@ -592,6 +755,38 @@ class HomeFlowPm @Inject constructor(
 
         bus.event(Events.Sync.Glucometer.Error)
         router.startFlow(Screens.ConnectStartScreen(isOnBoarding = false))
+    }
+
+    private fun bindAppMetricEvents() {
+        btControl.bluetoothPermissionsRequestResultRelay
+            .subscribe {
+                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam))
+            }
+            .untilDestroy()
+        btControl.combinedPermissionsRequestResultRelay
+            .subscribe { result ->
+                val eventParam = if (result) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                listOf(
+                    AppMetricEvent.Permission.AlertClick.Bluetooth(eventParam),
+                    AppMetricEvent.Permission.AlertClick.Location(eventParam)
+                ).forEach { event ->
+                    appMetric.trackEvent(event)
+                }
+            }
+            .untilDestroy()
+        btControl.locationPermissionsRequestResultRelay
+            .subscribe {
+                val eventParam = if (it) AlertResultParam.ALLOW else AlertResultParam.PROHIBIT
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Location(eventParam))
+            }
+            .untilDestroy()
+        btControl.bluetoothRequestResultRelay
+            .subscribe {
+                val eventParam = if (it) TurningResultParam.ALLOW else TurningResultParam.REJECT
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlertClick(eventParam))
+            }
+            .untilDestroy()
     }
 
 }

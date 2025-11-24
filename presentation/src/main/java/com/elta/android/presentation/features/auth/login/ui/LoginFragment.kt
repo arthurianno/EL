@@ -3,10 +3,12 @@ package com.elta.android.presentation.features.auth.login.ui
 import android.os.Bundle
 import android.view.View
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.registration.main.ui.BaseRegistrationFragment
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
+import me.dmdev.rxpm.widget.bindTo
 
 class LoginFragment : BaseRegistrationFragment<LoginPm>() {
 
@@ -22,6 +24,11 @@ class LoginFragment : BaseRegistrationFragment<LoginPm>() {
             privacyPolicyView.hide()
             authTitleIconView.show()
         }
+    }
+
+    override fun onBindPresentationModel(pm: LoginPm) {
+        super.onBindPresentationModel(pm)
+        pm.profileRestoredDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
     }
 
     companion object {

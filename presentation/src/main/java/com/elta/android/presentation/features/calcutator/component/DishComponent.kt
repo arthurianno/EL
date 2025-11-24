@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.R
+import com.elta.android.presentation.R.string.calculator_product_portion
 import com.elta.android.presentation.core.compose.common.NetworkState
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
@@ -318,7 +319,7 @@ fun PortionProductHeader(isQuestionButtonVisible: Boolean = true, callback: () -
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(id = R.string.calculator_product_portion),
+                text = stringResource(id = calculator_product_portion),
                 style = types.subtitle1,
                 color = colors.shadeBlack2
             )
@@ -413,10 +414,8 @@ private fun PreviewPortionProductContent() {
 @Composable
 fun PortionProductFooter(dish: DishUiEntity, isShowCountHelpSnack: Boolean) {
     val isSingleServing = dish.servings.size == 1
-
     val textHelpId = if (isSingleServing) R.string.calculator_portion_count_help_snack
     else R.string.calculator_portion_count_and_serving_help_snack
-
     val snackAlignment = if (isSingleServing) Alignment.TopStart else Alignment.TopCenter
 
     Box(
@@ -449,7 +448,7 @@ fun PortionHelper(
                 modifier = Modifier
                     .paint(
                         painter = painterResource(id = R.drawable.bg_portion_count_help_snack),
-                        contentScale = ContentScale.FillBounds
+                        contentScale = androidx.compose.ui.layout.ContentScale.FillBounds
                     ),
                 contentAlignment = Alignment.TopCenter
             ) {

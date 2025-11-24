@@ -1,3 +1,12 @@
+
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url = uri("https://developer.huawei.com/repo/") }
+    }
+}
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
@@ -8,6 +17,7 @@ dependencyResolutionManagement {
         maven(url = "https://maven.google.com")
         maven(url = "https://jitpack.io")
         maven(url = "https://plugins.gradle.org/m2/")
+        maven(url = "https://developer.huawei.com/repo/")
     }
 }
 rootProject.name = "Сателлит Online"

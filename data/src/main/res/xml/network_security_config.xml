@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-<!--    <base-config cleartextTrafficPermitted="true"/>-->
+    <!-- Debug-overrides: Только для debug-build (работает в отладке) -->
     <debug-overrides>
         <trust-anchors>
-            <certificates src="user" />
-            <certificates src="@raw/vdiabete_com" />
-            <certificates src="@raw/vdiabete_test" />
-            <certificates src="@raw/vdiabete_test1" />
-            <certificates src="@raw/vdiabete_test2" />
-            <certificates src="@raw/vdiabete_test3" />
-            <certificates src="@raw/vdiabete_test4" />
+            <!-- Добавляем промежуточный и корневой CA -->
+            <certificates src="@raw/alphassl_intermediate" />
+            <certificates src="@raw/globalsign_root" />
+            <!-- Или если используешь chain: <certificates src="@raw/vdiabete_chain" /> (после конвертации p7b в PEM) -->
+            <certificates src="system" /> <!-- Доверять системным CA -->
         </trust-anchors>
     </debug-overrides>
 
+    <!-- Domain-config для vdiabete.com: Применяется всегда, для прод/дебаг -->
+    <domain-config>
+        <domain includeSubdomains="true">vdiabete.com</domain>
+        <trust-anchors>
+            <!-- То же: intermediate и root -->
+            <certificates src="@raw/alphassl_intermediate" />
+            <certificates src="@raw/globalsign_root" />
+            <!-- Или chain: <certificates src="@raw/vdiabete_chain" /> -->
+            <certificates src="system" /> <!-- Для безопасности -->
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Твоя для test.ppma.ru (cleartext HTTP) -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">test.ppma.ru</domain>
     </domain-config>

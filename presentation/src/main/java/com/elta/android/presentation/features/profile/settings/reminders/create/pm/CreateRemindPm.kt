@@ -4,7 +4,9 @@ import com.elta.android.common.errors.ReminderTimeInPastError
 import com.elta.android.common.utils.isDateChanged
 import com.elta.android.domain.features.reminder.interactor.AddNewReminderUseCase
 import com.elta.android.domain.features.reminder.model.Reminder
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.reminders.base.model.ReminderFormModel
 import com.elta.android.presentation.features.profile.settings.reminders.base.pm.BaseRemindPm
@@ -19,6 +21,7 @@ import javax.inject.Inject
 
 class CreateRemindPm @Inject constructor(
     private val addNewReminderUseCase: AddNewReminderUseCase,
+    private val appMetricTracker: AppMetricTracker,
     remindersManager: RemindersManager,
     services: ServiceFacade
 ) : BaseRemindPm(remindersManager, services) {
@@ -73,6 +76,9 @@ class CreateRemindPm @Inject constructor(
     private fun saveActionSubscribe() {
         saveReminderAction.observable
             .skipWhileInProgress()
+            .doOnNext {
+                appMetricTracker.trackEvent(AppMetricEvent.TapButtonRemindersSave)
+            }
             .map(::createAddReminderParams)
             .doOnError(::handleError)
             .flatMapSingle { params ->

@@ -1,19 +1,25 @@
 package com.elta.android.data.di
 
 import com.elta.android.common.di.qualifires.Cache
-import com.elta.android.common.di.qualifires.Remote
 import com.elta.android.common.di.qualifires.Paging
 import com.elta.android.common.di.qualifires.PagingType
+import com.elta.android.common.di.qualifires.Remote
+import com.elta.android.data.common.datasource.download.DownloadDataSource
+import com.elta.android.data.common.datasource.download.DownloadSource
+import com.elta.android.data.features.files.source.FileInfoDataSource
+import com.elta.android.data.features.files.source.FileInfoSource
 import com.elta.android.data.core.paging.BasePagingSource
 import com.elta.android.data.features.auth.datasource.AuthDataSource
+import com.elta.android.data.features.auth.datasource.AuthDataSourceVariantA
 import com.elta.android.data.features.auth.datasource.AuthRemoteDataSource
+import com.elta.android.data.features.auth.datasource.AuthRemoteDataSourceVariantA
 import com.elta.android.data.features.auth.datasource.AuthSocialDataSource
 import com.elta.android.data.features.auth.datasource.AuthSocialRemoteDataSource
 import com.elta.android.data.features.calculator.paging.DishesPagingSource
 import com.elta.android.data.features.calculator.paging.ProductsPagingSource
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
-import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
+import com.elta.android.data.features.diary.events.datasource.cache.EventsCachedCacheDataSource
 import com.elta.android.data.features.diary.events.datasource.remote.EventsRemoteDataSource
 import com.elta.android.data.features.diary.medicines.datasource.cache.InsulinMedicamentCacheDataSource
 import com.elta.android.data.features.diary.medicines.datasource.cache.InsulinMedicamentCacheSource
@@ -27,15 +33,16 @@ import com.elta.android.data.features.diary.tags.datasource.TagsRemoteDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackDataSource
 import com.elta.android.data.features.feedback.datasource.FeedbackRemoteDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareDownloadDataSource
-import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoDataSource
-import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoRemoteDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareLocalDownloadDataSource
 import com.elta.android.data.features.firmware.datasource.FirmwareRemoteDownloadDataSource
+import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoDataSource
+import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoRemoteDataSource
 import com.elta.android.data.features.googlefit.datasource.GoogleFitDataSource
 import com.elta.android.data.features.googlefit.datasource.HealthAppDataSource
-import com.elta.android.data.features.observers.datasource.ObserverCachedDataSource
-import com.elta.android.data.features.observers.datasource.ObserverDataSource
-import com.elta.android.data.features.observers.datasource.ObserverRemoteDataSource
+import com.elta.android.data.features.observers.datasource.cache.ObserverCachedDataSource
+import com.elta.android.data.features.observers.datasource.cache.ObserverCachedSource
+import com.elta.android.data.features.observers.datasource.remote.ObserverRemoteDataSource
+import com.elta.android.data.features.observers.datasource.remote.ObserverRemoteSource
 import com.elta.android.data.features.reminder.datasource.RemindersCacheDataSource
 import com.elta.android.data.features.reminder.datasource.RemindersDataSource
 import com.elta.android.data.features.reports.datasource.ReportsDataSource
@@ -64,6 +71,11 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindAuthDataSource(source: AuthRemoteDataSource): AuthDataSource
 
+    // fixme Variant A : recovery_account
+    @Binds
+    @Singleton
+    abstract fun bindAuthDataSourceVariantA(source: AuthRemoteDataSourceVariantA): AuthDataSourceVariantA
+
     @Binds
     @Singleton
     abstract fun bindAuthSocialDataSource(source: AuthSocialRemoteDataSource): AuthSocialDataSource
@@ -81,12 +93,12 @@ abstract class DataSourceModule {
     @Remote
     @Binds
     @Singleton
-    abstract fun bindObserverRemoteDataSource(source: ObserverRemoteDataSource): ObserverDataSource
+    abstract fun bindObserverRemoteDataSource(source: ObserverRemoteDataSource): ObserverRemoteSource
 
     @Cache
     @Binds
     @Singleton
-    abstract fun bindObserverCachedDataSource(source: ObserverCachedDataSource): ObserverDataSource
+    abstract fun bindObserverCachedDataSource(source: ObserverCachedDataSource): ObserverCachedSource
 
     @Remote
     @Binds
@@ -183,4 +195,13 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindVersionDataSource(source: VersionDataSource): VersionSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDownloadSource(source: DownloadDataSource): DownloadSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFileInfoSource(source: FileInfoDataSource): FileInfoSource
+
 }

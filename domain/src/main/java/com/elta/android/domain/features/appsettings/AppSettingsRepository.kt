@@ -8,4 +8,6 @@ interface AppSettingsRepository {
     fun getBackendVariant(): Single<BackendVariant>
     fun changeBackendVariant(server: BackendVariant): Completable
     fun deleteDbFiles(): Completable
+    var shouldManualGlucoseDialogShow: Boolean
+    var isLocationNeeded: Boolean
 }

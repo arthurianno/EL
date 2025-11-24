@@ -10,6 +10,7 @@ plugins {
     id("io.objectbox")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.huawei.agconnect")
 }
 
 val CREDENTIALS_DEBUG = "../keystore/credentials-debug.properties"
@@ -27,8 +28,10 @@ fun getPropertiesFromFile(filename: String): Properties =
 android {
     compileSdk = AppConfig.completeSdk
 
-    val version = getTagInfo()
-    print(version.toString())
+    val version = getTagInfo().also {
+        println(">>> Current Git tag: $it")
+        println(">>> Version code: ${it.buildNumber}")
+    }
 
     defaultConfig {
         applicationId = AppConfig.applicationId
@@ -43,7 +46,6 @@ android {
     }
 
     signingConfigs {
-
         val credentialsDebug = getPropertiesFromFile(CREDENTIALS_DEBUG)
 
         getByName("debug") {
@@ -65,7 +67,6 @@ android {
     }
 
     buildTypes {
-
         all {
             resValue("string", "app_deep_link_host", AppConfig.DeepLink.host)
             resValue("string", "app_deep_link_schema", AppConfig.DeepLink.schema)
@@ -74,6 +75,7 @@ android {
             buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.debug.toString())
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"dev\"")
 
             versionNameSuffix = "-debug(${version.buildNumber})"
             signingConfig = signingConfigs["debug"]
@@ -87,6 +89,17 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             proguardFiles.addAll(fileTree("proguard"))
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"prod\"")
+        }
+
+        create("huawei") {
+            buildConfigField("boolean", "IS_LOG_ENABLED", AppConfig.LogEnabled.release.toString())
+            buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
+            signingConfig = signingConfigs["release"]
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles.addAll(fileTree("proguard"))
+            buildConfigField("String", "ENVIRONMENT_TAG", "\"prod\"")
         }
     }
 
@@ -121,8 +134,8 @@ android {
 kapt {
     correctErrorTypes = true
     javacOptions {
-        option("-source", "8")
-        option("-target", "8")
+        option("-source", "1.8")
+        option("-target", "1.8")
     }
 }
 
@@ -142,6 +155,7 @@ dependencies {
     implementation(Dependencies.Jetpack.reciclerView)
     implementation(Dependencies.Jetpack.multiDex)
     implementation(Dependencies.Yandex.mapKit)
+    implementation(Dependencies.Yandex.appMetrica)
     implementation(Dependencies.RxJava2.rxJava)
     implementation(Dependencies.RxJava2.rxPm)
     implementation(Dependencies.Cicerone.core)
@@ -164,6 +178,11 @@ dependencies {
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.guavaConflictLost)
     implementation(Dependencies.Webim.core)
+    implementation(Dependencies.OneSignal.core) // OneSignal уже есть
+    implementation ("com.huawei.hms:push:6.3.0.304") // Новая строка
+
+    implementation("androidx.room:room-common:2.7.2")
+    implementation("androidx.room:room-runtime:2.7.2")
 
     testBaseDependencies()
 }

@@ -5,6 +5,8 @@ import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricName
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
@@ -18,11 +20,13 @@ import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 
 class GlucoseFormatViewModel @Inject constructor(
     private val getProfile: GetUpdatedProfileUseCase,
     private val updateProfile: UpdateProfileUseCase,
+    private val appMetric: AppMetricTracker,
     private val bus: RxBus
 ) : BaseViewModel<GlucoseFormatViewState>() {
     override fun createInitState(): GlucoseFormatViewState =
@@ -38,10 +42,12 @@ class GlucoseFormatViewModel @Inject constructor(
                 .asFlow()
                 .catch { handleError(it) }
                 .collectLatest {
-                    reduceState { state.value.copy(
-                        profile = it,
-                        initGlucoseFormat = it.glucoseFormat
-                    ) }
+                    reduceState {
+                        state.value.copy(
+                            profile = it,
+                            initGlucoseFormat = it.glucoseFormat
+                        )
+                    }
                 }
         }
     }
@@ -55,17 +61,23 @@ class GlucoseFormatViewModel @Inject constructor(
     ).actionObserve()
 
     override fun handleUserAction(action: Action) {
-        when(action) {
+        when (action) {
             is DownButtonClick -> {
-                updateProfile.execute(UpdateProfileUseCase.Params(state.value.profile))
-                    .subscribe(
-                        {
-                            bus.event(Events.EventsChanged(false))
-                            backClick()
-                        },
-                        { handleError(it) }
-                    )
+                appMetric.trackEvent(state.value.profile.glucoseFormat.getMetricName())
+
+                launch {
+                    runCatching {
+                        updateProfile.execute(UpdateProfileUseCase.Params(state.value.profile))
+                            .await()
+                        bus.event(Events.EventsChanged(false))
+                        backClick()
+                    }
+                        .onFailure {
+                            handleError(it)
+                        }
+                }
             }
+
             is AppAction.BackPressure -> backClick()
         }
     }
@@ -79,6 +91,7 @@ class GlucoseFormatViewModel @Inject constructor(
             val newProfile = state.value.profile.copy(glucoseFormat = action.format)
             currentState.copy(profile = newProfile)
         }
+
         else -> currentState
     }
 }

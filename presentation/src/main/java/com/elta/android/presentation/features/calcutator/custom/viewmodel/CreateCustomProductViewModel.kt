@@ -8,6 +8,8 @@ import com.elta.android.domain.features.calculator.interactor.ReplaceProductUseC
 import com.elta.android.domain.features.calculator.model.MetricServingLink
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
@@ -57,7 +59,8 @@ class CreateCustomProductViewModel @Inject constructor(
     private val getServingsProductUseCase: GetServingsProductUseCase,
     private val addProductUseCase: AddProductUseCase,
     private val replaceProductUseCase: ReplaceProductUseCase,
-    private val addDishFragmentResult: AddDishFragmentResultHandler
+    private val addDishFragmentResult: AddDishFragmentResultHandler,
+    private val appMetricTracker: AppMetricTracker
 ) : BaseViewModel<CreateCustomProductViewState>() {
     override fun createInitState(): CreateCustomProductViewState = CreateCustomProductViewState(
         createCustomProductFlow = CreateCustomProductFlow.CREATING,
@@ -100,6 +103,7 @@ class CreateCustomProductViewModel @Inject constructor(
     ).actionObserve()
 
     init {
+        appMetricTracker.trackEvent(AppMetricEvent.ViewScreenFoodNew)
         collectPortionField()
         collectInputField()
         collectExtraBlock()
@@ -395,7 +399,7 @@ class CreateCustomProductViewModel @Inject constructor(
     }
 
     private fun downButtonClick() {
-
+        appMetricTracker.trackEvent(AppMetricEvent.TapButtonFoodNewSave)
         launch {
             val dish = state.value.dish
             val product = state.value.product.toProduct(dish)

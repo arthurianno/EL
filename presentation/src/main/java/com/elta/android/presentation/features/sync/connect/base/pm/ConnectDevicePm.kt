@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect.base.pm
 import android.os.Build
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
 import com.elta.android.common.errors.GlucometerAlreadyConnectedError
@@ -12,19 +13,27 @@ import com.elta.android.common.errors.GlucometerPinIncorrect
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
+import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.CheckConnectedDevicesUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
-import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getBluetoothPermissionGrantedMetricName
+import com.elta.android.presentation.analytic.getLocationPermissionGrantedMetricName
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.AlertResultParam
+import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
@@ -36,8 +45,6 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
 import com.elta.android.presentation.features.sync.control.bluetoothControl
-import com.elta.android.presentation.features.sync.control.handlePermissionResult
-import com.elta.android.presentation.features.sync.control.isBluetoothName
 import com.elta.android.presentation.messages.SnackBarMessageData
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Observable
@@ -46,6 +53,7 @@ import me.dmdev.rxpm.command
 import me.dmdev.rxpm.skipWhileInProgress
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 abstract class ConnectDevicePm constructor(
@@ -53,7 +61,9 @@ abstract class ConnectDevicePm constructor(
     private val connectDevice: AddNewDeviceUseCase,
     private val findGlucometers: FindGlucometersUseCase,
     private val checkConnectedDevices: CheckConnectedDevicesUseCase,
+    private val getLocationNeededUseCase: GetLocationNeededUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseListPm(services) {
 
@@ -65,6 +75,7 @@ abstract class ConnectDevicePm constructor(
 
     val startScanAction = action<Unit>()
     val toAppAction = action<Unit>()
+    private val locationNecessaryState = state(false)
 
     val openPinCodeDialogCommand = command<String>(bufferSize = 1)
 
@@ -75,6 +86,7 @@ abstract class ConnectDevicePm constructor(
     val retryPinControl = snackBarControl<SnackBarData>()
     val retryConnectControl = snackBarControl<SnackBarData>()
 
+    private var attemptsNumber: Int = 0
     private val scanResults = mutableSetOf<Glucometer>()
     private var glucometer: Glucometer? = null
 
@@ -90,6 +102,9 @@ abstract class ConnectDevicePm constructor(
     private val deviceAlreadyConnectedDialogData: DialogData by lazy {
         Dialogs.DeviceAlreadyConnectedDialogData(resources)
     }
+    private val deviceNeedLocationDialogData: DialogData by lazy {
+        Dialogs.DeviceNeedLocationDialogData(resources)
+    }
 
     val settingsDialog = dialogControl<DialogData, DialogResult>()
     val settingsIsVisible = state(false)
@@ -98,6 +113,8 @@ abstract class ConnectDevicePm constructor(
     val hideHomeButtonCommand = command<Unit>()
 
     val deviceAlreadyConnectedDialog = dialogControl<DialogData, DialogResult>()
+
+    val deviceNeedLocationDialog = dialogControl<DialogData, DialogResult>()
 
     private val incorrectPinCode: SnackBarData by lazy {
         SnackBarMessageData.WithButton(
@@ -112,9 +129,18 @@ abstract class ConnectDevicePm constructor(
             button = resources.getString(R.string.sync_connect_button_retry)
         )
     }
-
     private val showRetryPinAction = action<Unit>()
     private val showRetryConnectAction = action<Unit>()
+
+    val checkLocationPermissionCommand = command<Unit>()
+    val receivedLocationPermissionGrantedAction = action<Boolean>()
+    val showLocationPermissionRationaleAction = action<Unit>()
+    val onLocationPermissionGrantedAction = action<Unit>()
+
+    val checkBluetoothPermissionCommand = command<Unit>()
+    val receivedBluetoothPermissionGrantedAction = action<Boolean>()
+    val showBluetoothPermissionRationaleAction = action<Unit>()
+    val onBluetoothPermissionGrantedAction = action<Unit>()
 
     private val internalConnectDeviceAction = action<Unit>()
     private val pinState = state<String>()
@@ -129,6 +155,14 @@ abstract class ConnectDevicePm constructor(
         bindAnalytics()
         bindPermissionAction()
 
+        lifecycleObservable.filter { it == Lifecycle.CREATED }
+            .flatMapSingle {
+                getLocationNeededUseCase.execute()
+                    .doOnSuccess { locationNecessaryState.consumer.accept(it) }
+            }
+            .subscribe()
+            .untilDestroy()
+
         Observable.merge(
             btControl.bluetoothDeniedAction.observable,
             btControl.locationDeniedAction.observable
@@ -140,7 +174,8 @@ abstract class ConnectDevicePm constructor(
             btControl.bluetoothEnabledAction.observable,
             btControl.locationEnabledAction.observable
         )
-            .subscribe(startScanAction.consumer)
+            .doOnNext { startScanAction.consumer.accept(Unit) }
+            .subscribe()
             .untilDestroy()
 
 
@@ -151,17 +186,16 @@ abstract class ConnectDevicePm constructor(
 
     override fun handleError(error: Throwable) {
         when (error) {
-            is BluetoothNotEnabledError ->
+            is BluetoothNotEnabledError -> {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
                 btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            }
 
-            is LocationPermissionNotGrantedError -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
-                } else {
-                    btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-                }
+            is LocationPermissionNotGrantedError -> requestLocationPermission()
+
+            is BluetoothPermissionNotGrantedError -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) requestBluetoothPermission()
+                else requestLocationPermission()
             }
 
             is GlucometerAlreadyConnectedError ->
@@ -178,18 +212,25 @@ abstract class ConnectDevicePm constructor(
                 showRetryConnectAction.consumer.accept(Unit)
             }
 
-            is GlucometerSyncError -> {
-                if (error.cause is TimeoutException) {
-                    connectState.consumer.accept(ViewState.NOT_FOUND)
-                } else {
-                    val syncState = if (items.valueOrNull.isNullOrEmpty()) {
-                        ViewState.NOT_FOUND
-                    } else {
-                        ViewState.SYNC_ERROR
-                    }
-                    connectState.consumer.accept(syncState)
-                }
+            is GlucometerSyncError, is TimeoutException -> {
+                val isTimeoutError = error is TimeoutException || error.cause is TimeoutException
+                val isItemsEmpty = items.valueOrNull.isNullOrEmpty()
+                if (
+                    connectState.value == ViewState.SEARCH
+                    || connectState.value == ViewState.CONNECTED
+                    || connectState.value == ViewState.FOUND
+                ) {
+                    val syncError = when {
+                        isTimeoutError || isItemsEmpty -> {
+                            checkLocationNecessary()
+                            ViewState.NOT_FOUND
+                        }
 
+                        else -> ViewState.SYNC_ERROR
+                    }
+
+                    connectState.consumer.accept(syncError)
+                }
             }
 
             is GlucometerPinIncorrect -> showRetryPinAction.consumer.accept(Unit)
@@ -262,8 +303,10 @@ abstract class ConnectDevicePm constructor(
 
     private fun bindStartScanAction() {
         startScanAction.observable
+            .map { FindGlucometersUseCase.Params(isLocationNeeded = locationNecessaryState.value) }
             .flatMap {
-                findGlucometers.execute()
+                findGlucometers.execute(it)
+                    .timeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
                     .takeUntil(backHandleAction.observable)
                     .doOnSubscribe {
                         connectState.consumer.accept(ViewState.SEARCH)
@@ -317,13 +360,16 @@ abstract class ConnectDevicePm constructor(
         bus.events<Events.PinCodeEntered>()
             .map(Events.PinCodeEntered::pin)
             .doOnNext(pinState.consumer)
-            .map { Unit }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.DeviceConnectClick) }
+            .map { }
             .subscribe(internalConnectDeviceAction.consumer)
             .untilDestroy()
 
         bus.clicks<Clicks.DeviceClicked>()
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.SelectedDeviceConnectClick) }
             .doOnNext { click ->
-                glucometer = scanResults.firstOrNull { it.address == click.item.address && !click.item.isSelected }
+                glucometer =
+                    scanResults.firstOrNull { it.address == click.item.address && !click.item.isSelected }
                 val prevItems = (items.value as List<*>).map { it as DeviceItem }
                 val newItems = prevItems.mapIndexed { index, item ->
                     item.copy(
@@ -341,28 +387,79 @@ abstract class ConnectDevicePm constructor(
     }
 
     private fun bindPermissionAction() {
-        Observable.merge(
-            btControl.locationPermissionsGrantedAction.observable,
-            btControl.bluetoothPermissionsGrantedAction.observable
-        )
-            .subscribe { permission ->
-                val dialogData =
-                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData
-                    else settingsLocationDialogData
-
-                permission.handlePermissionResult(
-                    onPermissionGranted = {
-                        startScanAction.consumer.accept(Unit)
-                    },
-                    shouldShowPermissionRationale = {
-                        showSettingDialog(dialogData)
-                    },
-                    onPermissionDenied = {
-                        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
-                    }
-                )
+        onLocationPermissionGrantedAction.observable
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Location(AlertResultParam.ALLOW))
             }
+            .doOnNext { startScanAction.consumer.accept(Unit) }
+            .subscribe()
             .untilDestroy()
+
+        receivedLocationPermissionGrantedAction.observable
+            .doOnNext { appMetric.trackEvent(it.getLocationPermissionGrantedMetricName()) }
+            .doOnNext { isGranted ->
+                if (isGranted) startScanAction.consumer.accept(Unit)
+                else connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+            }
+            .subscribe()
+            .untilDestroy()
+
+        showLocationPermissionRationaleAction.observable
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Location(AlertResultParam.PROHIBIT))
+            }
+            .doOnNext { showSettingDialog(settingsLocationDialogData) }
+            .subscribe()
+            .untilDestroy()
+
+        onBluetoothPermissionGrantedAction.observable
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Bluetooth(AlertResultParam.ALLOW))
+            }
+            .doOnNext { startScanAction.consumer.accept(Unit) }
+            .subscribe()
+            .untilDestroy()
+
+        showBluetoothPermissionRationaleAction.observable
+            .doOnNext {
+                appMetric.trackEvent(AppMetricEvent.Permission.AlertClick.Bluetooth(AlertResultParam.PROHIBIT))
+            }
+            .doOnNext { showSettingDialog(settingsBluetoothDialogData) }
+            .subscribe()
+            .untilDestroy()
+
+        receivedBluetoothPermissionGrantedAction.observable
+            .doOnNext { appMetric.trackEvent(it.getBluetoothPermissionGrantedMetricName()) }
+            .doOnNext { isGranted ->
+                if (isGranted) startScanAction.consumer.accept(Unit)
+                else connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun checkLocationNecessary() {
+        if (attemptsNumber >= 1 && !locationNecessaryState.value) {
+            deviceNeedLocationDialog.showForResult(deviceNeedLocationDialogData)
+                .filter { it == DialogResult.POSITIVE }
+                .subscribe {
+                    locationNecessaryState.consumer.accept(true)
+                    startScanAction.consumer.accept(Unit)
+                }
+                .untilDestroy()
+        } else {
+            attemptsNumber += 1
+        }
+    }
+
+    private fun requestBluetoothPermission() {
+        checkBluetoothPermissionCommand.consumer.accept(Unit)
+        appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
+    }
+
+    private fun requestLocationPermission() {
+        checkLocationPermissionCommand.consumer.accept(Unit)
+        appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
     }
 
     private fun showDeviceAlreadyConnectedDialog() {
@@ -405,7 +502,9 @@ abstract class ConnectDevicePm constructor(
             newItems.map { it.address to it.isSelected }
 
     private fun navigateToShopsFlow(i: Unit) {
-        router.newRootFlow(Screens.ShopsFlow)
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        router.newRootFlow(Screens.ShopsFlow)
     }
 
     private fun handleSearchResults(results: List<Glucometer>) {
@@ -432,10 +531,61 @@ abstract class ConnectDevicePm constructor(
 
     private fun bindAnalytics() {
         connectState.observable
+            .takeUntil { it == ViewState.SEARCH }
+            .timeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+            .doOnError {
+                connectState.consumer.accept(ViewState.NOT_FOUND)
+            }
+            .subscribe()
+            .untilDestroy()
+
+        connectState.observable
             .filter { it == ViewState.SYNC_COMPLETED }
             .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
             .doOnNext(::handleHomeButton)
             .subscribe()
+            .untilDestroy()
+
+        connectState.observable
+            .filter {
+                it == ViewState.FOUND ||
+                        it == ViewState.CONNECTED ||
+                        it == ViewState.SYNC_COMPLETED ||
+                        it == ViewState.SYNC_ERROR
+            }
+            .subscribe { state ->
+                val eventName = when (state) {
+                    ViewState.FOUND -> AppMetricEvent.DevicesFoundScreen
+                    ViewState.CONNECTED -> AppMetricEvent.DeviceConnectedScreen
+                    ViewState.SYNC_COMPLETED ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.SUCCESS)
+
+                    ViewState.SYNC_ERROR ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.ERROR)
+
+                    else -> null
+                }
+                eventName?.let { appMetric.trackEvent(it) }
+            }
+
+        btControl.bluetoothDeniedAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.REJECT
+                    )
+                )
+            }
+            .untilDestroy()
+
+        btControl.bluetoothEnabledAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.ALLOW
+                    )
+                )
+            }
             .untilDestroy()
     }
 

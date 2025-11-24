@@ -1,6 +1,6 @@
 package com.elta.android.presentation.core.pm.listeners
 
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
 
 interface Trackable {
 

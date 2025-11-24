@@ -3,13 +3,15 @@ package com.elta.android.presentation.features.calcutator.products
 import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,7 +130,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
-        GetLocalProperties { _, _, colors, _, _ ->
+        GetLocalProperties { dimens, brash, colors, shapes, _ ->
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize()
@@ -137,6 +141,7 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .imePadding()
                         .padding(paddingValues)
                         .focusRequester(focusRequester)
                         .clickableWithNoRipple {
@@ -153,19 +158,57 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                         ) {
                             viewModel.sendAction(DishDetailAction.Retry)
                         }
-
                         else -> {
-                            MainHeader(
-                                dish = state.dish,
-                                calculatorFlow = state.calculatorFlow,
-                                viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
-                            )
-                            MainContent(
-                                viewModel = viewModel,
-                                state = state,
-                                focusRequester = focusRequester,
-                                focusManager = focusManager
-                            )
+                            Column(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                MainHeader(
+                                    dish = state.dish,
+                                    calculatorFlow = state.calculatorFlow,
+                                    viewNameClickListener = { viewModel sendAction DishDetailAction.ViewName }
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
+                                        .clip(shape = shapes.sheet)
+                                        .background(color = colors.white)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .verticalScroll(rememberScrollState())
+                                            .padding(dimens.contentPadding)
+                                    ) {
+                                        PortionProductHeader { viewModel sendAction CalculatorAction.PortionHelpClick }
+                                        VSpacerVerySmall()
+                                        PortionProductContent(
+                                            portionWidgetModel = viewModel.portionCountTextField,
+                                            portionDescriptionWidgetModel = viewModel.portionDescriptionDropdownField,
+                                            focusManager = focusManager,
+                                            focusRequester = focusRequester,
+                                            isError = false,
+                                            isFocusRequested = true,
+                                        )
+                                        PortionProductFooter(state.dish, state.isShowCountHelpSnack)
+                                    }
+                                }
+                                val isEnable = viewModel.downButton.state.collectAsState().value.enable
+                                val buttonBackground: Brush = if (isEnable) {
+                                    brash.downButton
+                                } else {
+                                    SolidColor(colors.shadeBlack3)
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .navigationBarsPadding()
+                                        .background(brush = buttonBackground),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    DownButton(widgetModel = viewModel.downButton)
+                                }
+                            }
                         }
                     }
                 }
@@ -182,44 +225,6 @@ class DishDetailFragment : BaseComposeFragment<DishDetailViewModel>() {
                 startIcon = R.drawable.ic_back,
                 startIconColor = colors.paleGray
             )
-        }
-    }
-
-    @Composable
-    private fun BoxScope.MainContent(
-        viewModel: DishDetailViewModel,
-        state: DishDetailViewState,
-        focusRequester: FocusRequester,
-        focusManager: FocusManager
-    ) {
-        GetLocalProperties { dimens, _, colors, shapes, _ ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimens.dishCardHeight)
-                    .clip(shape = shapes.sheet)
-                    .align(Alignment.BottomCenter)
-                    .background(color = colors.white)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(dimens.contentPadding)
-                        .fillMaxWidth(),
-                ) {
-                    PortionProductHeader { viewModel sendAction CalculatorAction.PortionHelpClick }
-                    VSpacerVerySmall()
-                    PortionProductContent(
-                        portionWidgetModel = viewModel.portionCountTextField,
-                        portionDescriptionWidgetModel = viewModel.portionDescriptionDropdownField,
-                        focusManager = focusManager,
-                        focusRequester = focusRequester,
-                        isError = false,
-                        isFocusRequested = true,
-                    )
-                    PortionProductFooter(state.dish, state.isShowCountHelpSnack)
-                }
-                DownButton(widgetModel = viewModel.downButton)
-            }
         }
     }
 

@@ -1,9 +1,8 @@
 package com.elta.android.presentation.features.sync.connect
 
+import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -22,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
@@ -36,16 +36,21 @@ import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
 import com.elta.android.presentation.core.compose.widgets.snackbar.BaseSnackBar
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
-import com.elta.android.presentation.features.sync.connect.model.ConnectAction
-import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
-import com.elta.android.presentation.features.sync.connect.model.ConnectingStageType
+import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingStageType
+import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingViewAction
+import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingViewEvent
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModel
 import com.elta.android.presentation.features.sync.connect.widgets.AppTopBar
 import com.elta.android.presentation.features.sync.connect.widgets.HelpBottomSheet
 import com.elta.android.presentation.features.sync.connect.widgets.MainImage
 import com.elta.android.presentation.features.sync.connect.widgets.TextNumericItem
+import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
+import com.elta.android.presentation.features.sync.control.requestEnableBluetooth
+import com.elta.android.presentation.features.sync.control.requestEnableLocation
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
+import com.elta.android.presentation.utils.openSettingsIntent
+import kotlinx.coroutines.flow.collectLatest
 
 class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     companion object {
@@ -71,7 +76,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         searchRepeatButton.setText(getString(R.string.repeat_search_button_text))
         completeButton.setText(getString(R.string.sync_state_action_sync_completed))
         appTopBar.setStartIconAction(AppAction.BackPressure)
-        appTopBar.setEndIconAction(ConnectAction.NeedHelp)
+        appTopBar.setEndIconAction(ConnectingViewAction.OpenHelp)
         exitDialogFromConnecting.initDialog(
             message = getString(R.string.sync_connection_exit_from_connecting_dialog_text),
             positiveButtonText = getString(R.string.yes_text),
@@ -81,6 +86,17 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             message = getString(R.string.sync_connection_exit_from_sync_dialog_text),
             positiveButtonText = getString(R.string.yes_text),
             negativeButtonText = getString(R.string.cancel_text)
+        )
+        warningNeedLocation.initDialog(
+            message = getString(R.string.device_need_location_dialog_message),
+            positiveButtonText = getString(R.string.device_need_location_dialog_positive_button),
+            negativeButtonText = getString(R.string.device_need_location_dialog_negative_button)
+        )
+        locationPermissionDialog.initDialog(
+            title = getString(R.string.settings_dialog_title),
+            message = getString(R.string.location_dialog_message),
+            positiveButtonText = getString(R.string.settings_dialog_positive),
+            negativeButtonText = getString(R.string.settings_dialog_negative)
         )
     }
 
@@ -93,20 +109,45 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     override fun Dialogs(viewModel: ConnectingViewModel) {
         BaseDialog(widgetModel = viewModel.exitDialogFromConnecting)
         BaseDialog(widgetModel = viewModel.exitDialogFromSync)
+        BaseDialog(widgetModel = viewModel.warningNeedLocation)
+        BaseDialog(widgetModel = viewModel.locationPermissionDialog)
     }
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: ConnectingViewModel) {
+        val context = LocalContext.current
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val state = viewModel.state.collectAsState().value
-        val event = viewModel.event.collectAsState(initial = null).value
-        if (state.requestBluetoothActivation) { requestEnableBluetooth() }
-        LaunchedEffect(key1 = event) {
-            when (event) {
-                is ConnectMainEvent.ShowSheet -> sheetState.show()
-                is ConnectMainEvent.HideSheet -> sheetState.hide()
-                else -> Unit
+        LaunchedEffect(key1 = Unit) {
+            viewModel.event.collectLatest {
+                when (it) {
+                    is ConnectingViewEvent.ShowSheet -> sheetState.show()
+                    is ConnectingViewEvent.HideSheet -> sheetState.hide()
+                    is ConnectingViewEvent.OpenSettings -> openSettingsIntent(requireContext())
+                    is ConnectingViewEvent.EnableBluetooth -> bluetoothResultLauncher.requestEnableBluetooth()
+                    is ConnectingViewEvent.Location.RequestPermission -> {
+                        context.checkSelfPermissionByName(
+                            permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
+                            onRequestPermission = { permissionName ->
+                                locationPermissionLauncher.launch(permissionName)
+                            },
+                            showPermissionRationale = {
+                                viewModel sendAction ConnectingViewAction.Location.ShowPermissionRationale
+                            },
+                            onGranted = {
+                                viewModel sendAction ConnectingViewAction.Location.AllowPermission
+                            }
+                        )
+                    }
+
+                    is ConnectingViewEvent.Location.Enable ->
+                        locationEnableResultLauncher.requestEnableLocation(context) {
+                            viewModel sendAction ConnectingViewAction.Location.Enable
+                        }
+
+                    else -> Unit
+                }
             }
         }
         GetLocalProperties { _, _, _, shapes, _ ->
@@ -115,8 +156,9 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 sheetContent = {
                     HelpBottomSheet(
                         downButtonModel = viewModel.connectByPinButton,
+                        connectAction = ConnectingViewAction.OnConnectClick,
                         closeOnClick = {
-                            viewModel sendAction ConnectAction.CloseHelp
+                            viewModel sendAction ConnectingViewAction.CloseHelp
                         }
                     )
                 },
@@ -202,7 +244,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             }
             DownButton(
                 widgetModel = viewModel.completeButton,
-                onClickAction = ConnectAction.Complete
+                onClickAction = ConnectingViewAction.ClickCompleteButton
             )
         }
     }
@@ -250,7 +292,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             }
             DownButton(
                 widgetModel = viewModel.syncRepeatButton,
-                onClickAction = ConnectAction.RepeatSync
+                onClickAction = ConnectingViewAction.ClickRepeatSyncButton
             )
         }
     }
@@ -272,7 +314,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             }
             DownButton(
                 widgetModel = viewModel.connectRepeatButton,
-                onClickAction = ConnectAction.RepeatConnect
+                onClickAction = ConnectingViewAction.ClickRepeatButton
             )
         }
     }
@@ -309,7 +351,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             }
             DownButton(
                 widgetModel = viewModel.searchRepeatButton,
-                onClickAction = ConnectAction.RepeatSearch
+                onClickAction = ConnectingViewAction.ClickSearchButton
             )
         }
     }
@@ -333,17 +375,32 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         }
     }
 
-    private fun requestEnableBluetooth() {
-        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        resultLauncher.launch(intent)
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        val action = if (isGranted) ConnectingViewAction.Location.AllowPermission
+        else ConnectingViewAction.Location.DeniedPermission
+
+        viewModel sendAction action
     }
 
-    private val resultLauncher = registerForActivityResult(
+    private val locationEnableResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                viewModel sendAction ConnectingViewAction.Location.Enable
+            }
+            else -> { }
+        }
+    }
+
+    private val bluetoothResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val connectAction = when (result.resultCode) {
-            Activity.RESULT_OK -> ConnectAction.RepeatSearch
-            else -> ConnectAction.ScannerError
+            Activity.RESULT_OK -> ConnectingViewAction.Bluetooth.Enable
+            else -> ConnectingViewAction.Bluetooth.Reject
         }
         viewModel sendAction connectAction
     }

@@ -1,17 +1,19 @@
 package com.elta.android.presentation.features.main.events.base.pm
 
 import com.elta.android.common.utils.atEndOfDay
-import com.elta.android.domain.features.FeatureToggles
 import com.elta.android.domain.features.calculator.interactor.CachedDishesUseCase
 import com.elta.android.domain.features.calculator.interactor.CalculatorFragmentResultHandler
 import com.elta.android.domain.features.calculator.model.Dish
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.getValidator
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
+import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.medicines.model.Medicament
 import com.elta.android.domain.features.diary.tags.model.Tag
+import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
@@ -24,6 +26,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.widgets.formSelectorControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.features.calcutator.mappers.ZERO_COUNT_DOUBLE
 import com.elta.android.presentation.features.main.events.base.initializer.MEDICAMENT_MEASURE_SUFFIX
 import com.elta.android.presentation.features.main.events.base.mapper.toChooserInsulin
 import com.elta.android.presentation.features.main.events.base.mapper.toChooserMedicament
@@ -82,6 +85,11 @@ abstract class BaseEventPm(
     val dishes = state<List<Dish>>(emptyList())
     val medicamentState = state<MedicamentModel>()
     val eventState = state<EventV2>()
+    val mealSelector = state(MealTag.NOT_SELECTED)
+    val beforeMealAction = action<Unit>()
+    val afterMealAction = action<Unit>()
+    val changeAppBarColorAction = action<Double>()
+    val appBarColorState = state<Int>()
     private val calculatorFlowState = state<CalculatorFlow>()
     protected val formPickerValue = state<Double>()
     protected val selectedDateState = state(ZonedDateTime.now())
@@ -113,6 +121,8 @@ abstract class BaseEventPm(
         observableCalculatorFlow()
         observeDishesResult()
         observeDishesChanges()
+        observeMealsAction()
+        observeAppBarColorAction()
     }
 
     private fun observableCalculatorFlow() {
@@ -128,8 +138,11 @@ abstract class BaseEventPm(
         eventTypeState.consumer.accept(eventType)
     }
 
-    protected fun isFormValid(form: EventFormModel): Boolean {
-        val validator = checkNotNull(form.eventType).getValidator()
+    protected fun isFormValid(
+        form: EventFormModel,
+        glucoseFormat: GlucoseFormat?
+    ): Boolean {
+        val validator = checkNotNull(form.eventType).getValidator(glucoseFormat)
         return validator.isValid(
             value = form.value,
             kind = form.kind,
@@ -262,13 +275,53 @@ abstract class BaseEventPm(
             .untilDestroy()
     }
 
+    private fun observeMealsAction() {
+        beforeMealAction.observable
+            .doOnNext { switchMealTag(MealTag.BEFOREMEAL) }
+            .subscribe()
+            .untilDestroy()
+        afterMealAction.observable
+            .doOnNext { switchMealTag(MealTag.AFTERMEAL) }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun switchMealTag(mealTag: MealTag) {
+        val selectedValue = mealSelector.value
+        mealSelector.consumer.accept(
+            if (selectedValue == MealTag.NOT_SELECTED || selectedValue != mealTag) {
+                mealTag
+            } else {
+                MealTag.NOT_SELECTED
+            }
+        )
+    }
+
+    private fun observeAppBarColorAction() {
+        changeAppBarColorAction.observable
+            .doOnNext {
+                if(eventTypeState.valueOrNull is EventType.Glucose){
+                    val glucoseNormalRange = profileState.valueOrNull?.glucoseLevelSettings?.normal ?: GlucoseLevelSettings.defaultRange
+                    val drawableId = when {
+                        it == ZERO_COUNT_DOUBLE -> R.drawable.bg_gradient_blue
+                        it in glucoseNormalRange -> R.drawable.bg_gradient_green
+                        it > glucoseNormalRange.end -> R.drawable.bg_gradient_red
+                        else -> R.drawable.bg_gradient_blue
+                    }
+                    appBarColorState.consumer.accept(drawableId)
+                }
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
     private fun createChooserConfiguration() =
         when (eventTypeState.value) {
             EventType.Insulin -> ChooserConfiguration(
                 chooserType = ChooserType.VARIANTS_WITH_SUBTYPE,
                 eventType = eventTypeState.value,
                 id = generateChooserId(),
-                insulinMedicament = formSelector.option.valueOrNull.toChooserInsulin()
+                insulinMedicament = formSelector.option.valueOrNull.toChooserInsulin(resources)
             )
 
             is EventType.Bread -> ChooserConfiguration(

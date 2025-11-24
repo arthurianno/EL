@@ -1,53 +1,64 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/stateDeviceFoundView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="horizontal">
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/New.Headline3.BlackBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sync_state_title_device_found" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_congrats" />
+
+        </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
-            style="@style/New.Headline3.BlackBlue"
-            android:layout_width="wrap_content"
+            style="@style/New.Title2.ShadeBlack0"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sync_state_title_device_found" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/sync_state_subtitle_device_found" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_congrats" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:clipToPadding="false"
+            android:fadeScrollbars="false"
+            android:overScrollMode="never"
+            android:paddingBottom="@dimen/large_button_height"
+            android:scrollbars="vertical" />
 
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/New.Title2.ShadeBlack0"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:lineSpacingExtra="2dp"
-        android:text="@string/sync_state_subtitle_device_found" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/itemsView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="36dp"
-        android:overScrollMode="never" />
-
-    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/actionButtonView"
         style="@style/Button.Large"
+        android:layout_gravity="bottom"
         android:text="@string/sync_state_action_button_device_found" />
 
-</LinearLayout>
+</FrameLayout>

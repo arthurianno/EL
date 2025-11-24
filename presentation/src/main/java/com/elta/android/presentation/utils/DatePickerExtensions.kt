@@ -3,6 +3,8 @@ package com.elta.android.presentation.utils
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.widget.DatePicker
 import android.widget.Toast
 import com.elta.android.common.utils.toMillis
 import com.elta.android.presentation.R
@@ -37,11 +39,20 @@ fun Context?.showDatePickerDialog(
     date: LocalDate,
     minDate: LocalDate? = null,
     maxDate: LocalDate? = null,
-    onDateSelectedFunction: (LocalDate) -> Unit
+    onDateSelectedFunction: (LocalDate) -> Unit,
+    onCancelPickerFunction: (LocalDate) -> Unit = {},
 ) {
+    var selectedDate = date
+
     if (this == null) return
     val onDateSelectedListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
         onDateSelectedFunction.invoke(LocalDate.of(year, month + 1, dayOfMonth))
+    }
+    val onCancelPickerListener = DialogInterface.OnCancelListener {
+        onCancelPickerFunction(selectedDate)
+    }
+    val onChangeListener = DatePicker.OnDateChangedListener { _, year, month, day ->
+        selectedDate = LocalDate.of(year, month + 1, day)
     }
     DatePickerDialog(
         this,
@@ -52,6 +63,8 @@ fun Context?.showDatePickerDialog(
     ).apply {
         minDate?.let { datePicker.minDate = it.toMillis() }
         maxDate?.let { datePicker.maxDate = it.toMillis() }
+        setOnCancelListener(onCancelPickerListener)
+        datePicker.init(date.year, date.month.ordinal, date.dayOfMonth, onChangeListener)
         show()
     }
 }

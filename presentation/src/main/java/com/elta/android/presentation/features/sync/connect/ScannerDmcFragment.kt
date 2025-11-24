@@ -5,11 +5,11 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Size
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
@@ -28,6 +28,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -84,7 +85,6 @@ private enum class CropCornerType(val degrees: Float, val align: Alignment) {
     BottomLeft(degrees = 270f, align = Alignment.BottomStart),
 }
 
-@ExperimentalCameraProviderConfiguration
 @ExperimentalGetImage
 class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     companion object {
@@ -126,6 +126,11 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 sheetState.bottomSheetState.collapse()
             } else {
                 sheetState.bottomSheetState.expand()
+            }
+        }
+        DisposableEffect(Unit) {
+            onDispose {
+                scanner?.close()
             }
         }
         GetLocalProperties { _, _, colors, shapes, _ ->
@@ -281,8 +286,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                             "$GLUCOMETER_MODEL${
                                 value.drop(1).takeLast(NUMBERS_COUNT_FOR_NAME)
                             }"
-                        viewModel sendAction ConnectAction.StartConnecting(pin, name)
-                        scanner?.close()
+                        viewModel sendAction ConnectAction.OnDmcReceived(pin, name)
                     }
                         .onFailure {
                             viewModel sendAction ConnectAction.ScannerError
@@ -305,7 +309,16 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     private fun BottomSheet(viewModel: ScannerDmcViewModel, sheetType: ScannerState) {
         when (sheetType) {
             ScannerState.Info -> InfoSheet()
-            ScannerState.Error -> ErrorSheet()
+            ScannerState.Error -> ErrorSheet(
+                title = R.string.sync_connection_scanner_sheet_error_title,
+                description = R.string.sync_connection_scanner_sheet_error_text
+            )
+
+            ScannerState.AlreadyConnected -> ErrorSheet(
+                title = R.string.sync_connection_scanner_sheet_already_connected_title,
+                description = R.string.sync_connection_scanner_sheet_already_connected_text
+            )
+
             ScannerState.Help -> HelpBottomSheet(
                 downButtonModel = viewModel.connectByPinButton,
                 closeOnClick = {
@@ -333,7 +346,7 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
     }
 
     @Composable
-    private fun ErrorSheet() {
+    private fun ErrorSheet(@StringRes title: Int, @StringRes description: Int) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(
                 modifier = Modifier
@@ -342,12 +355,12 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(id = R.string.sync_connection_scanner_sheet_error_title),
+                    text = stringResource(id = title),
                     style = types.h3
                 )
                 VSpacerVerySmall()
                 Text(
-                    text = stringResource(id = R.string.sync_connection_scanner_sheet_error_text),
+                    text = stringResource(id = description),
                     color = colors.shadeBlack0
                 )
             }

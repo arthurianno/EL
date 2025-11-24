@@ -5,11 +5,17 @@ import com.elta.android.domain.features.diary.chooser.interactor.GetInsulinMedic
 import com.elta.android.domain.features.diary.chooser.model.ChooserType
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
+import com.elta.android.domain.features.diary.medicines.model.PROLONGED
+import com.elta.android.domain.features.diary.medicines.model.MIXED
 import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
+import com.elta.android.domain.features.diary.medicines.model.SHORT
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.TypeOfInsulinParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.navigation.FlowRouter
@@ -21,6 +27,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Insulin
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
 import com.elta.android.presentation.features.main.events.chooser.ui.builder.ChooserOptionsItemsBuilder
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -36,6 +43,7 @@ class EventsOptionsChooserPm @Inject constructor(
     private val getChooserOptionsUseCase: GetChooserOptionsUseCase,
     private val getInsulinMedicamentsChooserOptionsUseCase: GetInsulinMedicamentsChooserOptionsUseCase,
     private val itemsBuilder: ChooserOptionsItemsBuilder,
+    private val appMetricTracker: AppMetricTracker,
     services: ServiceFacade
 ) : BaseListPm(services) {
     val toolbarTitleCommand = state<String>()
@@ -92,6 +100,15 @@ class EventsOptionsChooserPm @Inject constructor(
                 .filter { it.chooserType == ChooserType.VARIANTS && it.eventType is EventType.Insulin }
                 .flatMap { chooserConfiguration ->
                     val insulinType = chooserConfiguration.insulinMedicament?.let { medicamentChooser ->
+                        val insulinType = when(medicamentChooser.insulinCode) {
+                            SHORT -> TypeOfInsulinParam.SHORT
+                            PROLONGED -> TypeOfInsulinParam.LONG
+                            MIXED -> TypeOfInsulinParam.MIXED
+                            else -> null
+                        }
+                        insulinType?.let {
+                            appMetricTracker.trackEvent(AppMetricEvent.ViewScreenInsulinType(insulinType))
+                        }
                         GetInsulinMedicamentsChooserOptionsUseCase.Params(
                             MedicamentInsulinType(
                                 id = medicamentChooser.insulinId,
@@ -128,6 +145,16 @@ class EventsOptionsChooserPm @Inject constructor(
             }
             .throttleLatest(CLICK_DELAY_MILLIS, TimeUnit.MILLISECONDS)
             .doOnNext(selectedItemIdState.consumer)
+            .subscribe()
+            .untilDestroy()
+
+        bus.clicks<Clicks.ChooserOptionClicked>()
+            .withLatestFrom(configurationState.observable) { _, configuration ->
+                when(configuration.eventType) {
+                    is EventType.Activity -> appMetricTracker.trackEvent(AppMetricEvent.TapButtonActivityType)
+                    else -> Unit
+                }
+            }
             .subscribe()
             .untilDestroy()
 
@@ -221,6 +248,7 @@ class EventsOptionsChooserPm @Inject constructor(
 
             configuration.chooserType == ChooserType.VARIANTS &&
                     configuration.eventType is EventType.Activity -> {
+                appMetricTracker.trackEvent(AppMetricEvent.ViewScreenActivityType)
                 resources.getString(R.string.events_options_chooser_title_activities)
             }
 
@@ -272,7 +300,7 @@ class EventsOptionsChooserPm @Inject constructor(
         else
             InsulinMedicamentChooser(
                 insulinCode = insulinType.code,
-                insulinName = insulinType.name,
+                insulinName = insulinType.getLocalizedName(resources),
                 insulinId = insulinType.id
             )
 

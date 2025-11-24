@@ -12,6 +12,7 @@ data class Event(
     val tag: Tag?,
     val note: String?,
     val modificationTime: Long?,
+    val glucoseInputType: GlucoseInputType? = null,
     val value: Double?,
     val name: String?,
     val kind: String?,

@@ -2,14 +2,23 @@ package com.elta.android.domain.features.consultant.usecase
 
 import com.elta.android.domain.features.consultant.model.WebimUser
 import com.elta.android.domain.features.consultant.repository.ConsultantRepository
+import com.elta.android.domain.features.firebase.repository.MessagingTokenRepository
+import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 
 class WebimSessionUseCase @Inject constructor(
-    private val repository: ConsultantRepository
+    private val repository: ConsultantRepository,
+    private val messagingTokenRepository: MessagingTokenRepository
 ) {
 
-    fun create(webimUser: WebimUser) {
-        repository.webimSessionCreate(webimUser)
+    suspend fun create(webimUser: WebimUser) {
+        val firebaseToken = try {
+            messagingTokenRepository.getToken()
+                .await()
+        } catch (e: Throwable) {
+            null
+        }
+        repository.webimSessionCreate(webimUser, firebaseToken)
     }
 
     fun onResume() {

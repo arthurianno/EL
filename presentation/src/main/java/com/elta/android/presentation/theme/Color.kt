@@ -30,6 +30,7 @@ internal val shadeBlue2 = Color(0xFF334480)
 internal val shadeBlue3 = Color(0xFF4480d4)
 internal val shadeBlue3_20 = Color(0x334480d4)
 internal val lightBlue = Color(0xFFDFE4FB)
+internal val mintBlue = Color(0xFFebf7f8)
 internal val black = Color(0xFF17191f)
 internal val shadeBlack0 = Color(0xFF626a7c)
 internal val white = Color(0xFFffffff)
@@ -38,6 +39,9 @@ internal val shadeGGreen2B = Color(0xFF3b919a)
 internal val paleGray = Color(0xFFf7f7f7)
 internal val paleGrayDark = Color(0xFFf4f4f4)
 internal val ghostWhite = Color(0xFFf7f7f8)
+internal val greenBlue = Color(0xFF3BB2B8)
+internal val greenBlue10 = Color(0x1A3BB2B8)
+internal val gold = Color(0xFFFBC232)
 
 internal val materialThemeColors = lightColors(
     primary = gGreenA,
@@ -72,6 +76,7 @@ data class EltaColors(
     val shadeBlue3: Color,
     val shadeBlue3_20: Color,
     val lightBlue: Color,
+    val mintBlue: Color,
     val black: Color,
     val shadeBlack0: Color,
     val white: Color,
@@ -79,7 +84,10 @@ data class EltaColors(
     val shadeGGreen2B: Color,
     val paleGray: Color,
     val ghostWhite: Color,
-    val paleGrayDark: Color
+    val paleGrayDark: Color,
+    val greenBlue: Color,
+    val greenBlue10: Color,
+    val gold: Color
 )
 
 internal val eltaColors = EltaColors(
@@ -109,6 +117,7 @@ internal val eltaColors = EltaColors(
     shadeBlue3 = shadeBlue3,
     shadeBlue3_20 = shadeBlue3_20,
     lightBlue = lightBlue,
+    mintBlue = mintBlue,
     black = black,
     shadeBlack0 = shadeBlack0,
     white = white,
@@ -116,5 +125,8 @@ internal val eltaColors = EltaColors(
     shadeGGreen2B = shadeGGreen2B,
     paleGray = paleGray,
     paleGrayDark = paleGrayDark,
-    ghostWhite = ghostWhite
+    ghostWhite = ghostWhite,
+    greenBlue = greenBlue,
+    greenBlue10 = greenBlue10,
+    gold = gold
 )

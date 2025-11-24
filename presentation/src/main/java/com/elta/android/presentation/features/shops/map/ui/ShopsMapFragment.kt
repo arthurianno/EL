@@ -74,8 +74,7 @@ class ShopsMapFragment :
 
     private val snapHelper = PagerSnapHelper()
 
-    private val rxPermissions by lazy { RxPermissions(this) }
-
+    private val rxPermissions by lazy { RxPermissions(requireActivity()) }
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addOnBackPressedCallback {

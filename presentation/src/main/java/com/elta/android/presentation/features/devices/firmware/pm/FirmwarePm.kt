@@ -2,30 +2,40 @@ package com.elta.android.presentation.features.devices.firmware.pm
 
 import android.os.Build
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.FirmwareDownloadingError
 import com.elta.android.common.errors.FirmwareUpdateError
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerOfflineError
+import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
 import com.elta.android.common.errors.NotFoundError
 import com.elta.android.domain.features.devices.interactor.GetLastGlucometerInfoUseCase
-import com.elta.android.domain.features.devices.interactor.UpdateDeviceFirmwareUseCase
+import com.elta.android.domain.features.devices.interactor.UpdateFirmwareWithBootModeUseCase
+import com.elta.android.domain.features.devices.interactor.UpdateFirmwareWithDfuModeUseCase
+import com.elta.android.domain.features.devices.model.BootModeStatus
+import com.elta.android.domain.features.devices.interactor.UpdateDeviceInfoUseCase
 import com.elta.android.domain.features.devices.model.GlucometerInfo
 import com.elta.android.domain.features.firmware.interactor.DownloadFirmwareUseCase
 import com.elta.android.domain.features.firmware.interactor.GetFirmwareInfoUseCase
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import com.elta.android.domain.features.firmware.model.FirmwareInfo
+import com.elta.android.domain.features.firmware.model.FirmwareMode
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.snackBarControl
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.features.sync.control.bluetoothControl
 import com.elta.android.presentation.features.sync.control.handlePermissionResult
 import com.elta.android.presentation.features.sync.control.isBluetoothName
+import com.elta.android.presentation.messages.SnackBarMessageData
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
@@ -41,11 +51,14 @@ class FirmwarePm @Inject constructor(
     private val getLastGlucometerInfoUseCase: GetLastGlucometerInfoUseCase,
     private val downloadFirmwareUseCase: DownloadFirmwareUseCase,
     private val getFirmwareInfoUseCase: GetFirmwareInfoUseCase,
-    private val updateDeviceFirmwareUseCase: UpdateDeviceFirmwareUseCase,
+    private val updateFirmwareWithBootMode: UpdateFirmwareWithBootModeUseCase,
+    private val updateFirmwareWithDfuMode: UpdateFirmwareWithDfuModeUseCase,
+    private val updateDeviceInfo: UpdateDeviceInfoUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
 
     val buttonAction = action<Unit>()
+    val bootModeStatusAction = action<BootModeStatus>()
     val updateState = state<UpdateState>(UpdateState.Progress(resources))
 
     val btControl = bluetoothControl()
@@ -61,16 +74,26 @@ class FirmwarePm @Inject constructor(
     private val firmwareFileState = state<FirmwareFile>()
 
     private val delayedSetStateAction = action<UpdateState>()
+    private val showRetryUpdateAction = action<Unit>()
 
     val settingsDialog = dialogControl<DialogData, DialogResult>()
     val settingsIsVisible = state(false)
     val openSettingsCloseAction = action<Unit>()
+
+    val retryUpdateControl = snackBarControl<SnackBarData>()
 
     private val settingsLocationDialogData: DialogData by lazy {
         Dialogs.SettingsLocationDialogData(resources)
     }
     private val settingsBluetoothDialogData: DialogData by lazy {
         Dialogs.SettingsBluetoothDialogData(resources)
+    }
+
+    private val updateError: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            message = resources.getString(R.string.sync_connection_connect_error_title),
+            button = resources.getString(R.string.sync_connect_button_retry)
+        )
     }
 
     override fun onCreate() {
@@ -83,6 +106,8 @@ class FirmwarePm @Inject constructor(
         bindStartUpdateAction()
         bindBluetoothAndLocationAction()
         bindPermissionsAction()
+        bindBootModeAction()
+        bindRetrySnackAction()
     }
 
     override fun handleError(error: Throwable) {
@@ -93,6 +118,7 @@ class FirmwarePm @Inject constructor(
             is GlucometerOfflineError -> setState(UpdateState.GlucometerOfflineError(resources))
             is NotFoundError -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
             is BluetoothNotEnabledError -> setState(UpdateState.FirmwareUpdateError(resources))
+            is GlucometerSyncError -> showRetryUpdateAction.consumer.accept(Unit)
             else -> setState(UpdateState.NotFound(resources, getDeviceVersion()))
         }
     }
@@ -115,11 +141,16 @@ class FirmwarePm @Inject constructor(
 
         updateState.observable
             .filter { it is UpdateState.Updated }
-            .delay(NEXT_STATE_DELAY, TimeUnit.MILLISECONDS)
-            .subscribe {
-                bus.event(Events.FirmwareUpdated)
-                router.exit()
+            .map { createUpdateDeviceInfoParams() }
+            .flatMapCompletable {
+                updateDeviceInfo.execute(it)
+                    .delay(NEXT_STATE_DELAY, TimeUnit.MILLISECONDS)
+                    .doOnComplete {
+                        bus.event(Events.FirmwareUpdated)
+                        router.exit()
+                    }
             }
+            .subscribe()
             .untilDestroy()
 
         buttonAction.observable
@@ -196,8 +227,10 @@ class FirmwarePm @Inject constructor(
     private fun bindStartUpdateAction() =
         startUpdateAction.observable
             .skipWhileInProgress(progressState.observable)
-            .map(::createUpdateFirmwareUseCaseParams)
-            .flatMap(::updateFirmware)
+            .flatMap {
+                if (firmwareInfoState.value.firmwareMode == FirmwareMode.Boot) updateFirmwareBootMode()
+                else updateFirmwareDfuMode()
+            }
             .retry()
             .subscribe()
             .untilDestroy()
@@ -238,13 +271,22 @@ class FirmwarePm @Inject constructor(
             .skipWhileInProgress(progressState.observable)
             .flatMapSingle {
                 deviceInfo.valueOrNull?.let { glucometerInfo ->
-                    getFirmwareInfoUseCase.execute(GetFirmwareInfoUseCase.Params(
-                        modelId = getModel(),
-                        currentVersion = getDeviceVersion(),
-                        glucometerInfo = glucometerInfo
-                    ))
+                    getFirmwareInfoUseCase.execute(
+                        GetFirmwareInfoUseCase.Params(
+                            modelId = getModel(),
+                            currentVersion = getDeviceVersion(),
+                            glucometerInfo = glucometerInfo
+                        )
+                    )
                         .bindProgressExtended(progressState.consumer)
-                        .doOnSubscribe { setState(UpdateState.Progress(resources, getDeviceVersion())) }
+                        .doOnSubscribe {
+                            setState(
+                                UpdateState.Progress(
+                                    resources,
+                                    getDeviceVersion()
+                                )
+                            )
+                        }
                         .doOnSuccess(::handleNewVersionModelFirmwareInfo)
                         .doOnError(::handleError)
                 } ?: Single.error(NotFoundError("Device not found"))
@@ -252,6 +294,48 @@ class FirmwarePm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+
+    private fun bindBootModeAction() {
+        bootModeStatusAction.observable
+            .doOnNext { status ->
+                val state = when (status) {
+                    BootModeStatus.Progress -> UpdateState.Updating(resources)
+                    BootModeStatus.Completed -> UpdateState.Updated(resources)
+                    BootModeStatus.UpdateFailed -> UpdateState.FirmwareUpdateError(resources)
+                    BootModeStatus.SyncFailed -> {
+                        showRetryUpdateAction.consumer.accept(Unit)
+                        UpdateState.Found(
+                            resources,
+                            firmwareInfoState.value.version,
+                            getDeviceVersion()
+                        )
+                    }
+                }
+
+                updateState.consumer.accept(state)
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindRetrySnackAction() {
+        showRetryUpdateAction.observable
+            .switchMapMaybe {
+                deviceInfo.valueOrNull?.let {
+                    setState(
+                        UpdateState.Found(
+                            resources,
+                            firmwareInfoState.value.version,
+                            getDeviceVersion()
+                        )
+                    )
+                }
+
+                retryUpdateControl.showForResult(updateError)
+            }
+            .subscribe(startUpdateAction.consumer)
+            .untilDestroy()
+    }
 
     private fun setState(state: UpdateState) {
         delayedSetStateAction.consumer.accept(state)
@@ -267,6 +351,11 @@ class FirmwarePm @Inject constructor(
 
     private fun createGetDeviceInfoUseCaseParams(address: String): GetLastGlucometerInfoUseCase.Params =
         GetLastGlucometerInfoUseCase.Params(address)
+
+    private fun createUpdateDeviceInfoParams() = UpdateDeviceInfoUseCase.Params(
+        glucometerInfo = deviceInfo.value.copy(softwareVersion = firmwareInfoState.value.version),
+        lastSyncedEvent = null
+    )
 
     private fun handleDeviceInfo(info: GlucometerInfo) {
         deviceInfo.consumer.accept(info)
@@ -288,12 +377,6 @@ class FirmwarePm @Inject constructor(
         firmwareFileState.consumer.accept(file)
         startUpdateAction.consumer.accept(Unit)
     }
-
-    private fun createUpdateFirmwareUseCaseParams(i: Unit): UpdateDeviceFirmwareUseCase.Params =
-        UpdateDeviceFirmwareUseCase.Params(
-            address = deviceAddressState.valueOrNull.orEmpty(),
-            file = firmwareFileState.value
-        )
 
     private fun handleFirmwareUpdated() {
         setState(UpdateState.Updated(resources, firmwareInfoState.valueOrNull?.version))
@@ -321,33 +404,56 @@ class FirmwarePm @Inject constructor(
             .doOnError { progressConsumer.accept(false) }
     }
 
-    private fun updateFirmware(params: UpdateDeviceFirmwareUseCase.Params): Observable<String> =
-        updateDeviceFirmwareUseCase.execute(params)
+    private fun updateFirmwareBootMode(): Observable<String> =
+        updateFirmwareWithBootMode.execute(
+            UpdateFirmwareWithBootModeUseCase.Params(
+                deviceAddressState.valueOrNull.orEmpty(),
+                firmwareFileState.value
+            )
+        )
+            .bindProgressExtended(progressState.consumer)
+            .doOnSubscribe {
+                setState(UpdateState.Updating(resources, getDeviceVersion()))
+            }
+            .doOnError { error -> handleUpdateError(error) }
+
+    private fun updateFirmwareDfuMode(): Observable<String> =
+        updateFirmwareWithDfuMode.execute(
+            UpdateFirmwareWithDfuModeUseCase.Params(
+                deviceAddressState.valueOrNull.orEmpty(),
+                firmwareFileState.value
+            )
+        )
             .bindProgressExtended(progressState.consumer)
             .doOnSubscribe {
                 setState(UpdateState.Updating(resources, getDeviceVersion()))
             }
             .doOnComplete(::handleFirmwareUpdated)
-            .doOnError { error ->
-                when (error) {
-                    is BluetoothNotEnabledError ->
-                        btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            .doOnError { error -> handleUpdateError(error) }
 
-                    is LocationPermissionNotGrantedError ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                            btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
-                        } else {
-                            btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
-                        }
+    private fun handleUpdateError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledError ->
+                btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
 
-                    is LocationNotEnabledError ->
-                        btControl.requestEnableLocationCommand.consumer.accept(Unit)
+            is LocationPermissionNotGrantedError -> {
+                btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+            }
 
-                    else -> handleError(error)
+            is BluetoothPermissionNotGrantedError -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
+                } else {
+                    btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
                 }
             }
+
+            is LocationNotEnabledError ->
+                btControl.requestEnableLocationCommand.consumer.accept(Unit)
+
+            else -> handleError(error)
+        }
+    }
 
     companion object {
         private const val ZERO_DELAY = 0L

@@ -2,6 +2,7 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.home.interactor.buildDailyGlucoseModel
@@ -54,6 +55,9 @@ fun buildStatisticModel(
         statisticByDay[day] = dayStatistic
     }
 
+    val glucoseEventsFromGlucometer = eventsByType[EventType.Glucose(GlucoseInputType.AUTO)].orEmpty()
+    val glucoseEventsManual = eventsByType[EventType.Glucose(GlucoseInputType.MANUAL)].orEmpty()
+
     // 0(N)
     return StatisticByPeriodModel(
         period = period,
@@ -62,7 +66,7 @@ fun buildStatisticModel(
         allDays = statisticByDay,
         calculatorFlow = calculatorFlow,
         glucose = buildGlucoseStatisticModel(
-            eventsByType[EventType.Glucose],
+            glucoseEventsFromGlucometer + glucoseEventsManual,
             settings,
             glucoseFormat
         ),
@@ -228,7 +232,7 @@ fun buildInsulinStatisticModelByPeriod(
 }
 
 private fun List<MedicamentInsulinType>.convertToStatistic() =
-    map { insulinType -> insulinType.name.lowercase() }
+    map { insulinType -> insulinType.code.lowercase() }
 
 //private fun getInsulinTypeForStatistic(lambda: (EventV2) -> List<MedicamentInsulinType>?) =
 //    this?.mapNotNull { event -> lambda.invoke(event)?.map { type -> type.name.lowercase() } }

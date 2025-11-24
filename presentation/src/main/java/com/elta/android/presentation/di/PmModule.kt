@@ -6,16 +6,19 @@ import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.auth.flow.pm.AuthFlowPm
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
+import com.elta.android.presentation.features.auth.login.pm.LoginPmVariantA
 import com.elta.android.presentation.features.auth.password.create.pm.AuthPasswordCreatePm
 import com.elta.android.presentation.features.auth.password.recovery.pm.AuthPasswordRecoveryPm
 import com.elta.android.presentation.features.devices.all.pm.DevicesPm
 import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePm
+import com.elta.android.presentation.features.devices.firmware.pm.FirmwarePmVariantA
 import com.elta.android.presentation.features.devices.info.pm.DeviceInfoPm
 import com.elta.android.presentation.features.diary.flow.pm.DiaryFlowPm
 import com.elta.android.presentation.features.diary.main.pm.MainDiaryPm
 import com.elta.android.presentation.features.feedback.pm.FeedbackPm
 import com.elta.android.presentation.features.greeting.pm.GreetingPm
 import com.elta.android.presentation.features.home.pm.HomeFlowPm
+import com.elta.android.presentation.features.home.pm.HomeFlowPmVariantA
 import com.elta.android.presentation.features.main.events.chooser.pm.EventsOptionsChooserPm
 import com.elta.android.presentation.features.main.events.create.pm.EventCreationPm
 import com.elta.android.presentation.features.main.events.edit.pm.EditEventPm
@@ -41,6 +44,7 @@ import com.elta.android.presentation.features.registration.activation.pm.Activat
 import com.elta.android.presentation.features.registration.confirmation.pm.EmailConfirmationPm
 import com.elta.android.presentation.features.registration.flow.pm.RegistrationFlowPm
 import com.elta.android.presentation.features.registration.main.pm.RegistrationMainPm
+import com.elta.android.presentation.features.registration.main.variantA.pm.RegistrationMainPmVariantA
 import com.elta.android.presentation.features.registration.policy.pm.RegistrationPrivacyPolicyPm
 import com.elta.android.presentation.features.shops.flow.pm.ShopsFlowPm
 import com.elta.android.presentation.features.shops.map.pm.ShopsMapPm
@@ -49,7 +53,9 @@ import com.elta.android.presentation.features.statistic.flow.pm.StatisticFlowPm
 import com.elta.android.presentation.features.statistic.period.pm.PeriodPm
 import com.elta.android.presentation.features.statistic.report.pm.ReportPeriodChooserPm
 import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnBoardingConnectDevicePm
+import com.elta.android.presentation.features.sync.connect.onboarding.pm.FromOnBoardingConnectDevicePmVariantA
 import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePm
+import com.elta.android.presentation.features.sync.connect.other.pm.FromOtherConnectDevicePmVariantA
 import com.elta.android.presentation.features.sync.flow.onboarding.pm.FromOnBoardingSyncFlowPm
 import com.elta.android.presentation.features.sync.flow.other.pm.FromOtherSyncFlowPm
 import com.elta.android.presentation.features.sync.pin.pm.PinDialogPm
@@ -91,6 +97,11 @@ abstract class PmModule {
 
     @Binds
     @IntoMap
+    @PmKey(RegistrationMainPmVariantA::class)
+    abstract fun bindRegistrationMainPmVariantA(pm: RegistrationMainPmVariantA): PresentationModel
+
+    @Binds
+    @IntoMap
     @PmKey(GreetingPm::class)
     abstract fun bindGreetingPm(pm: GreetingPm): PresentationModel
 
@@ -114,6 +125,12 @@ abstract class PmModule {
     @IntoMap
     @PmKey(LoginPm::class)
     abstract fun bindLoginPm(pm: LoginPm): PresentationModel
+
+    // fixme Variant A : recovery_account
+    @Binds
+    @IntoMap
+    @PmKey(LoginPmVariantA::class)
+    abstract fun bindLoginPmVariantA(pm: LoginPmVariantA): PresentationModel
 
     @Binds
     @IntoMap
@@ -150,6 +167,11 @@ abstract class PmModule {
     @IntoMap
     @PmKey(HomeFlowPm::class)
     abstract fun bindHomeFlowPm(pm: HomeFlowPm): PresentationModel
+
+    @Binds
+    @IntoMap
+    @PmKey(HomeFlowPmVariantA::class)
+    abstract fun bindHomeFlowPmVariantA(pm: HomeFlowPmVariantA): PresentationModel
 
     @Binds
     @IntoMap
@@ -212,10 +234,22 @@ abstract class PmModule {
     @PmKey(FromOnBoardingConnectDevicePm::class)
     abstract fun bindFromOnBoardingConnectDevicePm(pm: FromOnBoardingConnectDevicePm): PresentationModel
 
+    // fixme Variant A : improved_enabling_location
+    @Binds
+    @IntoMap
+    @PmKey(FromOnBoardingConnectDevicePmVariantA::class)
+    abstract fun bindFromOnBoardingConnectDevicePmVariantA(pm: FromOnBoardingConnectDevicePmVariantA): PresentationModel
+
     @Binds
     @IntoMap
     @PmKey(FromOtherConnectDevicePm::class)
     abstract fun bindFromOtherConnectDevicePm(pm: FromOtherConnectDevicePm): PresentationModel
+
+    // fixme Variant A : improved_enabling_location
+    @Binds
+    @IntoMap
+    @PmKey(FromOtherConnectDevicePmVariantA::class)
+    abstract fun bindFromOtherConnectDevicePmVariantA(pm: FromOtherConnectDevicePmVariantA): PresentationModel
 
     // DIARY FLOW
     @Binds
@@ -283,6 +317,12 @@ abstract class PmModule {
     @IntoMap
     @PmKey(FirmwarePm::class)
     abstract fun bindFirmwarePm(pm: FirmwarePm): PresentationModel
+
+    // fixme Variant A : improved_enabling_location
+    @Binds
+    @IntoMap
+    @PmKey(FirmwarePmVariantA::class)
+    abstract fun bindFirmwarePmVariantA(pm: FirmwarePmVariantA): PresentationModel
 
     @Binds
     @IntoMap

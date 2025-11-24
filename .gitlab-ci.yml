@@ -1,4 +1,4 @@
-image: jangrewe/gitlab-ci-android
+image: mirror.gcr.io/jangrewe/gitlab-ci-android
 
 cache:
   key: ${CI_PROJECT_ID}
@@ -48,7 +48,7 @@ debug-test:
     branch: master
 
 deploy-debug:
-  image: node:latest
+  image: mirror.gcr.io/library/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-debug$/'
@@ -64,6 +64,7 @@ deploy-debug:
       if [ "$CI_JOB_STATUS" == "success" ]; then
         TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
         curl -X POST -H 'Content-type: application/json' --data "{
+                  \"channel\": \"eltaltd-original-builds-prj\",
                   \"text\": \"*Собран билд:* $CI_COMMIT_TAG\n*Инициатор сборки билда:* $GITLAB_USER_NAME\n*Release Notes:* $TAG_MESSAGE\n*Детали билда:* <$CI_JOB_URL|ссылка>\",
                   \"mrkdwn\": true
                 }" $CHANNEL_WEB_HOOK;
@@ -104,6 +105,23 @@ release-app-bundle-manual:
     - ./gradlew bundleRelease
     - mv app/build/outputs/bundle/release/app-release.aab $CI_COMMIT_TAG.aab
 
+huawei-manual:
+  stage: build
+  when: manual
+  only:
+    - /-release$/
+  tags:
+    - android,docker
+  artifacts:
+    when: on_success
+    expire_in: 1 week
+    paths:
+      - $CI_COMMIT_TAG-huawei.apk
+  script:
+    - ./gradlew clean
+    - ./gradlew assembleHuawei
+    - mv app/build/outputs/apk/huawei/app-universal-huawei.apk $CI_COMMIT_TAG-huawei.apk
+
 
 release-test:
   stage: test
@@ -118,7 +136,7 @@ release-test:
     branch: master
 
 deploy-release:
-  image: node:latest
+  image: mirror.gcr.io/library/node:latest
   stage: deploy
   rules:
     - if: '$CI_COMMIT_TAG  =~ /-release$/'
@@ -134,6 +152,7 @@ deploy-release:
         if [ "$CI_JOB_STATUS" == "success" ]; then
           TAG_MESSAGE=$(git tag -l --format='%(contents)' $CI_COMMIT_TAG)
           curl -X POST -H 'Content-type: application/json' --data "{
+                    \"channel\": \"eltaltd-original-builds-prj\",
                     \"text\": \"*Собран билд:* $CI_COMMIT_TAG\n*Инициатор сборки билда:* $GITLAB_USER_NAME\n*Release Notes:* $TAG_MESSAGE\n*Детали билда:* <$CI_JOB_URL|ссылка>\",
                     \"mrkdwn\": true
                   }" $CHANNEL_WEB_HOOK;

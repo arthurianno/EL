@@ -94,7 +94,7 @@ class SingleSubscriberRelay<T> private constructor() : Relay<T>() {
 
         fun onNext(t: T) {
             if (!get()) {
-                actual.onNext(t)
+                t?.let { actual.onNext(it) }
             }
         }
 

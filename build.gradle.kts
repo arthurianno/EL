@@ -8,9 +8,11 @@ buildscript {
         maven(url = "https://plugins.gradle.org/m2/")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         maven(url = "https://oss.sonatype.org/content/repositories/releases")
+        maven(url = "https://developer.huawei.com/repo/")
     }
     dependencies {
         classpath("com.android.tools.build:gradle:${Dependencies.gradleVersion}")
+        classpath("com.huawei.agconnect:agcp:1.9.1.301")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Kotlin.version}")
         classpath("com.google.gms:google-services:${Dependencies.Google.Services.servicesVersion}")
         classpath("com.google.firebase:firebase-plugins:${Dependencies.Google.FireBase.pluginVersion}")

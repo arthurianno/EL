@@ -2,9 +2,8 @@ package com.elta.android.presentation.features.sync.connect
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -15,16 +14,15 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
-import com.elta.android.presentation.core.compose.common.PermissionEvent
 import com.elta.android.presentation.core.compose.widgets.HSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
@@ -32,25 +30,23 @@ import com.elta.android.presentation.core.compose.widgets.VSpacerSmall
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBar
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButton
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialog
-import com.elta.android.presentation.features.sync.connect.model.ConnectAction
+import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectAction
+import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectEvent
 import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModel
 import com.elta.android.presentation.features.sync.connect.widgets.BluetoothString
 import com.elta.android.presentation.features.sync.connect.widgets.MainImage
 import com.elta.android.presentation.features.sync.connect.widgets.TextNumericItem
-import com.elta.android.presentation.features.sync.control.enableLocation
+import com.elta.android.presentation.features.sync.control.checkBluetoothSelfPermission
+import com.elta.android.presentation.features.sync.control.checkSelfPermissionByName
+import com.elta.android.presentation.features.sync.control.requestEnableBluetooth
+import com.elta.android.presentation.features.sync.control.requestEnableLocation
 import com.elta.android.presentation.theme.GetLocalProperties
 import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.flow.collectLatest
 
-private val requiredPermissions = listOf(
-    Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.BLUETOOTH_SCAN,
-    Manifest.permission.BLUETOOTH_CONNECT
-)
-
+@ExperimentalCameraProviderConfiguration
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     companion object {
         fun newInstance(isOnBoarding: Boolean) = HowToConnectFragment().apply {
@@ -98,21 +94,65 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     override fun Content(viewModel: HowToConnectViewModel) {
-        val permissions =
-            rememberMultiplePermissionsState(permissions = requiredPermissions)
-        val event = viewModel.event.collectAsState(initial = null).value
-        LaunchedEffect(key1 = event) {
-            when (event) {
-                is PermissionEvent.RequestPermissions -> permissions.launchMultiplePermissionRequest()
-                is PermissionEvent.OpenSettings -> openSettingsIntent(requireContext())
-                is PermissionEvent.Bluetooth.RequestEnable -> requestEnableBluetooth()
-                is PermissionEvent.Bluetooth.OnAllow -> {
-                    viewModel sendAction ConnectAction.OpenConnectingScreen
+        val context = LocalContext.current
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.event.collectLatest {
+                when (it) {
+                    is HowToConnectEvent.OpenSettings -> openSettingsIntent(requireContext())
+                    is HowToConnectEvent.Bluetooth.Enable -> bluetoothResultLauncher.requestEnableBluetooth()
+                    is HowToConnectEvent.RequestCameraPermission ->
+                        context.checkSelfPermissionByName(
+                            permissionName = Manifest.permission.CAMERA,
+                            onRequestPermission = { permissionName ->
+                                viewModel sendAction HowToConnectAction.Camera.AppearPermission
+                                cameraPermissionLauncher.launch(permissionName)
+                            },
+                            showPermissionRationale = {
+                                viewModel sendAction HowToConnectAction.Camera.ShowPermissionRationale
+                            },
+                            onGranted = {
+                                viewModel sendAction HowToConnectAction.Camera.AllowPermission(isAlreadyGranted = true)
+                            }
+                        )
+                    is HowToConnectEvent.Bluetooth.RequestPermission ->
+                        context.checkBluetoothSelfPermission(
+                            onRequestPermission = {
+                                viewModel sendAction HowToConnectAction.Bluetooth.AppearPermission
+                                bluetoothPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.BLUETOOTH_SCAN,
+                                        Manifest.permission.BLUETOOTH_CONNECT
+                                    )
+                                )
+                            },
+                            showPermissionRationale = {
+                                viewModel sendAction  HowToConnectAction.Bluetooth.ShowPermissionRationale
+                            },
+                            onGranted = {
+                                viewModel sendAction HowToConnectAction.Bluetooth.AllowPermission(isAlreadyGranted = true)
+                            }
+                        )
+                    is HowToConnectEvent.Location.RequestPermission ->
+                        context.checkSelfPermissionByName(
+                            permissionName = Manifest.permission.ACCESS_FINE_LOCATION,
+                            onRequestPermission = { permissionName ->
+                                viewModel sendAction HowToConnectAction.Location.AppearPermission
+                                locationPermissionLauncher.launch(permissionName)
+                            },
+                            showPermissionRationale = {
+                                viewModel sendAction HowToConnectAction.Location.ShowPermissionRationale
+                            },
+                            onGranted = {
+                                viewModel sendAction HowToConnectAction.Location.AllowPermission(isAlreadyGranted = true)
+                            },
+                        )
+
+                    is HowToConnectEvent.Location.Enable ->
+                        locationEnableResultLauncher.requestEnableLocation(context) {
+                            viewModel sendAction HowToConnectAction.Location.Enabled
+                        }
                 }
-                is PermissionEvent.RequestEnableLocation ->
-                    enableLocation(this@HowToConnectFragment) {
-                        requestEnableBluetooth()
-                    }
             }
         }
         GetLocalProperties { dimens, _, colors, _, _ ->
@@ -128,7 +168,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                 VSpacer(dimens.bigDim)
                 DownButton(
                     widgetModel = viewModel.downButton,
-                    onClickAction = ConnectAction.CheckPermissionsState(permissions.permissions)
+                    onClickAction = HowToConnectAction.OnConnectButtonClick
                 )
             }
         }
@@ -184,17 +224,46 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
         }
     }
 
-    private fun requestEnableBluetooth() {
-        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        resultLauncher.launch(intent)
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            viewModel sendAction HowToConnectAction.Camera.AllowPermission(isAlreadyGranted = false)
+        }
     }
 
-    private val resultLauncher = registerForActivityResult(
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            viewModel sendAction HowToConnectAction.Location.AllowPermission(isAlreadyGranted = false)
+        }
+    }
+
+    private val locationEnableResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                viewModel sendAction HowToConnectAction.Location.Enabled
+            }
+        }
+    }
+
+    private val bluetoothPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsMap ->
+        if (permissionsMap.all { it.value }) {
+            viewModel sendAction HowToConnectAction.Bluetooth.AllowPermission(isAlreadyGranted = false)
+        }
+    }
+
+    private val bluetoothResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val connectAction = when (result.resultCode) {
-            Activity.RESULT_OK -> ConnectAction.Complete
-            else -> ConnectAction.RepeatConnect
+            Activity.RESULT_OK -> HowToConnectAction.Bluetooth.Enabled
+            else -> HowToConnectAction.Bluetooth.Rejected
         }
         viewModel sendAction connectAction
     }

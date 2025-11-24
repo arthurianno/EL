@@ -86,7 +86,7 @@ fun ByteArray.toHexDecimalString() = StringBuffer().apply {
     this@toHexDecimalString.forEach {
         append(String.format("%02X", it))
     }
-}.toString().toLowerCase()
+}.toString().lowercase()
 
 /**
  * Decode hex [String] to original [String]

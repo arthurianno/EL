@@ -8,7 +8,7 @@ import com.elta.android.common.errors.NotFoundItemError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.common.dto.StateDto
-import com.elta.android.data.features.common.storage.FileStorage
+import com.elta.android.data.features.files.storage.FileStorageImpl
 import com.elta.android.data.features.diary.events.datasource.EventsDataSource
 import com.elta.android.data.features.diary.events.datasource.cache.EventsCacheDataSource
 import com.elta.android.data.features.diary.events.dto.EventTypeDto
@@ -22,13 +22,14 @@ import com.elta.android.data.features.sync.manger.LocalSyncManager
 import com.elta.android.domain.features.devices.model.GlucometerEvent
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
-import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
+import com.elta.android.domain.features.diary.medicines.model.MedicamentInsulinType
 import com.elta.android.domain.features.diary.medicines.repository.InsulinMedicamentRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.rx2.await
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class EventsDataRepository @Inject constructor(
     @Cache private val cacheSource: EventsCacheDataSource,
     private val insulinMedicamentRepository: InsulinMedicamentRepository,
     private val syncManager: LocalSyncManager,
-    private val fileStorage: FileStorage,
+    private val fileStorage: FileStorageImpl,
     private val eventsFromGlucometerMapper: Mapper<GlucometerEvent, EventV2>,
     private val crashlyticsReport: CrashlyticsReport
 ) : EventsRepository {
@@ -124,9 +125,9 @@ class EventsDataRepository @Inject constructor(
             remoteSource.addEventsSuspend(mappedEvents)
             crashlyticsReport.log("Saving measurements to remote storage is completed")
         } catch (e: Exception) {
+            crashlyticsReport.log("Saving measurements to remote storage is failed")
             crashlyticsReport.writeException(e)
-            syncManager.saveAsCreated(events)
-            throw e
+            syncManager.saveAsCreated(events).await()
         }
     }
 
@@ -224,7 +225,7 @@ class EventsDataRepository @Inject constructor(
 
     override fun getShareEventUri(sharingInfo: GlucoseSharingInfo): Single<Uri> =
         Single.fromCallable {
-            fileStorage.getFile(
+            fileStorage.getImageFile(
                 fileName = buildFileName(sharingInfo),
                 directoryName = EVENTS_DIR_NAME
             )

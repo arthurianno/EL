@@ -3,6 +3,7 @@ package com.elta.android.data.features.reports.datasource
 import android.net.Uri
 import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.data.features.reports.api.ReportsApi
+import com.elta.android.data.features.reports.dto.ReportNetworkRequest
 import com.elta.android.data.features.reports.dto.TokenDto
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import io.reactivex.Single
@@ -20,9 +21,11 @@ class ReportsRemoteDataSource @Inject constructor(
         glucoseFormat: GlucoseFormat
     ): Single<TokenDto> =
         reportsApi.getReportToken(
-            startDate = startDate.toStringWithFormat(DATE_PATTERN),
-            endDate = endDate.toStringWithFormat(DATE_PATTERN),
-            glucoseFormat = glucoseFormat.name
+            ReportNetworkRequest(
+                startDate = startDate.toStringWithFormat(DATE_PATTERN),
+                endDate = endDate.toStringWithFormat(DATE_PATTERN),
+                glucoseFormat = glucoseFormat.name
+            )
         )
 
     override fun downloadReport(token: String, fileName: String): Single<Uri> =

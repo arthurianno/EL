@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elta.android.domain.features.multiLang.entities.ScreenConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -43,12 +45,14 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     override fun ConnectStartViewModel.init() {
         appTopBar.setEndIconAction(ConnectAction.SkipNextStep)
         appTopBar.setStartIconAction(AppAction.BackPressure)
-
-        downButton.setText(getString(R.string.sync_state_pin_dialog_button))
+        // Текст кнопки устанавливается в ViewModel
     }
 
     @Composable
     override fun Content(viewModel: ConnectStartViewModel) {
+        val state = viewModel.state.collectAsState()
+        val screenConfig = state.value.screenConfig
+
         GetLocalProperties { dimens, _, colors, _, _ ->
             Column(
                 modifier = Modifier
@@ -58,17 +62,17 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
             ) {
                 TopAppBar(viewModel)
                 MainImage(imageId = R.drawable.ic_connect_dev)
-                Title()
+                Title(screenConfig)
                 VSpacerSmall()
-                Body()
+                Body(screenConfig)
                 VSpacer(height = dimens.bigDim)
-                DownButton(widgetModel = viewModel.downButton)
+                DownButton(widgetModel = viewModel.downButton) // Текст кнопки берется из ViewModel
             }
         }
     }
 
     @Composable
-    private fun Body() {
+    private fun Body(screenConfig: ScreenConfig?) {
         GetLocalProperties { dimens, _, colors, _, _ ->
             Text(
                 text = stringResource(id = R.string.sync_connect_start_text),
@@ -79,7 +83,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     }
 
     @Composable
-    private fun Title() {
+    private fun Title(screenConfig: ScreenConfig?) {
         GetLocalProperties { dimens, _, _, _, types ->
             Text(
                 text = stringResource(id = R.string.sync_connect_start_title),
@@ -93,7 +97,7 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     fun TopAppBar(viewModel: ConnectStartViewModel) {
         val state = viewModel.state.collectAsState()
         val isOnboarding = state.value.isOnBoarding
-        
+
         val endTextId = if (isOnboarding) R.string.sync_start_menu_button_text else null
         val startIconId = if (!isOnboarding) R.drawable.ic_dialog_close else null
 
@@ -107,13 +111,10 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
             )
         }
     }
-}
 
-@Preview
-@Composable
-private fun PreviewContent() {
-    val viewModel = ConnectStartViewModel().apply {
-        downButton.setText(stringResource(id = R.string.sync_connect_start_title))
+    @Preview
+    @Composable
+    private fun PreviewContent() {
+        Content(viewModel = viewModel())
     }
-    ConnectStartFragment().Content(viewModel = viewModel)
 }

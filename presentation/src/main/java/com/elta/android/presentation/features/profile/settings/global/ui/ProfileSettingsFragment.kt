@@ -19,23 +19,29 @@ import com.elta.android.presentation.features.googlefit.openGoogleFitIntent
 import com.elta.android.presentation.features.profile.settings.global.pm.ProfileSettingsPm
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.ProfileSettingsAdapter
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
+import com.elta.android.presentation.utils.showDatePickerDialog
 import com.elta.android.presentation.widgets.decoration.SettingsMarginItemDecoration
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.fragments.showDialog
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
+import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 class ProfileSettingsFragment :
     BaseRecyclerViewFragment<ProfileSettingsPm, FragmentProfileSettingsBinding>(
         FragmentProfileSettingsBinding::inflate
     ) {
+    companion object {
+        fun newInstance() = ProfileSettingsFragment()
+    }
+
     @Inject
     lateinit var profileSettingsAdapter: ProfileSettingsAdapter
-
     override val screenLayout: Int = R.layout.fragment_profile_settings
     override val classToken: Class<ProfileSettingsPm> = ProfileSettingsPm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
+
     override val adapter: ListAdapter<ListItem, RecyclerView.ViewHolder> by lazy { profileSettingsAdapter }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,19 +67,34 @@ class ProfileSettingsFragment :
             )
         }
         pm.profileDeleteDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
-        pm.copyTokenCommand.bindTo{ copyToClipboard(it) }
+        pm.copyTokenCommand.bindTo { copyToClipboard(it) }
         pm.downloadGoogleFitCommand.bindTo { requireContext().openGoogleFitInStoreIntent() }
         pm.openGoogleFitCommand.bindTo { requireContext().openGoogleFitIntent() }
-    }
+        pm.emiasErrorDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.datePickerExitDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
 
-    companion object {
-        fun newInstance() = ProfileSettingsFragment()
+        pm.showDatePickerDialog.bindTo { originalDate ->
+            activity.showDatePickerDialog(
+                date = originalDate,
+                minDate = LocalDate.parse(MIN_DATE_OF_BIRTH_DATE),
+                maxDate = LocalDate.now(),
+                onDateSelectedFunction = {
+                    pm.dateTimeSelectedAction.consumer.accept(it)
+                },
+                onCancelPickerFunction = { selectedDate ->
+                    pm.datePickerCloseAction.consumer.accept(selectedDate)
+                }
+            )
+        }
     }
 
     private fun copyToClipboard(message: String) {
-        val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboardManager =
+            requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("TOKEN", message)
         clipboardManager.setPrimaryClip(clip)
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }
+
+private const val MIN_DATE_OF_BIRTH_DATE = "1900-01-01"

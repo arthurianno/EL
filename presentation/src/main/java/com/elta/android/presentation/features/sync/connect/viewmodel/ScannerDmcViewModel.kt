@@ -6,10 +6,13 @@ import androidx.compose.ui.unit.DpSize
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.elta.android.domain.features.devices.interactor.GetGlucometersUseCase
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.core.Analytics
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.analytics.Analytics
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
@@ -22,13 +25,16 @@ import com.elta.android.presentation.features.sync.connect.model.ScannerDmcViewS
 import com.elta.android.presentation.features.sync.connect.model.ScannerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 
 private const val SCANNER_ERROR_SHOWING_DELAY_MILLIS = 1000L
 private const val CLOSE_TIMER_DELAY_MILLIS = 60000L
 
 class ScannerDmcViewModel @Inject constructor(
-    private val analytics: Analytics
+    private val getGlucometersUseCase: GetGlucometersUseCase,
+    private val analytics: Analytics,
+    private val appMetric: AppMetricTracker
 ) : BaseViewModel<ScannerDmcViewState>(), LifecycleEventObserver {
     override fun createInitState(): ScannerDmcViewState =
         ScannerDmcViewState(
@@ -49,6 +55,10 @@ class ScannerDmcViewModel @Inject constructor(
         appTopBar
     ).actionObserve()
 
+    init {
+        appMetric.trackEvent(AppMetricEvent.CameraScanningScreen)
+    }
+
     override fun handleFragmentArguments(arguments: Bundle) {
         reduceState {
             state.value.copy(
@@ -63,8 +73,8 @@ class ScannerDmcViewModel @Inject constructor(
         when (action) {
             is ConnectAction.ConnectByPin -> connectByPin()
             is AppAction.BackPressure -> backClick()
-            is ConnectAction.StartConnecting -> startConnecting(action.pin, action.name)
-            is ConnectAction.ScannerError -> setScannerError()
+            is ConnectAction.OnDmcReceived -> launch { startConnecting(action.pin, action.name) }
+            is ConnectAction.ScannerError -> setScannerError(ScannerState.Error)
         }
     }
 
@@ -88,11 +98,11 @@ class ScannerDmcViewModel @Inject constructor(
         reduceState { state.value.copy(cropRect = cropRect) }
     }
 
-    private fun setScannerError() {
+    private fun setScannerError(errorState: ScannerState) {
         if (scannerJob == null || scannerJob?.isCancelled == true) {
             restartCloseTime()
             scannerJob = launch {
-                reduceState { state.value.copy(scannerState = ScannerState.Error) }
+                reduceState { state.value.copy(scannerState = errorState) }
                 delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
                 reduceState { state.value.copy(scannerState = ScannerState.Info) }
                 delay(SCANNER_ERROR_SHOWING_DELAY_MILLIS)
@@ -102,8 +112,15 @@ class ScannerDmcViewModel @Inject constructor(
         }
     }
 
-    private fun startConnecting(pin: String, name: String) {
-        router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))
+    private suspend fun startConnecting(pin: String, name: String) {
+        val connectedGlucometers = getGlucometersUseCase.execute()
+            .await()
+            .map { it.first.name }
+        if (connectedGlucometers.contains(name)) {
+            setScannerError(ScannerState.AlreadyConnected)
+        } else {
+            router.navigateTo(Screens.ConnectingScreen(state.value.isOnBoarding, pin, name))
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

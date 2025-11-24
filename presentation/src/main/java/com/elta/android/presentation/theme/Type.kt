@@ -14,7 +14,7 @@ private val appBaseFontLight = FontFamily(Font(R.font.roboto_light))
 
 private val title1 = TextStyle(
     fontFamily = appBaseFontBold,
-    fontSize = 15.sp
+    fontSize = 18.sp
 )
 
 private val title2 = TextStyle(

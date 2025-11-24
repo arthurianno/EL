@@ -23,6 +23,12 @@ sealed class SyncStatus : Status {
             override val text: String = resources.getString(R.string.sync_with_glucometer_error),
             override val color: Int = resources.getColor(R.color.color_background_sync_error)
         ) : SyncStatus()
+
+        data class NoNewEvents(
+            val resources: ResourceProvider,
+            override val text: String = resources.getString(R.string.sync_with_glucometer_no_new_events),
+            override val color: Int = resources.getColor(R.color.black)
+        ) : SyncStatus()
     }
 
     sealed class Server : SyncStatus() {
@@ -54,6 +60,12 @@ sealed class SyncStatus : Status {
     data class Email(
         val resources: ResourceProvider,
         override val text: String = resources.getString(R.string.error_verify_your_email),
+        override val color: Int = resources.getColor(R.color.black)
+    ) : SyncStatus()
+
+    data class NetworkProblemTryLater(
+        val resources: ResourceProvider,
+        override val text: String = resources.getString(R.string.error_network_try_later),
         override val color: Int = resources.getColor(R.color.black)
     ) : SyncStatus()
 

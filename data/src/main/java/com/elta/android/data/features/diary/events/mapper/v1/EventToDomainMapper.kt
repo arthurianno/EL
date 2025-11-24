@@ -18,7 +18,7 @@ class EventToDomainMapper @Inject constructor() : Mapper<EventDto, Event> {
         with(source) {
             Event(
                 id = id,
-                type = data.type.toEventType(data.value),
+                type = data.type.toEventType(data.value, data.inputType),
                 additionTime = additionTime.toIsoDate(),
                 tagId = tagId,
                 tag = null,

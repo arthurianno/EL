@@ -7,22 +7,29 @@ import com.elta.android.common.di.qualifires.Token
 import com.elta.android.data.common.api.PersonalDataApi
 import com.elta.android.data.common.api.PersonalDataMockedApi
 import com.elta.android.data.features.auth.api.AuthApi
+import com.elta.android.data.features.auth.api.AuthApiVariantA
 import com.elta.android.data.features.auth.api.SocialApi
 import com.elta.android.data.features.auth.api.TokenRefreshApi
-import com.elta.android.data.features.calculator.api.ProductApi
-import com.elta.android.data.features.calculator.api.ProductMockedApi
 import com.elta.android.data.features.calculator.api.FatSecretApi
 import com.elta.android.data.features.calculator.api.FatSecretTokenApi
-import com.elta.android.data.features.diary.events.api.MockedEventsApi
+import com.elta.android.data.features.calculator.api.ProductApi
+import com.elta.android.data.features.calculator.api.ProductMockedApi
 import com.elta.android.data.features.diary.events.api.EventsV2Api
+import com.elta.android.data.features.diary.events.api.MockedEventsApi
 import com.elta.android.data.features.diary.medicines.api.MedicinesApi
 import com.elta.android.data.features.diary.medicines.api.MockMedicinesApi
 import com.elta.android.data.features.diary.tags.api.MockedTagsApi
 import com.elta.android.data.features.diary.tags.api.TagsApi
+import com.elta.android.data.features.emias.api.EmiasApi
+import com.elta.android.data.features.emias.api.EmiasMockedApi
 import com.elta.android.data.features.feedback.api.FeedbackApi
 import com.elta.android.data.features.feedback.api.MockedFeedbackApi
 import com.elta.android.data.features.firmware.api.FirmwareApi
 import com.elta.android.data.features.firmware.api.MockedFirmwareApi
+import com.elta.android.data.features.glucometers.api.GlucometersApi
+import com.elta.android.data.features.multiLang.api.ConfigApi
+import com.elta.android.data.features.multiLang.api.MockedConfigApi
+import com.elta.android.data.features.newsChannel.datasource.NewsApi
 import com.elta.android.data.features.observers.api.MockedObserverApi
 import com.elta.android.data.features.observers.api.ObserverApi
 import com.elta.android.data.features.reports.api.MockedReportsApi
@@ -49,7 +56,9 @@ private const val USE_MOCKED_REPORTS_API = false
 private const val USE_MOCKED_MEDICINES_API = false
 private const val USE_MOCKED_PRODUCT_API = false
 private const val USE_MOCKED_PERSONAL_DATA_API = true
+private const val USE_MOCKED_EMIAS_API = false
 private const val USE_MOCKED_VERSION_API = false
+private const val USE_MOCKED_CONFIG_API = true
 
 @Module
 @Suppress("FunctionOnlyReturningConstant", "TooManyFunctions")
@@ -60,6 +69,19 @@ class ApiModule {
     fun provideAuthApi(
         retrofit: Retrofit
     ): AuthApi = retrofit.create(AuthApi::class.java)
+
+    // fixme Variant A : recovery_account
+    @Provides
+    @Singleton
+    fun provideAuthApiVariantA(
+        retrofit: Retrofit
+    ): AuthApiVariantA = retrofit.create(AuthApiVariantA::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNewsApi(
+        retrofit: Retrofit
+    ): NewsApi = retrofit.create(NewsApi::class.java)
 
     @Provides
     @Singleton
@@ -127,6 +149,18 @@ class ApiModule {
             MockedTagsApi(context)
         } else {
             retrofit.create(TagsApi::class.java)
+        }
+
+
+    @Provides
+    @Singleton
+    fun provideConfigApi(
+        retrofit: Retrofit
+    ): ConfigApi =
+        if (USE_MOCKED_CONFIG_API) {
+            MockedConfigApi()
+        } else {
+            retrofit.create(ConfigApi::class.java)
         }
 
     @Provides
@@ -219,5 +253,22 @@ class ApiModule {
             MockedVersionApi()
         } else {
             retrofit.create(VersionApi::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideGlucometersApi(
+        retrofit: Retrofit
+    ): GlucometersApi = retrofit.create(GlucometersApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEmiasApi(
+        retrofit: Retrofit
+    ): EmiasApi =
+        if (USE_MOCKED_EMIAS_API) {
+            EmiasMockedApi()
+        } else {
+            retrofit.create(EmiasApi::class.java)
         }
 }

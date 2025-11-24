@@ -16,7 +16,7 @@ import retrofit2.http.Query
 
 interface ObserverApi {
 
-    @GET("api/share/v1/observers/invites")
+    @GET("api/share/v1/observers")
     fun getObserverInvites(
         @Query("pageIndex") page: Int,
         @Query("pageSize") pageSize: Int

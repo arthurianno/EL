@@ -5,7 +5,11 @@ import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideEmail
-import com.elta.android.domain.features.rostech.RosTechUseCase
+import com.elta.android.domain.common.usecase.CleanupCachedFilesUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.FetchRemoteConfigUseCase
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
+import com.elta.android.domain.features.rostech.interactor.RosTechUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.interactor.GetUserIdUseCase
 import com.elta.android.domain.features.user.model.ExitFromApp
 import com.elta.android.domain.features.userinfo.interactor.GetProfileSettingsUseCase
@@ -16,9 +20,12 @@ import com.elta.android.domain.features.version.model.VersionStatus
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEvent
-import com.elta.android.presentation.analytics.model.AnalyticsEventParam
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventParam
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.params.SnackStatusParam
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
@@ -31,6 +38,8 @@ import com.elta.android.presentation.widgets.status.Status
 import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
 import io.reactivex.Observable
+import io.reactivex.Single
+import kotlinx.coroutines.rx2.asObservable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
@@ -43,14 +52,26 @@ private const val STATUS_DELAY_MILLIS = 2000L
 
 class AppPm @Inject constructor(
     private val getUserInfo: GetUserInfoUseCase,
+    private val getProfile: GetProfileUseCase,
     private val getProfileSettings: GetProfileSettingsUseCase,
     private val getUserId: GetUserIdUseCase,
     private val checkAppVersion: CheckAppVersionUseCase,
+    private val cleanupFiles: CleanupCachedFilesUseCase,
     private val firebaseStorage: FirebaseStorage,
     private val crashlyticsReport: CrashlyticsReport,
+    private val fetchRemoteConfigUseCase: FetchRemoteConfigUseCase,
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     private val rosTech: RosTechUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
+
+    /**
+     * Так как диплинки выключены, то используем свой механизм диплинков
+     * с помощью интента и навигации
+     */
+    val consultantDeepLinkAction = action<Unit>()
+    val newsDeepLinkAction = action<Unit>()
 
     val coldStartAction = action<Unit>()
     val notificationStartAction = action<Uri>()
@@ -58,6 +79,8 @@ class AppPm @Inject constructor(
     val coldStartDeepLinkAction = action<Uri>()
     val onStopAction = action<String>()
     private val checkAppVersionAction = action<Unit>()
+    private val cleanupFilesAction = action<Unit>()
+    private val fetchRemoteConfigAction = action<Unit>()
 
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
@@ -87,7 +110,6 @@ class AppPm @Inject constructor(
                     }
                     .doOnSuccess { info ->
                         when {
-
                             info.first.isUserLoggedIn != true ->
                                 router.newRootFlow(Screens.GreetingFlow)
 
@@ -98,7 +120,14 @@ class AppPm @Inject constructor(
                                 )
 
                             !info.second -> router.newRootFlow(Screens.OnBoardingFlow)
-                            else -> router.newRootFlow(Screens.HomeFlow)
+                            else -> {
+                                // fixme Variant A : improved_enabling_location
+
+                                val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                                val screen = if (improvedEnablingLocation) Screens.HomeFlow
+                                else Screens.HomeFlowVariantA
+                                router.newRootFlow(screen)
+                            }
                         }
                     }
                     .doOnError(::handleError)
@@ -126,6 +155,7 @@ class AppPm @Inject constructor(
                                 setStatusVisibility(Visibility.Hide)
                                 router.newRootFlow(Screens.ForcedUpdateScreen)
                             }
+
                             else -> {}
                         }
                     }
@@ -135,15 +165,75 @@ class AppPm @Inject constructor(
             .subscribe()
             .untilDestroy()
 
+        cleanupFilesAction.observable
+            .flatMapSingle { Single.fromCallable { cleanupFiles() } }
+            .subscribe()
+            .untilDestroy()
+        fetchRemoteConfigAction.observable
+            .flatMapCompletable {
+                fetchRemoteConfigUseCase.execute()
+            }
+            .subscribe()
+            .untilDestroy()
         deepLinkAction.observable
-            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
+            // fixme Variant A : improved_enabling_location
+            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it,getFeatureConfigUseCase.invoke().improvedEnablingLocation) }
             .doOnNext { router.navigateTo(it as Screen) }
             .subscribe()
             .untilDestroy()
 
         coldStartDeepLinkAction.observable
-            .map { DynamicLinkNavigationMapper.deepLinkToScreen(it) }
+            .map { DynamicLinkNavigationMapper.deepLinkToScreen(
+                it,
+                // fixme Variant A : improved_enabling_location
+                getFeatureConfigUseCase.invoke().improvedEnablingLocation
+            ) }
             .doOnNext { router.newRootChain(Screens.GreetingFlow, it as Screen) }
+            .subscribe()
+            .untilDestroy()
+
+        consultantDeepLinkAction.observable
+            .concatMapSingle {
+                Single.zip(
+                    getUserId.execute(),
+                    getProfile().asObservable().firstOrError()
+                ) { id, profile ->
+                    id to "${profile.firstName} ${profile.secondName}"
+                }
+            }
+            .doOnNext { (id, userName) ->
+                val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                val homeScreen = if (improvedEnablingLocation) Screens.HomeFlow
+                else Screens.HomeFlowVariantA
+                router.newRootChain(
+                    homeScreen,
+                    Screens.Support,
+                    Screens.ConsultantScreen(id, userName)
+                )
+            }
+            .doOnError(::handleError)
+            .subscribe()
+            .untilDestroy()
+
+        newsDeepLinkAction.observable
+            .flatMapSingle {
+                getUserInfo.execute()
+                    .map { userInfo -> userInfo.isUserLoggedIn }
+            }
+            .doOnNext { isLoggedIn ->
+                if (isLoggedIn == true) {
+                    val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+                    val homeScreen = if (improvedEnablingLocation) Screens.HomeFlow
+                    else Screens.HomeFlowVariantA
+                    router.newRootChain(
+                        homeScreen,
+                        Screens.NewsScreen
+                    )
+                } else {
+                    router.newRootChain(Screens.GreetingFlow, Screens.AuthFlow)
+                }
+            }
+            .doOnError(::handleError)
             .subscribe()
             .untilDestroy()
 
@@ -179,13 +269,15 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
-            .map { }
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.AppStart) }
             .trackEvent(AnalyticsEventType.APP_LAUNCH)
             .subscribe()
             .untilDestroy()
 
         lifecycleObservable.filter { it == Lifecycle.CREATED }
             .map { }
+            .doOnNext(cleanupFilesAction.consumer)
+            .doOnNext(fetchRemoteConfigAction.consumer)
             .doOnNext(checkAppVersionAction.consumer)
             .subscribe()
             .untilDestroy()
@@ -207,6 +299,9 @@ class AppPm @Inject constructor(
                 when (it) {
                     is Events.Sync.Glucometer.Error -> setStatusVisibility(Visibility.Hide)
                     is Events.Sync.Glucometer.ErrorWithMessage -> {
+                        appMetric.trackEvent(
+                            AppMetricEvent.SnackSynchronization(SnackStatusParam.SYNCHRONIZATION_ERROR)
+                        )
                         setStatus(SyncStatus.Glucometer.Error(resources))
                         setStatusVisibility(Visibility.Show)
                         setStatusVisibility(Visibility.HideWithDelay)
@@ -218,7 +313,13 @@ class AppPm @Inject constructor(
                     }
 
                     is Events.Sync.Glucometer.Success -> {
+                        appMetric.trackEvent(AppMetricEvent.SnackSynchronization(SnackStatusParam.SUCCESS))
                         setStatus(SyncStatus.Glucometer.Success(resources))
+                        setStatusVisibility(Visibility.HideWithDelay)
+                    }
+
+                    is Events.Sync.Glucometer.NoNewEvents -> {
+                        setStatus(SyncStatus.Glucometer.NoNewEvents(resources))
                         setStatusVisibility(Visibility.HideWithDelay)
                     }
 
@@ -252,8 +353,18 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         bus.events<Events.EmailNotConfirmed>()
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.ProfileVerificationError) }
             .doOnNext {
                 setStatus(SyncStatus.Email(resources))
+                setStatusVisibility(Visibility.Show)
+                setStatusVisibility(Visibility.HideWithDelay)
+            }
+            .subscribe()
+            .untilDestroy()
+
+        bus.events<Events.NetworkProblemTryLater>()
+            .doOnNext {
+                setStatus(SyncStatus.NetworkProblemTryLater(resources))
                 setStatusVisibility(Visibility.Show)
                 setStatusVisibility(Visibility.HideWithDelay)
             }
@@ -290,7 +401,7 @@ class AppPm @Inject constructor(
 
     private fun handleNotification(pair: Pair<Uri, UserInfo>) {
         if (pair.second.isUserLoggedIn == true) {
-            NotificationNavigationMapper.notificationDataToScreen(pair.first)?.let {
+            NotificationNavigationMapper.notificationDataToScreen(pair.first, getFeatureConfigUseCase.invoke().improvedEnablingLocation)?.let {
                 router.newRootScreen(it)
             }
         } else {

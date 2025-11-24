@@ -1,0 +1,527 @@
+package com.elta.android.presentation.features.sync.connect.base.pm
+
+import android.os.Build
+import com.elta.android.common.constants.GLUCOMETER_MODEL
+import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
+import com.elta.android.common.errors.BluetoothScannerError
+import com.elta.android.common.errors.CommandError
+import com.elta.android.common.errors.GlucometerAlreadyConnectedError
+import com.elta.android.common.errors.GlucometerConnectionException
+import com.elta.android.common.errors.GlucometerOfflineError
+import com.elta.android.common.errors.GlucometerPinIncorrect
+import com.elta.android.common.errors.GlucometerSyncError
+import com.elta.android.common.errors.LocationNotEnabledErrorVariantA
+import com.elta.android.common.errors.LocationPermissionNotGrantedErrorVariantA
+import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCaseVariantA
+import com.elta.android.domain.features.devices.interactor.CheckConnectedDevicesUseCase
+import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCaseVariantA
+import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCaseVariantA
+import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
+import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.presentation.Clicks
+import com.elta.android.presentation.Dialogs
+import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
+import com.elta.android.presentation.analytic.model.appmetric.models.AlertType
+import com.elta.android.presentation.analytic.model.appmetric.params.SynchronizedStatusParam
+import com.elta.android.presentation.analytic.model.appmetric.params.TurningResultParam
+import com.elta.android.presentation.core.bus.clicks
+import com.elta.android.presentation.core.bus.event
+import com.elta.android.presentation.core.bus.events
+import com.elta.android.presentation.core.pm.BaseListPm
+import com.elta.android.presentation.core.pm.ServiceFacade
+import com.elta.android.presentation.core.pm.widgets.snackBarControl
+import com.elta.android.presentation.core.ui.dialog.DialogData
+import com.elta.android.presentation.core.ui.dialog.DialogResult
+import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
+import com.elta.android.presentation.features.sync.connect.base.ui.adapter.items.DeviceItem
+import com.elta.android.presentation.features.sync.control.bluetoothControl
+import com.elta.android.presentation.features.sync.control.handlePermissionResult
+import com.elta.android.presentation.features.sync.control.isBluetoothName
+import com.elta.android.presentation.messages.SnackBarMessageData
+import com.nullgr.core.rx.bindProgress
+import io.reactivex.Observable
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.skipWhileInProgress
+import me.dmdev.rxpm.state
+import me.dmdev.rxpm.widget.dialogControl
+import java.util.concurrent.TimeoutException
+
+abstract class ConnectDevicePmVariantA constructor(
+    private val syncWithGlucometer: SyncWithGlucometerUseCaseVariantA,
+    private val connectDevice: AddNewDeviceUseCaseVariantA,
+    private val findGlucometers: FindGlucometersUseCaseVariantA,
+    private val checkConnectedDevices: CheckConnectedDevicesUseCase,
+    private val updateUserInfo: UpdateUserInfoUseCase,
+    private val appMetric: AppMetricTracker,
+    services: ServiceFacade
+) : BaseListPm(services) {
+
+    val skipAction = action<Unit>()
+    val backHandleAction = action<Unit>()
+
+    val connectDeviceAction = action<Unit>()
+    val connectDeviceEnabledState = state(false)
+
+    val startScanAction = action<Unit>()
+    val toAppAction = action<Unit>()
+
+    val openPinCodeDialogCommand = command<String>(bufferSize = 1)
+
+    val connectState = state(ViewState.HOW_TO_CONNECT)
+
+    val btControl = bluetoothControl()
+
+    val retryPinControl = snackBarControl<SnackBarData>()
+    val retryConnectControl = snackBarControl<SnackBarData>()
+
+    private val scanResults = mutableSetOf<Glucometer>()
+    private var glucometer: Glucometer? = null
+
+    val startSyncAction = action<Unit>()
+    private val syncProgressState = state(false)
+
+    private val settingsLocationDialogData: DialogData by lazy {
+        Dialogs.SettingsLocationDialogData(resources)
+    }
+    private val settingsBluetoothDialogData: DialogData by lazy {
+        Dialogs.SettingsBluetoothDialogData(resources)
+    }
+    private val deviceAlreadyConnectedDialogData: DialogData by lazy {
+        Dialogs.DeviceAlreadyConnectedDialogData(resources)
+    }
+
+    val settingsDialog = dialogControl<DialogData, DialogResult>()
+    val settingsIsVisible = state(false)
+    val openSettingsCloseAction = action<Unit>()
+    val showHomeButtonCommand = command<Unit>()
+    val hideHomeButtonCommand = command<Unit>()
+
+    val deviceAlreadyConnectedDialog = dialogControl<DialogData, DialogResult>()
+
+    private val incorrectPinCode: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            message = resources.getString(R.string.sync_connect_incorrect_pin_code),
+            button = resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
+
+    private val connectError: SnackBarData by lazy {
+        SnackBarMessageData.WithButton(
+            message = resources.getString(R.string.sync_connect_connect_error),
+            button = resources.getString(R.string.sync_connect_button_retry)
+        )
+    }
+
+    private val showRetryPinAction = action<Unit>()
+    private val showRetryConnectAction = action<Unit>()
+
+    private val internalConnectDeviceAction = action<Unit>()
+    private val pinState = state<String>()
+
+    protected abstract fun navigateToApp(i: Unit)
+
+    override fun onCreate() {
+        super.onCreate()
+        bindActions()
+        bindRetryActions()
+        bindClicksAndEvents()
+        bindAnalytics()
+        bindPermissionAction()
+
+        Observable.merge(
+            btControl.bluetoothDeniedAction.observable,
+            btControl.locationDeniedAction.observable
+        )
+            .subscribe { connectState.consumer.accept(ViewState.HOW_TO_CONNECT) }
+            .untilDestroy()
+
+        Observable.merge(
+            btControl.bluetoothEnabledAction.observable,
+            btControl.locationEnabledAction.observable
+        )
+            .subscribe(startScanAction.consumer)
+            .untilDestroy()
+
+
+        openSettingsCloseAction.observable
+            .subscribe { settingsIsVisible.accept(false) }
+            .untilDestroy()
+    }
+
+    override fun handleError(error: Throwable) {
+        when (error) {
+            is BluetoothNotEnabledErrorVariantA -> {
+                appMetric.trackEvent(AppMetricEvent.BluetoothTurningAlert)
+                btControl.requestEnableBluetoothCommand.consumer.accept(Unit)
+            }
+
+            is LocationPermissionNotGrantedErrorVariantA -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    btControl.requestBluetoothPermissionCommand.consumer.accept(Unit)
+                    appMetric.trackEvent(AppMetricEvent.Permission.Alert.Bluetooth)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    btControl.requestCombinedPermissionsCommand.consumer.accept(Unit)
+                    listOf(
+                        AppMetricEvent.Permission.Alert.Location,
+                        AppMetricEvent.Permission.Alert.Bluetooth
+                    )
+                        .forEach { appMetric.trackEvent(it) }
+                } else {
+                    btControl.requestLocationPermissionsCommand.consumer.accept(Unit)
+                    appMetric.trackEvent(AppMetricEvent.Permission.Alert.Location)
+                }
+            }
+
+            is GlucometerAlreadyConnectedError ->
+                showDeviceAlreadyConnectedDialog()
+
+            is LocationNotEnabledErrorVariantA ->
+                btControl.requestEnableLocationCommand.consumer.accept(Unit)
+
+            is CommandError, is BluetoothScannerError -> {
+                connectState.consumer.accept(ViewState.SYNC_ERROR)
+            }
+
+            is GlucometerConnectionException -> {
+                showRetryConnectAction.consumer.accept(Unit)
+            }
+
+            is GlucometerSyncError -> {
+                if (error.cause is TimeoutException) {
+                    connectState.consumer.accept(ViewState.NOT_FOUND)
+                } else {
+                    val syncState = if (items.valueOrNull.isNullOrEmpty()) {
+                        ViewState.NOT_FOUND
+                    } else {
+                        ViewState.SYNC_ERROR
+                    }
+                    connectState.consumer.accept(syncState)
+                }
+
+            }
+
+            is GlucometerPinIncorrect -> showRetryPinAction.consumer.accept(Unit)
+            is GlucometerOfflineError -> showRetryConnectAction.consumer.accept(Unit)
+            else -> {
+                connectState.consumer.accept(ViewState.SYNC_ERROR)
+                super.handleError(error)
+            }
+        }
+    }
+
+    private fun bindActions() {
+        bindStartScanAction()
+        bindStartSyncAction()
+
+        skipAction.observable
+            .subscribe(::navigateToShopsFlow)
+            .untilDestroy()
+
+        connectDeviceAction.observable
+            .skipWhileInProgress()
+            .debounceAction()
+            .map { CheckConnectedDevicesUseCase.Params(glucometer?.address) }
+            .flatMap { params ->
+                checkConnectedDevices.execute(params)
+                    .bindProgress()
+            }
+            .doOnError(::handleError)
+            .doOnNext { isAlreadyConnected ->
+                when (isAlreadyConnected) {
+                    true -> showDeviceAlreadyConnectedDialog()
+
+                    else -> openPinCodeDialogCommand.consumer.accept(
+                        glucometer?.name ?: GLUCOMETER_MODEL
+                    )
+                }
+            }
+            .subscribe()
+            .untilDestroy()
+
+        internalConnectDeviceAction.observable
+            .skipWhileInProgress()
+            .filter { glucometer != null && pinState.hasValue() }
+            .map { AddNewDeviceUseCaseVariantA.Params(checkNotNull(glucometer), pinState.value) }
+            .flatMapCompletable { params ->
+                connectDevice.execute(params)
+                    .bindProgress()
+                    .doOnComplete {
+                        startSyncAction.consumer.accept(Unit)
+                        connectState.consumer.accept(ViewState.CONNECTED)
+                    }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+
+        toAppAction.observable
+            .flatMapSingle {
+                updateUserInfo.execute(UpdateUserInfoUseCase.Params(UserInfo(isFirstSync = true)))
+                    .toSingleDefault(Unit)
+            }
+            .subscribe(::navigateToApp)
+
+        backHandleAction.observable
+            .doOnNext(::handleBack)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindStartScanAction() {
+        startScanAction.observable
+            .flatMap {
+                findGlucometers.execute()
+                    .takeUntil(backHandleAction.observable)
+                    .doOnSubscribe {
+                        connectState.consumer.accept(ViewState.SEARCH)
+                    }
+                    .doOnNext(::handleSearchResults)
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindStartSyncAction() {
+        startSyncAction.observable
+            .doOnNext { connectState.consumer.accept(ViewState.CONNECTED) }
+            .skipWhileInProgress(syncProgressState.observable)
+            .filter { glucometer != null }
+            .map { SyncWithGlucometerUseCaseVariantA.Params(glucometer) }
+            .flatMap { params ->
+                syncWithGlucometer.execute(params)
+                    .bindProgress(syncProgressState.consumer)
+                    .doOnNext { events ->
+                        if (events > 0) bus.event(Events.EventsChanged(true))
+                    }
+                    .doOnComplete { connectState.consumer.accept(ViewState.SYNC_COMPLETED) }
+                    .doOnError(::handleError)
+            }
+            .retry()
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindRetryActions() {
+
+        showRetryPinAction.observable
+            .switchMapMaybe {
+                retryPinControl.showForResult(incorrectPinCode)
+            }
+            .subscribe(connectDeviceAction.consumer)
+            .untilDestroy()
+
+        showRetryConnectAction.observable
+            .switchMapMaybe {
+                retryConnectControl.showForResult(connectError)
+            }
+            .subscribe(internalConnectDeviceAction.consumer)
+            .untilDestroy()
+    }
+
+    private fun bindClicksAndEvents() {
+        bus.events<Events.PinCodeEntered>()
+            .map(Events.PinCodeEntered::pin)
+            .doOnNext(pinState.consumer)
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.DeviceConnectClick) }
+            .map { }
+            .subscribe(internalConnectDeviceAction.consumer)
+            .untilDestroy()
+
+        bus.clicks<Clicks.DeviceClicked>()
+            .doOnNext { appMetric.trackEvent(AppMetricEvent.SelectedDeviceConnectClick) }
+            .doOnNext { click ->
+                glucometer =
+                    scanResults.firstOrNull { it.address == click.item.address && !click.item.isSelected }
+                val prevItems = (items.value as List<*>).map { it as DeviceItem }
+                val newItems = prevItems.mapIndexed { index, item ->
+                    item.copy(
+                        isSelected = item.address == click.item.address && !item.isSelected,
+                        isLast = index == prevItems.size - 1
+                    )
+                }
+                items.consumer.accept(newItems)
+                connectDeviceEnabledState.consumer.accept(
+                    isValidDeviceChoice(prevItems = prevItems, newItems = newItems)
+                )
+            }
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun bindPermissionAction() {
+        Observable.merge(
+            btControl.locationPermissionsGrantedAction.observable,
+            btControl.bluetoothPermissionsGrantedAction.observable
+        )
+            .subscribe { permission ->
+                val (dialogData, alertType) =
+                    if (permission.name.isBluetoothName()) settingsBluetoothDialogData to AlertType.Bluetooth
+                    else settingsLocationDialogData to AlertType.Location
+
+                appMetric.trackEvent(permission.getMetricName(alertType))
+                permission.handlePermissionResult(
+                    onPermissionGranted = {
+                        startScanAction.consumer.accept(Unit)
+                    },
+                    shouldShowPermissionRationale = {
+                        showSettingDialog(dialogData)
+                    },
+                    onPermissionDenied = {
+                        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+                    }
+                )
+            }
+            .untilDestroy()
+    }
+
+    private fun showDeviceAlreadyConnectedDialog() {
+        deviceAlreadyConnectedDialog.showForResult(deviceAlreadyConnectedDialogData)
+            .subscribe()
+            .untilDestroy()
+    }
+
+    private fun handleBack(i: Unit) {
+        when (connectState.valueOrNull) {
+            ViewState.SYNC_COMPLETED,
+            ViewState.SYNC_ERROR -> toAppAction.consumer.accept(i)
+
+            ViewState.NOT_FOUND,
+            ViewState.CONNECTED,
+            ViewState.SEARCH -> connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+
+            ViewState.FOUND -> {
+                items.consumer.accept(emptyList())
+                connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+            }
+
+            else -> router.exit()
+        }
+    }
+
+    private fun isValidDeviceChoice(
+        prevItems: List<DeviceItem>,
+        newItems: List<DeviceItem>
+    ) = glucometer != null ||
+            isDevicesEquals(
+                prevItems = prevItems,
+                newItems = newItems
+            )
+
+    private fun isDevicesEquals(
+        prevItems: List<DeviceItem>,
+        newItems: List<DeviceItem>
+    ) = prevItems.map { it.address to it.isSelected } ==
+            newItems.map { it.address to it.isSelected }
+
+    private fun navigateToShopsFlow(i: Unit) {
+        // todo: SalepointHide
+        // скрываем точки продаж пока пока не примем решение что с ними делать
+//        router.newRootFlow(Screens.ShopsFlow)
+    }
+
+    private fun handleSearchResults(results: List<Glucometer>) {
+        if (results.isNotEmpty()) {
+            connectState.consumer.accept(ViewState.FOUND)
+        }
+        scanResults.clear()
+        scanResults.addAll(results)
+        items.consumer.accept(
+            results.mapIndexed { index, meter ->
+                mapToDeviceItem(meter, results.size, index)
+            }
+        )
+    }
+
+    private fun mapToDeviceItem(meter: Glucometer, size: Int, index: Int): DeviceItem =
+        DeviceItem(
+            id = meter.id,
+            name = meter.name ?: "Unknown device",
+            address = meter.address,
+            isSelected = meter.address == glucometer?.address,
+            isLast = index == size - 1
+        )
+
+    private fun bindAnalytics() {
+        connectState.observable
+            .filter { it == ViewState.SYNC_COMPLETED }
+            .trackEvent(AnalyticsEventType.GLUCOMETER_SYNCH)
+            .doOnNext(::handleHomeButton)
+            .subscribe()
+            .untilDestroy()
+
+        connectState.observable
+            .filter {
+                it == ViewState.FOUND ||
+                        it == ViewState.CONNECTED ||
+                        it == ViewState.SYNC_COMPLETED ||
+                        it == ViewState.SYNC_ERROR
+            }
+            .subscribe { state ->
+                val eventName = when (state) {
+                    ViewState.FOUND -> AppMetricEvent.DevicesFoundScreen
+                    ViewState.CONNECTED -> AppMetricEvent.DeviceConnectedScreen
+                    ViewState.SYNC_COMPLETED ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.SUCCESS)
+
+                    ViewState.SYNC_ERROR ->
+                        AppMetricEvent.DeviceSynchronizedScreen(SynchronizedStatusParam.ERROR)
+
+                    else -> null
+                }
+                eventName?.let { appMetric.trackEvent(it) }
+            }
+
+        btControl.bluetoothDeniedAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.REJECT
+                    )
+                )
+            }
+            .untilDestroy()
+
+        btControl.bluetoothEnabledAction.observable
+            .subscribe {
+                appMetric.trackEvent(
+                    AppMetricEvent.BluetoothTurningAlertClick(
+                        TurningResultParam.ALLOW
+                    )
+                )
+            }
+            .untilDestroy()
+    }
+
+    private fun handleHomeButton(state: ViewState) {
+        if (state == ViewState.SYNC_COMPLETED) hideHomeButtonCommand.consumer.accept(Unit)
+        else showHomeButtonCommand.consumer.accept(Unit)
+    }
+
+    private fun showSettingDialog(dialogData: DialogData) {
+        connectState.consumer.accept(ViewState.HOW_TO_CONNECT)
+        settingsDialog.showForResult(dialogData)
+            .map { it == DialogResult.POSITIVE }
+            .subscribe(settingsIsVisible.consumer)
+            .untilDestroy()
+    }
+
+    enum class ViewState {
+        HOW_TO_CONNECT,
+        SEARCH,
+        FOUND,
+        CONNECTED,
+        SYNC_COMPLETED,
+        SYNC_ERROR,
+        NOT_FOUND
+    }
+}

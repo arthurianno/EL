@@ -2,6 +2,7 @@ package com.elta.android.data.features.appsettings
 
 import com.elta.android.data.features.common.storage.DbSyncStorage
 import com.elta.android.data.features.common.storage.PreferencesHolder
+import com.elta.android.data.features.remoteconfig.datasource.RemoteConfigManager
 import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.appsettings.model.BackendVariant
 import io.reactivex.Completable
@@ -23,4 +24,15 @@ class AppSettingsDataRepository @Inject constructor(
         }
 
     override fun deleteDbFiles(): Completable = syncStorage.deleteDbFiles()
+
+    override var shouldManualGlucoseDialogShow: Boolean
+        get() = preferencesHolder.manualGlucoseRemind
+        set(value) {
+            preferencesHolder.manualGlucoseRemind = value
+        }
+    override var isLocationNeeded: Boolean
+        get() = preferencesHolder.isLocationNeeded
+        set(value) {
+            preferencesHolder.isLocationNeeded = value
+        }
 }

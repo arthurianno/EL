@@ -9,7 +9,7 @@ class GitTag private constructor(
     val buildType: String
 ) {
     companion object {
-        const val TAG_REGEX = "v(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)[-.](debug|release)"
+        const val TAG_REGEX = "v(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)[-.](debug|release|huawei)"
         const val DEFAULT = "v1.0.0.1-debug"
         fun fromString(string: String): GitTag {
             val matcher = Pattern.compile(TAG_REGEX).matcher(string)

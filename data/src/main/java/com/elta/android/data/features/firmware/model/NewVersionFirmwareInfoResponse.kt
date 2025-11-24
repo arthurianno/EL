@@ -6,5 +6,6 @@ data class NewVersionFirmwareInfoResponse(
     @SerializedName("id") val id: String,
     @SerializedName("version") val version: String,
     @SerializedName("size") val size: Int,
-    @SerializedName("hash") val hash: String
+    @SerializedName("hash") val hash: String,
+    @SerializedName("dfuMode") val dfuMode: String
 )

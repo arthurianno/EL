@@ -3,15 +3,17 @@ package com.elta.android.presentation.di
 import com.elta.android.common.di.scope.FragmentScope
 import com.elta.android.presentation.features.auth.flow.ui.AuthFlowFragment
 import com.elta.android.presentation.features.auth.login.ui.LoginFragment
+import com.elta.android.presentation.features.auth.login.ui.LoginFragmentVariantA
 import com.elta.android.presentation.features.auth.password.create.ui.AuthPasswordCreateFragment
 import com.elta.android.presentation.features.auth.password.recovery.ui.AuthPasswordRecoveryFragment
 import com.elta.android.presentation.features.calcutator.custom.CreateCustomProductFragment
-import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.custom.CustomProductsFragment
+import com.elta.android.presentation.features.calcutator.products.CalculatorFragment
 import com.elta.android.presentation.features.calcutator.products.DishDetailFragment
-import com.elta.android.presentation.features.consultant.ConsultantFragment
+import com.elta.android.presentation.features.consultant.ui.ConsultantFragment
 import com.elta.android.presentation.features.devices.all.ui.DevicesFragment
 import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragment
+import com.elta.android.presentation.features.devices.firmware.ui.FirmwareFragmentVariantA
 import com.elta.android.presentation.features.devices.info.ui.DeviceInfoFragment
 import com.elta.android.presentation.features.devices.search.GlucometerSearchFragment
 import com.elta.android.presentation.features.diary.flow.ui.DiaryFlowFragment
@@ -20,6 +22,7 @@ import com.elta.android.presentation.features.diary.main.ui.MainDiaryFragment
 import com.elta.android.presentation.features.feedback.ui.FeedbackFragment
 import com.elta.android.presentation.features.greeting.ui.GreetingFlowFragment
 import com.elta.android.presentation.features.home.ui.HomeFlowFragment
+import com.elta.android.presentation.features.home.ui.HomeFlowFragmentVariantA
 import com.elta.android.presentation.features.main.events.chooser.ui.EventsOptionsChooserFragment
 import com.elta.android.presentation.features.main.events.create.ui.EventCreationFragment
 import com.elta.android.presentation.features.main.events.edit.ui.EditEventFragment
@@ -28,6 +31,7 @@ import com.elta.android.presentation.features.main.events.selector.ui.EventSelec
 import com.elta.android.presentation.features.main.flow.ui.MainFlowFragment
 import com.elta.android.presentation.features.main.records.di.MainRecordsModule
 import com.elta.android.presentation.features.main.records.ui.MainRecordsFragment
+import com.elta.android.presentation.features.newsChannel.FragmentNewsChannel
 import com.elta.android.presentation.features.observers.all.ui.ObserversFragment
 import com.elta.android.presentation.features.observers.edit.ui.EditObserverFragment
 import com.elta.android.presentation.features.observers.invite.ui.InviteObserverFragment
@@ -37,6 +41,7 @@ import com.elta.android.presentation.features.profile.main.ui.MainProfileFragmen
 import com.elta.android.presentation.features.profile.settings.dialogs.diabetes.ui.DiabetesSettingDialogFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.ui.GlucoseSettingFragment
 import com.elta.android.presentation.features.profile.settings.dialogs.hemoglobin.ui.HemoglobinSettingsFragment
+import com.elta.android.presentation.features.profile.settings.emias.ui.EmiasProfileFragment
 import com.elta.android.presentation.features.profile.settings.gender.ui.ProfileSetGenderFragment
 import com.elta.android.presentation.features.profile.settings.global.ui.ProfileSettingsFragment
 import com.elta.android.presentation.features.profile.settings.glucoseformat.GlucoseFormatFragment
@@ -50,6 +55,7 @@ import com.elta.android.presentation.features.registration.activation.ui.Activat
 import com.elta.android.presentation.features.registration.confirmation.ui.EmailConfirmationFragment
 import com.elta.android.presentation.features.registration.flow.ui.RegistrationFlowFragment
 import com.elta.android.presentation.features.registration.main.ui.RegistrationMainFragment
+import com.elta.android.presentation.features.registration.main.variantA.ui.RegistrationMainFragmentVariantA
 import com.elta.android.presentation.features.registration.policy.ui.RegistrationPrivacyPolicyFragment
 import com.elta.android.presentation.features.shops.flow.ui.ShopsFlowFragment
 import com.elta.android.presentation.features.shops.map.ui.ShopsMapFragment
@@ -62,10 +68,15 @@ import com.elta.android.presentation.features.sync.connect.ConnectHelpFragment
 import com.elta.android.presentation.features.sync.connect.ConnectStartFragment
 import com.elta.android.presentation.features.sync.connect.ConnectTypeFragment
 import com.elta.android.presentation.features.sync.connect.ConnectingFragment
+import com.elta.android.presentation.features.sync.connect.ConnectingFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.HowToConnectFragment
+import com.elta.android.presentation.features.sync.connect.HowToConnectFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.ScannerDmcFragment
+import com.elta.android.presentation.features.sync.connect.ScannerDmcFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.onboarding.ui.FromOnBoardingConnectDeviceByPinFragmentVariantA
 import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragment
+import com.elta.android.presentation.features.sync.connect.other.ui.FromOtherConnectDeviceByPinFragmentVariantA
 import com.elta.android.presentation.features.sync.flow.onboarding.ui.FromOnBoardingSyncFlowFragment
 import com.elta.android.presentation.features.sync.flow.other.ui.FromOtherSyncFlowFragment
 import com.elta.android.presentation.features.sync.pin.ui.PinDialogFragment
@@ -97,6 +108,16 @@ abstract class FragmentBuilder {
     @ContributesAndroidInjector
     abstract fun bindRegistrationMainFragment(): RegistrationMainFragment
 
+    // fixme Variant A : recovery_account
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindRegistrationMainFragmentVariantA(): RegistrationMainFragmentVariantA
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindNewsFragment(): FragmentNewsChannel
+
+
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindRegistrationPrivacyPolicyFragment(): RegistrationPrivacyPolicyFragment
@@ -117,6 +138,11 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindLoginFragment(): LoginFragment
+
+    // fixme Variant A : recovery_account
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindLoginFragmentVariantA(): LoginFragmentVariantA
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -143,6 +169,11 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindHomeFlowFragment(): HomeFlowFragment
+
+    // fixme Variant A : improved_enabling_location
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindHomeFlowFragmentVariantA(): HomeFlowFragmentVariantA
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -197,6 +228,15 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindFromOnBoardingConnectDeviceByPinFragment(): FromOnBoardingConnectDeviceByPinFragment
+
+    // fixme Variant A : improved_enabling_location
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOnBoardingConnectDeviceByPinFragmentVariantA(): FromOnBoardingConnectDeviceByPinFragmentVariantA
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFromOtherConnectDeviceByPinFragmentVariantA(): FromOtherConnectDeviceByPinFragmentVariantA
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -255,6 +295,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindFirmwareFragment(): FirmwareFragment
+    // fixme Variant A : improved_enabling_location
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindFirmwareFragmentVariantA(): FirmwareFragmentVariantA
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -283,6 +327,10 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindProfileSetGenderFragment(): ProfileSetGenderFragment
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindEmiasProfileFragment(): EmiasProfileFragment
 
     @FragmentScope
     @ContributesAndroidInjector
@@ -337,6 +385,20 @@ abstract class FragmentBuilder {
     @FragmentScope
     @ContributesAndroidInjector
     abstract fun bindHowToConnectFragment(): HowToConnectFragment
+
+    // fixme Variant A : improved_enabling_location
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindHowToConnectFragmentVariantA(): HowToConnectFragmentVariantA
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindScannerDmcFragmentVariantA(): ScannerDmcFragmentVariantA
+
+    @FragmentScope
+    @ContributesAndroidInjector
+    abstract fun bindConnectingFragmentVariantA(): ConnectingFragmentVariantA
 
     @FragmentScope
     @ContributesAndroidInjector

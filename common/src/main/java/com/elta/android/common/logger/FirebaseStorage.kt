@@ -14,7 +14,6 @@ import com.google.firebase.storage.ktx.storage
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.Date
 import java.util.Locale
 

@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.main.records.mapper
 import android.graphics.drawable.Drawable
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.common.utils.toStringWithFormat
+import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelDirection
 import com.elta.android.domain.features.diary.home.model.HomeModel
@@ -46,8 +47,12 @@ class MainRecordsMapper @Inject constructor(
             glucoseLevel = lastGlucoseEvent?.value.format(),
             glucoseLevelIndex = glucoseLevelDifference.format(),
             glucoseLevelIndexIcon = this.glucoseLevelDirection?.icon(),
-            breadLevel = lastFoodEvent?.value.format(),
-            insulinLevel = lastInsulinEvent?.value.format(),
+            breadLevel = eventsBlocks
+                .flatMap { it.events }  // Все события из всех блоков
+                .filter { it.type is EventType.Bread }  // Только "Еда"
+                .sumOf { it.value ?: 0.0 }  // Сумма value (ХЕ)
+                .format(),  // Форматирование
+            insulinLevel = lastInsulinEvent?.value.format(),  // Если для инсулина тоже нужна сумма — аналогично измени
             glucoseFormat = glucoseFormat,
             calculatorFlow = calculatorFlow
         )

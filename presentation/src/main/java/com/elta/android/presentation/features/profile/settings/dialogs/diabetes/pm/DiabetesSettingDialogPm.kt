@@ -4,7 +4,10 @@ import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Events
-import com.elta.android.presentation.analytics.updateStableParam
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.getMetricAttributes
+import com.elta.android.presentation.analytic.getMetricName
+import com.elta.android.presentation.analytic.updateStableParam
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.settings.dialogs.base.pm.BaseSettingsDialogPm
@@ -14,6 +17,7 @@ import javax.inject.Inject
 
 class DiabetesSettingDialogPm @Inject constructor(
     private val getProfileUseCase: GetUpdatedProfileUseCase,
+    private val appMetric: AppMetricTracker,
     services: ServiceFacade
 ) : BaseSettingsDialogPm(services) {
 
@@ -44,6 +48,8 @@ class DiabetesSettingDialogPm @Inject constructor(
         mainAction.observable
             .debounceAction()
             .map(::updateProfile)
+            .doOnNext { appMetric.setProfileAttributes(it.getMetricAttributes()) }
+            .doOnNext { appMetric.trackEvent(selectedDiabetesState.value.getMetricName()) }
             .doOnNext { updateStableParam(profile = it) }
             .doOnNext { bus.event(Events.ProfileChanged(it)) }
             .doOnNext { closeDialogCommand.consumer.accept(Unit) }
@@ -64,7 +70,7 @@ class DiabetesSettingDialogPm @Inject constructor(
 
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+            .map { }
             .subscribe(loadScreeAction.consumer)
             .untilDestroy()
     }

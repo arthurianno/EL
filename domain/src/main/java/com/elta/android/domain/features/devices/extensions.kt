@@ -1,6 +1,7 @@
 package com.elta.android.domain.features.devices
 
 import com.elta.android.common.errors.BluetoothNotEnabledError
+import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
 import com.elta.android.common.errors.GlucometerSyncError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
@@ -11,15 +12,27 @@ import com.elta.android.domain.features.devices.repository.DeviceRepository
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import java.util.concurrent.TimeoutException
-import kotlin.jvm.Throws
 
 const val CONNECT_TIMEOUT: Long = 60_000
 const val SEND_DATA_TIMEOUT: Long = 120_000
 const val COMMAND_TIMEOUT = 30_000L
-@Throws(LocationPermissionNotGrantedError::class, BluetoothNotEnabledError::class, LocationNotEnabledError::class)
-fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport: CrashlyticsReport?) {
+
+@Throws(
+    LocationPermissionNotGrantedError::class,
+    BluetoothPermissionNotGrantedError::class,
+    BluetoothNotEnabledError::class,
+    LocationNotEnabledError::class
+)
+fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+    isLocationNeeded: Boolean = false,
+    crashlyticsReport: CrashlyticsReport?
+) {
     when {
-        !isPermissionGranted() -> {
+        !isBluetoothPermissionGranted() -> {
+            crashlyticsReport?.writeException(BluetoothPermissionNotGrantedError)
+            throw BluetoothPermissionNotGrantedError
+        }
+        !isLocationPermissionGranted() && isLocationNeeded -> {
             crashlyticsReport?.writeException(LocationPermissionNotGrantedError)
             throw LocationPermissionNotGrantedError
         }
@@ -27,7 +40,7 @@ fun BluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlytic
             crashlyticsReport?.writeException(BluetoothNotEnabledError)
             throw BluetoothNotEnabledError
         }
-        !isLocationEnabledPre34Api() -> {
+        !isLocationEnabled() && isLocationNeeded -> {
             crashlyticsReport?.writeException(LocationNotEnabledError)
             throw  LocationNotEnabledError
         }
@@ -45,3 +58,6 @@ suspend fun DeviceRepository.connectWithTimeout(address: String, pinCode: String
         throw exception
     }
 }
+
+
+

@@ -12,15 +12,20 @@ import com.elta.android.presentation.features.calcutator.products.viewmodel.Dish
 import com.elta.android.presentation.features.consultant.viewmodel.ConsultantViewModel
 import com.elta.android.presentation.features.devices.search.viewmodel.GlucometerSearchViewModel
 import com.elta.android.presentation.features.main.events.selector.viewmodel.EventSelectorViewModel
+import com.elta.android.presentation.features.newsChannel.viewModel.NewsViewModel
 import com.elta.android.presentation.features.profile.settings.dialogs.glucose.viewmodels.GlucoseSettingViewModel
+import com.elta.android.presentation.features.profile.settings.emias.viewmodel.EmiasProfileViewModel
 import com.elta.android.presentation.features.profile.settings.glucoseformat.viewmodel.GlucoseFormatViewModel
 import com.elta.android.presentation.features.profile.settings.reminders.all.viewmodels.RemindersViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectHelpViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectStartViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectTypeViewModel
 import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ConnectingViewModelVariantA
 import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.HowToConnectViewModelVariantA
 import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModel
+import com.elta.android.presentation.features.sync.connect.viewmodel.ScannerDmcViewModelVariantA
 import com.elta.android.presentation.features.version.mandatory.viewmodel.MandatoryUpdateViewModel
 import dagger.Binds
 import dagger.Module
@@ -57,6 +62,12 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
+    @ViewModelKey(NewsViewModel::class)
+    abstract fun bindNewsViewModel(viewModel: NewsViewModel): ViewModel
+
+
+    @Binds
+    @IntoMap
     @ViewModelKey(GlucometerSearchViewModel::class)
     abstract fun bindGlucometerSearchViewModel(viewModel: GlucometerSearchViewModel): ViewModel
 
@@ -80,6 +91,23 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ConnectingViewModel::class)
     abstract fun bindConnectingViewModel(viewModel: ConnectingViewModel): ViewModel
+
+    // fixme Variant A : improved_enabling_location
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConnectingViewModelVariantA::class)
+    abstract fun bindConnectingViewModelVariantA(viewModel: ConnectingViewModelVariantA): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HowToConnectViewModelVariantA::class)
+    @ExperimentalCameraProviderConfiguration
+    abstract fun bindHowToConnectViewModelVariantA(viewModel: HowToConnectViewModelVariantA): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ScannerDmcViewModelVariantA::class)
+    abstract fun bindScannerDmcViewModelVariantA(viewModel: ScannerDmcViewModelVariantA): ViewModel
 
     @Binds
     @IntoMap
@@ -120,4 +148,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MandatoryUpdateViewModel::class)
     abstract fun bindMandatoryUpdateViewModel(viewModel: MandatoryUpdateViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(EmiasProfileViewModel::class)
+    abstract fun bindEmiasProfileViewModel(viewModel: EmiasProfileViewModel): ViewModel
 }

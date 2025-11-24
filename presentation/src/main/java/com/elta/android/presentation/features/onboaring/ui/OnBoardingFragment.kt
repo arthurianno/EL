@@ -4,12 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.core.ui.fragment.BaseRecyclerViewFragment
 import com.elta.android.presentation.core.ui.fragment.addOnBackPressedCallback
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
@@ -25,10 +27,9 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.text
 import com.nullgr.core.adapter.items.ListItem
 import com.nullgr.core.ui.extensions.hide
-import javax.inject.Inject
 import me.dmdev.rxpm.bindTo
-
-private const val DISABLE_DELAY = 300L
+import me.dmdev.rxpm.widget.bindTo
+import javax.inject.Inject
 
 @Suppress("LabeledExpression")
 class OnBoardingFragment :
@@ -45,6 +46,11 @@ class OnBoardingFragment :
     private val snapHelper = PagerSnapHelper()
 
     private var lastX: Float = 0F
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,6 +83,8 @@ class OnBoardingFragment :
         pm.toolbarMenuButtonIsVisibleState.observable.subscribe{ binding.toolbar.menuButtonView.isVisible = it }
         pm.previousPageVisibilityState.bindTo(binding.previewPageButtonView.fadeVisibility())
         pm.nextPageVisibilityState.bindTo(binding.nextPageButtonView.fadeVisibility())
+        pm.showDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+
         itemsView?.pageScrolled()?.bindTo(pm.pageChangedAction)
 
         binding.previewPageButtonView.clicks().bindTo(pm.previousPageAction)
@@ -91,6 +99,11 @@ class OnBoardingFragment :
         addOnBackPressedCallback {
             presentationModel.backHandleAction.consumer.accept(Unit)
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     companion object {

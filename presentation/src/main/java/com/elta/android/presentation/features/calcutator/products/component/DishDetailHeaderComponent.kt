@@ -30,14 +30,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.elta.android.domain.features.calculator.model.DishType
-import com.elta.android.presentation.R
-import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
-import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.presentation.features.calcutator.products.model.DishUiEntity
 import com.elta.android.presentation.features.calcutator.products.model.ServingUiEntity
+import com.elta.android.presentation.features.calcutator.products.viewmodel.NOTHING_DASH
+import com.elta.android.presentation.core.compose.widgets.HSpacerVerySmall
+import com.elta.android.presentation.core.compose.widgets.VSpacer
 import com.elta.android.presentation.theme.GetLocalProperties
-
+import com.elta.android.presentation.R
 
 @Composable
 fun MainHeader(
@@ -48,12 +48,13 @@ fun MainHeader(
     GetLocalProperties { dimens, brash, _, _, _ ->
         Column(
             modifier = Modifier
-                .padding(bottom = dimens.dishCardHeight - dimens.headerBottomDim)
+                .fillMaxWidth()
                 .background(brush = brash.dishHeader),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Top // Убедимся, что всё начинается сверху
         ) {
             HeaderTitle(dish, viewNameClickListener)
             if (calculatorFlow == CalculatorFlow.BREAD_UNITS) {
+                VSpacer(height = dimens.verySmallDim) // Добавим небольшой отступ перед хлебными единицами
                 BreadUnitsValue(dish)
             } else {
                 VSpacer(height = dimens.dishCardTextEndPadding)
@@ -67,16 +68,17 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
     GetLocalProperties { dimens, _, colors, shapes, types ->
         Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = dimens.contentPadding),
-            verticalArrangement = Arrangement.Bottom
+                .padding(horizontal = dimens.contentPadding)
+                .padding(top = dimens.contentPadding), // Отступ сверху для видимости
+            verticalArrangement = Arrangement.Top
         ) {
             var didOverflowHeight by remember { mutableStateOf(false) }
 
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Bottom
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Top
             ) {
                 if (dish.brandName.isNotEmpty()) {
                     Text(
@@ -90,9 +92,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     if (dish.isVerified) {
                         Image(
@@ -106,6 +106,7 @@ private fun ColumnScope.HeaderTitle(dish: DishUiEntity, viewNameClickListener: (
                         text = dish.name,
                         style = types.h1,
                         color = colors.white,
+                        maxLines = 4, // Достаточно строк для длинных названий
                         onTextLayout = { textLayoutResult ->
                             didOverflowHeight = textLayoutResult.didOverflowHeight
                         },
@@ -185,9 +186,9 @@ fun BreadUnitsValue(dish: DishUiEntity) {
     }
 }
 
-@Preview
+@Preview(device = "spec:width=720dp,height=1280dp,dpi=320")
 @Composable
-private fun PreviewContent() {
+private fun PreviewContentSmall() {
     val serving = ServingUiEntity(
         "r1",
         1,
@@ -221,4 +222,10 @@ private fun PreviewContent() {
             viewNameClickListener = { }
         )
     }
+}
+
+@Preview
+@Composable
+private fun PreviewContent() {
+    // ... (тот же код)
 }

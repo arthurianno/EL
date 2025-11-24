@@ -1,8 +1,10 @@
 package com.elta.android.data.features.devices.glucometer.client
 
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.os.Build
 import com.elta.android.common.errors.GlucometerConnectionException
 import com.elta.android.common.errors.GlucometerLowBatteryLevelError
 import com.elta.android.common.errors.GlucometerNotConnectedException
@@ -18,16 +20,17 @@ import com.elta.android.data.features.devices.glucometer.firmware.FirmwareManage
 import com.elta.android.data.features.devices.glucometer.service.isEmptyEvent
 import com.elta.android.data.features.devices.glucometer.service.isOk
 import com.elta.android.domain.features.devices.CONNECT_TIMEOUT
+import com.elta.android.domain.features.devices.repository.BluetoothStateRepository
 import com.elta.android.domain.features.firmware.model.FirmwareFile
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,10 +39,12 @@ import kotlin.coroutines.resumeWithException
 
 @Singleton
 class GlucometerClientImpl @Inject constructor(
-    private val environmentScanner: EnvironmentScanner,
     private val glucometerBleManager: GlucometerBleManager,
     private val firmwareManager: FirmwareManager,
-    private val crashlyticsReport: CrashlyticsReport
+    private val environmentScanner: EnvironmentScanner,
+    private val crashlyticsReport: CrashlyticsReport,
+    private val bluetoothAdapter: BluetoothAdapter,
+    private val bluetoothStateRep: BluetoothStateRepository
 ) : GlucometerClient {
 
     private val settings: ScanSettings = ScanSettings.Builder()
@@ -62,7 +67,7 @@ class GlucometerClientImpl @Inject constructor(
             .build()
     )
 
-    override suspend fun updateFirmware(
+    override suspend fun updateFirmwareWithNordicDfu(
         address: String,
         firmwareFile: FirmwareFile
     ): String {
@@ -71,7 +76,8 @@ class GlucometerClientImpl @Inject constructor(
                 scan(address, dfuFilters)
             }
         } catch (e: TimeoutCancellationException) {
-            val exception = GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
+            val exception =
+                GlucometerSyncError(TimeoutException("Device search dfu ${address.hideMac()} timed out"))
             crashlyticsReport.writeException(exception)
             throw exception
         }
@@ -80,7 +86,7 @@ class GlucometerClientImpl @Inject constructor(
             crashlyticsReport.writeException(GlucometerNotFoundInDfuMode)
             throw GlucometerNotFoundInDfuMode
         }
-        return firmwareManager.updateFirmware(address, firmwareFile.path)
+        return firmwareManager.updateFirmwareWithNordicDfu(address, firmwareFile.path)
     }
 
     override fun findDevices(): Flow<List<ScanResult>> {
@@ -155,9 +161,13 @@ class GlucometerClientImpl @Inject constructor(
         crashlyticsReport.log("Scanning the environment is completed with the result")
 
         try {
+            // Решение для huawei/honor на Android 10. Эти устройства не успевают освободить ресурс и
+            // синхронизация не проходит. Поэтому нужна исскустенная задержка между scan и connect
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) delay(1_000)
+
             crashlyticsReport.log("Establishing a connection with a device")
             glucometerBleManager.connectToGlucometer(scanResult.device)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             val error = GlucometerConnectionException(e.message.orEmpty())
             crashlyticsReport.writeException(error)
             throw error
@@ -165,6 +175,7 @@ class GlucometerClientImpl @Inject constructor(
 
         checkPin(pin)
     }
+
 
     private suspend fun checkPin(pin: String) {
         crashlyticsReport.log("Checking pin")
@@ -257,12 +268,16 @@ class GlucometerClientImpl @Inject constructor(
             throw error
         }
 
-        val toDfuModeResult = glucometerBleManager.toDfuMode()
-        if (!toDfuModeResult.isOk()) {
+        val toBootModeResult = glucometerBleManager.toBootMode()
+        if (!toBootModeResult.isOk()) {
             crashlyticsReport.writeException(GlucometerToDfuModeError)
             throw GlucometerToDfuModeError
         }
         crashlyticsReport.log("The device has successfully switched to dfu mode")
+    }
+
+    override suspend fun sendFirmwareChunk(chuck: FirmwareChunk): String {
+        return glucometerBleManager.sendFirmwareChunk(chuck)
     }
 
     override suspend fun testAllCommands(address: String, pin: String) {

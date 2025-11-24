@@ -100,20 +100,28 @@ fun BaseDialog(widgetModel: BaseDialogWidgetModel<*>) {
                             color = colors.white,
                             shape = shapes.dialog
                         )
-                        .padding(dimens.dialogPaddings)
+                        .fillMaxWidth()
                 ) {
-                    state.value.title?.let {
-                        Text(text = it, style = types.title1)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimens.dialogPaddings)
+                    ) {
+                        state.value.title?.let {
+                            Text(text = it, style = types.title1)
+                        }
+                        VSpacer(height = dimens.halfMediumDim)
+                        Text(
+                            text = state.value.message,
+                            style = types.body2
+                        )
+                        VSpacerSmall()
                     }
-                    VSpacer(height = dimens.halfMediumDim)
-                    Text(
-                        text = state.value.message,
-                        style = types.body2
-                    )
-                    VSpacerSmall()
                     Row(
                         horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = dimens.smallDim, bottom = dimens.smallDim)
                     ) {
                         DialogButton(state.value.negativeButtonText, widgetModel::negativeClick)
                         HSpacerSmall()

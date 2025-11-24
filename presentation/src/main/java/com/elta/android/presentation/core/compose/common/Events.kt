@@ -9,7 +9,11 @@ sealed class PermissionEvent : Event {
     override fun hashCode() = System.identityHashCode(this)
 
     class Storage : PermissionEvent()
+    object Camera : PermissionEvent()
     class RecordAudio : PermissionEvent()
+
+    // fixme Variant A : improved_enabling_location  {
+    // ---
     object OpenSettings : PermissionEvent()
     object RequestPermissions : PermissionEvent()
     object RequestEnableLocation : PermissionEvent()
@@ -18,6 +22,10 @@ sealed class PermissionEvent : Event {
         object RequestEnable : Bluetooth()
         object OnAllow : Bluetooth()
     }
+    // ---
+    // }
+
+
 }
 
 object ClearEvent : Event

@@ -1,5 +1,6 @@
 package com.elta.android.data.features.user.mapper // ktlint-disable filename
 
+import com.elta.android.common.utils.toStringWithFormat
 import com.elta.android.data.features.user.cache.dto.ProfileSettingsDbEntity
 import com.elta.android.data.features.user.dto.DiabetesTypeNetworkEntity
 import com.elta.android.data.features.user.dto.GenderTypeNetworkEntity
@@ -22,6 +23,8 @@ import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.domain.features.user.model.ProfileSettings
 import com.elta.android.domain.features.user.model.SocialNetwork
 import com.elta.android.domain.features.user.model.SocialNetworkType
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 
 internal fun ProfileSettingsNetworkResponse.toDb(id: Long): ProfileSettingsDbEntity =
     ProfileSettingsDbEntity(
@@ -55,6 +58,7 @@ internal fun Profile.toNetwork(): ProfileNetworkResponse =
                 lastName = secondName
             )
         },
+        birthDate = birthDate?.toStringWithFormat(DateTimeFormatter.ISO_DATE),
         glucoseLevelsAverage = GlucoseLevelNetworkEntity(
             minValue = glucoseLevelSettings.normal.start,
             maxValue = glucoseLevelSettings.normal.end
@@ -79,6 +83,7 @@ internal fun ProfileNetworkResponse.toDomain(glucoseFormat: GlucoseFormatNetwork
         secondName = person?.lastName,
         gender = gender.toDomain(),
         email = email,
+        birthDate = birthDate?.let { LocalDate.parse(it) },
         glucoseLevelSettings = glucoseLevelsAverage.toSettings(),
         glucoseLevelBeforeEatSettings = glucoseLevelsBeforeEating.toSettings(),
         glucoseLevelAfterEatSettings = glucoseLevelsAfterEating.toSettings(),

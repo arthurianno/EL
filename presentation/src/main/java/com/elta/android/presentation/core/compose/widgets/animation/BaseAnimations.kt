@@ -9,18 +9,21 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 
 @Composable
 fun VerticallyAnimation(
     visualState: Boolean,
     toUp: Boolean = true,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     val alignmentAnimation = if (toUp) Alignment.Bottom else Alignment.Top
     AnimatedVisibility(
         visible = visualState,
         enter = expandVertically(expandFrom = alignmentAnimation),
-        exit = shrinkVertically(shrinkTowards = alignmentAnimation)
+        exit = shrinkVertically(shrinkTowards = alignmentAnimation),
+        modifier = modifier
     ) {
         content()
     }

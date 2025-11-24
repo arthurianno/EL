@@ -4,6 +4,7 @@ import com.elta.android.common.errors.GlucometerPinNotFoundInternaly
 import com.elta.android.common.errors.PrimaryGlucometerNotFoundError
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideMac
+import com.elta.android.domain.features.appsettings.AppSettingsRepository
 import com.elta.android.domain.features.devices.SEND_DATA_TIMEOUT
 import com.elta.android.domain.features.devices.checkBluetoothAvailabilityAndPermissions
 import com.elta.android.domain.features.devices.connectWithTimeout
@@ -13,7 +14,6 @@ import com.elta.android.domain.features.devices.repository.DeviceInfoRepository
 import com.elta.android.domain.features.devices.repository.DeviceRepository
 import com.elta.android.domain.features.devices.repository.PinRepository
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
-import com.elta.android.domain.features.rostech.RosTechRepository
 import com.elta.android.domain.features.user.repository.ProfileRepository
 import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Observable
@@ -27,11 +27,11 @@ class SyncWithGlucometerUseCase @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val deviceInfoRepository: DeviceInfoRepository,
     private val bluetoothStateRepository: BluetoothStateRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val profileRepository: ProfileRepository,
     private val pinRepository: PinRepository,
     private val eventsRepository: EventsRepository,
     private val crashlyticsReport: CrashlyticsReport,
-    private val rosTechRepository: RosTechRepository,
     schedulers: SchedulersFacade
 ) : ObservableWithTimerUseCase<Int, SyncWithGlucometerUseCase.Params>(schedulers, crashlyticsReport) {
 
@@ -45,7 +45,10 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 throw PrimaryGlucometerNotFoundError
             }
 
-            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(crashlyticsReport)
+            bluetoothStateRepository.checkBluetoothAvailabilityAndPermissions(
+                crashlyticsReport = crashlyticsReport,
+                isLocationNeeded = appSettingsRepository.isLocationNeeded
+            )
 
             crashlyticsReport.log("Getting a user profile")
             val profile = try {
@@ -75,7 +78,7 @@ class SyncWithGlucometerUseCase @Inject constructor(
         deviceAddress: String,
         userEmail: String,
         lastSyncEvent: String?
-    ): Int {
+    ) {
         crashlyticsReport.log("Getting pin")
         val pinCode = pinRepository.getPin(deviceAddress)
         if (pinCode == null) {
@@ -108,10 +111,9 @@ class SyncWithGlucometerUseCase @Inject constructor(
                 eventsRepository.addEventFromGlucometer(events)
 
                 resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
-                rosTechRepository.sendMeasurements(deviceAddress, events)
             }
 
-            return measurements.size
+            scope.channel.send(measurements.size)
         } finally {
             crashlyticsReport.log("The procedure for disconnecting the connection and stopping the timers has begun")
             deviceRepository.disconnect()

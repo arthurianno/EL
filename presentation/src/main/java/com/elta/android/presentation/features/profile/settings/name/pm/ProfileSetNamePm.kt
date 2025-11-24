@@ -102,7 +102,7 @@ class ProfileSetNamePm @Inject constructor(
 
         lifecycleObservable
             .filter { it == Lifecycle.CREATED }
-            .map { Unit }
+            .map { }
             .subscribe(getProfileAction.consumer)
             .untilDestroy()
     }
@@ -172,14 +172,10 @@ class ProfileSetNamePm @Inject constructor(
     }
 
     private fun checkIsValid(name: PersonNameModel) {
-        if (profileState.hasValue() && isNameChangedState.value) {
-            if (isFirstNameChangedState.value) {
-                firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
-            }
-            if (isSecondNameChangedState.value) {
-                secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
-            }
-        }
+        if (originalFullNameState.value.firstName.isNotEmpty() || isFirstNameChangedState.value)
+            firstNameInput.error.consumer.accept(getFirstNameErrorString(name.firstName))
+        if (originalFullNameState.value.secondName.isNotEmpty() || isSecondNameChangedState.value)
+            secondNameInput.error.consumer.accept(getSecondNameErrorString(name.secondName))
     }
 
     private fun getFirstNameErrorString(name: String): String = when {

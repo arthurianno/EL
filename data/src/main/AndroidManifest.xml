@@ -13,7 +13,10 @@
         tools:targetApi="s" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application>
         <!-- SOCIAL NETWORKS -->
@@ -64,6 +67,11 @@
 
         <service
             android:name=".features.devices.glucometer.service.firmware.EltaDfuService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"/>
+
+        <service
+            android:name=".features.devices.glucometer.service.firmware.BootModeService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
     </application>

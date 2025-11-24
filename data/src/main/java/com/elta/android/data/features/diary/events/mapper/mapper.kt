@@ -4,11 +4,13 @@ import com.elta.android.common.utils.toIsoDate
 import com.elta.android.data.features.calculator.mapper.toDomain
 import com.elta.android.data.features.calculator.model.ProductResponse
 import com.elta.android.data.features.diary.events.dto.EventTypeDto.Companion.toEventType
+import com.elta.android.data.features.diary.events.dto.GlucoseInputTypeDto
 import com.elta.android.data.features.diary.events.dto.v2.EventV2Dto
 import com.elta.android.data.features.diary.events.dto.v2.InsulinMedicamentDto
 import com.elta.android.data.features.diary.events.dto.v2.MedicamentDto
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.State
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicament
@@ -80,7 +82,7 @@ private fun MedicamentInsulinType.toDto(): InsulinMedicamentDto.MedicamentInsuli
 
 fun EventV2Dto.toDomain(): EventV2 = EventV2(
     id = id,
-    type = data.type.toEventType(data.value),
+    type = data.type.toEventType(data.value, data.inputType),
     additionTime = additionTime.toIsoDate(),
     tagId = tagId,
     tag = null,
@@ -98,7 +100,8 @@ fun EventV2Dto.toDomain(): EventV2 = EventV2(
     tabletsNumber = data.tabletsNumber,
     state = State.valueOf(state.name),
     glucometerSerialNumber = data.glucometerSerialNumber,
-    dishes = data.products?.toDomain().orEmpty()
+    dishes = data.products?.toDomain().orEmpty(),
+    glucoseInputType = data.inputType?.toDomain()
 )
 
 fun MedicamentDto.toDomain(): Medicament =
@@ -124,3 +127,9 @@ fun InsulinMedicamentDto.MedicamentInsulinTypeDto.toDomain(): MedicamentInsulinT
         id = id,
         name = name
     )
+
+fun GlucoseInputTypeDto.toDomain(): GlucoseInputType =
+    when (this) {
+        GlucoseInputTypeDto.MANUAL -> GlucoseInputType.MANUAL
+        GlucoseInputTypeDto.AUTO -> GlucoseInputType.AUTO
+    }

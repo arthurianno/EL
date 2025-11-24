@@ -6,7 +6,7 @@ import io.reactivex.Single
 
 interface VersionSource {
 
-    fun checkVersion(appId: String, appVersion: String): Single<String>
+    fun checkVersion(appId: String, appVersion: String, appStore: String): Single<String>
 
     fun sendAppVersion(appVersion: AppVersionNetworkRequest): Completable
 }

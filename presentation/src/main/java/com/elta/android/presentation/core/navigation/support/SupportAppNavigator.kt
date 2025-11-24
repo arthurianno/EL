@@ -3,7 +3,9 @@ package com.elta.android.presentation.core.navigation.support
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -31,6 +33,7 @@ open class SupportAppNavigator(
 ) : Navigator {
     private val localStackCopy = mutableListOf<String>()
 
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun applyCommands(commands: Array<out Command>) {
         fragmentManager.executePendingTransactions()
         copyStackToLocal()
@@ -45,6 +48,7 @@ open class SupportAppNavigator(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     protected fun applyCommand(command: Command) {
         when (command) {
             is Forward -> activityForward(command)
@@ -83,7 +87,7 @@ open class SupportAppNavigator(
     protected fun fragmentBack() {
         if (localStackCopy.isNotEmpty()) {
             fragmentManager.popBackStack()
-            localStackCopy.removeLast()
+            localStackCopy.removeAt(localStackCopy.size - 1) // Замена remove() на removeAt()
         } else {
             activityBack()
         }
@@ -108,7 +112,7 @@ open class SupportAppNavigator(
         val fragment: Fragment = createFragment(screen)
         if (localStackCopy.isNotEmpty()) {
             fragmentManager.popBackStack()
-            localStackCopy.removeLast()
+            localStackCopy.removeAt(localStackCopy.size - 1) // Замена remove() на removeAt()
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
             setupFragmentTransaction(
                 command,
@@ -135,6 +139,7 @@ open class SupportAppNavigator(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     protected fun backTo(command: BackTo) {
         if (command.screen == null) {
             backToRoot()
@@ -144,7 +149,7 @@ open class SupportAppNavigator(
             val size = localStackCopy.size
             if (index != -1) {
                 for (i in 1 until size - index) {
-                    localStackCopy.removeLast()
+                    localStackCopy.removeAt(localStackCopy.size - 1) // Замена remove() на removeAt()
                 }
                 fragmentManager.popBackStack(key, 0)
             } else {

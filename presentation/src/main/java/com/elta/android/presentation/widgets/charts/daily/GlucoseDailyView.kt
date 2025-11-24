@@ -25,6 +25,7 @@ class GlucoseDailyView @JvmOverloads constructor(
 
     fun setChartDataModel(chartDataModel: ChartDataModel) = with(binding) {
         dailyGlucoseChartView.chartDataModel = chartDataModel
+        //dailyGlucoseChartView.chartDataModel = binding.dailyGlucoseChartView.createMockChartDataModel()
         scrollToLastEvent()
     }
 

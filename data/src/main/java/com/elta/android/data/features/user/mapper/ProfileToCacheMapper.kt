@@ -21,6 +21,7 @@ class ProfileToCacheMapper @Inject constructor(
                 diabetes = diabetes?.name,
                 weight = weight,
                 gender = gender?.name,
+                birthDate = birthDate,
                 email = email,
                 timeStamp = timeStamp,
                 firstName = person?.firstName,

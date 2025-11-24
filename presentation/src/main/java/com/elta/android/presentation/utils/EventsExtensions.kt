@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.elta.android.domain.features.diary.events.model.ActivityType
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.tags.model.Tag
 import com.elta.android.domain.features.diary.tags.model.TagImage
@@ -18,7 +19,25 @@ fun EventType.toName(): Int =
         EventType.Medicaments -> R.string.event_type_medicaments
         EventType.Weight -> R.string.event_type_weight
         EventType.Activity -> R.string.event_type_activity
-        EventType.Glucose -> R.string.event_type_glucose
+        is EventType.Glucose -> {
+            if (this.inputType == GlucoseInputType.AUTO) R.string.event_type_glucose
+            else R.string.events_form_screen_title_glucose_manual
+        }
+        EventType.Glycatedhemoglobin -> R.string.event_type_hba1c
+    }
+
+@StringRes
+fun EventType.toEventDescriptionText(): Int =
+    when (this) {
+        is EventType.Bread -> R.string.event_type_bread
+        EventType.Insulin -> R.string.event_type_insulin
+        EventType.Medicaments -> R.string.event_type_medicaments
+        EventType.Weight -> R.string.event_type_weight
+        EventType.Activity -> R.string.event_type_activity
+        is EventType.Glucose -> {
+            if (this.inputType == GlucoseInputType.AUTO) R.string.event_type_glucose
+            else R.string.event_type_manual_glucose
+        }
         EventType.Glycatedhemoglobin -> R.string.event_type_hba1c
     }
 
@@ -30,7 +49,7 @@ fun EventType.toIcon(): Int =
         EventType.Medicaments -> R.drawable.ic_event_medicaments
         EventType.Weight -> R.drawable.ic_event_weight
         EventType.Activity -> R.drawable.ic_event_activity
-        EventType.Glucose -> R.drawable.ic_event_glucose
+        is EventType.Glucose -> R.drawable.ic_event_glucose
         else -> throw IllegalArgumentException("$this doesn't support icon resource.")
     }
 
@@ -42,7 +61,7 @@ fun EventType.toIconWithBg(): Int =
         EventType.Medicaments -> R.drawable.ic_event_medicaments_with_bg
         EventType.Weight -> R.drawable.ic_event_weight_with_bg
         EventType.Activity -> R.drawable.ic_event_activity_with_bg
-        EventType.Glucose -> R.drawable.ic_event_glucose_with_bg
+        is EventType.Glucose -> R.drawable.ic_event_glucose_with_bg
         else -> throw IllegalArgumentException("$this doesn't support icon resource.")
     }
 

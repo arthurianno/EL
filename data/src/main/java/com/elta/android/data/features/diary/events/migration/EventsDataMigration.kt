@@ -57,7 +57,8 @@ private fun EventCachedDto.toV2(): EventV2CachedDto {
         glucometerSerialNumber = glucometerSerialNumber,
         medicament = toInsulinMedicament(medicament, insulinType),
         medicamentDto = null,
-        tabletsNumber = null
+        tabletsNumber = null,
+        glucoseInputType = null
     )
 }
 
@@ -119,6 +120,6 @@ private enum class InsulinType {
     MIXED
 }
 
-private const val SHORT_ULTRASHORT = "Короткий"
-private const val PROLONG = "Продленный"
-private const val MIXED = "Смешанный"
+private const val SHORT_ULTRASHORT = "Short-acting"
+private const val PROLONG = "Long-acting"
+private const val MIXED = "Mixed"

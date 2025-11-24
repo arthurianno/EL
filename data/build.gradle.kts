@@ -22,14 +22,23 @@ android {
         targetCompatibility = AppConfig.javaVersion
     }
     buildTypes {
-        // todo: а нужно ли это? Вроде только две сборки осталось
-        create("releaseDev")
-        create("releaseStage")
+        create("huawei") {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.HuaweiAppGallery.storeName}\"")
+        }
+        release {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
+        }
+        debug {
+            buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
+        }
         all {
-            buildConfigField("String", "VERSION_NAME", "\"${version.versionName}\"")
+            buildConfigField("String", "VERSION_NAME", "\"${version}\"")
         }
     }
     namespace = "com.elta.android.data"
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 dependencies {
@@ -48,6 +57,7 @@ dependencies {
     implementation(Dependencies.Google.Services.auth)
 
     implementation(Dependencies.Google.FireBase.messagingBom)
+    implementation(Dependencies.Google.FireBase.configBom)
 
     implementation(Dependencies.Kotlin.coroutinesCore)
     implementation(Dependencies.Kotlin.coroutinesRx2)
@@ -58,6 +68,11 @@ dependencies {
 
     implementation(Dependencies.Dagger.javaxAnnotation)
     implementation(Dependencies.Dagger.javaxInject)
+    implementation("androidx.room:room-common:2.7.2")
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-common-jvm:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+    implementation(Dependencies.Kotlin.metadataJvm)
 
     kapt(Dependencies.Dagger.daggerCompiler)
     kapt(Dependencies.Dagger.daggerAndroidProcessor)

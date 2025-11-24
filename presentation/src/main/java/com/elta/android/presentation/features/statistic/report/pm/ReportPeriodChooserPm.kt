@@ -8,6 +8,8 @@ import com.elta.android.domain.features.reports.interactor.buildRange
 import com.elta.android.domain.features.reports.model.Range
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
+import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
+import com.elta.android.presentation.analytic.model.appmetric.AppMetricEvent
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -22,6 +24,7 @@ private const val FORMAT = "d LLLL"
 
 class ReportPeriodChooserPm @Inject constructor(
     private val getReportUseCase: GetReportUseCase,
+    private val appMetricTracker: AppMetricTracker,
     services: ServiceFacade
 ) : BasePm(services) {
 
@@ -66,6 +69,9 @@ class ReportPeriodChooserPm @Inject constructor(
             .subscribe(selectedRangeState.consumer)
             .untilDestroy()
         mainAction.observable
+            .doOnEach {
+                appMetricTracker.trackEvent(AppMetricEvent.TapUploadingAReport)
+            }
             .map(::createGetReportParams)
             .flatMapSingle {
                 getReportUseCase.execute(it)

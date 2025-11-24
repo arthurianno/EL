@@ -51,7 +51,7 @@ class ReportFileManager @Inject constructor(
         }
 
     private fun getFileUri(file: File): Uri =
-        FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        FileProvider.getUriForFile(context, "com.elta.android.fileprovider", file)
 
     private fun getFileName(originName: String) = "$originName.pdf"
 }

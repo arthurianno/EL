@@ -1,24 +1,25 @@
+@file:Suppress("UnstableApiUsage")
+
 object Dependencies {
-    const val gradleVersion = "8.2.0"
+    const val gradleVersion = "8.7.0"
     const val ktLintVersion = "10.3.0"
     const val dependenciesUpdateVersion = "0.42.0"
     const val detektGradlePluginVersion = "1.22.0-RC2"
 
     object Kotlin {
-        const val version = "1.9.20"
+        const val version = "2.2.0"
         private const val serializationVersion = "1.4.0"
         private const val coroutinesVersion = "1.6.4"
         private const val dateTimeVersion = "0.3.1"
+        private const val metadataVersion = "0.9.0"
 
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
-        const val coroutinesCore =
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         const val coroutinesRx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
-        const val serialization =
-            "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
-        const val serializationJson =
-            "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion"
+        const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
         const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion"
+        const val metadataJvm = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:$metadataVersion"
     }
 
     object Jetpack {
@@ -33,7 +34,6 @@ object Dependencies {
         private const val browserVersion = "1.4.0"
         private const val pagingVersion = "3.2.0"
 
-
         object Paging {
             const val pagingRuntime = "androidx.paging:paging-runtime:$pagingVersion"
             const val pagingCompose = "androidx.paging:paging-compose:$pagingVersion"
@@ -45,8 +45,7 @@ object Dependencies {
         const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifeCycleVersion"
         const val lifeCycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifeCycleVersion"
         const val appCompat = "androidx.appcompat:appcompat:$appcompatVersion"
-        const val constraintLayout =
-            "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+        const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
         const val multiDex = "androidx.multidex:multidex:$mutlidexVersion"
         const val reciclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
         const val annotations = "androidx.annotation:annotation:$annotationsVersion"
@@ -61,10 +60,9 @@ object Dependencies {
         }
 
         object Compose {
-            const val compilerVersion = "1.5.5"
-
-            private const val bomVersion = "2023.01.00"
-            private const val activityVersion = "1.6.1"
+            const val compilerVersion = "2.2.0"
+            private const val bomVersion = "2024.09.01"
+            private const val activityVersion = "1.9.2"
 
             const val bom = "androidx.compose:compose-bom:$bomVersion"
             const val bomMaterial = "androidx.compose.material:material"
@@ -89,9 +87,9 @@ object Dependencies {
     }
 
     object Utils {
-        private const val jodaTimeVersion = "2.9.9.2" // 2.12.0
+        private const val jodaTimeVersion = "2.9.9.2"
         private const val essentialsVersion = "3.1.0"
-        private const val android310Version = "1.2.0"
+        private const val android310Version = "1.4.7"
 
         const val jodaTime = "net.danlew:android.joda:$jodaTimeVersion"
         const val essentials = "org.greenrobot:essentials:$essentialsVersion"
@@ -113,12 +111,13 @@ object Dependencies {
         private const val fullVersion = "4.0.0-full"
         private const val mapKitVersion = "3.5.0"
         private const val mapKitClusteringVersion = "0.2"
+        private const val appMetricaVersion = "6.5.0"
 
+        const val appMetrica = "io.appmetrica.analytics:analytics:$appMetricaVersion"
         const val lite = "com.yandex.android:maps.mobile:$liteVersion"
         const val full = "com.yandex.android:maps.mobile:$fullVersion"
         const val mapKit = "com.yandex.android:mapkit:$mapKitVersion"
-        const val mapKitClustering =
-            "com.github.65apps:android-clustering-for-yandex-mapkit:$mapKitClusteringVersion"
+        const val mapKitClustering = "com.github.65apps:android-clustering-for-yandex-mapkit:$mapKitClusteringVersion"
     }
 
     object Google {
@@ -127,8 +126,7 @@ object Dependencies {
 
         const val materialDesign = "com.google.android.material:material:$materialVersion"
         const val gson = "com.google.code.gson:gson:$gsonVersion"
-        const val guavaConflictLost =
-            "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+        const val guavaConflictLost = "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
 
         object Services {
             const val servicesVersion = "4.4.0"
@@ -141,8 +139,7 @@ object Dependencies {
             object MlKit {
                 private const val barcodeScanerVersion = "18.1.0"
 
-                const val barcodeScaner =
-                    "com.google.android.gms:play-services-mlkit-barcode-scanning:$barcodeScanerVersion"
+                const val barcodeScaner = "com.google.android.gms:play-services-mlkit-barcode-scanning:$barcodeScanerVersion"
             }
 
             object CameraX {
@@ -167,6 +164,7 @@ object Dependencies {
             const val firestoreBom = "com.google.firebase:firebase-firestore-ktx"
             const val databaseBom = "com.google.firebase:firebase-database-ktx"
             const val analyticsBom = "com.google.firebase:firebase-analytics-ktx"
+            const val configBom = "com.google.firebase:firebase-config-ktx"
             const val crashlyticsBom = "com.google.firebase:firebase-crashlytics-ktx"
             const val appMessagingBom = "com.google.firebase:firebase-inappmessaging-display"
             const val dynamicLinksBom = "com.google.firebase:firebase-dynamic-links"
@@ -191,7 +189,7 @@ object Dependencies {
         private const val espressoVersion = "3.5.1"
         private const val monitorVersion = "1.6.0"
         private const val testStorageVersion = "1.4.2"
-        private const val java310Version = "1.3.1" // 1.6.3
+        private const val java310Version = "1.3.1"
         private const val coreTestVersion = "1.5.0"
         private const val rulesVersion = "1.5.0"
         private const val runnerVersion = "1.5.2"
@@ -204,18 +202,14 @@ object Dependencies {
         const val extJunitKtx = "androidx.test.ext:junit-ktx:$extJunitVersion"
         const val espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
         const val testStorage = "androidx.test.services:test-services:$testStorageVersion"
-
         const val monitor = "androidx.test:monitor:$monitorVersion"
         const val rules = "androidx.test:rules:$rulesVersion"
         const val runner = "androidx.test:runner:$runnerVersion"
         const val core = "androidx.test:core:$coreTestVersion"
         const val coreKtx = "androidx.test:core-ktx:$coreTestVersion"
-
         const val jsr310 = "org.threeten:threetenbp:$java310Version"
-
         const val kotlinJUnit = "org.jetbrains.kotlin:kotlin-test-junit:${Kotlin.version}"
-        const val mockito =
-            "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
+        const val mockito = "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
         const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
         const val mockitoAndroid = "org.mockito:mockito-android:$mockitoAndroidVersion"
     }
@@ -226,7 +220,7 @@ object Dependencies {
         private const val expandableLayoutVersion = "2.9.2"
         private const val tooltipVersion = "0.1.9"
         private const val inputMaskVersion = "6.1.0"
-        private const val materialDialogsVersion = "0.9.4.4" // Верхняя версия 3.3.0
+        private const val materialDialogsVersion = "0.9.4.4"
         private const val datePickerVersion = "2.0.0"
         private const val materialEditTextVersion = "2.1.4"
         private const val cardViewVersion = "1.0.0"
@@ -238,10 +232,8 @@ object Dependencies {
         const val tooltip = "com.github.vihtarb:tooltip:$tooltipVersion"
         const val inputMask = "com.github.RedMadRobot:input-mask-android:$inputMaskVersion"
         const val materialDialogs = "com.afollestad.material-dialogs:core:$materialDialogsVersion"
-        const val datePicker =
-            "com.github.prolificinteractive:material-calendarview:$datePickerVersion"
-        const val materialEditText =
-            "com.rengwuxian.materialedittext:library:$materialEditTextVersion"
+        const val datePicker = "com.github.prolificinteractive:material-calendarview:$datePickerVersion"
+        const val materialEditText = "com.rengwuxian.materialedittext:library:$materialEditTextVersion"
         const val cardView = "com.github.captain-miao:optroundcardview:$cardViewVersion"
         const val lottie = "com.airbnb.android:lottie:$lottieVersion"
     }
@@ -252,7 +244,7 @@ object Dependencies {
         private const val rxAndroidVersion = "2.1.0"
         private const val rxRelayVersion = "2.1.0"
         private const val rxLocationVersion = "2.1@aar"
-        private const val rxPermissionsVersion = "0.10.2"
+        private const val rxPermissionsVersion = "0.10.0"
         private const val rxPmVersion = "2.1.2"
         private const val rxBindingVersion = "2.0.0"
         private const val rxNetworkVersion = "3.0.2"
@@ -271,15 +263,14 @@ object Dependencies {
     }
 
     object Nordic {
-        private const val scanerVersion = "1.6.0"
-        private const val dfuVersion = "2.4.1"
-        private const val bleVersion = "2.7.2"
+        private const val scanerVersion = "1.7.2"
+        private const val dfuVersion = "2.5.0"
+        private const val bleVersion = "2.10.2"
 
         const val scanner = "no.nordicsemi.android.support.v18:scanner:$scanerVersion"
         const val dfu = "no.nordicsemi.android:dfu:$dfuVersion"
         const val ble = "no.nordicsemi.android:ble:$bleVersion"
         const val bleKtx = "no.nordicsemi.android:ble-ktx:$bleVersion"
-
     }
 
     object ObjectBox {
@@ -296,7 +287,7 @@ object Dependencies {
     }
 
     object Dagger {
-        const val daggerVersion = "2.22.1" // 2.42
+        const val daggerVersion = "2.22.1"
         const val hiltVersion = "2.42"
 
         private const val javaxAnnotationVersion = "1.3.2"
@@ -309,11 +300,9 @@ object Dependencies {
         const val dagger = "com.google.dagger:dagger:$daggerVersion"
         const val daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
         const val daggerAndroid = "com.google.dagger:dagger-android:$daggerVersion"
-        const val daggerAndroidProcessor =
-            "com.google.dagger:dagger-android-processor:$daggerVersion"
+        const val daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
         const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:$daggerVersion"
-        const val javaxAnnotation =
-            "javax.annotation:javax.annotation-api:$javaxAnnotationVersion"
+        const val javaxAnnotation = "javax.annotation:javax.annotation-api:$javaxAnnotationVersion"
         const val javaxInject = "javax.inject:javax.inject:$javaxInjectVersion"
         const val glassFish = "org.glassfish:javax.annotation:$glassFishVersion"
     }
@@ -325,7 +314,7 @@ object Dependencies {
     }
 
     object Retrofit {
-        private const val version = "2.9.0" // 2.9.0
+        private const val version = "2.9.0"
 
         const val core = "com.squareup.retrofit2:retrofit:$version"
         const val gsonConverter = "com.squareup.retrofit2:converter-gson:$version"
@@ -362,15 +351,13 @@ object Dependencies {
         const val androidCore = "org.kodein.di:kodein-di-framework-android-core:$version"
         const val androidSupport = "org.kodein.di:kodein-di-framework-android-support:$version"
         const val androidJetpack = "org.kodein.di:kodein-di-framework-android-x:$version"
-        const val androidViewModel =
-            "org.kodein.di:kodein-di-framework-android-x-viewmodel:$version"
-        const val androidViewModelWithState =
-            "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
+        const val androidViewModel = "org.kodein.di:kodein-di-framework-android-x-viewmodel:$version"
+        const val androidViewModelWithState = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate:$version"
         const val jetpackCompose = "org.kodein.di:kodein-di-framework-compose:$versionCompose"
     }
 
     object Webim {
-        private const val version = "3.+"
+        private const val version = "3.42.1"
 
         const val core = "ru.webim.sdk:webimclientsdkandroid:$version"
     }
@@ -380,4 +367,11 @@ object Dependencies {
 
         const val JacsonDatabind = "com.fasterxml.jackson.core:jackson-databind:$jacsonVersion"
     }
+
+    object OneSignal {
+        private const val version = "5.1.37"
+
+        const val core = "com.onesignal:OneSignal:$version"
+    }
+
 }

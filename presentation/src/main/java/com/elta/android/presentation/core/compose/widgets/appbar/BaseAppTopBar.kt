@@ -33,7 +33,8 @@ private const val EMPTY_STRING = ""
 
 @Immutable
 data class BaseTopAppBarWidgetState(
-    val title: String
+    val title: String,
+    val endText: Int?
 )
 
 class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarWidgetState>() {
@@ -60,8 +61,15 @@ class BaseAppTopBarWidgetModel : BaseWidgetModel<BaseTopAppBarWidgetState>() {
         endIconAction?.let { sendAction(it) }
     }
 
+    fun setEndText(textId: Int?){
+        setState { state.value.copy(endText = textId) }
+    }
+
     override fun createInitState(): BaseTopAppBarWidgetState =
-        BaseTopAppBarWidgetState(title = EMPTY_STRING)
+        BaseTopAppBarWidgetState(
+            title = EMPTY_STRING,
+            endText = null
+        )
 }
 
 @Composable
@@ -77,6 +85,10 @@ fun BaseAppTopBar(
     @StringRes endText: Int? = null
 ) {
     val state = widgetModel.state.collectAsState()
+
+    val endTextId = state.value.endText.takeIf { it != null }
+        ?: endText
+
     TopAppBar(
         title = {
             Text(
@@ -99,7 +111,7 @@ fun BaseAppTopBar(
                 iconId = endIcon,
                 iconColor = endIconColor,
                 onClick = widgetModel::endIconClick,
-                text = endText,
+                text = endTextId,
                 textColor = textColor,
                 textStyle = textStyle
             )

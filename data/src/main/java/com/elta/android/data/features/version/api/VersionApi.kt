@@ -13,7 +13,8 @@ interface VersionApi {
     @GET("api/apps/v1/check_version")
     fun checkAppVersion(
         @Query("appId") appId: String,
-        @Query("appVersion") appVersion: String
+        @Query("appVersion") appVersion: String,
+        @Query("appStore") appStore: String
     ): Single<VersionResponse>
 
     @PUT("api/telemetry/v1/appInfo")

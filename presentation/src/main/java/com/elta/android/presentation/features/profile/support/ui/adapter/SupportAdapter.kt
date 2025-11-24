@@ -30,7 +30,8 @@ class SupportAdapter @Inject constructor(
                 bus
             )
             SupportVersionItem::class.java.hashCode() -> SupportVersionViewHolder(
-                ItemSupportVersionBinding.inflate(inflater, parent, false)
+                ItemSupportVersionBinding.inflate(inflater, parent, false),
+                bus // Передаём bus в SupportVersionViewHolder
             )
             else -> throw IllegalArgumentException("No delegate defined for ${this::class.simpleName}")
         }

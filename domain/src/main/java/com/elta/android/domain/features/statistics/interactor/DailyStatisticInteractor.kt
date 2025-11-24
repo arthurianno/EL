@@ -2,6 +2,7 @@ package com.elta.android.domain.features.statistics.interactor
 
 import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.home.model.CalculatorFlow
 import com.elta.android.domain.features.diary.medicines.model.InsulinMedicamentStatistic
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
@@ -19,10 +20,14 @@ fun buildDailyStatisticModel(
     insulinMedicamentStatistic: InsulinMedicamentStatistic,
     calculatorFlow: CalculatorFlow
 ): DailyStatisticModel {
+
+    val glucoseEventsFromGlucometer = eventsPerDay[EventType.Glucose(GlucoseInputType.AUTO)].orEmpty()
+    val glucoseEventsManual = eventsPerDay[EventType.Glucose(GlucoseInputType.MANUAL)].orEmpty()
+
     return DailyStatisticModel(
         date = date,
         glucose = buildGlucoseStatisticModel(
-            glucoseEventsPerPeriod = eventsPerDay[EventType.Glucose],
+            glucoseEventsPerPeriod = glucoseEventsFromGlucometer + glucoseEventsManual,
             settings = settings,
             glucoseFormat = glucoseFormat,
             forPeriod = false

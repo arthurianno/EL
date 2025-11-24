@@ -1,7 +1,13 @@
 <paths>
+    <external-files-path
+        name="my_external_files"
+        path="." />
     <files-path
         name="internal_files"
         path="." />
+    <files-path
+        name="reports"
+        path="reports/" />
     <cache-path
         name="internal_cache"
         path="." />

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.permissions.requestStatus
@@ -13,6 +14,7 @@ import com.elta.android.presentation.core.ui.fragment.BaseFragment
 import com.elta.android.presentation.databinding.ActivityAppBinding
 import com.elta.android.presentation.features.app.pm.AppPm
 import com.elta.android.presentation.features.sync.control.checkPermissions
+import com.elta.android.presentation.features.sync.control.checkPermissionsVariantA
 import com.elta.android.presentation.features.version.optional.ui.OptionalUpdateDialogFragment
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkProcessor
 import com.elta.android.presentation.utils.keyboard.KeyboardEventListener
@@ -22,8 +24,16 @@ import com.nullgr.core.ui.fragments.showDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
+import javax.inject.Inject
 
 class AppActivity : BaseActivity<AppPm>() {
+    companion object {
+       // const val OPEN_CONSULTANT_CHAT = "open_consultant_chat"
+    }
+
+    @Inject
+    lateinit var getFeatureConfigUseCase: GetFeatureConfigUseCase
+
     override val screenLayout: Int = R.layout.activity_app
     override val classToken: Class<AppPm> = AppPm::class.java
 
@@ -42,12 +52,17 @@ class AppActivity : BaseActivity<AppPm>() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        checkPermissions(this)
+        // fixme Variant A : improved_enabling_location
+        val improvedEnablingLocation = getFeatureConfigUseCase.invoke().improvedEnablingLocation
+        if (improvedEnablingLocation) checkPermissions(this)
+        else checkPermissionsVariantA(this)
         DynamicLinkProcessor.from(intent)
             .ignoreColdStart(false)
             .withSavedState(savedInstanceState)
             .coldStartPassTo(presentationModel.coldStartAction)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)
+            .consultantDeeplink(presentationModel.consultantDeepLinkAction)
+            .newsDeeplink(presentationModel.newsDeepLinkAction)
             .coldStartByDeepLinkPassTo(presentationModel.coldStartDeepLinkAction)
             .notificationStartPassTo(presentationModel.notificationStartAction)
             .build()
@@ -70,12 +85,12 @@ class AppActivity : BaseActivity<AppPm>() {
         pm.networkStateCommand.bindTo(connectionStatusView.changeState())
         pm.syncStatusVisibility.bindTo(statusView.visibleChanges())
         pm.syncStatusState.bindTo(statusView.statusChanges())
-        pm.showOptionalUpdateDialogCommand.bindTo{
+        pm.showOptionalUpdateDialogCommand.bindTo {
             supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         DynamicLinkProcessor.from(intent)
             .deepLinkStartPassTo(presentationModel.deepLinkAction)

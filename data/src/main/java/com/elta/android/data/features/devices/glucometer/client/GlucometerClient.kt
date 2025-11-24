@@ -20,6 +20,8 @@ interface GlucometerClient {
      * */
     suspend fun connectDevice(address: String, pin: String)
 
+
+
     /**
      * Отключение от глюкометра
      * */
@@ -45,14 +47,15 @@ interface GlucometerClient {
      * */
     suspend fun locateGlucometer()
 
-    // TODO дописать документацию
     /**
-     * Обновление прошивки глюкометра.
+     * Обновление прошивки глюкометра через Nordic Dfu.
      * @param address Mac-адрес глюкометра.
      * @param firmwareFile Данные о файле с новой прошивкой (содержит путь до файла и версию).
-     * @return
+     * @return результат обновления
     **/
-    suspend fun updateFirmware(address: String, firmwareFile: FirmwareFile): String
+    suspend fun updateFirmwareWithNordicDfu(address: String, firmwareFile: FirmwareFile): String
+
+    suspend fun sendFirmwareChunk(chuck: FirmwareChunk): String
 
     suspend fun turnOnDfuMode()
 

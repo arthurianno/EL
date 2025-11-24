@@ -10,6 +10,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordItem
 import com.elta.android.presentation.features.main.records.ui.adapter.items.RecordsGroupItem
 import com.elta.android.presentation.utils.NumberFormatter
+import com.elta.android.presentation.utils.toEventDescriptionText
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toIconWithBg
 import com.elta.android.presentation.utils.toName
@@ -66,13 +67,13 @@ open class BaseRecordsMapper(
     private fun EventV2.formatType() =
         when (type) {
             EventType.Insulin ->
-                resources.getString(type.toName()) + resources.getString(
+                resources.getString(type.toEventDescriptionText()) + resources.getString(
                     R.string.event_type_insulin_medicament,
                     insulinMedicament?.name.orEmpty()
                 )
 
             EventType.Medicaments -> (name ?: medicament?.name).orEmpty()
-            else -> resources.getString(type.toName())
+            else -> resources.getString(type.toEventDescriptionText())
         }
 
     private fun EventV2.formatValue(calculatorFlow: CalculatorFlow): String? =
@@ -89,7 +90,7 @@ open class BaseRecordsMapper(
                 value.format().orEmpty()
             )
 
-            EventType.Glucose -> resources.getString(
+            is EventType.Glucose -> resources.getString(
                 R.string.event_type_glucose_pattern,
                 value.format().orEmpty()
             )
@@ -152,7 +153,7 @@ open class BaseRecordsMapper(
             is EventType.Bread -> kind ?: resources.getString(R.string.event_type_bread_no_name)
             EventType.Medicaments -> resources.getString(type.toName())
             EventType.Weight -> resources.getString(R.string.event_type_weight_no_name)
-            EventType.Glucose -> resources.getString(R.string.event_type_glucose_no_name)
+            is EventType.Glucose -> resources.getString(R.string.event_type_glucose_no_name)
             else -> ""
         }
 

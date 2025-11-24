@@ -13,6 +13,7 @@ import com.elta.android.presentation.features.main.events.chooser.models.Insulin
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserHeaderItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserItem
 import com.elta.android.presentation.features.main.events.chooser.ui.adapter.items.ChooserWithSubtypeItem
+import com.elta.android.presentation.features.main.events.extensions.getLocalizedName
 import com.elta.android.presentation.utils.toIcon
 import com.elta.android.presentation.utils.toName
 import com.nullgr.core.adapter.items.ListItem
@@ -68,7 +69,7 @@ class ChooserOptionsItemsBuilder @Inject constructor(
         val insulinType = source.meta as MedicamentInsulinType
         return ChooserWithSubtypeItem(
             id = source.id,
-            title = insulinType.name,
+            title = insulinType.getLocalizedName(resourceProvider),
             iconId = null,
             meta = insulinType,
             medicament = medicament,

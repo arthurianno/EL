@@ -6,8 +6,9 @@ import com.elta.android.domain.features.diary.events.interactor.GetEventByIdUseC
 import com.elta.android.domain.features.diary.events.interactor.GetShareEventUriUseCase
 import com.elta.android.domain.features.diary.events.interactor.SaveEventBitmapUseCase
 import com.elta.android.domain.features.diary.events.interactor.UpdateEventUseCase
-import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.EventType
+import com.elta.android.domain.features.diary.events.model.EventV2
+import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.events.model.MealTag
 import com.elta.android.domain.features.diary.events.model.form.GlucoseValidator
 import com.elta.android.domain.features.diary.events.model.glucoseValue
@@ -16,14 +17,14 @@ import com.elta.android.domain.features.diary.home.model.GlucoseLevel
 import com.elta.android.domain.features.diary.home.model.GlucoseLevelSettings
 import com.elta.android.domain.features.diary.home.model.GlucoseSharingInfo
 import com.elta.android.domain.features.diary.tags.model.Tag
-import com.elta.android.domain.features.user.interactor.GetUpdatedProfileUseCase
+import com.elta.android.domain.features.user.interactor.GetProfileUseCase
 import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.user.model.Profile
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
-import com.elta.android.presentation.analytics.model.AnalyticsEventType
+import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.bus.events
 import com.elta.android.presentation.core.pm.BasePm
@@ -46,19 +47,20 @@ import com.nullgr.core.rx.schedulers.SchedulersFacade
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.Singles
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import kotlinx.coroutines.rx2.asObservable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import me.dmdev.rxpm.widget.inputControl
 import org.threeten.bp.ZonedDateTime
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val OPEN_SCREEN_DELAY_MILLIS = 300L
 
 @Suppress("TooManyFunctions")
 class GlucoseEventPm @Inject constructor(
-    private val getProfileUseCase: GetUpdatedProfileUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val getShareEventUriUseCase: GetShareEventUriUseCase,
@@ -176,7 +178,7 @@ class GlucoseEventPm @Inject constructor(
             .flatMapSingle {
                 Singles.zip(
                     getEventByIdUseCase.execute(it),
-                    getProfileUseCase.execute()
+                    getProfileUseCase().asObservable().firstOrError()
                 )
                     .hideErrorContainer()
                     .bindProgress()
@@ -235,7 +237,7 @@ class GlucoseEventPm @Inject constructor(
             .map {
                 ChooserConfiguration(
                     ChooserType.GROUP_TAGS,
-                    EventType.Glucose,
+                    EventType.Glucose(GlucoseInputType.AUTO),
                     (tagSelector.option.value.meta as? Tag)?.id
                 )
             }

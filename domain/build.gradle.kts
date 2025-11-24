@@ -22,10 +22,11 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
     buildTypes {
-        create("releaseDev")
-        create("releaseStage")
+        create("huawei")
     }
+
     namespace = "com.elta.android.domain"
 }
 

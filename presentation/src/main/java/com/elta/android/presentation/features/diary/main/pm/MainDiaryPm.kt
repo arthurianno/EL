@@ -9,7 +9,6 @@ import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.bus.clicks
 import com.elta.android.presentation.core.bus.events
-import com.elta.android.presentation.core.pm.BaseListPm
 import com.elta.android.presentation.core.pm.ExpandableListPm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.diary.main.DiaryEventsMapper
@@ -22,7 +21,6 @@ import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
-import timber.log.Timber
 import javax.inject.Inject
 
 

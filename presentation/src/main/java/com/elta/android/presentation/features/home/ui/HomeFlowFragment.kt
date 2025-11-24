@@ -5,10 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -28,6 +33,7 @@ import com.elta.android.presentation.features.home.pm.HomeFlowPm
 import com.elta.android.presentation.features.home.ui.adapter.HomeBottomSheetAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
 import com.elta.android.presentation.features.sync.control.resolveResults
+import com.elta.android.presentation.utils.openSettingsIntent
 import com.elta.android.presentation.widgets.BottomNavigationView
 import com.elta.android.presentation.widgets.FixedLinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
@@ -44,8 +50,7 @@ import me.dmdev.rxpm.widget.bindTo
 
 private const val KEY_SELECTED_MENU_ID = "key_selected_menu_id"
 
-class HomeFlowFragment :
-    BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(FragmentHomeFlowBinding::inflate) {
+class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(FragmentHomeFlowBinding::inflate) {
     companion object {
         fun newInstance() = HomeFlowFragment()
     }
@@ -59,20 +64,20 @@ class HomeFlowFragment :
     @Inject
     lateinit var bus: RxBus
 
-    private val rxPermissions by lazy { RxPermissions(this) }
+    private lateinit var rxPermissions: RxPermissions
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Откладываем инициализацию RxPermissions
+        setupBottomNavigationInsets()
+        view.post {
+            if (isAdded && !requireActivity().supportFragmentManager.isStateSaved) {
+                rxPermissions = RxPermissions(requireActivity())
+            }
+        }
         savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        view?.findViewById<BottomNavigationView>(R.id.homeBottomNavigationView)?.selectedId?.let {
-            outState.putInt(KEY_SELECTED_MENU_ID, it)
-        }
     }
 
     override fun onBindPresentationModel(pm: HomeFlowPm) {
@@ -105,11 +110,21 @@ class HomeFlowFragment :
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         binding.homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
-        pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
-
+        // Проверяем, инициализирован ли rxPermissions перед использованием
+        if (::rxPermissions.isInitialized) {
+            pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
+        } else {
+            view?.post {
+                if (::rxPermissions.isInitialized) {
+                    pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
+                }
+            }
+        }
         pm.likeAppDialogControl.bindLikeAppDialog()
         pm.googlePlayDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
         pm.feedbackDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.glucoseDataReminderDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        pm.openSettingsCommand.bindTo { openSettingsIntent(requireContext()) }
         bindHelpBottomSheet(pm)
     }
 
@@ -139,17 +154,38 @@ class HomeFlowFragment :
 
         pm.manualSyncError.bindTo { error ->
             with(binding.syncErrorBottomSheetView) {
-
                 val title = when (error) {
                     ManualSyncError.ErrorSync -> R.string.sync_connection_sync_error_title
                     ManualSyncError.NotFound -> R.string.sync_connect_device_not_found
+                    ManualSyncError.PermissionNotGranted -> R.string.sync_connect_device_check_permission
                 }
-                val errorIsNotFound = error is ManualSyncError.NotFound
+                val errorTextView = findViewById<TextView>(R.id.error_sync_text)
+                val confirmButton = findViewById<AppCompatTextView>(R.id.confirmButtonView)
+
+                val (errorMessageId, buttonMessageId, action) =
+                    if (error is ManualSyncError.PermissionNotGranted)
+                        Triple(
+                            R.string.sync_connection_permission_not_granted_description,
+                            R.string.sync_connection_permission_not_granted_button,
+                            pm.permissionSyncErrorAction
+                        )
+                    else
+                        Triple(
+                            R.string.sync_connection_error_text,
+                            R.string.repeat_sync_button_text,
+                            pm.manualSyncErrorAction
+                        )
+
+                errorTextView.isVisible = error is ManualSyncError.ErrorSync || error is ManualSyncError.PermissionNotGranted
+                errorTextView.text = resources.getString(errorMessageId)
+
                 findViewById<TextView>(R.id.title).setText(title)
-                findViewById<TextView>(R.id.error_sync_text).isVisible = !errorIsNotFound
-                findViewById<TextView>(R.id.not_found_text).isVisible = errorIsNotFound
-                findViewById<AppCompatTextView>(R.id.confirmButtonView).clicks().bindTo(pm.manualSyncErrorAction)
-                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks().bindTo(pm.closeBottomSheetErrorAction)
+                findViewById<TextView>(R.id.not_found_text).isVisible = error is ManualSyncError.NotFound
+
+                confirmButton.text = resources.getString(buttonMessageId)
+                confirmButton.clicks().bindTo(action)
+                findViewById<AppCompatImageView>(R.id.dialogCloseButtonView).clicks()
+                    .bindTo(pm.closeBottomSheetErrorAction)
             }
         }
 
@@ -164,7 +200,6 @@ class HomeFlowFragment :
             binding.syncErrorBottomSheetView.hide()
             binding.homeActionView.isVisible = true
         }
-
     }
 
     override fun onAttach(context: Context) {
@@ -185,6 +220,39 @@ class HomeFlowFragment :
             adapter = this@HomeFlowFragment.adapter
         }
     }
+
+    private fun setupBottomNavigationInsets() {
+        val syncStatusView = requireActivity().findViewById<View>(R.id.syncStatusView)
+        syncStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+        val connectionStatusView = requireActivity().findViewById<View>(R.id.connectionStatusView)
+        connectionStatusView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                v.setPadding(
+                    v.paddingLeft,
+                    v.paddingTop,
+                    v.paddingRight,
+                    navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+    }
+
+
+
+
 
     private fun DialogControl<DialogData, DialogResult>.bindLikeAppDialog() =
         bindTo { data, dc ->

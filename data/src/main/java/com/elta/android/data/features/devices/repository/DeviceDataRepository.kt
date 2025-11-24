@@ -1,6 +1,8 @@
 package com.elta.android.data.features.devices.repository
 
 import android.bluetooth.le.ScanResult
+import com.elta.android.common.di.qualifires.Firmware
+import com.elta.android.common.di.qualifires.UpdateType
 import com.elta.android.common.mapper.Mapper
 import com.elta.android.data.features.devices.dto.GlucometerDto
 import com.elta.android.data.features.devices.dto.GlucometerInfoDto
@@ -15,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DeviceDataRepository @Inject constructor(
-    private val glucometerClient: GlucometerClient,
+    @Firmware(UpdateType.NordicDfu) private val glucometerClient: GlucometerClient,
     private val scanToDtoMapper: Mapper<ScanResult, GlucometerDto>,
     private val glucometerToDomainMapper: Mapper<GlucometerDto, Glucometer>,
     private val glucometerInfoToDomainMapper: Mapper<GlucometerInfoDto, GlucometerInfo>,
@@ -29,6 +31,8 @@ class DeviceDataRepository @Inject constructor(
 
     override suspend fun connectDevice(address: String, pinCode: String) =
         glucometerClient.connectDevice(address, pinCode)
+
+
 
     override suspend fun disconnect() {
         glucometerClient.disconnect()
