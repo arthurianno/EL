@@ -132,9 +132,11 @@ object Dependencies {
             const val servicesVersion = "4.4.0"
             private const val fitnessVersion = "21.1.0"
             private const val authVersion = "20.2.0"
+            private const val healthConnectVersion = "1.1.0-alpha10"
 
             const val fitness = "com.google.android.gms:play-services-fitness:$fitnessVersion"
             const val auth = "com.google.android.gms:play-services-auth:$authVersion"
+            const val healthConnect = "androidx.health.connect:connect-client:$healthConnectVersion"
 
             object MlKit {
                 private const val barcodeScanerVersion = "18.1.0"

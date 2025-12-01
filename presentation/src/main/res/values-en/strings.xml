@@ -443,6 +443,7 @@
     <string name="profile_delete_button_dissmit">No</string>
     <string name="profile_delete_text">After deleting the profile, all previously entered data, including the link to the EMIAS system, will be deleted. To restore the account with deleted data, you can contact service@eltaltd.ru within 30 days of profile deletion. Are you sure you want to delete the profile?</string>
     <string name="profile_settings_google_fit">Sync with Google Fit</string>
+    <string name="profile_settings_google_fit_requirement">Works only on Android 14 and above</string>
     <string name="profile_is_deleted_title">Account Deleted</string>
     <string name="profile_is_deleted_body">Want to restore your account?</string>
     <string name="profile_is_deleted_restored_body">Your account has been successfully restored.</string>

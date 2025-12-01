@@ -8,6 +8,7 @@ import com.elta.android.data.di.CacheModule
 import com.elta.android.data.di.ClipboardModule
 import com.elta.android.data.di.CoroutineModule
 import com.elta.android.data.di.DataSourceModule
+import com.elta.android.data.di.HealthConnectModule
 import com.elta.android.data.di.FatSecretModule
 import com.elta.android.data.di.GlucometerImplModule
 import com.elta.android.data.di.GlucometerModule
@@ -54,6 +55,7 @@ import javax.inject.Singleton
         NetworkModule::class,
         TokenModule::class,
         DataSourceModule::class,
+        HealthConnectModule::class,
         MappersModule::class,
         MigrationModule::class,
         CacheModule::class,

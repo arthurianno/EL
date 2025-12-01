@@ -55,6 +55,7 @@ dependencies {
 
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)
+    implementation(Dependencies.Google.Services.healthConnect)
 
     implementation(Dependencies.Google.FireBase.messagingBom)
     implementation(Dependencies.Google.FireBase.configBom)

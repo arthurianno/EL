@@ -35,8 +35,10 @@ fun EventType.toEventDescriptionText(): Int =
         EventType.Weight -> R.string.event_type_weight
         EventType.Activity -> R.string.event_type_activity
         is EventType.Glucose -> {
-            if (this.inputType == GlucoseInputType.AUTO) R.string.event_type_glucose
-            else R.string.event_type_manual_glucose
+            when (this.inputType) {
+                GlucoseInputType.AUTO, GlucoseInputType.GOOGLE_FIT -> R.string.event_type_glucose
+                GlucoseInputType.MANUAL -> R.string.event_type_manual_glucose
+            }
         }
         EventType.Glycatedhemoglobin -> R.string.event_type_hba1c
     }

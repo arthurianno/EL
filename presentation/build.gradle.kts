@@ -115,6 +115,7 @@ dependencies {
     implementation(Dependencies.Google.materialDesign)
     implementation(Dependencies.Google.Services.fitness)
     implementation(Dependencies.Google.Services.auth)
+    implementation(Dependencies.Google.Services.healthConnect)
     implementation(Dependencies.Google.Services.MlKit.barcodeScaner)
     implementation(Dependencies.Google.Services.CameraX.core)
     implementation(Dependencies.Google.Services.CameraX.camera2)

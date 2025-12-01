@@ -132,4 +132,5 @@ fun GlucoseInputTypeDto.toDomain(): GlucoseInputType =
     when (this) {
         GlucoseInputTypeDto.MANUAL -> GlucoseInputType.MANUAL
         GlucoseInputTypeDto.AUTO -> GlucoseInputType.AUTO
+        GlucoseInputTypeDto.GOOGLE_FIT -> GlucoseInputType.GOOGLE_FIT
     }

@@ -504,6 +504,7 @@
     <string name="profile_delete_button_dissmit">Нет</string>
     <string name="profile_delete_text">После удаления профиля все ранее внесенные данные, в том числе привязка к системе ЕМИАС, будут удалены.\n\nДля восстановления учетной записи с удаленными данными вы сможете обратиться на service@eltaltd.ru в течение 30 дней с момента удаления профиля. Вы уверены, что хотите удалить профиль?</string>
     <string name="profile_settings_google_fit">Синхронизация c Google Fit</string>
+    <string name="profile_settings_google_fit_requirement">Работает только с Android 14 и выше</string>
     <string name="profile_is_deleted_title">Аккаунт удален</string>
     <string name="profile_is_deleted_body">Хотите восстановить аккаунт?</string>
     <string name="profile_is_deleted_restored_body">Ваш аккаунт успешно восстановлен</string>

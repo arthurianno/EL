@@ -39,6 +39,9 @@ import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoDataS
 import com.elta.android.data.features.firmware.datasource.info.FirmwareInfoRemoteDataSource
 import com.elta.android.data.features.googlefit.datasource.GoogleFitDataSource
 import com.elta.android.data.features.googlefit.datasource.HealthAppDataSource
+import com.elta.android.data.features.googlefit.datasource.HealthConnectDataSource
+import com.elta.android.data.features.googlefit.datasource.HybridHealthDataSource
+import com.elta.android.data.features.googlefit.mapper.HealthConnectExerciseToActivityMapper
 import com.elta.android.data.features.observers.datasource.cache.ObserverCachedDataSource
 import com.elta.android.data.features.observers.datasource.cache.ObserverCachedSource
 import com.elta.android.data.features.observers.datasource.remote.ObserverRemoteDataSource
@@ -170,9 +173,8 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindUserInfoDataSource(sourceInfo: UserInfoCachedDataSource): UserInfoDataSource
 
-    @Binds
-    @Singleton
-    abstract fun bindHealthAppDataSource(source: GoogleFitDataSource): HealthAppDataSource
+    // Health Connect integration moved to HealthConnectModule
+    // @Binds @Singleton abstract fun bindHealthAppDataSource(source: GoogleFitDataSource): HealthAppDataSource
 
     @Binds
     @Singleton

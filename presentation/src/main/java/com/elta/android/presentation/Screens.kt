@@ -224,7 +224,7 @@ object Screens {
 
     data class EditEventScreen(val eventId: String, val eventType: EventType) : SupportAppScreen() {
         override fun getFragment() = when {
-            eventType is EventType.Glucose && eventType.inputType == GlucoseInputType.AUTO -> {
+            eventType is EventType.Glucose && (eventType.inputType == GlucoseInputType.AUTO || eventType.inputType == GlucoseInputType.GOOGLE_FIT) -> {
                 GlucoseEventFragment.newInstance(eventId)
             }
 

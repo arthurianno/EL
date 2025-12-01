@@ -25,7 +25,7 @@ fun EventType.getValidator(glucoseFormat: GlucoseFormat?): FormValidator =
         is EventType.Glucose -> {
             when (this.inputType) {
                 GlucoseInputType.MANUAL -> ManualGlucoseValidator(glucoseFormat)
-                GlucoseInputType.AUTO -> GlucoseValidator
+                GlucoseInputType.AUTO, GlucoseInputType.GOOGLE_FIT -> GlucoseValidator
             }
         }
         EventType.Insulin -> InsulinMedicamentValidator
