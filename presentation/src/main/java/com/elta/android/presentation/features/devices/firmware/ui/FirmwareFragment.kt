@@ -34,7 +34,11 @@ class FirmwareFragment :
     override val screenLayout: Int = R.layout.fragment_update_firmware
     override val classToken: Class<FirmwarePm> = FirmwarePm::class.java
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
-    private lateinit var rxPermissions: RxPermissions
+
+    // Используем lazy для безопасной инициализации RxPermissions
+    private val rxPermissions: RxPermissions by lazy {
+        RxPermissions(requireActivity())
+    }
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -49,10 +53,8 @@ class FirmwareFragment :
         }
     }
 
-    // Новый метод: Инициализация в onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rxPermissions = RxPermissions(requireActivity())
         val intentFilter = IntentFilter(BootModeStatus.ACTION_STATUS_NAME)
         context?.let {
             LocalBroadcastManager.getInstance(it).registerReceiver(receiver, intentFilter)
@@ -80,9 +82,9 @@ class FirmwareFragment :
             }
         }
 
-        // Изменение: Отложили bindTo через post, чтобы избежать вызова в "опасный" момент
+        // Откладываем инициализацию RxPermissions чтобы избежать конфликта с FragmentManager
         view?.post {
-            if (isAdded) {  // Проверка, чтобы не вызывать на detached фрагменте
+            if (isAdded && !isStateSaved) {
                 pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
             }
         }

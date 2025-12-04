@@ -46,13 +46,9 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    // Изменение: Убрали lazy, добавили lateinit
-    private lateinit var rxPermissions: RxPermissions
-
-    // Новый метод: Инициализация в onCreate
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        rxPermissions = RxPermissions(requireActivity())  // Инициализируем здесь, чтобы избежать конфликта в lifecycle
+    // Используем lazy для безопасной инициализации RxPermissions
+    private val rxPermissions: RxPermissions by lazy {
+        RxPermissions(requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,9 +96,9 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
             )
         }
 
-        // Изменение: Отложили bindTo через post, чтобы избежать вызова в "опасный" момент
+        // Откладываем инициализацию RxPermissions чтобы избежать конфликта с FragmentManager
         view?.post {
-            if (isAdded) {  // Проверка, чтобы не вызывать на detached фрагменте
+            if (isAdded && !isStateSaved) {
                 pm.btControl.bindTo(compositeUnbind, rxPermissions, this)
             }
         }

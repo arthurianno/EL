@@ -49,7 +49,10 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
     override val screenLayout: Int = R.layout.fragment_sync_connect
     override val statusBarConfigProvider: StatusBarConfigProvider = LightStatusBarConfigProvider
 
-    private lateinit var rxPermissions: RxPermissions
+    // Используем lazy для безопасной инициализации RxPermissions
+    private val rxPermissions: RxPermissions by lazy {
+        RxPermissions(requireActivity())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +60,6 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rxPermissions = RxPermissions(requireActivity())
         with(binding.toolbar) {
             menuButtonView.hide()
         }
@@ -89,8 +91,12 @@ abstract class ConnectDeviceByPinFragment<T : ConnectDevicePm> :
             makeSnackBarWithAction(binding.root, data, sc)
         }
 
-        // Теперь можем безопасно использовать rxPermissions без отложенного вызова
-        pm.btControl.bindTo(compositeUnbind, rxPermissions, this@ConnectDeviceByPinFragment)
+        // Откладываем инициализацию RxPermissions чтобы избежать конфликта с FragmentManager
+        binding.root.post {
+            if (isAdded && !isStateSaved) {
+                pm.btControl.bindTo(compositeUnbind, rxPermissions, this@ConnectDeviceByPinFragment)
+            }
+        }
 
         pm.openPinCodeDialogCommand.bindTo {
             childFragmentManager.showDialog(PinDialogFragment.newInstance(it))

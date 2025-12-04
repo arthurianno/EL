@@ -64,17 +64,14 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
     @Inject
     lateinit var bus: RxBus
 
-    private lateinit var rxPermissions: RxPermissions
+    // Используем lazy для безопасной инициализации RxPermissions
+    private val rxPermissions: RxPermissions by lazy {
+        RxPermissions(requireActivity())
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Откладываем инициализацию RxPermissions
         setupBottomNavigationInsets()
-        view.post {
-            if (isAdded && !requireActivity().supportFragmentManager.isStateSaved) {
-                rxPermissions = RxPermissions(requireActivity())
-            }
-        }
         savedInstanceState?.getInt(KEY_SELECTED_MENU_ID)
             ?.passTo(presentationModel.menuItemRestoredAction)
         initBottomSheetItemsView()
@@ -110,14 +107,10 @@ class HomeFlowFragment : BaseFlowFragment<HomeFlowPm, FragmentHomeFlowBinding>(F
             bus.event(Events.HomeBottomSheetStateChanged(visible))
         }
         binding.homeBottomNavigationView.tabClicks().bindTo(pm.menuItemSelectedAction)
-        // Проверяем, инициализирован ли rxPermissions перед использованием
-        if (::rxPermissions.isInitialized) {
-            pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
-        } else {
-            view?.post {
-                if (::rxPermissions.isInitialized) {
-                    pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
-                }
+        // Откладываем инициализацию RxPermissions чтобы избежать конфликта с FragmentManager
+        view?.post {
+            if (isAdded && !isStateSaved) {
+                pm.btControl.bindTo(compositeDestroy, rxPermissions, this)
             }
         }
         pm.likeAppDialogControl.bindLikeAppDialog()
