@@ -1,8 +1,6 @@
 package com.elta.android.data.features.googlefit.datasource
 
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import androidx.health.connect.client.records.BloodPressureRecord
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
 import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
@@ -19,11 +17,8 @@ interface HealthAppDataSource {
     // Health metrics (available only on Android 14+ via Health Connect)
     fun getBloodGlucose(): Observable<List<BloodGlucoseRecord>> = Observable.just(emptyList())
 
-    fun getBloodPressure(): Observable<List<BloodPressureRecord>> = Observable.just(emptyList())
-
     fun getWeight(): Observable<List<WeightRecord>> = Observable.just(emptyList())
 
-    fun getHeartRate(): Observable<List<HeartRateRecord>> = Observable.just(emptyList())
 
     fun getTotalCaloriesBurned(): Observable<List<TotalCaloriesBurnedRecord>> = Observable.just(emptyList())
 }

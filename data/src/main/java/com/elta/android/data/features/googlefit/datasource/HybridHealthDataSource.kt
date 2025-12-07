@@ -3,8 +3,6 @@ package com.elta.android.data.features.googlefit.datasource
 import android.content.Context
 import android.os.Build
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import androidx.health.connect.client.records.BloodPressureRecord
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
 import com.elta.android.data.features.googlefit.dto.ActivityDto
@@ -23,7 +21,6 @@ import javax.inject.Inject
  * using the modern Health Connect API when available.
  */
 class HybridHealthDataSource @Inject constructor(
-    private val context: Context,
     private val healthConnectDataSource: HealthConnectDataSource,
     private val googleFitDataSource: GoogleFitDataSource
 ) : HealthAppDataSource {
@@ -70,20 +67,12 @@ class HybridHealthDataSource @Inject constructor(
      */
     override fun getBloodGlucose() = healthConnectDataSource.getBloodGlucose()
 
-    /**
-     * Read blood pressure data (Health Connect only, Android 14+)
-     */
-    override fun getBloodPressure() = healthConnectDataSource.getBloodPressure()
 
     /**
      * Read weight data (Health Connect only, Android 14+)
      */
     override fun getWeight() = healthConnectDataSource.getWeight()
 
-    /**
-     * Read heart rate data (Health Connect only, Android 14+)
-     */
-    override fun getHeartRate() = healthConnectDataSource.getHeartRate()
 
     /**
      * Read total calories burned data (Health Connect only, Android 14+)

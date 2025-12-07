@@ -7,9 +7,7 @@ import android.os.Build
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
@@ -52,8 +50,6 @@ class HealthConnectDataSource @Inject constructor(
         HealthPermission.getReadPermission(StepsRecord::class),
         // Health metrics
         HealthPermission.getReadPermission(BloodGlucoseRecord::class),
-        HealthPermission.getReadPermission(BloodPressureRecord::class),
-        HealthPermission.getReadPermission(HeartRateRecord::class),
         HealthPermission.getReadPermission(WeightRecord::class),
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
     )
@@ -203,40 +199,7 @@ class HealthConnectDataSource @Inject constructor(
         }
     }
 
-    /**
-     * Read blood pressure data from Health Connect
-     */
-    override fun getBloodPressure(): Observable<List<BloodPressureRecord>> {
-        return Observable.fromCallable {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                return@fromCallable emptyList<BloodPressureRecord>()
-            }
 
-            val client = healthConnectClient ?: return@fromCallable emptyList<BloodPressureRecord>()
-
-            runBlocking {
-                try {
-                    val startTime = syncStorage.lastGoogleFitSync ?: millisAtStartOfDay()
-                    val endTime = currentMillis()
-
-                    val request = ReadRecordsRequest(
-                        recordType = BloodPressureRecord::class,
-                        timeRangeFilter = TimeRangeFilter.between(
-                            Instant.ofEpochMilli(startTime),
-                            Instant.ofEpochMilli(endTime)
-                        )
-                    )
-
-                    val response = client.readRecords(request)
-                    Timber.d("Successfully read ${response.records.size} blood pressure records from Health Connect")
-                    response.records
-                } catch (e: Exception) {
-                    Timber.e(e, "Error reading blood pressure from Health Connect")
-                    emptyList()
-                }
-            }
-        }
-    }
 
     /**
      * Read weight data from Health Connect
@@ -273,40 +236,7 @@ class HealthConnectDataSource @Inject constructor(
         }
     }
 
-    /**
-     * Read heart rate data from Health Connect
-     */
-    override fun getHeartRate(): Observable<List<HeartRateRecord>> {
-        return Observable.fromCallable {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                return@fromCallable emptyList<HeartRateRecord>()
-            }
 
-            val client = healthConnectClient ?: return@fromCallable emptyList<HeartRateRecord>()
-
-            runBlocking {
-                try {
-                    val startTime = syncStorage.lastGoogleFitSync ?: millisAtStartOfDay()
-                    val endTime = currentMillis()
-
-                    val request = ReadRecordsRequest(
-                        recordType = HeartRateRecord::class,
-                        timeRangeFilter = TimeRangeFilter.between(
-                            Instant.ofEpochMilli(startTime),
-                            Instant.ofEpochMilli(endTime)
-                        )
-                    )
-
-                    val response = client.readRecords(request)
-                    Timber.d("Successfully read ${response.records.size} heart rate records from Health Connect")
-                    response.records
-                } catch (e: Exception) {
-                    Timber.e(e, "Error reading heart rate from Health Connect")
-                    emptyList()
-                }
-            }
-        }
-    }
 
     /**
      * Read total calories burned data from Health Connect

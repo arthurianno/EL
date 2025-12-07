@@ -7,9 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
@@ -54,8 +52,8 @@ class HealthConnectAuthActivity : ComponentActivity() {
                     HealthPermission.getReadPermission(StepsRecord::class),
                     // Health metrics
                     HealthPermission.getReadPermission(BloodGlucoseRecord::class),
-                    HealthPermission.getReadPermission(BloodPressureRecord::class),
-                    HealthPermission.getReadPermission(HeartRateRecord::class),
+                    // REMOVED: BloodPressureRecord - not required by Google Play policy
+                    // REMOVED: HeartRateRecord - not required by Google Play policy
                     HealthPermission.getReadPermission(WeightRecord::class),
                     HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
                 )

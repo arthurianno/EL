@@ -36,11 +36,10 @@ class HealthConnectModule {
     @Provides
     @Singleton
     fun provideHybridHealthDataSource(
-        context: Context,
         healthConnectDataSource: HealthConnectDataSource,
         googleFitDataSource: GoogleFitDataSource
     ): HybridHealthDataSource {
-        return HybridHealthDataSource(context, healthConnectDataSource, googleFitDataSource)
+        return HybridHealthDataSource(healthConnectDataSource, googleFitDataSource)
     }
 
     @Provides

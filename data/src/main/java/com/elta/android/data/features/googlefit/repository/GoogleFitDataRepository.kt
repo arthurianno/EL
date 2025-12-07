@@ -9,10 +9,8 @@ import com.elta.android.data.features.googlefit.datasource.errors.GoogleFitSyncN
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.repository.EventsRepository
 import com.elta.android.domain.features.googlefit.model.BloodGlucoseData
-import com.elta.android.domain.features.googlefit.model.BloodPressureData
 import com.elta.android.domain.features.googlefit.model.CaloriesData
 import com.elta.android.domain.features.googlefit.model.GoogleFitAuthResult
-import com.elta.android.domain.features.googlefit.model.HeartRateData
 import com.elta.android.domain.features.googlefit.model.HealthMetrics
 import com.elta.android.domain.features.googlefit.model.WeightData
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
@@ -112,20 +110,6 @@ class GoogleFitDataRepository @Inject constructor(
                 .onErrorReturnItem(emptyList())
                 .firstOrError(),
 
-            dataSource.getBloodPressure()
-                .map { records ->
-                    records.map { record ->
-                        BloodPressureData(
-                            systolic = record.systolic.inMillimetersOfMercury,
-                            diastolic = record.diastolic.inMillimetersOfMercury,
-                            time = record.time,
-                            bodyPosition = record.bodyPosition.toString()
-                        )
-                    }
-                }
-                .onErrorReturnItem(emptyList())
-                .firstOrError(),
-
             dataSource.getWeight()
                 .map { records ->
                     records.map { record ->
@@ -133,20 +117,6 @@ class GoogleFitDataRepository @Inject constructor(
                             weightKg = record.weight.inKilograms,
                             time = record.time
                         )
-                    }
-                }
-                .onErrorReturnItem(emptyList())
-                .firstOrError(),
-
-            dataSource.getHeartRate()
-                .map { records ->
-                    records.flatMap { record ->
-                        record.samples.map { sample ->
-                            HeartRateData(
-                                bpm = sample.beatsPerMinute,
-                                time = sample.time
-                            )
-                        }
                     }
                 }
                 .onErrorReturnItem(emptyList())
@@ -164,19 +134,16 @@ class GoogleFitDataRepository @Inject constructor(
                 }
                 .onErrorReturnItem(emptyList())
                 .firstOrError()
-        ) { glucose, pressure, weight, heartRate, calories ->
+        ) { glucose, weight, calories ->
             HealthMetrics(
                 bloodGlucose = glucose,
-                bloodPressure = pressure,
                 weight = weight,
-                heartRate = heartRate,
                 calories = calories
             )
         }
         .doOnSuccess { metrics ->
             Timber.d("Synced health metrics: ${metrics.bloodGlucose.size} glucose, " +
-                    "${metrics.bloodPressure.size} pressure, ${metrics.weight.size} weight, " +
-                    "${metrics.heartRate.size} heart rate, ${metrics.calories.size} calories")
+                    "${metrics.weight.size} weight, ${metrics.calories.size} calories")
         }
         .doOnError { error ->
             Timber.e(error, "Error syncing health metrics")
