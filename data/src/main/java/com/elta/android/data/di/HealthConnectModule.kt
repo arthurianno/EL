@@ -24,6 +24,7 @@ class HealthConnectModule {
     }
 
     @Provides
+
     @Singleton
     fun provideHealthConnectDataSource(
         context: Context,
