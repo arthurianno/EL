@@ -10,10 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import com.elta.android.presentation.theme.GetLocalProperties
+
+
 
 @Composable
 internal fun ColumnScope.MainImage(
+    imageUrl: String? = null,
     @DrawableRes imageId: Int
 ) {
     GetLocalProperties { dimens, _, _, _, _ ->
@@ -24,10 +28,16 @@ internal fun ColumnScope.MainImage(
                 .padding(dimens.bigDim),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = imageId),
-                contentDescription = null
-            )
+           when(imageUrl != null){
+                true -> AsyncImage(
+                     model = imageUrl,
+                     contentDescription = null
+                )
+                false -> Image(
+                     painter = painterResource(id = imageId),
+                     contentDescription = null
+                )
+           }
         }
     }
 }

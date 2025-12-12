@@ -2,8 +2,14 @@ package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.elta.android.domain.features.multiLang.usecases.GetScreenConfigUseCase
+import coil.Coil.imageLoader
+import coil.ImageLoader
+import coil.request.ImageRequest
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetAllScreensUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
@@ -19,23 +25,47 @@ import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectStartViewState
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 class ConnectStartViewModel @Inject constructor(
     private val appMetric: AppMetricTracker,
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
-    private val getScreenConfigUseCase: GetScreenConfigUseCase,
+    private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
     private val context: Context
 ) : BaseViewModel<ConnectStartViewState>() {
 
     override fun createInitState() = ConnectStartViewState(
-        isOnBoarding = true,
-        screenConfig = null
+        isOnBoarding = true
     )
 
     internal val appTopBar = BaseAppTopBarWidgetModel()
     internal val downButton = DownButtonWidgetModel()
+
+    init {
+        // Устанавливаем дефолтный текст кнопки
+        downButton.setText(context.getString(R.string.sync_start_action_button))
+
+        viewModelScope.launch {
+            when (val result = getScreenFromCacheUseCase("connect-start-onboarding")) {
+                is Resource.Success -> {
+                    val screen = result.data
+                    Log.e("CONNECTSTART","${state.value}")
+                    // Обновляете state с данными экрана
+                    reduceState {
+                        state.value.copy(
+                            screenConfig = screen
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("ConnectStartViewModel", "Error fetching screen: ${result.message}")
+                }
+                is Resource.Loading -> {
+                    Log.e("ConnectStartViewModel", "Loading screen config...")
+                }
+            }
+        }
+    }
 
     override val widgets = listOf(
         appTopBar,
@@ -52,23 +82,6 @@ class ConnectStartViewModel @Inject constructor(
 
         reduceState {
             state.value.copy(isOnBoarding = isOnboarding)
-        }
-
-        // Запрашиваем конфигурацию для экрана и устанавливаем текст кнопки
-        viewModelScope.launch {
-            try {
-                val config = getScreenConfigUseCase("connect_start")
-                reduceState {
-                    state.value.copy(screenConfig = config)
-                }
-                // Устанавливаем текст кнопки из конфигурации
-                val buttonText = config?.description?.getTranslation("ru", defaultLang = "ru")
-                Timber.d("Button text from config: $buttonText") // Логируем для отладки
-                downButton.setText(buttonText ?: context.getString(R.string.sync_state_pin_dialog_button))
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to load screen config for connect_start")
-                downButton.setText(context.getString(R.string.sync_state_pin_dialog_button))
-            }
         }
     }
 

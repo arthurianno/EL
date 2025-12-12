@@ -28,7 +28,7 @@ import com.elta.android.data.features.feedback.repository.FeedbackDataRepository
 import com.elta.android.data.features.firmware.repository.FirmwareDataRepository
 import com.elta.android.data.features.glucometers.repository.GlucometersDataRepository
 import com.elta.android.data.features.googlefit.repository.GoogleFitDataRepository
-import com.elta.android.data.features.multiLang.repositories.ScreenConfigRepositoryImpl
+import com.elta.android.data.features.multiLangsConfig.repositoryImpl.MultiLangConfigRepositoryImpl
 import com.elta.android.data.features.newsChannel.repository.NewsDataRepository
 import com.elta.android.data.features.observers.repository.ObserverDataRepository
 import com.elta.android.data.features.reminder.repository.ReminderDataRepository
@@ -67,7 +67,7 @@ import com.elta.android.domain.features.feedback.repository.FeedbackRepository
 import com.elta.android.domain.features.firmware.repository.FirmwareRepository
 import com.elta.android.domain.features.glucometers.repository.GlucometersRepository
 import com.elta.android.domain.features.googlefit.repository.GoogleFitRepository
-import com.elta.android.domain.features.multiLang.repositories.ScreenConfigRepository
+import com.elta.android.domain.features.multiLangsConfig.repository.MultilangConfigRepository
 import com.elta.android.domain.features.newsChannel.repository.NewsRepository
 import com.elta.android.domain.features.observers.repository.ObserverRepository
 import com.elta.android.domain.features.reminder.repository.RemindersRepository
@@ -105,7 +105,7 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindScreenConfigRepository(repo: ScreenConfigRepositoryImpl): ScreenConfigRepository
+    abstract fun bindScreenConfigRepository(repo: MultiLangConfigRepositoryImpl): MultilangConfigRepository
 
     @Binds
     @Singleton

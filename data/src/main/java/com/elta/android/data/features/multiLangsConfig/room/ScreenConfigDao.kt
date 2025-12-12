@@ -1,4 +1,4 @@
-package com.elta.android.data.features.multiLang.room
+package com.elta.android.data.features.multiLangsConfig.room
 
 import androidx.room.Dao
 import androidx.room.Database
@@ -12,9 +12,10 @@ import androidx.room.RoomDatabase
 @Entity(tableName = "screen_configs")
 data class ScreenConfigEntity(
     @PrimaryKey val slug: String,
-    val descriptionJson: String, // JSON string of Map<String, String>
-    val backgroundImageUrl: String?,
-    val lastUpdated: Long // timestamp
+    val titleJson: String,  // ← JSON Map<String, String>
+    val descriptionJson: String,
+    val backgroundImageUrl: String?
+
 )
 
 @Dao
@@ -23,11 +24,14 @@ interface ScreenConfigDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(configs: List<ScreenConfigEntity>)
 
-    @Query("SELECT * FROM screen_configs WHERE slug IN (:slugs)")
-    suspend fun getConfigs(slugs: List<String>): List<ScreenConfigEntity>
+    @Query("SELECT * FROM screen_configs")
+    suspend fun getConfigs(): List<ScreenConfigEntity>
 
-    @Query("SELECT MAX(lastUpdated) FROM screen_configs")
-    suspend fun getLastUpdateTime(): Long?
+    @Query("SELECT * FROM screen_configs WHERE slug = :slug LIMIT 1")
+    suspend fun getConfigBySlug(slug: String): ScreenConfigEntity?
+
+//    @Query("SELECT MAX(lastUpdated) FROM screen_configs")
+//    suspend fun getLastUpdateTime(): Long?
 
     @Query("DELETE FROM screen_configs")
     suspend fun clearAll()

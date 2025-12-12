@@ -27,8 +27,7 @@ import com.elta.android.data.features.feedback.api.MockedFeedbackApi
 import com.elta.android.data.features.firmware.api.FirmwareApi
 import com.elta.android.data.features.firmware.api.MockedFirmwareApi
 import com.elta.android.data.features.glucometers.api.GlucometersApi
-import com.elta.android.data.features.multiLang.api.ConfigApi
-import com.elta.android.data.features.multiLang.api.MockedConfigApi
+import com.elta.android.data.features.multiLangsConfig.api.MultiLangConfigApi
 import com.elta.android.data.features.newsChannel.datasource.NewsApi
 import com.elta.android.data.features.observers.api.MockedObserverApi
 import com.elta.android.data.features.observers.api.ObserverApi
@@ -156,12 +155,9 @@ class ApiModule {
     @Singleton
     fun provideConfigApi(
         retrofit: Retrofit
-    ): ConfigApi =
-        if (USE_MOCKED_CONFIG_API) {
-            MockedConfigApi()
-        } else {
-            retrofit.create(ConfigApi::class.java)
-        }
+    ): MultiLangConfigApi =
+        retrofit.create(MultiLangConfigApi::class.java)
+
 
     @Provides
     @Singleton

@@ -1,11 +1,19 @@
 package com.elta.android.presentation.features.app.pm
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
+import coil.Coil
+import coil.Coil.imageLoader
 import com.elta.android.common.errors.UnauthorizedError
 import com.elta.android.common.logger.FirebaseStorage
 import com.elta.android.common.logger.crashlyrics.CrashlyticsReport
 import com.elta.android.common.utils.hideEmail
 import com.elta.android.domain.common.usecase.CleanupCachedFilesUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetAllScreensUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.ShouldRefreshScreenUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.UpdateLastRefreshTimeUseCase
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.remoteconfig.interactor.FetchRemoteConfigUseCase
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.domain.features.rostech.interactor.RosTechUseCase
@@ -32,6 +40,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.features.app.model.SyncStatus
+import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamiclinks.NotificationNavigationMapper
 import com.elta.android.presentation.widgets.status.Status
@@ -39,13 +48,16 @@ import com.elta.android.presentation.widgets.status.Visibility
 import com.github.terrakok.cicerone.Screen
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.rx2.rxSingle
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.invoke
 
 private const val EMPTY_STATUS_DELAY_MILLIS = 400L
 private const val STATUS_DELAY_MILLIS = 2000L
@@ -61,8 +73,12 @@ class AppPm @Inject constructor(
     private val crashlyticsReport: CrashlyticsReport,
     private val fetchRemoteConfigUseCase: FetchRemoteConfigUseCase,
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
+    private val getAllScreensUseCase: GetAllScreensUseCase,
+    private val shouldRefreshScreensUseCase: ShouldRefreshScreenUseCase,  // <-- добавить
+    private val updateLastRefreshTimeUseCase: UpdateLastRefreshTimeUseCase, // <-- добавить
     private val rosTech: RosTechUseCase,
     private val appMetric: AppMetricTracker,
+    private val context: Context,
     services: ServiceFacade
 ) : BasePm(services), ConnectionListener {
 
@@ -81,6 +97,7 @@ class AppPm @Inject constructor(
     private val checkAppVersionAction = action<Unit>()
     private val cleanupFilesAction = action<Unit>()
     private val fetchRemoteConfigAction = action<Unit>()
+    private val preloadScreensAction = action<Unit>()
 
     val syncStatusState = state<Status>()
     val syncStatusVisibility = state<Visibility>(Visibility.Hide)
@@ -169,9 +186,55 @@ class AppPm @Inject constructor(
             .flatMapSingle { Single.fromCallable { cleanupFiles() } }
             .subscribe()
             .untilDestroy()
+
         fetchRemoteConfigAction.observable
             .flatMapCompletable {
                 fetchRemoteConfigUseCase.execute()
+            }
+            .subscribe()
+            .untilDestroy()
+
+        preloadScreensAction.observable
+            .flatMapSingle {
+                rxSingle { shouldRefreshScreensUseCase.invoke() }  // <-- проверить нужно ли обновление
+                    .flatMap { shouldRefresh ->
+                        if (shouldRefresh) {
+                            // Если прошло 24 часа - делаем запрос
+                            rxSingle { getAllScreensUseCase.invoke() }
+                                .doOnSuccess { result ->
+                                    when (result) {
+                                        is Resource.Success -> {
+                                            // Сохраняем timestamp
+                                            rxSingle { updateLastRefreshTimeUseCase.invoke() }
+                                                .subscribe()
+
+                                            // Кэшируем картинки
+                                            rxSingle(Dispatchers.IO) {
+                                                result.data.map {
+                                                    val imageLoader = imageLoader(context)
+                                                    ImageCacheHelper.prefetchImage(
+                                                        it.backgroundImageUrl!!,
+                                                        context,
+                                                        imageLoader
+                                                    )
+                                                    Log.i("AppPM", "Prefetched image: ${imageLoader}")
+                                                }
+                                            }
+                                        }
+                                        is Resource.Error -> {
+                                            Log.i("AppPM", "Error: ${result.message}")
+                                        }
+                                        is Resource.Loading -> {
+                                            Log.i("AppPM", "Loading")
+                                        }
+                                    }
+                                }
+                        } else {
+                            // Если не прошло 24 часа - пропускаем
+                            Log.i("AppPM", "Skipping refresh, less than 24h passed")
+                            Single.just(Unit)
+                        }
+                    }
             }
             .subscribe()
             .untilDestroy()
@@ -279,6 +342,7 @@ class AppPm @Inject constructor(
             .doOnNext(cleanupFilesAction.consumer)
             .doOnNext(fetchRemoteConfigAction.consumer)
             .doOnNext(checkAppVersionAction.consumer)
+            .doOnNext(preloadScreensAction.consumer)
             .subscribe()
             .untilDestroy()
 

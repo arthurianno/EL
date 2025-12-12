@@ -3,8 +3,8 @@ package com.elta.android.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.elta.android.data.features.multiLang.room.ConfigDatabase
-import com.elta.android.data.features.multiLang.room.ScreenConfigDao
+import com.elta.android.data.features.multiLangsConfig.room.ConfigDatabase
+import com.elta.android.data.features.multiLangsConfig.room.ScreenConfigDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
