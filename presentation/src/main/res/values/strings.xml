@@ -46,8 +46,8 @@
     <string name="registration_main_email_hint">Ваш email</string>
     <string name="registration_main_password_hint">Пароль</string>
     <string name="registration_main_description_privacy_policy">Я ознакомлен и согласен с условиями\nлицензионного договора и политики\nобработки персональных данных, а также\nдаю согласие на обработку персональных\nданных</string>
-    <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики\nобработки персональных данных</string>
-    <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных\nданных</string>
+    <string name="registration_main_privacy_policy_clickable_mask">лицензионного договора и политики обработки персональных данных</string>
+    <string name="registration_main_personal_data_clickable_mask">согласие на обработку персональных данных</string>
     <string name="registration_main_button_continue">Продолжить</string>
     <string name="registration_privacy_policy">https://stage2.vdiabete.com/privacy_policy.html</string>
     <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
@@ -392,6 +392,7 @@
 
     <string name="sync_connect_menu_button_text">Пропустить этот шаг</string>
     <string name="sync_connect_start_title">Хотите подключить глюкометр?</string>
+    <string name="choose_opinion">Выберите опцию</string>
     <string name="sync_connect_start_text">Вы можете подключить глюкометр сейчас или пропустить этот шаг и сделать это позже в своём профиле</string>
 
     <string name="sync_connect_device_check_permission">Проверьте разрешение</string>
@@ -1039,5 +1040,9 @@
     <string name="general_date_range_title">Выберите период</string>
     <string name="general_date_range_description">Выберите начало и конец периода</string>
     <string name="general_date_range_action_button">Подтвердить</string>
+
+    <!-- SPLASH SCREEN -->
+    <string name="splash_loading_message">Не беспокойтесь, установка компонентов происходит только при обновлении!</string>
+    <string name="splash_loading_progress">Загрузка компонентов: %1$d/%2$d</string>
 
 </resources>

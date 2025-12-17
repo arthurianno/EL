@@ -38,6 +38,8 @@
     <color name="black">#17191f</color>
     <color name="shade_black0">#626a7c</color>
     <color name="white">#ffffff</color>
+    <color name="white_25">#40ffffff</color>
+    <color name="white_50">#80ffffff</color>
     <color name="shade_g_green2_a">#3ea48d</color>
     <color name="shade_g_green2_b">#3b919a</color>
     <color name="pale_gray">#f7f7f8</color>

@@ -1,6 +1,10 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import coil.imageLoader
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.LocationNotEnabledError
 import com.elta.android.common.errors.LocationPermissionNotGrantedError
@@ -8,9 +12,12 @@ import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Events
+import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.analytics.Analytics
 import com.elta.android.presentation.analytic.core.appmetric.AppMetricTracker
@@ -22,6 +29,7 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
+import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.core.compose.widgets.buttons.DownButtonWidgetModel
 import com.elta.android.presentation.core.compose.widgets.dialogs.BaseDialogWidgetModel
@@ -32,6 +40,8 @@ import com.elta.android.presentation.features.sync.connect.model.connecting.Conn
 import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingViewAction
 import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingViewEvent
 import com.elta.android.presentation.features.sync.connect.model.connecting.ConnectingViewState
+import com.elta.android.presentation.theme.red
+import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.nullgr.core.rx.RxBus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -42,6 +52,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
 import java.util.concurrent.TimeUnit
@@ -57,8 +68,14 @@ class ConnectingViewModel @Inject constructor(
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val bus: RxBus,
     private val analytics: Analytics,
-    private val appMetric: AppMetricTracker
-) : BaseViewModel<ConnectingViewState>() {
+    private val appMetric: AppMetricTracker,
+    private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
+    private val context: Context
+) : BaseViewModel<ConnectingViewState>(), ComposeScreenConfigurable {
+
+    override val screenConfigKey = "connecting-screen"
+    override val getScreenConfigUseCase = getScreenFromCacheUseCase
+
     override fun createInitState(): ConnectingViewState =
         ConnectingViewState(
             stageType = ConnectingStageType.Connecting,
@@ -92,7 +109,6 @@ class ConnectingViewModel @Inject constructor(
             sendEvent(ConnectingViewEvent.Location.RequestPermission)
         }
     )
-
     private var connectJob: Job? = null
     private var syncJob: Job? = null
     private var attempts: Int = 0
@@ -109,6 +125,30 @@ class ConnectingViewModel @Inject constructor(
     ).actionObserve()
 
     init {
+        loadMultipleScreenConfigs(
+            context = context,
+            configs = mapOf(
+                "sync" to "sync-screen",
+                "success" to "successful-sync-screen",
+                "failed" to "failed-sync-screen"
+            ),
+            onUpdate = { results ->
+                val syncResult = results["sync"]
+                val successResult = results["success"]
+                val failedResult = results["failed"]
+
+                state.value.copy(
+                    syncScreenConfig = syncResult?.first,
+                    isSyncImageReady = syncResult?.second ?: true,
+
+                    successfulSyncConfig = successResult?.first,
+                    isSuccessImageReady = successResult?.second ?: true,
+
+                    failedSyncConfig = failedResult?.first,
+                    isFailedImageReady = failedResult?.second ?: true
+                )
+            }
+        )
         launch {
             needEnableLocation = getLocationNeededUseCase.execute().await()
         }

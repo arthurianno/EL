@@ -38,8 +38,8 @@
     <string name="registration_main_email_hint">Your Email</string>
     <string name="registration_main_password_hint">Password</string>
     <string name="registration_main_description_privacy_policy">I have read and agree to the terms of the License Agreement and the Personal Data Processing Policy, and I consent to the processing of my personal data.</string>
-    <string name="registration_main_privacy_policy_clickable_mask">License Agreement and Personal Data Processing Policy</string>
-    <string name="registration_main_personal_data_clickable_mask">Consent to the processing of personal data</string>
+    <string name="registration_main_privacy_policy_clickable_mask">License Agreement and the Personal Data Processing Policy</string>
+    <string name="registration_main_personal_data_clickable_mask">consent to the processing of my personal data</string>
     <string name="registration_main_button_continue">Continue</string>
     <string name="registration_privacy_policy">https://stage2.vdiabete.com/privacy_policy.html</string>
     <string name="registration_personal_data">https://stage2.vdiabete.com/personal_data.html</string>
@@ -341,6 +341,7 @@
     <string name="sync_connect_menu_button_text">Skip This Step</string>
     <string name="sync_connect_start_title">Would you like to connect a glucose meter?</string>
     <string name="sync_connect_start_text">You can connect the glucose meter now or skip this step and do it later in your profile.</string>
+    <string name="choose_opinion">Choose opinion</string>
     <string name="sync_connect_device_check_permission">Check Permissions</string>
     <string name="sync_connect_device_not_found">Device Not Found</string>
     <string name="sync_connect_incorrect_pin_code">You have entered an incorrect PIN code.</string>
@@ -904,5 +905,9 @@
     <string name="error_file_not_saved">An error occurred while saving the file</string>
     <string name="statistic_general_index_description_by_hour_insulin">Total insulin amount %s: %s</string>
     <string name="statistic_general_index_description_by_hour_activity">" Number of workouts this hour: %1$s. Average workout duration: %2$s"</string>
+
+    <!-- SPLASH SCREEN -->
+    <string name="splash_loading_message">Don\'t worry, component installation only happens during updates!</string>
+    <string name="splash_loading_progress">Loading components: %1$d/%2$d</string>
 
 </resources>

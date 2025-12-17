@@ -1,17 +1,25 @@
+// BaseFragment.kt
 package com.elta.android.presentation.core.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
+import coil.load
+import coil.request.CachePolicy
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.navigation.FlowRouter
 import com.elta.android.presentation.core.navigation.RouterProvider
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.core.pm.ScreenConfigurable
 import com.elta.android.presentation.core.pm.factory.PmFactory
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.pm.widgets.bind
@@ -162,5 +170,135 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
     fun <T> SnackBarControl<T>.bindTo(createSnackBar: (data: T, sc: SnackBarControl<T>) -> Snackbar) {
         bind({ data, sc -> createSnackBar(data, sc) }, compositeDestroy)
+    }
+
+
+    protected inner class ScreenConfigBinder(private val pm: T) {
+        private var backgroundImageView: ImageView? = null
+        private var titleView: TextView? = null
+        private var descriptionView: TextView? = null
+        private var rootView: View? = null
+        private var defaultTitleRes: Int? = null
+        private var defaultDescriptionRes: Int? = null
+        private var defaultImageRes: Int? = null
+        private var onConfigLoaded: ((ScreenEntity?) -> Unit)? = null
+
+        fun withBackgroundImage(view: ImageView, defaultRes: Int? = null) = apply {
+            this.backgroundImageView = view
+            this.defaultImageRes = defaultRes
+        }
+
+        fun withTitle(view: TextView, defaultRes: Int? = null) = apply {
+            this.titleView = view
+            this.defaultTitleRes = defaultRes
+        }
+
+        fun withDescription(view: TextView, defaultRes: Int? = null) = apply {
+            this.descriptionView = view
+            this.defaultDescriptionRes = defaultRes
+        }
+
+        fun withRootView(view: View) = apply {
+            this.rootView = view
+        }
+
+        fun onConfigLoaded(action: (ScreenEntity?) -> Unit) = apply {
+            this.onConfigLoaded = action
+        }
+
+        fun bind() {
+            // ВАЖНО: Сначала показываем дефолтные значения сразу!
+            showDefaults()
+
+            // Проверяем, что PM реализует ScreenConfigurable
+            if (pm !is ScreenConfigurable) {
+                Log.w("BaseFragment", "PM doesn't implement ScreenConfigurable, using defaults only")
+                return
+            }
+
+            rootView?.visibility = View.INVISIBLE
+
+            // Подписка на конфигурацию (если придет)
+            pm.screenConfigState.bindTo { screenEntity ->
+                if (screenEntity != null) {
+                    // Обновляем тексты из конфигурации
+                    titleView?.text = screenEntity.title
+                        ?: defaultTitleRes?.let { getString(it) }
+
+                    descriptionView?.text = screenEntity.description
+                        ?: defaultDescriptionRes?.let { getString(it) }
+
+                    onConfigLoaded?.invoke(screenEntity)
+                } else {
+                    // Конфигурация не пришла - оставляем дефолты (уже установлены)
+                    Log.d("BaseFragment", "No screen config, using defaults")
+                }
+            }
+
+            // Подписка на готовность картинки
+            pm.imagePreloadState.bindTo { isReady ->
+                val screenEntity = pm.screenConfigState.valueOrNull
+                val imageUrl = screenEntity?.backgroundImageUrl
+
+                if (isReady && imageUrl != null) {
+                    // Картинка есть в кеше - загружаем её
+                    loadImageFromUrl(backgroundImageView, imageUrl, defaultImageRes)
+                } else {
+                    // Картинки нет или не в кеше - дефолтная уже установлена!
+                    Log.d("BaseFragment", "Image not ready or no URL, keeping default image")
+                }
+
+                // Всегда показываем экран после проверки картинки
+                rootView?.visibility = View.VISIBLE
+            }
+        }
+
+        // Устанавливаем дефолтные значения сразу при биндинге
+        private fun showDefaults() {
+            // Дефолтная картинка
+            defaultImageRes?.let {
+                backgroundImageView?.setImageResource(it)
+                Log.d("BaseFragment", "Set default image: $it")
+            }
+
+            // Дефолтные тексты
+            defaultTitleRes?.let {
+                titleView?.text = getString(it)
+            }
+
+            defaultDescriptionRes?.let {
+                descriptionView?.text = getString(it)
+            }
+
+            // Показываем экран сразу (fallback на случай если PM не ScreenConfigurable)
+            rootView?.visibility = View.VISIBLE
+        }
+
+        private fun loadImageFromUrl(imageView: ImageView?, url: String, defaultRes: Int?) {
+            imageView ?: return
+
+            imageView.load(url) {
+                crossfade(true)
+                memoryCachePolicy(CachePolicy.ENABLED)
+                diskCachePolicy(CachePolicy.ENABLED)
+                networkCachePolicy(CachePolicy.DISABLED)
+
+                // При ошибке - вернуться к дефолтной
+                defaultRes?.let { error(it) }
+
+                listener(
+                    onError = { _, result ->
+                        Log.e("BaseFragment", "Error loading image from URL: ${result.throwable.message}")
+                    },
+                    onSuccess = { _, _ ->
+                        Log.d("BaseFragment", "Successfully loaded image from URL: $url")
+                    }
+                )
+            }
+        }
+    }
+
+    protected fun bindScreenConfig(pm: T, builder: ScreenConfigBinder.() -> Unit) {
+        ScreenConfigBinder(pm).apply(builder).bind()
     }
 }

@@ -22,7 +22,6 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
     override val authTitleText: Int = R.string.registration_main_title_new_user
     override val authSubtitleText: Int = R.string.registration_main_subtitle
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.privacyPolicyView.show()
@@ -50,6 +49,14 @@ abstract class BaseRegistrationFragment<PM : BaseRegistrationPm> : BaseAuthFragm
         }
 
         binding.policyConfirmationCheckBoxView.checkedChanges().bindTo(pm.privacyPolicyAcceptAction)
+
+        // ИСПОЛЬЗУЕМ НАШУ НОВУЮ СИСТЕМУ!
+        bindScreenConfig(pm) {
+            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)
+            withTitle(binding.authTitleView, R.string.auth_title)
+            withDescription(binding.authSubtitleView, R.string.auth_subtitle)
+            withRootView(binding.root)
+        }
     }
 
     override fun onAttach(context: Context) {

@@ -1,18 +1,29 @@
 package com.elta.android.presentation.features.sync.connect
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -49,23 +60,81 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     @Composable
     override fun Content(viewModel: ConnectStartViewModel) {
         val state = viewModel.state.collectAsState()
+        var expanded by remember { mutableStateOf(false) }
+        val items = listOf("Satellite Online", "Satellite Monitor", "Test 1", "Test 2")
+        var selectedItem by remember { mutableStateOf(items.first()) }
         GetLocalProperties { dimens, _, colors, _, _ ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = colors.white)
-                    .systemBarsPadding()
+
+            AnimatedVisibility(
+                visible = viewModel.state.collectAsState().value.isContentReady,
+                enter = fadeIn()
             ) {
-                TopAppBar(viewModel)
-                MainImage(
-                    imageUrl = state.value.screenConfig?.backgroundImageUrl,
-                    imageId = R.drawable.ic_connect_dev
-                )
-                Title(state.value.screenConfig?.title ?: stringResource(id = R.string.sync_connect_start_title))
-                VSpacerSmall()
-                Body(state.value.screenConfig?.description ?: stringResource(id = R.string.sync_connect_start_text))
-                VSpacer(height = dimens.bigDim)
-                DownButton(widgetModel = viewModel.downButton)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = colors.white)
+                        .systemBarsPadding()
+                ) {
+                    TopAppBar(viewModel)
+                    MainImage(
+                        imageUrl = state.value.screenConfig?.backgroundImageUrl,
+                        imageId = R.drawable.ic_connect_dev
+                    )
+                    Title(
+                        state.value.screenConfig?.title
+                            ?: stringResource(id = R.string.sync_connect_start_title)
+                    )
+
+                    // ВЫПАДАЮЩИЙ СПИСОК ЗДЕСЬ
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimens.contentPadding)
+                            .padding(vertical = dimens.smallDim)
+                    ) {
+                        OutlinedButton(
+                            onClick = { expanded = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = colors.white
+                            )
+                        ) {
+                            Text(
+                                text = selectedItem,
+                                modifier = Modifier.weight(1f),
+                                color = colors.blackBlue
+                            )
+                            Text(
+                                text = "▼",
+                                color = colors.blackBlue
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items.forEach { item ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        selectedItem = item
+                                        expanded = false
+                                    }
+                                ) {
+                                    Text(text = item)
+                                }
+                            }
+                        }
+                    }
+                    VSpacerSmall()
+                    Body(
+                        state.value.screenConfig?.description
+                            ?: stringResource(id = R.string.sync_connect_start_text)
+                    )
+                    VSpacer(height = dimens.bigDim)
+                    DownButton(widgetModel = viewModel.downButton)
+                }
             }
         }
     }
@@ -109,11 +178,5 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                 endText = endTextId
             )
         }
-    }
-
-    @Preview
-    @Composable
-    private fun PreviewContent() {
-        Content(viewModel = viewModel())
     }
 }

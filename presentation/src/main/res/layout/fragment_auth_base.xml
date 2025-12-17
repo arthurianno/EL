@@ -23,16 +23,38 @@
             android:layout_gravity="bottom"
             tools:ignore="UselessParent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:padding="@dimen/padding_base">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/backgroundImageView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
+                    android:src="@drawable/ic_welcome"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@id/titleLayoutLin"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/titleLayoutLin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/backgroundImageView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/authSubtitleView">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/authTitleView"
@@ -49,30 +71,42 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="12dp"
                         android:src="@drawable/ic_hand" />
-
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/authSubtitleView"
                     style="@style/Subtitle1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
+
+                    app:layout_constraintTop_toBottomOf="@id/titleLayoutLin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/emailInputView"
                     tools:text="@string/registration_main_subtitle" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/emailInputView"
                     style="@style/InputStyle.Email"
-                    android:layout_width="match_parent"
-                    android:maxLength="254"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:hint="@string/registration_main_email_hint" />
+                    android:maxLength="254"
+                    android:hint="@string/registration_main_email_hint"
+                    app:layout_constraintTop_toBottomOf="@id/authSubtitleView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/passwordFrameLayout" />
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/passwordFrameLayout"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/emailInputView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/errorStateView">
 
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/passwordInputView"
@@ -93,18 +127,26 @@
 
                 <com.elta.android.presentation.widgets.SimpleErrorView
                     android:id="@+id/errorStateView"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/passwordFrameLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/privacyPolicyView" />
 
                 <LinearLayout
                     android:id="@+id/privacyPolicyView"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingTop="4dp"
-                    android:paddingBottom="24dp">
+                    android:paddingBottom="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/errorStateView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
 
                     <CheckBox
                         android:id="@+id/policyConfirmationCheckBoxView"
@@ -124,8 +166,7 @@
                         android:text="@string/registration_main_description_privacy_policy" />
                 </LinearLayout>
 
-
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
     </FrameLayout>
 

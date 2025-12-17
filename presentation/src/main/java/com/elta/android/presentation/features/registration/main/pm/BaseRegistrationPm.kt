@@ -1,13 +1,24 @@
 package com.elta.android.presentation.features.registration.main.pm
 
+import android.content.Context
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
+import com.elta.android.presentation.core.pm.ScreenConfigurable
 import com.elta.android.presentation.core.pm.ServiceFacade
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 
-abstract class BaseRegistrationPm(services: ServiceFacade) : BaseAuthPm(services) {
+abstract class BaseRegistrationPm(
+    services: ServiceFacade,
+    getScreenConfigUseCase: GetScreenConfigFromCache,
+    private val context: Context
+) : BaseAuthPm(services), ScreenConfigurable {
+
+    // Реализуем интерфейс ScreenConfigurable
+    override val screenConfigKey = "registration-screen"
+    override val getScreenConfigUseCase = getScreenConfigUseCase
 
     val privacyPolicyAcceptAction = action<Boolean>()
     val privacyPolicyClickAction = action<Unit>()
@@ -20,6 +31,9 @@ abstract class BaseRegistrationPm(services: ServiceFacade) : BaseAuthPm(services
 
     override fun onCreate() {
         super.onCreate()
+
+        // Загружаем конфигурацию через метод из BasePm
+        loadScreenConfig(context)
 
         privacyPolicyClickAction.observable
             .trackEvent(AnalyticsEventType.TERMS_OF_USE)

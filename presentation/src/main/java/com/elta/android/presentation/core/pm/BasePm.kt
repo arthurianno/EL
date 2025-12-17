@@ -2,7 +2,13 @@
 
 package com.elta.android.presentation.core.pm
 
+import android.content.Context
+import android.util.Log
 import androidx.annotation.StringRes
+import coil.imageLoader
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEvent
 import com.elta.android.presentation.analytic.model.analytics.AnalyticsEventType
 import com.elta.android.presentation.analytic.trackEvent
@@ -17,6 +23,7 @@ import com.elta.android.presentation.core.pm.widgets.networkControl
 import com.elta.android.presentation.core.pm.widgets.stateControl
 import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.stateview.StateData
+import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.nullgr.core.rx.bindProgress
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -47,6 +54,11 @@ abstract class BasePm(
 
     val progressState = state(false)
     val progressDialogState = state(false)
+    protected open val screenConfigKey: String? = null
+    protected open val getScreenConfigUseCase: GetScreenConfigFromCache? = null
+
+    val screenConfigState = state<ScreenEntity?>()
+    val imagePreloadState = state<Boolean>()
 
     val hideKeyBoardCommand = command<Unit>()
     val hideKeyboardAction = action<Unit>()
@@ -100,6 +112,65 @@ abstract class BasePm(
             .subscribe()
             .untilDestroy()
     }
+
+    protected fun loadScreenConfig(context: Context) {
+        val key = screenConfigKey
+        val useCase = getScreenConfigUseCase
+
+        // Если нет ключа или useCase - сразу говорим что готовы (покажутся дефолты)
+        if (key == null || useCase == null) {
+            imagePreloadState.consumer.accept(true)
+            return
+        }
+
+        launch {
+            when (val result = useCase(key)) {
+                is Resource.Success -> {
+                    val screenEntity = result.data
+                    screenConfigState.consumer.accept(screenEntity)
+
+                    val imageUrl = screenEntity.backgroundImageUrl
+                    if (imageUrl != null) {
+                        val imageLoader = context.imageLoader
+                        val isInCache = ImageCacheHelper.isImageInCache(
+                            imageUrl,
+                            context,
+                            imageLoader
+                        )
+                        // Если в кеше - true, если нет - false (покажется дефолт)
+                        imagePreloadState.consumer.accept(isInCache)
+                    } else {
+                        // URL нет - сразу true (покажется дефолт)
+                        imagePreloadState.consumer.accept(true)
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("BasePm", "Error loading screen config: ${result.message}")
+                    // При ошибке - сразу true (покажется дефолт)
+                    imagePreloadState.consumer.accept(true)
+                    // Можно отправить null, чтобы фрагмент знал что конфига нет
+                    //screenConfigState.consumer.accept(null)
+                }
+                is Resource.Loading -> {
+                    Log.d("BasePm", "Loading screen config...")
+                }
+            }
+        }
+    }
+
+    private suspend fun handleConfigSuccess(screenEntity: ScreenEntity, context: Context) {
+        screenConfigState.consumer.accept(screenEntity)
+
+        screenEntity.backgroundImageUrl?.let { imageUrl ->
+            val isInCache = ImageCacheHelper.isImageInCache(
+                imageUrl,
+                context,
+                context.imageLoader
+            )
+            imagePreloadState.consumer.accept(isInCache)
+        } ?: imagePreloadState.consumer.accept(true)
+    }
+
 
     internal fun sendDateChangedEvent() {
         bus.event(DateChangedEvent)
@@ -195,4 +266,8 @@ abstract class BasePm(
         coroutineScope.cancel()
         super.onDestroy()
     }
+}
+
+interface ScreenConfigurable {
+    val screenConfigKey: String
 }

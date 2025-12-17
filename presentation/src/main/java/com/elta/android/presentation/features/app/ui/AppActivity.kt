@@ -3,7 +3,9 @@ package com.elta.android.presentation.features.app.ui
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.BuildConfig
@@ -43,6 +45,9 @@ class AppActivity : BaseActivity<AppPm>() {
     }
     private val connectionStatusView by lazy {
         findViewById<TwoStateStatusView>(R.id.connectionStatusView)
+    }
+    private val splashOverlay by lazy {
+        findViewById<FrameLayout>(R.id.splashOverlay)
     }
 
     private val rxPermissions by lazy { RxPermissions(this) }
@@ -87,6 +92,20 @@ class AppActivity : BaseActivity<AppPm>() {
         pm.syncStatusState.bindTo(statusView.statusChanges())
         pm.showOptionalUpdateDialogCommand.bindTo {
             supportFragmentManager.showDialog(OptionalUpdateDialogFragment.newInstance())
+        }
+        pm.imagesLoadedCommand.bindTo {
+            Log.i("AppPM", "All images loaded, hiding splash screen")
+            if (splashOverlay == null) {
+                Log.i("AppPM", "All images not loaded, hiding splash screen")
+                return@bindTo
+            }
+            splashOverlay.animate()
+                .alpha(0f)
+                .setDuration(400)
+                .withEndAction {
+                    splashOverlay.visibility = View.GONE
+                }
+                .start()
         }
     }
 

@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.profile.settings.password.ui
 
 import android.content.Context
+import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import com.elta.android.presentation.R
@@ -14,6 +15,7 @@ import com.elta.android.presentation.utils.error
 import com.elta.android.presentation.utils.hideKeyboardFun
 import com.elta.android.presentation.utils.toggleSecure
 import com.elta.android.presentation.utils.toggleSecureIcon
+import com.elta.android.presentation.widgets.status.Visibility
 import com.jakewharton.rxbinding2.view.clicks
 import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.passTo
@@ -35,7 +37,12 @@ class ProfileChangePasswordFragment :
     override fun onBindPresentationModel(pm: ProfileChangePasswordPm) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
-
+        binding.root.visibility = View.INVISIBLE
+        pm.screenConfigState.bindTo { screenEntity ->
+            binding.titleView.text = screenEntity?.title ?: getString(R.string.profile_settings_change_password_title)
+            binding.descriptionView.text = screenEntity?.description ?: getString(R.string.profile_settings_change_password_description)
+            binding.root.visibility = View.VISIBLE
+        }
         binding.oldPasswordVisibilityView.bindToggleTo(binding.oldPasswordView)
         binding.newPasswordVisibilityView.bindToggleTo(binding.newPasswordView)
         binding.toolbar.homeButtonView.clicks().bindTo(pm.backHandleAction)

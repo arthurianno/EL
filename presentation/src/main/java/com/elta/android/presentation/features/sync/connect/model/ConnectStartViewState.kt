@@ -6,5 +6,6 @@ import javax.annotation.concurrent.Immutable
 @Immutable
 data class ConnectStartViewState(
     val isOnBoarding: Boolean,
-    val screenConfig: ScreenEntity? = null
+    val screenConfig: ScreenEntity? = null,
+    val isContentReady: Boolean = false
 )

@@ -87,6 +87,9 @@ class AppPm @Inject constructor(
      * с помощью интента и навигации
      */
     val consultantDeepLinkAction = action<Unit>()
+
+    val imagesLoadedCommand = command<Unit>()
+    private val imagesLoadedState = state<Boolean>(false)
     val newsDeepLinkAction = action<Unit>()
 
     val coldStartAction = action<Unit>()
@@ -183,7 +186,13 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         cleanupFilesAction.observable
-            .flatMapSingle { Single.fromCallable { cleanupFiles() } }
+            .flatMapSingle {
+                Single.fromCallable { cleanupFiles() }
+                    .onErrorReturn { error ->
+                        Log.w("AppPM", "⚠️ Cleanup skipped: ${error.message}")
+                        Unit
+                    }
+            }
             .subscribe()
             .untilDestroy()
 
@@ -196,45 +205,101 @@ class AppPm @Inject constructor(
 
         preloadScreensAction.observable
             .flatMapSingle {
-                rxSingle { shouldRefreshScreensUseCase.invoke() }  // <-- проверить нужно ли обновление
+                rxSingle { shouldRefreshScreensUseCase.invoke() }
                     .flatMap { shouldRefresh ->
                         if (shouldRefresh) {
-                            // Если прошло 24 часа - делаем запрос
+                            Log.i("AppPM", "24 hours passed since last refresh, updating screens...")
                             rxSingle { getAllScreensUseCase.invoke() }
                                 .doOnSuccess { result ->
+                                    Log.i("AppPM" ,"Screens fetched, ${result} screens received.")
                                     when (result) {
                                         is Resource.Success -> {
-                                            // Сохраняем timestamp
                                             rxSingle { updateLastRefreshTimeUseCase.invoke() }
                                                 .subscribe()
-
-                                            // Кэшируем картинки
+                                                .untilDestroy()
                                             rxSingle(Dispatchers.IO) {
-                                                result.data.map {
-                                                    val imageLoader = imageLoader(context)
-                                                    ImageCacheHelper.prefetchImage(
-                                                        it.backgroundImageUrl!!,
+                                                val totalStartTime = System.currentTimeMillis()
+                                                val uniqueImages = result.data
+                                                    .mapNotNull { it.backgroundImageUrl }
+                                                    .distinct()
+
+                                                Log.i(
+                                                    "AppPM",
+                                                    "Starting to prefetch ${uniqueImages.size} unique images"
+                                                )
+
+                                                var successCount = 0
+                                                var failCount = 0
+                                                val imageLoader = imageLoader(context)
+                                                uniqueImages.forEachIndexed { index, imageUrl ->
+                                                    val (success, duration) = ImageCacheHelper.prefetchImage(
+                                                        imageUrl,
                                                         context,
                                                         imageLoader
                                                     )
-                                                    Log.i("AppPM", "Prefetched image: ${imageLoader}")
+                                                    if (success) {
+                                                        successCount++
+                                                        Log.i(
+                                                            "AppPM",
+                                                            "✅ Image ${index + 1}/${uniqueImages.size} prefetched in ${duration}ms"
+                                                        )
+                                                    } else {
+                                                        failCount++
+                                                        Log.w(
+                                                            "AppPM",
+                                                            "⚠️ Image ${index + 1}/${uniqueImages.size} failed in ${duration}ms"
+                                                        )
+                                                    }
                                                 }
+                                                val totalDuration =
+                                                    System.currentTimeMillis() - totalStartTime
+                                                Log.i(
+                                                    "AppPM",
+                                                    "Prefetch completed: $successCount succeeded, $failCount failed in ${totalDuration}ms"
+                                                )
+                                                Log.i("AppPM", "🚀 Calling imagesLoadedCommand...")
+                                                imagesLoadedState.consumer.accept(true)
+                                                imagesLoadedCommand.consumer.accept(Unit)
+                                                Log.i("AppPM", "✅ imagesLoadedCommand called!")
                                             }
+                                                .doOnError { error ->
+                                                    Log.e(
+                                                        "AppPM",
+                                                        "Error prefetching images: ${error.message}"
+                                                    )
+                                                    Single.fromCallable {
+                                                        imagesLoadedState.consumer.accept(true)
+                                                        imagesLoadedCommand.consumer.accept(Unit)
+                                                    }
+                                                }
+                                                .subscribe()
+                                                .untilDestroy()
                                         }
+
                                         is Resource.Error -> {
                                             Log.i("AppPM", "Error: ${result.message}")
+                                            imagesLoadedState.consumer.accept(true)
+                                            imagesLoadedCommand.consumer.accept(Unit)
                                         }
+
                                         is Resource.Loading -> {
                                             Log.i("AppPM", "Loading")
                                         }
                                     }
                                 }
                         } else {
-                            // Если не прошло 24 часа - пропускаем
                             Log.i("AppPM", "Skipping refresh, less than 24h passed")
-                            Single.just(Unit)
+                            Single.fromCallable {
+                                imagesLoadedState.consumer.accept(true)
+                                imagesLoadedCommand.consumer.accept(Unit)
+                            }
                         }
                     }
+            }
+            .onErrorReturn { error ->
+                Log.e("AppPM", "preloadScreensAction error: ${error.message}")
+                imagesLoadedState.consumer.accept(true)
+                imagesLoadedCommand.consumer.accept(Unit)
             }
             .subscribe()
             .untilDestroy()

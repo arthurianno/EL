@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
 import com.elta.android.presentation.theme.GetLocalProperties
 
 
@@ -20,6 +22,7 @@ internal fun ColumnScope.MainImage(
     imageUrl: String? = null,
     @DrawableRes imageId: Int
 ) {
+    val context = LocalContext.current
     GetLocalProperties { dimens, _, _, _, _ ->
         Box(
             modifier = Modifier
@@ -30,7 +33,10 @@ internal fun ColumnScope.MainImage(
         ) {
            when(imageUrl != null){
                 true -> AsyncImage(
-                     model = imageUrl,
+                     model = ImageRequest.Builder(context)
+                         .data(imageUrl)
+                         .crossfade(false)
+                         .build(),
                      contentDescription = null
                 )
                 false -> Image(

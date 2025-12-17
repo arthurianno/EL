@@ -19,7 +19,8 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
     movementMethod = LinkMovementMethod.getInstance()
     return Observable.create<Unit> {
         if (startIndex == -1) {
-            it.onError(IllegalArgumentException("Text $spanText not found"))
+            it.onError(IllegalArgumentException("Text '$spanText' not found in '$spannable'"))
+            return@create
         }
 
         val span = object : ClickableSpan() {

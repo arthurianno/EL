@@ -1,7 +1,13 @@
 package com.elta.android.presentation.features.profile.settings.password.pm
 
+import android.content.Context
+import android.util.Log
+import coil.imageLoader
 import com.elta.android.domain.features.auth.interactor.ChangePasswordUseCase
 import com.elta.android.domain.features.auth.interactor.isPasswordValid
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
@@ -9,7 +15,12 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.messages.SnackBarMessageData
+import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
@@ -19,6 +30,8 @@ import javax.inject.Inject
 class ProfileChangePasswordPm @Inject constructor(
     private val changePasswordUseCase: ChangePasswordUseCase,
     serviceFacade: ServiceFacade,
+    private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
+    private val context: Context
 ) : BasePm(serviceFacade) {
 
     val oldPasswordInput = inputControl(hideErrorOnUserInput = false)
@@ -29,11 +42,12 @@ class ProfileChangePasswordPm @Inject constructor(
     val backHandleAction = action<Unit>()
 
     private val exitDialogAction = action<Unit>()
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val exitDialogData by lazy { Dialogs.ExitAndLoseData(resources) }
 
     override fun onCreate() {
         super.onCreate()
-
+        loadConfigScreen()
         bindHandleBack()
 
         Observables.combineLatest(
@@ -64,6 +78,36 @@ class ProfileChangePasswordPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
+    }
+
+
+    fun loadConfigScreen(){
+        coroutineScope.launch {
+            when (val result = getScreenFromCacheUseCase("new-password-screen")) {
+                is Resource.Success -> {
+                    val screenEntity = result.data
+                    screenConfigState.consumer.accept(screenEntity)
+                    val imageUrl = screenEntity.backgroundImageUrl
+                    val imageLoader = context.imageLoader
+                    if (imageUrl != null ){
+                        val isInCache = ImageCacheHelper.isImageInCache(imageUrl, context,imageLoader)
+                        when(isInCache){
+                            true -> imagePreloadState.consumer.accept(true)
+                            false -> imagePreloadState.consumer.accept(false)
+                        }
+                    }else {
+                        imagePreloadState.consumer.accept(false)
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("GreetingPm", "Error loading screen config: ${result.message}")
+                    imagePreloadState.consumer.accept(false)
+                }
+                is Resource.Loading -> {
+                    Log.d("GreetingPm", "Loading screen config...")
+                }
+            }
+        }
     }
 
     private fun isPasswordsFilled() =

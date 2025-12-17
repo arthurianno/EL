@@ -1,5 +1,8 @@
 package com.elta.android.presentation.features.onboaring.pm
 
+import android.content.Context
+import android.util.Log
+import coil.imageLoader
 import com.elta.android.common.errors.EmiasError
 import com.elta.android.common.errors.ServiceUnavailableError
 import com.elta.android.domain.features.diary.events.interactor.AddNewEventUseCase
@@ -8,6 +11,9 @@ import com.elta.android.domain.features.emias.interactor.GetEmiasStatusUseCase
 import com.elta.android.domain.features.emias.interactor.UpdateEmiasUseCase
 import com.elta.android.domain.features.emias.model.Emias
 import com.elta.android.domain.features.emias.model.EmiasStatus
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.Resource
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
@@ -40,8 +46,13 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingGlucoseFormatItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingItem
 import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoardingWeightItem
+import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toTimestamp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl

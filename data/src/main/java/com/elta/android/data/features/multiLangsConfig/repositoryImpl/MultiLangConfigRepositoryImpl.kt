@@ -14,6 +14,7 @@ import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.multiLangsConfig.repository.MultilangConfigRepository
 import javax.inject.Inject
+import androidx.core.content.edit
 
 class MultiLangConfigRepositoryImpl @Inject constructor(
     private val api: MultiLangConfigApi,
@@ -93,6 +94,6 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateLastRefreshTime() {
-        prefs.edit().putLong(KEY_LAST_REFRESH, System.currentTimeMillis()).apply()
+        prefs.edit { putLong(KEY_LAST_REFRESH, System.currentTimeMillis()) }
     }
 }

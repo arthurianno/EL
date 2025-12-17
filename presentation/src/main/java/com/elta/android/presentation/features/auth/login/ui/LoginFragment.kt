@@ -1,13 +1,17 @@
 package com.elta.android.presentation.features.auth.login.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import coil.load
+import coil.request.CachePolicy
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.dialog.createDialog
 import com.elta.android.presentation.features.auth.login.pm.LoginPm
 import com.elta.android.presentation.features.registration.main.ui.BaseRegistrationFragment
 import com.nullgr.core.ui.extensions.hide
 import com.nullgr.core.ui.extensions.show
+import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 
 class LoginFragment : BaseRegistrationFragment<LoginPm>() {
@@ -29,6 +33,12 @@ class LoginFragment : BaseRegistrationFragment<LoginPm>() {
     override fun onBindPresentationModel(pm: LoginPm) {
         super.onBindPresentationModel(pm)
         pm.profileRestoredDialogControl.bindTo { data, dc -> createDialog(this, dc, data) }
+        bindScreenConfig(pm){
+            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)  // Другая картинка!
+            withTitle(binding.authTitleView, R.string.auth_title)
+            withDescription(binding.authSubtitleView, R.string.auth_subtitle)
+            withRootView(binding.root)
+        }
     }
 
     companion object {

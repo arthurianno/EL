@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.lifecycle.ExperimentalCameraProviderConfiguration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -45,6 +47,7 @@ import com.elta.android.presentation.utils.bundle
 import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.runtime.collectAsState
 
 @ExperimentalCameraProviderConfiguration
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
@@ -156,29 +159,37 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             }
         }
         GetLocalProperties { dimens, _, colors, _, _ ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = colors.white)
-                    .systemBarsPadding()
+            // Показываем контент только когда всё готово (данные + картинка проверена)
+            AnimatedVisibility(
+                visible = viewModel.state.collectAsState().value.isContentReady,
+                enter = fadeIn()
             ) {
-                TopAppBar(viewModel)
-                MainImage(imageId = R.drawable.img_dmc_connect)
-                Info()
-                VSpacer(dimens.bigDim)
-                DownButton(
-                    widgetModel = viewModel.downButton,
-                    onClickAction = HowToConnectAction.OnConnectButtonClick
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = colors.white)
+                        .systemBarsPadding()
+                ) {
+                    TopAppBar(viewModel)
+                    MainImage(
+                        imageUrl = viewModel.state.collectAsState().value.screenConfig?.backgroundImageUrl,
+                        imageId = R.drawable.img_dmc_connect)
+                    Info(viewModel)
+                    VSpacer(dimens.bigDim)
+                    DownButton(
+                        widgetModel = viewModel.downButton,
+                        onClickAction = HowToConnectAction.OnConnectButtonClick
+                    )
+                }
             }
         }
     }
 
     @Composable
-    private fun Info() {
+    private fun Info(viewModel: HowToConnectViewModel) {
         GetLocalProperties { dimens, _, _, _, _ ->
             Column(Modifier.padding(dimens.contentPadding)) {
-                Title()
+                Title(viewModel)
                 VSpacer(dimens.halfMediumDim)
                 TextNumericItem(
                     number = R.string.list_numbering_1_dot,
@@ -196,11 +207,11 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     }
 
     @Composable
-    private fun Title() {
+    private fun Title(viewModel : HowToConnectViewModel) {
         GetLocalProperties { _, _, _, _, types ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = stringResource(id = R.string.sync_how_to_connect_title),
+                    text = viewModel.state.value.screenConfig?.title ?: stringResource(id = R.string.sync_how_to_connect_title),
                     style = types.h1
                 )
                 HSpacerSmall()

@@ -1,7 +1,9 @@
 package com.elta.android.presentation.features.registration.main.pm
 
+import android.content.Context
 import com.elta.android.common.errors.ProfileIsDeletedError
 import com.elta.android.domain.features.auth.interactor.RegisterUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.presentation.R
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.States
@@ -14,8 +16,10 @@ import javax.inject.Inject
 class RegistrationMainPm @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val appMetric: AppMetricTracker,
+    private val getScreenConfigFromCache: GetScreenConfigFromCache,
+    private val context: Context,
     services: ServiceFacade
-) : BaseRegistrationPm(services) {
+) : BaseRegistrationPm(services,getScreenConfigFromCache,context) {
 
     @Suppress("LongMethod")
     override fun onCreate() {

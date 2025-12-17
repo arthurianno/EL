@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
@@ -188,6 +189,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         viewModel: ConnectingViewModel,
         stageType: ConnectingStageType
     ) {
+        val state = viewModel.state.collectAsState().value
         val isCompleted =
             stageType == ConnectingStageType.Complete || stageType == ConnectingStageType.Sync
         AppTopBar(
@@ -195,38 +197,68 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             startIcon = R.drawable.ic_back.takeUnless { stageType == ConnectingStageType.Complete },
             endText = R.string.sync_connect_type_button_any_difficulties.takeUnless { isCompleted }
         )
-        MainImage(
-            imageId = if (isCompleted) {
-                R.drawable.ic_connect_finish
-            } else {
-                R.drawable.ic_connect_dev
+        when (stageType) {
+            ConnectingStageType.Complete -> {
+                MainImage(
+                    imageUrl = if (state.isSuccessImageReady) {
+                        state.successfulSyncConfig?.backgroundImageUrl
+                    } else null,
+                    imageId = R.drawable.ic_connect_finish
+                )
             }
-        )
+            ConnectingStageType.Sync -> {
+                MainImage(
+                    imageUrl = if (state.isSyncImageReady) {
+                        state.syncScreenConfig?.backgroundImageUrl
+                    } else null,
+                    imageId = R.drawable.ic_connect_dev
+                )
+            }
+            ConnectingStageType.ErrorSync -> {
+                MainImage(
+                    imageUrl = if (state.isFailedImageReady) {
+                        state.failedSyncConfig?.backgroundImageUrl
+                    } else null,
+                    imageId = R.drawable.ic_connect_dev
+                )
+            }
+            else -> {
+                MainImage(
+                    imageUrl = null,
+                    imageId = R.drawable.ic_connect_dev
+                )
+            }
+        }
     }
 
     @Composable
     private fun Footer(
         viewModel: ConnectingViewModel,
         stageType: ConnectingStageType,
-        glucometerName: String
+        glucometerName: String,
     ) {
+        val state = viewModel.state.collectAsState().value
         when (stageType) {
             ConnectingStageType.Connecting -> ConnectingFooter()
             ConnectingStageType.DeviceNotFound -> DeviceNotFoundFooter(viewModel)
             ConnectingStageType.ErrorConnect -> ErrorConnectFooter(viewModel)
-            ConnectingStageType.Sync -> SyncFooter(glucometerName)
-            ConnectingStageType.Complete -> CompleteFooter(viewModel)
-            ConnectingStageType.ErrorSync -> ErrorSyncFooter(viewModel)
+            ConnectingStageType.Sync -> SyncFooter(glucometerName, state.syncScreenConfig)
+            ConnectingStageType.Complete -> CompleteFooter(viewModel, state.successfulSyncConfig)
+            ConnectingStageType.ErrorSync -> ErrorSyncFooter(viewModel, state.failedSyncConfig)
         }
     }
 
     @Composable
-    private fun CompleteFooter(viewModel: ConnectingViewModel) {
+    private fun CompleteFooter(
+        viewModel: ConnectingViewModel,
+        config: ScreenEntity?
+    ) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Row {
                     Text(
-                        text = stringResource(id = R.string.sync_state_title_sync_completed),
+                        // Используем title из конфига или дефолтный
+                        text = config?.title ?: stringResource(id = R.string.sync_state_title_sync_completed),
                         style = types.h1,
                     )
                     HSpacerSmall()
@@ -237,7 +269,8 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 }
                 VSpacerSmall()
                 Text(
-                    text = stringResource(id = R.string.sync_state_subtitle_sync_completed),
+                    // Используем description из конфига или дефолтный
+                    text = config?.description ?: stringResource(id = R.string.sync_state_subtitle_sync_completed),
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -249,13 +282,18 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
         }
     }
 
+
+
     @Composable
-    private fun SyncFooter(glucometerName: String) {
+    private fun SyncFooter(
+        glucometerName: String,
+        config: ScreenEntity?
+    ) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(Modifier.padding(dimens.contentPadding)) {
                 Row {
                     Text(
-                        text = stringResource(id = R.string.sync_state_title_connected),
+                        text = config?.title ?: stringResource(id = R.string.sync_state_title_connected),
                         style = types.h1
                     )
                     HSpacerSmall()
@@ -266,7 +304,7 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
                 }
                 VSpacerSmall()
                 Text(
-                    text = stringResource(id = R.string.sync_connected_text, glucometerName),
+                    text = config?.description ?: stringResource(id = R.string.sync_connected_text, glucometerName),
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()
@@ -276,16 +314,19 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     @Composable
-    private fun ErrorSyncFooter(viewModel: ConnectingViewModel) {
+    private fun ErrorSyncFooter(
+        viewModel: ConnectingViewModel,
+        config: ScreenEntity?
+    ) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(modifier = Modifier.padding(dimens.contentPadding)) {
                 Text(
-                    text = stringResource(id = R.string.sync_connection_sync_error_title),
+                    text = config?.title ?: stringResource(id = R.string.sync_connection_sync_error_title),
                     style = types.h1
                 )
                 VSpacerSmall()
                 Text(
-                    text = stringResource(id = R.string.sync_connection_error_text),
+                    text = config?.description ?: stringResource(id = R.string.sync_connection_error_text),
                     color = colors.shadeBlack0
                 )
                 VSpacerSmall()

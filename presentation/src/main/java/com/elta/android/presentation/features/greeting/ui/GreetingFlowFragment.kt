@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.greeting.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import coil.load
 import coil.request.CachePolicy
@@ -31,34 +32,13 @@ class GreetingFlowFragment :
         super.onBindPresentationModel(pm)
         binding.toolbar.menuButtonView.clicks().bindTo(pm.menuAction)
         binding.registrationButtonView.clicks().bindTo(pm.registrationAction)
-
-        // 1. Подписка на обновление текстов
-        pm.screenConfigState.bindTo { screenEntity ->
-            binding.greetingTitleView.text = screenEntity?.title
-                ?: getString(R.string.greeting_title)
-            binding.greetingMessageView.text = screenEntity?.description
-                ?: getString(R.string.greeting_message)
+        bindScreenConfig(pm) {
+            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)
+            withTitle(binding.greetingTitleView, R.string.greeting_title)
+            withDescription(binding.greetingMessageView, R.string.greeting_message)
+            withRootView(binding.root)
         }
-
-        // 2. Подписка на готовность картинки
-        pm.imagePreloadState.bindTo { isReady ->
-            if (isReady != true) return@bindTo
-
-            pm.screenConfigState.value?.let { screenEntity ->
-                val imageUrl = screenEntity.backgroundImageUrl
-                if (imageUrl != null) {
-                    // Картинка УЖЕ в кэше, просто загружаем
-                    binding.backgroundImageView.load(imageUrl) {
-                        crossfade(false)
-                        memoryCachePolicy(CachePolicy.ENABLED)
-                    }
-                } else {
-                    // Нет URL — показываем дефолтную картинку
-                    binding.backgroundImageView.setImageResource(R.drawable.ic_welcome)
-                }
-                binding.root.visibility = View.VISIBLE
-            }
-        }
+        binding.root.visibility = View.VISIBLE
     }
 
 
