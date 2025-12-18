@@ -25,13 +25,15 @@ import javax.inject.Inject
 
 class GreetingPm @Inject constructor(
     private val appMetric: AppMetricTracker,
+    private val getScreenConfigFromCache: GetScreenConfigFromCache,
     services: ServiceFacade,
     private val context: Context
 ) : BasePm(services), ScreenConfigurable {
 
     val menuAction = action<Unit>()
 
-    override val screenConfigKey = "login-screen"
+    override val screenConfigKey = "welcome-screen"
+    override val getScreenConfigUseCase = getScreenConfigFromCache
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val registrationAction = action<Unit>()
 

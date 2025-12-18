@@ -40,11 +40,25 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val lang = getSystemLanguageCode()
                 val dtoList = response.body()!!.content
+                val newEntities = dtoList.map { it.toRoomEntity() }
 
-                // Сохраняем DTO напрямую в Room (со всеми языками)
-                dao.insertAll(dtoList.map { it.toRoomEntity() })
+                // ✅ ОПТИМИЗАЦИЯ: Поэлементное сравнение
+                val existingEntities = dao.getConfigs()
+                val existingMap = existingEntities.associateBy { it.slug }
 
-                // Возвращаем локализованные Entity
+                val toUpdate = newEntities.filter { newEntity ->
+                    val existing = existingMap[newEntity.slug]
+                    // Обновляем если записи нет или она изменилась
+                    existing == null || existing != newEntity
+                }
+
+                if (toUpdate.isNotEmpty()) {
+                    dao.insertAll(toUpdate)
+                    Log.i("MultiLangConfigRepo", "✅ Updated ${toUpdate.size} of ${newEntities.size} screens")
+                } else {
+                    Log.i("MultiLangConfigRepo", "⏭️ No changes detected, skipped DB update")
+                }
+
                 val screenEntity = dtoList.map { it.toEntity(lang) }
                 Resource.Success(screenEntity)
             } else {

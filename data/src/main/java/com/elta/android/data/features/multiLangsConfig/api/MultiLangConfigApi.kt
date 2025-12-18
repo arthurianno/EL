@@ -6,7 +6,7 @@ import retrofit2.http.GET
 
 
 interface MultiLangConfigApi {
-    @GET("https://test.vdiabete.com/api/config/screens/by-slugs?langs=ru&langs=en&langs=kz")
+    @GET("https://dev.vdiabete.com/api/config/screens/by-slugs?langs=ru&langs=en&langs=kz")
     suspend fun getAllScreensBySlugs(
     ): Response<ScreenResponseDto>
 }

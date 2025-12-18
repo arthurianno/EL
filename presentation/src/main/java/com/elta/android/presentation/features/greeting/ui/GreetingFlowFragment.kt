@@ -38,7 +38,7 @@ class GreetingFlowFragment :
             withDescription(binding.greetingMessageView, R.string.greeting_message)
             withRootView(binding.root)
         }
-        binding.root.visibility = View.VISIBLE
+
     }
 
 

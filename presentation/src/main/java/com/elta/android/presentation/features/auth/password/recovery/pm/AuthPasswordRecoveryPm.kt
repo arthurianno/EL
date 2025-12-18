@@ -23,7 +23,7 @@ class AuthPasswordRecoveryPm @Inject constructor(
     services: ServiceFacade
 ) : BaseAuthPm(services), ScreenConfigurable {
 
-    override val screenConfigKey = "login-screen"
+    override val screenConfigKey = "password-screen"
 
     override fun onCreate() {
         super.onCreate()
