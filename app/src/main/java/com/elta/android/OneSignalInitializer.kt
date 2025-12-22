@@ -10,10 +10,8 @@ import com.onesignal.notifications.INotificationLifecycleListener
 import com.onesignal.notifications.INotificationWillDisplayEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import timber.log.Timber  // Если используете Timber
+import timber.log.Timber
 
 object OneSignalInitializer {
 

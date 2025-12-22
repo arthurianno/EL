@@ -3,7 +3,6 @@ package com.elta.android.presentation.utils.dynamiclinks
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.elta.android.presentation.features.app.ui.AppActivity
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import me.dmdev.rxpm.Action
 import timber.log.Timber
@@ -24,41 +23,67 @@ class DynamicLinkProcessor private constructor(
     fun process() {
         if (initialIntent != null) {
             val launchUrl = initialIntent.getStringExtra("launch_url")
-            when (launchUrl) {
-                "myapp://news" -> {
-                    newsDeepLinkOpenAction?.consumer?.accept(Unit)
-                }
-                "myapp://consultant" -> {
-                    consultantDeepLinkOpenAction?.consumer?.accept(Unit)
-                }
-                else -> {
-                    FirebaseDynamicLinks.getInstance().getDynamicLink(initialIntent)
-                        .addOnSuccessListener { pendingDynamicLinkData ->
-                            with(pendingDynamicLinkData?.link) {
-                                if (this != null) {
-                                    if (!ignoreColdStart && savedState == null) {
-                                        coldStartByDeepLinkAction?.consumer?.accept(this)
-                                    } else {
-                                        deepLinkOpenAction?.consumer?.accept(this)
-                                    }
-                                } else {
-                                    if (initialIntent.data.isNotificationUriValid()) {
-                                        notificationStartAction?.consumer?.accept(initialIntent.data)
-                                    } else {
-                                        processColdStartIfNeed()
-                                    }
-                                }
-                            }
-                        }
-                        .addOnFailureListener {
-                            Timber.e(it, "DynamicLink process error ")
-                            processColdStartIfNeed()
-                        }
-                        .addOnCanceledListener {
-                            processColdStartIfNeed()
-                        }
+
+            // Обработка URL из пуш-уведомлений (OneSignal)
+            if (!launchUrl.isNullOrEmpty()) {
+                Timber.d("Processing launchURL from push: $launchUrl")
+                when {
+                    // Проверяем схему myapp://
+                    launchUrl == "myapp://news" -> {
+                        Timber.d("Opening news screen via myapp:// scheme")
+                        newsDeepLinkOpenAction?.consumer?.accept(Unit)
+                        return
+                    }
+                    launchUrl == "myapp://consultant" -> {
+                        Timber.d("Opening consultant screen via myapp:// scheme")
+                        consultantDeepLinkOpenAction?.consumer?.accept(Unit)
+                        return
+                    }
+                    // Проверяем HTTPS URL (например, https://vdiabete.com/app/news)
+                    launchUrl.contains("/app/news", ignoreCase = true) -> {
+                        Timber.d("Opening news screen via HTTPS URL")
+                        newsDeepLinkOpenAction?.consumer?.accept(Unit)
+                        return
+                    }
+                    launchUrl.contains("/app/consultant", ignoreCase = true) -> {
+                        Timber.d("Opening consultant screen via HTTPS URL")
+                        consultantDeepLinkOpenAction?.consumer?.accept(Unit)
+                        return
+                    }
+                    // Можно добавить другие маршруты
+                    else -> {
+                        Timber.d("Unknown launchURL format: $launchUrl, trying Firebase Dynamic Links")
+                    }
                 }
             }
+
+            // Обработка Firebase Dynamic Links (если launchURL не был обработан выше)
+            FirebaseDynamicLinks.getInstance().getDynamicLink(initialIntent)
+                .addOnSuccessListener { pendingDynamicLinkData ->
+                    with(pendingDynamicLinkData?.link) {
+                        if (this != null) {
+                            if (!ignoreColdStart && savedState == null) {
+                                coldStartByDeepLinkAction?.consumer?.accept(this)
+                            } else {
+                                deepLinkOpenAction?.consumer?.accept(this)
+                            }
+                        } else {
+                            if (initialIntent.data.isNotificationUriValid()) {
+                                notificationStartAction?.consumer?.accept(initialIntent.data)
+                            } else {
+                                processColdStartIfNeed()
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    Timber.e(it, "DynamicLink process error (this is normal if Firebase Dynamic Links not configured)")
+                    // Не считаем это критической ошибкой, так как мы обрабатываем push через launch_url
+                    processColdStartIfNeed()
+                }
+                .addOnCanceledListener {
+                    processColdStartIfNeed()
+                }
         } else {
             processColdStartIfNeed()
         }
