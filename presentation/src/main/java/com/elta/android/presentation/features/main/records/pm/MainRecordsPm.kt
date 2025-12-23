@@ -1,8 +1,11 @@
 package com.elta.android.presentation.features.main.records.pm
 
+import android.content.Context
 import com.elta.android.domain.features.diary.home.interactor.GetHomeModelUseCase
 import com.elta.android.domain.features.diary.home.model.DayPeriod
 import com.elta.android.domain.features.diary.home.model.HomeModel
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
@@ -25,14 +28,25 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import javax.inject.Inject
 
 class MainRecordsPm @Inject constructor(
     private val getHomeModelUseCase: GetHomeModelUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase,
     private val recordsMapper: MainRecordsMapper,
+    private val context: Context,
+    private val getScreenConfigFromCacheUseCase: GetScreenConfigFromCache,
     services: ServiceFacade
 ) : ExpandableListPm(services) {
+
+    // Переопределяем screenConfigKey и getScreenConfigUseCase для поддержки конфигов
+    override val screenConfigKey: String = "main-screen"
+    override val getScreenConfigUseCase: GetScreenConfigFromCache = getScreenConfigFromCacheUseCase
+
+    // State для хранения конфигурации экрана
+    val mainScreenConfig = state<ScreenEntity?>()
+    val mainScreenImageReady = state(true)
 
     val mainScreenState = stateControl()
 
@@ -40,6 +54,24 @@ class MainRecordsPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
+
+        // Загружаем конфигурацию экрана
+        loadScreenConfig(context)
+
+        // Биндим загруженную конфигурацию
+        screenConfigState.observable
+            .subscribe { config ->
+                if (config != null) {
+                    mainScreenConfig.consumer.accept(config)
+                }
+            }
+            .untilDestroy()
+
+        imagePreloadState.observable
+            .subscribe { isReady ->
+                mainScreenImageReady.consumer.accept(isReady)
+            }
+            .untilDestroy()
 
         loadScreenAction.observable
             .skipWhileInProgress()

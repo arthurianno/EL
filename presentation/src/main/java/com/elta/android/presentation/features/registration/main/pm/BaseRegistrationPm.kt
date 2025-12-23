@@ -17,7 +17,7 @@ abstract class BaseRegistrationPm(
 ) : BaseAuthPm(services), ScreenConfigurable {
 
     // Реализуем интерфейс ScreenConfigurable
-    override val screenConfigKey = "registration-screen"
+    override val screenConfigKey = "registration-screens"
     override val getScreenConfigUseCase = getScreenConfigUseCase
 
     val privacyPolicyAcceptAction = action<Boolean>()

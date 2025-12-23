@@ -9,11 +9,11 @@ data class ConnectingViewState(
     val pinCode: String,
     val glucometerName: String,
     val connectDevice: Glucometer?,
-    val syncScreenConfig: ScreenEntity? = null,
+    val connectingScreenConfig: ScreenEntity? = null,
     val successfulSyncConfig: ScreenEntity? = null,
     val failedSyncConfig: ScreenEntity? = null,
+    val isConnectingImageReady : Boolean = false,
     val isSuccessImageReady : Boolean = false,
-    val isSyncImageReady : Boolean = false,
     val isFailedImageReady : Boolean = false
 
 )

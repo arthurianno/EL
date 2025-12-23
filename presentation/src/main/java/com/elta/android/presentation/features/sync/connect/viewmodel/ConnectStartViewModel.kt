@@ -28,7 +28,7 @@ class ConnectStartViewModel @Inject constructor(
     private val getScreenFromCacheUseCase: GetScreenConfigFromCache
 ) : BaseViewModel<ConnectStartViewState>(), ComposeScreenConfigurable {
 
-    override val screenConfigKey = "connect-start-onboarding"
+    override val screenConfigKey = "device-screen"
     override val getScreenConfigUseCase = getScreenFromCacheUseCase
 
     override fun createInitState() = ConnectStartViewState(

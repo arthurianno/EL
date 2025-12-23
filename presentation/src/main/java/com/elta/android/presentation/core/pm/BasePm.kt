@@ -171,6 +171,69 @@ abstract class BasePm(
         } ?: imagePreloadState.consumer.accept(true)
     }
 
+    protected fun loadMultipleScreenConfigs(
+        context: Context,
+        configs: Map<String, String>, // ключ -> slug
+        onUpdate: (results: Map<String, Pair<ScreenEntity?, Boolean>>) -> Unit
+    ) {
+        val useCase = getScreenConfigUseCase
+
+        if (useCase == null) {
+            Log.w("BasePm", "getScreenConfigUseCase is null, skipping loadMultipleScreenConfigs")
+            // Вызываем callback с пустыми результатами
+            val emptyResults = configs.keys.associateWith { null to true }
+            onUpdate(emptyResults)
+            return
+        }
+
+        launch {
+            try {
+                Log.d("BasePm", "loadMultipleScreenConfigs started with ${configs.size} configs")
+                val results = mutableMapOf<String, Pair<ScreenEntity?, Boolean>>()
+
+                configs.forEach { (key, slug) ->
+                    Log.d("BasePm", "Processing config: key=$key, slug=$slug")
+
+                    when (val result = useCase(slug)) {
+                        is Resource.Success -> {
+                            Log.d("BasePm", "SUCCESS for '$slug': ${result.data.title}")
+                            val screenEntity = result.data
+                            val imageUrl = screenEntity.backgroundImageUrl
+
+                            val isImageReady = if (imageUrl != null) {
+                                ImageCacheHelper.isImageInCache(
+                                    imageUrl,
+                                    context,
+                                    context.imageLoader
+                                )
+                            } else {
+                                true
+                            }
+
+                            results[key] = screenEntity to isImageReady
+                        }
+                        is Resource.Error -> {
+                            Log.e("BasePm", "ERROR loading config '$slug': ${result.message}")
+                            results[key] = null to true
+                        }
+                        is Resource.Loading -> {
+                            Log.d("BasePm", "LOADING state for config '$slug'")
+                        }
+                    }
+                }
+
+                Log.d("BasePm", "All configs processed, results size: ${results.size}")
+                // Обновляем через callback
+                onUpdate(results)
+            } catch (e: Exception) {
+                Log.e("BasePm", "EXCEPTION in loadMultipleScreenConfigs: ${e.message}", e)
+                // При ошибке возвращаем пустые результаты
+                val emptyResults = configs.keys.associateWith { null to true }
+                onUpdate(emptyResults)
+            }
+        }
+    }
+
 
     internal fun sendDateChangedEvent() {
         bus.event(DateChangedEvent)

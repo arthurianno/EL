@@ -19,11 +19,13 @@ import javax.inject.Inject
 class AuthPasswordRecoveryPm @Inject constructor(
     private val sendPasswordResetLinkUseCase: SendPasswordResetLinkUseCase,
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
+    private val getScreenConfigFromCache: GetScreenConfigFromCache,
     private val context: Context,
     services: ServiceFacade
 ) : BaseAuthPm(services), ScreenConfigurable {
 
     override val screenConfigKey = "password-screen"
+    override val getScreenConfigUseCase = getScreenConfigFromCache
 
     override fun onCreate() {
         super.onCreate()

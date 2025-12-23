@@ -28,8 +28,6 @@ import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUME
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectAction
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectEvent
 import com.elta.android.presentation.features.sync.connect.model.howtoconnect.HowToConnectViewState
-import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 

@@ -31,7 +31,7 @@ class AuthPasswordRecoveryFragment :
     override fun onBindPresentationModel(pm: AuthPasswordRecoveryPm) {
         super.onBindPresentationModel(pm)
         bindScreenConfig(pm){
-            //withBackgroundImage(binding.backgroundImageView, R.drawable.ic_login_bg)  // Другая картинка!
+            withBackgroundImage(binding.backgroundImageView, R.drawable.ic_welcome)  // Другая картинка!
             withTitle(binding.authPasswordRecoveryTitle, R.string.auth_password_recovery_title)
             withDescription(binding.authPasswordRecoverySubTitle, R.string.auth_password_recovery_subtitle)
             withRootView(binding.root)

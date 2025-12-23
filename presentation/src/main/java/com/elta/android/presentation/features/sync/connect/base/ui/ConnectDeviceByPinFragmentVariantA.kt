@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.widgets.SnackBarControl
 import com.elta.android.presentation.core.ui.dialog.createDialog
@@ -15,7 +17,6 @@ import com.elta.android.presentation.core.ui.snackbarview.SnackBarData
 import com.elta.android.presentation.core.ui.system_ui.LightStatusBarConfigProvider
 import com.elta.android.presentation.core.ui.system_ui.StatusBarConfigProvider
 import com.elta.android.presentation.databinding.FragmentSyncConnectBinding
-import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePm
 import com.elta.android.presentation.features.sync.connect.base.pm.ConnectDevicePmVariantA
 import com.elta.android.presentation.features.sync.connect.base.ui.adapter.DeviceAdapter
 import com.elta.android.presentation.features.sync.control.bindTo
@@ -65,6 +66,10 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
     override fun onBindPresentationModel(pm: T) {
         super.onBindPresentationModel(pm)
         bindProgressDialog(pm)
+
+        // Биндим конфигурации экранов
+        bindScreenConfigs(pm)
+
         binding.toolbar.menuButtonView.clicks().bindTo(pm.skipAction)
         binding.layoutSyncStateDeviceFound.actionButtonView.clicks().bindTo(pm.connectDeviceAction)
         binding.layoutSyncStateNotFound.actionButtonView.clicks().bindTo(pm.startScanAction)
@@ -114,6 +119,53 @@ abstract class ConnectDeviceByPinFragmentVariantA<T : ConnectDevicePmVariantA> :
             }
         }
         pm.deviceAlreadyConnectedDialog.bindTo { data, dc -> createDialog(this, dc, data) }
+    }
+
+    private fun bindScreenConfigs(pm: T) {
+        // Биндим конфигурацию экрана CONNECTED
+        pm.connectedScreenConfig.bindTo { config ->
+            config?.let {
+                binding.layoutSyncStateConnected.titleView.text = it.title
+                binding.layoutSyncStateConnected.messageView.text = it.description
+                it.backgroundImageUrl?.let { url ->
+                    binding.layoutSyncStateConnected.backgroundImageView.load(url) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_connect_finish)
+                        error(R.drawable.ic_connect_finish)
+                    }
+                }
+            }
+        }
+
+        // Биндим конфигурацию экрана SYNC_COMPLETED (успешная синхронизация)
+        pm.syncCompletedScreenConfig.bindTo { config ->
+            config?.let {
+                binding.layoutSyncStateSyncCompleted.titleView.text = it.title
+                binding.layoutSyncStateSyncCompleted.messageView.text = it.description
+                it.backgroundImageUrl?.let { url ->
+                    binding.layoutSyncStateSyncCompleted.backgroundImageView.load(url) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_connect_finish)
+                        error(R.drawable.ic_connect_finish)
+                    }
+                }
+            }
+        }
+
+        // Биндим конфигурацию экрана SYNC_ERROR (ошибка синхронизации)
+        pm.syncErrorScreenConfig.bindTo { config ->
+            config?.let {
+                binding.layoutSyncStateSyncError.titleView.text = it.title
+                binding.layoutSyncStateSyncError.messageView.text = it.description
+                it.backgroundImageUrl?.let { url ->
+                    binding.layoutSyncStateSyncError.backgroundImageView.load(url) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_connect_dev)
+                        error(R.drawable.ic_connect_dev)
+                    }
+                }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

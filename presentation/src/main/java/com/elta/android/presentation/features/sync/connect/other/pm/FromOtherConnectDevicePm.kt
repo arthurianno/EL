@@ -1,10 +1,12 @@
 package com.elta.android.presentation.features.sync.connect.other.pm
 
+import android.content.Context
 import com.elta.android.domain.features.devices.interactor.AddNewDeviceUseCase
 import com.elta.android.domain.features.devices.interactor.CheckConnectedDevicesUseCase
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCase
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.presentation.Events
 import com.elta.android.presentation.Screens
@@ -27,6 +29,8 @@ class FromOtherConnectDevicePm @Inject constructor(
     checkConnectedDevicesUseCase: CheckConnectedDevicesUseCase,
     getLocationNeededUseCase: GetLocationNeededUseCase,
     appMetric: AppMetricTracker,
+    context: Context,
+    getScreenConfigFromCache: GetScreenConfigFromCache,
     services: ServiceFacade
 ) : ConnectDevicePm(
     syncWithGlucometerUseCase,
@@ -36,6 +40,8 @@ class FromOtherConnectDevicePm @Inject constructor(
     getLocationNeededUseCase,
     updateUserInfoUseCase,
     appMetric,
+    context,
+    getScreenConfigFromCache,
     services
 ) {
 

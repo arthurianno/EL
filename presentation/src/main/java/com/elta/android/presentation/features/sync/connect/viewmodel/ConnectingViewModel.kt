@@ -73,7 +73,8 @@ class ConnectingViewModel @Inject constructor(
     private val context: Context
 ) : BaseViewModel<ConnectingViewState>(), ComposeScreenConfigurable {
 
-    override val screenConfigKey = "connecting-screen"
+
+    override val screenConfigKey = "device-screen"
     override val getScreenConfigUseCase = getScreenFromCacheUseCase
 
     override fun createInitState(): ConnectingViewState =
@@ -125,30 +126,35 @@ class ConnectingViewModel @Inject constructor(
     ).actionObserve()
 
     init {
-        loadMultipleScreenConfigs(
-            context = context,
-            configs = mapOf(
-                "sync" to "sync-screen",
-                "success" to "successful-sync-screen",
-                "failed" to "failed-sync-screen"
-            ),
-            onUpdate = { results ->
-                val syncResult = results["sync"]
-                val successResult = results["success"]
-                val failedResult = results["failed"]
+        launch {
+            try {
+                loadMultipleScreenConfigs(
+                    context = context,
+                    configs = mapOf(
+                        "sync" to "sync-screen",
+                        "success" to "successful-sync-screen",
+                        "failed" to "failed-sync-screen"
+                    ),
+                    onUpdate = { results ->
+                        val syncResult = results["sync"]
+                        val successResult = results["success"]
+                        val failedResult = results["failed"]
+                        state.value.copy(
+                            connectingScreenConfig = syncResult?.first,
+                            isConnectingImageReady = syncResult?.second ?: true,
 
-                state.value.copy(
-                    syncScreenConfig = syncResult?.first,
-                    isSyncImageReady = syncResult?.second ?: true,
+                            successfulSyncConfig = successResult?.first,
+                            isSuccessImageReady = successResult?.second ?: true,
 
-                    successfulSyncConfig = successResult?.first,
-                    isSuccessImageReady = successResult?.second ?: true,
-
-                    failedSyncConfig = failedResult?.first,
-                    isFailedImageReady = failedResult?.second ?: true
+                            failedSyncConfig = failedResult?.first,
+                            isFailedImageReady = failedResult?.second ?: true
+                        )
+                    }
                 )
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        )
+        }
         launch {
             needEnableLocation = getLocationNeededUseCase.execute().await()
         }

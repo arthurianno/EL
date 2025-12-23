@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -208,13 +209,22 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
             }
             ConnectingStageType.Sync -> {
                 MainImage(
-                    imageUrl = if (state.isSyncImageReady) {
-                        state.syncScreenConfig?.backgroundImageUrl
+                    imageUrl = if (state.isSuccessImageReady) {
+                        state.connectingScreenConfig?.backgroundImageUrl
                     } else null,
                     imageId = R.drawable.ic_connect_dev
                 )
             }
             ConnectingStageType.ErrorSync -> {
+                MainImage(
+                    imageUrl = if (state.isFailedImageReady) {
+                        state.failedSyncConfig?.backgroundImageUrl
+                    } else null,
+                    imageId = R.drawable.ic_connect_dev
+                )
+            }
+
+            ConnectingStageType.ErrorConnect -> {
                 MainImage(
                     imageUrl = if (state.isFailedImageReady) {
                         state.failedSyncConfig?.backgroundImageUrl
@@ -239,10 +249,10 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     ) {
         val state = viewModel.state.collectAsState().value
         when (stageType) {
-            ConnectingStageType.Connecting -> ConnectingFooter()
+            ConnectingStageType.Connecting -> ConnectingFooter(state.connectingScreenConfig)
             ConnectingStageType.DeviceNotFound -> DeviceNotFoundFooter(viewModel)
             ConnectingStageType.ErrorConnect -> ErrorConnectFooter(viewModel)
-            ConnectingStageType.Sync -> SyncFooter(glucometerName, state.syncScreenConfig)
+            ConnectingStageType.Sync -> SyncFooter(glucometerName, state.connectingScreenConfig)
             ConnectingStageType.Complete -> CompleteFooter(viewModel, state.successfulSyncConfig)
             ConnectingStageType.ErrorSync -> ErrorSyncFooter(viewModel, state.failedSyncConfig)
         }
@@ -398,16 +408,16 @@ class ConnectingFragment : BaseComposeFragment<ConnectingViewModel>() {
     }
 
     @Composable
-    private fun ConnectingFooter() {
+    private fun ConnectingFooter(config: ScreenEntity?) {
         GetLocalProperties { dimens, _, colors, _, types ->
             Column(Modifier.padding(dimens.contentPadding)) {
                 Text(
-                    text = stringResource(id = R.string.sync_connection_screen_title),
+                    text = config?.title ?: stringResource(id = R.string.sync_connection_screen_title),
                     style = types.h1
                 )
                 VSpacerSmall()
                 Text(
-                    text = stringResource(id = R.string.sync_connection_screen_text),
+                   text = config?.description ?: stringResource(id = R.string.sync_connection_screen_text),
                     color = colors.shadeBlack0
                 )
             }

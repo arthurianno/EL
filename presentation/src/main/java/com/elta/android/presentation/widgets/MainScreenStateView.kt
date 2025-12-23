@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import coil.load
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.ui.stateview.StateData
 import com.elta.android.presentation.core.ui.stateview.StateView
@@ -35,6 +36,33 @@ class MainScreenStateView @JvmOverloads constructor(
         with(data) {
             titleView?.text = title
             descriptionView?.text = description
+        }
+    }
+
+    fun updateFromConfig(title: String?, description: String?, imageUrl: String?) {
+        // Обновляем title если есть
+        title?.let { titleView?.text = it }
+
+        // Обновляем description если есть
+        description?.let { descriptionView?.text = it }
+
+        // Обновляем фоновое изображение если есть URL
+        imageUrl?.let { url ->
+            iconView?.load(url) {
+                crossfade(true)
+                placeholder(R.drawable.ic_main_screen_bolb)
+                error(R.drawable.ic_main_screen_bolb)
+            }
+        }
+    }
+
+    fun updateBackgroundImage(imageUrl: String?) {
+        imageUrl?.let { url ->
+            iconView?.load(url) {
+                crossfade(true)
+                placeholder(R.drawable.ic_main_screen_bolb)
+                error(R.drawable.ic_main_screen_bolb)
+            }
         }
     }
 

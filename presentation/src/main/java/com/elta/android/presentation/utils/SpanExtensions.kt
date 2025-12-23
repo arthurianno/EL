@@ -15,11 +15,16 @@ import io.reactivex.disposables.Disposables
 
 fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observable<Unit> {
     val spannable = fullText?.toSpannable() ?: text.toSpannable()
-    val startIndex = spannable.indexOf(spanText)
+
+    // Normalize text for search: replace newlines and multiple spaces with single space
+    val normalizedSpannable = spannable.toString().replace(Regex("\\s+"), " ")
+    val normalizedSpanText = spanText.replace(Regex("\\s+"), " ")
+    val startIndex = normalizedSpannable.indexOf(normalizedSpanText)
+
     movementMethod = LinkMovementMethod.getInstance()
     return Observable.create<Unit> {
         if (startIndex == -1) {
-            it.onError(IllegalArgumentException("Text '$spanText' not found in '$spannable'"))
+            it.onError(IllegalArgumentException("Text '$normalizedSpanText' not found in '$normalizedSpannable'"))
             return@create
         }
 
@@ -36,7 +41,7 @@ fun TextView.clickableSpan(spanText: String, fullText: String? = null): Observab
             setSpan(
                 span,
                 startIndex,
-                startIndex + spanText.length,
+                startIndex + normalizedSpanText.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }

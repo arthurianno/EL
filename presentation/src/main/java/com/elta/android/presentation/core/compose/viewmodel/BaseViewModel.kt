@@ -185,44 +185,59 @@ abstract class BaseViewModel<ST> : ViewModel() {
         configs: Map<String, String>, // ключ -> slug
         onUpdate: (results: Map<String, Pair<ScreenEntity?, Boolean>>) -> ST
     ) {
+        Log.e("BaseViewModel", "========== loadMultipleScreenConfigs CALLED ==========")
+        Log.e("BaseViewModel", "Thread: ${Thread.currentThread().name}")
         launch {
-            val results = mutableMapOf<String, Pair<ScreenEntity?, Boolean>>()
+            try {
+                Log.e("BaseViewModel", "loadMultipleScreenConfigs started with ${configs.size} configs")
+                val results = mutableMapOf<String, Pair<ScreenEntity?, Boolean>>()
 
-            configs.forEach { (key, slug) ->
-                if (this@BaseViewModel !is ComposeScreenConfigurable) {
-                    results[key] = null to true
-                    return@forEach
-                }
+                configs.forEach { (key, slug) ->
+                    Log.e("BaseViewModel", "Processing config: key=$key, slug=$slug")
 
-                when (val result = getScreenConfigUseCase(slug)) {
-                    is Resource.Success -> {
-                        val screenEntity = result.data
-                        val imageUrl = screenEntity.backgroundImageUrl
-
-                        val isImageReady = if (imageUrl != null) {
-                            ImageCacheHelper.isImageInCache(
-                                imageUrl,
-                                context,
-                                context.imageLoader
-                            )
-                        } else {
-                            true
-                        }
-
-                        results[key] = screenEntity to isImageReady
-                    }
-                    is Resource.Error -> {
-                        Log.e("BaseViewModel", "Error loading config '$slug': ${result.message}")
+                    if (this@BaseViewModel !is ComposeScreenConfigurable) {
+                        Log.e("BaseViewModel", "ViewModel is NOT ComposeScreenConfigurable!")
                         results[key] = null to true
+                        return@forEach
                     }
-                    is Resource.Loading -> {
-                        Log.d("BaseViewModel", "Loading config '$slug'...")
+
+                    Log.e("BaseViewModel", "Calling getScreenConfigUseCase for slug: $slug")
+                    when (val result = getScreenConfigUseCase(slug)) {
+                        is Resource.Success -> {
+                            Log.e("BaseViewModel", "SUCCESS for '$slug': ${result.data.title}")
+                            val screenEntity = result.data
+                            val imageUrl = screenEntity.backgroundImageUrl
+
+                            val isImageReady = if (imageUrl != null) {
+                                ImageCacheHelper.isImageInCache(
+                                    imageUrl,
+                                    context,
+                                    context.imageLoader
+                                )
+                            } else {
+                                true
+                            }
+
+                            results[key] = screenEntity to isImageReady
+                        }
+                        is Resource.Error -> {
+                            Log.e("BaseViewModel", "ERROR loading config '$slug': ${result.message}")
+                            results[key] = null to true
+                        }
+                        is Resource.Loading -> {
+                            Log.e("BaseViewModel", "LOADING state for config '$slug' - THIS SHOULD NOT HAPPEN!")
+                        }
                     }
                 }
-            }
 
-            // Обновляем state со всеми результатами
-            reduceState { onUpdate(results) }
+                Log.e("BaseViewModel", "All configs processed, results size: ${results.size}")
+                // Обновляем state со всеми результатами
+                reduceState { onUpdate(results) }
+                Log.e("BaseViewModel", "State updated via onUpdate")
+            } catch (e: Exception) {
+                Log.e("BaseViewModel", "EXCEPTION in loadMultipleScreenConfigs: ${e.message}", e)
+                e.printStackTrace()
+            }
         }
     }
 }

@@ -20,6 +20,8 @@ import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCas
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCase
 import com.elta.android.domain.features.devices.model.Glucometer
 import com.elta.android.domain.features.diary.home.interactor.GetLocationNeededUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
@@ -64,8 +66,24 @@ abstract class ConnectDevicePm constructor(
     private val getLocationNeededUseCase: GetLocationNeededUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val appMetric: AppMetricTracker,
+    private val context: android.content.Context,
+    private val getScreenConfigFromCacheUseCase: GetScreenConfigFromCache,
     services: ServiceFacade
 ) : BaseListPm(services) {
+
+    // Переопределяем screenConfigKey и getScreenConfigUseCase для базовой поддержки
+    override val screenConfigKey: String = "connect-device"
+    override val getScreenConfigUseCase: GetScreenConfigFromCache = getScreenConfigFromCacheUseCase
+
+    // State-ы для хранения конфигов 3 экранов
+    val connectedScreenConfig = state<ScreenEntity?>()
+    val connectedImageReady = state(true)
+
+    val syncCompletedScreenConfig = state<ScreenEntity?>()
+    val syncCompletedImageReady = state(true)
+
+    val syncErrorScreenConfig = state<ScreenEntity?>()
+    val syncErrorImageReady = state(true)
 
     val skipAction = action<Unit>()
     val backHandleAction = action<Unit>()
@@ -149,6 +167,41 @@ abstract class ConnectDevicePm constructor(
 
     override fun onCreate() {
         super.onCreate()
+
+        // Загружаем конфигурации для 3 экранов
+        loadMultipleScreenConfigs(
+            context = context,
+            configs = mapOf(
+                "connected" to "sync-screen",
+                "success" to "successful-sync-screen",
+                "failed" to "failed-sync-screen"
+            )
+        ) { results ->
+            // CONNECTED screen config
+            results["connected"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    connectedScreenConfig.consumer.accept(config)
+                }
+                connectedImageReady.consumer.accept(imageReady)
+            }
+
+            // SYNC_COMPLETED screen config
+            results["success"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    syncCompletedScreenConfig.consumer.accept(config)
+                }
+                syncCompletedImageReady.consumer.accept(imageReady)
+            }
+
+            // SYNC_ERROR screen config
+            results["failed"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    syncErrorScreenConfig.consumer.accept(config)
+                }
+                syncErrorImageReady.consumer.accept(imageReady)
+            }
+        }
+
         bindActions()
         bindRetryActions()
         bindClicksAndEvents()

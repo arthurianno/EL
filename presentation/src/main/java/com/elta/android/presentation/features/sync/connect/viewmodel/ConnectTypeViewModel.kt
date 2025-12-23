@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.sync.connect.viewmodel
 
 import android.os.Bundle
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.analytic.core.analytics.Analytics
@@ -12,6 +13,7 @@ import com.elta.android.presentation.analytic.model.appmetric.params.ConnectingT
 import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.viewmodel.BaseViewModel
+import com.elta.android.presentation.core.compose.viewmodel.ComposeScreenConfigurable
 import com.elta.android.presentation.core.compose.widgets.appbar.BaseAppTopBarWidgetModel
 import com.elta.android.presentation.features.sync.connect.IS_ON_BOARDING_ARGUMENT_NAME
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
@@ -21,12 +23,16 @@ import javax.inject.Inject
 class ConnectTypeViewModel @Inject constructor(
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     private val analytics: Analytics,
-    private val appMetric: AppMetricTracker
-) : BaseViewModel<ConnectTypeViewState>() {
+    private val appMetric: AppMetricTracker,
+    private val getScreenCacheConfigUseCase : GetScreenConfigFromCache,
+) : BaseViewModel<ConnectTypeViewState>(), ComposeScreenConfigurable {
     override fun createInitState(): ConnectTypeViewState =
         ConnectTypeViewState(
             isOnBoarding = true
         )
+
+    override val screenConfigKey = "device-screen"
+    override val getScreenConfigUseCase = getScreenCacheConfigUseCase
 
     val appTopBar = BaseAppTopBarWidgetModel()
 

@@ -24,6 +24,7 @@ import com.nullgr.core.rx.RxBus
 import com.nullgr.core.ui.extensions.toggleVisibilityState
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
+import me.dmdev.rxpm.bindTo
 import javax.inject.Inject
 
 class MainRecordsFragment :
@@ -62,6 +63,19 @@ class MainRecordsFragment :
 
     override fun onBindPresentationModel(pm: MainRecordsPm) {
         super.onBindPresentationModel(pm)
+
+        // Биндим конфигурацию main screen
+        pm.mainScreenConfig.bindTo { config ->
+            config?.let {
+                // Обновляем title, description и изображение из конфига
+                binding.mainScreenStateView.updateFromConfig(
+                    title = it.title,
+                    description = it.description,
+                    imageUrl = it.backgroundImageUrl
+                )
+            }
+        }
+
         pm.mainScreenState.bind(binding.mainScreenStateView, compositeUnbind)
         pm.mainScreenState
             .visibilityState

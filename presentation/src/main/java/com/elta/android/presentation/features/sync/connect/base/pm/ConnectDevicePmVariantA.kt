@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.base.pm
 
+import android.content.Context
 import android.os.Build
 import com.elta.android.common.constants.GLUCOMETER_MODEL
 import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
@@ -17,6 +18,8 @@ import com.elta.android.domain.features.devices.interactor.CheckConnectedDevices
 import com.elta.android.domain.features.devices.interactor.FindGlucometersUseCaseVariantA
 import com.elta.android.domain.features.devices.interactor.SyncWithGlucometerUseCaseVariantA
 import com.elta.android.domain.features.devices.model.Glucometer
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
+import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
 import com.elta.android.presentation.Clicks
@@ -60,8 +63,24 @@ abstract class ConnectDevicePmVariantA constructor(
     private val checkConnectedDevices: CheckConnectedDevicesUseCase,
     private val updateUserInfo: UpdateUserInfoUseCase,
     private val appMetric: AppMetricTracker,
+    private val context: Context,
+    private val getScreenConfigFromCacheUseCase: GetScreenConfigFromCache,
     services: ServiceFacade
 ) : BaseListPm(services) {
+
+    // Переопределяем screenConfigKey и getScreenConfigUseCase для базовой поддержки
+    override val screenConfigKey: String = "connect-device"
+    override val getScreenConfigUseCase: GetScreenConfigFromCache = getScreenConfigFromCacheUseCase
+
+    // State-ы для хранения конфигов 3 экранов
+    val connectedScreenConfig = state<ScreenEntity?>()
+    val connectedImageReady = state(true)
+
+    val syncCompletedScreenConfig = state<ScreenEntity?>()
+    val syncCompletedImageReady = state(true)
+
+    val syncErrorScreenConfig = state<ScreenEntity?>()
+    val syncErrorImageReady = state(true)
 
     val skipAction = action<Unit>()
     val backHandleAction = action<Unit>()
@@ -129,6 +148,41 @@ abstract class ConnectDevicePmVariantA constructor(
 
     override fun onCreate() {
         super.onCreate()
+
+        // Загружаем конфигурации для 3 экранов
+        loadMultipleScreenConfigs(
+            context = context,
+            configs = mapOf(
+                "connected" to "sync-screen",
+                "success" to "successful-sync-screen",
+                "failed" to "failed-sync-screen"
+            )
+        ) { results ->
+            // CONNECTED screen config
+            results["connected"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    connectedScreenConfig.consumer.accept(config)
+                }
+                connectedImageReady.consumer.accept(imageReady)
+            }
+
+            // SYNC_COMPLETED screen config
+            results["success"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    syncCompletedScreenConfig.consumer.accept(config)
+                }
+                syncCompletedImageReady.consumer.accept(imageReady)
+            }
+
+            // SYNC_ERROR screen config
+            results["failed"]?.let { (config, imageReady) ->
+                if (config != null) {
+                    syncErrorScreenConfig.consumer.accept(config)
+                }
+                syncErrorImageReady.consumer.accept(imageReady)
+            }
+        }
+
         bindActions()
         bindRetryActions()
         bindClicksAndEvents()
