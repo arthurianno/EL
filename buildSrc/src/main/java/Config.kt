@@ -8,7 +8,7 @@ object AppConfig {
     val javaVersion = JavaVersion.VERSION_1_8
 
     object DeepLink {
-        const val host = "stage2.vdiabete.com"
+        const val host = "vdiabete.com"
         const val schema = "elta"
     }
 

@@ -22,6 +22,44 @@ class DynamicLinkProcessor private constructor(
     @Suppress("LongMethod")
     fun process() {
         if (initialIntent != null) {
+            // Обработка обычных Deep Links (HTTPS и custom схемы) из intent.data
+            val intentData = initialIntent.data
+            if (intentData != null) {
+                Timber.d("Processing Deep Link from intent.data: $intentData")
+                val scheme = intentData.scheme
+
+                // Обрабатываем HTTPS и custom схемы (elta://)
+                if (scheme == "https" || scheme == "http" || scheme == "elta") {
+                    Timber.d("Deep Link detected: scheme=$scheme, host=${intentData.host}, path=${intentData.path}")
+
+                    // Проверяем специальные пути для новостей и консультанта
+                    when {
+                        intentData.path?.contains("/app/news", ignoreCase = true) == true -> {
+                            Timber.d("Opening news screen via Deep Link")
+                            newsDeepLinkOpenAction?.consumer?.accept(Unit)
+                            return
+                        }
+                        intentData.path?.contains("/app/consultant", ignoreCase = true) == true -> {
+                            Timber.d("Opening consultant screen via Deep Link")
+                            consultantDeepLinkOpenAction?.consumer?.accept(Unit)
+                            return
+                        }
+                        // Обрабатываем все остальные Deep Links через общий обработчик
+                        else -> {
+                            Timber.d("Opening Deep Link screen via deepLinkOpenAction")
+                            if (!ignoreColdStart && savedState == null) {
+                                // Cold start с Deep Link
+                                coldStartByDeepLinkAction?.consumer?.accept(intentData)
+                            } else {
+                                // Hot start с Deep Link
+                                deepLinkOpenAction?.consumer?.accept(intentData)
+                            }
+                            return
+                        }
+                    }
+                }
+            }
+
             val launchUrl = initialIntent.getStringExtra("launch_url")
 
             // Обработка URL из пуш-уведомлений (OneSignal)
