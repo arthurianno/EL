@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import android.view.View
 import androidx.camera.core.CameraSelector
@@ -74,6 +75,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val NUMBER_SUFFIX = "D"
+private const val NUMBER_SUFFIX_2 = "E"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
 // fixme Variant A : improved_enabling_location

@@ -133,7 +133,24 @@ class EventsDataRepository @Inject constructor(
 
     override suspend fun addEventFromGlucometer(glucometerEvents: List<GlucometerEvent>) {
         val events = glucometerEvents.map { event ->
-            eventsFromGlucometerMapper.mapFromObject(event)
+            val newEvent = eventsFromGlucometerMapper.mapFromObject(event)
+
+            // Проверяем, существует ли уже событие в базе
+            // Если да - сохраняем существующий meal tag (чтобы не перезаписывать ручные изменения)
+            try {
+                val existingEventDto = cacheSource.getEventById(newEvent.id).await()
+                val existingMealTag = existingEventDto.data.mealTag
+                if (existingMealTag != null) {
+                    val existingEvent = existingEventDto.toDomain()
+                    Timber.d("📊 Preserving existing mealTag=${existingEvent.mealTag} for event ${newEvent.id}")
+                    newEvent.copy(mealTag = existingEvent.mealTag)
+                } else {
+                    newEvent
+                }
+            } catch (e: Exception) {
+                // Событие не найдено - используем новое
+                newEvent
+            }
         }
         addEventsSuspend(events)
     }

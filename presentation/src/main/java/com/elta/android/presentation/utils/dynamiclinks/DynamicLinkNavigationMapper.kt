@@ -21,6 +21,7 @@ object DynamicLinkNavigationMapper {
 
         val token = uri.getQueryParameter(QUERY_TOKEN)
         val screen = uri.getQueryParameter(QUERY_SCREEN)
+        val pathSegments = uri.pathSegments ?: emptyList()
 
         Timber.d("🔗 Params: token=$token, screen=$screen")
 
@@ -29,8 +30,7 @@ object DynamicLinkNavigationMapper {
                 Timber.d("✅ Matched RESET_PASSWORD_PATH -> Screens.PasswordCreate(token=$token)")
                 Screens.PasswordCreate(token)
             }
-            token != null && uri.lastPathSegment.equals(VERIFY_EMAIL_PATH, true) -> {
-                Timber.d("✅ Matched VERIFY_EMAIL_PATH -> Screens.EmailConfirmation(token=$token)")
+            token != null && (pathSegments.any { it.equals(VERIFY_EMAIL_PATH, true) } || uri.toString().contains(VERIFY_EMAIL_PATH, true)) -> {
                 Screens.EmailConfirmation(token)
             }
             // todo test inapp messaging(temporally solution)

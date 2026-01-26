@@ -1,8 +1,6 @@
 package com.elta.android.presentation.features.auth.password.recovery.pm
 
 import android.content.Context
-import android.util.Log
-import coil.imageLoader
 import com.elta.android.common.errors.NotFoundError
 import com.elta.android.domain.features.auth.interactor.SendPasswordResetLinkUseCase
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
@@ -19,13 +17,13 @@ import javax.inject.Inject
 class AuthPasswordRecoveryPm @Inject constructor(
     private val sendPasswordResetLinkUseCase: SendPasswordResetLinkUseCase,
     private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
-    private val getScreenConfigFromCache: GetScreenConfigFromCache,
+    getScreenConfigFromCacheUseCase: GetScreenConfigFromCache,
     private val context: Context,
     services: ServiceFacade
 ) : BaseAuthPm(services), ScreenConfigurable {
 
     override val screenConfigKey = "password-screen"
-    override val getScreenConfigUseCase = getScreenConfigFromCache
+    override val getScreenConfigUseCase = getScreenConfigFromCacheUseCase
 
     override fun onCreate() {
         super.onCreate()

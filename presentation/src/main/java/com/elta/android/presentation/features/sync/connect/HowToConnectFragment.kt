@@ -48,6 +48,7 @@ import com.elta.android.presentation.utils.openSettingsIntent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @ExperimentalCameraProviderConfiguration
 class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
@@ -98,6 +99,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
     @Composable
     override fun Content(viewModel: HowToConnectViewModel) {
         val context = LocalContext.current
+        val state by viewModel.state.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
             viewModel.event.collectLatest {
@@ -159,11 +161,7 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
             }
         }
         GetLocalProperties { dimens, _, colors, _, _ ->
-            // Показываем контент только когда всё готово (данные + картинка проверена)
-            AnimatedVisibility(
-                visible = viewModel.state.collectAsState().value.isContentReady,
-                enter = fadeIn()
-            ) {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -181,7 +179,6 @@ class HowToConnectFragment : BaseComposeFragment<HowToConnectViewModel>() {
                         onClickAction = HowToConnectAction.OnConnectButtonClick
                     )
                 }
-            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.sync.connect
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import android.view.View
 import androidx.annotation.StringRes
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -54,6 +56,7 @@ import com.elta.android.presentation.R
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseComposeFragment
 import com.elta.android.presentation.core.compose.widgets.HSpacerMedium
+import com.elta.android.presentation.core.compose.widgets.VSpacerMedium
 import com.elta.android.presentation.core.compose.widgets.VSpacerVerySmall
 import com.elta.android.presentation.features.sync.connect.model.ConnectAction
 import com.elta.android.presentation.features.sync.connect.model.ConnectMainEvent
@@ -76,6 +79,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val NUMBER_SUFFIX = "D"
+private const val NUMBER_SUFFIX_2 = "E"
 private const val NUMBERS_COUNT_FOR_NAME = 4
 
 private enum class CropCornerType(val degrees: Float, val align: Alignment) {
@@ -261,37 +265,49 @@ class ScannerDmcFragment : BaseComposeFragment<ScannerDmcViewModel>() {
                 )
                     ?.addOnSuccessListener { barcodes ->
                         handleBarcodes(barcodes, viewModel)
-                        imageProxy.close()
                     }
-                    ?.addOnFailureListener {
+                    ?.addOnFailureListener { exception ->
                         viewModel sendAction ConnectAction.ScannerError
+                        Log.e("ScannerDMC Fragment", "Barcode scanning failed", exception)
                     }
                     ?.addOnCompleteListener {
                         imageProxy.close()
                     }
-            }
+            } ?: imageProxy.close()
         }
 
-    private fun handleBarcodes(
-        barcodes: MutableList<Barcode>,
-        viewModel: ScannerDmcViewModel
-    ) {
-        if (barcodes.isNotEmpty()) {
-            barcodes.forEach { code ->
-                val value = code.rawValue.orEmpty()
-                if (value.startsWith(NUMBER_SUFFIX)) {
-                    runCatching {
-                        val pin = value.extractPinCode()
-                        val name =
-                            "$GLUCOMETER_MODEL${
-                                value.drop(1).takeLast(NUMBERS_COUNT_FOR_NAME)
-                            }"
-                        viewModel sendAction ConnectAction.OnDmcReceived(pin, name)
-                    }
-                        .onFailure {
-                            viewModel sendAction ConnectAction.ScannerError
-                        }
-                } else viewModel sendAction ConnectAction.ScannerError
+    private fun handleBarcodes(barcodes: MutableList<Barcode>, viewModel: ScannerDmcViewModel) {
+        barcodes.forEach { code ->
+            val value = code.rawValue.orEmpty().trim() // Убираем пробелы!
+            Log.d("ScannerDMC Fragment", "Scanned raw value: '$value' (length: ${value.length})")
+
+            val isVoice = value.startsWith(NUMBER_SUFFIX_2) // "E"
+            val isOnline = value.startsWith(NUMBER_SUFFIX)  // "D"
+
+            Log.d("ScannerDMC Fragment", "isVoice: $isVoice, isOnline: $isOnline")
+
+            if (isVoice || isOnline) {
+                runCatching {
+                    val pin = value.extractPinCode()
+
+                    // 1. Определяем префикс модели
+                    val modelName = if (isVoice) "SatelliteVoice" else "SatelliteOnline"
+
+                    // 2. Берем ПОСЛЕДНИЕ 4 цифры из отсканированного кода (value)
+                    // Для E25120000000 это будет "0000"
+                    val deviceSuffix = value.takeLast(NUMBERS_COUNT_FOR_NAME)
+
+                    val name = "$modelName$deviceSuffix"
+
+                    Log.d("ScannerDMC Fragment", "SUCCESS: pin = $pin, name = $name")
+                    viewModel sendAction ConnectAction.OnDmcReceived(pin, name)
+                }.onFailure { exception ->
+                    Log.e("ScannerDMC Fragment", "Error extracting pin from value: $value", exception)
+                    viewModel sendAction ConnectAction.ScannerError
+                }
+            } else {
+                Log.e("ScannerDMC Fragment", "Invalid barcode format: $value (doesn't start with D or E)")
+                viewModel sendAction ConnectAction.ScannerError
             }
         }
     }

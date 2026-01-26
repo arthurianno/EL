@@ -14,10 +14,12 @@ import com.elta.android.presentation.core.bus.event
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.messages.SnackBarMessageData
+import io.reactivex.Observable
 import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
 import me.dmdev.rxpm.state
 import org.threeten.bp.LocalDate
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val FORMAT = "d LLLL"
@@ -92,6 +94,10 @@ class ReportPeriodChooserPm @Inject constructor(
 
     private fun handleReport(uri: Uri) {
         bus.event(Events.ReportLoadedEvent(uri))
-        closeDialogCommand.consumer.accept(Unit)
+        // Добавляем задержку перед закрытием диалога, чтобы событие успело быть обработано
+        // StatisticFlowPm использует delay(400ms) для обработки события
+        Observable.timer(500, TimeUnit.MILLISECONDS)
+            .subscribe { closeDialogCommand.consumer.accept(Unit) }
+            .untilDestroy()
     }
 }

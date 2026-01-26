@@ -1,7 +1,10 @@
 package com.elta.android.presentation.features.auth.password.create.pm
 
+import android.content.Context
 import com.elta.android.domain.features.auth.interactor.ResetPasswordUseCase
+import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.presentation.R
+import com.elta.android.presentation.core.pm.ScreenConfigurable
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.registration.main.pm.BaseAuthPm
 import com.elta.android.presentation.messages.SnackBarMessageData
@@ -12,15 +15,21 @@ import javax.inject.Inject
 
 class AuthPasswordCreatePm @Inject constructor(
     private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val getScreenConfigFromCache: GetScreenConfigFromCache,
+    private val context: Context,
     services: ServiceFacade
-) : BaseAuthPm(services) {
+) : BaseAuthPm(services), ScreenConfigurable {
 
     private val token = state<String>()
     private val passwordChangedSuccessAction = action<Unit>()
 
+    override val screenConfigKey = "recovery-password-screen"
+    override val getScreenConfigUseCase = getScreenConfigFromCache
+
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
+        loadScreenConfig(context)
 
         isPasswordValidState.observable
             .subscribe(continueEnabledState.consumer)

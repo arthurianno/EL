@@ -7,6 +7,7 @@ import com.elta.android.domain.features.diary.events.model.EventType
 import com.elta.android.domain.features.diary.events.model.EventV2
 import com.elta.android.domain.features.diary.events.model.GlucoseInputType
 import com.elta.android.domain.features.diary.events.model.State
+import timber.log.Timber
 import javax.inject.Inject
 
 class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent, EventV2> {
@@ -14,6 +15,10 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
     override fun mapFromObject(source: GlucometerEvent): EventV2 =
         with(source) {
             val inputGlucose = GlucoseInputType.AUTO
+
+            // Логирование для отладки
+            Timber.d("📊 Mapping GlucometerEvent to EventV2: mealTag=${mealTag}, value=${value}, serial=${glucometerSerialNumber}")
+
             EventV2(
                 id = id,
                 type = EventType.Glucose(inputGlucose),
@@ -28,7 +33,7 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
                 temperature = temperature,
                 duration = null,
                 activityType = null,
-                mealTag = null,
+                mealTag = mealTag, // Передаем meal tag из глюкометра
                 insulinMedicament = null,
                 medicament = null,
                 tabletsNumber = null,
@@ -36,6 +41,8 @@ class EventV2FromGlucometerMapper @Inject constructor() : Mapper<GlucometerEvent
                 glucometerSerialNumber = glucometerSerialNumber,
                 dishes = emptyList(),
                 glucoseInputType = inputGlucose
-            )
+            ).also {
+                Timber.d("📊 Created EventV2 with mealTag: ${it.mealTag}")
+            }
         }
 }

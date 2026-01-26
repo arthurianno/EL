@@ -80,5 +80,11 @@
             android:name=".features.devices.glucometer.service.firmware.BootModeService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
+
+        <!-- НМГ мониторинг в фоне -->
+        <service
+            android:name=".features.devices.cgm.service.CgmMonitoringService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"/>
     </application>
 </manifest>

@@ -38,12 +38,12 @@ abstract class BaseAuthFragment<PM : BaseAuthPm> :
             continueButtonView.setText(continueButtonText)
             authTitleView.setText(authTitleText)
             authSubtitleView.setText(authSubtitleText)
-            scrollView.setOnTouchListener { view, event ->
-                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
-            }
-            frameView.setOnTouchListener { view, event ->
-                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
-            }
+//            scrollView.setOnTouchListener { view, event ->
+//                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
+//            }
+//            frameView.setOnTouchListener { view, event ->
+//                requireActivity().lostFocusOnClickOutside<MaterialEditText>(event, binding.root)
+//            }
             root.setOnApplyWindowInsetsListener { view, insets ->
                 clearFocusesFromInputs(view)
                 view.onApplyWindowInsets(insets)

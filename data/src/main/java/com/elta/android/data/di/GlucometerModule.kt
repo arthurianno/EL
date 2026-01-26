@@ -29,9 +29,7 @@ class GlucometerModule {
         glucometerBleManager,
         firmwareManager,
         environmentScanner,
-        crashlyticsReport,
-        bluetoothAdapter,
-        bluetoothStateRepository
+        crashlyticsReport
     )
 
     @Provides
@@ -48,8 +46,6 @@ class GlucometerModule {
         glucometerBleManager,
         firmwareManager,
         environmentScanner,
-        crashlyticsReport,
-        bluetoothAdapter,
-        bluetoothStateRepository
+        crashlyticsReport
     )
 }

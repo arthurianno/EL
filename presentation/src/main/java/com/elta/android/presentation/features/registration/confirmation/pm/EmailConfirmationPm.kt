@@ -3,6 +3,7 @@ package com.elta.android.presentation.features.registration.confirmation.pm
 import com.elta.android.common.errors.EmailLinkInvalid
 import com.elta.android.domain.features.auth.interactor.CheckTokenOwnerUseCase
 import com.elta.android.domain.features.auth.interactor.ConfirmEmailUseCase
+import com.elta.android.presentation.Events // Не забудь этот импорт!
 import com.elta.android.presentation.Screens
 import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
@@ -17,6 +18,7 @@ class EmailConfirmationPm @Inject constructor(
     private val checkTokenOwnerUseCase: CheckTokenOwnerUseCase,
     services: ServiceFacade
 ) : BasePm(services) {
+    // GetFeatureConfigUseCase здесь больше не нужен, так как мы идем на Onboarding
 
     override val isEmptyScreen: Boolean = true
 
@@ -45,7 +47,7 @@ class EmailConfirmationPm @Inject constructor(
                     .doOnSuccess(::handleSuccess)
                     .doOnError(::handleError)
             }
-            .retry()
+            .retry() // Обрати внимание: retry() может скрывать ошибки, если они не обработаны выше
             .subscribe()
             .untilDestroy()
 
@@ -76,10 +78,19 @@ class EmailConfirmationPm @Inject constructor(
             super.handleError(error)
     }
 
+    // ИСПРАВЛЕННЫЙ МЕТОД
     private fun handleSuccess(isOwner: Boolean) {
-        when (isOwner) {
-            false -> contentVisibilityCommand.consumer.accept(true)
-            else -> router.newRootScreen(Screens.OnBoardingFlow)
+        if (isOwner) {
+            // 1. ВАЖНО: Сообщаем AppPm, что почта подтверждена.
+            // Это уберет красные плашки, когда юзер в итоге попадет на главный экран.
+            bus.post(Events.ProfileDataChanged)
+
+            // 2. ОТПРАВЛЯЕМ НА ОНБОРДИНГ
+            // Так как профиль пустой, юзер должен его заполнить.
+            // Это предотвратит краш HomeFlowPm (NoSuchElementException).
+            router.newRootFlow(Screens.OnBoardingFlow)
+        } else {
+            contentVisibilityCommand.consumer.accept(true)
         }
     }
 

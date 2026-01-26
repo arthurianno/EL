@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import okhttp3.ResponseBody
 import org.greenrobot.essentials.io.IoUtils
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -26,29 +27,32 @@ class ReportFileManager @Inject constructor(
         }
     }
 
-    fun saveReport(name: String, body: ResponseBody): Uri =
-        try {
-            val file = File(reportsDir, getFileName(name))
+    fun saveReport(name: String, body: ResponseBody): Uri {
+        val file = File(reportsDir, getFileName(name))
 
-            var inputStream: InputStream? = null
-            var outputStream: OutputStream? = null
+        var inputStream: InputStream? = null
+        var outputStream: OutputStream? = null
 
+        return try {
+            inputStream = body.byteStream()
+            outputStream = FileOutputStream(file)
+
+            IoUtils.copyAllBytes(inputStream, outputStream)
+
+            Timber.d("Report saved successfully: ${file.absolutePath}, size: ${file.length()} bytes")
+            getFileUri(file)
+        } catch (e: IOException) {
+            Timber.e(e, "Failed to save report: ${file.absolutePath}")
+            throw IOException("Failed to save report file", e)
+        } finally {
             try {
-                inputStream = body.byteStream()
-                outputStream = FileOutputStream(file)
-
-                IoUtils.copyAllBytes(inputStream, outputStream)
-
-                getFileUri(file)
-            } catch (e: IOException) {
-                Uri.EMPTY
-            } finally {
                 inputStream?.close()
                 outputStream?.close()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to close streams")
             }
-        } catch (e: IOException) {
-            Uri.EMPTY
         }
+    }
 
     private fun getFileUri(file: File): Uri =
         FileProvider.getUriForFile(context, "com.elta.android.fileprovider", file)

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.imageLoader
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
@@ -14,7 +13,6 @@ import com.elta.android.presentation.core.compose.common.Action
 import com.elta.android.presentation.core.compose.common.AppAction
 import com.elta.android.presentation.core.compose.common.BaseWidgetModel
 import com.elta.android.presentation.core.compose.common.Event
-import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -151,26 +149,13 @@ abstract class BaseViewModel<ST> : ViewModel() {
             when (val result = getScreenConfigUseCase(screenConfigKey)) {
                 is Resource.Success -> {
                     val screenEntity = result.data
-                    val imageUrl = screenEntity.backgroundImageUrl
-
-                    if (imageUrl != null) {
-                        // Проверяем есть ли картинка в кеше
-                        val imageLoader = context.imageLoader
-                        val isInCache = ImageCacheHelper.isImageInCache(
-                            imageUrl,
-                            context,
-                            imageLoader
-                        )
-                        // Обновляем state
-                        reduceState { updateState(screenEntity, isInCache) }
-                    } else {
-                        // URL нет - сразу готово с дефолтами
-                        reduceState { updateState(screenEntity, true) }
-                    }
+                    // Мы получили данные? Значит контент ГОТОВ.
+                    // Неважно, есть картинка в кэше или нет.
+                    reduceState { updateState(screenEntity, true) }
                 }
                 is Resource.Error -> {
-                    Log.e("BaseViewModel", "Error loading screen config: ${result.message}")
-                    // При ошибке - показываем дефолты
+                    Log.e("BaseViewModel", "Error: ${result.message}")
+                    // Даже если ошибка, показываем дефолты
                     reduceState { updateState(null, true) }
                 }
                 is Resource.Loading -> {
@@ -206,19 +191,8 @@ abstract class BaseViewModel<ST> : ViewModel() {
                         is Resource.Success -> {
                             Log.e("BaseViewModel", "SUCCESS for '$slug': ${result.data.title}")
                             val screenEntity = result.data
-                            val imageUrl = screenEntity.backgroundImageUrl
-
-                            val isImageReady = if (imageUrl != null) {
-                                ImageCacheHelper.isImageInCache(
-                                    imageUrl,
-                                    context,
-                                    context.imageLoader
-                                )
-                            } else {
-                                true
-                            }
-
-                            results[key] = screenEntity to isImageReady
+                            // Всегда разрешаем загрузку картинок (из кеша или сети)
+                            results[key] = screenEntity to true
                         }
                         is Resource.Error -> {
                             Log.e("BaseViewModel", "ERROR loading config '$slug': ${result.message}")

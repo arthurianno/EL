@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.home.pm
 
+import android.content.Context
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
@@ -98,6 +99,7 @@ class HomeFlowPm @Inject constructor(
     private val shouldShowGlucoseDialog: ShouldManualGlucoseRemindShowUseCase,
     private val setManualGlucoseRemind: SetManualGlucoseRemindUseCase,
     private val appMetric: AppMetricTracker,
+    private val context: Context,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 

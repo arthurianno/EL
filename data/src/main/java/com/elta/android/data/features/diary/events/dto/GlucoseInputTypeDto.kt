@@ -9,7 +9,7 @@ enum class GlucoseInputTypeDto {
             return when(this){
                 GlucoseInputType.MANUAL -> MANUAL
                 GlucoseInputType.AUTO -> AUTO
-                GlucoseInputType.GOOGLE_FIT -> GOOGLE_FIT
+                GlucoseInputType.GOOGLE_FIT -> AUTO
             }
         }
     }

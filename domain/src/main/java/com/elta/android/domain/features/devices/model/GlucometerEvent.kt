@@ -1,5 +1,6 @@
 package com.elta.android.domain.features.devices.model
 
+import com.elta.android.domain.features.diary.events.model.MealTag
 import org.threeten.bp.ZonedDateTime
 
 data class GlucometerEvent(
@@ -8,5 +9,6 @@ data class GlucometerEvent(
     val temperature: Double?,
     val value: Double?,
     val glucometerSerialNumber: String?,
-    val originalResponse: String
+    val originalResponse: String,
+    val mealTag: MealTag? = null
 )

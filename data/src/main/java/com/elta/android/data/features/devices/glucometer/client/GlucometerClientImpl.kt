@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.threeten.bp.ZonedDateTime
+import timber.log.Timber
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,8 +44,6 @@ class GlucometerClientImpl @Inject constructor(
     private val firmwareManager: FirmwareManager,
     private val environmentScanner: EnvironmentScanner,
     private val crashlyticsReport: CrashlyticsReport,
-    private val bluetoothAdapter: BluetoothAdapter,
-    private val bluetoothStateRep: BluetoothStateRepository
 ) : GlucometerClient {
 
     private val settings: ScanSettings = ScanSettings.Builder()
@@ -209,12 +208,14 @@ class GlucometerClientImpl @Inject constructor(
 
             for (index in 0 until 1000) {
                 val event = readEvent(index)
+                Timber.d("📡 Raw event from glucometer [index=$index]: '$event' (length=${event.length})")
                 onCommandSuccess.invoke()
                 if (event.isEmptyEvent() || event == lastSyncEvent) break
                 events.add(event)
             }
 
             crashlyticsReport.log("All measurements were successfully read, events size: ${events.size}")
+            Timber.d("📡 Total events read from glucometer: ${events.size}")
 
             return events
         }

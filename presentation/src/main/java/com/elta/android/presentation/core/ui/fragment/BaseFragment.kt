@@ -241,10 +241,10 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
                 val imageUrl = screenEntity?.backgroundImageUrl
 
                 if (isReady && imageUrl != null) {
-                    // Картинка есть в кеше - загружаем её
+                    // Загружаем картинку (из кеша или сети)
                     loadImageFromUrl(backgroundImageView, imageUrl, defaultImageRes)
                 } else {
-                    // Картинки нет или не в кеше - дефолтная уже установлена!
+                    // URL картинки нет - дефолтная уже установлена!
                     Log.d("BaseFragment", "Image not ready or no URL, keeping default image")
                 }
 
@@ -281,7 +281,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
                 crossfade(true)
                 memoryCachePolicy(CachePolicy.ENABLED)
                 diskCachePolicy(CachePolicy.ENABLED)
-                networkCachePolicy(CachePolicy.DISABLED)
+                networkCachePolicy(CachePolicy.ENABLED) // Разрешаем загрузку из сети
 
                 // При ошибке - вернуться к дефолтной
                 defaultRes?.let { error(it) }

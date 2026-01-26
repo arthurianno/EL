@@ -14,6 +14,7 @@ import com.elta.android.domain.features.emias.model.EmiasStatus
 import com.elta.android.domain.features.multiLangsConfig.interactor.GetScreenConfigFromCache
 import com.elta.android.domain.features.multiLangsConfig.model.Resource
 import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
+import com.elta.android.domain.features.remoteconfig.interactor.GetFeatureConfigUseCase
 import com.elta.android.domain.features.user.interactor.UpdateProfileUseCase
 import com.elta.android.domain.features.user.model.Diabetes
 import com.elta.android.domain.features.user.model.Gender
@@ -49,6 +50,7 @@ import com.elta.android.presentation.features.onboaring.ui.adapter.items.OnBoard
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.nullgr.core.date.CommonFormats
 import com.nullgr.core.date.toTimestamp
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -71,6 +73,7 @@ class OnBoardingPm @Inject constructor(
     private val getEmiasStatus: GetEmiasStatusUseCase,
     private val addNewEvent: AddNewEventUseCase,
     private val appMetric: AppMetricTracker,
+    private val getFeatureConfigUseCase: GetFeatureConfigUseCase,
     services: ServiceFacade,
 ) : BaseListPm(services) {
 
@@ -204,6 +207,7 @@ class OnBoardingPm @Inject constructor(
                 updateProfileUseCase.execute(params)
                     .hideErrorContainer()
                     .bindProgress()
+                    .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete { updateStableParam(profile = params.profile) }
                     .doOnComplete {
                         appMetric.setProfileAttributes(params.profile.getMetricAttributes())

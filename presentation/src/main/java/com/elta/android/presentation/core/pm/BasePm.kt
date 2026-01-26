@@ -131,14 +131,8 @@ abstract class BasePm(
 
                     val imageUrl = screenEntity.backgroundImageUrl
                     if (imageUrl != null) {
-                        val imageLoader = context.imageLoader
-                        val isInCache = ImageCacheHelper.isImageInCache(
-                            imageUrl,
-                            context,
-                            imageLoader
-                        )
-                        // Если в кеше - true, если нет - false (покажется дефолт)
-                        imagePreloadState.consumer.accept(isInCache)
+                        // Всегда разрешаем загрузку картинки (из кеша или сети)
+                        imagePreloadState.consumer.accept(true)
                     } else {
                         // URL нет - сразу true (покажется дефолт)
                         imagePreloadState.consumer.accept(true)
@@ -198,19 +192,8 @@ abstract class BasePm(
                         is Resource.Success -> {
                             Log.d("BasePm", "SUCCESS for '$slug': ${result.data.title}")
                             val screenEntity = result.data
-                            val imageUrl = screenEntity.backgroundImageUrl
-
-                            val isImageReady = if (imageUrl != null) {
-                                ImageCacheHelper.isImageInCache(
-                                    imageUrl,
-                                    context,
-                                    context.imageLoader
-                                )
-                            } else {
-                                true
-                            }
-
-                            results[key] = screenEntity to isImageReady
+                            // Всегда разрешаем загрузку картинок (из кеша или сети)
+                            results[key] = screenEntity to true
                         }
                         is Resource.Error -> {
                             Log.e("BasePm", "ERROR loading config '$slug': ${result.message}")

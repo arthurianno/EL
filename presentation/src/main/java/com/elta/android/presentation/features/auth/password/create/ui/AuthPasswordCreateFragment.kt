@@ -39,6 +39,12 @@ class AuthPasswordCreateFragment :
 
     override fun onBindPresentationModel(pm: AuthPasswordCreatePm) {
         super.onBindPresentationModel(pm)
+        bindScreenConfig(pm){
+            withBackgroundImage(binding.headerImageView, R.drawable.ic_welcome)  // Другая картинка!
+            withTitle(binding.authPasswordNewTitle, R.string.auth_password_recovery_title)
+            withDescription(binding.authPasswordNewSubTitle, R.string.auth_password_recovery_subtitle)
+            //withRootView(binding.root)
+        }
         binding.passwordVisibilityButtonView.clicks()
             .subscribe { binding.passwordVisibilityButtonView.toggleSecureIcon(binding.passwordInputView.toggleSecure()) }
         pm.passwordInput.bindTo(binding.passwordInputView)

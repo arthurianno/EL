@@ -20,9 +20,11 @@ class ItemRecordViewHolder(
             recordTypeView.text = item.type
             recordCountView.text = item.count
             recordDateView.text = item.date
-            item.labelIcon?.let {
-                recordLabelView.setImageResource(it)
+            if (item.labelIcon != null) {
+                recordLabelView.setImageResource(item.labelIcon)
                 recordLabelView.visibility = View.VISIBLE
+            } else {
+                recordLabelView.visibility = View.GONE
             }
             root.setOnClickListener {
                 bus.click(Clicks.RecordClicked(item))

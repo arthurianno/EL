@@ -11,6 +11,7 @@ import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 import com.elta.android.presentation.Dialogs
 import com.elta.android.presentation.R
 import com.elta.android.presentation.core.pm.BasePm
+import com.elta.android.presentation.core.pm.ScreenConfigurable
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.ui.dialog.DialogData
 import com.elta.android.presentation.core.ui.dialog.DialogResult
@@ -32,8 +33,10 @@ class ProfileChangePasswordPm @Inject constructor(
     serviceFacade: ServiceFacade,
     private val getScreenFromCacheUseCase: GetScreenConfigFromCache,
     private val context: Context
-) : BasePm(serviceFacade) {
+) : BasePm(serviceFacade), ScreenConfigurable {
 
+    override val screenConfigKey = "new-password-screen"
+    override val getScreenConfigUseCase = getScreenFromCacheUseCase
     val oldPasswordInput = inputControl(hideErrorOnUserInput = false)
     val newPasswordInput = inputControl(hideErrorOnUserInput = false)
     val exitDialogControl = dialogControl<DialogData, DialogResult>()
@@ -47,7 +50,7 @@ class ProfileChangePasswordPm @Inject constructor(
 
     override fun onCreate() {
         super.onCreate()
-        loadConfigScreen()
+        loadScreenConfig(context)
         bindHandleBack()
 
         Observables.combineLatest(
@@ -78,36 +81,6 @@ class ProfileChangePasswordPm @Inject constructor(
             .retry()
             .subscribe()
             .untilDestroy()
-    }
-
-
-    fun loadConfigScreen(){
-        coroutineScope.launch {
-            when (val result = getScreenFromCacheUseCase("new-password-screen")) {
-                is Resource.Success -> {
-                    val screenEntity = result.data
-                    screenConfigState.consumer.accept(screenEntity)
-                    val imageUrl = screenEntity.backgroundImageUrl
-                    val imageLoader = context.imageLoader
-                    if (imageUrl != null ){
-                        val isInCache = ImageCacheHelper.isImageInCache(imageUrl, context,imageLoader)
-                        when(isInCache){
-                            true -> imagePreloadState.consumer.accept(true)
-                            false -> imagePreloadState.consumer.accept(false)
-                        }
-                    }else {
-                        imagePreloadState.consumer.accept(false)
-                    }
-                }
-                is Resource.Error -> {
-                    Log.e("GreetingPm", "Error loading screen config: ${result.message}")
-                    imagePreloadState.consumer.accept(false)
-                }
-                is Resource.Loading -> {
-                    Log.d("GreetingPm", "Loading screen config...")
-                }
-            }
-        }
     }
 
     private fun isPasswordsFilled() =
