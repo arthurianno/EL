@@ -74,7 +74,7 @@ class LoginPm @Inject constructor(
     @Suppress("LongMethod")
     override fun onCreate() {
         super.onCreate()
-        loadScreenConfig(context)
+        // loadScreenConfig уже вызывается в BaseRegistrationPm.onCreate()
         Observables.combineLatest(
             isEmailValidState.observable,
             isPasswordValidState.observable

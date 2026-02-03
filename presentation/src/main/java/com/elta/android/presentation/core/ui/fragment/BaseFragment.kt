@@ -221,6 +221,10 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
             // Подписка на конфигурацию (если придет)
             pm.screenConfigState.bindTo { screenEntity ->
                 if (screenEntity != null) {
+                    Log.i("BaseFragment", "🎨 Применяем конфигурацию к UI:")
+                    Log.i("BaseFragment", "   - slug: '${screenEntity.slug}'")
+                    Log.i("BaseFragment", "   - title: '${screenEntity.title}'")
+
                     // Обновляем тексты из конфигурации
                     titleView?.text = screenEntity.title
                         ?: defaultTitleRes?.let { getString(it) }
@@ -231,7 +235,7 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
                     onConfigLoaded?.invoke(screenEntity)
                 } else {
                     // Конфигурация не пришла - оставляем дефолты (уже установлены)
-                    Log.d("BaseFragment", "No screen config, using defaults")
+                    Log.d("BaseFragment", "📋 Конфигурация отсутствует, используем дефолтные значения")
                 }
             }
 
@@ -241,14 +245,16 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
                 val imageUrl = screenEntity?.backgroundImageUrl
 
                 if (isReady && imageUrl != null) {
+                    Log.i("BaseFragment", "🖼️ Загружаем изображение из: $imageUrl")
                     // Загружаем картинку (из кеша или сети)
                     loadImageFromUrl(backgroundImageView, imageUrl, defaultImageRes)
                 } else {
                     // URL картинки нет - дефолтная уже установлена!
-                    Log.d("BaseFragment", "Image not ready or no URL, keeping default image")
+                    Log.d("BaseFragment", "📋 Изображение не готово или URL отсутствует, используем дефолтное")
                 }
 
                 // Всегда показываем экран после проверки картинки
+                Log.d("BaseFragment", "👁️ Показываем экран пользователю")
                 rootView?.visibility = View.VISIBLE
             }
         }
@@ -277,6 +283,9 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
         private fun loadImageFromUrl(imageView: ImageView?, url: String, defaultRes: Int?) {
             imageView ?: return
 
+            Log.d("BaseFragment", "🔄 Начинаем загрузку изображения: $url")
+            val startTime = System.currentTimeMillis()
+
             imageView.load(url) {
                 crossfade(true)
                 memoryCachePolicy(CachePolicy.ENABLED)
@@ -288,10 +297,20 @@ abstract class BaseFragment<T : BasePm, B : ViewBinding>(
 
                 listener(
                     onError = { _, result ->
-                        Log.e("BaseFragment", "Error loading image from URL: ${result.throwable.message}")
+                        val duration = System.currentTimeMillis() - startTime
+                        Log.e("BaseFragment", "❌ Ошибка загрузки изображения за ${duration}ms: ${result.throwable.message}")
+                        Log.e("BaseFragment", "   URL: $url")
                     },
-                    onSuccess = { _, _ ->
-                        Log.d("BaseFragment", "Successfully loaded image from URL: $url")
+                    onSuccess = { _, result ->
+                        val duration = System.currentTimeMillis() - startTime
+                        val source = when {
+                            result.dataSource.toString().contains("MEMORY") -> "память"
+                            result.dataSource.toString().contains("DISK") -> "диск"
+                            result.dataSource.toString().contains("NETWORK") -> "сеть"
+                            else -> result.dataSource.toString()
+                        }
+                        Log.i("BaseFragment", "✅ Изображение загружено за ${duration}ms из: $source")
+                        Log.d("BaseFragment", "   URL: $url")
                     }
                 )
             }

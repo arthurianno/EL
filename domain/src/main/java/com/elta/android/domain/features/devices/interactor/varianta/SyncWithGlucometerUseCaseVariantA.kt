@@ -57,6 +57,7 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
 
             crashlyticsReport.log("Preparing data for synchronization")
             val address = params?.device?.address ?: deviceWithLastEvent.first.address
+            val glucometerName = params?.device?.name ?: deviceWithLastEvent.first.name
             val lastSyncEvent = deviceWithLastEvent.second.lastSyncEvent
             val email = profile.email
 
@@ -66,7 +67,7 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
                 throw exception
             }
 
-            syncWithDevice(this, address, email, lastSyncEvent)
+            syncWithDevice(this, address, email, lastSyncEvent, glucometerName)
         }
     }
 
@@ -74,7 +75,8 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
         scope: ProducerScope<Int>,
         deviceAddress: String,
         userEmail: String,
-        lastSyncEvent: String?
+        lastSyncEvent: String?,
+        glucometerName: String?
     ) {
         crashlyticsReport.log("Getting pin")
         val pinCode = pinRepository.getPin(deviceAddress)
@@ -99,7 +101,13 @@ class SyncWithGlucometerUseCaseVariantA @Inject constructor(
 
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)
             crashlyticsReport.log("Started saving device data to local storage")
-            val events = deviceRepository.buildEvents(deviceAddress, userEmail, glucometerInfo.glucometerSerialNumber, measurements)
+            val events = deviceRepository.buildEvents(
+                deviceAddress,
+                userEmail,
+                glucometerInfo.glucometerSerialNumber,
+                measurements,
+                glucometerName
+            )
             deviceInfoRepository.updateGlucometerInfo(glucometerInfo, events.firstOrNull())
 
             resetAndLaunchTimer(scope, SEND_DATA_TIMEOUT)

@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.elta.android",
+      "sha256_cert_fingerprints": [
+        "5F:D0:2C:94:55:E1:17:32:0A:19:5B:D0:E5:88:B2:A2:37:A5:1A:E8:90:E6:F0:DF:CD:85:68:62:18:17:64:CB",
+        "CE:91:11:E9:07:59:BA:63:40:83:FD:46:E5:72:89:31:58:01:BC:0B:00:CB:29:1A:28:89:B3:73:4A:AA:98:32"
+      ]
+    }
+  }
+]

@@ -32,17 +32,23 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
     override suspend fun getAllScreens(): Resource<List<ScreenEntity>> {
-        Log.e("MultiLangConfigRepo", "Fetching screens from API")
+        Log.i("MultiLangConfigRepo", "🌐 Начинаем загрузку конфигураций экранов с сервера...")
 
         return try {
+            val networkStartTime = System.currentTimeMillis()
             val response = api.getAllScreensBySlugs()
+            val networkDuration = System.currentTimeMillis() - networkStartTime
 
             if (response.isSuccessful && response.body() != null) {
                 val lang = getSystemLanguageCode()
                 val dtoList = response.body()!!.content
                 val newEntities = dtoList.map { it.toRoomEntity() }
 
+                Log.i("MultiLangConfigRepo", "✅ Загружено ${dtoList.size} экранов с сервера за ${networkDuration}ms")
+                Log.i("MultiLangConfigRepo", "📋 Слаги экранов: ${dtoList.map { it.slug }.joinToString(", ")}")
+
                 // ✅ ОПТИМИЗАЦИЯ: Поэлементное сравнение
+                val dbStartTime = System.currentTimeMillis()
                 val existingEntities = dao.getConfigs()
                 val existingMap = existingEntities.associateBy { it.slug }
 
@@ -54,13 +60,28 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
 
                 if (toUpdate.isNotEmpty()) {
                     dao.insertAll(toUpdate)
-                    Log.i("MultiLangConfigRepo", "✅ Updated ${toUpdate.size} of ${newEntities.size} screens")
+                    val dbDuration = System.currentTimeMillis() - dbStartTime
+                    Log.i("MultiLangConfigRepo", "💾 Обновлено ${toUpdate.size} из ${newEntities.size} экранов в БД за ${dbDuration}ms")
+                    Log.i("MultiLangConfigRepo", "📝 Обновленные слаги: ${toUpdate.map { it.slug }.joinToString(", ")}")
                 } else {
-                    Log.i("MultiLangConfigRepo", "⏭️ No changes detected, skipped DB update")
+                    Log.i("MultiLangConfigRepo", "⏭️ Изменений не обнаружено, БД не обновлялась")
                 }
 
-                val screenEntity = dtoList.map { it.toEntity(lang) }
-                Resource.Success(screenEntity)
+                // Маппим в ScreenEntity с обработкой ошибок
+                Log.d("MultiLangConfigRepo", "🔄 Начинаем маппинг ${dtoList.size} экранов в ScreenEntity...")
+                val screenEntities = mutableListOf<ScreenEntity>()
+                dtoList.forEachIndexed { index, dto ->
+                    try {
+                        val entity = dto.toEntity(lang)
+                        screenEntities.add(entity)
+                        Log.v("MultiLangConfigRepo", "✅ Экран ${index + 1}/${dtoList.size}: slug='${dto.slug}'")
+                    } catch (e: Exception) {
+                        Log.e("MultiLangConfigRepo", "❌ Ошибка маппинга экрана ${index + 1}/${dtoList.size}: slug='${dto.slug}', error=${e.message}", e)
+                    }
+                }
+                Log.i("MultiLangConfigRepo", "✅ Успешно замапили ${screenEntities.size} из ${dtoList.size} экранов")
+
+                Resource.Success(screenEntities)
             } else {
                 Resource.Error(
                     message = "Failed to load screen",
@@ -82,17 +103,22 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getScreenConfigFromCache(slug:String): Resource<ScreenEntity> {
         return try {
+            Log.d("MultiLangConfigRepo", "🔍 Запрашиваем конфигурацию из кеша для слага: '$slug'")
             val cachedScreen = dao.getConfigBySlug(slug)
             if (cachedScreen != null) {
                 val lang = getSystemLanguageCode()  // Получаем системный язык (ru, en и т.д.)
-                Resource.Success(cachedScreen.toLocalizedScreenEntity(lang))
+                val screenEntity = cachedScreen.toLocalizedScreenEntity(lang)
+                Log.i("MultiLangConfigRepo", "✅ Найдена конфигурация для '$slug': title='${screenEntity.title}', lang='$lang'")
+                Resource.Success(screenEntity)
             } else {
+                Log.w("MultiLangConfigRepo", "⚠️ Конфигурация для слага '$slug' не найдена в кеше")
                 Resource.Error(
                     message = "No cached screen config found",
                     errorType = ErrorType.NOT_FOUND
                 )
             }
         } catch (e: Exception) {
+            Log.e("MultiLangConfigRepo", "❌ Ошибка получения конфигурации для '$slug': ${e.message}")
             Resource.Error(
                 message = e.message ?: "Unknown error",
                 errorType = ErrorType.UNKNOWN

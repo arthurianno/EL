@@ -1,5 +1,6 @@
 package com.elta.android.presentation.features.sync.connect.widgets
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -32,17 +33,35 @@ internal fun ColumnScope.MainImage(
             contentAlignment = Alignment.Center
         ) {
            when(imageUrl != null){
-                true -> AsyncImage(
-                     model = ImageRequest.Builder(context)
-                         .data(imageUrl)
-                         .crossfade(false)
-                         .build(),
-                     contentDescription = null
-                )
-                false -> Image(
-                     painter = painterResource(id = imageId),
-                     contentDescription = null
-                )
+                true -> {
+                    Log.d("MainImage", "🖼️ [Compose] Загружаем изображение из URL: $imageUrl")
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(imageUrl)
+                            .crossfade(false)
+                            .listener(
+                                onStart = {
+                                    Log.d("MainImage", "⏳ [Compose] Начало загрузки изображения")
+                                },
+                                onSuccess = { _, result ->
+                                    val source = result.dataSource.toString()
+                                    Log.i("MainImage", "✅ [Compose] Изображение загружено из: $source")
+                                },
+                                onError = { _, result ->
+                                    Log.e("MainImage", "❌ [Compose] Ошибка загрузки: ${result.throwable.message}")
+                                }
+                            )
+                            .build(),
+                        contentDescription = null
+                    )
+                }
+                false -> {
+                    Log.d("MainImage", "📋 [Compose] Используем дефолтное изображение: $imageId")
+                    Image(
+                        painter = painterResource(id = imageId),
+                        contentDescription = null
+                    )
+                }
            }
         }
     }

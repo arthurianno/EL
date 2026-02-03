@@ -22,17 +22,25 @@ open class DefaultGlucometerEventBuilder @Inject constructor(
         userId: String,
         glucometerId: String,
         response: String,
-        glucometerSerialNumber: String?
+        glucometerSerialNumber: String?,
+        glucometerName: String?
     ): GlucometerEvent {
         val tokens = getTokens(response)
         val dateToken = tokens.first
         val temperatureAndValueToken = tokens.second
 
-        val mealTag = extractMealTag(response)
+        // Извлекаем meal tag только для Voice, для SatelliteOnline игнорируем
+        val isVoiceGlucometer = glucometerName?.contains("Voice", ignoreCase = true) == true
+        val mealTag = if (isVoiceGlucometer) {
+            extractMealTag(response)
+        } else {
+            null
+        }
 
         // Логирование для отладки
         Timber.d("📊 Glucometer response: '$response' (length=${response.length})")
-        Timber.d("📊 Extracted mealTag: $mealTag")
+        Timber.d("📊 Glucometer name: $glucometerName, isVoice: $isVoiceGlucometer")
+        Timber.d("📊 Extracted mealTag: $mealTag (${if (!isVoiceGlucometer) "ignored for SatelliteOnline" else "processed for Voice"})")
 
         return GlucometerEvent(
             id = generator.generate(userId, glucometerId, dateToken),

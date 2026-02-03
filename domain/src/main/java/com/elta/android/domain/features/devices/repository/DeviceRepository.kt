@@ -79,6 +79,13 @@ interface DeviceRepository {
      * @param email Email адрес пользователя.
      * @param serial Серийный номер устройства.
      * @param measurements список замеров которые превращаются в события.
+     * @param glucometerName имя модели глюкометра (SatelliteVoice/SatelliteOnline).
      */
-    suspend fun buildEvents(address: String, email: String, serial: String?, measurements: List<String>): List<GlucometerEvent>
+    suspend fun buildEvents(
+        address: String,
+        email: String,
+        serial: String?,
+        measurements: List<String>,
+        glucometerName: String? = null
+    ): List<GlucometerEvent>
 }

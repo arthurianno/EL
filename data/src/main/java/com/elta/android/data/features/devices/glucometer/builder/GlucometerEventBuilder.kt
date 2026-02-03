@@ -9,7 +9,8 @@ interface GlucometerEventBuilder {
         userId: String,
         glucometerId: String,
         response: String,
-        glucometerSerialNumber: String?
+        glucometerSerialNumber: String?,
+        glucometerName: String? = null
     ): GlucometerEvent
 
     fun getDate(response: String): Date

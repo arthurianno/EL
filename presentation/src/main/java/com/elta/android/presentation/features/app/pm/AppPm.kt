@@ -205,82 +205,88 @@ class AppPm @Inject constructor(
             .untilDestroy()
 
         preloadScreensAction.observable
+            .doOnNext { Log.i("AppPM", "🎬 preloadScreensAction triggered!") }
             .flatMapSingle {
-                // ❌ УБРАЛИ: rxSingle { shouldRefreshScreensUseCase.invoke() }
-                Log.i("AppPM", "Fetching latest screens configuration...")
+                Log.i("AppPM", "🚀 Начинаем предзагрузку конфигураций экранов...")
                 rxSingle { getAllScreensUseCase.invoke() }
-                    .doOnSuccess { result ->
-                        Log.i("AppPM", "Screens fetched: $result")
-                        when (result) {
-                            is Resource.Success -> {
-                                // ❌ УБРАЛИ: updateLastRefreshTimeUseCase.invoke()
-                                rxSingle(Dispatchers.IO) {
-                                    val totalStartTime = System.currentTimeMillis()
-                                    val uniqueImages = result.data
-                                        .mapNotNull { it.backgroundImageUrl }
-                                        .distinct()
-
-                                    Log.i("AppPM", "Starting to prefetch ${uniqueImages.size} unique images")
-
-                                    var successCount = 0
-                                    var failCount = 0
-                                    val imageLoader = imageLoader(context)
-
-                                    uniqueImages.forEachIndexed { index, imageUrl ->
-                                        val (success, duration) = ImageCacheHelper.prefetchImage(
-                                            imageUrl,
-                                            context,
-                                            imageLoader
-                                        )
-                                        if (success) {
-                                            successCount++
-                                            Log.i("AppPM", "✅ Image ${index + 1}/${uniqueImages.size} prefetched in ${duration}ms")
-                                        } else {
-                                            failCount++
-                                            Log.w("AppPM", "⚠️ Image ${index + 1}/${uniqueImages.size} failed in ${duration}ms")
-                                        }
-                                    }
-
-                                    val totalDuration = System.currentTimeMillis() - totalStartTime
-                                    Log.i("AppPM", "Prefetch completed: $successCount succeeded, $failCount failed in ${totalDuration}ms")
-                                    Log.i("AppPM", "🚀 Calling imagesLoadedCommand...")
-                                    imagesLoadedState.consumer.accept(true)
-                                    imagesLoadedCommand.consumer.accept(Unit)
-                                    Log.i("AppPM", "✅ imagesLoadedCommand called!")
-                                }
-                                    .doOnError { error ->
-                                        Log.e("AppPM", "Error prefetching images: ${error.message}")
-                                        Single.fromCallable {
-                                            imagesLoadedState.consumer.accept(true)
-                                            imagesLoadedCommand.consumer.accept(Unit)
-                                        }
-                                    }
-                                    .subscribe()
-                                    .untilDestroy()
-                            }
-
-                            is Resource.Error -> {
-                                Log.i("AppPM", "Error: ${result.message}")
-                                imagesLoadedState.consumer.accept(true)
-                                imagesLoadedCommand.consumer.accept(Unit)
-                            }
-
-                            is Resource.Loading -> {
-                                Log.i("AppPM", "Loading")
-                            }
-                        }
-                    }
+                    .doOnSuccess { Log.i("AppPM", "📦 getAllScreensUseCase завершен успешно") }
+                    .doOnError { error -> Log.e("AppPM", "❌ getAllScreensUseCase ошибка: ${error.message}") }
             }
+            .flatMapSingle { result ->
+                Log.i("AppPM", "🔀 Обрабатываем результат: ${result.javaClass.simpleName}")
+                when (result) {
+                    is Resource.Success -> {
+                        Log.i("AppPM", "✅ Получен результат: ${result.data.size} экранов")
+                        Log.i("AppPM", "📋 Список слагов: ${result.data.joinToString(", ") { it.slug }}")
+
+                        // Предзагружаем изображения
+                        rxSingle(Dispatchers.IO) {
+                            val totalStartTime = System.currentTimeMillis()
+                            val uniqueImages = result.data
+                                .mapNotNull { it.backgroundImageUrl }
+                                .distinct()
+
+                            Log.i("AppPM", "🖼️ Найдено ${uniqueImages.size} уникальных изображений для предзагрузки")
+                            if (uniqueImages.isNotEmpty()) {
+                                Log.i("AppPM", "📸 URLs изображений:")
+                                uniqueImages.forEachIndexed { i, url ->
+                                    Log.i("AppPM", "   ${i + 1}. $url")
+                                }
+                            }
+
+                            var successCount = 0
+                            var failCount = 0
+                            val imageLoader = imageLoader(context)
+
+                            uniqueImages.forEachIndexed { index, imageUrl ->
+                                Log.d("AppPM", "⏳ Загружаем изображение ${index + 1}/${uniqueImages.size}...")
+                                val (success, duration) = ImageCacheHelper.prefetchImage(
+                                    imageUrl,
+                                    context,
+                                    imageLoader
+                                )
+                                if (success) {
+                                    successCount++
+                                    Log.i("AppPM", "✅ Изображение ${index + 1}/${uniqueImages.size} загружено за ${duration}ms")
+                                } else {
+                                    failCount++
+                                    Log.w("AppPM", "⚠️ Изображение ${index + 1}/${uniqueImages.size} не загружено за ${duration}ms")
+                                }
+                            }
+
+                            val totalDuration = System.currentTimeMillis() - totalStartTime
+                            Log.i("AppPM", "🏁 Предзагрузка завершена: $successCount успешно, $failCount неудачно, за ${totalDuration}ms")
+                            imagesLoadedState.consumer.accept(true)
+                            imagesLoadedCommand.consumer.accept(Unit)
+                            Log.i("AppPM", "✅ imagesLoadedCommand вызван!")
+                            Unit
+                        }.doOnSuccess { Log.i("AppPM", "✅ rxSingle с предзагрузкой завершен") }
+                    }
+
+                    is Resource.Error -> {
+                        Log.e("AppPM", "❌ Ошибка загрузки конфигураций: ${result.message}")
+                        imagesLoadedState.consumer.accept(true)
+                        imagesLoadedCommand.consumer.accept(Unit)
+                        Single.just(Unit)
+                    }
+
+                    is Resource.Loading -> {
+                        Log.d("AppPM", "⏳ Загрузка конфигураций...")
+                        Single.just(Unit)
+                    }
+                }
+            }
+            .doOnNext { Log.i("AppPM", "✅ Вся цепочка preloadScreensAction завершена") }
             .onErrorReturn { error ->
-                Log.e("AppPM", "preloadScreensAction error: ${error.message}")
+                Log.e("AppPM", "❌ Ошибка в preloadScreensAction: ${error.message}", error)
                 imagesLoadedState.consumer.accept(true)
                 imagesLoadedCommand.consumer.accept(Unit)
-                Resource.Error(
-                    message = error.message ?: "Unknown error",
-                    errorType = ErrorType.UNKNOWN
-                )
+                Unit
             }
-            .subscribe()
+            .subscribe(
+                { Log.i("AppPM", "✅ preloadScreensAction subscribe onNext") },
+                { error -> Log.e("AppPM", "❌ preloadScreensAction subscribe onError: ${error.message}", error) }
+            )
             .untilDestroy()
 
         deepLinkAction.observable

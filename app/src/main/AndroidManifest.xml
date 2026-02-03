@@ -64,7 +64,7 @@
             </intent-filter>
 
             <!-- Deep Links: кастомная схема elta:// -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -80,6 +80,7 @@
 
                 <data android:scheme="https" android:host="vdiabete.com" />
                 <data android:scheme="https" android:host="dev.vdiabete.com" />
+                <data android:scheme="https" android:host="stage2.vdiabete.com" />
 
                 <data android:pathPrefix="/resetpassword" />
                 <data android:pathPrefix="/emailconfirmed" />

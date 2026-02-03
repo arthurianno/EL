@@ -71,14 +71,16 @@ class DeviceDataRepository @Inject constructor(
         address: String,
         email: String,
         serial: String?,
-        measurements: List<String>
+        measurements: List<String>,
+        glucometerName: String?
     ): List<GlucometerEvent> {
         return measurements.map { event ->
             glucometerEventBuilder.buildFrom(
                 email,
                 address,
                 event,
-                serial
+                serial,
+                glucometerName
             )
         }
     }

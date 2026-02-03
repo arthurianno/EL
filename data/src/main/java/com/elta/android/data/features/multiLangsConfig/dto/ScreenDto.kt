@@ -7,10 +7,10 @@ data class ScreenDto(
     val slug: String,
 
     @SerializedName("title")
-    val title: Map<String, String>,
+    val title: Map<String, String>?,
 
     @SerializedName("description")
-    val description: Map<String, String>,
+    val description: Map<String, String>?,
 
     @SerializedName("backgroundImageUrl")
     val backgroundImageUrl: String?,

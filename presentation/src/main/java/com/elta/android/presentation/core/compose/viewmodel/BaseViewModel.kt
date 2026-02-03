@@ -139,27 +139,39 @@ abstract class BaseViewModel<ST> : ViewModel() {
     ) {
         // Проверяем, реализует ли ViewModel интерфейс
         if (this !is ComposeScreenConfigurable) {
-            Log.w("BaseViewModel", "ViewModel doesn't implement ComposeScreenConfigurable")
+            Log.w("BaseViewModel", "⏭️ ViewModel не реализует ComposeScreenConfigurable, используем дефолты")
             // Сразу обновляем state с дефолтными значениями
             reduceState { updateState(null, true) }
             return
         }
 
+        val key = screenConfigKey
+        Log.i("BaseViewModel", "🔄 [Compose] Загружаем конфигурацию для ключа: '$key'")
+
         launch {
-            when (val result = getScreenConfigUseCase(screenConfigKey)) {
+            val startTime = System.currentTimeMillis()
+            when (val result = getScreenConfigUseCase(key)) {
                 is Resource.Success -> {
+                    val duration = System.currentTimeMillis() - startTime
                     val screenEntity = result.data
-                    // Мы получили данные? Значит контент ГОТОВ.
-                    // Неважно, есть картинка в кэше или нет.
+                    Log.i("BaseViewModel", "✅ [Compose] Конфигурация загружена за ${duration}ms для '$key':")
+                    Log.i("BaseViewModel", "   - title: '${screenEntity.title}'")
+                    Log.i("BaseViewModel", "   - description: '${screenEntity.description}'")
+                    Log.i("BaseViewModel", "   - backgroundImageUrl: '${screenEntity.backgroundImageUrl}'")
+
+                    // Обновляем state с новой конфигурацией
                     reduceState { updateState(screenEntity, true) }
+                    Log.i("BaseViewModel", "✅ [Compose] State обновлен с конфигурацией для '$key'")
                 }
                 is Resource.Error -> {
-                    Log.e("BaseViewModel", "Error: ${result.message}")
+                    val duration = System.currentTimeMillis() - startTime
+                    Log.e("BaseViewModel", "❌ [Compose] Ошибка загрузки конфигурации для '$key' за ${duration}ms: ${result.message}")
                     // Даже если ошибка, показываем дефолты
                     reduceState { updateState(null, true) }
+                    Log.d("BaseViewModel", "📋 [Compose] State обновлен с дефолтными значениями для '$key'")
                 }
                 is Resource.Loading -> {
-                    Log.d("BaseViewModel", "Loading screen config...")
+                    Log.d("BaseViewModel", "⏳ [Compose] Загрузка конфигурации для '$key'...")
                 }
             }
         }
@@ -170,47 +182,47 @@ abstract class BaseViewModel<ST> : ViewModel() {
         configs: Map<String, String>, // ключ -> slug
         onUpdate: (results: Map<String, Pair<ScreenEntity?, Boolean>>) -> ST
     ) {
-        Log.e("BaseViewModel", "========== loadMultipleScreenConfigs CALLED ==========")
-        Log.e("BaseViewModel", "Thread: ${Thread.currentThread().name}")
+        Log.i("BaseViewModel", "🔄 [Compose] Загружаем ${configs.size} конфигураций")
+        Log.d("BaseViewModel", "📋 [Compose] Карта конфигураций: ${configs.entries.joinToString { "${it.key} -> ${it.value}" }}")
+
         launch {
             try {
-                Log.e("BaseViewModel", "loadMultipleScreenConfigs started with ${configs.size} configs")
+                val startTime = System.currentTimeMillis()
                 val results = mutableMapOf<String, Pair<ScreenEntity?, Boolean>>()
 
                 configs.forEach { (key, slug) ->
-                    Log.e("BaseViewModel", "Processing config: key=$key, slug=$slug")
+                    Log.d("BaseViewModel", "🔍 [Compose] Обрабатываем: key='$key', slug='$slug'")
 
                     if (this@BaseViewModel !is ComposeScreenConfigurable) {
-                        Log.e("BaseViewModel", "ViewModel is NOT ComposeScreenConfigurable!")
+                        Log.e("BaseViewModel", "❌ [Compose] ViewModel не реализует ComposeScreenConfigurable!")
                         results[key] = null to true
                         return@forEach
                     }
 
-                    Log.e("BaseViewModel", "Calling getScreenConfigUseCase for slug: $slug")
                     when (val result = getScreenConfigUseCase(slug)) {
                         is Resource.Success -> {
-                            Log.e("BaseViewModel", "SUCCESS for '$slug': ${result.data.title}")
                             val screenEntity = result.data
-                            // Всегда разрешаем загрузку картинок (из кеша или сети)
+                            Log.i("BaseViewModel", "✅ [Compose] Успех для '$slug' (key='$key'): title='${screenEntity.title}'")
                             results[key] = screenEntity to true
                         }
                         is Resource.Error -> {
-                            Log.e("BaseViewModel", "ERROR loading config '$slug': ${result.message}")
+                            Log.e("BaseViewModel", "❌ [Compose] Ошибка для '$slug' (key='$key'): ${result.message}")
                             results[key] = null to true
                         }
                         is Resource.Loading -> {
-                            Log.e("BaseViewModel", "LOADING state for config '$slug' - THIS SHOULD NOT HAPPEN!")
+                            Log.w("BaseViewModel", "⚠️ [Compose] Loading state для '$slug' - не должно происходить!")
                         }
                     }
                 }
 
-                Log.e("BaseViewModel", "All configs processed, results size: ${results.size}")
+                val duration = System.currentTimeMillis() - startTime
+                Log.i("BaseViewModel", "✅ [Compose] Все ${results.size} конфигураций обработаны за ${duration}ms")
+
                 // Обновляем state со всеми результатами
                 reduceState { onUpdate(results) }
-                Log.e("BaseViewModel", "State updated via onUpdate")
+                Log.i("BaseViewModel", "✅ [Compose] State обновлен со всеми конфигурациями")
             } catch (e: Exception) {
-                Log.e("BaseViewModel", "EXCEPTION in loadMultipleScreenConfigs: ${e.message}", e)
-                e.printStackTrace()
+                Log.e("BaseViewModel", "❌ [Compose] Исключение в loadMultipleScreenConfigs: ${e.message}", e)
             }
         }
     }

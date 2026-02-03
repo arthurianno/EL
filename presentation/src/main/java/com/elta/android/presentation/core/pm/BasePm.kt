@@ -119,34 +119,46 @@ abstract class BasePm(
 
         // Если нет ключа или useCase - сразу говорим что готовы (покажутся дефолты)
         if (key == null || useCase == null) {
+            Log.d("BasePm", "⏭️ Пропускаем загрузку конфигурации: key=$key, useCase=$useCase")
             imagePreloadState.consumer.accept(true)
             return
         }
 
+        Log.i("BasePm", "🔄 Загружаем конфигурацию для ключа: '$key'")
         launch {
+            val startTime = System.currentTimeMillis()
             when (val result = useCase(key)) {
                 is Resource.Success -> {
+                    val duration = System.currentTimeMillis() - startTime
                     val screenEntity = result.data
+                    Log.i("BasePm", "✅ Конфигурация загружена за ${duration}ms для '$key':")
+                    Log.i("BasePm", "   - title: '${screenEntity.title}'")
+                    Log.i("BasePm", "   - description: '${screenEntity.description}'")
+                    Log.i("BasePm", "   - backgroundImageUrl: '${screenEntity.backgroundImageUrl}'")
+
                     screenConfigState.consumer.accept(screenEntity)
 
                     val imageUrl = screenEntity.backgroundImageUrl
                     if (imageUrl != null) {
+                        Log.d("BasePm", "🖼️ Изображение будет загружено из: $imageUrl")
                         // Всегда разрешаем загрузку картинки (из кеша или сети)
                         imagePreloadState.consumer.accept(true)
                     } else {
+                        Log.d("BasePm", "📋 URL изображения отсутствует, используем дефолтное")
                         // URL нет - сразу true (покажется дефолт)
                         imagePreloadState.consumer.accept(true)
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("BasePm", "Error loading screen config: ${result.message}")
+                    val duration = System.currentTimeMillis() - startTime
+                    Log.e("BasePm", "❌ Ошибка загрузки конфигурации для '$key' за ${duration}ms: ${result.message}")
                     // При ошибке - сразу true (покажется дефолт)
                     imagePreloadState.consumer.accept(true)
                     // Можно отправить null, чтобы фрагмент знал что конфига нет
                     //screenConfigState.consumer.accept(null)
                 }
                 is Resource.Loading -> {
-                    Log.d("BasePm", "Loading screen config...")
+                    Log.d("BasePm", "⏳ Загрузка конфигурации для '$key'...")
                 }
             }
         }
