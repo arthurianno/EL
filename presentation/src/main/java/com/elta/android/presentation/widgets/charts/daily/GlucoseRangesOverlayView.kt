@@ -60,10 +60,13 @@ class GlucoseRangesOverlayView @JvmOverloads constructor(
         normalRect: Rect,
         lowRect: Rect,
         lowText: String,
-        highText: String
+        highText: String,
+        parentFullViewHeight: Int
     ) {
         this.lowText = lowText
         this.highText = highText
+        // Обновляем высоту overlay для синхронизации с динамической высотой графика
+        this.fullViewHeight = parentFullViewHeight
         highRangeStartRect.set(0, highRect.top, rangeBarWidth, highRect.bottom)
         highRangeEndRect.set(
             fullViewWidth - rangeBarWidth,
@@ -88,6 +91,7 @@ class GlucoseRangesOverlayView @JvmOverloads constructor(
             lowRect.bottom
         )
         invalidate()
+        requestLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

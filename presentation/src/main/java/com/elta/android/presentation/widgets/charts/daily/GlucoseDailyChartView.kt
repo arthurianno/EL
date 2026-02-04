@@ -70,7 +70,15 @@ class GlucoseDailyChartView @JvmOverloads constructor(
     private var timeTextColor = 0
     private var chartPointTitleColor = 0
 
-    private var clearChartHeight = 0f
+    private val clearChartHeight: Float
+        get() {
+            val baseHeight = FULL_CHART_HEIGHT.dpToPx(context)
+            return if (_chartDataModel != null) {
+                baseHeight * dataModel().chartRangesModel.heightMultiplier
+            } else {
+                baseHeight
+            }
+        }
     private val boxHeight
         get() = clearChartHeight / 3
     private var fullViewHeight = 0f
@@ -366,7 +374,7 @@ class GlucoseDailyChartView @JvmOverloads constructor(
 
         sectionsDividerWidth = SECTIONS_DIVIDER_WIDTH.dpToPx(context)
         chartOffset = CHART_OFFSET.dpToPx(context)
-        clearChartHeight = FULL_CHART_HEIGHT.dpToPx(context)
+        // clearChartHeight будет вычисляться динамически в getChartHeight()
         singleHourWidth = SINGLE_HOUR_WIDTH.dpToPx(context)
         timeLineOffset = TIME_LINE_OFFSET.dpToPx(context)
         chartItemRadius = ITEM_RADIUS.dpToPx(context)
@@ -491,7 +499,8 @@ class GlucoseDailyChartView @JvmOverloads constructor(
             normalRangeRect,
             lowRangeRect,
             dataModel().chartRangesModel.start.format(),
-            dataModel().chartRangesModel.end.format()
+            dataModel().chartRangesModel.end.format(),
+            fullViewHeight.toInt()
         )
     }
 
@@ -507,12 +516,25 @@ class GlucoseDailyChartView @JvmOverloads constructor(
         val x = startX + singleHourWidth * (minutesOfEvent.toFloat() / MINUTES_IN_HOUR)
         with(dataModel().chartRangesModel) {
             val addY = when {
-                highMax != null && value > normalMax -> max(
-                    boxHeight * (highMax - value) / (highMax - normalMax),
-                    chartOffset.toDouble()
-                )
-                lowMax != null && value < lowMax -> boxHeight * 2 + boxHeight * (lowMax - value) / (lowMax)
-                else -> boxHeight + boxHeight * (normalMax - value) / (normalMax - start)
+                highMax != null && value > normalMax -> {
+                    // Улучшенный расчет для высоких значений
+                    val highRange = highMax - normalMax
+                    val valueOffset = value - normalMax
+                    val relativePosition = valueOffset / highRange
+                    // Используем весь доступный диапазон boxHeight, оставляя минимум chartOffset от верха
+                    max(
+                        chartOffset.toDouble(),
+                        boxHeight * (1 - relativePosition)
+                    )
+                }
+                lowMax != null && value < lowMax -> {
+                    // Расчет для низких значений
+                    boxHeight * 2 + boxHeight * (lowMax - value) / lowMax
+                }
+                else -> {
+                    // Расчет для нормальных значений
+                    boxHeight + boxHeight * (normalMax - value) / (normalMax - start)
+                }
             }
             val y = top + addY
             return PointF(x, y.toFloat())

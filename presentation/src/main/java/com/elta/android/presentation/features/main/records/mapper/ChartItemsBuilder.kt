@@ -9,6 +9,7 @@ import com.elta.android.presentation.widgets.charts.daily.models.ChartDataModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemModel
 import com.elta.android.presentation.widgets.charts.daily.models.ChartItemValueType
 import com.elta.android.presentation.widgets.charts.daily.models.ChartRangesModel
+import kotlin.math.ceil
 
 object ChartItemsBuilder {
 
@@ -39,12 +40,25 @@ object ChartItemsBuilder {
 
     private fun DailyGlucoseModel.ranges(): ChartRangesModel {
         val start = glucoseLevelSettings.normal.start
+        val normalMax = glucoseLevelSettings.normal.end
         val lowMax = when {
             minEvent != null -> glucoseLevelSettings.low.end
             else -> null
         }
-        val normalMax = glucoseLevelSettings.normal.end
-        val highMax = maxEvent?.value
+
+        // Динамическое вычисление highMax с умным округлением
+        val highMax = maxEvent?.value?.let { maxValue ->
+            if (maxValue > normalMax) {
+                val range = maxValue - normalMax
+                // Округляем до "красивого" числа с запасом для лучшей визуализации
+                when {
+                    range > 20 -> ceil((maxValue + 5) / 10.0) * 10  // Округление до 10 с запасом
+                    range > 10 -> ceil((maxValue + 3) / 5.0) * 5    // Округление до 5 с запасом
+                    else -> maxValue + 2  // Добавляем небольшой запас
+                }
+            } else null
+        }
+
         val end = glucoseLevelSettings.normal.end
         return ChartRangesModel(start, end, normalMax, lowMax, highMax)
     }

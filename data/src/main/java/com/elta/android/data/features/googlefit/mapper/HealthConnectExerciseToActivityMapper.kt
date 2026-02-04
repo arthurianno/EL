@@ -11,10 +11,11 @@ import javax.inject.Inject
 class HealthConnectExerciseToActivityMapper @Inject constructor() : Mapper<ExerciseSessionRecord, ActivityDto> {
 
     override fun mapFromObject(source: ExerciseSessionRecord): ActivityDto {
+        val durationMillis = source.endTime.toEpochMilli() - source.startTime.toEpochMilli()
         return ActivityDto(
             id = source.metadata.id.hashCode().toString(),
             activityType = mapExerciseTypeToString(source.exerciseType),
-            duration = source.endTime.toEpochMilli() - source.startTime.toEpochMilli(),
+            duration = durationMillis / 1000, // Convert milliseconds to seconds
             additionTime = source.startTime.toEpochMilli(),
             note = source.notes ?: source.title ?: ""
         )
