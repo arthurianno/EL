@@ -207,47 +207,72 @@ class AppPm @Inject constructor(
         preloadScreensAction.observable
             .doOnNext { Log.i("AppPM", "🎬 preloadScreensAction triggered!") }
             .flatMapSingle {
-                Log.i("AppPM", "🚀 Начинаем предзагрузку конфигураций экранов...")
-                rxSingle { getAllScreensUseCase.invoke() }
-                    .doOnSuccess { Log.i("AppPM", "📦 getAllScreensUseCase завершен успешно") }
-                    .doOnError { error -> Log.e("AppPM", "❌ getAllScreensUseCase ошибка: ${error.message}") }
+                Log.i("AppPM", "🚀 Проверяем, нужно ли обновлять конфигурации...")
+
+                // Сначала проверяем, нужно ли обновлять конфиги
+                rxSingle { shouldRefreshScreensUseCase.invoke() }
+            }
+            .flatMapSingle { shouldRefresh ->
+                if (shouldRefresh) {
+                    Log.i("AppPM", "✅ Прошло 24+ часа, начинаем загрузку конфигураций экранов...")
+
+                    rxSingle { getAllScreensUseCase.invoke() }
+                        .doOnSuccess { Log.i("AppPM", "📦 getAllScreensUseCase завершен успешно") }
+                        .doOnError { error -> Log.e("AppPM", "❌ getAllScreensUseCase ошибка: ${error.message}") }
+                } else {
+                    Log.i("AppPM", "⏭️ Обновление не требуется, используем кэш")
+                    // Возвращаем успешный результат без загрузки
+                    Single.just(Resource.Success(emptyList<com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity>()))
+                }
             }
             .flatMapSingle { result ->
                 Log.i("AppPM", "🔀 Обрабатываем результат: ${result.javaClass.simpleName}")
                 when (result) {
                     is Resource.Success -> {
-                        Log.i("AppPM", "✅ Получен результат: ${result.data.size} экранов")
-                        Log.i("AppPM", "📋 Список слагов: ${result.data.joinToString(", ") { it.slug }}")
+                        // Если список не пустой - значит были загружены данные с сервера
+                        if (result.data.isNotEmpty()) {
+                            Log.i("AppPM", "✅ Получен результат: ${result.data.size} экранов")
+                            Log.i("AppPM", "📋 Список слагов: ${result.data.joinToString(", ") { it.slug }}")
 
-                        // Предзагружаем изображения
-                        rxSingle(Dispatchers.IO) {
-                            val totalStartTime = System.currentTimeMillis()
-                            val uniqueImages = result.data
-                                .mapNotNull { it.backgroundImageUrl }
-                                .distinct()
+                            // Обновляем время последнего обновления
+                            rxSingle { updateLastRefreshTimeUseCase.invoke() }
+                                .doOnSuccess { Log.i("AppPM", "⏰ Время последнего обновления сохранено") }
+                                .subscribe()
+                                .untilDestroy()
+                        } else {
+                            Log.i("AppPM", "📦 Используем кэшированные конфигурации")
+                        }
 
-                            Log.i("AppPM", "🖼️ Найдено ${uniqueImages.size} уникальных изображений для предзагрузки")
-                            if (uniqueImages.isNotEmpty()) {
-                                Log.i("AppPM", "📸 URLs изображений:")
-                                uniqueImages.forEachIndexed { i, url ->
-                                    Log.i("AppPM", "   ${i + 1}. $url")
+                        // Предзагружаем изображения (если данные есть)
+                        if (result.data.isNotEmpty()) {
+                            rxSingle(Dispatchers.IO) {
+                                val totalStartTime = System.currentTimeMillis()
+                                val uniqueImages = result.data
+                                    .mapNotNull { it.backgroundImageUrl }
+                                    .distinct()
+
+                                Log.i("AppPM", "🖼️ Найдено ${uniqueImages.size} уникальных изображений для предзагрузки")
+                                if (uniqueImages.isNotEmpty()) {
+                                    Log.i("AppPM", "📸 URLs изображений:")
+                                    uniqueImages.forEachIndexed { i, url ->
+                                        Log.i("AppPM", "   ${i + 1}. $url")
+                                    }
                                 }
-                            }
 
-                            var successCount = 0
-                            var failCount = 0
-                            val imageLoader = imageLoader(context)
+                                var successCount = 0
+                                var failCount = 0
+                                val imageLoader = imageLoader(context)
 
-                            uniqueImages.forEachIndexed { index, imageUrl ->
-                                Log.d("AppPM", "⏳ Загружаем изображение ${index + 1}/${uniqueImages.size}...")
-                                val (success, duration) = ImageCacheHelper.prefetchImage(
-                                    imageUrl,
-                                    context,
-                                    imageLoader
-                                )
-                                if (success) {
-                                    successCount++
-                                    Log.i("AppPM", "✅ Изображение ${index + 1}/${uniqueImages.size} загружено за ${duration}ms")
+                                uniqueImages.forEachIndexed { index, imageUrl ->
+                                    Log.d("AppPM", "⏳ Загружаем изображение ${index + 1}/${uniqueImages.size}...")
+                                    val (success, duration) = ImageCacheHelper.prefetchImage(
+                                        imageUrl,
+                                        context,
+                                        imageLoader
+                                    )
+                                    if (success) {
+                                        successCount++
+                                        Log.i("AppPM", "✅ Изображение ${index + 1}/${uniqueImages.size} загружено за ${duration}ms")
                                 } else {
                                     failCount++
                                     Log.w("AppPM", "⚠️ Изображение ${index + 1}/${uniqueImages.size} не загружено за ${duration}ms")
@@ -261,6 +286,13 @@ class AppPm @Inject constructor(
                             Log.i("AppPM", "✅ imagesLoadedCommand вызван!")
                             Unit
                         }.doOnSuccess { Log.i("AppPM", "✅ rxSingle с предзагрузкой завершен") }
+                        } else {
+                            // Если используем кэш - просто отмечаем что изображения загружены
+                            imagesLoadedState.consumer.accept(true)
+                            imagesLoadedCommand.consumer.accept(Unit)
+                            Log.i("AppPM", "✅ Используем кэшированные данные, пропускаем загрузку изображений")
+                            Single.just(Unit)
+                        }
                     }
 
                     is Resource.Error -> {

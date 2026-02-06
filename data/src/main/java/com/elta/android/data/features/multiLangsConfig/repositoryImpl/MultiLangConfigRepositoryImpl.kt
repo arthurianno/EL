@@ -25,6 +25,7 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
     companion object {
         private const val PREFS_NAME = "screen_config_prefs"
         private const val KEY_LAST_REFRESH = "last_refresh_timestamp"
+        private const val KEY_RANDOM_OFFSET = "random_offset_minutes"
         private const val TWENTY_FOUR_HOURS_MILLIS = 24 * 60 * 60 * 1000L
     }
 
@@ -130,7 +131,43 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
         val lastRefresh = prefs.getLong(KEY_LAST_REFRESH, 0L)
         val currentTime = System.currentTimeMillis()
 
-        return (currentTime - lastRefresh) >= TWENTY_FOUR_HOURS_MILLIS
+        // Получаем или генерируем случайное смещение ±20 минут
+        val randomOffset = getOrGenerateRandomOffset()
+
+        // Интервал = 24 часа + случайное смещение (от -20 до +20 минут)
+        val refreshInterval = TWENTY_FOUR_HOURS_MILLIS + randomOffset
+
+        val shouldRefresh = (currentTime - lastRefresh) >= refreshInterval
+
+        Log.d("MultiLangConfigRepo", "🕐 Проверка обновления конфига:")
+        Log.d("MultiLangConfigRepo", "   Последнее обновление: ${java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(lastRefresh))}")
+        Log.d("MultiLangConfigRepo", "   Текущее время: ${java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(currentTime))}")
+        Log.d("MultiLangConfigRepo", "   Прошло времени: ${(currentTime - lastRefresh) / 1000 / 60} минут")
+        Log.d("MultiLangConfigRepo", "   Интервал обновления: ${refreshInterval / 1000 / 60} минут (24ч ± ${randomOffset / 1000 / 60} мин)")
+        Log.d("MultiLangConfigRepo", "   Требуется обновление: $shouldRefresh")
+
+        return shouldRefresh
+    }
+
+    /**
+     * Получает сохраненное случайное смещение или генерирует новое (от -20 до +20 минут)
+     */
+    private fun getOrGenerateRandomOffset(): Long {
+        var offset = prefs.getLong(KEY_RANDOM_OFFSET, Long.MAX_VALUE)
+
+        // Если смещение еще не было сгенерировано
+        if (offset == Long.MAX_VALUE) {
+            // Генерируем случайное число от -20 до +20 минут
+            val randomMinutes = (-20..20).random()
+            offset = randomMinutes * 60 * 1000L
+
+            // Сохраняем смещение
+            prefs.edit { putLong(KEY_RANDOM_OFFSET, offset) }
+
+            Log.i("MultiLangConfigRepo", "🎲 Сгенерировано случайное смещение: $randomMinutes минут для этого устройства")
+        }
+
+        return offset
     }
 
     override suspend fun updateLastRefreshTime() {
