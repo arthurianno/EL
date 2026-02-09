@@ -7,19 +7,22 @@ import com.elta.android.domain.features.multiLangsConfig.model.ScreenEntity
 object ScreenMapper {
     fun ScreenDto.toEntity(lang: String = java.util.Locale.getDefault().language): ScreenEntity {
         return try {
+            val titleValue = title?.get(lang) ?: title?.get("ru")
+            val descriptionValue = description?.get(lang) ?: description?.get("ru")
+
             ScreenEntity(
                 slug = slug,
-                title = title?.get(lang) ?: title?.get("ru") ?: "",
-                description = description?.get(lang) ?: description?.get("ru") ?: "",
+                title = titleValue?.takeIf { it.isNotBlank() },
+                description = descriptionValue?.takeIf { it.isNotBlank() },
                 backgroundImageUrl = backgroundImageUrl,
                 lang = lang
             )
         } catch (e: Exception) {
-            Log.e("ScreenMapper", "❌ Ошибка маппинга для slug='$slug': ${e.message}", e)
             ScreenEntity(
                 slug = slug,
-                title = "",
-                description = "",
+                // ✅ ИЗМЕНЕНО: возвращаем null вместо пустой строки
+                title = null,
+                description = null,
                 backgroundImageUrl = backgroundImageUrl,
                 lang = lang
             )

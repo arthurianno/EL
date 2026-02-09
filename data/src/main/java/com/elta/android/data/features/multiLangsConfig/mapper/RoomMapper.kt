@@ -16,22 +16,31 @@ fun ScreenDto.toRoomEntity(): ScreenConfigEntity {
     )
 }
 
-// ScreenConfigEntity → ScreenEntity с конкретным языком (возвращает локализованные строки)
 fun ScreenConfigEntity.toLocalizedScreenEntity(lang: String): ScreenEntity {
     val gson = Gson()
     val type = object : TypeToken<Map<String, String>>() {}.type
 
-    val titleMap: Map<String, String> = gson.fromJson(this.titleJson, type)
-    val descriptionMap: Map<String, String> = gson.fromJson(this.descriptionJson, type)
+    // ✅ ДОБАВЛЕНА ЗАЩИТА: если JSON невалидный, используем пустую карту
+    val titleMap: Map<String, String> = try {
+        gson.fromJson(this.titleJson, type) ?: emptyMap()
+    } catch (e: Exception) {
+        emptyMap()
+    }
+
+    val descriptionMap: Map<String, String> = try {
+        gson.fromJson(this.descriptionJson, type) ?: emptyMap()
+    } catch (e: Exception) {
+        emptyMap()
+    }
 
     // Извлекаем только нужный язык с fallback на ru
-    val localizedTitle = titleMap[lang] ?: titleMap["ru"] ?: ""
-    val localizedDescription = descriptionMap[lang] ?: descriptionMap["ru"] ?: ""
+    val localizedTitle = titleMap[lang] ?: titleMap["ru"]
+    val localizedDescription = descriptionMap[lang] ?: descriptionMap["ru"]
 
     return ScreenEntity(
         slug = this.slug,
-        title = localizedTitle,  // Возвращаем строку
-        description = localizedDescription,  // Возвращаем строку
+        title = localizedTitle?.takeIf { it.isNotBlank() },
+        description = localizedDescription?.takeIf { it.isNotBlank() },
         backgroundImageUrl = this.backgroundImageUrl,
         lang = lang
     )

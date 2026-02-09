@@ -104,22 +104,22 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getScreenConfigFromCache(slug:String): Resource<ScreenEntity> {
         return try {
-            Log.d("MultiLangConfigRepo", "🔍 Запрашиваем конфигурацию из кеша для слага: '$slug'")
+
             val cachedScreen = dao.getConfigBySlug(slug)
             if (cachedScreen != null) {
                 val lang = getSystemLanguageCode()  // Получаем системный язык (ru, en и т.д.)
                 val screenEntity = cachedScreen.toLocalizedScreenEntity(lang)
-                Log.i("MultiLangConfigRepo", "✅ Найдена конфигурация для '$slug': title='${screenEntity.title}', lang='$lang'")
+
                 Resource.Success(screenEntity)
             } else {
-                Log.w("MultiLangConfigRepo", "⚠️ Конфигурация для слага '$slug' не найдена в кеше")
+
                 Resource.Error(
                     message = "No cached screen config found",
                     errorType = ErrorType.NOT_FOUND
                 )
             }
         } catch (e: Exception) {
-            Log.e("MultiLangConfigRepo", "❌ Ошибка получения конфигурации для '$slug': ${e.message}")
+
             Resource.Error(
                 message = e.message ?: "Unknown error",
                 errorType = ErrorType.UNKNOWN
@@ -138,13 +138,6 @@ class MultiLangConfigRepositoryImpl @Inject constructor(
         val refreshInterval = TWENTY_FOUR_HOURS_MILLIS + randomOffset
 
         val shouldRefresh = (currentTime - lastRefresh) >= refreshInterval
-
-        Log.d("MultiLangConfigRepo", "🕐 Проверка обновления конфига:")
-        Log.d("MultiLangConfigRepo", "   Последнее обновление: ${java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(lastRefresh))}")
-        Log.d("MultiLangConfigRepo", "   Текущее время: ${java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(currentTime))}")
-        Log.d("MultiLangConfigRepo", "   Прошло времени: ${(currentTime - lastRefresh) / 1000 / 60} минут")
-        Log.d("MultiLangConfigRepo", "   Интервал обновления: ${refreshInterval / 1000 / 60} минут (24ч ± ${randomOffset / 1000 / 60} мин)")
-        Log.d("MultiLangConfigRepo", "   Требуется обновление: $shouldRefresh")
 
         return shouldRefresh
     }
