@@ -145,7 +145,7 @@ object Dependencies {
             }
 
             object CameraX {
-                private const val cameraxVersion = "1.3.0-alpha05"
+                private const val cameraxVersion = "1.4.1"
 
                 const val core = "androidx.camera:camera-core:$cameraxVersion"
                 const val camera2 = "androidx.camera:camera-camera2:$cameraxVersion"
@@ -276,7 +276,7 @@ object Dependencies {
     }
 
     object ObjectBox {
-        const val version = "3.5.1"
+        const val version = "4.1.0"
 
         const val core = "io.objectbox:objectbox-kotlin:$version"
         const val browser = "io.objectbox:objectbox-android-objectbrowser:$version"
