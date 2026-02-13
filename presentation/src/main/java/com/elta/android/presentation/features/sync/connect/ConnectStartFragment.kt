@@ -61,8 +61,8 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
     override fun Content(viewModel: ConnectStartViewModel) {
         val state = viewModel.state.collectAsState()
         var expanded by remember { mutableStateOf(false) }
-        val items = listOf("Satellite Online", "Satellite Monitor", "Test 1", "Test 2")
-        var selectedItem by remember { mutableStateOf(items.first()) }
+        //val items = listOf("Satellite Online", "Satellite Monitor", "Test 1", "Test 2")
+        //var selectedItem by remember { mutableStateOf(items.first()) }
         GetLocalProperties { dimens, _, colors, _, _ ->
 
             AnimatedVisibility(
@@ -85,49 +85,49 @@ class ConnectStartFragment : BaseComposeFragment<ConnectStartViewModel>() {
                             ?: stringResource(id = R.string.sync_connect_start_title)
                     )
 
-                    // ВЫПАДАЮЩИЙ СПИСОК ЗДЕСЬ
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = dimens.contentPadding)
-                            .padding(vertical = dimens.smallDim)
-                    ) {
-                        OutlinedButton(
-                            onClick = { expanded = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = colors.white
-                            )
-                        ) {
-                            Text(
-                                text = selectedItem,
-                                modifier = Modifier.weight(1f),
-                                color = colors.blackBlue
-                            )
-                            Text(
-                                text = "▼",
-                                color = colors.blackBlue
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items.forEach { item ->
-                                DropdownMenuItem(
-                                    onClick = {
-                                        selectedItem = item
-                                        expanded = false
-                                    }
-                                ) {
-                                    Text(text = item)
-                                }
-                            }
-                        }
-                    }
-                    VSpacerSmall()
+//                    // ВЫПАДАЮЩИЙ СПИСОК ЗДЕСЬ
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = dimens.contentPadding)
+//                            .padding(vertical = dimens.smallDim)
+//                    ) {
+//                        OutlinedButton(
+//                            onClick = { expanded = true },
+//                            modifier = Modifier.fillMaxWidth(),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                backgroundColor = colors.white
+//                            )
+//                        ) {
+//                            Text(
+//                                text = selectedItem,
+//                                modifier = Modifier.weight(1f),
+//                                color = colors.blackBlue
+//                            )
+//                            Text(
+//                                text = "▼",
+//                                color = colors.blackBlue
+//                            )
+//                        }
+//
+//                        DropdownMenu(
+//                            expanded = expanded,
+//                            onDismissRequest = { expanded = false },
+//                            modifier = Modifier.fillMaxWidth()
+//                        ) {
+//                            items.forEach { item ->
+//                                DropdownMenuItem(
+//                                    onClick = {
+//                                        selectedItem = item
+//                                        expanded = false
+//                                    }
+//                                ) {
+//                                    Text(text = item)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    VSpacerSmall()
                     Body(
                         state.value.screenConfig?.description
                             ?: stringResource(id = R.string.sync_connect_start_text)
