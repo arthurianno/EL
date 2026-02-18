@@ -18,11 +18,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!-- Health Connect permissions -->
+    <!-- Health Connect READ permissions (для чтения данных на Android 14+) -->
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
-    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
     <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <uses-permission android:name="android.permission.health.WRITE_STEPS" />
 
     <application>
         <!-- SOCIAL NETWORKS -->
