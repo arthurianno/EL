@@ -1,6 +1,5 @@
 package com.elta.android.presentation.features.home.pm
 
-import android.content.Context
 import android.util.Log
 import com.elta.android.common.errors.BluetoothNotEnabledError
 import com.elta.android.common.errors.BluetoothPermissionNotGrantedError
@@ -34,6 +33,7 @@ import com.elta.android.domain.features.user.model.GlucoseFormat
 import com.elta.android.domain.features.userinfo.interactor.GetUserInfoUseCase
 import com.elta.android.domain.features.userinfo.interactor.UpdateUserInfoUseCase
 import com.elta.android.domain.features.userinfo.model.UserInfo
+import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.domain.features.version.interactor.SendAppVersionUseCase
 import com.elta.android.presentation.Clicks
 import com.elta.android.presentation.Dialogs
@@ -99,7 +99,6 @@ class HomeFlowPm @Inject constructor(
     private val shouldShowGlucoseDialog: ShouldManualGlucoseRemindShowUseCase,
     private val setManualGlucoseRemind: SetManualGlucoseRemindUseCase,
     private val appMetric: AppMetricTracker,
-    private val context: Context,
     services: ServiceFacade
 ) : BaseFlowPm(services), ConnectionListener {
 
@@ -736,6 +735,7 @@ class HomeFlowPm @Inject constructor(
 
     override fun handleError(error: Throwable) {
         if (error is InvalidRefreshTokenError) {
+            OneSignalTags.logout()
             logOutUseCase.execute()
                 .subscribe()
                 .untilDestroy()

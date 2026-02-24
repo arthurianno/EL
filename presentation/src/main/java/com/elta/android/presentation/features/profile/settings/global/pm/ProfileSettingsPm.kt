@@ -34,6 +34,7 @@ import com.elta.android.presentation.core.ui.dialog.DialogResult
 import com.elta.android.presentation.features.profile.settings.emias.viewmodel.EMIAS_TIMEOUT
 import com.elta.android.presentation.features.profile.settings.global.ui.adapter.items.ProfileSettingsItem.Type
 import com.elta.android.presentation.features.profile.settings.global.ui.builder.ProfileSettingsItemsBuilder
+import com.elta.android.presentation.utils.OneSignalTags
 import com.nullgr.core.rx.RxBus
 import com.nullgr.core.rx.SingletonRxBusProvider
 import io.reactivex.Observable
@@ -132,6 +133,7 @@ class ProfileSettingsPm @Inject constructor(
         logoutAction.observable
             .flatMapCompletable {
                 logOutUseCase.execute()
+                    .doOnComplete { OneSignalTags.logout() }
             }
             .doOnError(::handleError)
             .subscribe()

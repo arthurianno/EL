@@ -43,6 +43,7 @@ android {
     buildTypes {
         release {
             buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
+            buildConfigField("String", "CLEAN_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
             buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
@@ -52,6 +53,7 @@ android {
         debug {
             val debugVersionName = "\"${version.versionName}-debug(${version.buildNumber})\""
             buildConfigField("String", "APP_VERSION", debugVersionName)
+            buildConfigField("String", "CLEAN_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.GooglePlay.storeName}\"")
             buildConfigField("boolean", "DEBUG", "true")
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.dev.path}\"")
@@ -61,6 +63,7 @@ android {
         }
         create("huawei") {
             buildConfigField("String", "APP_VERSION", "\"${version.versionName}\"")
+            buildConfigField("String", "CLEAN_VERSION", "\"${version.versionName}\"")
             buildConfigField("String", "APP_STORE", "\"${AppStore.HuaweiAppGallery.storeName}\"")
             buildConfigField("String", "SERVER_URL", "\"${BackendVariant.prod.path}\"")
             buildConfigField("String", "BUILD_NUMBER", "\"${version.buildNumber}\"")
@@ -162,6 +165,7 @@ dependencies {
     implementation(Dependencies.Google.GoogleMap.location)
     implementation(Dependencies.CustomView.cardView)
     implementation(Dependencies.Webim.core)
+    implementation(Dependencies.OneSignal.core)
 
     implementation(Dependencies.Jetpack.Paging.pagingRuntime)
     implementation(Dependencies.Jetpack.Paging.pagingCompose)

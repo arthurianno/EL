@@ -41,6 +41,7 @@ import com.elta.android.presentation.core.pm.BasePm
 import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.core.pm.listeners.ConnectionListener
 import com.elta.android.presentation.features.app.model.SyncStatus
+import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.presentation.utils.cacheHelper.ImageCacheHelper
 import com.elta.android.presentation.utils.dynamiclinks.DynamicLinkNavigationMapper
 import com.elta.android.presentation.utils.dynamiclinks.NotificationNavigationMapper
@@ -120,14 +121,20 @@ class AppPm @Inject constructor(
                         getProfileSettings.execute()
                             .map { userInfo to it.isOnboarded }
                     }
-                    .doOnSuccess {
-                        getUserId.execute()
-                            .doOnSuccess {
-                                firebaseStorage.userLogin = it
-                                crashlyticsReport.setUserId(it.hideEmail())
-                            }
-                            .subscribe()
-                            .untilDestroy()
+                    .flatMap { info ->
+                        if (info.first.isUserLoggedIn == true) {
+                            getUserId.execute()
+                                .doOnSuccess { userId ->
+                                    firebaseStorage.userLogin = userId
+                                    crashlyticsReport.setUserId(userId.hideEmail())
+                                    OneSignalTags.login(userId, context)
+                                }
+                                .doOnError { Timber.e(it, "OneSignal login failed") }
+                                .map { info }
+                                .onErrorReturnItem(info)
+                        } else {
+                            Single.just(info)
+                        }
                     }
                     .doOnSuccess { info ->
                         when {

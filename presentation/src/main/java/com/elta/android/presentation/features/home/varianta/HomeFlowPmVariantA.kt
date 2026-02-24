@@ -1,6 +1,7 @@
 package com.elta.android.presentation.features.home.pm
 
 import android.util.Log
+import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.common.errors.BluetoothNotEnabledErrorVariantA
 import com.elta.android.common.errors.BluetoothScannerError
 import com.elta.android.common.errors.CommandError
@@ -715,6 +716,7 @@ class HomeFlowPmVariantA @Inject constructor(
 
     override fun handleError(error: Throwable) {
         if (error is InvalidRefreshTokenError) {
+            OneSignalTags.logout()
             logOutUseCase.execute()
                 .subscribe()
                 .untilDestroy()

@@ -29,6 +29,7 @@ import com.elta.android.presentation.core.pm.ServiceFacade
 import com.elta.android.presentation.features.profile.main.ui.adapter.items.MainProfileIndicatorItem
 import com.elta.android.presentation.features.profile.main.ui.builder.MainProfileOptionsItemsBuilder
 import com.elta.android.presentation.features.profile.settings.reminders.utils.RemindersManager
+import com.elta.android.presentation.utils.OneSignalTags
 import com.elta.android.presentation.utils.createFullName
 import com.nullgr.core.resources.ResourceProvider
 import io.reactivex.Completable
@@ -114,6 +115,7 @@ class MainProfilePm @Inject constructor(
                 logOutUseCase.execute()
                     .startWith(Completable.fromCallable { remindersManager.cancelAll() })
                     .doOnComplete {
+                        OneSignalTags.logout()
                         analytics.clearStableParams()
                         router.newRootFlow(Screens.GreetingFlow)
                     }

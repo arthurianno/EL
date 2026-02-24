@@ -1,8 +1,10 @@
+package com.elta.android
+
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.elta.android.BuildConfig
 import com.elta.android.presentation.features.app.ui.AppActivity
+import com.elta.android.presentation.utils.OneSignalTags
 import com.onesignal.OneSignal
 import com.onesignal.notifications.INotificationClickEvent
 import com.onesignal.notifications.INotificationClickListener
@@ -23,10 +25,11 @@ object OneSignalInitializer {
 
         CoroutineScope(Dispatchers.Main).launch {
             val accepted = OneSignal.Notifications.requestPermission(true)
-           Log.e("OneSignal", "Permission accepted: $accepted")
+            Log.e("OneSignal", "Permission accepted: $accepted")
         }
 
-        OneSignal.User.addTag("environment", BuildConfig.ENVIRONMENT_TAG)
+        // Apply default tags for anonymous user immediately after init.
+        OneSignalTags.apply(context)
 
         // Обработчик для показа уведомлений в foreground (без изменений)
         OneSignal.Notifications.addForegroundLifecycleListener(object : INotificationLifecycleListener {
